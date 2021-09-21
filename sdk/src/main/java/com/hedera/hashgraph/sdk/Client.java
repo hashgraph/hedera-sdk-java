@@ -287,7 +287,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     @Override
-    public synchronized void pingSync(AccountId nodeAccountId) {
+    public Void ping(AccountId nodeAccountId) {
         try {
             new AccountBalanceQuery()
                 .setAccountId(nodeAccountId)
@@ -296,6 +296,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         } catch (Exception e) {
             // Do nothing as this is just a ping
         }
+
+        return null;
     }
 
     @Override
@@ -312,10 +314,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     @Override
-    public synchronized void pingAllSync() {
+    public synchronized Void pingAll() {
         for (var nodeAccountId : network.network.values()) {
-            pingSync(nodeAccountId);
+            ping(nodeAccountId);
         }
+
+        return null;
     }
 
     @Override

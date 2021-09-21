@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import io.grpc.CallOptions;
-import io.grpc.Deadline;
+import io.grpc.ClientCall;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
@@ -159,7 +158,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    abstract void onExecute(Client client) throws Exception;
+    abstract void onExecute(Client client) throws TimeoutException, PrecheckStatusException;
 
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
@@ -185,93 +184,49 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    public O executeSync(Client client) throws Exception {
-        return executeSync(client, client.getRequestTimeout());
+    public O execute(Client client) throws TimeoutException, PrecheckStatusException {
+        return execute(client, client.getRequestTimeout());
     }
 
-    public O executeSync(Client client, Duration timeout) throws Exception {
+    public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
+        Throwable lastException = null;
+
         mergeFromClient(client);
-
         onExecute(client);
-
         checkNodeAccountIds();
         setNodesFromNodeAccountIds(client);
 
-        Throwable lastException = null;
+        for (int attempt = 1; attempt <= maxAttempts + 1; attempt++) {
+            var grpcRequest = new GrpcRequest(attempt);
 
-        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
-
-            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            long delay = (long) Math.min(minBackoff.toMillis() * Math.pow(2, attempt - 1), maxBackoff.toMillis());
-
-            var node = nodes.get(nextNodeIndex);
-            node.inUse();
-
-            logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
-
-            if (!node.isHealthy()) {
-                logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.accountId, attempt, node.delayUntil);
-                delay(node.delay());
+            if (!grpcRequest.node.isHealthy()) {
+                delay(grpcRequest.node.delay);
+                continue;
             }
-
-            var methodDescriptor = getMethodDescriptor();
-            var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT.withDeadline(Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS)));
-            var request = makeRequest();
-
-            // advance the internal index
-            // non-free queries and transactions map to more than 1 actual transaction and this will cause
-            // the next invocation of makeRequest to return the _next_ transaction
-            advanceRequest();
-
-            var startAt = System.nanoTime();
 
             ResponseT response = null;
 
             try {
-                response = ClientCalls.blockingUnaryCall(call, request);
+                response = ClientCalls.blockingUnaryCall(grpcRequest.call, grpcRequest.request);
             } catch (Throwable e) {
                 lastException = e;
             }
 
-            var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
-
-            if (lastException != null && shouldRetryExceptionally(lastException)) {
-                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                    node.accountId, delay, attempt, lastException.getMessage());
-
-                node.increaseDelay();
-                delay(delay);
+            if (response == null && grpcRequest.shouldRetryExceptionally(lastException)) {
+                delay(grpcRequest.delay);
                 continue;
             }
 
-            node.decreaseDelay();
-
-            var responseStatus = mapResponseStatus(Objects.requireNonNull(response));
-
-            logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
-                responseStatus, latency, node.accountId, attempt, response);
-
-            switch (shouldRetry(responseStatus, response)) {
+            switch (grpcRequest.shouldRetry(Objects.requireNonNull(response))) {
                 case Retry:
-                    // the response has been identified as failing or otherwise
-                    // needing a retry let's do this again after a delay
-                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                        node.accountId, delay, attempt, responseStatus);
-
-                    lastException = new PrecheckStatusException(responseStatus, getTransactionId());
-                    delay(delay);
-
+                    lastException = grpcRequest.mapStatusException();
+                    delay(grpcRequest.delay);
                     continue;
                 case Error:
-                    // request to hedera failed in a non-recoverable way
-                    throw mapStatusError(responseStatus,
-                        getTransactionId(),
-                        response
-                    );
+                    throw grpcRequest.mapStatusException();
                 case Finished:
                 default:
-                    // successful response from Hedera
-                    return mapResponse(response, node.accountId, request);
+                    return grpcRequest.mapResponse();
             }
         }
 
@@ -302,25 +257,21 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
-        if (attempt > Objects.requireNonNull(maxAttempts)) {
-            return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
-        }
-
+    private Node getNodeForExecute(int attempt) {
         var node = nodes.get(nextNodeIndex);
         node.inUse();
 
         logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
 
+        var nodeIsHealthy = node.isHealthy();
         if (!node.isHealthy()) {
             logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.accountId, attempt, node.delayUntil);
-
-            return Delayer.delayFor(node.delay(), client.executor)
-                .thenCompose((v) -> executeAsync(client, attempt + 1, lastException));
         }
 
-        var methodDescriptor = getMethodDescriptor();
-        var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
+        return node;
+    }
+
+    private ProtoRequestT getRequestForExecute() {
         var request = makeRequest();
 
         // advance the internal index
@@ -328,19 +279,23 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         // the next invocation of makeRequest to return the _next_ transaction
         advanceRequest();
 
-        var startAt = System.nanoTime();
+        return request;
+    }
 
-        return toCompletableFuture(ClientCalls.futureUnaryCall(call, request)).handle((response, error) -> {
-            var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
+    private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
+        if (attempt > maxAttempts) {
+            return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
+        }
 
-            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            long delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1), Objects.requireNonNull(maxBackoff).toMillis());
+        var grpcRequest = new GrpcRequest(attempt);
 
-            if (shouldRetryExceptionally(error)) {
-                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                    node.accountId, delay, attempt, error.getMessage());
-                node.increaseDelay();
+        if (!grpcRequest.node.isHealthy()) {
+            return Delayer.delayFor(grpcRequest.node.delay(), client.executor)
+                .thenCompose((v) -> executeAsync(client, attempt + 1, lastException));
+        }
 
+        return toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.call, grpcRequest.request)).handle((response, error) -> {
+            if (grpcRequest.shouldRetryExceptionally(error)) {
                 // the transaction had a network failure reaching Hedera
                 return executeAsync(client, attempt + 1, error);
             }
@@ -350,41 +305,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 return CompletableFuture.<O>failedFuture(error);
             }
 
-            node.decreaseDelay();
-
-            var responseStatus = mapResponseStatus(response);
-
-            logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
-                responseStatus, latency, node.accountId, attempt, response);
-
-            switch (shouldRetry(responseStatus, response)) {
+            switch (grpcRequest.shouldRetry(response)) {
                 case Retry:
-                    // the response has been identified as failing or otherwise
-                    // needing a retry let's do this again after a delay
-                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                        node.accountId, delay, attempt, responseStatus);
-                    return Delayer.delayFor(delay, client.executor)
-                        .thenCompose(
-                            (v) -> executeAsync(
-                                client,
-                                attempt + 1,
-                                new PrecheckStatusException(responseStatus, getTransactionId())
-                            )
-                        );
-
+                    return Delayer.delayFor(grpcRequest.delay, client.executor)
+                        .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
                 case Error:
-                    // request to hedera failed in a non-recoverable way
-                    return CompletableFuture.<O>failedFuture(
-                        mapStatusError(responseStatus,
-                            getTransactionId(),
-                            response
-                        )
-                    );
-
+                    return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
                 case Finished:
                 default:
-                    // successful response from Hedera
-                    return CompletableFuture.completedFuture(mapResponse(response, node.accountId, request));
+                    return CompletableFuture.completedFuture(grpcRequest.mapResponse());
             }
         }).thenCompose(x -> x);
     }
@@ -443,7 +372,84 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
+    PrecheckStatusException mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
         return new PrecheckStatusException(status, transactionId);
+    }
+
+    private class GrpcRequest {
+        Node node;
+        int attempt;
+        MethodDescriptor<ProtoRequestT, ResponseT> methodDescriptor;
+        ClientCall<ProtoRequestT, ResponseT> call;
+        ProtoRequestT request;
+        ResponseT response;
+        long startAt;
+        double latency;
+        long delay;
+        Status responseStatus;
+
+        GrpcRequest(int attempt) {
+            this.attempt = attempt;
+            node = Executable.this.getNodeForExecute(attempt);
+            methodDescriptor = Executable.this.getMethodDescriptor();
+            call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT);
+            request = Executable.this.getRequestForExecute();
+            startAt = System.nanoTime();
+
+            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
+            delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1), Objects.requireNonNull(maxBackoff).toMillis());
+        }
+
+        boolean shouldRetryExceptionally(@Nullable Throwable e) {
+            latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
+
+            var retry = Executable.this.shouldRetryExceptionally(e);
+
+            if (retry) {
+                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                    node.accountId, node.delay, attempt, e != null ? e.getMessage() : "NULL");
+                node.increaseDelay();
+            }
+
+            return retry;
+        }
+
+        PrecheckStatusException mapStatusException() {
+            // request to hedera failed in a non-recoverable way
+            return Executable.this.mapStatusError(responseStatus,
+                Executable.this.getTransactionId(),
+                response
+            );
+
+        }
+
+        O mapResponse() {
+            // successful response from Hedera
+            return Executable.this.mapResponse(response, node.accountId, request);
+        }
+
+        ExecutionState shouldRetry(ResponseT response) {
+            node.decreaseDelay();
+
+            this.response = response;
+            this.responseStatus = Executable.this.mapResponseStatus(response);
+
+            logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
+                responseStatus, latency, node.accountId, attempt, response);
+
+            var executionState = Executable.this.shouldRetry(responseStatus, response);
+
+            switch (executionState) {
+                case Retry:
+                    // the response has been identified as failing or otherwise
+                    // needing a retry let's do this again after a delay
+                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                        node.accountId, delay, attempt, responseStatus);
+                default:
+                    // Do nothing
+            }
+
+            return executionState;
+        }
     }
 }

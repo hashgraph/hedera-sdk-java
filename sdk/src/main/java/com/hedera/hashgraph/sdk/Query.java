@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Base class for all queries that can be submitted to Hedera.
@@ -107,9 +108,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return (T) this;
     }
 
-    public Hbar getCostSync(Client client) throws Exception {
+    public Hbar getCost(Client client) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeSync(client);
+        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client);
     }
 
     @Override
@@ -155,86 +156,52 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     @Override
-    void onExecute(Client client) throws Exception {
-        initWithNodeIds(client);
+    void onExecute(Client client) throws TimeoutException, PrecheckStatusException {
+        var grpcCostQuery = new GrpcCostQuery(client);
 
-        if ((paymentTransactions != null) || !isPaymentRequired()) {
+        if (grpcCostQuery.existEarly) {
             return;
         }
 
-        var operator = getOperatorFromClient(client);
-        var cost = queryPayment;
+        if (grpcCostQuery.cost == null) {
+            grpcCostQuery.setCost(getCost(client));
 
-        if (queryPayment == null) {
-            // No payment was specified so we need to go ask
-            // This is a query in its own right so we use a nested future here
-
-            cost = getCostSync(client);
-            var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.defaultMaxQueryPayment);
-
-            // Check if this is below our configured maximum query payment
-            if (cost.compareTo(maxCost) > 0) {
-                throw new MaxQueryPaymentExceededException(
-                    this,
-                    cost,
-                    maxCost
-                );
+            if (grpcCostQuery.shouldError()) {
+                throw grpcCostQuery.mapError();
             }
         }
 
-        chosenQueryPayment = cost;
-        paymentOperator = operator;
-        paymentTransactions = new ArrayList<>(nodeAccountIds.size());
-
-        for (int i = 0; i < nodeAccountIds.size(); i++) {
-            paymentTransactions.add(null);
-        }
+        grpcCostQuery.finish();
     }
 
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
-        initWithNodeIds(client);
+        var grpcCostQuery = new GrpcCostQuery(client);
 
-        if ((paymentTransactions != null) || !isPaymentRequired()) {
+        if (grpcCostQuery.existEarly) {
             return CompletableFuture.completedFuture(null);
         }
 
-        // Generate payment transactions if one was
-        // not set and payment is required
-
-        var operator = getOperatorFromClient(client);
-
         return CompletableFuture.supplyAsync(() -> {
-            if (queryPayment == null) {
-                // No payment was specified so we need to go ask
-                // This is a query in its own right so we use a nested future here
+                if (grpcCostQuery.cost == null) {
+                    // No payment was specified so we need to go ask
+                    // This is a query in its own right so we use a nested future here
+                    return getCostAsync(client).thenCompose(cost -> {
+                        grpcCostQuery.setCost(cost);
 
-                return getCostAsync(client).thenCompose(cost -> {
-                    // Check if this is below our configured maximum query payment
-                    var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.defaultMaxQueryPayment);
+                        if (grpcCostQuery.shouldError()) {
+                            return CompletableFuture.failedFuture(grpcCostQuery.mapError());
+                        }
 
-                    if (cost.compareTo(maxCost) > 0) {
-                        return CompletableFuture.failedFuture(new MaxQueryPaymentExceededException(
-                            this,
-                            cost,
-                            maxCost
-                        ));
-                    }
+                        return CompletableFuture.completedFuture(null);
+                    });
+                }
 
-                    return CompletableFuture.completedFuture(cost);
-                });
-            }
-
-            return CompletableFuture.completedFuture(queryPayment);
-        }, client.executor)
+                return CompletableFuture.completedFuture(null);
+            }, client.executor)
             .thenCompose(x -> x)
             .thenAccept((paymentAmount) -> {
-                chosenQueryPayment = paymentAmount;
-                paymentOperator = operator;
-                paymentTransactions = new ArrayList<>(nodeAccountIds.size());
-                for (int i = 0; i < nodeAccountIds.size(); i++) {
-                    paymentTransactions.add(null);
-                }
+                grpcCostQuery.finish();
             });
     }
 
@@ -323,6 +290,48 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
 
         return builder.toString();
+    }
+
+    private class GrpcCostQuery {
+        Client.Operator operator;
+        Hbar cost;
+        Hbar maxCost;
+        boolean existEarly;
+
+        GrpcCostQuery(Client client) {
+            Query.this.initWithNodeIds(client);
+            cost = Query.this.queryPayment;
+            existEarly = (Query.this.paymentTransactions != null) || !Query.this.isPaymentRequired();
+            maxCost = MoreObjects.firstNonNull(Query.this.maxQueryPayment, client.defaultMaxQueryPayment);
+
+            if (!existEarly) {
+                operator = Query.this.getOperatorFromClient(client);
+            }
+        }
+
+        GrpcCostQuery setCost(Hbar cost) {
+            this.cost = cost;
+            return this;
+        }
+
+        boolean shouldError() {
+            // Check if this is below our configured maximum query payment
+            return cost.compareTo(maxCost) > 0;
+        }
+
+        MaxQueryPaymentExceededException mapError() {
+            return new MaxQueryPaymentExceededException(Query.this, cost, maxCost);
+        }
+
+        void finish() {
+            Query.this.chosenQueryPayment = cost;
+            Query.this.paymentOperator = operator;
+            Query.this.paymentTransactions = new ArrayList<>(Query.this.nodeAccountIds.size());
+
+            for (int i = 0; i < Query.this.nodeAccountIds.size(); i++) {
+                Query.this.paymentTransactions.add(null);
+            }
+        }
     }
 
     @SuppressWarnings("NullableDereference")

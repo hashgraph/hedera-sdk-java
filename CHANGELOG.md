@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneathe
 
+### Fixed
+
+ * `Transaction[Receipt|Record]Query` will no longer error when `TransactionReceipt.status` is not `SUCCESS`. Only `*.get[Receipt|Record]()` should error when `TransactionReceipt.status` is not `SUCCESS`.
+
 ## v2.1.0
 
 ### Added
