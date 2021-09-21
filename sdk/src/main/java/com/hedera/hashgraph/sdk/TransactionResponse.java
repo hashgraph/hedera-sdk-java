@@ -29,12 +29,28 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
         this.scheduledTransactionId = scheduledTransactionId;
     }
 
+    public TransactionReceipt getReceiptSync(Client client) throws Exception {
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
+    }
+
     @Override
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
             .setTransactionId(transactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
             .executeAsync(client);
+    }
+
+    public TransactionRecord getRecordSync(Client client) throws Exception {
+        getReceiptSync(client);
+
+        return new TransactionRecordQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
     }
 
     @Override

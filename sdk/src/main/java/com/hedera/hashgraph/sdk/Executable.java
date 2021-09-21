@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import io.grpc.CallOptions;
+import io.grpc.Deadline;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
@@ -15,15 +16,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Pattern;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Nullable
     protected Integer maxAttempts = null;
@@ -151,11 +153,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return (SdkRequestT) this;
     }
 
+    void checkNodeAccountIds() {
+        if (nodeAccountIds.isEmpty()) {
+            throw new IllegalStateException("Request node account IDs were not set before executing");
+        }
+    }
+
+    abstract void onExecute(Client client) throws Exception;
+
     abstract CompletableFuture<Void> onExecuteAsync(Client client);
 
-    @Override
-    @FunctionalExecutable
-    public CompletableFuture<O> executeAsync(Client client) {
+    void mergeFromClient(Client client) {
         if (maxAttempts == null) {
             maxAttempts = client.getMaxAttempts();
         }
@@ -167,12 +175,116 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         if (minBackoff == null) {
             minBackoff = client.getMinBackoff();
         }
+    }
 
-        return onExecuteAsync(client).thenCompose((v) -> {
-            if (nodeAccountIds.isEmpty()) {
-                throw new IllegalStateException("Request node account IDs were not set before executing");
+    void delay(long delay) {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public O executeSync(Client client) throws Exception {
+        return executeSync(client, client.getRequestTimeout());
+    }
+
+    public O executeSync(Client client, Duration timeout) throws Exception {
+        mergeFromClient(client);
+
+        onExecute(client);
+
+        checkNodeAccountIds();
+        setNodesFromNodeAccountIds(client);
+
+        Throwable lastException = null;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+
+            // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
+            long delay = (long) Math.min(minBackoff.toMillis() * Math.pow(2, attempt - 1), maxBackoff.toMillis());
+
+            var node = nodes.get(nextNodeIndex);
+            node.inUse();
+
+            logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
+
+            if (!node.isHealthy()) {
+                logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.accountId, attempt, node.delayUntil);
+                delay(node.delay());
             }
 
+            var methodDescriptor = getMethodDescriptor();
+            var call = node.getChannel().newCall(methodDescriptor, CallOptions.DEFAULT.withDeadline(Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS)));
+            var request = makeRequest();
+
+            // advance the internal index
+            // non-free queries and transactions map to more than 1 actual transaction and this will cause
+            // the next invocation of makeRequest to return the _next_ transaction
+            advanceRequest();
+
+            var startAt = System.nanoTime();
+
+            ResponseT response = null;
+
+            try {
+                response = ClientCalls.blockingUnaryCall(call, request);
+            } catch (Throwable e) {
+                lastException = e;
+            }
+
+            var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
+
+            if (lastException != null && shouldRetryExceptionally(lastException)) {
+                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                    node.accountId, delay, attempt, lastException.getMessage());
+
+                node.increaseDelay();
+                delay(delay);
+                continue;
+            }
+
+            node.decreaseDelay();
+
+            var responseStatus = mapResponseStatus(Objects.requireNonNull(response));
+
+            logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
+                responseStatus, latency, node.accountId, attempt, response);
+
+            switch (shouldRetry(responseStatus, response)) {
+                case Retry:
+                    // the response has been identified as failing or otherwise
+                    // needing a retry let's do this again after a delay
+                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
+                        node.accountId, delay, attempt, responseStatus);
+
+                    lastException = new PrecheckStatusException(responseStatus, getTransactionId());
+                    delay(delay);
+
+                    continue;
+                case Error:
+                    // request to hedera failed in a non-recoverable way
+                    throw mapStatusError(responseStatus,
+                        getTransactionId(),
+                        response
+                    );
+                case Finished:
+                default:
+                    // successful response from Hedera
+                    return mapResponse(response, node.accountId, request);
+            }
+        }
+
+        throw new MaxAttemptsExceededException(lastException);
+    }
+
+    @Override
+    @FunctionalExecutable
+    public CompletableFuture<O> executeAsync(Client client) {
+        mergeFromClient(client);
+
+        return onExecuteAsync(client).thenCompose((v) -> {
+            checkNodeAccountIds();
             setNodesFromNodeAccountIds(client);
 
             return executeAsync(client, 1, null);

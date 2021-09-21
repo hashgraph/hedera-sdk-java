@@ -94,6 +94,20 @@ class AccountBalanceIntegrationTest {
     }
 
     @Test
+    @DisplayName("Can fetch operator balance using `executeSync`")
+    void canFetchOperatorBalanceUsingExecuteSync() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var balance = new AccountBalanceQuery()
+            .setAccountId(testEnv.operatorId)
+            .executeSync(testEnv.client);
+
+        assertTrue(balance.hbars.toTinybars() > 0);
+
+        testEnv.close();
+    }
+
+    @Test
     @DisplayName("Can fetch cost for the query, big max set")
     void getCostBigMaxBalanceForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1);

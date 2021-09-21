@@ -107,6 +107,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return (T) this;
     }
 
+    public Hbar getCostSync(Client client) throws Exception {
+        initWithNodeIds(client);
+        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeSync(client);
+    }
+
     @Override
     @FunctionalExecutable(type = "Hbar")
     public CompletableFuture<Hbar> getCostAsync(Client client) {
@@ -138,6 +143,54 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
+    Client.Operator getOperatorFromClient(Client client) {
+        var operator = client.getOperator();
+
+        if (operator == null) {
+            throw new IllegalStateException(
+                "`client` must have an `operator` or an explicit payment transaction must be provided");
+        }
+
+        return operator;
+    }
+
+    @Override
+    void onExecute(Client client) throws Exception {
+        initWithNodeIds(client);
+
+        if ((paymentTransactions != null) || !isPaymentRequired()) {
+            return;
+        }
+
+        var operator = getOperatorFromClient(client);
+        var cost = queryPayment;
+
+        if (queryPayment == null) {
+            // No payment was specified so we need to go ask
+            // This is a query in its own right so we use a nested future here
+
+            cost = getCostSync(client);
+            var maxCost = MoreObjects.firstNonNull(maxQueryPayment, client.defaultMaxQueryPayment);
+
+            // Check if this is below our configured maximum query payment
+            if (cost.compareTo(maxCost) > 0) {
+                throw new MaxQueryPaymentExceededException(
+                    this,
+                    cost,
+                    maxCost
+                );
+            }
+        }
+
+        chosenQueryPayment = cost;
+        paymentOperator = operator;
+        paymentTransactions = new ArrayList<>(nodeAccountIds.size());
+
+        for (int i = 0; i < nodeAccountIds.size(); i++) {
+            paymentTransactions.add(null);
+        }
+    }
+
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         initWithNodeIds(client);
@@ -149,12 +202,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         // Generate payment transactions if one was
         // not set and payment is required
 
-        var operator = client.getOperator();
-
-        if (operator == null) {
-            throw new IllegalStateException(
-                "`client` must have an `operator` or an explicit payment transaction must be provided");
-        }
+        var operator = getOperatorFromClient(client);
 
         return CompletableFuture.supplyAsync(() -> {
             if (queryPayment == null) {

@@ -287,6 +287,18 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     @Override
+    public synchronized void pingSync(AccountId nodeAccountId) {
+        try {
+            new AccountBalanceQuery()
+                .setAccountId(nodeAccountId)
+                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+                .execute(this);
+        } catch (Exception e) {
+            // Do nothing as this is just a ping
+        }
+    }
+
+    @Override
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
     public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
         return new AccountBalanceQuery()
@@ -297,6 +309,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 // Do nothing
                 return null;
             });
+    }
+
+    @Override
+    public synchronized void pingAllSync() {
+        for (var nodeAccountId : network.network.values()) {
+            pingSync(nodeAccountId);
+        }
     }
 
     @Override
