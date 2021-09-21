@@ -22,18 +22,18 @@ import java.util.concurrent.TimeoutException;
 
 class Network {
     static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
-    final ExecutorService executor;
-    final Semaphore lock = new Semaphore(1);
 
-    HashMap<String, AccountId> network = new HashMap<>();
-    HashMap<AccountId, Node> networkNodes = new HashMap<>();
-    List<Node> nodes = new ArrayList<>();
+    private final ExecutorService executor;
+    private final Semaphore lock = new Semaphore(1);
 
-    @Nullable
-    NetworkName networkName = null;
+    private HashMap<AccountId, Node> network = new HashMap<>();
+    private List<Node> nodes = new ArrayList<>();
 
     @Nullable
-    Integer maxNodesPerTransaction = null;
+    private NetworkName networkName = null;
+
+    @Nullable
+    private Integer maxNodesPerTransaction = null;
 
     private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
     private Duration nodeWaitTime = Duration.ofMillis(250);
@@ -106,24 +106,31 @@ class Network {
         return networkName;
     }
 
-    Network setNetworkName(NetworkName networkName) {
+    Network setNetworkName(@Nullable NetworkName networkName) {
         this.networkName = networkName;
 
-        switch (networkName) {
-            case MAINNET:
-                addressBook = readAddressBookResource("addressbook/mainnet.pb");
-                break;
-            case TESTNET:
-                addressBook = readAddressBookResource("addressbook/testnet.pb");
-                break;
-            case PREVIEWNET:
-                addressBook = readAddressBookResource("addressbook/previewnet.pb");
-                break;
-        }
+        if (networkName != null) {
+            switch (networkName) {
+                case MAINNET:
+                    addressBook = readAddressBookResource("addressbook/mainnet.pb");
+                    break;
+                case TESTNET:
+                    addressBook = readAddressBookResource("addressbook/testnet.pb");
+                    break;
+                case PREVIEWNET:
+                    addressBook = readAddressBookResource("addressbook/previewnet.pb");
+                    break;
+            }
 
-        if (addressBook != null) {
+            if (addressBook != null) {
+                for (var node : nodes) {
+                    node.setAddressBook(addressBook.get(node.accountId));
+                }
+            }
+        } else {
+            addressBook = null;
             for (var node : nodes) {
-                node.setAddressBook(addressBook.get(node.accountId));
+                node.setAddressBook(null);
             }
         }
 
@@ -159,17 +166,25 @@ class Network {
         }
     }
 
+    Map<String, AccountId> getNetwork() {
+        var network = new HashMap<String, AccountId>(this.nodes.size());
+
+        for (var node : nodes) {
+            network.put(node.address.toString(), node.accountId);
+        }
+
+        return network;
+    }
+
     void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
         lock.acquire();
 
         // Bypass the more complex code if the network is empty
-        if (this.network.isEmpty()) {
-            this.network = new HashMap<>(network);
-
+        if (nodes.isEmpty()) {
             for (var entry : network.entrySet()) {
                 var node = new Node(entry.getValue(), entry.getKey(), nodeWaitTime.toMillis(), executor);
-                this.networkNodes.put(entry.getValue(), node);
-                this.nodes.add(node);
+                this.network.put(entry.getValue(), node);
+                nodes.add(node);
             }
 
             Collections.shuffle(nodes);
@@ -178,7 +193,6 @@ class Network {
             return;
         }
 
-        this.network = new HashMap<>(network);
         var inverted = HashBiMap.create(network).inverse();
         var newNodeAccountIds = network.values();
         var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
@@ -186,17 +200,24 @@ class Network {
         // Remove nodes that don't exist in new network or that have a different
         // address for the same AccountId
         for (int i = 0; i < nodes.size(); i++) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
+            var remainingTime = stopAt - Instant.now().getEpochSecond();
+            var node = nodes.get(i);
+            var nodeAccountId = node.accountId;
+            var nodeAddress = node.address.toString();
+
+            // Exit early if we have no time remaining
+            if (remainingTime <= 0) {
                 lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
+            // Remove and close nodes which are not in the new network
             if (
-                !newNodeAccountIds.contains(nodes.get(i).accountId) ||
-                    !Objects.requireNonNull(inverted.get(nodes.get(i).accountId)).equals(nodes.get(i).address)
+                !newNodeAccountIds.contains(nodeAccountId) ||
+                    !Objects.requireNonNull(inverted.get(nodeAccountId)).equals(nodeAddress)
             ) {
-                networkNodes.remove(nodes.get(i).accountId);
-                nodes.get(i).close(stopAt - Instant.now().toEpochMilli());
+                this.network.remove(nodeAccountId);
+                node.close(remainingTime);
                 nodes.remove(i);
                 i--;
             }
@@ -204,11 +225,14 @@ class Network {
 
         // Add new nodes that are not present in the list
         for (var entry : inverted.entrySet()) {
-            if (networkNodes.get(entry.getKey()) == null) {
+
+            // Only add nodes which don't already exist in our network map
+            if (this.network.get(entry.getKey()) == null) {
                 var node = new Node(entry.getKey(), entry.getValue(), nodeWaitTime.toMillis(), executor);
 
+                // Add nodes to both the nodes list and network map
                 nodes.add(node);
-                networkNodes.put(entry.getKey(), node);
+                this.network.put(entry.getKey(), node);
             }
         }
 
@@ -236,8 +260,7 @@ class Network {
                 if (node.attempts >= maxNodeAttempts) {
                     node.close(30);
                     nodes.remove(i);
-                    network.remove(node.address);
-                    networkNodes.remove(node.accountId);
+                    network.remove(node.accountId);
                     i--;
                 }
             }
@@ -317,9 +340,20 @@ class Network {
         }
 
         nodes.clear();
-        networkNodes.clear();
         network.clear();
 
         lock.release();
+    }
+
+    Network setTransportSecurity(boolean transportSecurity) {
+        for (var node : nodes) {
+            node.setTransportSecurity(transportSecurity);
+        }
+
+        return this;
+    }
+
+    Node getNode(AccountId nodeAccountId) {
+        return network.get(nodeAccountId);
     }
 }

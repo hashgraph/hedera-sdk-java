@@ -20,16 +20,13 @@ class AccountBalanceIntegrationTest {
     @Test
     @DisplayName("can connect to previewnwet with TLS")
     void canConnectToPreviewnetWithTLS() throws Exception {
-        var network = new HashMap<String, AccountId>();
-        network.put("0.previewnet.hedera.com:50212", new AccountId(3));
-        network.put("1.previewnet.hedera.com:50212", new AccountId(4));
-        network.put("2.previewnet.hedera.com:50212", new AccountId(5));
-        network.put("3.previewnet.hedera.com:50212", new AccountId(6));
-        network.put("4.previewnet.hedera.com:50212", new AccountId(7));
+        var client = Client.forPreviewnet()
+            .setTransportSecurity(true)
+            .setNetworkName(null);
 
-        var client = Client.forNetwork(network);
+        for (var entry : client.getNetwork().entrySet()) {
+            assertTrue(entry.getKey().endsWith(":50212"));
 
-        for (var entry : network.entrySet()) {
             new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
                 .setAccountId(entry.getValue())
@@ -41,16 +38,13 @@ class AccountBalanceIntegrationTest {
     @Test
     @DisplayName("can connect to testnet with TLS")
     void canConnectToTestnetWithTLS() throws Exception {
-        var network = new HashMap<String, AccountId>();
-        network.put("0.testnet.hedera.com:50212", new AccountId(3));
-        network.put("1.testnet.hedera.com:50212", new AccountId(4));
-        network.put("2.testnet.hedera.com:50212", new AccountId(5));
-        network.put("3.testnet.hedera.com:50212", new AccountId(6));
-        network.put("4.testnet.hedera.com:50212", new AccountId(7));
+        var client = Client.forTestnet()
+            .setTransportSecurity(true)
+            .setNetworkName(null);
 
-        var client = Client.forNetwork(network);
-
-        for (var entry : network.entrySet()) {
+        for (var entry : client.getNetwork().entrySet()) {
+            assertTrue(entry.getKey().endsWith(":50212"));
+            
             new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
                 .setAccountId(entry.getValue())

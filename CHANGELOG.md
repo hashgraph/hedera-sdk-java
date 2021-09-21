@@ -35,6 +35,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `pauseKey` field in `TokenUpdateTransaction` and `TokenCreateTransaction`
  * `pauseKey` and `pauseStatus` fields in `TokenInfo` (`TokenInfoQuery`)
 
+### Added
+
+* `Client.setTransportSecurity()` - Enable/Disable TLS for any node
+*
 ### Changed
 
  * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneath

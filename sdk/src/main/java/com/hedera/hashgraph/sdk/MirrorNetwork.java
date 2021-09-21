@@ -62,7 +62,7 @@ class MirrorNetwork {
 
         // Remove nodes that do not exist in new network
         for (int i = 0; i < network.size(); i++) {
-            if (!addresses.contains(network.get(i).address)) {
+            if (!addresses.contains(network.get(i).address.toString())) {
                 network.get(i).close(stopAt - Instant.now().getEpochSecond());
                 network.remove(i);
                 i--;
@@ -74,7 +74,7 @@ class MirrorNetwork {
             @Var
             var contains = false;
             for (var node : this.network) {
-                if (node.address.equals(address)) {
+                if (node.address.toString().equals(address)) {
                     contains = true;
                 }
             }
@@ -84,7 +84,7 @@ class MirrorNetwork {
             }
         }
 
-        this.addresses = new CopyOnWriteArrayList<>(addresses);
+        this.addresses = new CopyOnWriteArrayList<String>(addresses);
         Collections.shuffle(network, ThreadLocalSecureRandom.current());
 
         lock.release();

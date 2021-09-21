@@ -281,13 +281,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public Map<String, AccountId> getNetwork() {
-        var network = new HashMap<String, AccountId>(this.network.network.size());
+        return network.getNetwork();
+    }
 
-        for (var entry : this.network.network.entrySet()) {
-            network.put(entry.getKey(), AccountId.fromProtobuf(entry.getValue().toProtobuf()));
-        }
-
-        return network;
+    public synchronized Client setTransportSecurity(boolean transportSecurity) {
+        this.network.setTransportSecurity(transportSecurity);
+        return this;
     }
 
     @Override
@@ -329,9 +328,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     @Override
     @FunctionalExecutable(type = "Void", onClient = true)
     public synchronized CompletableFuture<Void> pingAllAsync() {
-        var list = new ArrayList<CompletableFuture<Void>>(network.network.size());
+        var network = this.network.getNetwork();
+        var list = new ArrayList<CompletableFuture<Void>>(network.size());
 
-        for (var nodeAccountId : network.network.values()) {
+        for (var nodeAccountId : network.values()) {
             list.add(pingAsync(nodeAccountId));
         }
 
@@ -386,11 +386,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     @Nullable
     public synchronized NetworkName getNetworkName() {
-        return network.networkName;
+        return network.getNetworkName();
     }
 
     public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
-        this.network.networkName = networkName;
+        this.network.setNetworkName(networkName);
         return this;
     }
 

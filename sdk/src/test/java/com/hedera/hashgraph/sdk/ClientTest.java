@@ -147,8 +147,10 @@ class ClientTest {
 
         client.setNetwork(setNetworkNodes);
 
-        Assertions.assertEquals("2.testnet.hedera.com:50211", Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5))).getChannel().authority());
-        Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
+        var network = client.getNetwork();
+        Assertions.assertEquals(2, network.size());
+        Assertions.assertEquals(network.get("2.testnet.hedera.com:50211"), new AccountId(5));
+        Assertions.assertEquals(network.get("3.testnet.hedera.com:50211"), new AccountId(6));
         client.close();
     }
 }

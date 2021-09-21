@@ -32,7 +32,7 @@ class Node extends ManagedNode implements Comparable<Node> {
         return addressBook;
     }
 
-    public Node setAddressBook(@Nullable NodeAddress addressBook) {
+    Node setAddressBook(@Nullable NodeAddress addressBook) {
         this.addressBook = addressBook;
         return this;
     }

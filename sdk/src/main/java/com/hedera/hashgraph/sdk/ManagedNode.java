@@ -12,18 +12,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 abstract class ManagedNode {
-    private static final String IN_PROCESS = "in-process:";
     final ExecutorService executor;
-    String address;
+    ManagedNodeAddress address;
     long lastUsed = 0;
     long useCount = 0;
 
     @Nullable
     ManagedChannel channel = null;
+    boolean transportSecurityChanged;
 
     ManagedNode(String address, ExecutorService executor) {
         this.executor = executor;
-        this.address = address;
+        this.address = ManagedNodeAddress.fromString(address);
+    }
+
+    ManagedNode setTransportSecurity(boolean transportSecurity) {
+        address.setTransportSecurity(transportSecurity);
+        transportSecurityChanged = true;
+        return this;
     }
 
     synchronized void inUse() {
@@ -36,19 +42,18 @@ abstract class ManagedNode {
     }
 
     synchronized ManagedChannel getChannel() {
-        if (channel != null) {
+        if (!transportSecurityChanged && channel != null) {
             return channel;
         }
-
+        
         ManagedChannelBuilder<?> channelBuilder;
 
-        if (address.startsWith(IN_PROCESS)) {
-          String name = address.substring(IN_PROCESS.length());
-          channelBuilder = InProcessChannelBuilder.forName(name);
-        } else if (address.endsWith(":50212") || address.endsWith(":443")) {
-            channelBuilder = Grpc.newChannelBuilder(address, getChannelCredentials()).overrideAuthority("127.0.0.1");
+        if (address.isInProcess()) {
+            channelBuilder = InProcessChannelBuilder.forName(address.getName());
+        } else if (address.getTransportSecurity()) {
+            channelBuilder = Grpc.newChannelBuilder(address.toString(), getChannelCredentials()).overrideAuthority("127.0.0.1");
         } else {
-            channelBuilder = ManagedChannelBuilder.forTarget(address).usePlaintext();
+            channelBuilder = ManagedChannelBuilder.forTarget(address.toString()).usePlaintext();
         }
 
         channel = channelBuilder

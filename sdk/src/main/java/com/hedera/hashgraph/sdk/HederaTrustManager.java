@@ -3,14 +3,20 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.util.encoders.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.X509TrustManager;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 class HederaTrustManager implements X509TrustManager {
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     @Nullable
     private final String certHash;
 
@@ -29,16 +35,18 @@ class HederaTrustManager implements X509TrustManager {
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         if (certHash == null) {
+            logger.warn("skipping certificate check since no cert hash was found");
             return;
         }
 
         for (var cert : chain) {
-            var digest = new SHA384Digest();
-            var certHash = new byte[digest.getDigestSize()];
-            var certEncoded = cert.getEncoded();
+            var certHash = new byte[0];
 
-            digest.update(certEncoded, 0, certEncoded.length);
-            digest.doFinal(certHash, 0);
+            try {
+                certHash = MessageDigest.getInstance("SHA-384").digest(cert.getEncoded());
+            } catch (NoSuchAlgorithmException e) {
+                throw new IllegalStateException("Failed to find SHA-384 digest for certificate hashing", e);
+            }
 
             if (this.certHash.equals(Hex.toHexString(certHash))) {
                 return;
