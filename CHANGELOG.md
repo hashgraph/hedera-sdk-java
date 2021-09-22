@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `TokenNftInfoQuery.byTokenId()` with no replacement
  * `TokenNftInfoQuery.[set|get]Start()` with no replacement
  * `TokenNftInfoQuery.[set|get]End()` with no replacement
+ * `Client.networkName` can now be specified via config file
 
 ### v2.0.13
 
