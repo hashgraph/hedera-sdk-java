@@ -34,6 +34,7 @@ public class IntegrationTestEnv {
     public AccountId operatorId;
     private AccountId originalOperatorId;
 
+    @SuppressWarnings("EmptyCatch")
     public IntegrationTestEnv(int numberOfNodes) throws Exception {
         client = createTestEnvClient()
             .setMaxNodesPerTransaction(numberOfNodes);
@@ -44,7 +45,7 @@ public class IntegrationTestEnv {
             operatorKey = operatorPrivateKey.getPublicKey();
 
             client.setOperator(operatorId, operatorPrivateKey);
-        } catch (Exception e) {
+        } catch (RuntimeException ignored) {
         }
 
         operatorKey = client.getOperatorPublicKey();
@@ -62,6 +63,7 @@ public class IntegrationTestEnv {
         client.setNetwork(network);
     }
 
+    @SuppressWarnings("EmptyCatch")
     private static Client createTestEnvClient() throws Exception {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
             return Client.forPreviewnet();
@@ -77,7 +79,7 @@ public class IntegrationTestEnv {
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");
@@ -92,7 +94,7 @@ public class IntegrationTestEnv {
             .execute(client)
             .getReceipt(client)
             .accountId;
-        client.setOperator(operatorId, key);
+        client.setOperator(Objects.requireNonNull(operatorId), key);
         return this;
     }
 

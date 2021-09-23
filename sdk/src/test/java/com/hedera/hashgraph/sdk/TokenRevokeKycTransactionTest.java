@@ -28,21 +28,13 @@ public class TokenRevokeKycTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TokenRevokeKycTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAccountId(AccountId.fromString("0.0.222"))
-            .setTokenId(TokenId.fromString("6.5.4"))
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TokenRevokeKycTransaction()
+    private TokenRevokeKycTransaction spawnTestTransaction() {
+        return new TokenRevokeKycTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.222"))
@@ -50,6 +42,11 @@ public class TokenRevokeKycTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TokenRevokeKycTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

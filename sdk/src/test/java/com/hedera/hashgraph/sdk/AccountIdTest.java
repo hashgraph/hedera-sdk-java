@@ -11,9 +11,9 @@ import java.util.concurrent.TimeoutException;
 
 class AccountIdTest {
 
-    static Client mainnetClient = null;
-    static Client testnetClient = null;
-    static Client previewnetClient = null;
+    static Client mainnetClient;
+    static Client testnetClient;
+    static Client previewnetClient;
 
     @BeforeAll
     public static void beforeAll() {

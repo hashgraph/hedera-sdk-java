@@ -12,7 +12,6 @@ import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -22,80 +21,74 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class AccountDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete account")
-    void canDeleteAccount() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canDeleteAccount() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .setInitialBalance(new Hbar(1))
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+        var info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
 
-            assertEquals(info.accountId, accountId);
-            assertFalse(info.isDeleted);
-            assertEquals(info.key.toString(), key.getPublicKey().toString());
-            assertEquals(info.balance, new Hbar(1));
-            assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-            assertNull(info.proxyAccountId);
-            assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertEquals(accountId, info.accountId);
+        assertFalse(info.isDeleted);
+        assertEquals(key.getPublicKey().toString(), info.key.toString());
+        assertEquals(new Hbar(1), info.balance);
+        assertEquals(Duration.ofDays(90), info.autoRenewPeriod);
+        assertNull(info.proxyAccountId);
+        assertEquals(Hbar.ZERO, info.proxyReceived);
 
-            testEnv.close(accountId, key);
-        });
+        testEnv.close(accountId, key);
     }
 
     @Test
     @DisplayName("Cannot delete invalid account ID")
-    void cannotCreateAccountWithNoKey() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotCreateAccountWithNoKey() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new AccountDeleteTransaction()
-                    .setTransferAccountId(testEnv.operatorId)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString()));
-
-            testEnv.close();
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            new AccountDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString()));
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot delete account that has not signed transaction")
-    void cannotDeleteAccountThatHasNotSignedTransaction() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotDeleteAccountThatHasNotSignedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var key = PrivateKey.generate();
+        var key = PrivateKey.generate();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+        var response = new AccountCreateTransaction()
+            .setKey(key)
+            .setInitialBalance(new Hbar(1))
+            .execute(testEnv.client);
 
-            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
-                new AccountDeleteTransaction()
-                    .setAccountId(accountId)
-                    .setTransferAccountId(testEnv.operatorId)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
-
-            testEnv.close(accountId, key);
+        var error = assertThrows(ReceiptStatusException.class, () -> {
+            new AccountDeleteTransaction()
+                .setAccountId(accountId)
+                .setTransferAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+
+        testEnv.close(accountId, key);
     }
 }

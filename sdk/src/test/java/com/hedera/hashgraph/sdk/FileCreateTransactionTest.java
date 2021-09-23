@@ -28,22 +28,13 @@ public class FileCreateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new FileCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setContents(new byte[]{1, 2, 3, 4})
-            .setExpirationTime(Instant.ofEpochSecond(1554158728))
-            .setKeys(unusedPrivateKey)
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new FileCreateTransaction()
+    private FileCreateTransaction spawnTestTransaction() {
+        return new FileCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setContents(new byte[]{1, 2, 3, 4})
@@ -52,6 +43,11 @@ public class FileCreateTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = FileCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

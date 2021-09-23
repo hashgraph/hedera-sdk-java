@@ -26,30 +26,19 @@ public class ScheduleCreateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
+
     @Test
     void shouldSerialize() {
-        var transferTransaction = new TransferTransaction()
-            .addHbarTransfer(AccountId.fromString("0.0.555"), new Hbar(-10))
-            .addHbarTransfer(AccountId.fromString("0.0.333"), new Hbar(10));
-        SnapshotMatcher.expect(transferTransaction.schedule()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAdminKey(unusedPrivateKey)
-            .setPayerAccountId(AccountId.fromString("0.0.222"))
-            .setScheduleMemo("hi")
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
+    private ScheduleCreateTransaction spawnTestTransaction() {
         var transferTransaction = new TransferTransaction()
             .addHbarTransfer(AccountId.fromString("0.0.555"), new Hbar(-10))
             .addHbarTransfer(AccountId.fromString("0.0.333"), new Hbar(10));
-        var tx = transferTransaction.schedule()
+        return transferTransaction.schedule()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAdminKey(unusedPrivateKey)
@@ -58,6 +47,11 @@ public class ScheduleCreateTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = ScheduleCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

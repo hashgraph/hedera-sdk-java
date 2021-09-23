@@ -185,6 +185,14 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().replace("\"", "")));
             }
             client = Client.forNetwork(nodes);
+            if (config.networkName != null) {
+                var networkNameString = config.networkName.getAsString();
+                try {
+                    client.setNetworkName(NetworkName.fromString(networkNameString));
+                } catch (Exception ignored) {
+                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
+                }
+            }
         } else {
             String networks = config.network.getAsString();
             switch (networks) {
@@ -609,6 +617,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static class Config {
         @Nullable
         private JsonElement network;
+
+        @Nullable
+        private JsonElement networkName;
 
         @Nullable
         private ConfigOperator operator;

@@ -40,6 +40,17 @@ abstract class ManagedNode {
             return channel;
         }
 
+        var packageBuilder = ManagedChannelBuilder.forTarget("");
+
+        var packageVersion = packageBuilder.getClass().getPackage().getImplementationVersion();
+        var packageVersionParts = packageVersion.split("\\.", 3);
+        var packageVersionMajor = Integer.parseInt(packageVersionParts[0]);
+        var packageVersionMinor = Integer.parseInt(packageVersionParts[1]);
+
+        if ((packageVersionMajor < 1) || (packageVersionMajor == 1 && packageVersionMinor < 40)) {
+            throw new IllegalStateException("gRPC version should be at least 1.40.0");
+        }
+
         ManagedChannelBuilder<?> channelBuilder;
 
         if (address.startsWith(IN_PROCESS)) {

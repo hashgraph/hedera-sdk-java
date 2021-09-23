@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -17,173 +16,157 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileContentsIntegrationTest {
     @Test
     @DisplayName("Can query file contents")
-    void canQueryFileContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canQueryFileContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
+        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can query empty file contents")
-    void canQueryEmptyFileContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void canQueryEmptyFileContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
-            assertEquals(contents.size(), 0);
+        assertEquals(0, contents.size());
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot query file contents when file ID is not set")
-    void cannotQueryFileContentsWhenFileIDIsNotSet() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void cannotQueryFileContentsWhenFileIDIsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                new FileContentsQuery()
-                    .execute(testEnv.client);
-            });
-
-            assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
-
-            testEnv.close();
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            new FileContentsQuery()
+                .execute(testEnv.client);
         });
+
+        assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Can get cost, even with a big max")
-    void getCostBigMaxQueryFileContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void getCostBigMaxQueryFileContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(new Hbar(1000));
+        var contentsQuery = new FileContentsQuery()
+            .setFileId(fileId)
+            .setMaxQueryPayment(new Hbar(1000));
 
-            var cost = contentsQuery.getCost(testEnv.client);
+        var contents = contentsQuery.execute(testEnv.client);
 
-            var contents = contentsQuery.execute(testEnv.client);
+        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
 
-            assertEquals(contents.toStringUtf8(), "[e2e::FileCreateTransaction]");
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
-        });
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Error, max is smaller than set payment.")
-    void getCostSmallMaxQueryFileContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void getCostSmallMaxQueryFileContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(Hbar.fromTinybars(1));
+        var contentsQuery = new FileContentsQuery()
+            .setFileId(fileId)
+            .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-            var cost = contentsQuery.getCost(testEnv.client);
+        var cost = contentsQuery.getCost(testEnv.client);
 
-            var error = assertThrows(RuntimeException.class, () -> {
-                contentsQuery.execute(testEnv.client);
-            });
-
-            assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
-
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
+        var error = assertThrows(RuntimeException.class, () -> {
+            contentsQuery.execute(testEnv.client);
         });
+
+        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Insufficient tx fee error.")
-    void getCostInsufficientTxFeeQueryFileContents() {
-        assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+    void getCostInsufficientTxFeeQueryFileContents() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
 
-            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(new Hbar(100));
+        var contentsQuery = new FileContentsQuery()
+            .setFileId(fileId)
+            .setMaxQueryPayment(new Hbar(100));
 
-            var cost = contentsQuery.getCost(testEnv.client);
-
-            var error = assertThrows(PrecheckStatusException.class, () -> {
-                contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-            });
-
-            assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
-
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
+        var error = assertThrows(PrecheckStatusException.class, () -> {
+            contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
         });
+
+        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 }

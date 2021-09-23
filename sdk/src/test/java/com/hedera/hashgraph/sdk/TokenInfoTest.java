@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 // TODO: update this, test deepClone()
@@ -24,7 +23,7 @@ public class TokenInfoTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private TokenInfo spawnTokenInfoExample() {
+    private static TokenInfo spawnTokenInfoExample() {
         List<CustomFee> fees = new ArrayList<>();
         fees.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))
@@ -64,13 +63,11 @@ public class TokenInfoTest {
     }
 
     @Test
-    void shouldSerialize() {
-        assertDoesNotThrow(() -> {
-            var originalTokenInfo = spawnTokenInfoExample();
-            byte[] tokenInfoBytes = originalTokenInfo.toBytes();
-            var copyTokenInfo = TokenInfo.fromBytes(tokenInfoBytes);
-            assertTrue(originalTokenInfo.toString().equals(copyTokenInfo.toString()));
-            SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
-        });
+    void shouldSerialize() throws Exception {
+        var originalTokenInfo = spawnTokenInfoExample();
+        byte[] tokenInfoBytes = originalTokenInfo.toBytes();
+        var copyTokenInfo = TokenInfo.fromBytes(tokenInfoBytes);
+        assertTrue(originalTokenInfo.toString().equals(copyTokenInfo.toString()));
+        SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
     }
 }

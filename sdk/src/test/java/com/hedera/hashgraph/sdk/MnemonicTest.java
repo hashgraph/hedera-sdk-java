@@ -192,48 +192,40 @@ public class MnemonicTest {
 
     @Test
     @DisplayName("Mnemonic 3 test")
-    void thirdMnemonicTest() {
-        assertDoesNotThrow(() -> {
-            Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC3_STRING));
-            PrivateKey key = mnemonic.toLegacyPrivateKey();
-            PrivateKey derivedKey = key.legacyDerive(0);
-            PrivateKey derivedKey2 = key.legacyDerive(-1);
-            assertEquals(derivedKey.toString(), "302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb");
-            assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5");
-        });
+    void thirdMnemonicTest() throws Exception {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC3_STRING));
+        PrivateKey key = mnemonic.toLegacyPrivateKey();
+        PrivateKey derivedKey = key.legacyDerive(0);
+        PrivateKey derivedKey2 = key.legacyDerive(-1);
+        assertEquals(derivedKey.toString(), "302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb");
+        assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5");
     }
 
     @Test
     @DisplayName("Legacy mnemonic test")
-    void legacyMnemonicTest() {
-        assertDoesNotThrow(() -> {
-            Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
-            PrivateKey key = mnemonic.toLegacyPrivateKey();
-            PrivateKey derivedKey = key.legacyDerive(0);
-            PrivateKey derivedKey2 = key.legacyDerive(-1);
-            assertEquals(derivedKey.toString(), "302e020100300506032b657004220420fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6");
-            assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf");
-        });
+    void legacyMnemonicTest() throws Exception {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
+        PrivateKey key = mnemonic.toLegacyPrivateKey();
+        PrivateKey derivedKey = key.legacyDerive(0);
+        PrivateKey derivedKey2 = key.legacyDerive(-1);
+        assertEquals(derivedKey.toString(), "302e020100300506032b657004220420fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6");
+        assertEquals(derivedKey2.toString(), "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf");
     }
 
     @Test
     @DisplayName("should match MyHbarWallet v1")
-    void myHbarWalletV1Test() {
-        assertDoesNotThrow(() -> {
-            Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
-            PrivateKey key = mnemonic.toLegacyPrivateKey();
-            PrivateKey derivedKey = key.legacyDerive(1099511627775L);
-            assertEquals(derivedKey.getPublicKey().toString(), "302a300506032b657003210045f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9");
-        });
+    void myHbarWalletV1Test() throws Exception {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
+        PrivateKey key = mnemonic.toLegacyPrivateKey();
+        PrivateKey derivedKey = key.legacyDerive(1099511627775L);
+        assertEquals(derivedKey.getPublicKey().toString(), "302a300506032b657003210045f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9");
     }
 
     @Test
     @DisplayName("Mnemonic test")
-    void mnemonicTest() {
-        assertDoesNotThrow(() -> {
-            Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
-            PrivateKey key = mnemonic.toPrivateKey();
-            assertEquals(key.toString(), MNEMONIC_PRIVATE_KEY);
-        });
+    void mnemonicTest() throws Exception {
+        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
+        PrivateKey key = mnemonic.toPrivateKey();
+        assertEquals(key.toString(), MNEMONIC_PRIVATE_KEY);
     }
 }
