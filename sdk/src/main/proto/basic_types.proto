@@ -981,6 +981,11 @@ enum HederaFunctionality {
      * Update a token's custom fee schedule, if permissible
      */
     TokenFeeScheduleUpdate = 77;
+
+    /**
+     * Get execution time(s) by TransactionID, if available
+     */
+    NetworkGetExecutionTime = 78;
 }
 
 /**
