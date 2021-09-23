@@ -6,51 +6,58 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 abstract class ManagedNode {
-    final ExecutorService executor;
-    ManagedNodeAddress address;
-    long lastUsed = 0;
-    long useCount = 0;
+    protected final ExecutorService executor;
+
+    protected final ManagedNodeAddress address;
+    protected long lastUsed = 0;
+    protected long useCount = 0;
 
     @Nullable
-    ManagedChannel channel = null;
-    boolean transportSecurityChanged;
+    protected ManagedChannel channel = null;
 
-    ManagedNode(String address, ExecutorService executor) {
+    protected ManagedNode(ManagedNodeAddress address, ExecutorService executor) {
         this.executor = executor;
-        this.address = ManagedNodeAddress.fromString(address);
+        this.address = address;
     }
 
-    ManagedNode setTransportSecurity(boolean transportSecurity) {
-        address.setTransportSecurity(transportSecurity);
-        transportSecurityChanged = true;
-        return this;
+    protected ManagedNode(ManagedNode node, ManagedNodeAddress address) {
+        this.executor = node.executor;
+        this.address = address;
+        this.lastUsed = node.lastUsed;
+        this.useCount = node.useCount;
     }
 
-    synchronized void inUse() {
+    public ManagedNodeAddress getAddress() {
+        return address;
+    }
+
+    public synchronized void inUse() {
         useCount++;
         lastUsed = System.currentTimeMillis();
     }
 
-    ChannelCredentials getChannelCredentials() {
+    public ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.create();
     }
 
-    synchronized ManagedChannel getChannel() {
-        if (!transportSecurityChanged && channel != null) {
+    public synchronized ManagedChannel getChannel() {
+        if (channel != null) {
             return channel;
         }
-        
+
         ManagedChannelBuilder<?> channelBuilder;
 
         if (address.isInProcess()) {
-            channelBuilder = InProcessChannelBuilder.forName(address.getName());
-        } else if (address.getTransportSecurity()) {
+            channelBuilder = InProcessChannelBuilder.forName(Objects.requireNonNull(address.getName()));
+        } else if (address.isTransportSecurity()) {
             channelBuilder = Grpc.newChannelBuilder(address.toString(), getChannelCredentials()).overrideAuthority("127.0.0.1");
         } else {
             channelBuilder = ManagedChannelBuilder.forTarget(address.toString()).usePlaintext();
@@ -64,10 +71,10 @@ abstract class ManagedNode {
         return channel;
     }
 
-    synchronized void close(long seconds) throws InterruptedException {
+    public synchronized void close(Duration timeout) throws InterruptedException {
         if (channel != null) {
             channel.shutdown();
-            channel.awaitTermination(seconds, TimeUnit.SECONDS);
+            channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
             channel = null;
         }
     }

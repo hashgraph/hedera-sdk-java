@@ -1,19 +1,13 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import org.bouncycastle.crypto.digests.SHA384Digest;
-import org.bouncycastle.jce.provider.PEMUtil;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.util.io.pem.PemGenerationException;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.X509TrustManager;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -28,8 +22,13 @@ class HederaTrustManager implements X509TrustManager {
     @Nullable
     private final String certHash;
 
-    HederaTrustManager(@Nullable ByteString certHash) {
+    HederaTrustManager(@Nullable ByteString certHash, boolean verifyCertificate) {
         if (certHash == null || certHash.isEmpty()) {
+            if (verifyCertificate) {
+                throw new IllegalStateException("transport security and certificate verification are enabled, but no applicable address book was found");
+            }
+
+            logger.warn("skipping certificate check since no cert hash was found");
             this.certHash = null;
         } else {
             this.certHash = new String(certHash.toByteArray(), StandardCharsets.UTF_8);
@@ -43,7 +42,6 @@ class HederaTrustManager implements X509TrustManager {
     @Override
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         if (certHash == null) {
-            logger.warn("skipping certificate check since no cert hash was found");
             return;
         }
 

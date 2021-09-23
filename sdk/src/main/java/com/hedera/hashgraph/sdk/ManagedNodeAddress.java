@@ -1,88 +1,89 @@
 package com.hedera.hashgraph.sdk;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 class ManagedNodeAddress {
-    private static final String IN_PROCESS = "in-process:";
+    private static final Pattern HOST_AND_PORT = Pattern.compile("(?<address>^.*):(?<port>\\d+$)");
+    private static final Pattern IN_PROCESS = Pattern.compile("in-process:(?<name>.*)");
 
     // If address is `in-process:.*` this will contain the right side of the `:`
-    private String name;
-    private String address;
-    private Integer port;
-    private boolean transportSecurity;
+    @Nullable
+    private final String name;
 
-    ManagedNodeAddress() {
+    @Nullable
+    private final String address;
+    private final int port;
+
+    public ManagedNodeAddress(@Nullable String name, @Nullable String address, int port) {
+        this.name = name;
+        this.address = address;
+        this.port = port;
     }
 
-    static ManagedNodeAddress fromString(String string) {
-        var nodeAddress = new ManagedNodeAddress();
+    public static ManagedNodeAddress fromString(String string) {
+        var hostAndPortMatcher = HOST_AND_PORT.matcher(string);
+        var inProcessMatcher = IN_PROCESS.matcher(string);
 
-        if (string.matches("^.*:\\d+$")) {
-            var index = string.lastIndexOf(':');
-            var address = string.substring(0, index);
-            var port = string.substring(index + 1);
+        if (hostAndPortMatcher.find()) {
+            var address = hostAndPortMatcher.group("address");
+            var port = hostAndPortMatcher.group("port");
 
-            nodeAddress.setAddress(address)
-                .setPort(Integer.parseInt(port));
-        } else if (string.startsWith(IN_PROCESS)) {
-            nodeAddress.setName(string.substring(IN_PROCESS.length()));
+            return new ManagedNodeAddress(null, address, Integer.parseInt(port));
+        } else if (inProcessMatcher.find()) {
+            return new ManagedNodeAddress(inProcessMatcher.group("name"), null, 0);
         } else {
-            nodeAddress.setAddress(string);
+            throw new IllegalStateException("failed to parse node address");
         }
-
-        return nodeAddress;
     }
 
     public String getName() {
         return name;
     }
 
-    public ManagedNodeAddress setName(String name) {
-        this.name = name;
-        return this;
-    }
-
-    String getAddress() {
+    public String getAddress() {
         return address;
     }
 
-    ManagedNodeAddress setAddress(String address) {
-        this.address = address;
-        return this;
-    }
-
-    int getPort() {
+    public int getPort() {
         return port;
     }
 
-    ManagedNodeAddress setPort(int port) {
-        this.port = port;
+    public boolean isInProcess() {
+        return name != null;
+    }
 
-        switch (port) {
-            case 5600:
-            case 50211:
-                transportSecurity = false;
+    public boolean isTransportSecurity() {
+        return port == 50211 || port == 433;
+    }
+
+    public ManagedNodeAddress toInsecure() {
+        var port = this.port;
+
+        switch (this.port) {
+            case 50212:
+                port = 50211;
                 break;
             case 433:
-            case 50212:
-                transportSecurity = true;
-                break;
+                port = 5600;
         }
 
-        return this;
+        return new ManagedNodeAddress(name, address, port);
     }
 
-    boolean getTransportSecurity() {
-        return transportSecurity;
-    }
+    public ManagedNodeAddress toSecure() {
+        var port = this.port;
 
-    ManagedNodeAddress setTransportSecurity(boolean transportSecurity) {
-        this.transportSecurity = transportSecurity;
-        return this;
-    }
+        switch (this.port) {
+            case 50211:
+                port = 50212;
+                break;
+            case 5600:
+                port = 433;
+        }
 
-    boolean isInProcess() {
-        return name != null;
+        return new ManagedNodeAddress(name, address, port);
     }
 
     @Override
@@ -91,25 +92,7 @@ class ManagedNodeAddress {
             return name;
         }
 
-        if (port == null) {
-            return address;
-        }
-
-        var s = address;
-
-        switch (port) {
-            case 5600:
-            case 433:
-                s += ":" + (transportSecurity ? 433 : 5600);
-                break;
-            case 50211:
-            case 50212:
-                s += ":" + (transportSecurity ? 50212 : 50211);
-            default:
-                // Do nothing
-        }
-
-        return s;
+        return address + ":" + port;
     }
 
     @Override
@@ -117,11 +100,11 @@ class ManagedNodeAddress {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ManagedNodeAddress that = (ManagedNodeAddress) o;
-        return getTransportSecurity() == that.getTransportSecurity() && Objects.equals(getName(), that.getName()) && Objects.equals(getAddress(), that.getAddress()) && Objects.equals(getPort(), that.getPort());
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getAddress(), that.getAddress()) && Objects.equals(getPort(), that.getPort());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getAddress(), getPort(), getTransportSecurity());
+        return Objects.hash(getName(), getAddress(), getPort());
     }
 }

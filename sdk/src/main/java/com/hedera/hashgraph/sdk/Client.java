@@ -36,6 +36,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
+    static final Duration DEFAULT_CLOSE_TIMEOUT = Duration.ofSeconds(30L);
+    static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(2L);
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -53,7 +55,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     @Nullable
     private Operator operator;
 
-    private Duration requestTimeout = Duration.ofMinutes(2);
+    private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
+    private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
 
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
 
@@ -81,7 +84,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
-        this.mirrorNetwork.setNetwork(network);
+        try {
+            this.mirrorNetwork.setNetwork(network);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+
         return this;
     }
 
@@ -284,9 +292,40 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network.getNetwork();
     }
 
-    public synchronized Client setTransportSecurity(boolean transportSecurity) {
-        this.network.setTransportSecurity(transportSecurity);
+    /**
+     * Set if transport security should be used.
+     *
+     * If transport security is enabled all connections to nodes will use TLS, and the server's certificate hash will be
+     * compared to the hash stored in the {@link NodeAddressBook} for the given network.
+     *
+     * *Note*: If transport security is enabled, but {@link Client#getNetworkName()} is unset then server certificates
+     * will not be verified.
+     *
+     * @param transportSecurity - enable or disable transport security
+     * @return {@code this} for fluent API usage.
+     */
+    public Client setTransportSecurity(boolean transportSecurity) {
+        network.setTransportSecurity(transportSecurity);
         return this;
+    }
+
+    public boolean isTransportSecurity() {
+        return network.isTransportSecurity();
+    }
+
+    /**
+     * Set if server certificates should be verified against an existing address book
+     *
+     * @param verifyCertificates - enable or disable certificate verification
+     * @return
+     */
+    public Client setVerifyCertificates(boolean verifyCertificates) {
+        network.setVerifyCertificates(verifyCertificates);
+        return this;
+    }
+
+    public boolean isVerifyCertificates() {
+        return network.isVerifyCertificates();
     }
 
     @Override
@@ -318,7 +357,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     @Override
     public synchronized Void pingAll() {
-        for (var nodeAccountId : network.network.values()) {
+        for (var nodeAccountId : network.getNetwork().values()) {
             ping(nodeAccountId);
         }
 
@@ -468,16 +507,16 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized Duration getNodeWaitTime() {
-        return network.getNodeWaitTime();
+        return network.getMinBackoff();
     }
 
     public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
-        network.setNodeWaitTime(nodeWaitTime);
+        network.setMinBackoff(nodeWaitTime);
         return this;
     }
 
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
-        this.network.setMaxNodesPerTransaction(maxNodesPerTransaction);
+        this.network.setMaxNodesPerRequest(maxNodesPerTransaction);
         return this;
     }
 
@@ -603,7 +642,18 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
-        this.requestTimeout = requestTimeout;
+        this.requestTimeout = Objects.requireNonNull(requestTimeout);
+        return this;
+    }
+
+    public Duration getCloseTimeout() {
+        return closeTimeout;
+    }
+
+    public Client setCloseTimeout(Duration closeTimeout) {
+        this.closeTimeout = Objects.requireNonNull(closeTimeout);
+        network.setCloseTimeout(closeTimeout);
+        mirrorNetwork.setCloseTimeout(closeTimeout);
         return this;
     }
 
@@ -621,7 +671,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Override
     public synchronized void close() throws TimeoutException {
-        close(Duration.ofSeconds(30));
+        network.close();
+        mirrorNetwork.close();
     }
 
     /**

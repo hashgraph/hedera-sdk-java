@@ -2,73 +2,116 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ChannelCredentials;
 import io.grpc.TlsChannelCredentials;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 
 class Node extends ManagedNode implements Comparable<Node> {
-    AccountId accountId;
+    private final AccountId accountId;
 
     @Nullable
-    NodeAddress addressBook;
+    private NodeAddress addressBook;
 
-    long delay;
-    long delayUntil;
-    long waitTime;
-    long attempts;
+    private long backoffUntil;
+    private Duration currentBackoff;
+    private Duration minBackoff;
+    private long attempts;
+    private boolean verifyCertificates;
 
-    Node(AccountId accountId, String address, long waitTime, ExecutorService executor) {
+    public Node(AccountId accountId, ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
-        this.delay = waitTime;
-        this.waitTime = waitTime;
-        this.delayUntil = 0;
-        this.attempts = 0;
+        this.currentBackoff = Client.DEFAULT_MIN_BACKOFF;
+        this.minBackoff = Client.DEFAULT_MIN_BACKOFF;
     }
 
-    @Nullable
+    public Node(AccountId accountId, String address, ExecutorService executor) {
+        this(accountId, ManagedNodeAddress.fromString(address), executor);
+    }
+
+    private Node(Node node, ManagedNodeAddress address) {
+        super(node, address);
+
+        this.accountId = node.accountId;
+        this.minBackoff = node.minBackoff;
+        this.verifyCertificates = node.verifyCertificates;
+        this.addressBook = node.addressBook;
+        this.backoffUntil = node.backoffUntil;
+        this.currentBackoff = node.currentBackoff;
+        this.attempts = node.attempts;
+    }
+
+    public Node toInsecure() {
+        return new Node(this, address.toInsecure());
+    }
+
+    public Node toSecure() {
+        return new Node(this, address.toSecure());
+    }
+
+    public AccountId getAccountId() {
+        return accountId;
+    }
+
     public NodeAddress getAddressBook() {
         return addressBook;
     }
 
-    Node setAddressBook(@Nullable NodeAddress addressBook) {
+    public Node setAddressBook(@Nullable NodeAddress addressBook) {
         this.addressBook = addressBook;
         return this;
     }
 
-    @Override
-    ChannelCredentials getChannelCredentials() {
-        return TlsChannelCredentials.newBuilder()
-            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash))
-            .build();
+    public long getBackoffUntil() {
+        return backoffUntil;
     }
 
-    void setWaitTime(long waitTime) {
-        // If delay is equal to the old waitTime we should change it to the new waitTime
-        if (delay == this.waitTime) {
-            delay = waitTime;
+    public Duration getMinBackoff() {
+        return minBackoff;
+    }
+
+    public long getAttempts() {
+        return attempts;
+    }
+
+    public boolean isVerifyCertificates() {
+        return verifyCertificates;
+    }
+
+    public Node setVerifyCertificates(boolean verifyCertificates) {
+        this.verifyCertificates = verifyCertificates;
+        return this;
+    }
+
+    public Node setMinBackoff(Duration minBackoff) {
+        // If delay is equal to the old minBackoff we should change it to the new minBackoff
+        if (currentBackoff == this.minBackoff) {
+            currentBackoff = minBackoff;
         }
 
-        this.waitTime = waitTime;
+        this.minBackoff = minBackoff;
+
+        return this;
     }
 
     boolean isHealthy() {
-        return delayUntil < System.currentTimeMillis();
+        return backoffUntil < System.currentTimeMillis();
     }
 
     void increaseDelay() {
         this.attempts++;
-        this.delayUntil = System.currentTimeMillis() + this.delay;
-        this.delay = Math.min(this.delay * 2, 8000);
+        this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
+        this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, 8000));
     }
 
     void decreaseDelay() {
-        this.delay = Math.max(this.delay / 2, waitTime);
+        this.currentBackoff = Duration.ofMillis(Math.max(this.currentBackoff.toMillis() / 2, minBackoff.toMillis()));
     }
 
-    long delay() {
-        return delayUntil - System.currentTimeMillis();
+    long getRemainingTimeForBackoff() {
+        return backoffUntil - System.currentTimeMillis();
     }
 
     @Override
@@ -98,6 +141,13 @@ class Node extends ManagedNode implements Comparable<Node> {
                 return 0;
             }
         }
+    }
+
+    @Override
+    public ChannelCredentials getChannelCredentials() {
+        return TlsChannelCredentials.newBuilder()
+            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash, verifyCertificates))
+            .build();
     }
 
     @Override
