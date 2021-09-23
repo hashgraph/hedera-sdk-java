@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.util.concurrent.ExecutorService;
 
-class MirrorNode extends ManagedNode {
+class MirrorNode extends ManagedNode<MirrorNode> {
     public MirrorNode(ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
     }

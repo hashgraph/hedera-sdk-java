@@ -55,7 +55,7 @@ class ManagedNodeAddress {
     }
 
     public boolean isTransportSecurity() {
-        return port == 50211 || port == 433;
+        return port == 50212 || port == 433;
     }
 
     public ManagedNodeAddress toInsecure() {

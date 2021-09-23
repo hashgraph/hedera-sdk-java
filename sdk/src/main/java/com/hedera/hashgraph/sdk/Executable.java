@@ -201,13 +201,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         mergeFromClient(client);
         onExecute(client);
+        setNodesFromNodeAccountIds(client);
         checkNodeAccountIds();
-
-        try {
-            setNodesFromNodeAccountIds(client);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
             var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
@@ -259,18 +254,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 throw new IllegalStateException("Request node account IDs were not set before executing");
             }
 
-            try {
-                setNodesFromNodeAccountIds(client);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            setNodesFromNodeAccountIds(client);
             checkNodeAccountIds();
 
             return executeAsync(client, 1, null);
         });
     }
 
-    private void setNodesFromNodeAccountIds(Client client) throws InterruptedException {
+    private void setNodesFromNodeAccountIds(Client client) {
         for (var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.getNodeForAccountId(accountId);
@@ -283,7 +274,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     private Node getNodeForExecute(int attempt) {
         var node = nodes.get(nextNodeIndex);
-        node.inUse();
 
         logger.trace("Sending request #{} to node {}: {}", attempt, node.getAccountId(), this);
 

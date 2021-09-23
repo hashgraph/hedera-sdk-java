@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -134,23 +138,101 @@ class ClientTest {
 
     @Test
     @DisplayName("setNetwork() functions correctly")
-    void testReplaceNodes() throws Exception {
-        Map<String, AccountId> nodes = new HashMap<>();
+    void setNetworkWorks() throws Exception {
+        var nodes = new HashMap<String, AccountId>();
         nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
         nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
         Client client = Client.forNetwork(nodes);
+        @Var var network = client.getNetwork();
 
-        Map<String, AccountId> setNetworkNodes = new HashMap<>();
-        setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
-        setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
-
-        client.setNetwork(setNetworkNodes);
-
-        var network = client.getNetwork();
         Assertions.assertEquals(2, network.size());
+        Assertions.assertEquals(network.get("0.testnet.hedera.com:50211"), new AccountId(3));
+        Assertions.assertEquals(network.get("1.testnet.hedera.com:50211"), new AccountId(4));
+
+        client.setNetwork(nodes);
+        network = client.getNetwork();
+
+        Assertions.assertEquals(2, network.size());
+        Assertions.assertEquals(network.get("0.testnet.hedera.com:50211"), new AccountId(3));
+        Assertions.assertEquals(network.get("1.testnet.hedera.com:50211"), new AccountId(4));
+
+        nodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+
+        client.setNetwork(nodes);
+        network = client.getNetwork();
+
+        Assertions.assertEquals(3, network.size());
+        Assertions.assertEquals(network.get("0.testnet.hedera.com:50211"), new AccountId(3));
+        Assertions.assertEquals(network.get("1.testnet.hedera.com:50211"), new AccountId(4));
         Assertions.assertEquals(network.get("2.testnet.hedera.com:50211"), new AccountId(5));
-        Assertions.assertEquals(network.get("3.testnet.hedera.com:50211"), new AccountId(6));
+
+        nodes.clear();
+        nodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+
+        client.setNetwork(nodes);
+        network = client.getNetwork();
+
+        Assertions.assertEquals(1, network.size());
+        Assertions.assertEquals(network.get("2.testnet.hedera.com:50211"), new AccountId(5));
+
+        nodes.clear();
+        nodes.put("2.testnet.hedera.com:50211", new AccountId(6));
+
+        client.setNetwork(nodes);
+        network = client.getNetwork();
+
+        Assertions.assertEquals(1, network.size());
+        Assertions.assertEquals(network.get("2.testnet.hedera.com:50211"), new AccountId(6));
+
+        client.close();
+    }
+
+    @Test
+    @DisplayName("setNetwork() functions correctly")
+    void setMirrorNetworkWorks() throws Exception {
+        var nodes = new ArrayList<String>();
+        nodes.add("hcs.testnet.mirrornode.hedera.com:5600");
+
+        Client client = Client.forNetwork(new HashMap<>()).setMirrorNetwork(nodes);
+        @Var var mirrorNetwork = new HashSet<>(client.getMirrorNetwork());
+
+        Assertions.assertEquals(1, mirrorNetwork.size());
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet.mirrornode.hedera.com:5600"));
+
+        client.setMirrorNetwork(nodes);
+        mirrorNetwork = new HashSet<>(client.getMirrorNetwork());
+
+        Assertions.assertEquals(1, mirrorNetwork.size());
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet.mirrornode.hedera.com:5600"));
+
+        nodes.add("hcs.testnet1.mirrornode.hedera.com:5600");
+
+        client.setMirrorNetwork(nodes);
+        mirrorNetwork = new HashSet<>(client.getMirrorNetwork());
+
+        Assertions.assertEquals(2, mirrorNetwork.size());
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet.mirrornode.hedera.com:5600"));
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet1.mirrornode.hedera.com:5600"));
+
+        nodes.clear();
+        nodes.add("hcs.testnet1.mirrornode.hedera.com:5600");
+
+        client.setMirrorNetwork(nodes);
+        mirrorNetwork = new HashSet<>(client.getMirrorNetwork());
+
+        Assertions.assertEquals(1, mirrorNetwork.size());
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet1.mirrornode.hedera.com:5600"));
+
+        nodes.clear();
+        nodes.add("hcs.testnet.mirrornode.hedera.com:5600");
+
+        client.setMirrorNetwork(nodes);
+        mirrorNetwork = new HashSet<>(client.getMirrorNetwork());
+
+        Assertions.assertEquals(1, mirrorNetwork.size());
+        Assertions.assertTrue(mirrorNetwork.contains("hcs.testnet.mirrornode.hedera.com:5600"));
+
         client.close();
     }
 }

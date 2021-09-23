@@ -198,7 +198,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             }
             client = Client.forNetwork(nodes);
             if (config.networkName != null) {
-                client.setNetworkName(NetworkName.fromString(config.networkName.getAsString()));
+                var networkNameString = config.networkName.getAsString();
+                try {
+                    client.setNetworkName(NetworkName.fromString(networkNameString));
+                } catch (Exception ignored) {
+                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
+                }
             }
         } else {
             String networks = config.network.getAsString();
@@ -298,13 +303,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * If transport security is enabled all connections to nodes will use TLS, and the server's certificate hash will be
      * compared to the hash stored in the {@link NodeAddressBook} for the given network.
      *
-     * *Note*: If transport security is enabled, but {@link Client#getNetworkName()} is unset then server certificates
+     * *Note*: If transport security is enabled, but {@link Client#isVerifyCertificates()} is disabled then server certificates
      * will not be verified.
      *
      * @param transportSecurity - enable or disable transport security
      * @return {@code this} for fluent API usage.
      */
-    public Client setTransportSecurity(boolean transportSecurity) {
+    public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
         return this;
     }
@@ -324,10 +329,21 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Is certificate verification enabled.
+     *
+     * @return
+     */
     public boolean isVerifyCertificates() {
         return network.isVerifyCertificates();
     }
 
+    /**
+     * Ping a specific node from the network
+     *
+     * @param nodeAccountId
+     * @return
+     */
     @Override
     public Void ping(AccountId nodeAccountId) {
         try {
@@ -355,6 +371,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             });
     }
 
+    /**
+     * Ping all network nodes.
+     * @return
+     */
     @Override
     public synchronized Void pingAll() {
         for (var nodeAccountId : network.getNetwork().values()) {
@@ -423,20 +443,43 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Current name of the network; corresponds to ledger ID in entity ID checksum calculations.
+     *
+     * @return
+     */
     @Nullable
     public synchronized NetworkName getNetworkName() {
         return network.getNetworkName();
     }
 
+    /**
+     * Set the network name to a particular value. Useful when constructing a network which is a subset of an existing
+     * known network.
+     *
+     * @param networkName
+     * @return
+     */
     public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
         this.network.setNetworkName(networkName);
         return this;
     }
 
+    /**
+     * Max number of attempts a request executed with this client will do.
+     *
+     * @return
+     */
     public synchronized int getMaxAttempts() {
         return maxAttempts;
     }
 
+    /**
+     * Set the max number of attempts a request executed with this client will do.
+     *
+     * @param maxAttempts
+     * @return
+     */
     public synchronized Client setMaxAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
             throw new IllegalArgumentException("maxAttempts must be greater than zero");
@@ -497,34 +540,73 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Max number of times any node in the network can receive a bad gRPC status before being removed from the network.
+     *
+     * @return
+     */
     public synchronized int getMaxNodeAttempts() {
         return network.getMaxNodeAttempts();
     }
 
+    /**
+     * Set the max number of times any node in the network can receive a bad gRPC status before being removed from the
+     * network.
+     *
+     * @param maxNodeAttempts
+     * @return
+     */
     public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
         this.network.setMaxNodeAttempts(maxNodeAttempts);
         return this;
     }
 
+    /**
+     * The minimum backoff time for any node in the network.
+     *
+     * @return
+     */
     public synchronized Duration getNodeWaitTime() {
         return network.getMinBackoff();
     }
 
+    /**
+     * Set the minimum backoff time for any node in the network.
+     *
+     * @param nodeWaitTime
+     * @return
+     */
     public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
         network.setMinBackoff(nodeWaitTime);
         return this;
     }
 
+    /**
+     * Set the max amount of nodes that will be chosen per request. By default, the request will use 1/3rd the network
+     * nodes per request.
+     *
+     * @param maxNodesPerTransaction
+     * @return
+     */
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
         this.network.setMaxNodesPerRequest(maxNodesPerTransaction);
         return this;
     }
 
+    /**
+     * Enable or disable automatic entity ID checksum validation.
+     * @param value
+     * @return
+     */
     public synchronized Client setAutoValidateChecksums(boolean value) {
         autoValidateChecksums = value;
         return this;
     }
 
+    /**
+     * Is automatic entity ID checksum validation enabled.
+     * @return
+     */
     public synchronized boolean isAutoValidateChecksumsEnabled() {
         return autoValidateChecksums;
     }
@@ -557,6 +639,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return operator.publicKey;
     }
 
+    /**
+     * The default maximum fee used for transactions
+     * @return
+     */
     @Nullable
     public synchronized Hbar getDefaultMaxTransactionFee() {
         return defaultMaxTransactionFee;
@@ -636,20 +722,42 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
+    /**
+     * Maximum amount of time a request can run
+     *
+     * @return
+     */
     @Override
     public synchronized Duration getRequestTimeout() {
         return requestTimeout;
     }
 
+    /**
+     * Set the maximum amount of time a request can run. Used only in async variants of methods.
+     *
+     * @param requestTimeout
+     * @return
+     */
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = Objects.requireNonNull(requestTimeout);
         return this;
     }
 
+    /**
+     * Maximum amount of time closing a network can take.
+     *
+     * @return
+     */
     public Duration getCloseTimeout() {
         return closeTimeout;
     }
 
+    /**
+     * Set the maximum amount of time closing a network can take.
+     *
+     * @param closeTimeout
+     * @return
+     */
     public Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
@@ -671,8 +779,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Override
     public synchronized void close() throws TimeoutException {
-        network.close();
-        mirrorNetwork.close();
+        try {
+            network.close();
+            mirrorNetwork.close();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -685,8 +797,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param timeout The Duration to be set
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
-        network.close(timeout);
-        mirrorNetwork.close(timeout);
+        try {
+            network.close(timeout);
+            mirrorNetwork.close(timeout);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static class Operator {

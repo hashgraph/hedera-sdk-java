@@ -4,8 +4,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import com.google.protobuf.ByteString;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -16,39 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-class Network {
-    static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
-
-    private final ExecutorService executor;
-    private final Semaphore lock = new Semaphore(1);
-
-    private HashMap<AccountId, Node> network = new HashMap<>();
-    private List<Node> nodes = new ArrayList<>();
-
-    @Nullable
-    private NetworkName networkName;
-
+class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, AccountId>, Map.Entry<String, AccountId>> {
     @Nullable
     private Integer maxNodesPerRequest;
-
-    private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
-    private Duration minBackoff = Client.DEFAULT_MIN_BACKOFF;
-
-    private boolean verifyCertificates;
-    private boolean transportSecurity;
-    private boolean transportSecurityChanged;
-
-    private Duration closeTimeout = Client.DEFAULT_CLOSE_TIMEOUT;
 
     @Nullable
     private Map<AccountId, NodeAddress> addressBook;
 
+    private boolean verifyCertificates = true;
+
     private Network(ExecutorService executor, Map<String, AccountId> network) {
-        this.executor = executor;
+        super(executor);
 
         try {
             setNetwork(network);
@@ -121,25 +99,12 @@ class Network {
         return this;
     }
 
-    @Nullable
-    public NetworkName getNetworkName() {
-        return networkName;
-    }
-
     public Network setNetworkName(@Nullable NetworkName networkName) {
-        this.networkName = networkName;
+        super.setNetworkName(networkName);
 
-        if (networkName != null) {
-            addressBook = readAddressBookResource("addressbook/" + networkName + ".pb");
-
-            for (var node : nodes) {
-                node.setAddressBook(addressBook.get(node.getAccountId()));
-            }
-        } else {
-            addressBook = null;
-            for (var node : nodes) {
-                node.setAddressBook(null);
-            }
+        addressBook = networkName == null ? null : readAddressBookResource("addressbook/" + networkName + ".pb");
+        for (var node : nodes) {
+            node.setAddressBook(addressBook == null ? null : addressBook.get(node.getAccountId()));
         }
 
         return this;
@@ -175,78 +140,52 @@ class Network {
         return network;
     }
 
-    public Network setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        lock.acquire();
-
-        // Bypass the more complex code if the network is empty
-        if (nodes.isEmpty()) {
-            for (var entry : network.entrySet()) {
-                var node = new Node(entry.getValue(), entry.getKey(), executor)
-                    .setMinBackoff(minBackoff)
-                    .setVerifyCertificates(verifyCertificates);
-
-                this.network.put(entry.getValue(), node);
-                nodes.add(node);
-            }
-
-            Collections.shuffle(nodes);
-
-            lock.release();
-            return this;
-        }
-
-        var inverted = HashBiMap.create(network).inverse();
-        var newNodeAccountIds = network.values();
-        var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
-
-        // Remove nodes that don't exist in new network or that have a different
-        // address for the same AccountId
-        for (int i = 0; i < nodes.size(); i++) {
-            var remainingTime = stopAt - Instant.now().getEpochSecond();
-            var node = nodes.get(i);
-            var nodeAccountId = node.getAccountId();
-            var nodeAddress = node.address.toString();
-
-            // Exit early if we have no time remaining
-            if (remainingTime <= 0) {
-                lock.release();
-                throw new TimeoutException("Failed to properly shutdown all channels");
-            }
-
-            // Remove and close nodes which are not in the new network
-            if (
-                !newNodeAccountIds.contains(nodeAccountId) ||
-                    !Objects.requireNonNull(inverted.get(nodeAccountId)).equals(nodeAddress)
-            ) {
-                this.network.remove(nodeAccountId);
-                node.close(Duration.ofSeconds(remainingTime));
-                nodes.remove(i);
-                i--;
-            }
-        }
-
-        // Add new nodes that are not present in the list
-        for (var entry : inverted.entrySet()) {
-
-            // Only add nodes which don't already exist in our network map
-            if (this.network.get(entry.getKey()) == null) {
-                var node = new Node(entry.getKey(), entry.getValue(), executor)
-                    .setMinBackoff(minBackoff)
-                    .setVerifyCertificates(verifyCertificates);
-
-                // Add nodes to both the nodes list and network map
-                nodes.add(node);
-                this.network.put(entry.getKey(), node);
-            }
-        }
-
-        Collections.shuffle(nodes);
-
-        lock.release();
-
-        return this;
+    @Override
+    protected Iterable<Map.Entry<String, AccountId>> createIterableNetwork(Map<String, AccountId> network) {
+        return network.entrySet();
     }
 
+    @Override
+    protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
+        return new Node(entry.getValue(), entry.getKey(), executor)
+            .setMinBackoff(minBackoff)
+            .setVerifyCertificates(verifyCertificates);
+    }
+
+    @Override
+    protected void addNodeToNetwork(Node node) {
+        network.put(node.getAccountId(), node);
+    }
+
+    @Override
+    protected void removeNodeFromNetwork(Node node) {
+        network.remove(node.getAccountId());
+    }
+
+    @Override
+    protected List<Integer> getNodesToRemove(Map<String, AccountId> network) {
+        var nodes = new ArrayList<Integer>(this.nodes.size());
+        var newNodeAccountIds = network.values();
+        var inverted = HashBiMap.create(network).inverse();
+
+        for (int i = this.nodes.size() - 1; i >= 0; i--) {
+            var node = this.nodes.get(i);
+
+            if (
+                !newNodeAccountIds.contains(node.getAccountId()) ||
+                    !Objects.requireNonNull(inverted.get(node.getAccountId())).equals(node.getAddress().toString())
+            ) {
+                nodes.add(i);
+            }
+        }
+
+        return nodes;
+    }
+
+    @Override
+    protected boolean checkNetworkContainsEntry(Map.Entry<String, AccountId> entry) {
+        return this.network.containsKey(entry.getValue());
+    }
 
     /**
      * Pick 1/3 of the nodes sorted by health and expected delay from the network.
@@ -255,32 +194,14 @@ class Network {
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
     public List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
-        lock.acquire();
+        var nodes = getNumberOfMostHealthyNodes(getNumberOfNodesForRequest());
+        var nodeAccountIds = new ArrayList<AccountId>(nodes.size());
 
-        Collections.sort(nodes);
-
-        // Remove nodes which have surpassed max attempts
-        if (maxNodeAttempts > 0) {
-            for (var i = 0; i < nodes.size(); i++) {
-                var node = Objects.requireNonNull(nodes.get(i));
-                if (node.getAttempts() >= maxNodeAttempts) {
-                    node.close(closeTimeout);
-                    nodes.remove(i);
-                    network.remove(node.getAccountId());
-                    i--;
-                }
-            }
+        for (var node : nodes) {
+            nodeAccountIds.add(node.getAccountId());
         }
 
-        List<AccountId> resultNodeAccountIds = new ArrayList<>();
-
-        for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
-            resultNodeAccountIds.add(nodes.get(i).getAccountId());
-        }
-
-        lock.release();
-
-        return resultNodeAccountIds;
+        return nodeAccountIds;
     }
 
     public Network setMaxNodesPerRequest(int maxNodesPerRequest) {
@@ -288,28 +209,7 @@ class Network {
         return this;
     }
 
-    public int getMaxNodeAttempts() {
-        return maxNodeAttempts;
-    }
-
-    public Network setMaxNodeAttempts(int maxNodeAttempts) {
-        this.maxNodeAttempts = maxNodeAttempts;
-        return this;
-    }
-
-    public Duration getMinBackoff() {
-        return minBackoff;
-    }
-
-    public Network setMinBackoff(Duration minBackoff) {
-        this.minBackoff = minBackoff;
-        for (var node : nodes) {
-            node.setMinBackoff(minBackoff);
-        }
-        return this;
-    }
-
-    public int getNumberOfNodesForTransaction() {
+    public int getNumberOfNodesForRequest() {
         if (maxNodesPerRequest != null) {
             return Math.min(maxNodesPerRequest, nodes.size());
         } else {
@@ -317,93 +217,7 @@ class Network {
         }
     }
 
-    void close() throws TimeoutException {
-        close(closeTimeout);
-    }
-
-    void close(Duration timeout) throws TimeoutException {
-        try {
-            lock.acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
-
-        for (var node : nodes) {
-            if (node.channel != null) {
-                node.channel = node.channel.shutdown();
-            }
-        }
-
-        for (var node : nodes) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
-                lock.release();
-                throw new TimeoutException("Failed to properly shutdown all channels");
-            }
-
-            if (node.channel != null) {
-                try {
-                    node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    lock.release();
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        nodes.clear();
-        network.clear();
-
-        lock.release();
-    }
-
-    Network setTransportSecurity(boolean transportSecurity) {
-        this.transportSecurityChanged = this.transportSecurity != transportSecurity;
-        this.transportSecurity = transportSecurity;
-
-        // TODO
-
-        return this;
-    }
-
-    public boolean isTransportSecurity() {
-        return transportSecurity;
-    }
-
-    public Duration getCloseTimeout() {
-        return closeTimeout;
-    }
-
-    public Network setCloseTimeout(Duration closeTimeout) {
-        this.closeTimeout = closeTimeout;
-        return this;
-    }
-
-    Node getNodeForAccountId(AccountId nodeAccountId) throws InterruptedException {
-        // If transport security changed, remove all nodes, and construct new nodes with the correct transport security
-        // keeping all other fields identical. The reason we construct new nodes instead of mutating existing ones
-        // is because keep the nodes immutable prevents potential race conditions from happening.
-        if (transportSecurityChanged) {
-            lock.acquire();
-
-            var nodes = new ArrayList<Node>(this.nodes.size());
-            var network = new HashMap<AccountId, Node>();
-
-            for (var node : this.nodes) {
-                var newNode = transportSecurity ? node.toSecure() : node.toInsecure();
-
-                node.close(closeTimeout);
-                nodes.add(newNode);
-                network.put(newNode.getAccountId(), newNode);
-            }
-
-            this.nodes = nodes;
-            this.network = network;
-
-            lock.release();
-        }
-
+    public Node getNodeForAccountId(AccountId nodeAccountId) {
         return network.get(nodeAccountId);
     }
 }
