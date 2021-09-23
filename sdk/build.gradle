@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.hedera.hashgraph"
-version = "2.1.0-beta.1"
+version = "2.1.0"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
@@ -44,7 +44,7 @@ dependencies {
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.1"
-	integrationTestRuntimeOnly "io.grpc:grpc-netty-shaded:1.40.0"
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.40.1'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
