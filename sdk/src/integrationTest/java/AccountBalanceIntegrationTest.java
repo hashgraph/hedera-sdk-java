@@ -21,8 +21,7 @@ class AccountBalanceIntegrationTest {
     @DisplayName("can connect to previewnwet with TLS")
     void canConnectToPreviewnetWithTLS() throws Exception {
         var client = Client.forPreviewnet()
-            .setTransportSecurity(true)
-            .setNetworkName(null);
+            .setTransportSecurity(true);
 
         for (var entry : client.getNetwork().entrySet()) {
             assertTrue(entry.getKey().endsWith(":50212"));
@@ -39,12 +38,11 @@ class AccountBalanceIntegrationTest {
     @DisplayName("can connect to testnet with TLS")
     void canConnectToTestnetWithTLS() throws Exception {
         var client = Client.forTestnet()
-            .setTransportSecurity(true)
-            .setNetworkName(null);
+            .setTransportSecurity(true);
 
         for (var entry : client.getNetwork().entrySet()) {
             assertTrue(entry.getKey().endsWith(":50212"));
-            
+
             new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
                 .setAccountId(entry.getValue())
