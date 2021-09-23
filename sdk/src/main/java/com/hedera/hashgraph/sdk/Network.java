@@ -110,17 +110,7 @@ class Network {
         this.networkName = networkName;
 
         if (networkName != null) {
-            switch (networkName) {
-                case MAINNET:
-                    addressBook = readAddressBookResource("addressbook/mainnet.pb");
-                    break;
-                case TESTNET:
-                    addressBook = readAddressBookResource("addressbook/testnet.pb");
-                    break;
-                case PREVIEWNET:
-                    addressBook = readAddressBookResource("addressbook/previewnet.pb");
-                    break;
-            }
+            addressBook = readAddressBookResource("addressbook/" + networkName + ".pb");
 
             if (addressBook != null) {
                 for (var node : nodes) {
