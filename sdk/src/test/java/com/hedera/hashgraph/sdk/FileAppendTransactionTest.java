@@ -79,16 +79,20 @@ public class FileAppendTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new FileAppendTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+        SnapshotMatcher.expect(spawnTestTransaction(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .toString()
+        ).toMatchSnapshot();
+    }
+
+    private FileAppendTransaction spawnTestTransaction(List<AccountId> accountIds) {
+        return new FileAppendTransaction()
+            .setNodeAccountIds(accountIds)
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setContents(new byte[]{1, 2, 3, 4})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
+            .sign(unusedPrivateKey);
     }
 
     @Test
@@ -97,16 +101,20 @@ public class FileAppendTransactionTest {
         nodeAccountIds.add(AccountId.fromString("0.0.444"));
         nodeAccountIds.add(AccountId.fromString("0.0.555"));
 
-        SnapshotMatcher.expect(new FileAppendTransaction()
+        SnapshotMatcher.expect(spawnTestTransactionBigContents(nodeAccountIds)
+            .toString()
+        ).toMatchSnapshot();
+    }
+
+    private FileAppendTransaction spawnTestTransactionBigContents(ArrayList<AccountId> nodeAccountIds) {
+        return new FileAppendTransaction()
             .setNodeAccountIds(nodeAccountIds)
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.6006"))
             .setContents(BIG_CONTENTS)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
+            .sign(unusedPrivateKey);
     }
 
     String hashesToString(List<Map<AccountId, byte[]>> hashes) {
@@ -129,14 +137,7 @@ public class FileAppendTransactionTest {
         nodeAccountIds.add(AccountId.fromString("0.0.555"));
 
         SnapshotMatcher.expect(
-            hashesToString(new FileAppendTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-                .setFileId(FileId.fromString("0.0.6006"))
-                .setContents(BIG_CONTENTS)
-                .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-                .freeze()
-                .sign(unusedPrivateKey)
+            hashesToString(spawnTestTransactionBigContents(nodeAccountIds)
                 .getAllTransactionHashesPerNode()
             )
         ).toMatchSnapshot();
@@ -169,14 +170,7 @@ public class FileAppendTransactionTest {
         var nodeAccountIds = new ArrayList<AccountId>();
         nodeAccountIds.add(AccountId.fromString("0.0.444"));
         nodeAccountIds.add(AccountId.fromString("0.0.555"));
-        var signatures = new FileAppendTransaction()
-            .setNodeAccountIds(nodeAccountIds)
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFileId(FileId.fromString("0.0.6006"))
-            .setContents(new byte[]{1, 2, 3, 4})
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        var signatures = spawnTestTransaction(nodeAccountIds)
             .sign(secondPrivateKey)
             .getSignatures();
         SnapshotMatcher.expect(signaturesToString(signatures)).toMatchSnapshot();
@@ -187,14 +181,7 @@ public class FileAppendTransactionTest {
         var nodeAccountIds = new ArrayList<AccountId>();
         nodeAccountIds.add(AccountId.fromString("0.0.444"));
         nodeAccountIds.add(AccountId.fromString("0.0.555"));
-        var signatures = new FileAppendTransaction()
-            .setNodeAccountIds(nodeAccountIds)
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFileId(FileId.fromString("0.0.6006"))
-            .setContents(BIG_CONTENTS)
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        var signatures = spawnTestTransactionBigContents(nodeAccountIds)
             .sign(secondPrivateKey)
             .getAllSignatures();
         SnapshotMatcher.expect(allSignaturesToString(signatures)).toMatchSnapshot();
@@ -205,14 +192,7 @@ public class FileAppendTransactionTest {
         var nodeAccountIds = new ArrayList<AccountId>();
         nodeAccountIds.add(AccountId.fromString("0.0.444"));
         nodeAccountIds.add(AccountId.fromString("0.0.555"));
-        var tx = new FileAppendTransaction()
-            .setNodeAccountIds(nodeAccountIds)
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFileId(FileId.fromString("0.0.6006"))
-            .setContents(BIG_CONTENTS)
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey);
+        var tx = spawnTestTransactionBigContents(nodeAccountIds);
         var tx2 = FileAppendTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

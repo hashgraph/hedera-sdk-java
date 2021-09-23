@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,15 +8,16 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.threeten.bp.Duration;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -51,8 +51,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 0, 249})
     @ParameterizedTest(name = "Invalid maxBackoff {0}")
-    void setMaxBackoffInvalid(Long maxBackoffMillis) throws TimeoutException {
-        Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
+    @SuppressWarnings("NullAway")
+    void setMaxBackoffInvalid(@Nullable Long maxBackoffMillis) throws TimeoutException {
+        @Nullable Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMaxBackoff(maxBackoff);
@@ -69,8 +70,9 @@ class ClientTest {
     @NullSource
     @ValueSource(longs = {-1, 8001})
     @ParameterizedTest(name = "Invalid minBackoff {0}")
-    void setMinBackoffInvalid(Long minBackoffMillis) throws TimeoutException {
-        Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
+    @SuppressWarnings("NullAway")
+    void setMinBackoffInvalid(@Nullable Long minBackoffMillis) throws TimeoutException {
+        @Nullable Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
         assertThrows(IllegalArgumentException.class, () -> {
             client.setMinBackoff(minBackoff);
@@ -132,23 +134,21 @@ class ClientTest {
 
     @Test
     @DisplayName("setNetwork() functions correctly")
-    void testReplaceNodes() {
-        assertDoesNotThrow(() -> {
-            @Var Map<String, AccountId> nodes = new HashMap<>();
-            nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
-            nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
+    void testReplaceNodes() throws Exception {
+        Map<String, AccountId> nodes = new HashMap<>();
+        nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
+        nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-            Client client = Client.forNetwork(nodes);
+        Client client = Client.forNetwork(nodes);
 
-            @Var Map<String, AccountId> setNetworkNodes = new HashMap<>();
-            setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
-            setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
+        Map<String, AccountId> setNetworkNodes = new HashMap<>();
+        setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
+        setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
 
-            client.setNetwork(setNetworkNodes);
+        client.setNetwork(setNetworkNodes);
 
-            Assertions.assertEquals(client.network.networkNodes.get(new AccountId(5)).getChannel().authority(), "2.testnet.hedera.com:50211");
-            Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
-            client.close();
-        });
+        Assertions.assertEquals("2.testnet.hedera.com:50211", Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5))).getChannel().authority());
+        Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
+        client.close();
     }
 }

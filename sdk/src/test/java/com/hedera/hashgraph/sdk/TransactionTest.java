@@ -13,7 +13,7 @@ public class TransactionTest {
 
         var transaction = (TransferTransaction) Transaction.fromBytes(bytes);
 
-        assertEquals(new Hbar(1).negated(), transaction.getHbarTransfers().get(new AccountId(476260)));
-        assertEquals(new Hbar(1), transaction.getHbarTransfers().get(new AccountId(476267)));
+        assertEquals(transaction.getHbarTransfers().get(new AccountId(476260)), new Hbar(1).negated());
+        assertEquals(transaction.getHbarTransfers().get(new AccountId(476267)), new Hbar(1));
     }
 }

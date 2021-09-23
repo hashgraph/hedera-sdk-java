@@ -14,7 +14,9 @@ class StatusTest {
         for (ResponseCodeEnum code : ResponseCodeEnum.values()) {
             // not an actual value we want to handle
             // this is what we're given if an unexpected value was decoded
-            if (code == ResponseCodeEnum.UNRECOGNIZED) continue;
+            if (code == ResponseCodeEnum.UNRECOGNIZED) {
+                continue;
+            }
 
             Status status = Status.valueOf(code);
 

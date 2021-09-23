@@ -4,7 +4,6 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Collections;
@@ -37,6 +36,7 @@ public class AccountCreateTransactionTest {
             .setAccountMemo("some dumb memo")
             .setReceiverSignatureRequired(true)
             //.setAutoRenewPeriod(Duration.ofHours(10))
+            .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);

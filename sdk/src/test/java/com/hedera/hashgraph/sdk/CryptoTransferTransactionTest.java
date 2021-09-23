@@ -29,22 +29,13 @@ public class CryptoTransferTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TransferTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .addHbarTransfer(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800).negated())
-            .addHbarTransfer(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
-            .addHbarTransfer(AccountId.fromString("0.0.5008"), Hbar.fromTinybars(400))
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new TransferTransaction()
+    private TransferTransaction spawnTestTransaction() {
+        return new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .addHbarTransfer(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800).negated())
@@ -53,6 +44,11 @@ public class CryptoTransferTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TransferTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

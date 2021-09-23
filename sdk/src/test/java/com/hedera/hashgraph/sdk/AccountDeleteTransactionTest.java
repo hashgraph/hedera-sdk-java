@@ -28,21 +28,13 @@ public class AccountDeleteTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new AccountDeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setAccountId(AccountId.fromString("0.0.5007"))
-            .setTransferAccountId(AccountId.fromString("0.0.5008"))
-            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
-            .freeze()
-            .sign(unusedPrivateKey)
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldBytes() throws Exception {
-        var tx = new AccountDeleteTransaction()
+    private AccountDeleteTransaction spawnTestTransaction() {
+        return new AccountDeleteTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.5007"))
@@ -50,6 +42,11 @@ public class AccountDeleteTransactionTest {
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = AccountDeleteTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }

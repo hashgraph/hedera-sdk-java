@@ -22,7 +22,7 @@ class KeystoreTest {
         Keystore keystore = Keystore.fromStream(inputStream, PASSPHRASE);
 
         PrivateKey privateKey = keystore.getEd25519();
-        Assertions.assertEquals(privateKey.toString(), TEST_KEY_STR);
+        Assertions.assertEquals(TEST_KEY_STR, privateKey.toString());
     }
 
     @Test
@@ -34,7 +34,7 @@ class KeystoreTest {
         Keystore keystore = Keystore.fromStream(inputStream, PASSPHRASE);
 
         PrivateKey privateKey = keystore.getEd25519();
-        Assertions.assertEquals(privateKey.toString(), TEST_KEY_STR);
+        Assertions.assertEquals(TEST_KEY_STR, privateKey.toString());
     }
 
     @Test
@@ -49,6 +49,6 @@ class KeystoreTest {
         Keystore keystore2 = Keystore.fromStream(new ByteArrayInputStream(outputStream.toByteArray()), PASSPHRASE);
         PrivateKey privateKey2 = keystore2.getEd25519();
 
-        Assertions.assertEquals(privateKey2.toString(), TEST_KEY_STR);
+        Assertions.assertEquals(TEST_KEY_STR, privateKey2.toString());
     }
 }

@@ -28,59 +28,14 @@ public class TokenUpdateTransactionTest {
     }
 
     @Test
-    void shouldSerializeFungible() {
-        SnapshotMatcher.expect(new TokenUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("1.2.3"))
-            .setFeeScheduleKey(unusedPrivateKey)
-            .setSupplyKey(unusedPrivateKey)
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
-            .setAutoRenewPeriod(Duration.ofSeconds(100))
-            .setFreezeKey(unusedPrivateKey)
-            .setWipeKey(unusedPrivateKey)
-            .setTokenSymbol("F")
-            .setKycKey(unusedPrivateKey)
-            .setExpirationTime(validStart)
-            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
-            .setTokenName("floof")
-            .setTokenMemo("Floof says hi")
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
+    void shouldSerialize() {
+        SnapshotMatcher.expect(spawnTestTransaction()
             .toString()
         ).toMatchSnapshot();
     }
 
-    @Test
-    void shouldSerializeNft() {
-        SnapshotMatcher.expect(new TokenUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFeeScheduleKey(unusedPrivateKey)
-            .setSupplyKey(unusedPrivateKey)
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
-            .setAutoRenewPeriod(Duration.ofSeconds(100))
-            .setFreezeKey(unusedPrivateKey)
-            .setWipeKey(unusedPrivateKey)
-            .setTokenSymbol("F")
-            .setKycKey(unusedPrivateKey)
-            .setExpirationTime(validStart)
-            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
-            .setTokenName("floof")
-            .setTokenMemo("Floof says hi")
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey)
-            .toString()
-        ).toMatchSnapshot();
-    }
-
-    @Test
-    void shouldBytesFungible() throws Exception {
-        var tx = new TokenUpdateTransaction()
+    private TokenUpdateTransaction spawnTestTransaction() {
+        return new TokenUpdateTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTokenId(TokenId.fromString("1.2.3"))
@@ -100,31 +55,11 @@ public class TokenUpdateTransactionTest {
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
-        var tx2 = TokenUpdateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
     }
 
     @Test
-    void shouldBytesNft() throws Exception {
-        var tx = new TokenUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFeeScheduleKey(unusedPrivateKey)
-            .setSupplyKey(unusedPrivateKey)
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
-            .setAutoRenewPeriod(Duration.ofSeconds(100))
-            .setFreezeKey(unusedPrivateKey)
-            .setWipeKey(unusedPrivateKey)
-            .setTokenSymbol("F")
-            .setKycKey(unusedPrivateKey)
-            .setExpirationTime(validStart)
-            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
-            .setTokenName("floof")
-            .setTokenMemo("Floof says hi")
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+    void shouldBytes() throws Exception {
+        var tx = spawnTestTransaction();
         var tx2 = TokenUpdateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
