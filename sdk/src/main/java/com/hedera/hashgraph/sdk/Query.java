@@ -159,11 +159,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     void onExecute(Client client) throws TimeoutException, PrecheckStatusException {
         var grpcCostQuery = new GrpcCostQuery(client);
 
-        if (grpcCostQuery.existEarly) {
+        if (grpcCostQuery.isRequired()) {
             return;
         }
 
-        if (grpcCostQuery.cost == null) {
+        if (grpcCostQuery.getCost() == null) {
             grpcCostQuery.setCost(getCost(client));
 
             if (grpcCostQuery.shouldError()) {
@@ -178,12 +178,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     CompletableFuture<Void> onExecuteAsync(Client client) {
         var grpcCostQuery = new GrpcCostQuery(client);
 
-        if (grpcCostQuery.existEarly) {
+        if (grpcCostQuery.isRequired()) {
             return CompletableFuture.completedFuture(null);
         }
 
         return CompletableFuture.supplyAsync(() -> {
-                if (grpcCostQuery.cost == null) {
+                if (grpcCostQuery.getCost() == null) {
                     // No payment was specified so we need to go ask
                     // This is a query in its own right so we use a nested future here
                     return getCostAsync(client).thenCompose(cost -> {
@@ -293,20 +293,34 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     private class GrpcCostQuery {
-        Client.Operator operator;
-        Hbar cost;
-        Hbar maxCost;
-        boolean existEarly;
+        private final Hbar maxCost;
+        private final boolean required;
+
+        private Client.Operator operator;
+        private Hbar cost;
 
         GrpcCostQuery(Client client) {
             Query.this.initWithNodeIds(client);
+
             cost = Query.this.queryPayment;
-            existEarly = (Query.this.paymentTransactions != null) || !Query.this.isPaymentRequired();
+            required = (Query.this.paymentTransactions != null) || !Query.this.isPaymentRequired();
             maxCost = MoreObjects.firstNonNull(Query.this.maxQueryPayment, client.defaultMaxQueryPayment);
 
-            if (!existEarly) {
+            if (!required) {
                 operator = Query.this.getOperatorFromClient(client);
             }
+        }
+
+        public Client.Operator getOperator() {
+            return operator;
+        }
+
+        public Hbar getCost() {
+            return cost;
+        }
+
+        public boolean isRequired() {
+            return required;
         }
 
         GrpcCostQuery setCost(Hbar cost) {
