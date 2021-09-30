@@ -159,7 +159,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     void onExecute(Client client) throws TimeoutException, PrecheckStatusException {
         var grpcCostQuery = new GrpcCostQuery(client);
 
-        if (grpcCostQuery.isRequired()) {
+        if (grpcCostQuery.isNotRequired()) {
             return;
         }
 
@@ -178,7 +178,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     CompletableFuture<Void> onExecuteAsync(Client client) {
         var grpcCostQuery = new GrpcCostQuery(client);
 
-        if (grpcCostQuery.isRequired()) {
+        if (grpcCostQuery.isNotRequired()) {
             return CompletableFuture.completedFuture(null);
         }
 
@@ -294,7 +294,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
     private class GrpcCostQuery {
         private final Hbar maxCost;
-        private final boolean required;
+        private final boolean notRequired;
 
         private Client.Operator operator;
         private Hbar cost;
@@ -303,10 +303,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             Query.this.initWithNodeIds(client);
 
             cost = Query.this.queryPayment;
-            required = (Query.this.paymentTransactions != null) || !Query.this.isPaymentRequired();
+            notRequired = (Query.this.paymentTransactions != null) || !Query.this.isPaymentRequired();
             maxCost = MoreObjects.firstNonNull(Query.this.maxQueryPayment, client.defaultMaxQueryPayment);
 
-            if (!required) {
+            if (!notRequired) {
                 operator = Query.this.getOperatorFromClient(client);
             }
         }
@@ -319,8 +319,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             return cost;
         }
 
-        public boolean isRequired() {
-            return required;
+        public boolean isNotRequired() {
+            return notRequired;
         }
 
         GrpcCostQuery setCost(Hbar cost) {
