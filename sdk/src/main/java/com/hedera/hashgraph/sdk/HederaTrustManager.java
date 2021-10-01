@@ -46,17 +46,11 @@ class HederaTrustManager implements X509TrustManager {
         }
 
         for (var cert : chain) {
-            var base64Cert = new String(Base64.encode(cert.getEncoded()));
-
-            // Convert DER encoding to PEM encoding
-            StringBuilder pemBuilder = new StringBuilder(PEM_HEADER);
-            for (int i = 0; i < base64Cert.length(); i += 64) {
-                var end = Math.min(i + 64, base64Cert.length());
-                pemBuilder.append(base64Cert, i, end).append("\n");
-            }
-            pemBuilder.append(PEM_FOOTER);
-
-            var pem = pemBuilder.toString().getBytes(StandardCharsets.US_ASCII);
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
+      pemWriter.writeObject(new PemObject("CERTIFICATE", cert.getEncoded()));
+    }
+    var pem = outputStream.toByteArray();
 
             var certHash = new byte[0];
 
