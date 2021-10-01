@@ -200,6 +200,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -211,6 +212,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    @Nullable
     public String getTokenMemo() {
         return tokenMemo;
     }

@@ -13,7 +13,6 @@ import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -144,7 +143,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     public List<Map<AccountId, Map<PublicKey, byte[]>>> getAllSignatures() {
         if (publicKeys.isEmpty()) {
-            return Collections.emptyList();
+            return new ArrayList<>();
         }
 
         buildAllTransactions();
@@ -273,7 +272,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
 
             onFreezeChunk(
-                frozenBodyBuilder.setTransactionID(nextTransactionId.build()),
+                Objects.requireNonNull(frozenBodyBuilder).setTransactionID(nextTransactionId.build()),
                 initialTransactionId,
                 startIndex,
                 endIndex,

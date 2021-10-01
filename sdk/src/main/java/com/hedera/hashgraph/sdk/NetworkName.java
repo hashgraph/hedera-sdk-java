@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import java.util.Objects;
-
 public enum NetworkName {
     MAINNET(0),
     TESTNET(1),

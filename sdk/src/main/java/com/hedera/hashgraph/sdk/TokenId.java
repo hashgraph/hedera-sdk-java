@@ -72,8 +72,8 @@ public class TokenId {
     }
 
     /**
-     * @param client
-     * @throws BadEntityIdException
+     * @param client to validate against
+     * @throws BadEntityIdException if entity ID is formatted poorly
      * @deprecated Use {@link #validateChecksum(Client)} instead.
      */
     @Deprecated
@@ -109,9 +109,14 @@ public class TokenId {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof TokenId)) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof TokenId)) {
+            return false;
+        }
 
         TokenId otherId = (TokenId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;

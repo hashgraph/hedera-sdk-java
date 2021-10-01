@@ -83,7 +83,10 @@ final class Pem {
         for (; ; ) {
             PemObject nextObject = pemReader.readPemObject();
 
-            if (nextObject == null) break;
+            if (nextObject == null) {
+                break;
+            }
+
             readObject = nextObject;
 
             String objType = readObject.getType();

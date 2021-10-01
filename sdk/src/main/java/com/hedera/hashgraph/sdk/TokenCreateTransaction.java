@@ -225,6 +225,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }

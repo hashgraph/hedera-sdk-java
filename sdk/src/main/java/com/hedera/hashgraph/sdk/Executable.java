@@ -8,6 +8,7 @@ import java8.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
+import io.grpc.Status.Code;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -24,9 +25,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
-    protected Integer maxAttempts;
-    protected Duration maxBackoff;
-    protected Duration minBackoff;
+    @Nullable
+    protected Integer maxAttempts = null;
+
+    @Nullable
+    protected Duration maxBackoff = null;
+
+    @Nullable
+    protected Duration minBackoff = null;
+
     protected int nextNodeIndex = 0;
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
@@ -35,7 +42,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     /**
-     * @return maxBackoff The maximum amount of time to wait between retries
+     * The maximum amount of time to wait between retries
+     *
+     * @return maxBackoff
      */
     public final Duration getMaxBackoff() {
         return maxBackoff != null ? maxBackoff : Client.DEFAULT_MAX_BACKOFF;
@@ -60,7 +69,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     /**
-     * @return minBackoff The minimum amount of time to wait between retries
+     * The minimum amount of time to wait between retries
+     *
+     * @return minBackoff
      */
     public final Duration getMinBackoff() {
         return minBackoff != null ? minBackoff : Client.DEFAULT_MIN_BACKOFF;
@@ -180,7 +191,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
-        if (attempt > maxAttempts) {
+        if (attempt > Objects.requireNonNull(maxAttempts)) {
             return CompletableFuture.<O>failedFuture(new Exception("Failed to get gRPC response within maximum retry count", lastException));
         }
 
@@ -211,7 +222,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            long delay = (long) Math.min(minBackoff.toMillis() * Math.pow(2, attempt - 1), maxBackoff.toMillis());
+            long delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1), Objects.requireNonNull(maxBackoff).toMillis());
 
             if (shouldRetryExceptionally(error)) {
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
@@ -296,9 +307,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var status = statusException.getStatus().getCode();
             var description = statusException.getStatus().getDescription();
 
-            return (status == io.grpc.Status.Code.UNAVAILABLE) ||
-                (status == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
-                (status == io.grpc.Status.Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
+            return (status == Code.UNAVAILABLE) ||
+                (status == Code.RESOURCE_EXHAUSTED) ||
+                (status == Code.INTERNAL && description != null && RST_STREAM.matcher(description).matches());
         }
 
         return false;
