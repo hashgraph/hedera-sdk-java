@@ -26,7 +26,7 @@ class ManagedNodeAddress {
         var hostAndPortMatcher = HOST_AND_PORT.matcher(string);
         var inProcessMatcher = IN_PROCESS.matcher(string);
 
-        if (hostAndPortMatcher.find()) {
+        if (hostAndPortMatcher.matches() && hostAndPortMatcher.groupCount() == 2) {
             var address = hostAndPortMatcher.group("address");
             var port = hostAndPortMatcher.group("port");
 
