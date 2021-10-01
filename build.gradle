@@ -62,7 +62,7 @@ allprojects {
 			option("NullAway:TreatGeneratedAsUnannotated", "true")
 
 			// https://github.com/grpc/grpc-java-api-checker
-			warn("GrpcExperimentalApi")
+			disable("GrpcExperimentalApi")
 			warn("GrpcInternal")
 
 			// Enable _all_ error prone checks then selectively disble
@@ -77,6 +77,7 @@ allprojects {
 			disable("ThreadJoinLoop")
 			disable("UnnecessaryDefaultInEnumSwitch")
 			disable("UngroupedOverloads")
+			disable("InlineMeSuggester")
 
 			// Uncomment do disable Android + JDK7 checks
 			// disable("Java7ApiChecker")

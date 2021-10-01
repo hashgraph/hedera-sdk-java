@@ -43,7 +43,7 @@ public final class Mnemonic {
     @Nullable
     private String asString;
 
-
+    @SuppressWarnings("StaticAssignmentInConstructor")
     private Mnemonic(List<? extends CharSequence> words) {
         if (words.size() == 22) {
             isLegacy = true;
@@ -182,7 +182,7 @@ public final class Mnemonic {
         @Var
         var found = -1;
         for (var i = 0; i < wordList.size(); i++) {
-            if (word.equals(wordList.get(i))) {
+            if (word.toString().equals(wordList.get(i))) {
                 found = i;
             }
         }

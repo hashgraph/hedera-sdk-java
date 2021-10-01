@@ -4,17 +4,29 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
 
+import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class NodeAddress {
+    @Nullable
     String publicKey;
+
+    @Nullable
     AccountId accountId;
+
     long nodeId;
+
+    @Nullable
     ByteString certHash;
-    List<Endpoint> addresses;
-    String description;
+
+    List<Endpoint> addresses = Collections.emptyList();
+
+    @Nullable
+    String description = null;
+
     long stake;
 
     NodeAddress() {
@@ -36,17 +48,22 @@ class NodeAddress {
             address.add(Endpoint.fromProtobuf(endpoint));
         }
 
-
-        return new NodeAddress()
+        var node = new NodeAddress()
             .setPublicKey(nodeAddress.getRSAPubKey())
             .setNodeId(nodeAddress.getNodeId())
-            .setAccountId(nodeAddress.hasNodeAccountId() ? AccountId.fromProtobuf(nodeAddress.getNodeAccountId()) : null)
             .setCertHash(nodeAddress.getNodeCertHash())
             .setAddresses(address)
             .setDescription(nodeAddress.getDescription())
             .setStake(nodeAddress.getStake());
+
+        if (nodeAddress.hasNodeAccountId()) {
+            node.setAccountId(AccountId.fromProtobuf(nodeAddress.getNodeAccountId()));
+        }
+
+        return node;
     }
 
+    @Nullable
     String getPublicKey() {
         return publicKey;
     }
@@ -56,6 +73,7 @@ class NodeAddress {
         return this;
     }
 
+    @Nullable
     AccountId getAccountId() {
         return accountId;
     }
@@ -74,6 +92,7 @@ class NodeAddress {
         return this;
     }
 
+    @Nullable
     ByteString getCertHash() {
         return certHash;
     }
@@ -92,6 +111,7 @@ class NodeAddress {
         return this;
     }
 
+    @Nullable
     String getDescription() {
         return description;
     }
@@ -112,8 +132,11 @@ class NodeAddress {
 
     com.hedera.hashgraph.sdk.proto.NodeAddress toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.NodeAddress.newBuilder()
-            .setNodeId(nodeId)
-            .setNodeCertHash(certHash);
+            .setNodeId(nodeId);
+
+        if (certHash != null) {
+            builder.setNodeCertHash(certHash);
+        }
 
         if (publicKey != null) {
             builder.setRSAPubKey(publicKey);
@@ -134,12 +157,13 @@ class NodeAddress {
         return builder.build();
     }
 
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("publicKey", publicKey)
             .add("accountId", accountId)
             .add("nodeId", nodeId)
-            .add("certHash", new String(certHash.toByteArray(), StandardCharsets.UTF_8))
+            .add("certHash", certHash != null ? new String(certHash.toByteArray(), StandardCharsets.UTF_8) : null)
             .add("addresses", addresses)
             .add("description", description)
             .add("stake", stake)

@@ -34,6 +34,12 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:1.7.32'
 
+	// Toggle which slf4j library to use to enable/disable logging
+	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha1'
+	integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha1'
+	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+
 	implementation "io.grpc:grpc-core:1.41.0"
 	implementation "io.grpc:grpc-protobuf-lite:1.41.0"
 	implementation "io.grpc:grpc-stub:1.41.0"
@@ -44,7 +50,7 @@ dependencies {
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
 	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.41.0"
-	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.40.1'
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.41.0'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -223,7 +229,11 @@ modifyPom {
 extraArchive {
 	sources = true
 	tests = false
-	javadoc = true
+	javadoc = false
+}
+
+javadoc {
+	exclude 'build/**'
 }
 
 nexus {

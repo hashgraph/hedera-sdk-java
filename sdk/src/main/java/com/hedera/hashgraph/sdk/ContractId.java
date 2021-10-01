@@ -79,8 +79,8 @@ public final class ContractId extends Key {
     }
 
     /**
-     * @param client
-     * @throws BadEntityIdException
+     * @param client to validate against
+     * @throws BadEntityIdException if entity ID is formatted poorly
      * @deprecated Use {@link #validateChecksum(Client)} instead.
      */
     @Deprecated
@@ -124,9 +124,14 @@ public final class ContractId extends Key {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ContractId)) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof ContractId)) {
+            return false;
+        }
 
         ContractId otherId = (ContractId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;

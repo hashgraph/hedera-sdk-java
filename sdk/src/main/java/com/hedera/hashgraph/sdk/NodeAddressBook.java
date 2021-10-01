@@ -5,10 +5,11 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class NodeAddressBook {
-    List<NodeAddress> nodeAddresses;
+    List<NodeAddress> nodeAddresses = Collections.emptyList();
 
     NodeAddressBook() {
     }
@@ -50,6 +51,7 @@ class NodeAddressBook {
         return toProtobuf().toByteString();
     }
 
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("nodeAddresses", nodeAddresses)

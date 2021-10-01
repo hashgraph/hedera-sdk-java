@@ -311,7 +311,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) throws InvalidProtocolBufferException {
+    public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()
             .setMemo(scheduled.getMemo())
             .setTransactionFee(scheduled.getTransactionFee());
@@ -859,7 +859,7 @@ public abstract class Transaction<T extends Transaction<T>>
             ).build());
     }
 
-    private boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
+    private static boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
         for(var pair : sigPairList) {
             if(pair.getPubKeyPrefix().equals(publicKeyBytes)) {
                 return true;
