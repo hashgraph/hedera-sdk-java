@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 class ManagedNodeAddress {
-    private static final Pattern HOST_AND_PORT = Pattern.compile("(?<address>^.*):(?<port>\\d+$)");
-    private static final Pattern IN_PROCESS = Pattern.compile("in-process:(?<name>.*)");
+    private static final Pattern HOST_AND_PORT = Pattern.compile("^(?<address>\\S+):(?<port>\\d+)$");
+    private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(?<name>\\S+)$");
 
     // If address is `in-process:.*` this will contain the right side of the `:`
     @Nullable
