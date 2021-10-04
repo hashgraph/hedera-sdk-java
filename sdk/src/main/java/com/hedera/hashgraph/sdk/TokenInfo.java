@@ -119,13 +119,38 @@ public class TokenInfo {
      */
     public final String tokenMemo;
 
+    /**
+     * The custom fees to be assessed during a CryptoTransfer that transfers units of this token
+     */
     public final List<CustomFee> customFees;
 
+    /**
+     * The token type
+     */
     public final TokenType tokenType;
 
+    /**
+     * The token supply type
+     */
     public final TokenSupplyType supplyType;
 
+    /**
+     * For tokens of type FUNGIBLE_COMMON - The Maximum number of fungible tokens that can be in
+     * circulation. For tokens of type NON_FUNGIBLE_UNIQUE - the maximum number of NFTs (serial
+     * numbers) that can be in circulation
+     */
     public final long maxSupply;
+
+    /**
+     * The Key which can pause and unpause the Token.
+     */
+    @Nullable
+    public final Key pauseKey;
+
+    /**
+     * Specifies whether the token is paused or not. PauseNotApplicable is returned if pauseKey is not set.
+     */
+    public final TokenPauseStatus pauseStatus;
 
     TokenInfo(
         TokenId tokenId,
@@ -150,7 +175,9 @@ public class TokenInfo {
         List<CustomFee> customFees,
         TokenType tokenType,
         TokenSupplyType supplyType,
-        long maxSupply
+        long maxSupply,
+        @Nullable Key pauseKey,
+        TokenPauseStatus pauseStatus
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -175,6 +202,8 @@ public class TokenInfo {
         this.tokenType = tokenType;
         this.supplyType = supplyType;
         this.maxSupply = maxSupply;
+        this.pauseKey = pauseKey;
+        this.pauseStatus = pauseStatus;
     }
 
     @Nullable
@@ -213,7 +242,9 @@ public class TokenInfo {
             customFeesFromProto(info),
             TokenType.valueOf(info.getTokenType()),
             TokenSupplyType.valueOf(info.getSupplyType()),
-            info.getMaxSupply()
+            info.getMaxSupply(),
+            info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
+            TokenPauseStatus.valueOf(info.getPauseStatus())
         );
     }
 
@@ -251,7 +282,8 @@ public class TokenInfo {
             .setMemo(tokenMemo)
             .setTokenType(tokenType.code)
             .setSupplyType(supplyType.code)
-            .setMaxSupply(maxSupply);
+            .setMaxSupply(maxSupply)
+            .setPauseStatus(pauseStatus.code);
         if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
@@ -269,6 +301,9 @@ public class TokenInfo {
         }
         if (feeScheduleKey != null) {
             tokenInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if (pauseKey != null) {
+            tokenInfoBuilder.setPauseKey(pauseKey.toProtobufKey());
         }
         if (autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
@@ -311,6 +346,8 @@ public class TokenInfo {
             .add("tokenType", tokenType)
             .add("supplyType", supplyType)
             .add("maxSupply", maxSupply)
+            .add("pauseKey", pauseKey)
+            .add("pauseStatus", pauseStatus)
             .toString();
     }
 
