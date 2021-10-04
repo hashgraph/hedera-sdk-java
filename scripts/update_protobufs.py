@@ -49,6 +49,7 @@ JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hedera", "hashgraph", "s
 REQUEST_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "RequestType.java")
 STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "Status.java")
 FEE_DATA_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FeeDataType.java")
+TOKEN_PAUSE_STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "TokenPauseStatus.java")
 
 
 PROTO_DO_NOT_REMOVE = (
@@ -96,6 +97,8 @@ def main():
     generate_Status()
     print(">>> Generating FeeDataType.java")
     generate_FeeDataType()
+    print(">>> Generating TokenPauseStatus.java")
+    generate_TokenPauseStatus()
     print(">>> Clearing proto output directory")
     clear_proto_dir()
     print(">>> Generating modified proto files")
@@ -156,6 +159,15 @@ def generate_FeeDataType():
         add_to_FeeDataType,
         finalize_FeeDataType)
     output_java_file(FEE_DATA_TYPE_OUT_PATH, FeeDataType_sections)
+
+
+def generate_TokenPauseStatus():
+    parse_enum_from_file(
+        BASIC_TYPES_PATH,
+        "TokenPauseStatus",
+        add_to_TokenPauseStatus,
+        finalize_TokenPauseStatus)
+    output_java_file(TOKEN_PAUSE_STATUS_OUT_PATH, TokenPauseStatus_sections)
 
 
 def clear_proto_dir():
@@ -226,6 +238,17 @@ FeeDataType_sections = [
 ]
 
 
+TokenPauseStatus_sections = [
+    premade("TokenPauseStatus", 0),
+    "",
+    premade("TokenPauseStatus", 2),
+    "",
+    premade("TokenPauseStatus", 4),
+    "",
+    premade("TokenPauseStatus", 6)
+]
+
+
 def output_java_file(out_path, section_list):
     out_file = open(out_path, "w")
     for section in section_list:
@@ -257,6 +280,13 @@ def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
     FeeDataType_sections[5] += generate_toString(original_name, cap_snake_name, 3)
 
 
+def add_to_TokenPauseStatus(original_name, cap_snake_name, comment_lines):
+    TokenPauseStatus_sections[1] += \
+        generate_enum(original_name, cap_snake_name, comment_lines, "com.hedera.hashgraph.sdk.proto.TokenPauseStatus", 1)
+    TokenPauseStatus_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
+    TokenPauseStatus_sections[5] += generate_toString(original_name, cap_snake_name, 3)
+
+
 def replace_last_enum_comma(s):
     return s[0:-3] + ";\n\n"
 
@@ -271,6 +301,9 @@ def finalize_Status():
 
 def finalize_FeeDataType():
     FeeDataType_sections[1] = replace_last_enum_comma(FeeDataType_sections[1])
+
+def finalize_TokenPauseStatus():
+    TokenPauseStatus_sections[1] = replace_last_enum_comma(TokenPauseStatus_sections[1])
 
 
 
