@@ -264,7 +264,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     private void setNodesFromNodeAccountIds(Client client) {
         for (var accountId : nodeAccountIds) {
             @Nullable
-            var node = client.network.getNodeForAccountId(accountId);
+            var node = client.network.getNode(accountId);
             if (node == null) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }

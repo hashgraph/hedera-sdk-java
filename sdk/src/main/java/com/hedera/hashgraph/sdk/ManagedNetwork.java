@@ -77,7 +77,7 @@ abstract class ManagedNetwork<
     }
 
     @Nullable
-    public NetworkName getNetworkName() {
+    NetworkName getNetworkName() {
         return networkName;
     }
 
@@ -88,14 +88,14 @@ abstract class ManagedNetwork<
      * @param networkName
      * @return
      */
-    public ManagedNetworkT setNetworkName(@Nullable NetworkName networkName) {
+    ManagedNetworkT setNetworkName(@Nullable NetworkName networkName) {
         this.networkName = networkName;
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
     }
 
-    public int getMaxNodeAttempts() {
+    int getMaxNodeAttempts() {
         return maxNodeAttempts;
     }
 
@@ -105,14 +105,14 @@ abstract class ManagedNetwork<
      * @param maxNodeAttempts
      * @return
      */
-    public ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
+    ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
         this.maxNodeAttempts = maxNodeAttempts;
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
     }
 
-    public Duration getMinBackoff() {
+    Duration getMinBackoff() {
         return minBackoff;
     }
 
@@ -122,7 +122,7 @@ abstract class ManagedNetwork<
      * @param minBackoff
      * @return
      */
-    public ManagedNetworkT setMinBackoff(Duration minBackoff) {
+    ManagedNetworkT setMinBackoff(Duration minBackoff) {
         this.minBackoff = minBackoff;
 
         for (var node : nodes) {
@@ -133,7 +133,7 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-    public boolean isTransportSecurity() {
+    boolean isTransportSecurity() {
         return transportSecurity;
     }
 
@@ -144,7 +144,7 @@ abstract class ManagedNetwork<
      * @return
      * @throws InterruptedException
      */
-    public ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
+    ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         if (this.transportSecurity != transportSecurity) {
             lock.acquire();
 
@@ -170,11 +170,11 @@ abstract class ManagedNetwork<
     }
 
 
-    public Duration getCloseTimeout() {
+    Duration getCloseTimeout() {
         return closeTimeout;
     }
 
-    public ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
+    ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = closeTimeout;
 
         // noinspection unchecked
@@ -214,7 +214,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException - when shutting down nodes
      * @throws InterruptedException - when acquiring the lock
      */
-    public ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
+    ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
         lock.acquire();
 
         var iterableNetwork = createIterableNetwork(network);
@@ -319,7 +319,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    public void close() throws TimeoutException, InterruptedException {
+    void close() throws TimeoutException, InterruptedException {
         close(closeTimeout);
     }
 
@@ -330,7 +330,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    public void close(Duration timeout) throws TimeoutException, InterruptedException {
+    void close(Duration timeout) throws TimeoutException, InterruptedException {
         lock.acquire();
 
         var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();

@@ -80,20 +80,20 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      *
      * @return
      */
-    public abstract N toInsecure();
+    abstract N toInsecure();
 
     /**
      * Create a secure version of this node
      * @return
      */
-    public abstract N toSecure();
+    abstract N toSecure();
 
     /**
      * Get the address of this node
      *
      * @return
      */
-    public ManagedNodeAddress getAddress() {
+    ManagedNodeAddress getAddress() {
         return address;
     }
 
@@ -101,7 +101,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * Get the minimum backoff
      * @return
      */
-    public Duration getMinBackoff() {
+    Duration getMinBackoff() {
         return minBackoff;
     }
 
@@ -111,7 +111,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * @param minBackoff
      * @return
      */
-    public N setMinBackoff(Duration minBackoff) {
+    N setMinBackoff(Duration minBackoff) {
         this.minBackoff = minBackoff;
 
         // noinspection unchecked
@@ -122,7 +122,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * Get the number of times this node has received a bad gRPC status
      * @return
      */
-    public long getAttempts() {
+    long getAttempts() {
         return attempts;
     }
 
@@ -133,14 +133,14 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      *
      * @return
      */
-    public boolean isHealthy() {
+    boolean isHealthy() {
         return backoffUntil < System.currentTimeMillis();
     }
 
     /**
      * Used when a node has received a bad gRPC status
      */
-    public void increaseDelay() {
+    void increaseDelay() {
         this.attempts++;
         this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
         this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, 8000));
@@ -152,7 +152,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * this is to allow a node which has been performing poorly (receiving several bad gRPC status) to become used again
      * once it stops receiving bad gRPC statuses.
      */
-    public void decreaseDelay() {
+    void decreaseDelay() {
         this.currentBackoff = Duration.ofMillis(Math.max(this.currentBackoff.toMillis() / 2, minBackoff.toMillis()));
     }
 
@@ -161,7 +161,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      *
      * @return
      */
-    public long getRemainingTimeForBackoff() {
+    long getRemainingTimeForBackoff() {
         return backoffUntil - System.currentTimeMillis();
     }
 
@@ -170,7 +170,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      *
      * @return
      */
-    public ChannelCredentials getChannelCredentials() {
+    ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.create();
     }
 
@@ -179,7 +179,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      *
      * @return
      */
-    public synchronized ManagedChannel getChannel() {
+    synchronized ManagedChannel getChannel() {
         useCount++;
         lastUsed = System.currentTimeMillis();
 
@@ -211,7 +211,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * @param timeout
      * @throws InterruptedException
      */
-    public synchronized void close(Duration timeout) throws InterruptedException {
+    synchronized void close(Duration timeout) throws InterruptedException {
         if (channel != null) {
             channel.shutdown();
             channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);

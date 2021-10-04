@@ -35,11 +35,11 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         }
     }
 
-    public static Network forNetwork(ExecutorService executor, Map<String, AccountId> network) {
+    static Network forNetwork(ExecutorService executor, Map<String, AccountId> network) {
         return new Network(executor, network);
     }
 
-    public static Network forMainnet(ExecutorService executor) {
+    static Network forMainnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
         network.put("35.186.191.247:50211", new AccountId(4));
@@ -63,7 +63,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return new Network(executor, network).setNetworkName(NetworkName.MAINNET);
     }
 
-    public static Network forTestnet(ExecutorService executor) {
+    static Network forTestnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
@@ -74,7 +74,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return new Network(executor, network).setNetworkName(NetworkName.TESTNET);
     }
 
-    public static Network forPreviewnet(ExecutorService executor) {
+    static Network forPreviewnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
@@ -85,11 +85,11 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
     }
 
-    public boolean isVerifyCertificates() {
+    boolean isVerifyCertificates() {
         return verifyCertificates;
     }
 
-    public Network setVerifyCertificates(boolean verifyCertificates) {
+    Network setVerifyCertificates(boolean verifyCertificates) {
         this.verifyCertificates = verifyCertificates;
 
         for (var node : nodes) {
@@ -99,7 +99,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return this;
     }
 
-    public Network setNetworkName(@Nullable NetworkName networkName) {
+    Network setNetworkName(@Nullable NetworkName networkName) {
         super.setNetworkName(networkName);
 
         addressBook = networkName == null ? null : readAddressBookResource("addressbook/" + networkName + ".pb");
@@ -130,7 +130,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         }
     }
 
-    public Map<String, AccountId> getNetwork() {
+    Map<String, AccountId> getNetwork() {
         var network = new HashMap<String, AccountId>(this.nodes.size());
 
         for (var node : nodes) {
@@ -193,7 +193,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
      *
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
-    public List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
+    List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
         var nodes = getNumberOfMostHealthyNodes(getNumberOfNodesForRequest());
         var nodeAccountIds = new ArrayList<AccountId>(nodes.size());
 
@@ -204,12 +204,12 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return nodeAccountIds;
     }
 
-    public Network setMaxNodesPerRequest(int maxNodesPerRequest) {
+    Network setMaxNodesPerRequest(int maxNodesPerRequest) {
         this.maxNodesPerRequest = maxNodesPerRequest;
         return this;
     }
 
-    public int getNumberOfNodesForRequest() {
+    int getNumberOfNodesForRequest() {
         if (maxNodesPerRequest != null) {
             return Math.min(maxNodesPerRequest, nodes.size());
         } else {
@@ -217,7 +217,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         }
     }
 
-    public Node getNodeForAccountId(AccountId nodeAccountId) {
+    Node getNode(AccountId nodeAccountId) {
         return network.get(nodeAccountId);
     }
 }

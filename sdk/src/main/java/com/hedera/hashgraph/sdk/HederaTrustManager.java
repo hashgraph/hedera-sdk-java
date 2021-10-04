@@ -1,13 +1,17 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.net.ssl.X509TrustManager;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -46,11 +50,15 @@ class HederaTrustManager implements X509TrustManager {
         }
 
         for (var cert : chain) {
-    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-    try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
-      pemWriter.writeObject(new PemObject("CERTIFICATE", cert.getEncoded()));
-    }
-    var pem = outputStream.toByteArray();
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
+                pemWriter.writeObject(new PemObject("CERTIFICATE", cert.getEncoded()));
+            } catch (IOException e) {
+                logger.warn("Failed to write PEM to byte array: ", e);
+                continue;
+            }
+
+            var pem = outputStream.toByteArray();
 
             var certHash = new byte[0];
 

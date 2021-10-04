@@ -15,13 +15,13 @@ class Node extends ManagedNode<Node> {
 
     private boolean verifyCertificates;
 
-    public Node(AccountId accountId, ManagedNodeAddress address, ExecutorService executor) {
+    Node(AccountId accountId, ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
     }
 
-    public Node(AccountId accountId, String address, ExecutorService executor) {
+    Node(AccountId accountId, String address, ExecutorService executor) {
         this(accountId, ManagedNodeAddress.fromString(address), executor);
     }
 
@@ -33,38 +33,40 @@ class Node extends ManagedNode<Node> {
         this.addressBook = node.addressBook;
     }
 
-    public Node toInsecure() {
+    @Override
+    Node toInsecure() {
         return new Node(this, address.toInsecure());
     }
 
-    public Node toSecure() {
+    @Override
+    Node toSecure() {
         return new Node(this, address.toSecure());
     }
 
-    public AccountId getAccountId() {
+    AccountId getAccountId() {
         return accountId;
     }
 
-    public NodeAddress getAddressBook() {
+    NodeAddress getAddressBook() {
         return addressBook;
     }
 
-    public Node setAddressBook(@Nullable NodeAddress addressBook) {
+    Node setAddressBook(@Nullable NodeAddress addressBook) {
         this.addressBook = addressBook;
         return this;
     }
 
-    public boolean isVerifyCertificates() {
+    boolean isVerifyCertificates() {
         return verifyCertificates;
     }
 
-    public Node setVerifyCertificates(boolean verifyCertificates) {
+    Node setVerifyCertificates(boolean verifyCertificates) {
         this.verifyCertificates = verifyCertificates;
         return this;
     }
 
     @Override
-    public ChannelCredentials getChannelCredentials() {
+    ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.newBuilder()
             .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash, verifyCertificates))
             .build();

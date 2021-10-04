@@ -31,7 +31,7 @@ class ManagedNodeAddress {
             var port = hostAndPortMatcher.group("port");
 
             return new ManagedNodeAddress(null, address, Integer.parseInt(port));
-        } else if (inProcessMatcher.find()) {
+        } else if (inProcessMatcher.matches() && inProcessMatcher.groupCount() == 1) {
             return new ManagedNodeAddress(inProcessMatcher.group("name"), null, 0);
         } else {
             throw new IllegalStateException("failed to parse node address");
