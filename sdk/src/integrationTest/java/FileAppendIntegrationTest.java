@@ -94,8 +94,6 @@ public class FileAppendIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        Thread.sleep(10000);
-
         info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);

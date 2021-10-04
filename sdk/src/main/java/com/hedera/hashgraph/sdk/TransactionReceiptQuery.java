@@ -125,9 +125,4 @@ public final class TransactionReceiptQuery
                 return ExecutionState.Finished;
         }
     }
-
-    @Override
-    PrecheckStatusException mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
-        return new PrecheckStatusException(status, transactionId);
-    }
 }

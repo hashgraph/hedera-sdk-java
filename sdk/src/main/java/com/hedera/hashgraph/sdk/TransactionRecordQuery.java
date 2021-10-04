@@ -121,9 +121,4 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
                 return ExecutionState.Finished;
         }
     }
-
-    @Override
-    PrecheckStatusException mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
-        return new PrecheckStatusException(status, transactionId);
-    }
 }

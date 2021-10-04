@@ -385,10 +385,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    PrecheckStatusException mapStatusError(Status status, @Nullable TransactionId transactionId, ResponseT response) {
-        return new PrecheckStatusException(status, transactionId);
-    }
-
     private class GrpcRequest {
         private final Node node;
         private final int attempt;
@@ -444,11 +440,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         PrecheckStatusException mapStatusException() {
             // request to hedera failed in a non-recoverable way
-            return Executable.this.mapStatusError(responseStatus,
-                Executable.this.getTransactionId(),
-                response
-            );
-
+            return new PrecheckStatusException(responseStatus, Executable.this.getTransactionId());
         }
 
         O mapResponse() {

@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
- * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneathe
+ * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneath
 
 ### Fixed
 
