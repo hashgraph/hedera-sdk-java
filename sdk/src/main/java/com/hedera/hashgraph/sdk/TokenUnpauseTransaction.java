@@ -59,7 +59,7 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return TokenServiceGrpc.getPauseTokenMethod();
+        return TokenServiceGrpc.getUnpauseTokenMethod();
     }
 
     @Override
