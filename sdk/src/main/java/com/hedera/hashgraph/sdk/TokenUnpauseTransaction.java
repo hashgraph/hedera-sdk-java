@@ -42,7 +42,7 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
     }
 
     void initFromTransactionBody() {
-        var body = sourceTransactionBody.getTokenPause();
+        var body = sourceTransactionBody.getTokenUnpause();
         if (body.hasToken()) {
             tokenId = TokenId.fromProtobuf(body.getToken());
         }
