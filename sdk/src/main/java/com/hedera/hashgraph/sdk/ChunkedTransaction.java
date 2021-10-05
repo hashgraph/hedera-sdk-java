@@ -13,6 +13,7 @@ import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -187,7 +188,16 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         var responses = new ArrayList<TransactionResponse>(transactionIds.size());
 
         for (var i = 0; i < transactionIds.size(); i++) {
-            responses.add(super.execute(client));
+            var response = super.execute(client);
+
+            if (shouldGetReceipt()) {
+                new TransactionReceiptQuery()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTransactionId(response.transactionId)
+                    .execute(client);
+            }
+
+            responses.add(response);
         }
 
         return responses;
