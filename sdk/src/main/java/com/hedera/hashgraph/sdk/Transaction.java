@@ -306,6 +306,12 @@ public abstract class Transaction<T extends Transaction<T>>
             case SCHEDULESIGN:
                 return new ScheduleSignTransaction(txs);
 
+            case TOKEN_PAUSE:
+                return new TokenPauseTransaction(txs);
+
+            case TOKEN_UNPAUSE:
+                return new TokenUnpauseTransaction(txs);
+
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
@@ -409,6 +415,12 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case TOKENWIPE:
                 return new TokenWipeTransaction(body.setTokenWipe(scheduled.getTokenWipe()).build());
+
+            case TOKEN_PAUSE:
+                return new TokenPauseTransaction(body.setTokenPause(scheduled.getTokenPause()).build());
+
+            case TOKEN_UNPAUSE:
+                return new TokenUnpauseTransaction(body.setTokenUnpause(scheduled.getTokenUnpause()).build());
 
             case SCHEDULEDELETE:
                 return new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
