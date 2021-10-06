@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.TokenKycStatus;
+import com.hedera.hashgraph.sdk.proto.TokenPauseStatus;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -148,9 +149,10 @@ public class TokenInfo {
     public final Key pauseKey;
 
     /**
-     * Specifies whether the token is paused or not. PauseNotApplicable is returned if pauseKey is not set.
+     * Specifies whether the token is paused or not. Null if pauseKey is not set.
      */
-    public final TokenPauseStatus pauseStatus;
+    @Nullable
+    public final Boolean pauseStatus;
 
     TokenInfo(
         TokenId tokenId,
@@ -177,7 +179,7 @@ public class TokenInfo {
         TokenSupplyType supplyType,
         long maxSupply,
         @Nullable Key pauseKey,
-        TokenPauseStatus pauseStatus
+        @Nullable Boolean pauseStatus
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -216,6 +218,11 @@ public class TokenInfo {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 
+    @Nullable
+    static Boolean pauseStatusFromProtobuf(TokenPauseStatus pauseStatus) {
+        return pauseStatus == TokenPauseStatus.PauseNotApplicable ? null : pauseStatus == TokenPauseStatus.Paused;
+    }
+
     static TokenInfo fromProtobuf(TokenGetInfoResponse response) {
         var info = response.getTokenInfo();
 
@@ -244,7 +251,7 @@ public class TokenInfo {
             TokenSupplyType.valueOf(info.getSupplyType()),
             info.getMaxSupply(),
             info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
-            TokenPauseStatus.valueOf(info.getPauseStatus())
+            pauseStatusFromProtobuf(info.getPauseStatus())
         );
     }
 
@@ -268,6 +275,10 @@ public class TokenInfo {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
+    static TokenPauseStatus pauseStatusToProtobuf(@Nullable Boolean pauseStatus) {
+        return pauseStatus == null ? TokenPauseStatus.PauseNotApplicable : pauseStatus ? TokenPauseStatus.Paused : TokenPauseStatus.Unpaused;
+    }
+
     TokenGetInfoResponse toProtobuf() {
         var tokenInfoBuilder = com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
             .setTokenId(tokenId.toProtobuf())
@@ -283,7 +294,7 @@ public class TokenInfo {
             .setTokenType(tokenType.code)
             .setSupplyType(supplyType.code)
             .setMaxSupply(maxSupply)
-            .setPauseStatus(pauseStatus.code);
+            .setPauseStatus(pauseStatusToProtobuf(pauseStatus));
         if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }

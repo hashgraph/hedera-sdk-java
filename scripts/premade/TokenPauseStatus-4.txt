@@ -1,8 +1,0 @@
-            default:
-                throw new IllegalStateException("(BUG) unhandled TokenPauseStatus");
-        }
-    }
-
-    @Override
-    public String toString() {
-        switch (this) {

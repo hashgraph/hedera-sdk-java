@@ -60,7 +60,7 @@ public class TokenInfoTest {
             TokenSupplyType.FINITE,
             1000000,
             null,
-            TokenPauseStatus.PAUSED
+            true
         );
     }
 

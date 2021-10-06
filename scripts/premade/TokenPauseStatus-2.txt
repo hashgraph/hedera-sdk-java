@@ -1,8 +1,0 @@
-    final com.hedera.hashgraph.sdk.proto.TokenPauseStatus code;
-
-    TokenPauseStatus(com.hedera.hashgraph.sdk.proto.TokenPauseStatus code) {
-        this.code = code;
-    }
-
-    static TokenPauseStatus valueOf(com.hedera.hashgraph.sdk.proto.TokenPauseStatus code) {
-        switch (code) {
