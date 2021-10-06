@@ -8,6 +8,8 @@ import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
@@ -34,6 +36,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
@@ -287,6 +291,20 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     @Override
+    public Void ping(AccountId nodeAccountId) {
+        try {
+            new AccountBalanceQuery()
+                .setAccountId(nodeAccountId)
+                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+                .execute(this);
+        } catch (Exception e) {
+            logger.debug("pining account {} failed with exception {}", nodeAccountId, e.getMessage());
+        }
+
+        return null;
+    }
+
+    @Override
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
     public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
         return new AccountBalanceQuery()
@@ -297,6 +315,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 // Do nothing
                 return null;
             });
+    }
+
+    @Override
+    public synchronized Void pingAll() {
+        for (var nodeAccountId : network.network.values()) {
+            ping(nodeAccountId);
+        }
+
+        return null;
     }
 
     @Override

@@ -13,11 +13,13 @@ import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
     private static final int CHUNK_SIZE = 1024;
@@ -160,9 +162,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return retval;
     }
 
-    @Override
-    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
-    public CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> executeAllAsync(Client client) {
+    private void freezeAndSign(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
@@ -174,6 +174,39 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
         }
+    }
+
+    @Override
+    public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
+        return executeAll(client).get(0);
+    }
+
+    @Override
+    public List<TransactionResponse> executeAll(Client client) throws PrecheckStatusException, TimeoutException {
+        freezeAndSign(client);
+
+        var responses = new ArrayList<TransactionResponse>(transactionIds.size());
+
+        for (var i = 0; i < transactionIds.size(); i++) {
+            var response = super.execute(client);
+
+            if (shouldGetReceipt()) {
+                new TransactionReceiptQuery()
+                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                    .setTransactionId(response.transactionId)
+                    .execute(client);
+            }
+
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    @Override
+    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
+    public CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client) {
+        freezeAndSign(client);
 
         @Var
         CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =

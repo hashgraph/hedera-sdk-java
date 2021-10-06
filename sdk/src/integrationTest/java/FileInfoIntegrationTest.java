@@ -3,6 +3,7 @@ import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
+import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -114,14 +115,9 @@ public class FileInfoIntegrationTest {
             .setFileId(fileId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = infoQuery.getCost(testEnv.client);
-
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThrows(MaxQueryPaymentExceededException.class, () -> {
             infoQuery.execute(testEnv.client);
         });
-
-        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
-
 
         new FileDeleteTransaction()
             .setFileId(fileId)
