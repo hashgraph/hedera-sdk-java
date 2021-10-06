@@ -70,7 +70,7 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertDoesNotThrow(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            var testEnv = new IntegrationTestEnv(2);
 
             var response = new TopicCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
@@ -78,6 +78,8 @@ public class TopicMessageSubmitIntegrationTest {
                 .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+            Thread.sleep(5000);
 
             @Var var info = new TopicInfoQuery()
                 .setTopicId(topicId)
