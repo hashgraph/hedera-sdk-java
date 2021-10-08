@@ -27,7 +27,7 @@ import java.util.concurrent.TimeoutException;
 abstract class ManagedNetwork<
     ManagedNetworkT extends ManagedNetwork<ManagedNetworkT, KeyT, ManagedNodeT, SdkNetworkT, SdkNetworkEntryT>,
     KeyT,
-    ManagedNodeT extends ManagedNode<ManagedNodeT>,
+    ManagedNodeT extends ManagedNode<ManagedNodeT, KeyT>,
     SdkNetworkT,
     SdkNetworkEntryT> {
     protected static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
@@ -157,7 +157,7 @@ abstract class ManagedNetwork<
                 node = transportSecurity ? node.toSecure() : node.toInsecure();
 
                 nodes.set(i, node);
-                addNodeToNetwork(node);
+                network.put(node.getKey(), node);
             }
 
             lock.release();
@@ -184,10 +184,6 @@ abstract class ManagedNetwork<
     protected abstract Iterable<SdkNetworkEntryT> createIterableNetwork(SdkNetworkT network);
 
     protected abstract ManagedNodeT createNodeFromNetworkEntry(SdkNetworkEntryT entry);
-
-    protected abstract void addNodeToNetwork(ManagedNodeT node);
-
-    protected abstract void removeNodeFromNetwork(ManagedNodeT node);
 
     /**
      * Returns a list of index in descending order to remove from the current node list.
@@ -223,8 +219,8 @@ abstract class ManagedNetwork<
         if (nodes.isEmpty()) {
             for (var entry : iterableNetwork) {
                 var node = createNodeFromNetworkEntry(entry);
-                addNodeToNetwork(node);
-                nodes.add(node);
+                this.network.put(node.getKey(), node);
+                this.nodes.add(node);
             }
 
             Collections.shuffle(nodes);
@@ -246,9 +242,9 @@ abstract class ManagedNetwork<
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
-            removeNodeFromNetwork(node);
+            this.network.remove(node.getKey());
             node.close(Duration.ofSeconds(remainingTime));
-            nodes.remove(index.intValue());
+            this.nodes.remove(index.intValue());
         }
 
         // Add new nodes that are not present in the list
@@ -256,8 +252,8 @@ abstract class ManagedNetwork<
             // Only add nodes which don't already exist in our network map
             if (!checkNetworkContainsEntry(entry)) {
                 var node = createNodeFromNetworkEntry(entry);
-                addNodeToNetwork(node);
-                nodes.add(node);
+                this.network.put(node.getKey(), node);
+                this.nodes.add(node);
             }
         }
 
@@ -280,7 +276,7 @@ abstract class ManagedNetwork<
 
                 if (node.getAttempts() >= maxNodeAttempts) {
                     node.close(closeTimeout);
-                    removeNodeFromNetwork(node);
+                    network.remove(node.getKey());
                     nodes.remove(i);
                 }
             }

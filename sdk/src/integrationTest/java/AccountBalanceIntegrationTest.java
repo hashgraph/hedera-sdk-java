@@ -9,10 +9,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -47,6 +47,30 @@ class AccountBalanceIntegrationTest {
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
                 .setAccountId(entry.getValue())
                 .execute(client);
+        }
+
+        client.close();
+    }
+
+    @Test
+    @DisplayName("can connect to previewnet with certificate verification off")
+    void cannotConnectToPreviewnetWhenNetworkNameIsNullAndCertificateVerificationIsEnabled() throws Exception {
+        var client = Client.forPreviewnet()
+            .setTransportSecurity(true)
+            .setVerifyCertificates(true)
+            .setNetworkName(null);
+
+        assertFalse(client.getNetwork().isEmpty());
+
+        for (var entry : client.getNetwork().entrySet()) {
+            assertTrue(entry.getKey().endsWith(":50212"));
+
+            assertThrows(IllegalStateException.class, () -> {
+                new AccountBalanceQuery()
+                    .setNodeAccountIds(Collections.singletonList(entry.getValue()))
+                    .setAccountId(entry.getValue())
+                    .execute(client);
+            });
         }
 
         client.close();

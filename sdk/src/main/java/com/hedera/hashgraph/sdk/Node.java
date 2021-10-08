@@ -7,7 +7,7 @@ import org.threeten.bp.Duration;
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 
-class Node extends ManagedNode<Node> {
+class Node extends ManagedNode<Node, AccountId> {
     private final AccountId accountId;
 
     @Nullable
@@ -41,6 +41,11 @@ class Node extends ManagedNode<Node> {
     @Override
     Node toSecure() {
         return new Node(this, address.toSecure());
+    }
+
+    @Override
+    AccountId getKey() {
+        return accountId;
     }
 
     AccountId getAccountId() {

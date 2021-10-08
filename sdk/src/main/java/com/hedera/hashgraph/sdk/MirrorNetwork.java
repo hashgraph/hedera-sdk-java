@@ -9,8 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
 class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, List<String>, String> {
-    private HashSet<String> network = new HashSet<>();
-
     private MirrorNetwork(ExecutorService executor, List<String> addresses) {
         super(executor);
 
@@ -38,13 +36,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, Li
     }
 
     public List<String> getNetwork() {
-        var addresses = new ArrayList<String>(nodes.size());
-
-        for (var node : nodes) {
-            addresses.add(node.address.toString());
-        }
-
-        return addresses;
+        return new ArrayList<>(network.keySet());
     }
 
     @Override
@@ -55,16 +47,6 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, Li
     @Override
     protected MirrorNode createNodeFromNetworkEntry(String entry) {
         return new MirrorNode(entry, executor).setMinBackoff(minBackoff);
-    }
-
-    @Override
-    protected void addNodeToNetwork(MirrorNode node) {
-        this.network.add(node.getAddress().toString());
-    }
-
-    @Override
-    protected void removeNodeFromNetwork(MirrorNode node) {
-        this.network.remove(node.getAddress().toString());
     }
 
     @Override
@@ -84,7 +66,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, Li
 
     @Override
     protected boolean checkNetworkContainsEntry(String entry) {
-        for (var address : network) {
+        for (var address : network.keySet()) {
             if (address.equals(entry)) {
                 return true;
             }

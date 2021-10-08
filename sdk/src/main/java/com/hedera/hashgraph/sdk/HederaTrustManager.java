@@ -19,8 +19,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 class HederaTrustManager implements X509TrustManager {
-    private static final String PEM_HEADER = "-----BEGIN CERTIFICATE-----\n";
-    private static final String PEM_FOOTER = "-----END CERTIFICATE-----\n";
+    private static final String CERTIFICATE = "CERTIFICATE";
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Nullable
@@ -50,15 +49,19 @@ class HederaTrustManager implements X509TrustManager {
         }
 
         for (var cert : chain) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (PemWriter pemWriter = new PemWriter(new OutputStreamWriter(outputStream))) {
-                pemWriter.writeObject(new PemObject("CERTIFICATE", cert.getEncoded()));
+            byte[] pem;
+
+            try (
+                var outputStream = new ByteArrayOutputStream();
+                var outputStreamWriter = new OutputStreamWriter(outputStream);
+                var pemWriter = new PemWriter(outputStreamWriter)
+            ) {
+                pemWriter.writeObject(new PemObject(CERTIFICATE, cert.getEncoded()));
+                pem = outputStream.toByteArray();
             } catch (IOException e) {
                 logger.warn("Failed to write PEM to byte array: ", e);
                 continue;
             }
-
-            var pem = outputStream.toByteArray();
 
             var certHash = new byte[0];
 

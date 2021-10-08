@@ -2,7 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.util.concurrent.ExecutorService;
 
-class MirrorNode extends ManagedNode<MirrorNode> {
+class MirrorNode extends ManagedNode<MirrorNode, String> {
     MirrorNode(ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
     }
@@ -21,5 +21,10 @@ class MirrorNode extends ManagedNode<MirrorNode> {
 
     MirrorNode toSecure() {
         return new MirrorNode(this, address.toSecure());
+    }
+
+    @Override
+    String getKey() {
+        return address.toString();
     }
 }

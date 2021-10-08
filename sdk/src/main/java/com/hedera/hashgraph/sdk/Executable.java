@@ -250,10 +250,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         mergeFromClient(client);
 
         return onExecuteAsync(client).thenCompose((v) -> {
-            if (nodeAccountIds.isEmpty()) {
-                throw new IllegalStateException("Request node account IDs were not set before executing");
-            }
-
             setNodesFromNodeAccountIds(client);
             checkNodeAccountIds();
 

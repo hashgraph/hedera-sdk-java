@@ -4,6 +4,8 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import com.google.protobuf.ByteString;
+import java8.util.stream.Collectors;
+import java8.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -131,13 +133,8 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
     }
 
     Map<String, AccountId> getNetwork() {
-        var network = new HashMap<String, AccountId>(this.nodes.size());
-
-        for (var node : nodes) {
-            network.put(node.address.toString(), node.getAccountId());
-        }
-
-        return network;
+        return StreamSupport.stream(network.values())
+            .collect(Collectors.toUnmodifiableMap((node -> node.getAddress().toString()), Node::getAccountId));
     }
 
     @Override
@@ -150,16 +147,6 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return new Node(entry.getValue(), entry.getKey(), executor)
             .setMinBackoff(minBackoff)
             .setVerifyCertificates(verifyCertificates);
-    }
-
-    @Override
-    protected void addNodeToNetwork(Node node) {
-        network.put(node.getAccountId(), node);
-    }
-
-    @Override
-    protected void removeNodeFromNetwork(Node node) {
-        network.remove(node.getAccountId());
     }
 
     @Override

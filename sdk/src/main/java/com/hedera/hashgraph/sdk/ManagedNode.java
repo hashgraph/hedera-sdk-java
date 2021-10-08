@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<ManagedNode<N>> {
+abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
     protected final ExecutorService executor;
 
     /**
@@ -87,6 +87,8 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * @return
      */
     abstract N toSecure();
+
+    abstract KeyT getKey();
 
     /**
      * Get the address of this node
@@ -229,7 +231,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
      * @return
      */
     @Override
-    public int compareTo(ManagedNode<N> node) {
+    public int compareTo(ManagedNode<N, KeyT> node) {
         if (this.isHealthy() && node.isHealthy()) {
             return compareToSameHealth(node);
         } else if (this.isHealthy() && !node.isHealthy()) {
@@ -241,7 +243,7 @@ abstract class ManagedNode<N extends ManagedNode<N>> implements Comparable<Manag
         }
     }
 
-    private int compareToSameHealth(ManagedNode<N> node) {
+    private int compareToSameHealth(ManagedNode<N, KeyT> node) {
         if (this.useCount < node.useCount) {
             return -1;
         } else if (this.useCount > node.useCount) {
