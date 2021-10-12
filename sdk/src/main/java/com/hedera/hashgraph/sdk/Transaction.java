@@ -311,7 +311,7 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
-    public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) throws InvalidProtocolBufferException {
+    public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()
             .setMemo(scheduled.getMemo())
             .setTransactionFee(scheduled.getTransactionFee());
@@ -859,7 +859,7 @@ public abstract class Transaction<T extends Transaction<T>>
             ).build());
     }
 
-    private boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
+    private static boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
         for(var pair : sigPairList) {
             if(pair.getPubKeyPrefix().equals(publicKeyBytes)) {
                 return true;
@@ -932,8 +932,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
-    @Override
-    CompletableFuture<Void> onExecuteAsync(Client client) {
+    void onExecute(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
@@ -955,7 +954,11 @@ public abstract class Transaction<T extends Transaction<T>>
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
         }
+    }
 
+    @Override
+    CompletableFuture<Void> onExecuteAsync(Client client) {
+        onExecute(client);
         return CompletableFuture.completedFuture(null);
     }
 

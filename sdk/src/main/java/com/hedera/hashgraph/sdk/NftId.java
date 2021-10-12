@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NftID;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 public class NftId {
@@ -68,9 +69,14 @@ public class NftId {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof NftId)) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof NftId)) {
+            return false;
+        }
 
         NftId otherId = (NftId) o;
         return tokenId.equals(otherId.tokenId) && serial == otherId.serial;

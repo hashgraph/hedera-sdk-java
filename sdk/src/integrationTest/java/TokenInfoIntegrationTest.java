@@ -1,4 +1,5 @@
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
@@ -239,13 +240,9 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = infoQuery.getCost(testEnv.client);
-
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThrows(MaxQueryPaymentExceededException.class, () -> {
             infoQuery.execute(testEnv.client);
         });
-
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TokenInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         testEnv.close(tokenId);
     }

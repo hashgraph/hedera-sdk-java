@@ -25,7 +25,8 @@ class IPv4AddressPart {
         return this;
     }
 
+    @Override
     public String toString() {
-        return Byte.toUnsignedInt(left) + "." + Byte.toUnsignedInt(right);
+        return ((int) left & 0x000000FF) + "." + ((int) right & 0x000000FF);
     }
 }

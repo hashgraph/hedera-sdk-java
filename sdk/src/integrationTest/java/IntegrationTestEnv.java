@@ -16,19 +16,15 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 public class IntegrationTestEnv {
-    public static Random random = new Random();
-
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
@@ -70,7 +66,7 @@ public class IntegrationTestEnv {
         } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
             return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
-            var network = new Hashtable<String, AccountId>();
+            var network = new HashMap<String, AccountId>();
             network.put("127.0.0.1:50213", new AccountId(3));
             network.put("127.0.0.1:50214", new AccountId(4));
             network.put("127.0.0.1:50215", new AccountId(5));

@@ -186,9 +186,14 @@ public final class KeyList extends Key implements Collection<Key> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof KeyList)) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof KeyList)) {
+            return false;
+        }
 
         KeyList keyList = (KeyList) o;
 

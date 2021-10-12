@@ -28,6 +28,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
+    @Nullable
     public TransactionId getTransactionId() {
         return transactionId;
     }
@@ -120,24 +121,8 @@ public final class TransactionReceiptQuery
             case RECORD_NOT_FOUND:
                 return ExecutionState.Retry;
 
-            case SUCCESS:
-                return ExecutionState.Finished;
-
             default:
-                return ExecutionState.Error;
+                return ExecutionState.Finished;
         }
-    }
-
-    @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
-        if (status != Status.OK) {
-            return new PrecheckStatusException(status, transactionId);
-        }
-
-        // has reached consensus but not generated
-        return new ReceiptStatusException(
-            Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt())
-        );
     }
 }

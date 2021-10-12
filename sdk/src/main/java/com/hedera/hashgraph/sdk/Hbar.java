@@ -1,5 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.Splitter;
+
+import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Objects;
@@ -83,8 +86,8 @@ public final class Hbar implements Comparable<Hbar> {
         if (!matcher.matches()) {
             throw new IllegalArgumentException("Attempted to convert string to Hbar, but \"" + text + "\" was not correctly formatted");
         }
-        String[] parts = text.toString().split(" ");
-        return new Hbar(new BigDecimal(parts[0]), parts.length == 2 ? getUnit(parts[1]) : HbarUnit.HBAR);
+        var parts = Splitter.on(' ').splitToList(text.toString());
+        return new Hbar(new BigDecimal(parts.get(0)), parts.size() == 2 ? getUnit(parts.get(1)) : HbarUnit.HBAR);
     }
 
     /**
@@ -201,9 +204,15 @@ public final class Hbar implements Comparable<Hbar> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         Hbar hbar = (Hbar) o;
         return valueInTinybar == hbar.valueInTinybar;
     }

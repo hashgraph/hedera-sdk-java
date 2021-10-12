@@ -19,7 +19,7 @@ public class FileAppendIntegrationTest {
     @DisplayName("Can append to file")
     void canAppendToFile() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
-        var testEnv = new IntegrationTestEnv(2);
+        var testEnv = new IntegrationTestEnv(1);
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -76,6 +76,8 @@ public class FileAppendIntegrationTest {
             .execute(testEnv.client);
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        Thread.sleep(5000);
 
         @Var var info = new FileInfoQuery()
             .setFileId(fileId)

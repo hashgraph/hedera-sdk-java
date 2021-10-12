@@ -125,7 +125,7 @@ public class ReceiptQueryIntegrationTest {
             recordQuery.execute(testEnv.client);
         });
 
-        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
+        assertEquals("cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         testEnv.close(receipt.accountId, key);
     }

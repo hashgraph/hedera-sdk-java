@@ -21,14 +21,18 @@ import java.util.Objects;
 
 public class MockingTest {
 
-    @ParameterizedTest(name = "Executable retries on error with status {0} and description {1}")
+    @ParameterizedTest(name = "[{2}] Executable retries on gRPC error with status {0} and description {1}")
     @CsvSource({
-        "INTERNAL, internal RST_STREAM error",
-        "INTERNAL, rst stream",
-        "RESOURCE_EXHAUSTED, ",
-        "UNAVAILABLE, "
+        "INTERNAL, internal RST_STREAM error, sync",
+        "INTERNAL, rst stream, sync",
+        "RESOURCE_EXHAUSTED, , sync",
+        "UNAVAILABLE, , sync",
+        "INTERNAL, internal RST_STREAM error, async",
+        "INTERNAL, rst stream, async",
+        "RESOURCE_EXHAUSTED, , async",
+        "UNAVAILABLE, , async"
     })
-    void executableRetryTest(Status.Code code, String description) throws Exception {
+    void shouldRetryExceptionallyFunctionsCorrectly(Status.Code code, String description, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("executableRetry", service);
 
@@ -40,10 +44,134 @@ public class MockingTest {
             .enqueueResponse(TestResponse.error(exception))
             .enqueueResponse(TestResponse.transactionOk());
 
-        new AccountCreateTransaction()
-            .execute(server.client);
+        if (sync.equals("sync")) {
+            new AccountCreateTransaction()
+                .execute(server.client);
+        } else {
+            new AccountCreateTransaction()
+                .executeAsync(server.client)
+                .get();
+        }
 
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
+
+        server.close();
+    }
+
+
+    @ParameterizedTest(name = "[{2}] Executable should make max {1} attempts when there are {0} errors, and error")
+    @CsvSource({
+        "2, 2, sync",
+        "2, 2, async"
+    })
+    void maxAttempts(Integer numberOfErrors ,Integer maxAttempts, String sync) throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("executableMaxAttemptsSync", service);
+
+        var exception = Status.UNAVAILABLE.asRuntimeException();
+
+        for (var i = 0; i < numberOfErrors; i++) {
+            service.buffer.enqueueResponse(TestResponse.error(exception));
+        }
+
+        service.buffer.enqueueResponse(TestResponse.transactionOk());
+
+        if (sync.equals("sync")) {
+            Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
+                new AccountCreateTransaction()
+                    .setMaxAttempts(maxAttempts)
+                    .execute(server.client);
+            });
+        } else {
+            new AccountCreateTransaction()
+                .setMaxAttempts(2)
+                .executeAsync(server.client)
+                .handle((response, error) -> {
+                    Assertions.assertNotNull(error);
+                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+
+                    return null;
+                })
+                .get();
+        }
+
+        Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
+
+        server.close();
+    }
+
+    @ParameterizedTest(name = "[{2}] Executable retries on {1} Hedera status error(s) {0}")
+    @CsvSource({
+        "BUSY, 1, sync",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 1, sync",
+        "BUSY, 3, sync",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 3, sync",
+        "BUSY, 1, async",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 1, async",
+        "BUSY, 3, async",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 3, async",
+    })
+    void shouldRetryFunctionsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("shouldRetryFunctionsCorrectly", service);
+
+        for (var i = 0; i < numberOfErrors; i++) {
+            service.buffer.enqueueResponse(TestResponse.transaction(status));
+        }
+
+        service.buffer.enqueueResponse(TestResponse.transactionOk());
+
+        server.client.setMaxAttempts(4);
+
+        if (sync.equals("sync")) {
+            new AccountCreateTransaction()
+                .execute(server.client);
+        } else {
+            new AccountCreateTransaction()
+                .executeAsync(server.client)
+                .get();
+        }
+
+        Assertions.assertEquals(numberOfErrors + 1, service.buffer.transactionRequestsReceived.size());
+
+        server.close();
+    }
+
+    @ParameterizedTest(name = "[{2}] Executable retries on {1} Hedera status error(s) {0}")
+    @CsvSource({
+        "BUSY, 2, sync",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 2, sync",
+        "BUSY, 2, async",
+        "PLATFORM_TRANSACTION_NOT_CREATED, 2, async",
+    })
+    void shouldRetryErrorsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("shouldRetryFunctionsCorrectly", service);
+
+        for (var i = 0; i < numberOfErrors; i++) {
+            service.buffer.enqueueResponse(TestResponse.transaction(status));
+        }
+
+        server.client.setMaxAttempts(2);
+
+        if (sync.equals("sync")) {
+            Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
+                new AccountCreateTransaction()
+                    .execute(server.client);
+            });
+        } else {
+            new AccountCreateTransaction()
+                .executeAsync(server.client)
+                .handle((response, error) -> {
+                    Assertions.assertNotNull(error);
+                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+
+                    return null;
+                })
+                .get();
+        }
+
+        Assertions.assertEquals(numberOfErrors, service.buffer.transactionRequestsReceived.size());
 
         server.close();
     }
