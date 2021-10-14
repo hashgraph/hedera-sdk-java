@@ -58,7 +58,9 @@ public class TokenInfoTest {
             fees,
             TokenType.FUNGIBLE_COMMON,
             TokenSupplyType.FINITE,
-            1000000
+            1000000,
+            null,
+            true
         );
     }
 

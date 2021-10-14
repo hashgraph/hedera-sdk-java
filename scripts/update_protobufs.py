@@ -158,6 +158,15 @@ def generate_FeeDataType():
     output_java_file(FEE_DATA_TYPE_OUT_PATH, FeeDataType_sections)
 
 
+def generate_TokenPauseStatus():
+    parse_enum_from_file(
+        BASIC_TYPES_PATH,
+        "TokenPauseStatus",
+        add_to_TokenPauseStatus,
+        finalize_TokenPauseStatus)
+    output_java_file(TOKEN_PAUSE_STATUS_OUT_PATH, TokenPauseStatus_sections)
+
+
 def clear_proto_dir():
     clear_dir(PROTO_OUT_PATH)
 

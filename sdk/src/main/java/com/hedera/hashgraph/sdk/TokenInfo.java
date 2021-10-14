@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.TokenKycStatus;
+import com.hedera.hashgraph.sdk.proto.TokenPauseStatus;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -119,13 +120,39 @@ public class TokenInfo {
      */
     public final String tokenMemo;
 
+    /**
+     * The custom fees to be assessed during a CryptoTransfer that transfers units of this token
+     */
     public final List<CustomFee> customFees;
 
+    /**
+     * The token type
+     */
     public final TokenType tokenType;
 
+    /**
+     * The token supply type
+     */
     public final TokenSupplyType supplyType;
 
+    /**
+     * For tokens of type FUNGIBLE_COMMON - The Maximum number of fungible tokens that can be in
+     * circulation. For tokens of type NON_FUNGIBLE_UNIQUE - the maximum number of NFTs (serial
+     * numbers) that can be in circulation
+     */
     public final long maxSupply;
+
+    /**
+     * The Key which can pause and unpause the Token.
+     */
+    @Nullable
+    public final Key pauseKey;
+
+    /**
+     * Specifies whether the token is paused or not. Null if pauseKey is not set.
+     */
+    @Nullable
+    public final Boolean pauseStatus;
 
     TokenInfo(
         TokenId tokenId,
@@ -150,7 +177,9 @@ public class TokenInfo {
         List<CustomFee> customFees,
         TokenType tokenType,
         TokenSupplyType supplyType,
-        long maxSupply
+        long maxSupply,
+        @Nullable Key pauseKey,
+        @Nullable Boolean pauseStatus
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -175,6 +204,8 @@ public class TokenInfo {
         this.tokenType = tokenType;
         this.supplyType = supplyType;
         this.maxSupply = maxSupply;
+        this.pauseKey = pauseKey;
+        this.pauseStatus = pauseStatus;
     }
 
     @Nullable
@@ -185,6 +216,11 @@ public class TokenInfo {
     @Nullable
     static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
+    }
+
+    @Nullable
+    static Boolean pauseStatusFromProtobuf(TokenPauseStatus pauseStatus) {
+        return pauseStatus == TokenPauseStatus.PauseNotApplicable ? null : pauseStatus == TokenPauseStatus.Paused;
     }
 
     static TokenInfo fromProtobuf(TokenGetInfoResponse response) {
@@ -213,7 +249,9 @@ public class TokenInfo {
             customFeesFromProto(info),
             TokenType.valueOf(info.getTokenType()),
             TokenSupplyType.valueOf(info.getSupplyType()),
-            info.getMaxSupply()
+            info.getMaxSupply(),
+            info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
+            pauseStatusFromProtobuf(info.getPauseStatus())
         );
     }
 
@@ -237,6 +275,10 @@ public class TokenInfo {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
+    static TokenPauseStatus pauseStatusToProtobuf(@Nullable Boolean pauseStatus) {
+        return pauseStatus == null ? TokenPauseStatus.PauseNotApplicable : pauseStatus ? TokenPauseStatus.Paused : TokenPauseStatus.Unpaused;
+    }
+
     TokenGetInfoResponse toProtobuf() {
         var tokenInfoBuilder = com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
             .setTokenId(tokenId.toProtobuf())
@@ -251,7 +293,8 @@ public class TokenInfo {
             .setMemo(tokenMemo)
             .setTokenType(tokenType.code)
             .setSupplyType(supplyType.code)
-            .setMaxSupply(maxSupply);
+            .setMaxSupply(maxSupply)
+            .setPauseStatus(pauseStatusToProtobuf(pauseStatus));
         if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
@@ -269,6 +312,9 @@ public class TokenInfo {
         }
         if (feeScheduleKey != null) {
             tokenInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if (pauseKey != null) {
+            tokenInfoBuilder.setPauseKey(pauseKey.toProtobufKey());
         }
         if (autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
@@ -311,6 +357,8 @@ public class TokenInfo {
             .add("tokenType", tokenType)
             .add("supplyType", supplyType)
             .add("maxSupply", maxSupply)
+            .add("pauseKey", pauseKey)
+            .add("pauseStatus", pauseStatus)
             .toString();
     }
 
