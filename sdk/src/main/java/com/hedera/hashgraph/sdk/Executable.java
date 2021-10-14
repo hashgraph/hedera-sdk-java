@@ -210,7 +210,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 throw  maxAttemptsExceeded;
             }
 
-            var grpcRequest = new GrpcRequest(attempt);
+            GrpcRequest grpcRequest;
+
+            try {
+                grpcRequest = new GrpcRequest(attempt);
+            } catch (StatusRuntimeException error) {
+                if (shouldRetryExceptionally(error)) {
+                    continue;
+                }
+
+                throw error;
+            }
 
             // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
             if (!grpcRequest.getNode().isHealthy()) {
@@ -299,7 +309,19 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return CompletableFuture.<O>failedFuture(maxAttemptsExceeded);
         }
 
-        var grpcRequest = new GrpcRequest(attempt);
+        GrpcRequest grpcRequest;
+
+        try {
+            grpcRequest = new GrpcRequest(attempt);
+        } catch (StatusRuntimeException error) {
+            if (shouldRetryExceptionally(error)) {
+                // the transaction had a network failure reaching Hedera
+                return executeAsync(client, attempt + 1, error);
+            }
+
+            return CompletableFuture.<O>failedFuture(error);
+        }
+
 
         // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
         if (!grpcRequest.getNode().isHealthy()) {
@@ -400,8 +422,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         GrpcRequest(int attempt) {
             this.attempt = attempt;
             this.node = Executable.this.getNodeForExecute(attempt);
-            this.call = this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), CallOptions.DEFAULT);
             this.request = Executable.this.getRequestForExecute();
+            this.call = this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), CallOptions.DEFAULT);
             this.startAt = System.nanoTime();
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s

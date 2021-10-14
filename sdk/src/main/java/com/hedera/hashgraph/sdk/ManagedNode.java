@@ -1,9 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import io.grpc.ChannelCredentials;
+import io.grpc.ConnectivityState;
 import io.grpc.Grpc;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
 
@@ -51,13 +54,36 @@ abstract class ManagedNode {
             channelBuilder = ManagedChannelBuilder.forTarget(address).usePlaintext();
         }
 
-        channel = channelBuilder
+        var channel = channelBuilder
             .keepAliveTimeout(10, TimeUnit.SECONDS)
             .userAgent(getUserAgent())
             .executor(executor)
             .build();
 
-        return channel;
+        if (channel.getState(true) != ConnectivityState.READY) {
+            try {
+                TimeUnit.SECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            channel.resetConnectBackoff();
+        }
+
+        if (channel.getState(true) != ConnectivityState.READY) {
+            channel.shutdown();
+
+            try {
+                channel.awaitTermination(10, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+
+            throw new StatusRuntimeException(Status.UNAVAILABLE);
+        }
+
+        this.channel = channel;
+        return this.channel;
     }
 
     synchronized void close(long seconds) throws InterruptedException {
