@@ -52,6 +52,7 @@ abstract class ManagedNode {
         }
 
         channel = channelBuilder
+            .keepAliveTimeout(10, TimeUnit.SECONDS)
             .userAgent(getUserAgent())
             .executor(executor)
             .build();

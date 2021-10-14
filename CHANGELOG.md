@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleassed
 
+### Fixed
+
+ * Added keep alive timeout of 10 seconds to all gRPC connections
+
 ### Changed
 
  * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneath
