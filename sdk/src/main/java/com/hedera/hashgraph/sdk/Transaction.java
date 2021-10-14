@@ -944,8 +944,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
-    @Override
-    CompletableFuture<Void> onExecuteAsync(Client client) {
+    void onExecute(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
         }
@@ -967,7 +966,11 @@ public abstract class Transaction<T extends Transaction<T>>
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
         }
+    }
 
+    @Override
+    CompletableFuture<Void> onExecuteAsync(Client client) {
+        onExecute(client);
         return CompletableFuture.completedFuture(null);
     }
 
