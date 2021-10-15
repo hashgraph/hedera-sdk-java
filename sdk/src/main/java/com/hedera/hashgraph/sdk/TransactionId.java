@@ -9,6 +9,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+import java.util.Collections;
+import java.util.concurrent.TimeoutException;
+
 import static java8.util.concurrent.CompletableFuture.completedFuture;
 import static java8.util.concurrent.CompletableFuture.failedFuture;
 
@@ -111,6 +114,18 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
         return this;
     }
 
+    public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        var receipt = new TransactionReceiptQuery()
+            .setTransactionId(this)
+            .execute(client);
+
+        if (receipt.status != Status.SUCCESS) {
+            throw new ReceiptStatusException(this, receipt);
+        }
+
+        return receipt;
+    }
+
     @Override
     @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"ReceiptStatusException"})
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
@@ -124,6 +139,14 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
 
                 return completedFuture(receipt);
             });
+    }
+
+    public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        getReceipt(client);
+
+        return new TransactionRecordQuery()
+            .setTransactionId(this)
+            .execute(client);
     }
 
     @Override

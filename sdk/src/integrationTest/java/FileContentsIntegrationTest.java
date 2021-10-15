@@ -2,6 +2,7 @@ import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
@@ -124,13 +125,9 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = contentsQuery.getCost(testEnv.client);
-
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThrows(MaxQueryPaymentExceededException.class, () -> {
             contentsQuery.execute(testEnv.client);
         });
-
-        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for FileContentsQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
 
         new FileDeleteTransaction()
             .setFileId(fileId)

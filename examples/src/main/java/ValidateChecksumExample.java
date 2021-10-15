@@ -5,9 +5,9 @@ import com.hedera.hashgraph.sdk.BadEntityIdException;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
@@ -21,12 +21,12 @@ public final class ValidateChecksumExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final Scanner INPUT_SCANNER = new Scanner(System.in);
+    private static final Scanner INPUT_SCANNER = new Scanner(System.in, Charset.defaultCharset().name());
 
     private ValidateChecksumExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public static void main(String[] args) throws TimeoutException, PrecheckStatusException {
         Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

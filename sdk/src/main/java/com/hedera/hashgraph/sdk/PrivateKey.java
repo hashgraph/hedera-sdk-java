@@ -210,7 +210,7 @@ public final class PrivateKey extends Key {
         return readPem(new StringReader(encodedPem), password);
     }
 
-    static byte[] legacyDeriveChildKey(byte[] entropy, Long index) {
+    static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
         byte[] seed = new byte[entropy.length + 8];
         Arrays.fill(seed, 0, seed.length, (byte) 0);
         if (index == 0xffffffffffL) {
@@ -222,7 +222,7 @@ public final class PrivateKey extends Key {
             } else {
                 Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) 0);
             }
-            Arrays.fill(seed, entropy.length + 4, seed.length, index.byteValue());
+            Arrays.fill(seed, entropy.length + 4, seed.length, Long.valueOf(index).byteValue());
         }
         System.arraycopy(entropy, 0, seed, 0, entropy.length);
 
@@ -244,7 +244,7 @@ public final class PrivateKey extends Key {
         return PrivateKey.fromBytes(keyBytes);
     }
 
-    public PrivateKey legacyDerive(Long index) {
+    public PrivateKey legacyDerive(long index) {
         var keyBytes = legacyDeriveChildKey(this.keyData, index);
 
         return PrivateKey.fromBytes(keyBytes);

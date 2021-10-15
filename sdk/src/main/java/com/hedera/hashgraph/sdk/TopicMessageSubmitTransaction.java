@@ -38,7 +38,7 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         initFromTransactionBody();
     }
 
-    TopicMessageSubmitTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    TopicMessageSubmitTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }

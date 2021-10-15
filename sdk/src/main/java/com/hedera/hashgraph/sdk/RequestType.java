@@ -319,7 +319,22 @@ public enum RequestType {
     /**
      * Update a token's custom fee schedule, if permissible
      */
-    TOKEN_FEE_SCHEDULE_UPDATE(HederaFunctionality.TokenFeeScheduleUpdate);
+    TOKEN_FEE_SCHEDULE_UPDATE(HederaFunctionality.TokenFeeScheduleUpdate),
+
+    /**
+     * Get execution time(s) by TransactionID, if available
+     */
+    NETWORK_GET_EXECUTION_TIME(HederaFunctionality.NetworkGetExecutionTime),
+
+    /**
+     * Pause the Token
+     */
+    TOKEN_PAUSE(HederaFunctionality.TokenPause),
+
+    /**
+     * Unpause the Token
+     */
+    TOKEN_UNPAUSE(HederaFunctionality.TokenUnpause);
 
     final HederaFunctionality code;
 
@@ -457,6 +472,12 @@ public enum RequestType {
                 return TOKEN_GET_NFT_INFOS;
             case TokenFeeScheduleUpdate:
                 return TOKEN_FEE_SCHEDULE_UPDATE;
+            case NetworkGetExecutionTime:
+                return NETWORK_GET_EXECUTION_TIME;
+            case TokenPause:
+                return TOKEN_PAUSE;
+            case TokenUnpause:
+                return TOKEN_UNPAUSE;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -593,6 +614,12 @@ public enum RequestType {
                 return "TOKEN_GET_NFT_INFOS";
             case TOKEN_FEE_SCHEDULE_UPDATE:
                 return "TOKEN_FEE_SCHEDULE_UPDATE";
+            case NETWORK_GET_EXECUTION_TIME:
+                return "NETWORK_GET_EXECUTION_TIME";
+            case TOKEN_PAUSE:
+                return "TOKEN_PAUSE";
+            case TOKEN_UNPAUSE:
+                return "TOKEN_UNPAUSE";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

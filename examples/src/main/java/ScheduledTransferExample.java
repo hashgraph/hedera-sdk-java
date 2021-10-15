@@ -1,4 +1,3 @@
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.AccountBalance;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
@@ -15,7 +14,6 @@ import com.hedera.hashgraph.sdk.ScheduleInfo;
 import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
 import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
@@ -143,26 +141,20 @@ public final class ScheduledTransferExample {
          * getScheduledTransaction() will return an SDK Transaction object identical to the transaction
          * that was scheduled, which Bob can then inspect like a normal transaction.
          */
-        try {
-            // Throws com.google.protobuf.InvalidProtocolBufferException
-            Transaction<?> scheduledTransaction = scheduledTransactionInfo.getScheduledTransaction();
+        Transaction<?> scheduledTransaction = scheduledTransactionInfo.getScheduledTransaction();
 
-            // We happen to know that this transaction is (or certainly ought to be) a TransferTransaction
-            if (scheduledTransaction instanceof TransferTransaction) {
-                TransferTransaction scheduledTransfer = (TransferTransaction) scheduledTransaction;
-                System.out.println("The scheduled transfer transaction from Bob's POV:");
-                System.out.println(scheduledTransfer);
-            } else {
-                System.out.println("The scheduled transaction was not a transfer transaction.");
-                System.out.println("Something has gone horribly wrong.  Crashing...");
-                System.exit(-1);
-            }
-        } catch (InvalidProtocolBufferException exc) {
-            System.out.println("Failed to get copy of scheduled transaction, crashing...");
+        // We happen to know that this transaction is (or certainly ought to be) a TransferTransaction
+        if (scheduledTransaction instanceof TransferTransaction) {
+            TransferTransaction scheduledTransfer = (TransferTransaction) scheduledTransaction;
+            System.out.println("The scheduled transfer transaction from Bob's POV:");
+            System.out.println(scheduledTransfer);
+        } else {
+            System.out.println("The scheduled transaction was not a transfer transaction.");
+            System.out.println("Something has gone horribly wrong.  Crashing...");
             System.exit(-1);
         }
 
-        TransactionReceipt signReceipt = new ScheduleSignTransaction()
+        new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(bobsKey)

@@ -39,6 +39,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     private Key supplyKey = null;
     @Nullable
     private Key feeScheduleKey = null;
+    @Nullable
+    private Key pauseKey = null;
     private boolean freezeDefault = false;
     @Nullable
     private Instant expirationTime = null;
@@ -190,6 +192,18 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
+    public Key getPauseKey() {
+        return pauseKey;
+    }
+
+    public TokenCreateTransaction setPauseKey(Key key) {
+        requireNotFrozen();
+        Objects.requireNonNull(key);
+        pauseKey = key;
+        return this;
+    }
+
     public boolean getFreezeDefault() {
         return freezeDefault;
     }
@@ -225,6 +239,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -335,6 +350,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (feeScheduleKey != null) {
             builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
+        if (pauseKey != null) {
+            builder.setPauseKey(pauseKey.toProtobufKey());
+        }
         builder.setFreezeDefault(freezeDefault);
         if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
@@ -383,6 +401,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         }
         if (body.hasFeeScheduleKey()) {
             feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
+        }
+        if (body.hasPauseKey()) {
+            pauseKey = Key.fromProtobufKey(body.getPauseKey());
         }
         freezeDefault = body.getFreezeDefault();
         if (body.hasExpiry()) {
