@@ -162,6 +162,7 @@ def generate_FeeDataType():
     output_java_file(FEE_DATA_TYPE_OUT_PATH, FeeDataType_sections)
 
 
+
 def generate_FreezeType():
     parse_enum_from_file(
         FREEZE_TYPE_PATH,
@@ -169,6 +170,15 @@ def generate_FreezeType():
         add_to_FreezeType,
         finalize_FreezeType)
     output_java_file(FREEZE_TYPE_OUT_PATH, FreezeType_sections)
+
+    
+def generate_TokenPauseStatus():
+    parse_enum_from_file(
+        BASIC_TYPES_PATH,
+        "TokenPauseStatus",
+        add_to_TokenPauseStatus,
+        finalize_TokenPauseStatus)
+    output_java_file(TOKEN_PAUSE_STATUS_OUT_PATH, TokenPauseStatus_sections)
 
 
 def clear_proto_dir():
