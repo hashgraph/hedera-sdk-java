@@ -229,11 +229,6 @@ modifyPom {
 extraArchive {
 	sources = true
 	tests = false
-	javadoc = false
-}
-
-javadoc {
-	exclude 'build/**'
 }
 
 nexus {
