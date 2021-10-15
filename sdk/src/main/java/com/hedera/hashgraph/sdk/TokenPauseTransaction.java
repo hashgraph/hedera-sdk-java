@@ -18,7 +18,7 @@ public class TokenPauseTransaction extends Transaction<TokenPauseTransaction>{
     @Nullable
     private TokenId tokenId = null;
 
-    TokenPauseTransaction() {
+    public TokenPauseTransaction() {
     }
 
     TokenPauseTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
