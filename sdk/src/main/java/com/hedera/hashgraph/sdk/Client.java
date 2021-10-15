@@ -4,6 +4,8 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -33,6 +35,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
@@ -185,12 +189,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             }
             client = Client.forNetwork(nodes);
             if (config.networkName != null) {
-                var networkNameString = config.networkName.getAsString();
-                try {
-                    client.setNetworkName(NetworkName.fromString(networkNameString));
-                } catch (Exception ignored) {
-                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
-                }
+                client.setNetworkName(NetworkName.fromString(config.networkName.getAsString()));
             }
         } else {
             String networks = config.network.getAsString();
@@ -290,6 +289,21 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network;
     }
 
+    @Override
+    public Void ping(AccountId nodeAccountId) {
+        try {
+            new AccountBalanceQuery()
+                .setAccountId(nodeAccountId)
+                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+                .execute(this);
+        } catch (Exception e) {
+            logger.debug("pining account {} failed with exception {}", nodeAccountId, e.getMessage());
+        }
+
+        return null;
+    }
+
+    @Override
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
     public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
         return new AccountBalanceQuery()
@@ -302,6 +316,16 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             });
     }
 
+    @Override
+    public synchronized Void pingAll() {
+        for (var nodeAccountId : network.network.values()) {
+            ping(nodeAccountId);
+        }
+
+        return null;
+    }
+
+    @Override
     @FunctionalExecutable(type = "Void", onClient = true)
     public synchronized CompletableFuture<Void> pingAllAsync() {
         var list = new ArrayList<CompletableFuture<Void>>(network.network.size());
@@ -382,7 +406,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * @return maxBackoff The maximum amount of time to wait between retries
+     * The maximum amount of time to wait between retries
+     *
+     * @return maxBackoff
      */
     public Duration getMaxBackoff() {
         return maxBackoff;
@@ -406,7 +432,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * @return minBackoff The minimum amount of time to wait between retries
+     * The minimum amount of time to wait between retries
+     *
+     * @return minBackoff
      */
     public Duration getMinBackoff() {
         return minBackoff;
@@ -515,8 +543,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
+     * Set the maximum fee to be paid for transactions executed by this client.
+     * <p>
+     * Because transaction fees are always maximums, this will simply add a call to
+     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
+     * fee assessed for a given transaction may be less than this value, but never greater.
+     *
      * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
      */
+    @Deprecated
     public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
         return setDefaultMaxTransactionFee(maxTransactionFee);
     }
@@ -561,6 +596,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
+    @Override
     public synchronized Duration getRequestTimeout() {
         return requestTimeout;
     }

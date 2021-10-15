@@ -4,14 +4,13 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TokenUpdateTransactionTest {
+public class TokenUnpauseTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
@@ -27,6 +26,16 @@ public class TokenUpdateTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
+    TokenUnpauseTransaction spawnTestTransaction() {
+        return new TokenUnpauseTransaction()
+            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setTokenId(TokenId.fromString("1.23.4"))
+            .setMaxTransactionFee(new Hbar(1))
+            .freeze()
+            .sign(unusedPrivateKey);
+    }
+
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(spawnTestTransaction()
@@ -34,34 +43,10 @@ public class TokenUpdateTransactionTest {
         ).toMatchSnapshot();
     }
 
-    private TokenUpdateTransaction spawnTestTransaction() {
-        return new TokenUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("1.2.3"))
-            .setFeeScheduleKey(unusedPrivateKey)
-            .setSupplyKey(unusedPrivateKey)
-            .setAdminKey(unusedPrivateKey)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.123"))
-            .setAutoRenewPeriod(Duration.ofSeconds(100))
-            .setFreezeKey(unusedPrivateKey)
-            .setWipeKey(unusedPrivateKey)
-            .setTokenSymbol("F")
-            .setKycKey(unusedPrivateKey)
-            .setPauseKey(unusedPrivateKey)
-            .setExpirationTime(validStart)
-            .setTreasuryAccountId(AccountId.fromString("0.0.456"))
-            .setTokenName("floof")
-            .setTokenMemo("Floof says hi")
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
-    }
-
     @Test
-    void shouldBytes() throws Exception {
+    void shouldBytesNft() throws Exception {
         var tx = spawnTestTransaction();
-        var tx2 = TokenUpdateTransaction.fromBytes(tx.toBytes());
+        var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
     }
 }

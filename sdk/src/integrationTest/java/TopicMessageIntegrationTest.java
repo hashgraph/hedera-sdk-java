@@ -72,7 +72,7 @@ public class TopicMessageIntegrationTest {
     @Test
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        var testEnv = new IntegrationTestEnv(2);
 
         var response = new TopicCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
@@ -80,6 +80,8 @@ public class TopicMessageIntegrationTest {
             .execute(testEnv.client);
 
         var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
 
         var info = new TopicInfoQuery()
             .setTopicId(topicId)

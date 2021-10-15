@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.ContractInfoQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
@@ -190,13 +191,9 @@ public class ContractInfoIntegrationTest {
             .setContractId(contractId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = infoQuery.getCost(testEnv.client);
-
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThrows(MaxQueryPaymentExceededException.class, () -> {
             infoQuery.execute(testEnv.client);
         });
-
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for ContractInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         new ContractDeleteTransaction()
             .setContractId(contractId)

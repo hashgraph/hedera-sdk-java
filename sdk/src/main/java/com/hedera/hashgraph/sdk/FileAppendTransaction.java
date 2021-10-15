@@ -37,7 +37,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         initFromTransactionBody();
     }
 
-    FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) throws InvalidProtocolBufferException {
+    FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }

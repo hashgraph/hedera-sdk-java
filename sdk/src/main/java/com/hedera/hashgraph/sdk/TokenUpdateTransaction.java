@@ -38,6 +38,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     @Nullable
     private Key feeScheduleKey = null;
     @Nullable
+    private Key pauseKey = null;
+    @Nullable
     private Instant expirationTime = null;
     @Nullable
     private Duration autoRenewPeriod = null;
@@ -177,6 +179,18 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     @Nullable
+    public Key getPauseKey() {
+        return pauseKey;
+    }
+
+    public TokenUpdateTransaction setPauseKey(Key key) {
+        requireNotFrozen();
+        Objects.requireNonNull(key);
+        pauseKey = key;
+        return this;
+    }
+
+    @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -201,6 +215,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -212,6 +227,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         return this;
     }
 
+    @Nullable
     public String getTokenMemo() {
         return tokenMemo;
     }
@@ -260,6 +276,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (body.hasFeeScheduleKey()) {
             feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
         }
+        if (body.hasPauseKey()) {
+            pauseKey = Key.fromProtobufKey(body.getPauseKey());
+        }
         if (body.hasExpiry()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
         }
@@ -302,6 +321,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         if (feeScheduleKey != null) {
             builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if (pauseKey != null) {
+            builder.setPauseKey(pauseKey.toProtobufKey());
         }
         if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));

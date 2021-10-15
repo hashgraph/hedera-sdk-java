@@ -1,14 +1,22 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
+
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 class Endpoint {
-    IPv4Address address;
+    @Nullable
+    IPv4Address address = null;
+
     int port;
 
     Endpoint() {
     }
 
-    static Endpoint fromProtobuf(com.hedera.hashgraph.sdk.proto.ServiceEndpoint serviceEndpoint) {
-        var port = (int) Integer.toUnsignedLong(serviceEndpoint.getPort());
+    static Endpoint fromProtobuf(ServiceEndpoint serviceEndpoint) {
+        @Var var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
 
         if (port == 0 || port == 50111) {
             port = 50211;
@@ -19,6 +27,7 @@ class Endpoint {
             .setPort(port);
     }
 
+    @Nullable
     IPv4Address getAddress() {
         return address;
     }
@@ -37,8 +46,8 @@ class Endpoint {
         return this;
     }
 
-    com.hedera.hashgraph.sdk.proto.ServiceEndpoint toProtobuf() {
-        var builder = com.hedera.hashgraph.sdk.proto.ServiceEndpoint.newBuilder();
+    ServiceEndpoint toProtobuf() {
+        var builder = ServiceEndpoint.newBuilder();
 
         if (address != null) {
             builder.setIpAddressV4(address.toProtobuf());
@@ -47,8 +56,9 @@ class Endpoint {
         return builder.setPort(port).build();
     }
 
+    @Override
     public String toString() {
-        return address.toString() +
+        return Objects.requireNonNull(address) +
             ":" +
             port;
     }

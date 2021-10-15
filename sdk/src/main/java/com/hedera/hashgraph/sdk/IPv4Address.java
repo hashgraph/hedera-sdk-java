@@ -2,8 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 class IPv4Address {
+    @Nullable
     IPv4AddressPart network;
+
+    @Nullable
     IPv4AddressPart host;
 
     IPv4Address() {
@@ -21,6 +27,7 @@ class IPv4Address {
             );
     }
 
+    @Nullable
     IPv4AddressPart getNetwork() {
         return network;
     }
@@ -30,6 +37,7 @@ class IPv4Address {
         return this;
     }
 
+    @Nullable
     IPv4AddressPart getHost() {
         return host;
     }
@@ -40,10 +48,11 @@ class IPv4Address {
     }
 
     ByteString toProtobuf() {
-        return ByteString.copyFrom(new byte[]{network.left, network.right, host.left, host.right});
+        return ByteString.copyFrom(new byte[]{Objects.requireNonNull(network).left, network.right, Objects.requireNonNull(host).left, host.right});
     }
 
+    @Override
     public String toString() {
-        return network.toString() + "." + host.toString();
+        return Objects.requireNonNull(network) + "." + Objects.requireNonNull(host);
     }
 }

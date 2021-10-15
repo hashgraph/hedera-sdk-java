@@ -269,7 +269,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
 
         if ((autoRenewAccountId != null) &&
-            (!autoRenewAccountId.equals(new AccountId(0)))
+            !autoRenewAccountId.equals(new AccountId(0))
         ) {
             autoRenewAccountId.validateChecksum(client);
         }

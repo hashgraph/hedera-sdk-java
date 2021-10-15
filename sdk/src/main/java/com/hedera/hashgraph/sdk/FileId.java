@@ -80,8 +80,8 @@ public final class FileId {
     }
 
     /**
-     * @param client
-     * @throws BadEntityIdException
+     * @param client to validate against
+     * @throws BadEntityIdException if entity ID is formatted poorly
      * @deprecated Use {@link #validateChecksum(Client)} instead.
      */
     @Deprecated
@@ -117,9 +117,14 @@ public final class FileId {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FileId)) return false;
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof FileId)) {
+            return false;
+        }
 
         FileId otherId = (FileId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;

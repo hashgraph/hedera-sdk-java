@@ -1,4 +1,5 @@
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
@@ -119,15 +120,9 @@ public class TopicInfoIntegrationTest {
             .setTopicId(topicId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = infoQuery.getCost(testEnv.client);
-
-        assertNotNull(cost);
-
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThrows(MaxQueryPaymentExceededException.class, () -> {
             infoQuery.execute(testEnv.client);
         });
-
-        assertEquals(error.getMessage(), "com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for TopicInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)

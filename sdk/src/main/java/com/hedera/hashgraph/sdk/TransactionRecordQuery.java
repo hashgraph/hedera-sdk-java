@@ -85,7 +85,9 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     ExecutionState shouldRetry(Status status, Response response) {
         var retry = super.shouldRetry(status, response);
-        if (retry != ExecutionState.Finished) return retry;
+        if (retry != ExecutionState.Finished) {
+            return retry;
+        }
 
         switch (status) {
             case BUSY:
@@ -115,25 +117,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case RECORD_NOT_FOUND:
                 return ExecutionState.Retry;
 
-            case SUCCESS:
-            case IDENTICAL_SCHEDULE_ALREADY_CREATED:
-                return ExecutionState.Finished;
-
             default:
-                return ExecutionState.Error;
+                return ExecutionState.Finished;
         }
-    }
-
-    @Override
-    Exception mapStatusError(Status status, @Nullable TransactionId transactionId, Response response) {
-        if (status != Status.OK) {
-            return new PrecheckStatusException(status, transactionId);
-        }
-
-        // has reached consensus but not generated
-        return new ReceiptStatusException(
-            Objects.requireNonNull(transactionId),
-            TransactionReceipt.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord().getReceipt())
-        );
     }
 }

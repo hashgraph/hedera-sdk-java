@@ -4,20 +4,18 @@ import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.TokenGetAccountNftInfosQuery;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoQuery;
-import com.hedera.hashgraph.sdk.proto.TokenGetNftInfosQuery;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
 
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     @Nullable
@@ -32,18 +30,10 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     public TokenNftInfoQuery() {
     }
 
-    private static List<TokenNftInfo> infosFromProtos(List<com.hedera.hashgraph.sdk.proto.TokenNftInfo> protoList) {
-        var infoList = new ArrayList<TokenNftInfo>();
-        for (var proto : protoList) {
-            infoList.add(TokenNftInfo.fromProtobuf(proto));
-        }
-        return infoList;
-    }
-
     /**
-     * @deprecated use setNftId instead
      * Sets the NFT ID for which information is requested.
      *
+     * @deprecated use {@link TokenNftInfoQuery#setNftId(NftId)} instead
      * @param nftId The NftId to be set
      * @return {@code this}
      */
@@ -70,9 +60,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     /**
-     * @deprecated with no replacement
      * Sets the Token ID and the index range for which information is requested.
      *
+     * @deprecated with no replacement
      * @param tokenId The ID of the token for which information is requested
      * @return {@code this}
      */
@@ -90,9 +80,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     /**
-     * @deprecated with no replacement
      * Sets the Account ID for which information is requested.
      *
+     * @deprecated with no replacement
      * @param accountId The Account ID for which information is requested
      * @return {@code this}
      */
@@ -115,9 +105,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     /**
-     * @deprecated with no replacement
      * Sets the start of the index range for which information is requested.
      *
+     * @deprecated with no replacement
      * @param start The start index (inclusive) of the range of NFTs to query for. Value must be in the range [0; ownedNFTs-1]
      * @return {@code this}
      */
@@ -133,9 +123,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
     }
 
     /**
-     * @deprecated with no replacement
      * Sets the end of the index range for which information is requested.
      *
+     * @deprecated with no replacement
      * @param end The end index (exclusive) of the range of NFTs to query for. Value must be in the range (start; ownedNFTs]
      * @return {@code this}
      */

@@ -17,8 +17,6 @@ import java.util.Objects;
  * Create a new Hedera™ account.
  */
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
-    private static final Hbar DEFAULT_RECORD_THRESHOLD = Hbar.fromTinybars(Long.MAX_VALUE);
-
     @Nullable
     private AccountId proxyAccountId = null;
     @Nullable
