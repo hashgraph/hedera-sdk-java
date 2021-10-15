@@ -40,6 +40,7 @@ PROTO_SDK_IN_PATH = os.path.join(PROTO_GIT_PATH, "sdk")
 PROTO_MIRROR_IN_PATH = os.path.join(PROTO_GIT_PATH, "mirror")
 BASIC_TYPES_PATH = os.path.join(PROTO_IN_PATH, "basic_types.proto")
 RESPONSE_CODE_PATH = os.path.join(PROTO_IN_PATH, "response_code.proto")
+FREEZE_TYPE_PATH = os.path.join(PROTO_IN_PATH, "freeze_type.proto")
 
 
 MAIN_PATH = os.path.join("..", "sdk", "src", "main")
@@ -49,6 +50,7 @@ JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hedera", "hashgraph", "s
 REQUEST_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "RequestType.java")
 STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "Status.java")
 FEE_DATA_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FeeDataType.java")
+FREEZE_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FreezeType.java")
 
 
 PROTO_DO_NOT_REMOVE = (
@@ -96,6 +98,8 @@ def main():
     generate_Status()
     print(">>> Generating FeeDataType.java")
     generate_FeeDataType()
+    print(">>> Generating FreezeType.java")
+    generate_FreezeType()
     print(">>> Clearing proto output directory")
     clear_proto_dir()
     print(">>> Generating modified proto files")
@@ -156,6 +160,15 @@ def generate_FeeDataType():
         add_to_FeeDataType,
         finalize_FeeDataType)
     output_java_file(FEE_DATA_TYPE_OUT_PATH, FeeDataType_sections)
+
+
+def generate_FreezeType():
+    parse_enum_from_file(
+        FREEZE_TYPE_PATH,
+        "FreezeType",
+        add_to_FreezeType,
+        finalize_FreezeType)
+    output_java_file(FREEZE_TYPE_OUT_PATH, FreezeType_sections)
 
 
 def clear_proto_dir():
@@ -226,6 +239,15 @@ FeeDataType_sections = [
 ]
 
 
+FreezeType_sections = [
+    premade("FreezeType", 0),
+    "",
+    premade("FreezeType", 2),
+    "",
+    premade("FreezeType", 4)
+]
+
+
 def output_java_file(out_path, section_list):
     out_file = open(out_path, "w")
     for section in section_list:
@@ -257,6 +279,12 @@ def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
     FeeDataType_sections[5] += generate_toString(original_name, cap_snake_name, 3)
 
 
+def add_to_FreezeType(original_name, cap_snake_name, comment_lines):
+    FreezeType_sections[1] += \
+        generate_enum(original_name, cap_snake_name, comment_lines, "com.hedera.hashgraph.sdk.proto.FreezeType", 1)
+    FreezeType_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
+
+
 def replace_last_enum_comma(s):
     return s[0:-3] + ";\n\n"
 
@@ -271,6 +299,10 @@ def finalize_Status():
 
 def finalize_FeeDataType():
     FeeDataType_sections[1] = replace_last_enum_comma(FeeDataType_sections[1])
+
+
+def finalize_FreezeType():
+    FreezeType_sections[1] = replace_last_enum_comma(FreezeType_sections[1])
 
 
 
