@@ -16,7 +16,7 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
     @Nullable
     private TokenId tokenId = null;
 
-    TokenUnpauseTransaction() {
+    public TokenUnpauseTransaction() {
     }
 
     TokenUnpauseTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
