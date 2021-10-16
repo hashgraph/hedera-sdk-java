@@ -3,6 +3,8 @@ package com.hedera.hashgraph.sdk;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 public class ManagedNodeAddressTest {
     @Test
     void fromString() {
@@ -59,5 +61,26 @@ public class ManagedNodeAddressTest {
         Assertions.assertNull(processAddressInsecure.getAddress());
         Assertions.assertEquals(processAddressInsecure.getPort(), 0);
         Assertions.assertEquals(processAddressInsecure.toString(), "testingProcess");
+
+        var mirrorNodeAddress = ManagedNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:5600");
+        Assertions.assertNull(mirrorNodeAddress.getName());
+        Assertions.assertEquals(mirrorNodeAddress.getAddress(), "hcs.mainnet.mirrornode.hedera.com");
+        Assertions.assertEquals(mirrorNodeAddress.getPort(), 5600);
+        Assertions.assertEquals(mirrorNodeAddress.toString(), "hcs.mainnet.mirrornode.hedera.com:5600");
+
+        var mirrorNodeAddressSecure = mirrorNodeAddress.toSecure();
+        Assertions.assertNull(mirrorNodeAddressSecure.getName());
+        Assertions.assertEquals(mirrorNodeAddressSecure.getAddress(), "hcs.mainnet.mirrornode.hedera.com");
+        Assertions.assertEquals(mirrorNodeAddressSecure.getPort(), 433);
+        Assertions.assertEquals(mirrorNodeAddressSecure.toString(), "hcs.mainnet.mirrornode.hedera.com:433");
+
+        var mirrorNodeAddressInsecure = mirrorNodeAddressSecure.toInsecure();
+        Assertions.assertNull(mirrorNodeAddressInsecure.getName());
+        Assertions.assertEquals(mirrorNodeAddressInsecure.getAddress(), "hcs.mainnet.mirrornode.hedera.com");
+        Assertions.assertEquals(mirrorNodeAddressInsecure.getPort(), 5600);
+        Assertions.assertEquals(mirrorNodeAddressInsecure.toString(), "hcs.mainnet.mirrornode.hedera.com:5600");
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("this is a random string with spaces:433"));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:notarealport"));
     }
 }

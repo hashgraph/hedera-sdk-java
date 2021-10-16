@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -31,14 +33,13 @@ abstract class ManagedNetwork<
     SdkNetworkT,
     SdkNetworkEntryT> {
     protected static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
-    protected final Semaphore lock = new Semaphore(1);
 
     protected final ExecutorService executor;
 
     /**
      * Map of node identifiers to nodes. Used to quickly fetch node for identifier.
      */
-    protected HashMap<KeyT, ManagedNodeT> network = new HashMap<>();
+    protected Map<KeyT, ManagedNodeT> network = new ConcurrentHashMap<>();
 
     /**
      * The list of nodes. This list is continuously sorted so the leftmost nodes are the "healthiest" {@link ManagedNode#isHealthy()}
@@ -50,6 +51,12 @@ abstract class ManagedNetwork<
      * gRPC status.
      */
     protected Duration minBackoff = Client.DEFAULT_MIN_BACKOFF;
+
+    /**
+     * The current maximum backoff for the nodes in the network. This backoff is used when nodes return a bad
+     * gRPC status.
+     */
+    protected Duration maxBackoff = Client.DEFAULT_MAX_BACKOFF;
 
     /**
      * Timeout for closing either a single node when setting a new network, or closing the entire network.
@@ -88,7 +95,7 @@ abstract class ManagedNetwork<
      * @param networkName
      * @return
      */
-    ManagedNetworkT setNetworkName(@Nullable NetworkName networkName) {
+    synchronized ManagedNetworkT setNetworkName(@Nullable NetworkName networkName) {
         this.networkName = networkName;
 
         // noinspection unchecked
@@ -105,7 +112,7 @@ abstract class ManagedNetwork<
      * @param maxNodeAttempts
      * @return
      */
-    ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
+    synchronized ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
         this.maxNodeAttempts = maxNodeAttempts;
 
         // noinspection unchecked
@@ -122,11 +129,32 @@ abstract class ManagedNetwork<
      * @param minBackoff
      * @return
      */
-    ManagedNetworkT setMinBackoff(Duration minBackoff) {
+    synchronized ManagedNetworkT setMinBackoff(Duration minBackoff) {
         this.minBackoff = minBackoff;
 
         for (var node : nodes) {
             node.setMinBackoff(minBackoff);
+        }
+
+        // noinspection unchecked
+        return (ManagedNetworkT) this;
+    }
+
+    Duration getMaxBackoff() {
+        return maxBackoff;
+    }
+
+    /**
+     * Set the maximum backoff a node should use when receiving a bad gRPC status.
+     *
+     * @param maxBackoff
+     * @return
+     */
+    synchronized ManagedNetworkT setMaxBackoff(Duration maxBackoff) {
+        this.maxBackoff = maxBackoff;
+
+        for (var node : nodes) {
+            node.setMaxBackoff(maxBackoff);
         }
 
         // noinspection unchecked
@@ -144,10 +172,8 @@ abstract class ManagedNetwork<
      * @return
      * @throws InterruptedException
      */
-    ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
+    synchronized ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         if (this.transportSecurity != transportSecurity) {
-            lock.acquire();
-
             network.clear();
 
             for (int i = 0; i < nodes.size(); i++) {
@@ -159,8 +185,6 @@ abstract class ManagedNetwork<
                 nodes.set(i, node);
                 network.put(node.getKey(), node);
             }
-
-            lock.release();
         }
 
         this.transportSecurity = transportSecurity;
@@ -174,7 +198,7 @@ abstract class ManagedNetwork<
         return closeTimeout;
     }
 
-    ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
+    synchronized ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = closeTimeout;
 
         // noinspection unchecked
@@ -210,9 +234,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException - when shutting down nodes
      * @throws InterruptedException - when acquiring the lock
      */
-    ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
-        lock.acquire();
-
+    synchronized ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
         var iterableNetwork = createIterableNetwork(network);
 
         // Sort circuit the rest of the setNetwork logic if nodes is empty
@@ -224,7 +246,6 @@ abstract class ManagedNetwork<
             }
 
             Collections.shuffle(nodes);
-            lock.release();
 
             // noinspection unchecked
             return (ManagedNetworkT) this;
@@ -238,7 +259,6 @@ abstract class ManagedNetwork<
 
             // Exit early if we have no time remaining
             if (remainingTime <= 0) {
-                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -258,7 +278,6 @@ abstract class ManagedNetwork<
         }
 
         Collections.shuffle(nodes);
-        lock.release();
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
@@ -292,8 +311,6 @@ abstract class ManagedNetwork<
      * @throws InterruptedException
      */
     protected List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
-        lock.acquire();
-
         Collections.sort(nodes);
         removeDeadNodes();
 
@@ -304,8 +321,6 @@ abstract class ManagedNetwork<
             nodes.add(this.nodes.get(i));
         }
 
-        lock.release();
-
         return nodes;
     }
 
@@ -315,7 +330,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    void close() throws TimeoutException, InterruptedException {
+    synchronized void close() throws TimeoutException, InterruptedException {
         close(closeTimeout);
     }
 
@@ -326,9 +341,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    void close(Duration timeout) throws TimeoutException, InterruptedException {
-        lock.acquire();
-
+    synchronized void close(Duration timeout) throws TimeoutException, InterruptedException {
         var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
 
         // Start the shutdown process on all nodes
@@ -341,7 +354,6 @@ abstract class ManagedNetwork<
         // Await termination for all nodes
         for (var node : nodes) {
             if (stopAt - Instant.now().getEpochSecond() == 0) {
-                lock.release();
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
@@ -350,7 +362,6 @@ abstract class ManagedNetwork<
                 try {
                     node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
                 } catch (InterruptedException e) {
-                    lock.release();
                     throw new RuntimeException(e);
                 }
             }
@@ -358,6 +369,5 @@ abstract class ManagedNetwork<
 
         nodes.clear();
         network.clear();
-        lock.release();
     }
 }

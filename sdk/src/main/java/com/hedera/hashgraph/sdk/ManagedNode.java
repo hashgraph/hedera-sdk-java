@@ -39,7 +39,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     protected long backoffUntil;
 
     /**
-     * The current backoff duration. Uses exponential backoff so think 1s, 2s, 4s, 8s, etc.
+     * The current backoff duration. Uses exponential backoff so think 1s, 2s, 4s, 8s, etc until maxBackoff is hit
      */
     protected Duration currentBackoff;
 
@@ -49,7 +49,12 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     protected Duration minBackoff;
 
     /**
-     * Number of times this node has received a bad gRPDC status
+     * Maximum backoff used by node when receiving a bad gRPC status
+     */
+    protected Duration maxBackoff;
+
+    /**
+     * Number of times this node has received a bad gRPC status
      */
     protected long attempts;
 
@@ -61,6 +66,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.address = address;
         this.currentBackoff = Client.DEFAULT_MIN_BACKOFF;
         this.minBackoff = Client.DEFAULT_MIN_BACKOFF;
+        this.maxBackoff = Client.DEFAULT_MAX_BACKOFF;
     }
 
     protected ManagedNode(N node, ManagedNodeAddress address) {
@@ -68,6 +74,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
 
         this.executor = node.executor;
         this.minBackoff = node.minBackoff;
+        this.maxBackoff = node.maxBackoff;
         this.backoffUntil = node.backoffUntil;
         this.currentBackoff = node.currentBackoff;
         this.attempts = node.attempts;
@@ -121,6 +128,27 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
+     * Get the maximum backoff
+     * @return
+     */
+    Duration getMaxBackoff() {
+        return maxBackoff;
+    }
+
+    /**
+     * Set the minimum backoff
+     *
+     * @param maxBackoff
+     * @return
+     */
+    N setMaxBackoff(Duration maxBackoff) {
+        this.maxBackoff = ManagedNode.this.maxBackoff;
+
+        // noinspection unchecked
+        return (N) this;
+    }
+
+    /**
      * Get the number of times this node has received a bad gRPC status
      * @return
      */
@@ -142,10 +170,10 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Used when a node has received a bad gRPC status
      */
-    void increaseDelay() {
+    synchronized void increaseDelay() {
         this.attempts++;
         this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
-        this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, 8000));
+        this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, this.maxBackoff.toMillis()));
     }
 
     /**
@@ -154,7 +182,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * this is to allow a node which has been performing poorly (receiving several bad gRPC status) to become used again
      * once it stops receiving bad gRPC statuses.
      */
-    void decreaseDelay() {
+    synchronized void decreaseDelay() {
         this.currentBackoff = Duration.ofMillis(Math.max(this.currentBackoff.toMillis() / 2, minBackoff.toMillis()));
     }
 

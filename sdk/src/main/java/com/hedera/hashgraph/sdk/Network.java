@@ -22,8 +22,13 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
     @Nullable
     private Integer maxNodesPerRequest;
 
+    /**
+     * The protobuf address book converted into a map of node account IDs to NodeAddress
+     *
+     * This variable is package private so tests can use it
+     */
     @Nullable
-    private Map<AccountId, NodeAddress> addressBook;
+    Map<AccountId, NodeAddress> addressBook;
 
     private boolean verifyCertificates = true;
 

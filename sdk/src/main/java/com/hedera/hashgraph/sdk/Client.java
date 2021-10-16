@@ -564,20 +564,63 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * The minimum backoff time for any node in the network.
      *
+     * @deprecated - Use {@link Client#getNodeMaxBackoff()} instead
      * @return
      */
+    @Deprecated
     public synchronized Duration getNodeWaitTime() {
+        return getNodeMinBackoff();
+    }
+
+    /**
+     * Set the minimum backoff time for any node in the network.
+     *
+     * @deprecated - Use {@link Client#setNodeMinBackoff(Duration)} ()} instead
+     * @param nodeWaitTime
+     * @return
+     */
+    @Deprecated
+    public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
+        return setNodeMinBackoff(nodeWaitTime);
+    }
+
+    /**
+     * The minimum backoff time for any node in the network.
+     *
+     * @return
+     */
+    public synchronized Duration getNodeMinBackoff() {
         return network.getMinBackoff();
     }
 
     /**
      * Set the minimum backoff time for any node in the network.
      *
-     * @param nodeWaitTime
+     * @param minBackoff
      * @return
      */
-    public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
-        network.setMinBackoff(nodeWaitTime);
+    public synchronized Client setNodeMinBackoff(Duration minBackoff) {
+        network.setMinBackoff(minBackoff);
+        return this;
+    }
+
+    /**
+     * The maximum backoff time for any node in the network.
+     *
+     * @return
+     */
+    public synchronized Duration getNodeMaxBackoff() {
+        return network.getMaxBackoff();
+    }
+
+    /**
+     * Set the maximum backoff time for any node in the network.
+     *
+     * @param maxBackoff
+     * @return
+     */
+    public synchronized Client setNodeMaxBackoff(Duration maxBackoff) {
+        network.setMaxBackoff(maxBackoff);
         return this;
     }
 
