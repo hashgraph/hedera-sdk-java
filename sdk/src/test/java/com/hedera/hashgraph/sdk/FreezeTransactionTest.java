@@ -38,9 +38,10 @@ public class FreezeTransactionTest {
         return new FreezeTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setUpdateFileId(FileId.fromString("4.5.6"))
-            .setUpdateFileHash(Hex.decode("1723904587120938954702349857"))
+            .setFileId(FileId.fromString("4.5.6"))
+            .setFileHash(Hex.decode("1723904587120938954702349857"))
             .setStartTime(validStart)
+            .setFreezeType(FreezeType.FREEZE_ABORT)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
