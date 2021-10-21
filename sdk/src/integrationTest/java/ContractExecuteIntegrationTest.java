@@ -33,7 +33,7 @@ public class ContractExecuteIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(2000)
+            .setGas(75000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -43,7 +43,7 @@ public class ContractExecuteIntegrationTest {
 
         new ContractExecuteTransaction()
             .setContractId(contractId)
-            .setGas(10000)
+            .setGas(75000)
             .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -66,9 +66,9 @@ public class ContractExecuteIntegrationTest {
     void cannotExecuteContractWhenContractIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        var error = assertThrows(ReceiptStatusException.class, () -> {
             new ContractExecuteTransaction()
-                .setGas(10000)
+                .setGas(75000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -94,7 +94,7 @@ public class ContractExecuteIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(2000)
+                .setGas(75000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -106,7 +106,7 @@ public class ContractExecuteIntegrationTest {
         var error = assertThrows(ReceiptStatusException.class, () -> {
             new ContractExecuteTransaction()
                 .setContractId(contractId)
-                .setGas(10000)
+                .setGas(75000)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         });
@@ -141,7 +141,7 @@ public class ContractExecuteIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(2000)
+                .setGas(75000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
