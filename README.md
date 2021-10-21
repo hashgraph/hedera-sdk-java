@@ -20,10 +20,10 @@ Select _one_ of the following depending on your target platform.
 
 ```groovy
 // Android, Corda DJVM, Java 7+
-implementation 'com.hedera.hashgraph:sdk-jdk7:2.2.0-beta.2'
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.2.0"'
 
 // Java 9+, Kotlin
-implementation 'com.hedera.hashgraph:sdk:2.2.0-beta.2'
+implementation 'com.hedera.hashgraph:sdk:2.2.0"'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
@@ -61,14 +61,14 @@ Select _one_ of the following depending on your target platform.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk-jdk7</artifactId>
-  <version>2.2.0-beta.2</version>
+  <version>2.2.0"</version>
 </dependency>
 
 <!-- Java 9+, Kotlin -->
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.2.0-beta.2</version>
+  <version>2.2.0"</version>
 </dependency>
 ```
 
@@ -79,21 +79,21 @@ Select _one_ of the following to provide the gRPC implementation.
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.38.0</version>
+  <version>1.40.0</version>
 </dependency>
 
 <!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty</artifactId>
-  <version>1.38.0</version>
+  <version>1.40.0</version>
 </dependency>
 
 <!-- okhttp transport (for lighter-weight applications or Android) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-okhttp</artifactId>
-  <version>1.38.0</version>
+  <version>1.40.0</version>
 </dependency>
 ```
 
