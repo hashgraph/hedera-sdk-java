@@ -34,7 +34,7 @@ public class SystemIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(2000)
+                .setGas(75000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
