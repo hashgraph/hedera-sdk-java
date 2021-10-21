@@ -27,8 +27,9 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     @Nullable
     private Instant startTime = null;
     @Nullable
-    private FileId updateFileId = null;
-    private byte[] updateFileHash = {};
+    private FileId fileId = null;
+    private byte[] fileHash = {};
+    private FreezeType freezeType = FreezeType.UNKNOWN_FREEZE_TYPE;
 
     public FreezeTransaction() {
     }
@@ -63,6 +64,9 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return setStartTime(Instant.ofEpochMilli(((long)hour * 60 * 60 + (long)minute * 60) * 1000));
     }
 
+    /**
+     * @deprecated with no replacement
+     */
     @Deprecated
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getEndTime() {
@@ -72,6 +76,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     /**
      * Sets the end time (in UTC).
      *
+     * @deprecated with no replacement
      * @param hour   The hour to be set
      * @param minute The minute to be set
      * @return {@code this}
@@ -86,26 +91,70 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return this;
     }
 
+    /**
+     * @deprecated Use {@link #getFileId()} instead.
+     */
+    @Deprecated
     @Nullable
     public FileId getUpdateFileId() {
-        return updateFileId;
+        return fileId;
     }
 
+    /**
+     * @deprecated Use {@link #setFileId(FileId)} instead.
+     */
+    @Deprecated
     public FreezeTransaction setUpdateFileId(FileId updateFileId) {
+        return setFileId(updateFileId);
+    }
+
+    /**
+     * @deprecated Use {@link #getFileHash()} instead.
+     */
+    @Deprecated
+    public byte[] getUpdateFileHash() {
+        return fileHash;
+    }
+
+    /**
+     * @deprecated Use {@link #setFileHash(byte[])} instead.
+     */
+    @Deprecated
+    public FreezeTransaction setUpdateFileHash(byte[] updateFileHash) {
+        return setFileHash(updateFileHash);
+    }
+
+    @Nullable
+    public FileId getFileId() {
+        return fileId;
+    }
+
+    public FreezeTransaction setFileId(FileId fileId) {
         requireNotFrozen();
-        Objects.requireNonNull(updateFileId);
-        this.updateFileId = updateFileId;
+        Objects.requireNonNull(fileId);
+        this.fileId = fileId;
         return this;
     }
 
-    public byte[] getUpdateFileHash() {
-        return updateFileHash;
+    public byte[] getFileHash() {
+        return fileHash;
     }
 
-    public FreezeTransaction setUpdateFileHash(byte[] updateFileHash) {
+    public FreezeTransaction setFileHash(byte[] fileHash) {
         requireNotFrozen();
-        Objects.requireNonNull(updateFileHash);
-        this.updateFileHash = updateFileHash;
+        Objects.requireNonNull(fileHash);
+        this.fileHash = fileHash;
+        return this;
+    }
+
+    public FreezeType getFreezeType() {
+        return freezeType;
+    }
+
+    public FreezeTransaction setFreezeType(FreezeType freezeType) {
+        requireNotFrozen();
+        Objects.requireNonNull(freezeType);
+        this.freezeType = freezeType;
         return this;
     }
 
@@ -121,12 +170,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFreeze();
-        endHour = body.getEndHour();
-        endMinute = body.getEndMin();
+        freezeType = FreezeType.valueOf(body.getFreezeType());
         if (body.hasUpdateFile()) {
-            updateFileId = FileId.fromProtobuf(body.getUpdateFile());
+            fileId = FileId.fromProtobuf(body.getUpdateFile());
         }
-        updateFileHash = body.getFileHash().toByteArray();
+        fileHash = body.getFileHash().toByteArray();
         if (body.hasStartTime()) {
             startTime = InstantConverter.fromProtobuf(body.getStartTime());
         }
@@ -134,12 +182,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     FreezeTransactionBody.Builder build() {
         var builder = FreezeTransactionBody.newBuilder();
-        builder.setEndHour(endHour);
-        builder.setEndMin(endMinute);
-        if (updateFileId != null) {
-            builder.setUpdateFile(updateFileId.toProtobuf());
+        builder.setFreezeType(freezeType.code);
+        if (fileId != null) {
+            builder.setUpdateFile(fileId.toProtobuf());
         }
-        builder.setFileHash(ByteString.copyFrom(updateFileHash));
+        builder.setFileHash(ByteString.copyFrom(fileHash));
         if (startTime != null) {
             builder.setStartTime(InstantConverter.toProtobuf(startTime));
         }

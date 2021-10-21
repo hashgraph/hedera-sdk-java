@@ -4,7 +4,6 @@ import com.hedera.hashgraph.sdk.proto.SubType;
 
 
 public enum FeeDataType {
-
     /**
      * The resource prices have no special scope
      */
