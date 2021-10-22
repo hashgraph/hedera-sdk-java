@@ -1,0 +1,18 @@
+            case UNRECOGNIZED:
+                // NOTE: Protobuf deserialization will not give us the code on the wire
+                throw new IllegalArgumentException(
+                    "network returned unrecognized response code; your SDK may be out of date");
+        }
+
+        // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
+        throw new IllegalArgumentException(
+            "response code "
+                + code.name()
+                + " is unhandled by the SDK; update your SDK or open an issue");
+    }
+
+    @Override
+    public String toString() {
+        return code.name();
+    }
+}

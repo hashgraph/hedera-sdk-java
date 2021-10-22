@@ -324,7 +324,17 @@ public enum RequestType {
     /**
      * Get execution time(s) by TransactionID, if available
      */
-    NETWORK_GET_EXECUTION_TIME(HederaFunctionality.NetworkGetExecutionTime);
+    NETWORK_GET_EXECUTION_TIME(HederaFunctionality.NetworkGetExecutionTime),
+
+    /**
+     * Pause the Token
+     */
+    TOKEN_PAUSE(HederaFunctionality.TokenPause),
+
+    /**
+     * Unpause the Token
+     */
+    TOKEN_UNPAUSE(HederaFunctionality.TokenUnpause);
 
     final HederaFunctionality code;
 
@@ -464,6 +474,10 @@ public enum RequestType {
                 return TOKEN_FEE_SCHEDULE_UPDATE;
             case NetworkGetExecutionTime:
                 return NETWORK_GET_EXECUTION_TIME;
+            case TokenPause:
+                return TOKEN_PAUSE;
+            case TokenUnpause:
+                return TOKEN_UNPAUSE;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -602,6 +616,10 @@ public enum RequestType {
                 return "TOKEN_FEE_SCHEDULE_UPDATE";
             case NETWORK_GET_EXECUTION_TIME:
                 return "NETWORK_GET_EXECUTION_TIME";
+            case TOKEN_PAUSE:
+                return "TOKEN_PAUSE";
+            case TOKEN_UNPAUSE:
+                return "TOKEN_UNPAUSE";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

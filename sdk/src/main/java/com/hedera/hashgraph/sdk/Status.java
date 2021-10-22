@@ -43,7 +43,8 @@ public enum Status {
     INVALID_TRANSACTION_START(ResponseCodeEnum.INVALID_TRANSACTION_START),
 
     /**
-     * valid transaction duration is a positive non zero number that does not exceed 120 seconds
+     * The given transactionValidDuration was either non-positive, or greater than the maximum
+     * valid duration of 180 secs.
      */
     INVALID_TRANSACTION_DURATION(ResponseCodeEnum.INVALID_TRANSACTION_DURATION),
 
@@ -1138,9 +1139,86 @@ public enum Status {
     EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT(ResponseCodeEnum.EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT),
 
     /**
-     * Cannot set the number of automatic associations for an account more than the maximum allowed token associations tokens.maxPerAccount
+     * Cannot set the number of automatic associations for an account more than the maximum allowed
+     * token associations tokens.maxPerAccount.
      */
-    REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT(ResponseCodeEnum.REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT);
+    REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT(ResponseCodeEnum.REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT),
+
+    /**
+     * Token is paused. This Token cannot be a part of any kind of Transaction until unpaused.
+     */
+    TOKEN_IS_PAUSED(ResponseCodeEnum.TOKEN_IS_PAUSED),
+
+    /**
+     * Pause key is not set on token
+     */
+    TOKEN_HAS_NO_PAUSE_KEY(ResponseCodeEnum.TOKEN_HAS_NO_PAUSE_KEY),
+
+    /**
+     * The provided pause key was invalid
+     */
+    INVALID_PAUSE_KEY(ResponseCodeEnum.INVALID_PAUSE_KEY),
+
+    /**
+     * The update file in a freeze transaction body must exist.
+     */
+    FREEZE_UPDATE_FILE_DOES_NOT_EXIST(ResponseCodeEnum.FREEZE_UPDATE_FILE_DOES_NOT_EXIST),
+
+    /**
+     * The hash of the update file in a freeze transaction body must match the in-memory hash.
+     */
+    FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH(ResponseCodeEnum.FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH),
+
+    /**
+     * A FREEZE_UPGRADE transaction was handled with no previous update prepared.
+     */
+    NO_UPGRADE_HAS_BEEN_PREPARED(ResponseCodeEnum.NO_UPGRADE_HAS_BEEN_PREPARED),
+
+    /**
+     * A FREEZE_ABORT transaction was handled with no scheduled freeze.
+     */
+    NO_FREEZE_IS_SCHEDULED(ResponseCodeEnum.NO_FREEZE_IS_SCHEDULED),
+
+    /**
+     * The update file hash when handling a FREEZE_UPGRADE transaction differs from the file
+     * hash at the time of handling the PREPARE_UPGRADE transaction.
+     */
+    UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE(ResponseCodeEnum.UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE),
+
+    /**
+     * The given freeze start time was in the (consensus) past.
+     */
+    FREEZE_START_TIME_MUST_BE_FUTURE(ResponseCodeEnum.FREEZE_START_TIME_MUST_BE_FUTURE),
+
+    /**
+     * The prepared update file cannot be updated or appended until either the upgrade has
+     * been completed, or a FREEZE_ABORT has been handled.
+     */
+    PREPARED_UPDATE_FILE_IS_IMMUTABLE(ResponseCodeEnum.PREPARED_UPDATE_FILE_IS_IMMUTABLE),
+
+    /**
+     * Once a freeze is scheduled, it must be aborted before any other type of freeze can
+     * can be performed.
+     */
+    FREEZE_ALREADY_SCHEDULED(ResponseCodeEnum.FREEZE_ALREADY_SCHEDULED),
+
+    /**
+     * If an NMT upgrade has been prepared, the following operation must be a FREEZE_UPGRADE.
+     * (To issue a FREEZE_ONLY, submit a FREEZE_ABORT first.)
+     */
+    FREEZE_UPGRADE_IN_PROGRESS(ResponseCodeEnum.FREEZE_UPGRADE_IN_PROGRESS),
+
+    /**
+     * If an NMT upgrade has been prepared, the subsequent FREEZE_UPGRADE transaction must
+     * confirm the id of the file to be used in the upgrade.
+     */
+    UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED(ResponseCodeEnum.UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED),
+
+    /**
+     * If an NMT upgrade has been prepared, the subsequent FREEZE_UPGRADE transaction must
+     * confirm the hash of the file to be used in the upgrade.
+     */
+    UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED(ResponseCodeEnum.UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED);
 
     final ResponseCodeEnum code;
 
@@ -1596,6 +1674,34 @@ public enum Status {
                 return EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT;
             case REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT:
                 return REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT;
+            case TOKEN_IS_PAUSED:
+                return TOKEN_IS_PAUSED;
+            case TOKEN_HAS_NO_PAUSE_KEY:
+                return TOKEN_HAS_NO_PAUSE_KEY;
+            case INVALID_PAUSE_KEY:
+                return INVALID_PAUSE_KEY;
+            case FREEZE_UPDATE_FILE_DOES_NOT_EXIST:
+                return FREEZE_UPDATE_FILE_DOES_NOT_EXIST;
+            case FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH:
+                return FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH;
+            case NO_UPGRADE_HAS_BEEN_PREPARED:
+                return NO_UPGRADE_HAS_BEEN_PREPARED;
+            case NO_FREEZE_IS_SCHEDULED:
+                return NO_FREEZE_IS_SCHEDULED;
+            case UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE:
+                return UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE;
+            case FREEZE_START_TIME_MUST_BE_FUTURE:
+                return FREEZE_START_TIME_MUST_BE_FUTURE;
+            case PREPARED_UPDATE_FILE_IS_IMMUTABLE:
+                return PREPARED_UPDATE_FILE_IS_IMMUTABLE;
+            case FREEZE_ALREADY_SCHEDULED:
+                return FREEZE_ALREADY_SCHEDULED;
+            case FREEZE_UPGRADE_IN_PROGRESS:
+                return FREEZE_UPGRADE_IN_PROGRESS;
+            case UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED:
+                return UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED;
+            case UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED:
+                return UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

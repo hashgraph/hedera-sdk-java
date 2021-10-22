@@ -4,4 +4,3 @@ import com.hedera.hashgraph.sdk.proto.SubType;
 
 
 public enum FeeDataType {
-

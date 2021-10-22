@@ -121,4 +121,10 @@ service TokenService {
     rpc getTokenNftInfos (Query) returns (Response) {
          option deprecated = true;
     };
+
+    // Pause the token
+    rpc pauseToken (Transaction) returns (TransactionResponse);
+
+    //  Unpause the token
+    rpc unpauseToken (Transaction) returns (TransactionResponse);
 }
