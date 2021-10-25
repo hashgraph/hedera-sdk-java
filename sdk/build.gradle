@@ -17,7 +17,7 @@ configurations {
 
 dependencies {
 	// https://github.com/bsideup/jabel
-	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.1'
+	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
 
 	// custom annotation processor to help generate methods around executables
 	annotationProcessor project(":executable-processor")
@@ -72,7 +72,7 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.18.1"
+		artifact = "com.google.protobuf:protoc:3.19.0"
 	}
 	plugins {
 		grpc {
