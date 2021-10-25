@@ -3,15 +3,6 @@ name: Hedera Services Latest Release
 on:
   schedule:
     - cron: '0 0 * * *'
-# Just for testing CI in a PR
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
 
 jobs:
   test:
