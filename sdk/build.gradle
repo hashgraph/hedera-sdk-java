@@ -17,7 +17,7 @@ configurations {
 
 dependencies {
 	// https://github.com/bsideup/jabel
-	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.1'
+	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
 
 	// custom annotation processor to help generate methods around executables
 	annotationProcessor project(":executable-processor")
