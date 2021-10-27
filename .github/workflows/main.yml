@@ -1,14 +1,8 @@
 name: Hedera Services Main
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - main
-      - develop
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   test:
@@ -65,6 +59,7 @@ jobs:
         with:
           path: hedera-sdk-java
       - name: Run Hedera SDK Tests
+        timeout-minutes: 30
         env:
           OPERATOR_KEY: "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"
           OPERATOR_ID: "0.0.2"
