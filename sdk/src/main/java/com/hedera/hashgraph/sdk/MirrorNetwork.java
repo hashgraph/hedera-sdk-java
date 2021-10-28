@@ -66,11 +66,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, Li
 
     @Override
     protected boolean checkNetworkContainsEntry(String entry) {
-        for (var address : network.keySet()) {
-            if (address.equals(entry)) {
-                return true;
-            }
-        }
+        return network.containsKey(entry);
 
         return false;
     }
