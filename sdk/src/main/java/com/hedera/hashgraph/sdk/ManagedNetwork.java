@@ -237,7 +237,7 @@ abstract class ManagedNetwork<
     synchronized ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
         var iterableNetwork = createIterableNetwork(network);
 
-        // Sort circuit the rest of the setNetwork logic if nodes is empty
+        // Short circuit the rest of the setNetwork logic if nodes is empty
         if (nodes.isEmpty()) {
             for (var entry : iterableNetwork) {
                 var node = createNodeFromNetworkEntry(entry);
