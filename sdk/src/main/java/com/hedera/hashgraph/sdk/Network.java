@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
-class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, AccountId>, Map.Entry<String, AccountId>> {
+class Network extends ManagedNetwork<Network, AccountId, Node> {
     @Nullable
     private Integer maxNodesPerRequest;
 
@@ -143,11 +143,6 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
     }
 
     @Override
-    protected Iterable<Map.Entry<String, AccountId>> createIterableNetwork(Map<String, AccountId> network) {
-        return network.entrySet();
-    }
-
-    @Override
     protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
         return new Node(entry.getValue(), entry.getKey(), executor)
             .setMinBackoff(minBackoff)
@@ -174,18 +169,13 @@ class Network extends ManagedNetwork<Network, AccountId, Node, Map<String, Accou
         return nodes;
     }
 
-    @Override
-    protected boolean checkNetworkContainsEntry(Map.Entry<String, AccountId> entry) {
-        return this.network.containsKey(entry.getValue());
-    }
-
     /**
      * Pick 1/3 of the nodes sorted by health and expected delay from the network.
      * This is used by Query and Transaction for selecting node AccountId's.
      *
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
-    List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
+    synchronized List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
         var nodes = getNumberOfMostHealthyNodes(getNumberOfNodesForRequest());
         var nodeAccountIds = new ArrayList<AccountId>(nodes.size());
 

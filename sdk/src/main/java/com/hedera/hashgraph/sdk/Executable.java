@@ -201,8 +201,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         mergeFromClient(client);
         onExecute(client);
-        setNodesFromNodeAccountIds(client);
         checkNodeAccountIds();
+        setNodesFromNodeAccountIds(client);
 
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
             var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
@@ -250,8 +250,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         mergeFromClient(client);
 
         return onExecuteAsync(client).thenCompose((v) -> {
-            setNodesFromNodeAccountIds(client);
             checkNodeAccountIds();
+            setNodesFromNodeAccountIds(client);
 
             return executeAsync(client, 1, null);
         });

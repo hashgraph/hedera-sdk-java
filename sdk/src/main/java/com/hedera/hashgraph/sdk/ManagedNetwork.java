@@ -27,11 +27,9 @@ import java.util.concurrent.TimeoutException;
  * @param <SdkNetworkEntryT> - The type used to iterate over the network.
  */
 abstract class ManagedNetwork<
-    ManagedNetworkT extends ManagedNetwork<ManagedNetworkT, KeyT, ManagedNodeT, SdkNetworkT, SdkNetworkEntryT>,
+    ManagedNetworkT extends ManagedNetwork<ManagedNetworkT, KeyT, ManagedNodeT>,
     KeyT,
-    ManagedNodeT extends ManagedNode<ManagedNodeT, KeyT>,
-    SdkNetworkT,
-    SdkNetworkEntryT> {
+    ManagedNodeT extends ManagedNode<ManagedNodeT, KeyT>> {
     protected static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
 
     protected final ExecutorService executor;
@@ -205,21 +203,17 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-    protected abstract Iterable<SdkNetworkEntryT> createIterableNetwork(SdkNetworkT network);
-
-    protected abstract ManagedNodeT createNodeFromNetworkEntry(SdkNetworkEntryT entry);
+    protected abstract ManagedNodeT createNodeFromNetworkEntry(Map.Entry<String, KeyT> entry);
 
     /**
      * Returns a list of index in descending order to remove from the current node list.
      *
-     * Descending order is important here because {@link ManagedNetwork#setNetwork(Object)} uses a for-each loop.
+     * Descending order is important here because {@link ManagedNetwork#setNetwork(Map<String, KeyT>)} uses a for-each loop.
      *
      * @param network - the new network
      * @return - list of indexes in descending order
      */
-    protected abstract List<Integer> getNodesToRemove(SdkNetworkT network);
-
-    protected abstract boolean checkNetworkContainsEntry(SdkNetworkEntryT entry);
+    protected abstract List<Integer> getNodesToRemove(Map<String, KeyT> network);
 
     /**
      * Intelligently overwrites the current network.
@@ -234,23 +228,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException - when shutting down nodes
      * @throws InterruptedException - when acquiring the lock
      */
-    synchronized ManagedNetworkT setNetwork(SdkNetworkT network) throws TimeoutException, InterruptedException {
-        var iterableNetwork = createIterableNetwork(network);
-
-        // Short circuit the rest of the setNetwork logic if nodes is empty
-        if (nodes.isEmpty()) {
-            for (var entry : iterableNetwork) {
-                var node = createNodeFromNetworkEntry(entry);
-                this.network.put(node.getKey(), node);
-                this.nodes.add(node);
-            }
-
-            Collections.shuffle(nodes);
-
-            // noinspection unchecked
-            return (ManagedNetworkT) this;
-        }
-
+    synchronized ManagedNetworkT setNetwork(Map<String, KeyT> network) throws TimeoutException, InterruptedException {
         // getNodesToRemove() should always return the list in reverse order
         for (var index : getNodesToRemove(network)) {
             var stopAt = Instant.now().getEpochSecond() + closeTimeout.getSeconds();
@@ -268,9 +246,9 @@ abstract class ManagedNetwork<
         }
 
         // Add new nodes that are not present in the list
-        for (var entry : iterableNetwork) {
+        for (var entry : network.entrySet()) {
             // Only add nodes which don't already exist in our network map
-            if (!checkNetworkContainsEntry(entry)) {
+            if (!this.network.containsKey(entry.getValue())) {
                 var node = createNodeFromNetworkEntry(entry);
                 this.network.put(node.getKey(), node);
                 this.nodes.add(node);
@@ -310,7 +288,7 @@ abstract class ManagedNetwork<
      * @return
      * @throws InterruptedException
      */
-    protected List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
+    protected synchronized List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
         Collections.sort(nodes);
         removeDeadNodes();
 
