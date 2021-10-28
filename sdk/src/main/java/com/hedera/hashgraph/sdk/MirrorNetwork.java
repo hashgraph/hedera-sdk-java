@@ -35,7 +35,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode, Li
         return new MirrorNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
-    public List<String> getNetwork() {
+   List<String> getNetwork() {
         return new ArrayList<>(network.keySet());
     }
 
