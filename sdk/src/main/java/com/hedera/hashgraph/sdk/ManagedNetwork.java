@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Abstracts await most of the similar functionality between {@link Network} and {@link MirrorNetwork}
+ * Abstracts away most of the similar functionality between {@link Network} and {@link MirrorNetwork}
  *
  * @param <ManagedNetworkT> - The network that is extending this class. This is used for builder pattern setter methods.
  * @param <KeyT> - The identifying type for the network.
