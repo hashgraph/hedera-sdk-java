@@ -23,8 +23,6 @@ import java.util.concurrent.TimeoutException;
  * @param <ManagedNetworkT> - The network that is extending this class. This is used for builder pattern setter methods.
  * @param <KeyT> - The identifying type for the network.
  * @param <ManagedNodeT> - The specific node type for this network.
- * @param <SdkNetworkT> - The type used by users to create this network.
- * @param <SdkNetworkEntryT> - The type used to iterate over the network.
  */
 abstract class ManagedNetwork<
     ManagedNetworkT extends ManagedNetwork<ManagedNetworkT, KeyT, ManagedNodeT>,
