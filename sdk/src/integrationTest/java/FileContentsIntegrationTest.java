@@ -1,6 +1,7 @@
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
@@ -8,6 +9,8 @@ import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -15,6 +18,21 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileContentsIntegrationTest {
+    @Test
+    void downloadAddressBook() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var contents = new FileContentsQuery()
+            .setFileId(FileId.ADDRESS_BOOK)
+            .execute(testEnv.client);
+
+        try (FileOutputStream outputStream = new FileOutputStream(new File("previewnet.pb"))) {
+            outputStream.write(contents.toByteArray());
+        }
+
+        testEnv.close();
+    }
+
     @Test
     @DisplayName("Can query file contents")
     void canQueryFileContents() throws Exception {
