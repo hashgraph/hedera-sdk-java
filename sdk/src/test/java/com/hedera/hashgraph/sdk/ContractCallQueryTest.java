@@ -31,7 +31,6 @@ public class ContractCallQueryTest {
                 new ContractFunctionParameters()
                     .addString("Hello")
                     .addString("world!"))
-            .setMaxResultSize(4444444)
             .toString()
         ).toMatchSnapshot();
     }
@@ -47,7 +46,6 @@ public class ContractCallQueryTest {
                     .addString("world!")
                     .toBytes(null)
                     .toByteArray())
-            .setMaxResultSize(4444444)
             .toString()
         ).toMatchSnapshot();
     }

@@ -162,16 +162,16 @@ public class IntegrationTestEnv {
             for (; index < nodes.size(); index++) {
                 var node = nodes.get(index);
                 try {
-                    new AccountBalanceQuery()
+                    new AccountCreateTransaction()
                         .setNodeAccountIds(Collections.singletonList(node.getValue()))
                         .setMaxAttempts(1)
-                        .setAccountId(client.getOperatorAccountId())
+                        .setKey(PrivateKey.generate())
+                        //.setAccountId(client.getOperatorAccountId())
                         .execute(client);
                     nodes.remove(index);
                     outMap.put(node.getKey(), node.getValue());
                     return;
-                } catch (Exception ignored) {
-                    throw ignored;
+                } catch (Throwable ignored) {
                 }
             }
             throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");
