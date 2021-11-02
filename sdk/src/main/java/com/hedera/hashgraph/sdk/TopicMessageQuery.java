@@ -146,7 +146,13 @@ public final class TopicMessageQuery {
     public SubscriptionHandle subscribe(Client client, Consumer<TopicMessage> onNext) {
         SubscriptionHandle subscriptionHandle = new SubscriptionHandle();
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
-        makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(), pendingMessages);
+
+        try {
+            makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(), pendingMessages);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         return subscriptionHandle;
     }
 
@@ -158,7 +164,7 @@ public final class TopicMessageQuery {
         AtomicLong counter,
         AtomicReference<ConsensusTopicResponse> lastMessage,
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
-    ) {
+    ) throws InterruptedException {
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             client.mirrorNetwork.getNextMirrorNode().getChannel()
                 .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
@@ -248,7 +254,11 @@ public final class TopicMessageQuery {
                     Thread.currentThread().interrupt();
                 }
 
-                makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage, pendingMessages);
+                try {
+                    makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage, pendingMessages);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
 
             @Override

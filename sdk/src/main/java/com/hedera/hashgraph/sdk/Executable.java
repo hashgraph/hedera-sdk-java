@@ -215,7 +215,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
             if (!grpcRequest.getNode().isHealthy()) {
-                delay(grpcRequest.getNode().delay);
+                delay(grpcRequest.getNode().getRemainingTimeForBackoff());
             }
 
             ResponseT response = null;
@@ -261,7 +261,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     private void setNodesFromNodeAccountIds(Client client) {
         for (var accountId : nodeAccountIds) {
             @Nullable
-            var node = client.network.networkNodes.get(accountId);
+            var node = client.network.getNode(accountId);
             if (node == null) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
@@ -271,13 +271,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     private Node getNodeForExecute(int attempt) {
         var node = nodes.get(nextNodeIndex);
-        node.inUse();
 
-        logger.trace("Sending request #{} to node {}: {}", attempt, node.accountId, this);
+        logger.trace("Sending request #{} to node {}: {}", attempt, node.getAccountId(), this);
 
         var nodeIsHealthy = node.isHealthy();
         if (!node.isHealthy()) {
-            logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.accountId, attempt, node.delayUntil);
+            logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.getAccountId(), attempt, node.getRemainingTimeForBackoff());
         }
 
         return node;
@@ -304,7 +303,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
         if (!grpcRequest.getNode().isHealthy()) {
-            return Delayer.delayFor(grpcRequest.getNode().delay(), client.executor)
+            return Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor)
                 .thenCompose((v) -> executeAsync(client, attempt, lastException));
         }
 
@@ -432,7 +431,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             if (retry) {
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                    node.accountId, node.delay, attempt, e != null ? e.getMessage() : "NULL");
+                    node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
                 node.increaseDelay();
             }
 
@@ -446,7 +445,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         O mapResponse() {
             // successful response from Hedera
-            return Executable.this.mapResponse(response, node.accountId, request);
+            return Executable.this.mapResponse(response, node.getAccountId(), request);
         }
 
         ExecutionState shouldRetry(ResponseT response) {
@@ -456,7 +455,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             this.responseStatus = Executable.this.mapResponseStatus(response);
 
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
-                responseStatus, latency, node.accountId, attempt, response);
+                responseStatus, latency, node.getAccountId(), attempt, response);
 
             var executionState = Executable.this.shouldRetry(responseStatus, response);
 
@@ -465,7 +464,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     // the response has been identified as failing or otherwise
                     // needing a retry let's do this again after a delay
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                        node.accountId, delay, attempt, responseStatus);
+                        node.getAccountId(), delay, attempt, responseStatus);
                 default:
                     // Do nothing
             }

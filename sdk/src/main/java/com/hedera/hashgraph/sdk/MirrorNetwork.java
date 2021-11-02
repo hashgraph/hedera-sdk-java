@@ -1,41 +1,26 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
-
-import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-class MirrorNetwork {
-    final ExecutorService executor;
-    final Semaphore lock = new Semaphore(1);
-    List<String> addresses = new CopyOnWriteArrayList<>();
-    List<MirrorNode> network = new ArrayList<>();
-    int index = 0;
-
-    MirrorNetwork(ExecutorService executor) {
-        this.executor = executor;
+class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode> {
+    private MirrorNetwork(ExecutorService executor, List<String> addresses) {
+        super(executor);
 
         try {
             setNetwork(addresses);
-        } catch (InterruptedException e) {
-            // Do nothing as this should never occur
+        } catch (InterruptedException | TimeoutException e) {
+            // This should never occur. The network is empty.
         }
     }
 
     static MirrorNetwork forNetwork(ExecutorService executor, List<String> addresses) {
-        try {
-            return new MirrorNetwork(executor).setNetwork(addresses);
-        } catch (InterruptedException e) {
-            // Should never happen
-            throw new RuntimeException(e);
-        }
+        return new MirrorNetwork(executor, addresses);
     }
 
     static MirrorNetwork forMainnet(ExecutorService executor) {
@@ -50,81 +35,40 @@ class MirrorNetwork {
         return MirrorNetwork.forNetwork(executor, List.of("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
+    synchronized MirrorNetwork setNetwork(List<String> network) throws TimeoutException, InterruptedException {
+        var map = new HashMap<String, String>(network.size());
+        for (var address : network) {
+            map.put(address, address);
+        }
+        return super.setNetwork(map);
+    }
+
     List<String> getNetwork() {
-        return Collections.unmodifiableList(addresses);
+        return Collections.unmodifiableList(new ArrayList<>(network.keySet()));
     }
 
-    synchronized MirrorNetwork setNetwork(List<String> addresses) throws InterruptedException {
-        lock.acquire();
-
-        var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
-
-        // Remove nodes that do not exist in new network
-        for (int i = 0; i < network.size(); i++) {
-            if (!addresses.contains(network.get(i).address)) {
-                network.get(i).close(stopAt - Instant.now().getEpochSecond());
-                network.remove(i);
-                i--;
-            }
-        }
-
-        // Add new nodes that the network doesn't already have
-        for (var address : addresses) {
-            @Var
-            var contains = false;
-            for (var node : this.network) {
-                if (node.address.equals(address)) {
-                    contains = true;
-                }
-            }
-
-            if (!contains) {
-                this.network.add(new MirrorNode(address, executor));
-            }
-        }
-
-        this.addresses = new CopyOnWriteArrayList<>(addresses);
-        Collections.shuffle(network, ThreadLocalSecureRandom.current());
-
-        lock.release();
-        return this;
+    @Override
+    protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, String> entry) {
+        return new MirrorNode(entry.getKey(), executor).setMinBackoff(minBackoff);
     }
 
-    MirrorNode getNextMirrorNode() {
-        var node = network.get(index);
-        index = (index + 1) % network.size();
-        return node;
+    @Override
+    protected List<Integer> getNodesToRemove(Map<String, String> network) {
+        var nodes = new ArrayList<Integer>(this.nodes.size());
+        var addresses = network.keySet();
+
+        for (int i = this.nodes.size() - 1; i >= 0; i--) {
+            var node = this.nodes.get(i);
+
+            if (!addresses.contains(node.getAddress().toString())) {
+                nodes.add(i);
+            }
+        }
+
+        return nodes;
     }
 
-    void close(Duration timeout) {
-        try {
-            lock.acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        for (var node : network) {
-            if (node.channel != null) {
-                node.channel.shutdown();
-            }
-        }
-
-        for (var node : network) {
-            if (node.channel != null) {
-                try {
-                    while (!node.channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS)) {
-                        // Do nothing
-                    }
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        network.clear();
-        addresses.clear();
-        index = 0;
-
-        lock.release();
+    synchronized MirrorNode getNextMirrorNode() throws InterruptedException {
+        return getNumberOfMostHealthyNodes(1).get(0);
     }
 }

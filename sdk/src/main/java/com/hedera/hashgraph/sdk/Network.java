@@ -12,38 +12,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-class Network {
-    static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
-    final ExecutorService executor;
-    final Semaphore lock = new Semaphore(1);
-
-    HashMap<String, AccountId> network = new HashMap<>();
-    HashMap<AccountId, Node> networkNodes = new HashMap<>();
-    List<Node> nodes = new ArrayList<>();
-
+class Network extends ManagedNetwork<Network, AccountId, Node> {
     @Nullable
-    NetworkName networkName = null;
+    private Integer maxNodesPerRequest;
 
+    /**
+     * The protobuf address book converted into a map of node account IDs to NodeAddress
+     *
+     * This variable is package private so tests can use it
+     */
     @Nullable
-    Integer maxNodesPerTransaction = null;
+    Map<AccountId, NodeAddress> addressBook;
 
-    private int maxNodeAttempts = DEFAULT_MAX_NODE_ATTEMPTS;
-    private Duration nodeWaitTime = Duration.ofMillis(250);
+    private boolean verifyCertificates = true;
 
-    @Nullable
-    private Map<AccountId, NodeAddress> addressBook;
-
-    Network(ExecutorService executor, Map<String, AccountId> network) {
-        this.executor = executor;
+    private Network(ExecutorService executor, Map<String, AccountId> network) {
+        super(executor);
 
         try {
             setNetwork(network);
@@ -102,42 +92,29 @@ class Network {
         return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
     }
 
-    @Nullable
-    NetworkName getNetworkName() {
-        return networkName;
+    boolean isVerifyCertificates() {
+        return verifyCertificates;
     }
 
-    Network setNetworkName(NetworkName networkName) {
-        this.networkName = networkName;
+    Network setVerifyCertificates(boolean verifyCertificates) {
+        this.verifyCertificates = verifyCertificates;
 
-        switch (networkName) {
-            case MAINNET:
-                addressBook = readAddressBookResource("addressbook/mainnet.pb");
-                break;
-            case TESTNET:
-                addressBook = readAddressBookResource("addressbook/testnet.pb");
-                break;
-            case PREVIEWNET:
-                addressBook = readAddressBookResource("addressbook/previewnet.pb");
-                break;
-        }
-
-        if (addressBook != null) {
-            for (var node : nodes) {
-                node.setAddressBook(addressBook.get(node.accountId));
-            }
+        for (var node : nodes) {
+            node.setVerifyCertificates(verifyCertificates);
         }
 
         return this;
     }
 
-    @Nullable
-    NodeAddress getAddressBook(AccountId nodeAccountId) {
-        if (addressBook == null) {
-            return null;
+    Network setNetworkName(@Nullable NetworkName networkName) {
+        super.setNetworkName(networkName);
+
+        addressBook = networkName == null ? null : readAddressBookResource("addressbook/" + networkName + ".pb");
+        for (var node : nodes) {
+            node.setAddressBook(addressBook == null ? null : addressBook.get(node.getAccountId()));
         }
 
-        return addressBook.get(nodeAccountId);
+        return this;
     }
 
     static Map<AccountId, NodeAddress> readAddressBookResource(String fileName) {
@@ -160,64 +137,37 @@ class Network {
         }
     }
 
-    void setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        lock.acquire();
-
-        // Bypass the more complex code if the network is empty
-        if (this.network.isEmpty()) {
-            this.network = new HashMap<>(network);
-
-            for (var entry : network.entrySet()) {
-                var node = new Node(entry.getValue(), entry.getKey(), nodeWaitTime.toMillis(), executor);
-                this.networkNodes.put(entry.getValue(), node);
-                this.nodes.add(node);
-            }
-
-            Collections.shuffle(nodes);
-
-            lock.release();
-            return;
-        }
-
-        this.network = new HashMap<>(network);
-        var inverted = HashBiMap.create(network).inverse();
-        var newNodeAccountIds = network.values();
-        var stopAt = Instant.now().getEpochSecond() + Duration.ofSeconds(30).getSeconds();
-
-        // Remove nodes that don't exist in new network or that have a different
-        // address for the same AccountId
-        for (int i = 0; i < nodes.size(); i++) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
-                lock.release();
-                throw new TimeoutException("Failed to properly shutdown all channels");
-            }
-
-            if (
-                !newNodeAccountIds.contains(nodes.get(i).accountId) ||
-                    !Objects.requireNonNull(inverted.get(nodes.get(i).accountId)).equals(nodes.get(i).address)
-            ) {
-                networkNodes.remove(nodes.get(i).accountId);
-                nodes.get(i).close(stopAt - Instant.now().toEpochMilli());
-                nodes.remove(i);
-                i--;
-            }
-        }
-
-        // Add new nodes that are not present in the list
-        for (var entry : inverted.entrySet()) {
-            if (networkNodes.get(entry.getKey()) == null) {
-                var node = new Node(entry.getKey(), entry.getValue(), nodeWaitTime.toMillis(), executor);
-
-                nodes.add(node);
-                networkNodes.put(entry.getKey(), node);
-            }
-        }
-
-        Collections.shuffle(nodes);
-
-        lock.release();
+    Map<String, AccountId> getNetwork() {
+        return Collections.unmodifiableMap(network.values().stream()
+            .collect(Collectors.toMap((node -> node.getAddress().toString()), node -> node.getAccountId())));
     }
 
+    @Override
+    protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
+        return new Node(entry.getValue(), entry.getKey(), executor)
+            .setMinBackoff(minBackoff)
+            .setVerifyCertificates(verifyCertificates);
+    }
+
+    @Override
+    protected List<Integer> getNodesToRemove(Map<String, AccountId> network) {
+        var nodes = new ArrayList<Integer>(this.nodes.size());
+        var newNodeAccountIds = network.values();
+        var inverted = HashBiMap.create(network).inverse();
+
+        for (int i = this.nodes.size() - 1; i >= 0; i--) {
+            var node = this.nodes.get(i);
+
+            if (
+                !newNodeAccountIds.contains(node.getAccountId()) ||
+                    !Objects.requireNonNull(inverted.get(node.getAccountId())).equals(node.getAddress().toString())
+            ) {
+                nodes.add(i);
+            }
+        }
+
+        return nodes;
+    }
 
     /**
      * Pick 1/3 of the nodes sorted by health and expected delay from the network.
@@ -225,102 +175,31 @@ class Network {
      *
      * @return {@link java.util.List<com.hedera.hashgraph.sdk.AccountId>}
      */
-    List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
-        lock.acquire();
+    synchronized List<AccountId> getNodeAccountIdsForExecute() throws InterruptedException {
+        var nodes = getNumberOfMostHealthyNodes(getNumberOfNodesForRequest());
+        var nodeAccountIds = new ArrayList<AccountId>(nodes.size());
 
-        Collections.sort(nodes);
-
-        // Remove nodes which have surpassed max attempts
-        if (maxNodeAttempts > 0) {
-            for (var i = 0; i < nodes.size(); i++) {
-                var node = Objects.requireNonNull(nodes.get(i));
-                if (node.attempts >= maxNodeAttempts) {
-                    node.close(30);
-                    nodes.remove(i);
-                    network.remove(node.address);
-                    networkNodes.remove(node.accountId);
-                    i--;
-                }
-            }
-        }
-
-        List<AccountId> resultNodeAccountIds = new ArrayList<>();
-
-        for (int i = 0; i < getNumberOfNodesForTransaction(); i++) {
-            resultNodeAccountIds.add(nodes.get(i).accountId);
-        }
-
-        lock.release();
-
-        return resultNodeAccountIds;
-    }
-
-    void setMaxNodesPerTransaction(int maxNodesPerTransaction) {
-        this.maxNodesPerTransaction = maxNodesPerTransaction;
-    }
-
-    int getMaxNodeAttempts() {
-        return maxNodeAttempts;
-    }
-
-    void setMaxNodeAttempts(int maxNodeAttempts) {
-        this.maxNodeAttempts = maxNodeAttempts;
-    }
-
-    Duration getNodeWaitTime() {
-        return nodeWaitTime;
-    }
-
-    void setNodeWaitTime(Duration nodeWaitTime) {
-        this.nodeWaitTime = nodeWaitTime;
         for (var node : nodes) {
-            node.setWaitTime(nodeWaitTime.toMillis());
+            nodeAccountIds.add(node.getAccountId());
         }
+
+        return nodeAccountIds;
     }
 
-    int getNumberOfNodesForTransaction() {
-        if (maxNodesPerTransaction != null) {
-            return Math.min(maxNodesPerTransaction, nodes.size());
+    Network setMaxNodesPerRequest(int maxNodesPerRequest) {
+        this.maxNodesPerRequest = maxNodesPerRequest;
+        return this;
+    }
+
+    int getNumberOfNodesForRequest() {
+        if (maxNodesPerRequest != null) {
+            return Math.min(maxNodesPerRequest, nodes.size());
         } else {
             return (nodes.size() + 3 - 1) / 3;
         }
     }
 
-    void close(Duration timeout) throws TimeoutException {
-        try {
-            lock.acquire();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
-
-        for (var node : nodes) {
-            if (node.channel != null) {
-                node.channel = node.channel.shutdown();
-            }
-        }
-
-        for (var node : nodes) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
-                lock.release();
-                throw new TimeoutException("Failed to properly shutdown all channels");
-            }
-
-            if (node.channel != null) {
-                try {
-                    node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    lock.release();
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        nodes.clear();
-        networkNodes.clear();
-        network.clear();
-
-        lock.release();
+    Node getNode(AccountId nodeAccountId) {
+        return network.get(nodeAccountId);
     }
 }
