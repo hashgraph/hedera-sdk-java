@@ -14,10 +14,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ClientTest {
@@ -134,21 +135,73 @@ class ClientTest {
 
     @Test
     @DisplayName("setNetwork() functions correctly")
-    void testReplaceNodes() throws Exception {
-        Map<String, AccountId> nodes = new HashMap<>();
-        nodes.put("0.testnet.hedera.com:50211", new AccountId(3));
-        nodes.put("1.testnet.hedera.com:50211", new AccountId(4));
+    void setNetworkWorks() throws Exception {
+        var defaultNetwork = Map.of(
+            "0.testnet.hedera.com:50211", new AccountId(3),
+            "1.testnet.hedera.com:50211", new AccountId(4)
+        );
 
-        Client client = Client.forNetwork(nodes);
+        Client client = Client.forNetwork(defaultNetwork);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(defaultNetwork);
 
-        Map<String, AccountId> setNetworkNodes = new HashMap<>();
-        setNetworkNodes.put("2.testnet.hedera.com:50211", new AccountId(5));
-        setNetworkNodes.put("3.testnet.hedera.com:50211", new AccountId(6));
+        client.setNetwork(defaultNetwork);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(defaultNetwork);
 
-        client.setNetwork(setNetworkNodes);
+        var defaultNetworkWithExtraNode = Map.of(
+            "0.testnet.hedera.com:50211", new AccountId(3),
+            "1.testnet.hedera.com:50211", new AccountId(4),
+            "2.testnet.hedera.com:50211", new AccountId(5)
+        );
 
-        Assertions.assertEquals("2.testnet.hedera.com:50211", Objects.requireNonNull(client.network.networkNodes.get(new AccountId(5))).getChannel().authority());
-        Assertions.assertFalse(client.network.networkNodes.containsKey(new AccountId(3)));
+        client.setNetwork(defaultNetworkWithExtraNode);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(defaultNetworkWithExtraNode);
+
+        var singleNodeNetwork = Map.of(
+            "2.testnet.hedera.com:50211", new AccountId(5)
+        );
+
+        client.setNetwork(singleNodeNetwork);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(singleNodeNetwork);
+
+        var singleNodeNetworkWithDifferentAccountId = Map.of(
+            "2.testnet.hedera.com:50211", new AccountId(6)
+        );
+
+        client.setNetwork(singleNodeNetworkWithDifferentAccountId);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(singleNodeNetworkWithDifferentAccountId);
+
+        client.close();
+    }
+
+    @Test
+    @DisplayName("setMirrorNetwork() functions correctly")
+    void setMirrorNetworkWorks() throws Exception {
+        var defaultNetwork = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+
+        Client client = Client.forNetwork(new HashMap<>()).setMirrorNetwork(defaultNetwork);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
+
+        client.setMirrorNetwork(defaultNetwork);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
+
+        var defaultNetworkWithExtraNode = List.of(
+            "hcs.testnet.mirrornode.hedera.com:5600",
+            "hcs.testnet1.mirrornode.hedera.com:5600"
+        );
+
+        client.setMirrorNetwork(defaultNetworkWithExtraNode);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetworkWithExtraNode);
+
+        var singleNodeNetwork = List.of("hcs.testnet1.mirrornode.hedera.com:5600");
+
+        client.setMirrorNetwork(singleNodeNetwork);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(singleNodeNetwork);
+
+        var singleNodeNetworkWithDifferentNode = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+
+        client.setMirrorNetwork(singleNodeNetworkWithDifferentNode);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(singleNodeNetworkWithDifferentNode);
+
         client.close();
     }
 }
