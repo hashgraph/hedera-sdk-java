@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.errorprone.annotations.Var;
 import io.grpc.ChannelCredentials;
 import io.grpc.ConnectivityState;
 import io.grpc.Grpc;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 abstract class ManagedNode {
     private static final String IN_PROCESS = "in-process:";
+    private static final int GET_STATE_INTERVAL_MILLIS = 250;
     final ExecutorService executor;
     String address;
     long lastUsed = 0;
@@ -60,17 +62,18 @@ abstract class ManagedNode {
             .executor(executor)
             .build();
 
-        if (channel.getState(true) != ConnectivityState.READY) {
-            try {
-                TimeUnit.SECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+        @Var var state = channel.getState(true);
+        try {
+            for (@Var int i = 0; i < (10000 / GET_STATE_INTERVAL_MILLIS) && state != ConnectivityState.READY; i++) {
+                TimeUnit.MILLISECONDS.sleep(GET_STATE_INTERVAL_MILLIS);
+                state = channel.getState(true);
             }
-
-            channel.resetConnectBackoff();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        if (channel.getState(true) != ConnectivityState.READY) {
+        if (state != ConnectivityState.READY) {
+            System.out.println("not ready");
             channel.shutdown();
 
             try {

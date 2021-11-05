@@ -184,14 +184,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    private MaxAttemptsExceededException isAttemptGreaterThanMax(int attempt, @Nullable Throwable e) {
-        if (attempt > maxAttempts) {
-            return new MaxAttemptsExceededException(e);
-        }
-
-        return null;
-    }
-
     public O execute(Client client) throws TimeoutException, PrecheckStatusException {
         return execute(client, client.getRequestTimeout());
     }
@@ -205,9 +197,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         setNodesFromNodeAccountIds(client);
 
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
-            var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
-            if (maxAttemptsExceeded != null) {
-                throw  maxAttemptsExceeded;
+            if (attempt > maxAttempts) {
+                throw new MaxAttemptsExceededException(lastException);
             }
 
             GrpcRequest grpcRequest;
@@ -235,12 +226,16 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 lastException = e;
             }
 
-            if (response == null && grpcRequest.shouldRetryExceptionally(lastException)) {
-                delay(grpcRequest.getDelay());
-                continue;
+            if (response == null) {
+                if(grpcRequest.shouldRetryExceptionally(lastException)) {
+                    delay(grpcRequest.getDelay());
+                    continue;
+                } else {
+                    throw grpcRequest.mapStatusException();
+                }
             }
 
-            switch (grpcRequest.shouldRetry(Objects.requireNonNull(response))) {
+            switch (grpcRequest.shouldRetry(response)) {
                 case Retry:
                     lastException = grpcRequest.mapStatusException();
                     delay(grpcRequest.getDelay());
@@ -304,10 +299,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
-        var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
-        if (maxAttemptsExceeded != null) {
-            return CompletableFuture.<O>failedFuture(maxAttemptsExceeded);
+        if (attempt > maxAttempts) {
+            return CompletableFuture.<O>failedFuture(new MaxAttemptsExceededException(lastException));
         }
+
 
         GrpcRequest grpcRequest;
 
