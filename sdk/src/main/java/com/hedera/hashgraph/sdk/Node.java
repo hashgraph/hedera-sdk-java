@@ -2,102 +2,79 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ChannelCredentials;
 import io.grpc.TlsChannelCredentials;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 
-class Node extends ManagedNode implements Comparable<Node> {
-    AccountId accountId;
+class Node extends ManagedNode<Node, AccountId> {
+    private final AccountId accountId;
 
     @Nullable
-    NodeAddress addressBook;
+    private NodeAddress addressBook;
 
-    long delay;
-    long delayUntil;
-    long waitTime;
-    long attempts;
+    private boolean verifyCertificates;
 
-    Node(AccountId accountId, String address, long waitTime, ExecutorService executor) {
+    Node(AccountId accountId, ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
-        this.delay = waitTime;
-        this.waitTime = waitTime;
-        this.delayUntil = 0;
-        this.attempts = 0;
     }
 
-    @Nullable
-    public NodeAddress getAddressBook() {
+    Node(AccountId accountId, String address, ExecutorService executor) {
+        this(accountId, ManagedNodeAddress.fromString(address), executor);
+    }
+
+    private Node(Node node, ManagedNodeAddress address) {
+        super(node, address);
+
+        this.accountId = node.accountId;
+        this.verifyCertificates = node.verifyCertificates;
+        this.addressBook = node.addressBook;
+    }
+
+    @Override
+    Node toInsecure() {
+        return new Node(this, address.toInsecure());
+    }
+
+    @Override
+    Node toSecure() {
+        return new Node(this, address.toSecure());
+    }
+
+    @Override
+    AccountId getKey() {
+        return accountId;
+    }
+
+    AccountId getAccountId() {
+        return accountId;
+    }
+
+    NodeAddress getAddressBook() {
         return addressBook;
     }
 
-    public Node setAddressBook(@Nullable NodeAddress addressBook) {
+    Node setAddressBook(@Nullable NodeAddress addressBook) {
         this.addressBook = addressBook;
+        return this;
+    }
+
+    boolean isVerifyCertificates() {
+        return verifyCertificates;
+    }
+
+    Node setVerifyCertificates(boolean verifyCertificates) {
+        this.verifyCertificates = verifyCertificates;
         return this;
     }
 
     @Override
     ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.newBuilder()
-            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash))
+            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash, verifyCertificates))
             .build();
-    }
-
-    void setWaitTime(long waitTime) {
-        // If delay is equal to the old waitTime we should change it to the new waitTime
-        if (delay == this.waitTime) {
-            delay = waitTime;
-        }
-
-        this.waitTime = waitTime;
-    }
-
-    boolean isHealthy() {
-        return delayUntil < System.currentTimeMillis();
-    }
-
-    void increaseDelay() {
-        this.attempts++;
-        this.delayUntil = System.currentTimeMillis() + this.delay;
-        this.delay = Math.min(this.delay * 2, 8000);
-    }
-
-    void decreaseDelay() {
-        this.delay = Math.max(this.delay / 2, waitTime);
-    }
-
-    long delay() {
-        return delayUntil - System.currentTimeMillis();
-    }
-
-    @Override
-    public int compareTo(Node node) {
-        if (this.isHealthy() && node.isHealthy()) {
-            return compareToSameHealth(node);
-        } else if (this.isHealthy() && !node.isHealthy()) {
-            return -1;
-        } else if (!this.isHealthy() && node.isHealthy()) {
-            return 1;
-        } else {
-            return compareToSameHealth(node);
-        }
-    }
-
-    private int compareToSameHealth(Node node) {
-        if (this.useCount < node.useCount) {
-            return -1;
-        } else if (this.useCount > node.useCount) {
-            return 1;
-        } else {
-            if (this.lastUsed < node.lastUsed) {
-                return -1;
-            } else if (this.lastUsed > node.lastUsed) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
     }
 
     @Override
