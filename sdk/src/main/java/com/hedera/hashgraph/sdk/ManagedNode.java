@@ -8,6 +8,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
+import java8.util.Objects;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
@@ -16,12 +17,12 @@ import java8.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-abstract class ManagedNode {
+abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
     private static final int GET_STATE_MAX_ATTEMPTS = GET_STATE_TIMEOUT_MILLIS / GET_STATE_INTERVAL_MILLIS;
     private boolean hasConnected = false;
-  
+
     protected final ExecutorService executor;
 
     /**
@@ -224,7 +225,7 @@ abstract class ManagedNode {
         if (channel != null) {
             return channel;
         }
-        
+
         ManagedChannelBuilder<?> channelBuilder;
 
         if (address.isInProcess()) {

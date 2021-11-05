@@ -433,8 +433,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         Throwable reactToConnectionFailure() {
             node.increaseDelay();
             logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
-                node.accountId, node.delay, attempt);
-            return new IllegalStateException("Failed to connect to node " + node.accountId);
+                node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
+            return new IllegalStateException("Failed to connect to node " + node.getAccountId());
         }
 
         boolean shouldRetryExceptionally(@Nullable Throwable e) {
@@ -445,7 +445,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             if (retry) {
                 node.increaseDelay();
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                    node.accountId, node.delay, attempt, e != null ? e.getMessage() : "NULL");
+                    node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
             }
 
             return retry;
