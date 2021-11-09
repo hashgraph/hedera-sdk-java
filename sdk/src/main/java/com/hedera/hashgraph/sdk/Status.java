@@ -1218,7 +1218,13 @@ public enum Status {
      * If an NMT upgrade has been prepared, the subsequent FREEZE_UPGRADE transaction must
      * confirm the hash of the file to be used in the upgrade.
      */
-    UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED(ResponseCodeEnum.UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED);
+    UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED(ResponseCodeEnum.UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED),
+
+    /**
+     * Consensus throttle did not allow execution of this transaction. System is throttled at
+     * consensus level.
+     */
+    CONSENSUS_GAS_EXHAUSTED(ResponseCodeEnum.CONSENSUS_GAS_EXHAUSTED);
 
     final ResponseCodeEnum code;
 
@@ -1702,6 +1708,8 @@ public enum Status {
                 return UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED;
             case UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED:
                 return UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED;
+            case CONSENSUS_GAS_EXHAUSTED:
+                return CONSENSUS_GAS_EXHAUSTED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
