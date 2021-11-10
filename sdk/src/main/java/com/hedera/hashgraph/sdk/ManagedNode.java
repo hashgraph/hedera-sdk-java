@@ -249,16 +249,15 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         if (hasConnected) {
             return false;
         }
-        @Var var state = getChannel().getState(true);
+        hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
         try {
-            for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && state != ConnectivityState.READY; i++) {
+            for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
                 TimeUnit.MILLISECONDS.sleep(GET_STATE_INTERVAL_MILLIS);
-                state = getChannel().getState(true);
+                hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        hasConnected = (state == ConnectivityState.READY);
         return !hasConnected;
     }
 
