@@ -40,16 +40,16 @@ dependencies {
 	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-core:1.41.0"
-	implementation "io.grpc:grpc-protobuf-lite:1.41.0"
-	implementation "io.grpc:grpc-stub:1.41.0"
+	implementation "io.grpc:grpc-core:1.42.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.42.0"
+	implementation "io.grpc:grpc-stub:1.42.0"
 
 	testCompile "org.assertj:assertj-core:3.21.0"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.1"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.1"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.41.0"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.42.0"
 	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.41.0'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
@@ -76,7 +76,7 @@ protobuf {
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.41.0"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.42.0"
 		}
 	}
 	generateProtoTasks {
