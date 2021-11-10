@@ -2,14 +2,19 @@ import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MaxAttemptsExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -107,6 +112,32 @@ class AccountBalanceIntegrationTest {
         assertEquals(0, cost.toTinybars());
 
         testEnv.close();
+    }
+
+    @Test
+    @DisplayName("Should ignore unresponsive nodes")
+    void shouldIgnoreUnresponsiveNodes() throws Exception {
+        var network = new HashMap<String, AccountId>();
+        network.put("35.237.200.180:50211", new AccountId(3));
+        network.put("35.242.233.154:50211", new AccountId(10));
+
+        var client = Client.forNetwork(network);
+
+        assertThrows(MaxAttemptsExceededException.class, () ->
+            new AccountBalanceQuery()
+                .setMaxAttempts(3)
+                .setNodeAccountIds(Collections.singletonList(new AccountId(10)))
+                .setAccountId(new AccountId(10))
+                .execute(client)
+        );
+
+        new AccountBalanceQuery()
+            .setMaxAttempts(3)
+            .setNodeAccountIds(List.of(new AccountId(10), new AccountId(3)))
+            .setAccountId(new AccountId(10))
+            .execute(client);
+
+        client.close();
     }
 
     @Test

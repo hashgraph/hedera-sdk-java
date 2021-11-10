@@ -41,10 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `pauseKey` field in `TokenUpdateTransaction` and `TokenCreateTransaction`
  * `pauseKey` and `pauseStatus` fields in `TokenInfo` (`TokenInfoQuery`)
 
+### Fixed
+
+ * Added keep alive timeout of 10 seconds to all gRPC connections
+
 ### Added
 
 * `Client.setTransportSecurity()` - Enable/Disable TLS for any node
-*
+
 ### Changed
 
  * Updated `*.[execute|getReceipt|getRecord]()` methods to not use the asynchronous version underneath

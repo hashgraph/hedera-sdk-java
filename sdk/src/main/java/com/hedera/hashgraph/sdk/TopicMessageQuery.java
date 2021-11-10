@@ -163,6 +163,7 @@ public final class TopicMessageQuery {
         AtomicReference<ConsensusTopicResponse> lastMessage,
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
     ) throws InterruptedException {
+        // TODO: check status of channel before using it?
         ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
             client.mirrorNetwork.getNextMirrorNode().getChannel()
                 .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
