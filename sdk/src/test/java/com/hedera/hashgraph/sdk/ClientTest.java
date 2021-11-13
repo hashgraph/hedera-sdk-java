@@ -170,6 +170,21 @@ class ClientTest {
         client.setNetwork(singleNodeNetworkWithDifferentAccountId);
         assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(singleNodeNetworkWithDifferentAccountId);
 
+        var multiAddressNetwork = Map.of(
+            "0.testnet.hedera.com:50211", new AccountId(3),
+            "34.94.106.61:50211", new AccountId(3),
+            "50.18.132.211:50211", new AccountId(3),
+            "138.91.142.219:50211", new AccountId(3),
+
+            "1.testnet.hedera.com:50211", new AccountId(4),
+            "35.237.119.55:50211", new AccountId(4),
+            "3.212.6.13:50211", new AccountId(4),
+            "52.168.76.241:50211", new AccountId(4)
+        );
+
+        client.setNetwork(multiAddressNetwork);
+        assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(multiAddressNetwork);
+
         client.close();
     }
 
