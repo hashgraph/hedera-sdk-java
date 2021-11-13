@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -35,7 +36,7 @@ abstract class ManagedNetwork<
     /**
      * Map of node identifiers to nodes. Used to quickly fetch node for identifier.
      */
-    protected Map<KeyT, ManagedNodeT> network = new ConcurrentHashMap<>();
+    protected Map<KeyT, List<ManagedNodeT>> network = new ConcurrentHashMap<>();
 
     /**
      * The list of nodes. This list is continuously sorted so the leftmost nodes are the "healthiest" {@link ManagedNode#isHealthy()}
@@ -179,7 +180,7 @@ abstract class ManagedNetwork<
                 node = transportSecurity ? node.toSecure() : node.toInsecure();
 
                 nodes.set(i, node);
-                network.put(node.getKey(), node);
+                addNodeToNetwork(node);
             }
         }
 
@@ -211,7 +212,31 @@ abstract class ManagedNetwork<
      * @param network - the new network
      * @return - list of indexes in descending order
      */
-    protected abstract List<Integer> getNodesToRemove(Map<String, KeyT> network);
+    protected List<Integer> getNodesToRemove(Map<String, KeyT> network) {
+        var nodes = new ArrayList<Integer>(this.nodes.size());
+
+        for (int i = this.nodes.size() - 1; i >= 0; i--) {
+            var node = this.nodes.get(i);
+
+            if (!nodeIsInGivenNetwork(node, network)) {
+                nodes.add(i);
+            }
+        }
+
+        return nodes;
+    }
+
+    private boolean nodeIsInGivenNetwork(ManagedNodeT node, Map<String,KeyT> network) {
+        for (var entry : network.entrySet()) {
+            if (
+                node.getKey().equals(entry.getValue()) &&
+                node.address.equals(ManagedNodeAddress.fromString(entry.getKey()))
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * Intelligently overwrites the current network.
@@ -238,25 +263,67 @@ abstract class ManagedNetwork<
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
-            this.network.remove(node.getKey());
+            removeNodeFromNetwork(node);
             node.close(Duration.ofSeconds(remainingTime));
             this.nodes.remove(index.intValue());
         }
 
         // Add new nodes that are not present in the list
         for (var entry : network.entrySet()) {
+            var nodesForKey = getNodesForKey(entry.getValue());
+
             // Only add nodes which don't already exist in our network map
-            if (!this.network.containsKey(entry.getValue())) {
+            if (!addressIsInNodeList(entry.getKey(), nodesForKey)) {
                 var node = createNodeFromNetworkEntry(entry);
-                this.network.put(node.getKey(), node);
+                this.addNodeToNetwork(node);
                 this.nodes.add(node);
             }
         }
 
         Collections.shuffle(nodes);
+        for (var nodeList : this.network.values()) {
+            Collections.shuffle(nodeList);
+        }
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
+    }
+
+    private void addNodeToNetwork(ManagedNodeT node) {
+        if (network.containsKey(node.getKey())) {
+            network.get(node.getKey()).add(node);
+        } else {
+            var list = new ArrayList<ManagedNodeT>(1);
+            list.add(node);
+            network.put(node.getKey(), list);
+        }
+    }
+
+    private void removeNodeFromNetwork(ManagedNodeT node) {
+        var nodesForKey = this.network.get(node.getKey());
+        nodesForKey.remove(node);
+        if (nodesForKey.isEmpty()) {
+            this.network.remove(node.getKey());
+        }
+    }
+
+    private List<ManagedNodeT> getNodesForKey(KeyT key) {
+        if (network.containsKey(key)) {
+            return network.get(key);
+        } else {
+            var newList = new ArrayList<ManagedNodeT>();
+            network.put(key, newList);
+            return newList;
+        }
+    }
+
+    private boolean addressIsInNodeList(String address, List<ManagedNodeT> nodes) {
+        for (var node : nodes) {
+            if (node.address.equals(ManagedNodeAddress.fromString(address))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -271,7 +338,7 @@ abstract class ManagedNetwork<
 
                 if (node.getAttempts() >= maxNodeAttempts) {
                     node.close(closeTimeout);
-                    network.remove(node.getKey());
+                    removeNodeFromNetwork(node);
                     nodes.remove(i);
                 }
             }
@@ -282,6 +349,8 @@ abstract class ManagedNetwork<
      * Returns `count` number of the most healthy nodes. Healthy-ness is determined by sort order; leftmost being most
      * healthy. This will also remove any nodes which have hit or exceeded {@link ManagedNetwork#maxNodeAttempts}.
      *
+     * Returns a list of nodes where each node has a unique key.
+     *
      * @param count - number of nodes to return
      * @return
      * @throws InterruptedException
@@ -289,15 +358,23 @@ abstract class ManagedNetwork<
     protected synchronized List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
         Collections.sort(nodes);
         removeDeadNodes();
-
-        List<ManagedNodeT> nodes = new ArrayList<>(count);
-
-        var size = Math.min(count, this.nodes.size());
-        for (int i = 0; i < size; i++) {
-            nodes.add(this.nodes.get(i));
+        for (var nodeList : network.values()) {
+            Collections.sort(nodeList);
         }
 
-        return nodes;
+        var returnSize = Math.min(count, this.network.size());
+        var returnNodes = new HashMap<KeyT, ManagedNodeT>(returnSize);
+
+        for (var node : this.nodes) {
+            if (returnNodes.size() >= returnSize) {
+                break;
+            }
+            if (!returnNodes.containsKey(node.getKey())) {
+                returnNodes.put(node.getKey(), node);
+            }
+        }
+
+        return Lists.copyOf(returnNodes.values());
     }
 
     /**

@@ -54,22 +54,6 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, String, MirrorNode> {
         return new MirrorNode(entry.getKey(), executor).setMinBackoff(minBackoff);
     }
 
-    @Override
-    protected List<Integer> getNodesToRemove(Map<String, String> network) {
-        var nodes = new ArrayList<Integer>(this.nodes.size());
-        var addresses = network.keySet();
-
-        for (int i = this.nodes.size() - 1; i >= 0; i--) {
-            var node = this.nodes.get(i);
-
-            if (!addresses.contains(node.getAddress().toString())) {
-                nodes.add(i);
-            }
-        }
-
-        return nodes;
-    }
-
     synchronized MirrorNode getNextMirrorNode() throws InterruptedException {
         return getNumberOfMostHealthyNodes(1).get(0);
     }
