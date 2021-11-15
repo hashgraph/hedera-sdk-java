@@ -5,8 +5,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 class ManagedNodeAddress {
-    private static final Pattern HOST_AND_PORT = Pattern.compile("^(?<address>\\S+):(?<port>\\d+)$");
-    private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(?<name>\\S+)$");
+    private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
+    private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
 
     // If address is `in-process:.*` this will contain the right side of the `:`
     @Nullable
@@ -27,12 +27,12 @@ class ManagedNodeAddress {
         var inProcessMatcher = IN_PROCESS.matcher(string);
 
         if (hostAndPortMatcher.matches() && hostAndPortMatcher.groupCount() == 2) {
-            var address = hostAndPortMatcher.group("address");
-            var port = hostAndPortMatcher.group("port");
+            var address = hostAndPortMatcher.group(1);
+            var port = hostAndPortMatcher.group(2);
 
             return new ManagedNodeAddress(null, address, Integer.parseInt(port));
         } else if (inProcessMatcher.matches() && inProcessMatcher.groupCount() == 1) {
-            return new ManagedNodeAddress(inProcessMatcher.group("name"), null, 0);
+            return new ManagedNodeAddress(inProcessMatcher.group(1), null, 0);
         } else {
             throw new IllegalStateException("failed to parse node address");
         }

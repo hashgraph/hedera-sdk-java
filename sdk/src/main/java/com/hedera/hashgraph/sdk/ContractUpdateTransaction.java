@@ -166,12 +166,18 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @deprecated with no replacement
+     */
     @Nullable
+    @Deprecated
     public FileId getBytecodeFileId() {
         return bytecodeFileId;
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Sets the file ID of file containing the smart contract byte code.
      * <p>
      * A copy will be made and held by the contract instance, and have the same expiration
@@ -180,6 +186,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param bytecodeFileId The FileId to be set
      * @return {@code this}
      */
+    @Deprecated
     public ContractUpdateTransaction setBytecodeFileId(FileId bytecodeFileId) {
         Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
@@ -219,9 +226,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
-        if (body.hasFileID()) {
-            bytecodeFileId = FileId.fromProtobuf(body.getFileID());
-        }
         if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
@@ -244,9 +248,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
-        if (bytecodeFileId != null) {
-            builder.setFileID(bytecodeFileId.toProtobuf());
-        }
         if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
@@ -266,10 +267,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
             contractId.validateChecksum(client);
-        }
-
-        if (bytecodeFileId != null) {
-            bytecodeFileId.validateChecksum(client);
         }
 
         if (proxyAccountId != null) {
