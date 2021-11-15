@@ -119,17 +119,24 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public long getMaxResultSize() {
         return maxResultSize;
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Sets the max number of bytes that the result might include.
      * The run will fail if it would have returned more than this number of bytes.
      *
      * @param size The long to be set as size
      * @return {@code this}
      */
+    @Deprecated
     public ContractCallQuery setMaxResultSize(long size) {
         maxResultSize = size;
         return this;
@@ -149,7 +156,6 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
             builder.setContractID(contractId.toProtobuf());
         }
         builder.setGas(gas);
-        builder.setMaxResultSize(maxResultSize);
         builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
 
         queryBuilder.setContractCallLocal(builder.setHeader(header));
