@@ -180,7 +180,7 @@ abstract class ManagedNetwork<
                 node = transportSecurity ? node.toSecure() : node.toInsecure();
 
                 nodes.set(i, node);
-                addNodeToNetwork(node);
+                getNodesForKey(node.getKey()).add(node);
             }
         }
 
@@ -275,7 +275,7 @@ abstract class ManagedNetwork<
             // Only add nodes which don't already exist in our network map
             if (!addressIsInNodeList(entry.getKey(), nodesForKey)) {
                 var node = createNodeFromNetworkEntry(entry);
-                this.addNodeToNetwork(node);
+                nodesForKey.add(node);
                 this.nodes.add(node);
             }
         }
@@ -287,16 +287,6 @@ abstract class ManagedNetwork<
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
-    }
-
-    private void addNodeToNetwork(ManagedNodeT node) {
-        if (network.containsKey(node.getKey())) {
-            network.get(node.getKey()).add(node);
-        } else {
-            var list = new ArrayList<ManagedNodeT>(1);
-            list.add(node);
-            network.put(node.getKey(), list);
-        }
     }
 
     private void removeNodeFromNetwork(ManagedNodeT node) {
@@ -317,9 +307,10 @@ abstract class ManagedNetwork<
         }
     }
 
-    private boolean addressIsInNodeList(String address, List<ManagedNodeT> nodes) {
+    private boolean addressIsInNodeList(String addressString, List<ManagedNodeT> nodes) {
+        var address = ManagedNodeAddress.fromString(addressString);
         for (var node : nodes) {
-            if (node.address.equals(ManagedNodeAddress.fromString(address))) {
+            if (node.address.equals(address)) {
                 return true;
             }
         }
