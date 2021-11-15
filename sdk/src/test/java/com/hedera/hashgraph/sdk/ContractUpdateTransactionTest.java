@@ -41,7 +41,6 @@ public class ContractUpdateTransactionTest {
             .setContractId(ContractId.fromString("0.0.5007"))
             .setAdminKey(privateKey)
             .setAutoRenewPeriod(Duration.ofDays(1))
-            .setBytecodeFileId(new FileId(2))
             .setContractMemo("3")
             .setExpirationTime(Instant.ofEpochMilli(4))
             .setProxyAccountId(new AccountId(4))

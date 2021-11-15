@@ -184,14 +184,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    private MaxAttemptsExceededException isAttemptGreaterThanMax(int attempt, @Nullable Throwable e) {
-        if (attempt > maxAttempts) {
-            return new MaxAttemptsExceededException(e);
-        }
-
-        return null;
-    }
-
     public O execute(Client client) throws TimeoutException, PrecheckStatusException {
         return execute(client, client.getRequestTimeout());
     }
@@ -205,32 +197,41 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         setNodesFromNodeAccountIds(client);
 
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
-            var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
-            if (maxAttemptsExceeded != null) {
-                throw  maxAttemptsExceeded;
+            if (attempt > maxAttempts) {
+                throw new MaxAttemptsExceededException(lastException);
             }
 
-            var grpcRequest = new GrpcRequest(attempt);
+            GrpcRequest grpcRequest = new GrpcRequest(attempt);
 
             // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
             if (!grpcRequest.getNode().isHealthy()) {
                 delay(grpcRequest.getNode().getRemainingTimeForBackoff());
             }
 
-            ResponseT response = null;
-
-            try {
-                response = ClientCalls.blockingUnaryCall(grpcRequest.getCall(), grpcRequest.getRequest());
-            } catch (Throwable e) {
-                lastException = e;
-            }
-
-            if (response == null && grpcRequest.shouldRetryExceptionally(lastException)) {
+            if (grpcRequest.getNode().channelFailedToConnect()) {
+                lastException = grpcRequest.reactToConnectionFailure();
                 delay(grpcRequest.getDelay());
                 continue;
             }
 
-            switch (grpcRequest.shouldRetry(Objects.requireNonNull(response))) {
+            ResponseT response = null;
+
+            try {
+                response = ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
+            } catch (Throwable e) {
+                lastException = e;
+            }
+
+            if (response == null) {
+                if(grpcRequest.shouldRetryExceptionally(lastException)) {
+                    delay(grpcRequest.getDelay());
+                    continue;
+                } else {
+                    throw grpcRequest.mapStatusException();
+                }
+            }
+
+            switch (grpcRequest.shouldRetry(response)) {
                 case Retry:
                     lastException = grpcRequest.mapStatusException();
                     delay(grpcRequest.getDelay());
@@ -293,12 +294,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
-        var maxAttemptsExceeded = isAttemptGreaterThanMax(attempt, lastException);
-        if (maxAttemptsExceeded != null) {
-            return CompletableFuture.<O>failedFuture(maxAttemptsExceeded);
+        if (attempt > maxAttempts) {
+            return CompletableFuture.<O>failedFuture(new MaxAttemptsExceededException(lastException));
         }
 
-        var grpcRequest = new GrpcRequest(attempt);
+        GrpcRequest grpcRequest = new GrpcRequest(attempt);
 
         // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
         if (!grpcRequest.getNode().isHealthy()) {
@@ -306,28 +306,36 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 .thenCompose((v) -> executeAsync(client, attempt, lastException));
         }
 
-        return toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.getCall(), grpcRequest.getRequest())).handle((response, error) -> {
-            if (grpcRequest.shouldRetryExceptionally(error)) {
-                // the transaction had a network failure reaching Hedera
-                return executeAsync(client, attempt + 1, error);
+        return grpcRequest.getNode().channelFailedToConnectAsync().thenCompose(connectionFailed -> {
+            if (connectionFailed) {
+                var connectionException = grpcRequest.reactToConnectionFailure();
+                return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
+                    .thenCompose((v) -> executeAsync(client, attempt + 1, connectionException));
             }
 
-            if (error != null) {
-                // not a network failure, some other weirdness going on; just fail fast
-                return CompletableFuture.<O>failedFuture(error);
-            }
+            return toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
+                if (grpcRequest.shouldRetryExceptionally(error)) {
+                    // the transaction had a network failure reaching Hedera
+                    return executeAsync(client, attempt + 1, error);
+                }
 
-            switch (grpcRequest.shouldRetry(response)) {
-                case Retry:
-                    return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
-                        .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
-                case Error:
-                    return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
-                case Finished:
-                default:
-                    return CompletableFuture.completedFuture(grpcRequest.mapResponse());
-            }
-        }).thenCompose(x -> x);
+                if (error != null) {
+                    // not a network failure, some other weirdness going on; just fail fast
+                    return CompletableFuture.<O>failedFuture(error);
+                }
+
+                switch (grpcRequest.shouldRetry(response)) {
+                    case Retry:
+                        return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
+                            .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
+                    case Error:
+                        return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
+                    case Finished:
+                    default:
+                        return CompletableFuture.completedFuture(grpcRequest.mapResponse());
+                }
+            }).thenCompose(x -> x);
+        });
     }
 
     abstract ProtoRequestT makeRequest();
@@ -387,7 +395,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     private class GrpcRequest {
         private final Node node;
         private final int attempt;
-        private final ClientCall<ProtoRequestT, ResponseT> call;
+        //private final ClientCall<ProtoRequestT, ResponseT> call;
         private final ProtoRequestT request;
         private final long startAt;
         private final long delay;
@@ -399,7 +407,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         GrpcRequest(int attempt) {
             this.attempt = attempt;
             this.node = Executable.this.getNodeForExecute(attempt);
-            this.call = this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), CallOptions.DEFAULT);
             this.request = Executable.this.getRequestForExecute();
             this.startAt = System.nanoTime();
 
@@ -411,8 +418,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return node;
         }
 
-        public ClientCall<ProtoRequestT, ResponseT> getCall() {
-            return call;
+        public ClientCall<ProtoRequestT, ResponseT> createCall() {
+            return this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), CallOptions.DEFAULT);
         }
 
         public ProtoRequestT getRequest() {
@@ -423,15 +430,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return delay;
         }
 
+        Throwable reactToConnectionFailure() {
+            node.increaseDelay();
+            logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
+                node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
+            return new IllegalStateException("Failed to connect to node " + node.getAccountId());
+        }
+
         boolean shouldRetryExceptionally(@Nullable Throwable e) {
             latency = (double) (System.nanoTime() - startAt) / 1000000000.0;
 
             var retry = Executable.this.shouldRetryExceptionally(e);
 
             if (retry) {
+                node.increaseDelay();
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                     node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
-                node.increaseDelay();
             }
 
             return retry;

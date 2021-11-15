@@ -79,7 +79,7 @@ message ContractUpdateTransactionBody {
      * The new id of the file asserted to contain the bytecode of the Solidity transaction that
      * created this contract
      */
-    FileID fileID = 8;
+    FileID fileID = 8 [deprecated = true];
 
     /**
      * The new contract memo, assumed to be Unicode encoded with UTF-8 (at most 100 bytes)
