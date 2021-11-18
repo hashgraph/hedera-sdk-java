@@ -76,7 +76,8 @@ public class IntegrationTestEnv {
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
-            } catch (Exception ignored) {
+            } catch (Exception configFileException) {
+                configFileException.printStackTrace();
             }
         }
         throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");

@@ -349,9 +349,6 @@ abstract class ManagedNetwork<
     protected synchronized List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
         Collections.sort(nodes);
         removeDeadNodes();
-        for (var nodeList : network.values()) {
-            Collections.sort(nodeList);
-        }
 
         var returnSize = Math.min(count, this.network.size());
         var returnNodes = new HashMap<KeyT, ManagedNodeT>(returnSize);
