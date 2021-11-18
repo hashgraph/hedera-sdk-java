@@ -107,9 +107,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
-     * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
-     * transaction with the first chunk and then use {@link FileAppendTransaction} with
-     * {@link FileAppendTransaction#setContents(byte[])} for the remaining chunks.
+     * <p>In this case, you will need to keep the initial file contents under ~6KiB and
+     * then use {@link FileAppendTransaction} to append the remaining contents.
      *
      * @param bytes the contents of the file.
      * @return {@code this}
@@ -134,9 +133,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * network; if you exceed this you may receive a {@link PrecheckStatusException}
      * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
      *
-     * <p>In this case, you will need to break the data into chunks of less than ~6KiB and execute this
-     * transaction with the first chunk and then use {@link FileAppendTransaction} with
-     * {@link FileAppendTransaction#setContents(String)} for the remaining chunks.
+     * <p>In this case, you will need to keep the initial file contents under ~6KiB and
+     * then use {@link FileAppendTransaction} to append the remaining contents.
      *
      * @param text the contents of the file.
      * @return {@code this}

@@ -117,9 +117,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a {@link Status#TRANSACTION_OVERSIZE}.
      * <p>
-     * In this case, you will need to break the data into chunks of less than ~6KiB and execute this
-     * transaction with the first chunk and then use {@link FileAppendTransaction} with
-     * {@link FileAppendTransaction#setContents(byte[])} for the remaining chunks.
+     * In this case, you will need to keep the initial file contents under ~6KiB and
+     * then use {@link FileAppendTransaction} to append the remaining contents.
      *
      * @param bytes the bytes to replace the contents of the file with.
      * @return {@code this}
@@ -147,9 +146,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
      * network; if you exceed this you may receive a  {@link Status#TRANSACTION_OVERSIZE}.
      * <p>
-     * In this case, you will need to break the data into chunks of less than ~6KiB and execute this
-     * transaction with the first chunk and then use {@link FileAppendTransaction} with
-     * {@link FileAppendTransaction#setContents(String)} for the remaining chunks.
+     * In this case, you will need to keep the initial file contents under ~6KiB and
+     * then use {@link FileAppendTransaction} to append the remaining contents.
      *
      * @param text the string to replace the contents of the file with.
      * @return {@code this}
