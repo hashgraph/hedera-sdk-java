@@ -10,8 +10,10 @@ import java8.util.stream.StreamSupport;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,34 +51,151 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     static Network forMainnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
+        network.put("34.239.82.6:50211", new AccountId(3));
+        network.put("13.82.40.153:50211", new AccountId(3));
+        network.put("13.124.142.126:50211", new AccountId(3));
+        network.put("15.164.44.66:50211", new AccountId(3));
+        network.put("15.165.118.251:50211", new AccountId(3));
+
         network.put("35.186.191.247:50211", new AccountId(4));
+        network.put("3.130.52.236:50211", new AccountId(4));
+        network.put("137.116.36.18:50211", new AccountId(4));
+
         network.put("35.192.2.25:50211", new AccountId(5));
+        network.put("3.18.18.254:50211", new AccountId(5));
+        network.put("104.43.194.202:50211", new AccountId(5));
+        network.put("23.111.186.250:50211", new AccountId(5));
+        network.put("74.50.117.35:50211", new AccountId(5));
+        network.put("107.155.64.98:50211", new AccountId(5));
+
         network.put("35.199.161.108:50211", new AccountId(6));
+        network.put("13.52.108.243:50211", new AccountId(6));
+        network.put("13.64.151.232:50211", new AccountId(6));
+        network.put("13.235.15.32:50211", new AccountId(6));
+        network.put("104.211.205.124:50211", new AccountId(6));
+        network.put("13.71.90.154:50211", new AccountId(6));
+
         network.put("35.203.82.240:50211", new AccountId(7));
+        network.put("3.114.54.4:50211", new AccountId(7));
+        network.put("23.102.74.34:50211", new AccountId(7));
+
         network.put("35.236.5.219:50211", new AccountId(8));
+        network.put("35.183.66.150:50211", new AccountId(8));
+        network.put("23.96.185.18:50211", new AccountId(8));
+
         network.put("35.197.192.225:50211", new AccountId(9));
+        network.put("35.181.158.250:50211", new AccountId(9));
+        network.put("23.97.237.125:50211", new AccountId(9));
+        network.put("31.214.8.131:50211", new AccountId(9));
+
         network.put("35.242.233.154:50211", new AccountId(10));
+        network.put("3.248.27.48:50211", new AccountId(10));
+        network.put("65.52.68.254:50211", new AccountId(10));
+        network.put("179.190.33.184:50211", new AccountId(10));
+
         network.put("35.240.118.96:50211", new AccountId(11));
+        network.put("13.53.119.185:50211", new AccountId(11));
+        network.put("23.97.247.27:50211", new AccountId(11));
+        network.put("69.87.222.61:50211", new AccountId(11));
+        network.put("96.126.72.172:50211", new AccountId(11));
+        network.put("69.87.221.231:50211", new AccountId(11));
+
         network.put("35.204.86.32:50211", new AccountId(12));
+        network.put("35.177.162.180:50211", new AccountId(12));
+        network.put("51.140.102.228:50211", new AccountId(12));
+
         network.put("35.234.132.107:50211", new AccountId(13));
+        network.put("34.215.192.104:50211", new AccountId(13));
+        network.put("13.77.158.252:50211", new AccountId(13));
+
         network.put("35.236.2.27:50211", new AccountId(14));
+        network.put("52.8.21.141:50211", new AccountId(14));
+        network.put("40.114.107.85:50211", new AccountId(14));
+
         network.put("35.228.11.53:50211", new AccountId(15));
+        network.put("3.121.238.26:50211", new AccountId(15));
+        network.put("40.89.139.247:50211", new AccountId(15));
+
         network.put("34.91.181.183:50211", new AccountId(16));
+        network.put("18.157.223.230:50211", new AccountId(16));
+        network.put("13.69.120.73:50211", new AccountId(16));
+        network.put("50.7.176.235:50211", new AccountId(16));
+        network.put("198.16.99.40:50211", new AccountId(16));
+        network.put("50.7.124.46:50211", new AccountId(16));
+
         network.put("34.86.212.247:50211", new AccountId(17));
+        network.put("18.232.251.19:50211", new AccountId(17));
+        network.put("40.114.92.39:50211", new AccountId(17));
+
         network.put("172.105.247.67:50211", new AccountId(18));
+        network.put("172.104.150.132:50211", new AccountId(18));
+        network.put("139.162.156.222:50211", new AccountId(18));
+
         network.put("34.89.87.138:50211", new AccountId(19));
+        network.put("18.168.4.59:50211", new AccountId(19));
+        network.put("51.140.43.81:50211", new AccountId(19));
+
         network.put("34.82.78.255:50211", new AccountId(20));
+        network.put("13.77.151.212:50211", new AccountId(20));
+
+        network.put("34.76.140.109:50211", new AccountId(21));
+        network.put("13.36.123.209:50211", new AccountId(21));
+
+        network.put("34.64.141.166:50211", new AccountId(22));
+        network.put("52.78.202.34:50211", new AccountId(22));
+
+        network.put("35.232.244.145:50211", new AccountId(23));
+        network.put("3.18.91.176:50211", new AccountId(23));
+
+        network.put("34.89.103.38:50211", new AccountId(24));
+        network.put("18.135.7.211:50211", new AccountId(24));
+
+        network.put("34.93.112.7:50211", new AccountId(25));
+        network.put("13.232.240.207:50211", new AccountId(25));
+
+        network.put("34.87.150.174:50211", new AccountId(26));
+        network.put("13.228.103.14:50211", new AccountId(26));
 
         return new Network(executor, network).setNetworkName(NetworkName.MAINNET);
     }
 
     static Network forTestnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
+
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
+        network.put("34.94.106.61:50211", new AccountId(3));
+        network.put("50.18.132.211:50211", new AccountId(3));
+        network.put("138.91.142.219:50211", new AccountId(3));
+
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
+        network.put("35.237.119.55:50211", new AccountId(4));
+        network.put("3.212.6.13:50211", new AccountId(4));
+        network.put("52.168.76.241:50211", new AccountId(4));
+
         network.put("2.testnet.hedera.com:50211", new AccountId(5));
+        network.put("35.245.27.193:50211", new AccountId(5));
+        network.put("52.20.18.86:50211", new AccountId(5));
+        network.put("40.79.83.124:50211", new AccountId(5));
+
         network.put("3.testnet.hedera.com:50211", new AccountId(6));
+        network.put("34.83.112.116:50211", new AccountId(6));
+        network.put("54.70.192.33:50211", new AccountId(6));
+        network.put("52.183.45.65:50211", new AccountId(6));
+
         network.put("4.testnet.hedera.com:50211", new AccountId(7));
+        network.put("34.94.160.4:50211", new AccountId(7));
+        network.put("54.176.199.109:50211", new AccountId(7));
+        network.put("13.64.181.136:50211", new AccountId(7));
+
+        network.put("5.testnet.hedera.com:50211", new AccountId(8));
+        network.put("34.106.102.218:50211", new AccountId(8));
+        network.put("35.155.49.147:50211", new AccountId(8));
+        network.put("13.78.238.32:50211", new AccountId(8));
+
+        network.put("6.testnet.hedera.com:50211", new AccountId(9));
+        network.put("34.133.197.230:50211", new AccountId(9));
+        network.put("52.14.252.207:50211", new AccountId(9));
+        network.put("52.165.17.231:50211", new AccountId(9));
 
         return new Network(executor, network).setNetworkName(NetworkName.TESTNET);
     }
@@ -138,8 +257,11 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     Map<String, AccountId> getNetwork() {
-        return StreamSupport.stream(network.values())
-            .collect(Collectors.toUnmodifiableMap((node -> node.getAddress().toString()), Node::getAccountId));
+        Map<String, AccountId> returnMap = new HashMap<>();
+        for (var node : nodes) {
+            returnMap.put(node.address.toString(), node.getAccountId());
+        }
+        return returnMap;
     }
 
     @Override
@@ -147,26 +269,6 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return new Node(entry.getValue(), entry.getKey(), executor)
             .setMinBackoff(minBackoff)
             .setVerifyCertificates(verifyCertificates);
-    }
-
-    @Override
-    protected List<Integer> getNodesToRemove(Map<String, AccountId> network) {
-        var nodes = new ArrayList<Integer>(this.nodes.size());
-        var newNodeAccountIds = network.values();
-        var inverted = HashBiMap.create(network).inverse();
-
-        for (int i = this.nodes.size() - 1; i >= 0; i--) {
-            var node = this.nodes.get(i);
-
-            if (
-                !newNodeAccountIds.contains(node.getAccountId()) ||
-                    !Objects.requireNonNull(inverted.get(node.getAccountId())).equals(node.getAddress().toString())
-            ) {
-                nodes.add(i);
-            }
-        }
-
-        return nodes;
     }
 
     /**
@@ -193,13 +295,13 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
 
     int getNumberOfNodesForRequest() {
         if (maxNodesPerRequest != null) {
-            return Math.min(maxNodesPerRequest, nodes.size());
+            return Math.min(maxNodesPerRequest, network.size());
         } else {
-            return (nodes.size() + 3 - 1) / 3;
+            return (network.size() + 3 - 1) / 3;
         }
     }
 
     Node getNode(AccountId nodeAccountId) {
-        return network.get(nodeAccountId);
+        return network.get(nodeAccountId).get(0);
     }
 }
