@@ -4,8 +4,6 @@ import com.google.common.collect.HashBiMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import com.google.protobuf.ByteString;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 
 import javax.annotation.Nullable;
 import java.io.IOException;

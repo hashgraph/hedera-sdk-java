@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import java8.util.Lists;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,15 +24,15 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
     }
 
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Collections.singletonList("hcs.mainnet.mirrornode.hedera.com:5600"));
     }
 
     static MirrorNetwork forTestnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Collections.singletonList("hcs.testnet.mirrornode.hedera.com:5600"));
     }
 
     static MirrorNetwork forPreviewnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Collections.singletonList("hcs.previewnet.mirrornode.hedera.com:5600"));
     }
 
     synchronized MirrorNetwork setNetwork(List<String> network) throws TimeoutException, InterruptedException {

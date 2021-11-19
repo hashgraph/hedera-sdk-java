@@ -3,12 +3,11 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import java8.util.J8Arrays;
-import java8.util.stream.Collectors;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -145,9 +144,10 @@ public final class AccountInfo {
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
 
-        var liveHashes = J8Arrays.stream(accountInfo.getLiveHashesList().toArray())
-            .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash) liveHash))
-            .collect(Collectors.toList());
+        List<LiveHash> liveHashes = new ArrayList<>();
+        for (var liveHash : accountInfo.getLiveHashesList()) {
+            liveHashes.add(LiveHash.fromProtobuf(liveHash));
+        }
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
 
@@ -182,9 +182,10 @@ public final class AccountInfo {
     }
 
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
-        var hashes = J8Arrays.stream(liveHashes.toArray())
-            .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
-            .collect(Collectors.toList());
+        List<com.hedera.hashgraph.sdk.proto.LiveHash> hashes = new ArrayList<>();
+        for (var liveHash : liveHashes) {
+            hashes.add(liveHash.toProtobuf());
+        }
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())

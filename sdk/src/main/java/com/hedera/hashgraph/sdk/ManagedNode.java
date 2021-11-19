@@ -8,12 +8,12 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
-import java8.util.Objects;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java8.util.concurrent.CompletableFuture;
 
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 

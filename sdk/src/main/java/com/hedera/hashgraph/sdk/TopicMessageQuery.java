@@ -14,7 +14,6 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
-import java8.util.function.Predicate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
@@ -25,6 +24,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+// TODO: Predicate is java8, remove it
 
 public final class TopicMessageQuery {
 

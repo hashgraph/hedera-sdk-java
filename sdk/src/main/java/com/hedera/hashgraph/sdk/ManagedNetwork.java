@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
-import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -365,7 +364,7 @@ abstract class ManagedNetwork<
             }
         }
 
-        return Lists.copyOf(returnNodes.values());
+        return Collections.list(Collections.enumeration(returnNodes.values()));
     }
 
     /**

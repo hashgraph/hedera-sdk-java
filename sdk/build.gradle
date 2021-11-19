@@ -54,10 +54,9 @@ dependencies {
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
-	// https://github.com/stefan-zobel/streamsupport
+	// https://github.com/stefan-zobel/minifuture
 	// https://developer.android.com/about/dashboards/index.html
-	api "net.sourceforge.streamsupport:streamsupport:1.7.4"
-	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
+	api 'net.sourceforge.streamsupport:streamsupport-minifuture:1.7.4'
 
 	// NOTE: This is to support Android API < 26.
 	api "org.threeten:threetenbp:1.5.2"

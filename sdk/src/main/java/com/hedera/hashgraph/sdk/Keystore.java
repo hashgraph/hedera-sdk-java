@@ -6,7 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
-import java8.util.Optional;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -39,7 +38,8 @@ final class Keystore {
                 .getAsJsonObject();
             return fromJson(jsonObject, passphrase);
         } catch (IllegalStateException e) {
-            throw new BadKeyException(Optional.ofNullable(e.getMessage()).orElse("failed to parse Keystore"));
+            var message = e.getMessage();
+            throw new BadKeyException(message != null ? message : "failed to parse Keystore");
         } catch (JsonIOException e) {
             // RFC (@abonander): I'm all for keeping this as an unchecked exception
             // but I want consistency with export() so this may involve creating our own exception

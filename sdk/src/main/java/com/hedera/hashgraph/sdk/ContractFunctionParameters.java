@@ -2,11 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-import java8.util.J8Arrays;
-import java8.util.stream.Collectors;
-import java8.util.stream.IntStream;
-import java8.util.stream.IntStreams;
-import java8.util.stream.Stream;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -16,6 +11,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+// TODO: remove streams
 
 // an implementation of function selector and parameter encoding as specified here:
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#

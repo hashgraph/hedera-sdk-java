@@ -4,7 +4,6 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
@@ -242,13 +241,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 String mirror = config.mirrorNetwork.getAsString();
                 switch (mirror) {
                     case "mainnet":
-                        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+                        client.setMirrorNetwork(Collections.singletonList("hcs.mainnet.mirrornode.hedera.com:5600"));
                         break;
                     case "testnet":
-                        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+                        client.setMirrorNetwork(Collections.singletonList("hcs.testnet.mirrornode.hedera.com:5600"));
                         break;
                     case "previewnet":
-                        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+                        client.setMirrorNetwork(Collections.singletonList("hcs.previewnet.mirrornode.hedera.com:5600"));
                         break;
                     default:
                         throw new JsonParseException("Illegal argument for mirrorNetwork.");

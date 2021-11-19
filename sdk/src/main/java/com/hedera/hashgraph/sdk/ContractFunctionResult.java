@@ -3,8 +3,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
@@ -62,7 +60,10 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+        logs = new ArrayList<>();
+        for (var log : inner.getLogInfoList()) {
+            logs.add(ContractLogInfo.fromProtobuf(log));
+        }
     }
 
     /**
