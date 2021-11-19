@@ -155,7 +155,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             );
         }
         txBuilder.setTransfers(list);
-        
+
         return txBuilder;
     }
 

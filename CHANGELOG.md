@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
-* Support for adding multiple addresses for the same node to the network.
+ * Support for adding multiple addresses for the same node to the network.
+ * `*Id` objects are now comparable.
 
 ## v2.4.0
 
