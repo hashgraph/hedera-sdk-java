@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * The ID for a smart contract instance on Hedera.
  */
-public final class ContractId extends Key {
+public final class ContractId extends Key implements Comparable<ContractId> {
     /**
      * The shard number
      */
@@ -135,5 +135,19 @@ public final class ContractId extends Key {
 
         ContractId otherId = (ContractId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(ContractId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }

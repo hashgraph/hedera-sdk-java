@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * The ID for a file on Hedera.
  */
-public final class FileId {
+public final class FileId implements Comparable<FileId> {
     /**
      * The public node address book for the current network.
      */
@@ -128,5 +128,19 @@ public final class FileId {
 
         FileId otherId = (FileId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(FileId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }

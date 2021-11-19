@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * The ID for a crypto-currency account on Hedera.
  */
-public final class AccountId {
+public final class AccountId implements Comparable<AccountId>{
     /**
      * The shard number
      */
@@ -127,5 +127,19 @@ public final class AccountId {
 
         AccountId otherId = (AccountId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(AccountId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }
