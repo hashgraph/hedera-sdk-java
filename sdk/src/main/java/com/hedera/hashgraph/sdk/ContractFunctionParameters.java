@@ -76,9 +76,7 @@ public final class ContractFunctionParameters {
         return rightPad32(ByteString.copyFrom(bytes));
     }
 
-    private static ByteString encodeArray(Stream<ByteString> elements) {
-        List<ByteString> list = elements.collect(Collectors.toList());
-
+    private static ByteString encodeArray(List<ByteString> list) {
         return int256(list.size(), 32)
             .concat(ByteString.copyFrom(list));
     }
@@ -219,9 +217,10 @@ public final class ContractFunctionParameters {
      * @throws NullPointerException if any value in `strings` is null
      */
     public ContractFunctionParameters addStringArray(String[] strings) {
-        List<ByteString> byteStrings = J8Arrays.stream(strings)
-            .map(ContractFunctionParameters::encodeString)
-            .collect(Collectors.toList());
+        List<ByteString> byteStrings = new ArrayList<>();
+        for (var string : strings) {
+            byteStrings.add(encodeString(string));
+        }
 
         ByteString argBytes = encodeDynArr(byteStrings);
 
@@ -249,9 +248,10 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addBytesArray(byte[][] param) {
-        List<ByteString> byteArrays = J8Arrays.stream(param)
-            .map(ContractFunctionParameters::encodeBytes)
-            .collect(Collectors.toList());
+        List<ByteString> byteArrays = new ArrayList<>();
+        for (var p : param) {
+            byteArrays.add(encodeBytes(p));
+        }
 
         args.add(new Argument("bytes[]", encodeDynArr(byteArrays), true));
 
@@ -284,8 +284,10 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addBytes32Array(byte[][] param) {
         // array of fixed-size elements
-        Stream<ByteString> byteArrays = J8Arrays.stream(param)
-            .map(ContractFunctionParameters::encodeBytes32);
+        List<ByteString> byteArrays = new ArrayList<>();
+        for (var p : param) {
+            byteArrays.add(encodeBytes32(p));
+        }
 
         args.add(new Argument("bytes32[]", encodeArray(byteArrays), true));
 
