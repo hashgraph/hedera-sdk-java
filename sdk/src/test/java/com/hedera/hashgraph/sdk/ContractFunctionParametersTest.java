@@ -1,8 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,44 +20,44 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ContractFunctionParametersTest {
     @SuppressWarnings("unused")
     private static List<Arguments> int256Arguments() {
-        return Lists.of(
-            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
-            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
-            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
-            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"),
-            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"),
-            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"),
-            // deadbeef as an integer literal is negative
-            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"),
-            Arguments.of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"),
-            Arguments.of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"),
-            Arguments.of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"),
-            Arguments.of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"),
-            Arguments.of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"),
-            Arguments.of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"),
-            Arguments.of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef")
-        );
+        List<Arguments> retval = new ArrayList<>();
+        retval.add(Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"));
+        retval.add(Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"));
+        retval.add(Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"));
+        retval.add(Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff"));
+        retval.add(Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000"));
+        retval.add(Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000"));
+        // deadbeef as an integer literal is negative
+        retval.add(Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef"));
+        retval.add(Arguments.of(-1, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"));
+        retval.add(Arguments.of(-2, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe"));
+        retval.add(Arguments.of(-256, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"));
+        retval.add(Arguments.of(-4096, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000"));
+        retval.add(Arguments.of(255 << 24, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffff000000"));
+        retval.add(Arguments.of(4095 << 20, "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00000"));
+        retval.add(Arguments.of(0xdeadbeef, "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffdeadbeef"));
+        return retval;
     }
 
     @SuppressWarnings("unused")
     private static List<Arguments> uInt256Arguments() {
-        return Lists.of(
-            Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),
-            Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8),
-            Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8),
-            Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff", 32),
-            Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000", 32),
-            Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000", 32),
-            // deadbeef as an integer literal is negative
-            Arguments.of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef", 32),
-            Arguments.of(-1, "000000000000000000000000000000000000000000000000ffffffffffffffff", 64),
-            Arguments.of(-2, "000000000000000000000000000000000000000000000000fffffffffffffffe", 64),
-            Arguments.of(-256, "000000000000000000000000000000000000000000000000ffffffffffffff00", 64),
-            Arguments.of(-4096, "000000000000000000000000000000000000000000000000fffffffffffff000", 64),
-            Arguments.of(255 << 24, "000000000000000000000000000000000000000000000000ffffffffff000000", 64),
-            Arguments.of(4095 << 20, "000000000000000000000000000000000000000000000000fffffffffff00000", 64),
-            Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef", 64)
-        );
+        List<Arguments> retval = new ArrayList<>();
+        retval.add(Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8));
+        retval.add(Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8));
+        retval.add(Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8));
+        retval.add(Arguments.of(4095, "0000000000000000000000000000000000000000000000000000000000000fff", 32));
+        retval.add(Arguments.of(127 << 24, "000000000000000000000000000000000000000000000000000000007f000000", 32));
+        retval.add(Arguments.of(2047 << 20, "000000000000000000000000000000000000000000000000000000007ff00000", 32));
+        // deadbeef as an integer literal is negative
+        retval.add(Arguments.of(0xdeadbeef, "00000000000000000000000000000000000000000000000000000000deadbeef", 32));
+        retval.add(Arguments.of(-1, "000000000000000000000000000000000000000000000000ffffffffffffffff", 64));
+        retval.add(Arguments.of(-2, "000000000000000000000000000000000000000000000000fffffffffffffffe", 64));
+        retval.add(Arguments.of(-256, "000000000000000000000000000000000000000000000000ffffffffffffff00", 64));
+        retval.add(Arguments.of(-4096, "000000000000000000000000000000000000000000000000fffffffffffff000", 64));
+        retval.add(Arguments.of(255 << 24, "000000000000000000000000000000000000000000000000ffffffffff000000", 64));
+        retval.add(Arguments.of(4095 << 20, "000000000000000000000000000000000000000000000000fffffffffff00000", 64));
+        retval.add(Arguments.of(0xdeadbeefL, "00000000000000000000000000000000000000000000000000000000deadbeef", 64));
+        return retval;
     }
 
     @Test

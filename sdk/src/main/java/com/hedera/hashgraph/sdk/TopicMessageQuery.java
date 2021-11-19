@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-
-// TODO: Predicate is java8, remove it
+import java.util.function.Predicate;
 
 public final class TopicMessageQuery {
 

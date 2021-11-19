@@ -217,7 +217,7 @@ public final class ContractFunctionParameters {
      * @throws NullPointerException if any value in `strings` is null
      */
     public ContractFunctionParameters addStringArray(String[] strings) {
-        List<ByteString> byteStrings = new ArrayList<>();
+        List<ByteString> byteStrings = new ArrayList<>(strings.length);
         for (var string : strings) {
             byteStrings.add(encodeString(string));
         }
@@ -248,7 +248,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addBytesArray(byte[][] param) {
-        List<ByteString> byteArrays = new ArrayList<>();
+        List<ByteString> byteArrays = new ArrayList<>(param.length);
         for (var p : param) {
             byteArrays.add(encodeBytes(p));
         }
@@ -284,7 +284,7 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addBytes32Array(byte[][] param) {
         // array of fixed-size elements
-        List<ByteString> byteArrays = new ArrayList<>();
+        List<ByteString> byteArrays = new ArrayList<>(param.length);
         for (var p : param) {
             byteArrays.add(encodeBytes32(p));
         }
@@ -362,13 +362,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt8Array(byte[] intArray) {
-        IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (byte val : intArray) {
+            valList.add(int256(val, 8));
+        }
 
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            intStream.mapToObj(i -> int256(i, 8))
-                .collect(Collectors.toList()));
-
-        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("int8[]", arrayBytes, true));
 
@@ -382,11 +382,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt32Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (int val : intArray) {
+            valList.add(int256(val, 32));
+        }
 
-        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("int32[]", arrayBytes, true));
 
@@ -400,11 +402,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt64Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (long val : intArray) {
+            valList.add(int256(val, 64));
+        }
 
-        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("int64[]", arrayBytes, true));
 
@@ -420,11 +424,13 @@ public final class ContractFunctionParameters {
      *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::int256)
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (BigInteger val : intArray) {
+            valList.add(int256(val));
+        }
 
-        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 256)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("int256[]", arrayBytes, true));
 
@@ -503,13 +509,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint8Array(byte[] intArray) {
-        IntStream intStream = IntStreams.range(0, intArray.length).map(idx -> intArray[idx]);
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (byte val : intArray) {
+            valList.add(uint256(val, 8));
+        }
 
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            intStream.mapToObj(i -> uint256(i, 8))
-                .collect(Collectors.toList()));
-
-        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("uint8[]", arrayBytes, true));
 
@@ -526,11 +532,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint32Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (int val : intArray) {
+            valList.add(uint256(val, 32));
+        }
 
-        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("uint32[]", arrayBytes, true));
 
@@ -547,11 +555,13 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint64Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (long val : intArray) {
+            valList.add(uint256(val, 64));
+        }
 
-        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 32)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("uint64[]", arrayBytes, true));
 
@@ -570,11 +580,13 @@ public final class ContractFunctionParameters {
      *                                  (max range including the sign bit) or is negative.
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::uint256)
-                .collect(Collectors.toList()));
+        List<ByteString> valList = new ArrayList<>(intArray.length);
+        for (BigInteger val : intArray) {
+            valList.add(uint256(val));
+        }
 
-        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
+        ByteString arrayBytes = uint256(intArray.length, 256)
+            .concat(ByteString.copyFrom(valList));
 
         args.add(new Argument("uint256[]", arrayBytes, true));
 
@@ -612,11 +624,11 @@ public final class ContractFunctionParameters {
      * @throws NullPointerException     if any value in the array is null.
      */
     public ContractFunctionParameters addAddressArray(String[] addresses) {
-        ByteString addressArray = encodeArray(
-            J8Arrays.stream(addresses).map(a -> {
-                byte[] address = decodeAddress(a);
-                return leftPad32(ByteString.copyFrom(address));
-            }));
+        List<ByteString> list = new ArrayList<>(addresses.length);
+        for (var address : addresses) {
+            list.add(leftPad32(ByteString.copyFrom(decodeAddress(address))));
+        }
+        ByteString addressArray = encodeArray(list);
 
         args.add(new Argument("address[]", addressArray, true));
 

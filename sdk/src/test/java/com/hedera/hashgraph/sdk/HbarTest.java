@@ -1,13 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
-import java8.util.stream.RefStreams;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -23,14 +24,14 @@ public class HbarTest {
     private final Hbar negativeFiftyHbar = new Hbar(-50);
 
     static Iterator<Arguments> getValueConversions() {
-        return RefStreams.of(
-            Arguments.arguments(new BigDecimal(50_000_000), HbarUnit.MICROBAR),
-            Arguments.arguments(new BigDecimal(50_000), HbarUnit.MILLIBAR),
-            Arguments.arguments(new BigDecimal(50), HbarUnit.HBAR),
-            Arguments.arguments(new BigDecimal("0.05"), HbarUnit.KILOBAR),
-            Arguments.arguments(new BigDecimal("0.00005"), HbarUnit.MEGABAR),
-            Arguments.arguments(new BigDecimal("0.00000005"), HbarUnit.GIGABAR)
-        ).iterator();
+        List<Arguments> retval = new ArrayList<>();
+        retval.add(Arguments.arguments(new BigDecimal(50_000_000), HbarUnit.MICROBAR));
+        retval.add(Arguments.arguments(new BigDecimal(50_000), HbarUnit.MILLIBAR));
+        retval.add(Arguments.arguments(new BigDecimal(50), HbarUnit.HBAR));
+        retval.add(Arguments.arguments(new BigDecimal("0.05"), HbarUnit.KILOBAR));
+        retval.add(Arguments.arguments(new BigDecimal("0.00005"), HbarUnit.MEGABAR));
+        retval.add(Arguments.arguments(new BigDecimal("0.00000005"), HbarUnit.GIGABAR));
+        return retval.iterator();
     }
 
     @Test

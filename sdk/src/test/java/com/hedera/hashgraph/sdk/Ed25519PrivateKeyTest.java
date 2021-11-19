@@ -3,8 +3,6 @@ package com.hedera.hashgraph.sdk;
 //import com.hedera.hashgraph.sdk.BadKeyException;
 //import com.hedera.hashgraph.sdk.Mnemonic;
 
-import java8.util.stream.RefStreams;
-import java8.util.stream.Stream;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -66,6 +64,7 @@ class Ed25519PrivateKeyTest {
     private static final byte[] MESSAGE_BYTES = MESSAGE_STR.getBytes(StandardCharsets.UTF_8);
     private static final String SIG_STR = "73bea53f31ca9c42a422ecb7516ec08d0bbd1a6bfd630ccf10ec1872454814d29f4a8011129cd007eab544af01a75f508285b591e5bed24b68f927751e49e30e";
 
+    /*
     @SuppressWarnings("unused")
     private static Stream<String> privKeyStrings() {
         return RefStreams.of(
@@ -76,7 +75,7 @@ class Ed25519PrivateKeyTest {
             // raw hex (just private key)
             TEST_KEY_STR_RAW
         );
-    }
+    }*/
 
     @Test
     @DisplayName("private key generates successfully")
