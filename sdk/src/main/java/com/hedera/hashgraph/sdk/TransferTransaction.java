@@ -117,6 +117,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             transferLists.add(list);
         }
 
+        Collections.sort(transferLists);
+
         List<Map.Entry<AccountId, Hbar>> hbarTransferList = new ArrayList<>();
         hbarTransferList.addAll(hbarTransfers.entrySet());
         Collections.sort(hbarTransferList, (o1, o2) -> {
