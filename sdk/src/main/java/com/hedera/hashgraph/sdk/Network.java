@@ -203,10 +203,39 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     static Network forPreviewnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
+        network.put("35.231.208.148:50211", new AccountId(3));
+        network.put("3.211.248.172:50211", new AccountId(3));
+        network.put("40.121.64.48:50211", new AccountId(3));
+
         network.put("1.previewnet.hedera.com:50211", new AccountId(4));
+        network.put("35.199.15.177:50211", new AccountId(4));
+        network.put("3.133.213.146:50211", new AccountId(4));
+        network.put("40.70.11.202:50211", new AccountId(4));
+
         network.put("2.previewnet.hedera.com:50211", new AccountId(5));
+        network.put("35.225.201.195:50211", new AccountId(5));
+        network.put("52.15.105.130:50211", new AccountId(5));
+        network.put("104.43.248.63:50211", new AccountId(5));
+
         network.put("3.previewnet.hedera.com:50211", new AccountId(6));
+        network.put("35.247.109.135:50211", new AccountId(6));
+        network.put("54.241.38.1:50211", new AccountId(6));
+        network.put("13.88.22.47:50211", new AccountId(6));
+
         network.put("4.previewnet.hedera.com:50211", new AccountId(7));
+        network.put("35.235.65.51:50211", new AccountId(7));
+        network.put("54.177.51.127:50211", new AccountId(7));
+        network.put("13.64.170.40:50211", new AccountId(7));
+
+        network.put("5.previewnet.hedera.com:50211", new AccountId(8));
+        network.put("34.106.247.65:50211", new AccountId(8));
+        network.put("35.83.89.171:50211", new AccountId(8));
+        network.put("13.78.232.192:50211", new AccountId(8));
+
+        network.put("6.previewnet.hedera.com:50211", new AccountId(9));
+        network.put("34.125.23.49:50211", new AccountId(9));
+        network.put("50.18.17.93:50211", new AccountId(9));
+        network.put("20.150.136.89:50211", new AccountId(9));
 
         return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
     }
@@ -302,6 +331,6 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     Node getNode(AccountId nodeAccountId) {
-        return network.get(nodeAccountId).get(0);
+        return Collections.min(network.get(nodeAccountId));
     }
 }
