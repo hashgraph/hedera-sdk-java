@@ -67,13 +67,6 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     /**
      * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
      *
-     * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link PrecheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
-     *
-     * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
-     * and use a separate {@link FileAppendTransaction} for each.
-     *
      * @param contents the contents to append to the file.
      * @return {@code this}
      * @see #setContents(String) for an overload which takes {@link String}.
@@ -84,13 +77,6 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
     /**
      * <p>Set the contents to append to the file as identified by {@link #setFileId(FileId)}.
-     *
-     * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link PrecheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
-     *
-     * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
-     * and use a separate {@link FileAppendTransaction} for each.
      *
      * @param contents the contents to append to the file.
      * @return {@code this}
@@ -109,13 +95,6 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * {@link FileContentsQuery#execute(Client)} via
      * {@link String#String(byte[], java.nio.charset.Charset)} using
      * {@link java.nio.charset.StandardCharsets#UTF_8}.
-     *
-     * <p>Note that total size for a given transaction is limited to 6KiB (as of March 2020) by the
-     * network; if you exceed this you may receive a {@link PrecheckStatusException}
-     * with {@link com.hedera.hashgraph.sdk.Status#TRANSACTION_OVERSIZE}.
-     *
-     * <p>If you want to append more than ~6KiB of data, you will need to break it into multiple chunks
-     * and use a separate {@link FileAppendTransaction} for each.
      *
      * @param text The String to be set as the contents of the file
      * @return {@code this}
