@@ -4,7 +4,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -101,9 +100,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 Collections.emptyList()
             );
             retval.transfers.addAll(transfersEntry.getValue().entrySet());
-            Collections.sort(retval.transfers, (o1, o2) -> {
-                return o1.getKey().compareTo(o2.getKey());
-            });
+            Collections.sort(retval.transfers, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
             return retval;
         }
 
@@ -157,9 +154,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         List<Map.Entry<AccountId, Hbar>> hbarTransferList = new ArrayList<>();
         hbarTransferList.addAll(hbarTransfers.entrySet());
-        Collections.sort(hbarTransferList, (o1, o2) -> {
-            return o1.getKey().compareTo(o2.getKey());
-        });
+        Collections.sort(hbarTransferList, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
 
         var txBuilder = CryptoTransferTransactionBody.newBuilder();
 
