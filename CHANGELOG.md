@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * Support for adding multiple addresses for the same node to the network.
  * `*Id` objects are now comparable.
+ * Adds `createdContractIds` to `ContractFunctionResult`
 
 ## v2.4.0
 

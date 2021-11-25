@@ -11,6 +11,7 @@ import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,6 +39,8 @@ public final class ContractFunctionResult {
 
     public final List<ContractLogInfo> logs;
 
+    public final List<ContractId> createdContractIds;
+
     private final ByteString rawResult;
 
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
@@ -63,6 +66,8 @@ public final class ContractFunctionResult {
         gasUsed = inner.getGasUsed();
 
         logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+
+        createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
     }
 
     /**
@@ -326,6 +331,10 @@ public final class ContractFunctionResult {
             contractFunctionResult.addLogInfo(log.toProtobuf());
         }
 
+        for (var contractId : createdContractIds) {
+            contractFunctionResult.addCreatedContractIDs(contractId.toProtobuf());
+        }
+
         return contractFunctionResult.build();
     }
 
@@ -338,6 +347,7 @@ public final class ContractFunctionResult {
             .add("gasUsed", gasUsed)
             .add("errorMessage", errorMessage)
             .add("logs", logs)
+            .add("createdContractIds", createdContractIds)
             .toString();
     }
 }
