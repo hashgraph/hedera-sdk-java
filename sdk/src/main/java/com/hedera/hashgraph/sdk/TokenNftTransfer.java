@@ -4,6 +4,9 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NftTransfer;
 
+import javax.annotation.Nullable;
+import java.util.Objects;
+
 public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     public final AccountId sender;
     public final AccountId receiver;
@@ -54,10 +57,29 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
         if (senderComparison != 0) {
             return senderComparison;
         }
-        int receiverComparison = receiver.compareTo(o.sender);
+        int receiverComparison = receiver.compareTo(o.receiver);
         if (receiverComparison != 0) {
             return receiverComparison;
         }
         return Long.compare(serial, o.serial);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof TokenNftTransfer)) {
+            return false;
+        }
+
+        TokenNftTransfer otherTransfer = (TokenNftTransfer) o;
+        return sender.equals(otherTransfer.sender) && receiver.equals(otherTransfer.receiver) && serial == otherTransfer.serial;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(sender.hashCode(), receiver.hashCode(), serial);
     }
 }
