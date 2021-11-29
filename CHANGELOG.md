@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Support for adding multiple addresses for the same node to the network.
  * `*Id` objects are now comparable.
  * Adds `createdContractIds` to `ContractFunctionResult`
+ * Makes `AccountBalance.[to|from]Bytes()` public.
  * New smart contract response codes
 
 ## v2.5.0-beta.1
