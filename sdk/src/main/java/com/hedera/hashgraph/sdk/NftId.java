@@ -7,7 +7,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class NftId {
+public class NftId implements Comparable<NftId> {
     /**
      * The (non-fungible) token of which this NFT is an instance
      */
@@ -80,5 +80,15 @@ public class NftId {
 
         NftId otherId = (NftId) o;
         return tokenId.equals(otherId.tokenId) && serial == otherId.serial;
+    }
+
+    @Override
+    public int compareTo(NftId o) {
+        Objects.requireNonNull(o);
+        int tokenComparison = tokenId.compareTo(o.tokenId);
+        if (tokenComparison != 0) {
+            return tokenComparison;
+        }
+        return Long.compare(serial, o.serial);
     }
 }

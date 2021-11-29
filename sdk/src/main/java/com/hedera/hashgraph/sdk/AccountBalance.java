@@ -45,7 +45,7 @@ public class AccountBalance {
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
     }
 
-    static AccountBalance fromBytes(byte[] data) throws InvalidProtocolBufferException {
+    public static AccountBalance fromBytes(byte[] data) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetAccountBalanceResponse.parseFrom(data));
     }
 
@@ -64,7 +64,7 @@ public class AccountBalance {
         return protobuf.build();
     }
 
-    ByteString toBytes() {
+    public ByteString toBytes() {
         return toProtobuf().toByteString();
     }
 

@@ -7,7 +7,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public final class ScheduleId {
+public final class ScheduleId implements Comparable<ScheduleId> {
     /**
      * The shard number
      */
@@ -116,5 +116,19 @@ public final class ScheduleId {
 
         ScheduleId otherId = (ScheduleId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(ScheduleId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }
