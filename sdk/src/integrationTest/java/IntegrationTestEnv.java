@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -75,7 +76,8 @@ public class IntegrationTestEnv {
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
-            } catch (Exception ignored) {
+            } catch (Exception configFileException) {
+                configFileException.printStackTrace();
             }
         }
         throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");
@@ -162,12 +164,13 @@ public class IntegrationTestEnv {
             for (; index < nodes.size(); index++) {
                 var node = nodes.get(index);
                 try {
-                    new AccountCreateTransaction()
+                    new TransferTransaction()
                         .setNodeAccountIds(Collections.singletonList(node.getValue()))
                         .setMaxAttempts(1)
-                        .setKey(PrivateKey.generate())
-                        //.setAccountId(client.getOperatorAccountId())
-                        .execute(client);
+                        .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(1).negated())
+                        .addHbarTransfer(AccountId.fromString("0.0.3"), Hbar.fromTinybars(1))
+                        .execute(client)
+                        .getReceipt(client);
                     nodes.remove(index);
                     outMap.put(node.getKey(), node.getValue());
                     return;

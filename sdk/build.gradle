@@ -3,11 +3,11 @@ plugins {
 	id "idea"
 	id "maven"
 	id "com.bmuschko.nexus" version "2.3.1"
-	id "com.google.protobuf" version "0.8.17"
+	id "com.google.protobuf" version "0.8.18"
 }
 
 group = "com.hedera.hashgraph"
-version = "2.4.0"
+version = "2.5.0"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
@@ -36,9 +36,9 @@ dependencies {
 
 	implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
 
-	implementation "io.grpc:grpc-core:1.41.0"
-	implementation "io.grpc:grpc-protobuf-lite:1.41.0"
-	implementation "io.grpc:grpc-stub:1.41.0"
+	implementation "io.grpc:grpc-core:1.42.1"
+	implementation "io.grpc:grpc-protobuf-lite:1.42.1"
+	implementation "io.grpc:grpc-stub:1.42.1"
 
 	// Toggle which slf4j library to use to enable/disable logging
 	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha5'
@@ -47,14 +47,14 @@ dependencies {
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
 	testCompile "org.assertj:assertj-core:3.21.0"
-	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.1"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.1"
+	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.42.0"
-	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.41.0'
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.42.1"
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.42.1'
 
-	implementation "com.google.code.gson:gson:2.8.8"
+	implementation "com.google.code.gson:gson:2.8.9"
 
 	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 
@@ -68,7 +68,7 @@ protobuf {
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.42.0"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.42.1"
 		}
 	}
 	generateProtoTasks {

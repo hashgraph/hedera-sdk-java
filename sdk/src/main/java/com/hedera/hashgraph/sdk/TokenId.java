@@ -7,7 +7,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-public class TokenId {
+public class TokenId implements Comparable<TokenId> {
     /**
      * The shard number
      */
@@ -120,5 +120,19 @@ public class TokenId {
 
         TokenId otherId = (TokenId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(TokenId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }

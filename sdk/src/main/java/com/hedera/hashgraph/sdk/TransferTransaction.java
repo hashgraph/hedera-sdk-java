@@ -11,7 +11,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,31 +78,102 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
-    CryptoTransferTransactionBody.Builder build() {
-        var builder = CryptoTransferTransactionBody.newBuilder();
-        for (var entry : tokenTransfers.entrySet()) {
-            var list = TokenTransferList.newBuilder()
-                .setToken(entry.getKey().toProtobuf());
+    private static class SortableTokenTransferList implements Comparable<SortableTokenTransferList> {
+        public final TokenId tokenId;
+        public final List<Map.Entry<AccountId, Long>> transfers;
+        public final List<TokenNftTransfer> nftTransfers;
 
-            for (var aa : entry.getValue().entrySet()) {
-                list.addTransfers(AccountAmount.newBuilder()
-                    .setAccountID(aa.getKey().toProtobuf())
-                    .setAmount(aa.getValue())
-                );
+        private SortableTokenTransferList(
+            TokenId tokenId,
+            List<Map.Entry<AccountId, Long>> transfers,
+            List<TokenNftTransfer> nftTransfers
+        ) {
+            this.tokenId = tokenId;
+            this.transfers = transfers;
+            this.nftTransfers = nftTransfers;
+        }
+
+        public static SortableTokenTransferList forTransfers(Map.Entry<TokenId, Map<AccountId, Long>> transfersEntry) {
+            var retval = new SortableTokenTransferList(
+                transfersEntry.getKey(),
+                new ArrayList<>(),
+                Collections.emptyList()
+            );
+            retval.transfers.addAll(transfersEntry.getValue().entrySet());
+            Collections.sort(retval.transfers, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+            return retval;
+        }
+
+        public static SortableTokenTransferList forNftTransfers(Map.Entry<TokenId, List<TokenNftTransfer>> nftTransfersEntry) {
+            var retval = new SortableTokenTransferList(
+                nftTransfersEntry.getKey(),
+                Collections.emptyList(),
+                nftTransfersEntry.getValue()
+            );
+            Collections.sort(retval.nftTransfers);
+            return retval;
+        }
+
+        @Override
+        public int compareTo(SortableTokenTransferList o) {
+            return tokenId.compareTo(o.tokenId);
+        }
+
+        @Override
+        public boolean equals(@Nullable Object o) {
+            if (this == o) {
+                return true;
             }
 
-            builder.addTokenTransfers(list);
+            if (!(o instanceof SortableTokenTransferList)) {
+                return false;
+            }
+
+            SortableTokenTransferList otherTransferList = (SortableTokenTransferList) o;
+            return tokenId.equals(otherTransferList.tokenId);
+        }
+
+        @Override
+        public int hashCode() {
+            return tokenId.hashCode();
+        }
+    }
+
+    CryptoTransferTransactionBody.Builder build() {
+        List<SortableTokenTransferList> transferLists = new ArrayList<>();
+
+        for (var entry : tokenTransfers.entrySet()) {
+            transferLists.add(SortableTokenTransferList.forTransfers(entry));
         }
 
         for (var entry : nftTransfers.entrySet()) {
-            var list = TokenTransferList.newBuilder()
-                .setToken(entry.getKey().toProtobuf());
+            transferLists.add(SortableTokenTransferList.forNftTransfers(entry));
+        }
 
-            for (var nftTransfer : entry.getValue()) {
-                list.addNftTransfers(nftTransfer.toProtobuf());
+        Collections.sort(transferLists);
+
+        List<Map.Entry<AccountId, Hbar>> hbarTransferList = new ArrayList<>();
+        hbarTransferList.addAll(hbarTransfers.entrySet());
+        Collections.sort(hbarTransferList, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+
+        var txBuilder = CryptoTransferTransactionBody.newBuilder();
+
+        for (var list : transferLists) {
+            var listBuilder = TokenTransferList.newBuilder()
+                .setToken(list.tokenId.toProtobuf());
+
+            for (var transfer : list.transfers) {
+                listBuilder.addTransfers(AccountAmount.newBuilder()
+                    .setAccountID(transfer.getKey().toProtobuf())
+                    .setAmount(transfer.getValue())
+                );
             }
 
-            builder.addTokenTransfers(list);
+            for (var nftTransfer : list.nftTransfers) {
+                listBuilder.addNftTransfers(nftTransfer.toProtobuf());
+            }
+
+            txBuilder.addTokenTransfers(listBuilder);
         }
 
         var list = TransferList.newBuilder();
@@ -110,9 +183,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 .setAmount(entry.getValue().toTinybars())
             );
         }
-        builder.setTransfers(list);
+        txBuilder.setTransfers(list);
 
-        return builder;
+        return txBuilder;
     }
 
     @Override

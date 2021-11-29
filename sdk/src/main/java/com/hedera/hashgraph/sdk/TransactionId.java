@@ -8,6 +8,7 @@ import com.google.errorprone.annotations.Var;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
+import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import javax.annotation.Nullable;
 
@@ -21,7 +22,7 @@ import static java.util.concurrent.CompletableFuture.failedFuture;
  * right after creating it, for instantiating a smart contract with bytecode in a file just created,
  * and internally by the network for detecting when duplicate transactions are submitted.
  */
-public final class TransactionId implements WithGetReceipt, WithGetRecord {
+public final class TransactionId implements WithGetReceipt, WithGetRecord, Comparable<TransactionId> {
     /**
      * The Account ID that paid for this transaction.
      */
@@ -210,5 +211,33 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord {
     @Override
     public int hashCode() {
         return toString().hashCode();
+    }
+
+    @Override
+    public int compareTo(TransactionId o) {
+        Objects.requireNonNull(o);
+        if (scheduled != o.scheduled) {
+            return scheduled ? 1 : -1;
+        }
+        var thisAccountIdIsNull = (accountId == null);
+        var otherAccountIdIsNull = (o.accountId == null);
+        if (thisAccountIdIsNull != otherAccountIdIsNull) {
+            return thisAccountIdIsNull ? -1 : 1;
+        }
+        if (!thisAccountIdIsNull) {
+            int accountIdComparison = accountId.compareTo(o.accountId);
+            if (accountIdComparison != 0) {
+                return accountIdComparison;
+            }
+        }
+        var thisStartIsNull = (validStart == null);
+        var otherStartIsNull = (o.validStart == null);
+        if (thisStartIsNull != otherStartIsNull) {
+            return thisAccountIdIsNull ? -1 : 1;
+        }
+        if (!thisStartIsNull) {
+            return validStart.compareTo(o.validStart);
+        }
+        return 0;
     }
 }
