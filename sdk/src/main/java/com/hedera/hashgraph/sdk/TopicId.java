@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * Unique identifier for a topic (used by the consensus service).
  */
-public final class TopicId {
+public final class TopicId implements Comparable<TopicId> {
     /**
      * The shard number
      */
@@ -120,5 +120,19 @@ public final class TopicId {
 
         TopicId otherId = (TopicId) o;
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+    }
+
+    @Override
+    public int compareTo(TopicId o) {
+        Objects.requireNonNull(o);
+        int shardComparison = Long.compare(shard, o.shard);
+        if (shardComparison != 0) {
+            return shardComparison;
+        }
+        int realmComparison = Long.compare(realm, o.realm);
+        if (realmComparison != 0) {
+            return realmComparison;
+        }
+        return Long.compare(num, o.num);
     }
 }
