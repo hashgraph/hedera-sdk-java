@@ -5,12 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.5.0
+
+### Added
 
  * Support for adding multiple addresses for the same node to the network.
  * `*Id` objects are now comparable.
  * Adds `createdContractIds` to `ContractFunctionResult`
  * Makes `AccountBalance.[to|from]Bytes()` public.
+ * New smart contract response codes
+
+## v2.5.0-beta.1
+
+### Added
+
+ * New smart contract response codes
 
 ## v2.4.0
 
