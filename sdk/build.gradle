@@ -25,7 +25,7 @@ dependencies {
 
 	// NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
 	// <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
-	implementation "org.bouncycastle:bcprov-jdk15on:1.69"
+	implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
