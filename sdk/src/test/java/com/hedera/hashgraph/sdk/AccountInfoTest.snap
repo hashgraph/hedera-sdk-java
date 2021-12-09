@@ -34,9 +34,10 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
         "isMutable": false
       },
       "memoizedSerializedSize": -1,
+      "accountCase_": 3,
+      "account_": 1,
       "shardNum_": 0,
       "realmNum_": 0,
-      "accountNum_": 1,
       "initialized": true
     },
     "contractAccountID_": "",
@@ -51,9 +52,10 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
         "isMutable": false
       },
       "memoizedSerializedSize": -1,
+      "accountCase_": 3,
+      "account_": 8,
       "shardNum_": 0,
       "realmNum_": 0,
-      "accountNum_": 8,
       "initialized": true
     },
     "proxyReceived_": 2,
@@ -128,9 +130,10 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
             "isMutable": false
           },
           "memoizedSerializedSize": -1,
+          "accountCase_": 3,
+          "account_": 10,
           "shardNum_": 0,
           "realmNum_": 0,
-          "accountNum_": 10,
           "initialized": true
         },
         "hash_": {
@@ -192,6 +195,12 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
     "memo_": "",
     "ownedNfts_": 0,
     "maxAutomaticTokenAssociations_": 0,
+    "alias_": {
+      "hash": 0,
+      "bytes": "",
+      "validUtf8": true,
+      "empty": true
+    },
     "initialized": true
   }
 ]

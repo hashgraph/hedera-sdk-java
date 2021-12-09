@@ -132,9 +132,10 @@ com.hedera.hashgraph.sdk.TopicInfoTest.toProtobuf=[
           "isMutable": false
         },
         "memoizedSerializedSize": -1,
+        "accountCase_": 3,
+        "account_": 4,
         "shardNum_": 0,
         "realmNum_": 0,
-        "accountNum_": 4,
         "initialized": true
       },
       "initialized": true

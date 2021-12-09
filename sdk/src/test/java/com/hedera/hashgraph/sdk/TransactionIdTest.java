@@ -23,8 +23,14 @@ class TransactionIdTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325").toProtobuf().toString())
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldToBytes() {
+        var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
+        assertEquals(originalId.toString(), copyId.toString());
     }
 
     @Test
