@@ -6,11 +6,15 @@ import com.hedera.hashgraph.sdk.proto.AccountID;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 /**
  * The ID for a crypto-currency account on Hedera.
  */
-public final class AccountId implements Comparable<AccountId>{
+public final class AccountId implements Comparable<AccountId> {
+    // TODO: not sure about this pattern
+    private static final Pattern ALIAS_ID_REGEX = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.((?:[0-9a-fA-F]*))$");
+
     /**
      * The shard number
      */
@@ -30,6 +34,9 @@ public final class AccountId implements Comparable<AccountId>{
     public final long num;
 
     @Nullable
+    public final PublicKey aliasKey;
+
+    @Nullable
     private final String checksum;
 
     public AccountId(@Nonnegative long num) {
@@ -47,10 +54,43 @@ public final class AccountId implements Comparable<AccountId>{
         this.realm = realm;
         this.num = num;
         this.checksum = checksum;
+        this.aliasKey = null;
+    }
+
+    @SuppressWarnings("InconsistentOverloads")
+    AccountId(
+        @Nonnegative long shard,
+        @Nonnegative long realm,
+        @Nonnegative long num,
+        @Nullable String checksum,
+        @Nullable PublicKey aliasKey
+    ) {
+        this.shard = shard;
+        this.realm = realm;
+        this.num = num;
+        this.checksum = checksum;
+        this.aliasKey = aliasKey;
     }
 
     public static AccountId fromString(String id) {
-        return EntityIdHelper.fromString(id, AccountId::new);
+        try {
+            return EntityIdHelper.fromString(id, AccountId::new);
+        } catch (IllegalArgumentException error) {
+            var match = ALIAS_ID_REGEX.matcher(id);
+            if (!match.find()) {
+                throw new IllegalArgumentException(
+                    "Invalid Account ID \"" + id + "\": format should look like 0.0.123 or 0.0.123-vfmkw or 0.0.1337BEEF (where 1337BEEF is a hex-encoded, DER-format public key)"
+                );
+            } else {
+                return new AccountId(
+                    Long.parseLong(match.group(1)),
+                    Long.parseLong(match.group(2)),
+                    Long.parseLong(match.group(3)),
+                    null,
+                    PublicKey.fromString(match.group(4))
+                );
+            }
+        }
     }
 
     public static AccountId fromSolidityAddress(String address) {
@@ -59,7 +99,13 @@ public final class AccountId implements Comparable<AccountId>{
 
     static AccountId fromProtobuf(AccountID accountId) {
         Objects.requireNonNull(accountId);
-        return new AccountId(accountId.getShardNum(), accountId.getRealmNum(), accountId.getAccountNum());
+        return new AccountId(
+            accountId.getShardNum(),
+            accountId.getRealmNum(),
+            accountId.getAccountNum(),
+            null,
+            PublicKey.fromAliasBytes(accountId.getAlias())
+        );
     }
 
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -71,11 +117,15 @@ public final class AccountId implements Comparable<AccountId>{
     }
 
     AccountID toProtobuf() {
-        return AccountID.newBuilder()
+        var accountIdBuilder = AccountID.newBuilder()
             .setShardNum(shard)
-            .setRealmNum(realm)
-            .setAccountNum(num)
-            .build();
+            .setRealmNum(realm);
+        if (aliasKey != null) {
+            accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
+        } else {
+            accountIdBuilder.setAccountNum(num);
+        }
+        return accountIdBuilder.build();
     }
 
     /**
@@ -89,7 +139,9 @@ public final class AccountId implements Comparable<AccountId>{
     }
 
     public void validateChecksum(Client client) throws BadEntityIdException {
-        EntityIdHelper.validate(shard, realm, num, client, checksum);
+        if (aliasKey != null) {
+            EntityIdHelper.validate(shard, realm, num, client, checksum);
+        }
     }
 
     @Nullable
@@ -103,16 +155,24 @@ public final class AccountId implements Comparable<AccountId>{
 
     @Override
     public String toString() {
-        return EntityIdHelper.toString(shard, realm, num);
+        if (aliasKey != null) {
+            return "" + shard + "." + realm + "." + aliasKey.toStringDER();
+        } else {
+            return EntityIdHelper.toString(shard, realm, num);
+        }
     }
 
     public String toStringWithChecksum(Client client) {
-        return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
+        if (aliasKey != null) {
+            return "" + shard + "." + realm + "." + aliasKey.toStringDER();
+        } else {
+            return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
+        }
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(shard, realm, num);
+        return Objects.hash(shard, realm, num, (aliasKey != null) ? aliasKey.toBytes() : null);
     }
 
     @Override
@@ -126,7 +186,11 @@ public final class AccountId implements Comparable<AccountId>{
         }
 
         AccountId otherId = (AccountId) o;
-        return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+        if ((aliasKey == null) != (otherId.aliasKey == null)) {
+            return false;
+        }
+        return shard == otherId.shard && realm == otherId.realm && num == otherId.num &&
+            (aliasKey == null || aliasKey.equals(otherId.aliasKey));
     }
 
     @Override
@@ -140,6 +204,16 @@ public final class AccountId implements Comparable<AccountId>{
         if (realmComparison != 0) {
             return realmComparison;
         }
-        return Long.compare(num, o.num);
+        int numComparison = Long.compare(num, o.num);
+        if (numComparison != 0) {
+            return numComparison;
+        }
+        if ((aliasKey == null) != (o.aliasKey == null)) {
+            return aliasKey != null ? 1 : -1;
+        }
+        if (aliasKey == null) {
+            return 0;
+        }
+        return aliasKey.toStringDER().compareTo(o.aliasKey.toStringDER());
     }
 }

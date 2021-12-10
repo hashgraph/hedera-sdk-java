@@ -13,6 +13,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
@@ -373,6 +374,10 @@ public final class PrivateKey extends Key {
 
     public String toStringRaw() {
         return Hex.toHexString(keyData);
+    }
+
+    public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
+        return getPublicKey().toAccountId(shard, realm);
     }
 
     @Override

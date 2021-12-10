@@ -2,12 +2,14 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
@@ -38,6 +40,18 @@ public final class PublicKey extends Key {
 
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
         return new PublicKey(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+    }
+
+    @Nullable
+    static PublicKey fromAliasBytes(ByteString aliasBytes) {
+        if (!aliasBytes.isEmpty()) {
+            try {
+                var key = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(aliasBytes));
+                return (key instanceof PublicKey) ? ((PublicKey) key) : null;
+            } catch (InvalidProtocolBufferException ignored) {
+            }
+        }
+        return null;
     }
 
     /**
@@ -120,6 +134,10 @@ public final class PublicKey extends Key {
 
     public String toStringRaw() {
         return Hex.toHexString(keyData);
+    }
+
+    public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
+        return new AccountId(shard, realm, 0, null, this);
     }
 
     @Override

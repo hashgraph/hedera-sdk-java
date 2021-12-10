@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
 import java8.util.J8Arrays;
@@ -100,6 +101,9 @@ public final class AccountInfo {
 
     public final int maxAutomaticTokenAssociations;
 
+    @Nullable
+    public final PublicKey aliasKey;
+
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -117,7 +121,8 @@ public final class AccountInfo {
         Map<TokenId, TokenRelationship> tokenRelationships,
         String accountMemo,
         long ownedNfts,
-        int maxAutomaticTokenAssociations
+        int maxAutomaticTokenAssociations,
+        @Nullable PublicKey aliasKey
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -136,6 +141,7 @@ public final class AccountInfo {
         this.accountMemo = accountMemo;
         this.ownedNfts = ownedNfts;
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        this.aliasKey = aliasKey;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -156,6 +162,9 @@ public final class AccountInfo {
             relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
         }
 
+        @Nullable
+        var aliasKey = PublicKey.fromAliasBytes(accountInfo.getAlias());
+
         return new AccountInfo(
             accountId,
             accountInfo.getContractAccountID(),
@@ -173,7 +182,8 @@ public final class AccountInfo {
             relationships,
             accountInfo.getMemo(),
             accountInfo.getOwnedNfts(),
-            accountInfo.getMaxAutomaticTokenAssociations()
+            accountInfo.getMaxAutomaticTokenAssociations(),
+            aliasKey
         );
     }
 
@@ -210,6 +220,10 @@ public final class AccountInfo {
             accountInfoBuilder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
 
+        if (aliasKey != null) {
+            accountInfoBuilder.setAlias(ByteString.copyFrom(aliasKey.toBytes()));
+        }
+
         return accountInfoBuilder.build();
     }
 
@@ -233,6 +247,7 @@ public final class AccountInfo {
             .add("accountMemo", accountMemo)
             .add("ownedNfts", ownedNfts)
             .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
+            .add("aliasKey", aliasKey)
             .toString();
     }
 
