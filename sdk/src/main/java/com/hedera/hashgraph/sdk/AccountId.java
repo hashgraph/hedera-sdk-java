@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
  */
 public final class AccountId implements Comparable<AccountId> {
     // TODO: not sure about this pattern
-    private static final Pattern ALIAS_ID_REGEX = Pattern.compile("(0|(?:[1-9]\\d*))\\.(0|(?:[1-9]\\d*))\\.((?:[0-9a-fA-F]*))$");
+    private static final Pattern ALIAS_ID_REGEX = Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.((?:[0-9a-fA-F][0-9a-fA-F])+)$");
 
     /**
      * The shard number
@@ -85,9 +85,9 @@ public final class AccountId implements Comparable<AccountId> {
                 return new AccountId(
                     Long.parseLong(match.group(1)),
                     Long.parseLong(match.group(2)),
-                    Long.parseLong(match.group(3)),
+                    0,
                     null,
-                    PublicKey.fromString(match.group(4))
+                    PublicKey.fromString(match.group(3))
                 );
             }
         }
@@ -139,7 +139,7 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     public void validateChecksum(Client client) throws BadEntityIdException {
-        if (aliasKey != null) {
+        if (aliasKey == null) {
             EntityIdHelper.validate(shard, realm, num, client, checksum);
         }
     }
