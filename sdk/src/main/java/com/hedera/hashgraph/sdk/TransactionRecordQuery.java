@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,7 +24,8 @@ import java.util.Objects;
  */
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     @Nullable
-    TransactionId transactionId = null;
+    private TransactionId transactionId = null;
+    private boolean includeChildren = false;
 
     public TransactionRecordQuery() {
     }
@@ -45,6 +48,15 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         return this;
     }
 
+    public boolean getIncludeChildren() {
+        return includeChildren;
+    }
+
+    public TransactionRecordQuery setIncludeChildren(boolean value) {
+        includeChildren = value;
+        return this;
+    }
+
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (transactionId != null) {
@@ -54,7 +66,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        var builder = TransactionGetRecordQuery.newBuilder();
+        var builder = TransactionGetRecordQuery.newBuilder()
+            .setIncludeChildRecords(includeChildren);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -74,7 +87,19 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Override
     TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
+        var recordResponse = response.getTransactionGetRecord();
+        List<TransactionRecord> children = mapRecordList(recordResponse.getChildTransactionRecordsList());
+        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children);
+    }
+
+    private List<TransactionRecord> mapRecordList(
+        List<com.hedera.hashgraph.sdk.proto.TransactionRecord> protoRecordList
+    ) {
+        List<TransactionRecord> outList = new ArrayList<>(protoRecordList.size());
+        for (var protoRecord : protoRecordList) {
+            outList.add(TransactionRecord.fromProtobuf(protoRecord));
+        }
+        return outList;
     }
 
     @Override

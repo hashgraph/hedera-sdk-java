@@ -88,6 +88,8 @@ public final class TransactionRecord {
     @Nullable
     public final PublicKey aliasKey;
 
+    public final List<TransactionRecord> children;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -102,7 +104,8 @@ public final class TransactionRecord {
         @Nullable ScheduleId scheduleRef,
         List<AssessedCustomFee> assessedCustomFees,
         List<TokenAssociation> automaticTokenAssociations,
-        @Nullable PublicKey aliasKey
+        @Nullable PublicKey aliasKey,
+        List<TransactionRecord> children
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -118,9 +121,13 @@ public final class TransactionRecord {
         this.assessedCustomFees = assessedCustomFees;
         this.automaticTokenAssociations = automaticTokenAssociations;
         this.aliasKey = aliasKey;
+        this.children = children;
     }
 
-    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
+    static TransactionRecord fromProtobuf(
+        com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
+        List<TransactionRecord> children
+    ) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
             transfers.add(Transfer.fromProtobuf(accountAmount));
@@ -177,8 +184,13 @@ public final class TransactionRecord {
             transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
             fees,
             automaticTokenAssociations,
-            aliasKey
+            aliasKey,
+            children
         );
+    }
+
+    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
+        return fromProtobuf(transactionRecord, new ArrayList<>());
     }
 
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -253,6 +265,7 @@ public final class TransactionRecord {
             .add("assessedCustomFees", assessedCustomFees)
             .add("automaticTokenAssociations", automaticTokenAssociations)
             .add("aliasKey", aliasKey)
+            .add("children", children)
             .toString();
     }
 

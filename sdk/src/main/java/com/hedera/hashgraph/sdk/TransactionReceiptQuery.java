@@ -25,8 +25,8 @@ public final class TransactionReceiptQuery
 
     @Nullable
     private TransactionId transactionId = null;
-
     private boolean includeChildren = false;
+    private boolean includeDuplicates = false;
 
     public TransactionReceiptQuery() {
     }
@@ -55,6 +55,15 @@ public final class TransactionReceiptQuery
 
     public TransactionReceiptQuery setIncludeChildren(boolean value) {
         includeChildren = value;
+        return this;
+    }
+
+    public boolean getIncludeDuplicates() {
+        return includeDuplicates;
+    }
+
+    public TransactionReceiptQuery setIncludeDuplicates(boolean value) {
+        includeDuplicates = value;
         return this;
     }
 
