@@ -25,6 +25,9 @@ public abstract class Key {
             case CONTRACTID:
                 return ContractId.fromProtobuf(key.getContractID());
 
+            case DELEGATABLE_CONTRACT_ID:
+                return ContractId.fromProtobuf(key.getDelegatableContractId());
+
             default:
                 throw new IllegalStateException("Key#fromProtobuf: unhandled key case: " + key.getKeyCase());
         }
