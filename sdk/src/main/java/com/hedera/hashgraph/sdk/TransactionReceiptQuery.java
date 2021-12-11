@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptQuery;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,7 +24,9 @@ public final class TransactionReceiptQuery
     extends Query<TransactionReceipt, TransactionReceiptQuery> {
 
     @Nullable
-    TransactionId transactionId = null;
+    private TransactionId transactionId = null;
+
+    private boolean includeChildren = false;
 
     public TransactionReceiptQuery() {
     }
@@ -45,6 +49,15 @@ public final class TransactionReceiptQuery
         return this;
     }
 
+    public boolean getIncludeChildren() {
+        return includeChildren;
+    }
+
+    public TransactionReceiptQuery setIncludeChildren(boolean value) {
+        includeChildren = value;
+        return this;
+    }
+
     @Override
     boolean isPaymentRequired() {
         return false;
@@ -59,7 +72,8 @@ public final class TransactionReceiptQuery
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        var builder = TransactionGetReceiptQuery.newBuilder();
+        var builder = TransactionGetReceiptQuery.newBuilder()
+            .setIncludeChildReceipts(includeChildren);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -76,7 +90,20 @@ public final class TransactionReceiptQuery
 
     @Override
     TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
+        var receiptResponse = response.getTransactionGetReceipt();
+        var duplicates = mapReceiptList(receiptResponse.getDuplicateTransactionReceiptsList());
+        var children = mapReceiptList(receiptResponse.getChildTransactionReceiptsList());
+        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children);
+    }
+
+    private static List<TransactionReceipt> mapReceiptList(
+        List<com.hedera.hashgraph.sdk.proto.TransactionReceipt> protoReceiptList
+    ) {
+        List<TransactionReceipt> outList = new ArrayList<>(protoReceiptList.size());
+        for (var protoReceipt : protoReceiptList) {
+            outList.add(TransactionReceipt.fromProtobuf(protoReceipt));
+        }
+        return outList;
     }
 
     @Override
