@@ -82,7 +82,8 @@ public final class TransactionReceiptQuery
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         var builder = TransactionGetReceiptQuery.newBuilder()
-            .setIncludeChildReceipts(includeChildren);
+            .setIncludeChildReceipts(includeChildren)
+            .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
