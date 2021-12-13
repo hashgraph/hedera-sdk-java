@@ -163,7 +163,7 @@ public final class AccountId implements Comparable<AccountId> {
 
     public String toStringWithChecksum(Client client) {
         if (aliasKey != null) {
-            return "" + shard + "." + realm + "." + aliasKey.toStringDER();
+            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey");
         } else {
             return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
         }

@@ -242,7 +242,7 @@ public final class TransactionRecord {
         }
 
         if (aliasKey != null) {
-            transactionRecord.setAlias(ByteString.copyFrom(aliasKey.toBytes()));
+            transactionRecord.setAlias(aliasKey.toProtobufKey().toByteString());
         }
 
         return transactionRecord.build();
