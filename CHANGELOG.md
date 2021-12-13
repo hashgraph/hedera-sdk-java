@@ -10,9 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * `AccountId.aliasKey`, including `AccountId.[to|from]String()` support.
- * `PublicKey.toAccountId()` and `PrivateKey.toAccountId()`.
+ * `[PublicKey|PrivateKey].toAccountId()`.
  * `aliasKey` fields in `TransactionRecord` and `AccountInfo`.
- * New alias key response codes.
+ * `nonce` field in `TransactionId`, including `TransactionId.[set|get]Nonce()`
+ * `children` fields in `TransactionRecord` and `TransactionReceipt`
+ * `duplicates` field in `TransactionReceipt`
+ * `[TransactionReceiptQuery|TransactionRecordQuery].[set|get]IncludeChildren()`
+ * `TransactionReceiptQuery.[set|get]IncludeDuplicates()`
+ * New response codes.
 
 ## v2.5.0
 
