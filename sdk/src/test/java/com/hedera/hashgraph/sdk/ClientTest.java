@@ -13,9 +13,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -218,5 +220,24 @@ class ClientTest {
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(singleNodeNetworkWithDifferentNode);
 
         client.close();
+    }
+
+    @Test
+    @DisplayName("timeout functions correctly")
+    void testExecuteTimeout() throws Exception {
+        AccountId accountId = AccountId.fromString("0.0.1");
+        Client client = Client.forNetwork(Map.of("127.0.0.1:50211", accountId))
+            .setRequestTimeout(Duration.ofSeconds(3));
+        AccountBalanceQuery query = new AccountBalanceQuery()
+            .setAccountId(accountId)
+            .setMaxAttempts(1);
+        Instant start = Instant.now();
+        try {
+            AccountBalance balance = query.executeAsync(client).get();
+        } catch (ExecutionException e) {
+            // fine...
+        }
+        long secondsTaken = java.time.Duration.between(start, Instant.now()).toSeconds();
+        assertThat(secondsTaken).isLessThan(4);
     }
 }
