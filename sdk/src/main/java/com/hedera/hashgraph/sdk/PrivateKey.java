@@ -2,12 +2,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -18,8 +15,6 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
@@ -41,7 +36,7 @@ public abstract class PrivateKey extends Key {
     }
 
     public static PrivateKey generateED25519() {
-        return PrivateKeyED25519.generateED25519Internal();
+        return PrivateKeyED25519.generateInternal();
     }
 
     /**
@@ -117,7 +112,7 @@ public abstract class PrivateKey extends Key {
     }
 
     public static PrivateKey fromBytesED25519(byte[] privateKey) {
-        return PrivateKeyED25519.fromBytesED25519Internal(privateKey);
+        return PrivateKeyED25519.fromBytesInternal(privateKey);
     }
 
     public static PrivateKey fromBytesDER(byte[] privateKey) {
@@ -128,7 +123,7 @@ public abstract class PrivateKey extends Key {
         // TODO: detect type and switch
         // TODO: static final AlgorithmIdentifiers?
         if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
-            return PrivateKeyED25519.fromPrivateKeyInfoED25519(privateKeyInfo);
+            return PrivateKeyED25519.fromPrivateKeyInfoInternal(privateKeyInfo);
         } else {
             // TODO: interpret as ECDSA
             return null;

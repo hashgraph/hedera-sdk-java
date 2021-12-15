@@ -10,34 +10,39 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 
-class PublicKeyED25519 extends PublicKey {
-    private final byte[] keyData;
+public class PublicKeyECDSA extends PublicKey {
+    // Compressed 33 byte form
+    private byte[] keyData;
 
-    PublicKeyED25519(byte[] keyData) {
+    PublicKeyECDSA(byte[] keyData) {
         this.keyData = keyData;
     }
 
     static PublicKeyED25519 fromBytesInternal(byte[] publicKey) {
+        // TODO
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
             // If this is a 32 byte string, assume an Ed25519 public key
             return new PublicKeyED25519(publicKey);
         }
 
         // Assume a DER-encoded private key descriptor
-        return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
+        return fromSubjectKeyInfoED25519(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 
     static PublicKeyED25519 fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
+        // TODO
         return new PublicKeyED25519(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }
 
     @Override
     public boolean verify(byte[] message, byte[] signature) {
+        // TODO
         return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
     }
 
     @Override
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
+        // TODO
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
             .setEd25519(ByteString.copyFrom(keyData))
             .build();
@@ -45,6 +50,7 @@ class PublicKeyED25519 extends PublicKey {
 
     @Override
     SignaturePair toSignaturePairProtobuf(byte[] signature) {
+        // TODO
         return SignaturePair.newBuilder()
             .setPubKeyPrefix(ByteString.copyFrom(keyData))
             .setEd25519(ByteString.copyFrom(signature))
@@ -53,6 +59,7 @@ class PublicKeyED25519 extends PublicKey {
 
     @Override
     public byte[] toBytesDER() {
+        // TODO
         try {
             return new SubjectPublicKeyInfo(
                 new AlgorithmIdentifier(ID_ED25519),
@@ -65,16 +72,18 @@ class PublicKeyED25519 extends PublicKey {
 
     @Override
     public byte[] toBytes() {
-        return toBytesRaw();
+        return toBytesDER();
     }
 
     @Override
     public byte[] toBytesRaw() {
+        // TODO
         return keyData;
     }
 
     @Override
     public boolean equals(@Nullable Object o) {
+        // TODO
         if (this == o) {
             return true;
         }
@@ -89,6 +98,7 @@ class PublicKeyED25519 extends PublicKey {
 
     @Override
     public int hashCode() {
+        // TODO
         return Arrays.hashCode(keyData);
     }
 }

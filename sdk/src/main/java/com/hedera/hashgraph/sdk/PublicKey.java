@@ -11,8 +11,6 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * A public key on the Hedera™ network.
@@ -33,7 +31,7 @@ public abstract class PublicKey extends Key {
     }
 
     public static PublicKey fromBytesED25519(byte[] publicKey) {
-        return PublicKeyED25519.fromBytesED25519Internal(publicKey);
+        return PublicKeyED25519.fromBytesInternal(publicKey);
     }
 
     public static PublicKey fromString(String publicKey) {
@@ -44,7 +42,7 @@ public abstract class PublicKey extends Key {
         // TODO: detect type and switch
         // TODO: static final AlgorithmIdentifiers?
         if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
-            return PublicKeyED25519.fromSubjectKeyInfoED25519(subjectPublicKeyInfo);
+            return PublicKeyED25519.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
         } else {
             // TODO: assume ECDSA
             return null;

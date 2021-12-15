@@ -27,7 +27,7 @@ class PrivateKeyED25519 extends PrivateKey {
         this.chainCode = chainCode;
     }
 
-    static PrivateKey generateED25519Internal() {
+    static PrivateKeyED25519 generateInternal() {
         // extra 32 bytes for chain code
         byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
         ThreadLocalSecureRandom.current().nextBytes(data);
@@ -35,7 +35,7 @@ class PrivateKeyED25519 extends PrivateKey {
         return derivableKeyED25519(data);
     }
 
-    static PrivateKeyED25519 fromPrivateKeyInfoED25519(PrivateKeyInfo privateKeyInfo) {
+    static PrivateKeyED25519 fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
             var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
 
@@ -52,7 +52,7 @@ class PrivateKeyED25519 extends PrivateKey {
         return new PrivateKeyED25519(keyData, chainCode);
     }
 
-    public static PrivateKey fromBytesED25519Internal(byte[] privateKey) {
+    public static PrivateKey fromBytesInternal(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
@@ -60,7 +60,7 @@ class PrivateKeyED25519 extends PrivateKey {
         }
 
         // Assume a DER-encoded private key descriptor
-        return fromPrivateKeyInfoED25519(PrivateKeyInfo.getInstance(privateKey));
+        return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
     }
 
     static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
@@ -95,7 +95,7 @@ class PrivateKeyED25519 extends PrivateKey {
     public PrivateKey legacyDerive(long index) {
         var keyBytes = legacyDeriveChildKey(this.keyData, index);
 
-        return fromBytesED25519Internal(keyBytes);
+        return fromBytesInternal(keyBytes);
     }
 
     @Override
