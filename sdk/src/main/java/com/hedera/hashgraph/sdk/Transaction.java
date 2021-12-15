@@ -892,7 +892,7 @@ public abstract class Transaction<T extends Transaction<T>>
             if (signers.get(i) == null) {
                 continue;
             }
-            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytes()), thisSigPairList)) {
+            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytesRaw()), thisSigPairList)) {
                 continue;
             }
 

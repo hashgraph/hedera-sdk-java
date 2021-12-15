@@ -221,7 +221,7 @@ public final class AccountInfo {
         }
 
         if (aliasKey != null) {
-            accountInfoBuilder.setAlias(ByteString.copyFrom(aliasKey.toBytes()));
+            accountInfoBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         }
 
         return accountInfoBuilder.build();

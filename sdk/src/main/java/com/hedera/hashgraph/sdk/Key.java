@@ -14,7 +14,7 @@ public abstract class Key {
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519:
-                return new PublicKey(key.getEd25519().toByteArray());
+                return new PublicKeyED25519(key.getEd25519().toByteArray());
 
             case KEYLIST:
                 return KeyList.fromProtobuf(key.getKeyList(), null);

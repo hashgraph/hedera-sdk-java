@@ -17,21 +17,23 @@ import java.util.Arrays;
 /**
  * A public key on the Hedera™ network.
  */
-public final class PublicKey extends Key {
-    private final byte[] keyData;
-
-    PublicKey(byte[] keyData) {
-        this.keyData = keyData;
-    }
-
+public abstract class PublicKey extends Key {
     public static PublicKey fromBytes(byte[] publicKey) {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
             // If this is a 32 byte string, assume an Ed25519 public key
-            return new PublicKey(publicKey);
+            return new PublicKeyED25519(publicKey);
         }
 
         // Assume a DER-encoded private key descriptor
+        return fromBytesDER(publicKey);
+    }
+
+    public static PublicKey fromBytesDER(byte[] publicKey) {
         return PublicKey.fromSubjectKeyInfo(SubjectPublicKeyInfo.getInstance(publicKey));
+    }
+
+    public static PublicKey fromBytesED25519(byte[] publicKey) {
+        return PublicKeyED25519.fromBytesED25519Internal(publicKey);
     }
 
     public static PublicKey fromString(String publicKey) {
@@ -39,7 +41,14 @@ public final class PublicKey extends Key {
     }
 
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        return new PublicKey(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+        // TODO: detect type and switch
+        // TODO: static final AlgorithmIdentifiers?
+        if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
+            return PublicKeyED25519.fromSubjectKeyInfoED25519(subjectPublicKeyInfo);
+        } else {
+            // TODO: assume ECDSA
+            return null;
+        }
     }
 
     @Nullable
@@ -61,9 +70,7 @@ public final class PublicKey extends Key {
      * @param signature The array of bytes representing the signature
      * @return boolean
      */
-    public boolean verify(byte[] message, byte[] signature) {
-        return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
-    }
+    public abstract boolean verify(byte[] message, byte[] signature);
 
     public boolean verifyTransaction(Transaction<?> transaction) {
         if (!transaction.isFrozen()) {
@@ -90,38 +97,17 @@ public final class PublicKey extends Key {
         return true;
     }
 
-    @Override
-    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
-        return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(keyData))
-            .build();
-    }
-
     /**
      * Serialize this key as a SignaturePair protobuf object
      */
-    SignaturePair toSignaturePairProtobuf(byte[] signature) {
-        return SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(keyData))
-            .setEd25519(ByteString.copyFrom(signature))
-            .build();
-    }
+    abstract SignaturePair toSignaturePairProtobuf(byte[] signature);
 
     @Override
-    public byte[] toBytes() {
-        return keyData;
-    }
+    public abstract byte[] toBytes();
 
-    private byte[] toDER() {
-        try {
-            return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
-                keyData
-            ).getEncoded("DER");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public abstract byte[] toBytesDER();
+
+    public abstract byte[] toBytesRaw();
 
     @Override
     public String toString() {
@@ -129,33 +115,14 @@ public final class PublicKey extends Key {
     }
 
     public String toStringDER() {
-        return Hex.toHexString(toDER());
+        return Hex.toHexString(toBytesDER());
     }
 
     public String toStringRaw() {
-        return Hex.toHexString(keyData);
+        return Hex.toHexString(toBytesRaw());
     }
 
     public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
         return new AccountId(shard, realm, 0, null, this);
-    }
-
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        PublicKey publicKey = (PublicKey) o;
-        return Arrays.equals(keyData, publicKey.keyData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(keyData);
     }
 }

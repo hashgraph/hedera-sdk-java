@@ -37,7 +37,10 @@ public abstract class PrivateKey extends Key {
      * @return the new Ed25519 private key.
      */
     public static PrivateKey generate() {
-        // TODO: deprecate
+        return generateED25519();
+    }
+
+    public static PrivateKey generateED25519() {
         return PrivateKeyED25519.generateED25519Internal();
     }
 
@@ -94,6 +97,14 @@ public abstract class PrivateKey extends Key {
         return fromBytes(Hex.decode(privateKey));
     }
 
+    public static PrivateKey fromStringDER(String privateKey) {
+        return fromBytesDER(Hex.decode(privateKey));
+    }
+
+    public static PrivateKey fromStringED25519(String privateKey) {
+        return fromBytesED25519(Hex.decode(privateKey));
+    }
+
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
@@ -102,13 +113,21 @@ public abstract class PrivateKey extends Key {
         }
 
         // Assume a DER-encoded private key descriptor
+        return fromBytesDER(privateKey);
+    }
+
+    public static PrivateKey fromBytesED25519(byte[] privateKey) {
+        return PrivateKeyED25519.fromBytesED25519Internal(privateKey);
+    }
+
+    public static PrivateKey fromBytesDER(byte[] privateKey) {
         return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
     }
 
     private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
         // TODO: detect type and switch
         // TODO: static final AlgorithmIdentifiers?
-        if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(Key.ID_ED25519))) {
+        if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PrivateKeyED25519.fromPrivateKeyInfoED25519(privateKeyInfo);
         } else {
             // TODO: interpret as ECDSA
@@ -252,9 +271,8 @@ public abstract class PrivateKey extends Key {
         return signature;
     }
 
-    public byte[] toBytes() {
-        return toBytesDER();
-    }
+    @Override
+    public abstract byte[] toBytes();
 
     public abstract byte[] toBytesDER();
 

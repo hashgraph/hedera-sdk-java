@@ -140,7 +140,7 @@ class PrivateKeyED25519 extends PrivateKey {
         byte[] publicKeyData = new byte[Ed25519.PUBLIC_KEY_SIZE];
         Ed25519.generatePublicKey(keyData, 0, publicKeyData, 0);
 
-        publicKey = new PublicKey(publicKeyData);
+        publicKey = new PublicKeyED25519(publicKeyData);
         return publicKey;
     }
 
@@ -150,6 +150,11 @@ class PrivateKeyED25519 extends PrivateKey {
         Ed25519.sign(keyData, 0, message, 0, message.length, signature, 0);
 
         return signature;
+    }
+
+    @Override
+    public byte[] toBytes() {
+        return toBytesRaw();
     }
 
     @Override
