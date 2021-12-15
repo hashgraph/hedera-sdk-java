@@ -3,31 +3,22 @@ package com.hedera.hashgraph.sdk;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.digests.KeccakDigest;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
-import org.bouncycastle.crypto.params.ECDomainParameters;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
-import org.bouncycastle.jcajce.provider.digest.Keccak;
-import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.Arrays;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigInteger;
-import java.util.Collections;
 
 public class PrivateKeyECDSA extends PrivateKey {
-    private static final X9ECParameters curve = SECNamedCurves.getByName("secp256k1");
-    private static final ECDomainParameters domain = new ECDomainParameters(curve.getCurve(), curve.getG(), curve.getN(), curve.getH());
 
     private final BigInteger keyData;
 
@@ -37,12 +28,12 @@ public class PrivateKeyECDSA extends PrivateKey {
     }
 
     static PrivateKeyECDSA generateInternal() {
-        ECKeyPairGenerator generator = new ECKeyPairGenerator();
-        ECKeyGenerationParameters keygenParams = new ECKeyGenerationParameters(domain, ThreadLocalSecureRandom.current());
+        var generator = new ECKeyPairGenerator();
+        var keygenParams = new ECKeyGenerationParameters(ECDSA_SECP256K1_DOMAIN, ThreadLocalSecureRandom.current());
         generator.init(keygenParams);
-        AsymmetricCipherKeyPair keypair = generator.generateKeyPair();
-        ECPrivateKeyParameters privParams = (ECPrivateKeyParameters) keypair.getPrivate();
-        ECPublicKeyParameters pubParams = (ECPublicKeyParameters) keypair.getPublic();
+        var keypair = generator.generateKeyPair();
+        var privParams = (ECPrivateKeyParameters) keypair.getPrivate();
+        var pubParams = (ECPublicKeyParameters) keypair.getPublic();
         return new PrivateKeyECDSA(privParams.getD(), new PublicKeyECDSA(pubParams.getQ().getEncoded(true)));
     }
 
@@ -90,20 +81,18 @@ public class PrivateKeyECDSA extends PrivateKey {
             return publicKey;
         }
 
-        var q = domain.getG().multiply(keyData);
-        var publicParams = new ECPublicKeyParameters(q, domain);
+        var q = ECDSA_SECP256K1_DOMAIN.getG().multiply(keyData);
+        var publicParams = new ECPublicKeyParameters(q, ECDSA_SECP256K1_DOMAIN);
         publicKey = new PublicKeyECDSA(publicParams.getQ().getEncoded(true));
         return publicKey;
     }
 
     @Override
     public byte[] sign(byte[] message) {
-        var digest = new Keccak.Digest256();
-        digest.update(message);
-        var hash = digest.digest();
+        var hash = Crypto.calcKeccak256(message);
 
         var signer = new ECDSASigner(new HMacDSAKCalculator(new SHA256Digest()));
-        signer.init(true, new ECPrivateKeyParameters(keyData, domain));
+        signer.init(true, new ECPrivateKeyParameters(keyData, ECDSA_SECP256K1_DOMAIN));
         BigInteger[] bigSig = signer.generateSignature(hash);
 
         byte[] sigBytes = Arrays.copyOf(bigIntTo32Bytes(bigSig[0]), 64);
@@ -120,7 +109,11 @@ public class PrivateKeyECDSA extends PrivateKey {
     private static byte[] bigIntTo32Bytes(BigInteger n) {
         byte[] bytes = n.toByteArray();
         byte[] bytes32 = new byte[32];
-        System.arraycopy(bytes, Math.max(0, bytes.length - 32), bytes32, Math.max(0, 32 - bytes.length), Math.min(32, bytes.length));
+        System.arraycopy(
+            bytes, Math.max(0, bytes.length - 32),
+            bytes32, Math.max(0, 32 - bytes.length),
+            Math.min(32, bytes.length)
+        );
         return bytes32;
     }
 

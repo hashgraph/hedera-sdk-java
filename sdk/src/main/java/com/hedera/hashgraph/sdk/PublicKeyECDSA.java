@@ -4,10 +4,12 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
-import org.bouncycastle.math.ec.rfc8032.Ed25519;
+import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.crypto.signers.ECDSASigner;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class PublicKeyECDSA extends PublicKey {
@@ -18,51 +20,61 @@ public class PublicKeyECDSA extends PublicKey {
         this.keyData = keyData;
     }
 
-    static PublicKeyED25519 fromBytesInternal(byte[] publicKey) {
-        // TODO
-        if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
-            // If this is a 32 byte string, assume an Ed25519 public key
-            return new PublicKeyED25519(publicKey);
+    static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
+        if (publicKey.length == 33) {
+            // compressed 33 byte raw form
+            return new PublicKeyECDSA(publicKey);
+        } else if (publicKey.length == 65) {
+            // compress the 65 byte form
+            return new PublicKeyECDSA(
+                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true)
+            );
         }
 
-        // Assume a DER-encoded private key descriptor
-        return fromSubjectKeyInfoED25519(SubjectPublicKeyInfo.getInstance(publicKey));
+        // Assume a DER-encoded public key descriptor
+        return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 
-    static PublicKeyED25519 fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        // TODO
-        return new PublicKeyED25519(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+    static PublicKeyECDSA fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
+        return new PublicKeyECDSA(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }
 
     @Override
     public boolean verify(byte[] message, byte[] signature) {
-        // TODO
-        return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
+        var hash = Crypto.calcKeccak256(message);
+
+        ECDSASigner signer = new ECDSASigner();
+        signer.init(false, new ECPublicKeyParameters(
+            Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(keyData),
+            Key.ECDSA_SECP256K1_DOMAIN
+        ));
+
+        BigInteger r = new BigInteger(1, Arrays.copyOf(signature, 32));
+        BigInteger s = new BigInteger(1, Arrays.copyOfRange(signature, 32, 64));
+
+        return signer.verifySignature(hash, r, s);
     }
 
     @Override
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
-        // TODO
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(keyData))
+            .setECDSASecp256K1(ByteString.copyFrom(keyData))
             .build();
     }
 
     @Override
     SignaturePair toSignaturePairProtobuf(byte[] signature) {
-        // TODO
         return SignaturePair.newBuilder()
             .setPubKeyPrefix(ByteString.copyFrom(keyData))
-            .setEd25519(ByteString.copyFrom(signature))
+            .setECDSASecp256K1(ByteString.copyFrom(signature))
             .build();
     }
 
     @Override
     public byte[] toBytesDER() {
-        // TODO
         try {
             return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
+                new AlgorithmIdentifier(ID_ECDSA_SECP256K1),
                 keyData
             ).getEncoded("DER");
         } catch (IOException e) {
@@ -77,13 +89,11 @@ public class PublicKeyECDSA extends PublicKey {
 
     @Override
     public byte[] toBytesRaw() {
-        // TODO
         return keyData;
     }
 
     @Override
     public boolean equals(@Nullable Object o) {
-        // TODO
         if (this == o) {
             return true;
         }
@@ -92,13 +102,12 @@ public class PublicKeyECDSA extends PublicKey {
             return false;
         }
 
-        PublicKeyED25519 publicKey = (PublicKeyED25519) o;
+        PublicKeyECDSA publicKey = (PublicKeyECDSA) o;
         return Arrays.equals(keyData, publicKey.keyData);
     }
 
     @Override
     public int hashCode() {
-        // TODO
         return Arrays.hashCode(keyData);
     }
 }

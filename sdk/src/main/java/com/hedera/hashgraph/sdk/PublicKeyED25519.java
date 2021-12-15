@@ -23,7 +23,7 @@ class PublicKeyED25519 extends PublicKey {
             return new PublicKeyED25519(publicKey);
         }
 
-        // Assume a DER-encoded private key descriptor
+        // Assume a DER-encoded public key descriptor
         return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 

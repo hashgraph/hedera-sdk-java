@@ -29,6 +29,8 @@ public abstract class PrivateKey extends Key {
     /**
      * Generates a new <a href="https://ed25519.cr.yp.to/">Ed25519</a> private key.
      *
+     * @deprecated use {@link #generateED25519()} or {@link #generateECDSA()} instead
+     *
      * @return the new Ed25519 private key.
      */
     public static PrivateKey generate() {
@@ -37,6 +39,10 @@ public abstract class PrivateKey extends Key {
 
     public static PrivateKey generateED25519() {
         return PrivateKeyED25519.generateInternal();
+    }
+
+    public static PrivateKey generateECDSA() {
+        return PrivateKeyECDSA.generateInternal();
     }
 
     /**
@@ -100,6 +106,10 @@ public abstract class PrivateKey extends Key {
         return fromBytesED25519(Hex.decode(privateKey));
     }
 
+    public static PrivateKey fromStringECDSA(String privateKey) {
+        return fromBytesECDSA(Hex.decode(privateKey));
+    }
+
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
@@ -115,18 +125,20 @@ public abstract class PrivateKey extends Key {
         return PrivateKeyED25519.fromBytesInternal(privateKey);
     }
 
+    public static PrivateKey fromBytesECDSA(byte[] privateKey) {
+        return PrivateKeyECDSA.fromBytesInternal(privateKey);
+    }
+
     public static PrivateKey fromBytesDER(byte[] privateKey) {
         return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
     }
 
     private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
-        // TODO: detect type and switch
-        // TODO: static final AlgorithmIdentifiers?
         if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PrivateKeyED25519.fromPrivateKeyInfoInternal(privateKeyInfo);
         } else {
-            // TODO: interpret as ECDSA
-            return null;
+            // assume ECDSA
+            return PrivateKeyECDSA.fromPrivateKeyInfoInternal(privateKeyInfo);
         }
     }
 
