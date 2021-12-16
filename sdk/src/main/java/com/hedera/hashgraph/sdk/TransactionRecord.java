@@ -90,6 +90,11 @@ public final class TransactionRecord {
 
     public final List<TransactionRecord> children;
 
+    public final List<TransactionRecord> duplicates;
+
+    @Nullable
+    public final Instant parentConsensusTimestamp;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -105,7 +110,9 @@ public final class TransactionRecord {
         List<AssessedCustomFee> assessedCustomFees,
         List<TokenAssociation> automaticTokenAssociations,
         @Nullable PublicKey aliasKey,
-        List<TransactionRecord> children
+        List<TransactionRecord> children,
+        List<TransactionRecord> duplicates,
+        @Nullable Instant parentConsensusTimestamp
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -122,11 +129,14 @@ public final class TransactionRecord {
         this.automaticTokenAssociations = automaticTokenAssociations;
         this.aliasKey = aliasKey;
         this.children = children;
+        this.duplicates = duplicates;
+        this.parentConsensusTimestamp = parentConsensusTimestamp;
     }
 
     static TransactionRecord fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
-        List<TransactionRecord> children
+        List<TransactionRecord> children,
+        List<TransactionRecord> duplicates
     ) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
@@ -185,12 +195,15 @@ public final class TransactionRecord {
             fees,
             automaticTokenAssociations,
             aliasKey,
-            children
+            children,
+            duplicates,
+            transactionRecord.hasParentConsensusTimestamp() ?
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
         );
     }
 
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
-        return fromProtobuf(transactionRecord, new ArrayList<>());
+        return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
     }
 
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -245,6 +258,10 @@ public final class TransactionRecord {
             transactionRecord.setAlias(aliasKey.toProtobufKey().toByteString());
         }
 
+        if (parentConsensusTimestamp != null) {
+            transactionRecord.setParentConsensusTimestamp(InstantConverter.toProtobuf(parentConsensusTimestamp));
+        }
+
         return transactionRecord.build();
     }
 
@@ -266,6 +283,8 @@ public final class TransactionRecord {
             .add("automaticTokenAssociations", automaticTokenAssociations)
             .add("aliasKey", aliasKey)
             .add("children", children)
+            .add("duplicates", duplicates)
+            .add("parentConsensusTimestamp", parentConsensusTimestamp)
             .toString();
     }
 

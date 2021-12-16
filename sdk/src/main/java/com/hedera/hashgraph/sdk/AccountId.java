@@ -86,7 +86,7 @@ public final class AccountId implements Comparable<AccountId> {
                     Long.parseLong(match.group(2)),
                     0,
                     null,
-                    PublicKey.fromString(match.group(3))
+                    PublicKey.fromStringDER(match.group(3))
                 );
             }
         }

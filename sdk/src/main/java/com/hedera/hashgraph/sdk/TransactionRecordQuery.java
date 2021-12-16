@@ -26,6 +26,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Nullable
     private TransactionId transactionId = null;
     private boolean includeChildren = false;
+    private boolean includeDuplicates = false;
 
     public TransactionRecordQuery() {
     }
@@ -48,6 +49,15 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         return this;
     }
 
+    public boolean getIncludeDuplicates() {
+        return includeDuplicates;
+    }
+
+    public TransactionRecordQuery setIncludeDuplicates(boolean value) {
+        includeDuplicates = value;
+        return this;
+    }
+
     public boolean getIncludeChildren() {
         return includeChildren;
     }
@@ -67,7 +77,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         var builder = TransactionGetRecordQuery.newBuilder()
-            .setIncludeChildRecords(includeChildren);
+            .setIncludeChildRecords(includeChildren)
+            .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -89,7 +100,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         var recordResponse = response.getTransactionGetRecord();
         List<TransactionRecord> children = mapRecordList(recordResponse.getChildTransactionRecordsList());
-        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children);
+        List<TransactionRecord> duplicates = mapRecordList(recordResponse.getDuplicateTransactionRecordsList());
+        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children, duplicates);
     }
 
     private List<TransactionRecord> mapRecordList(
