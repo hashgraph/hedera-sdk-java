@@ -53,6 +53,13 @@ public final class TransactionReceiptQuery
         return includeChildren;
     }
 
+    /**
+     * Whether the response should include the records of any child transactions spawned by the
+     * top-level transaction with the given transactionID.
+     *
+     * @param value The value that includeChildren should be set to; true to include children, false to exclude
+     * @return {@code this}
+     */
     public TransactionReceiptQuery setIncludeChildren(boolean value) {
         includeChildren = value;
         return this;
@@ -62,6 +69,16 @@ public final class TransactionReceiptQuery
         return includeDuplicates;
     }
 
+    /**
+     * Whether records of processing duplicate transactions should be returned along with the record
+     * of processing the first consensus transaction with the given id whose status was neither
+     * INVALID_NODE_ACCOUNT nor INVALID_PAYER_SIGNATURE or, if no such
+     * record exists, the record of processing the first transaction to reach consensus with the
+     * given transaction id.
+     *
+     * @param value The value that includeDuplicates should be set to; true to include duplicates, false to exclude
+     * @return {@code this}
+     */
     public TransactionReceiptQuery setIncludeDuplicates(boolean value) {
         includeDuplicates = value;
         return this;
