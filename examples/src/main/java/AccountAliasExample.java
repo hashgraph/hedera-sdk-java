@@ -27,8 +27,6 @@ public class AccountAliasExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final Scanner INPUT_SCANNER = new Scanner(System.in, Charset.defaultCharset().name());
-
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         Client client = Client.forName(HEDERA_NETWORK);
 
@@ -61,7 +59,7 @@ public class AccountAliasExample {
 
         System.out.println("\"Creating\" a new account");
 
-        PrivateKey privateKey = PrivateKey.generate();
+        PrivateKey privateKey = PrivateKey.generateED25519();
         PublicKey publicKey = privateKey.getPublicKey();
 
         // Assuming that the target shard and realm are known.

@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `[TransactionReceiptQuery|TransactionRecordQuery].[set|get]IncludeChildren()`
  * `TransactionReceiptQuery.[set|get]IncludeDuplicates()`
  * New response codes.
+ * Support for ECDSA SecP256K1 keys.
+ * `PrivateKey.generate[ED25519|ECDSA]()`
+ * `[Private|Public]Key.from[Bytes|String][DER|ED25519|ECDSA]()`
+ * `[Private|Public]Key.to[Bytes|String][Raw|DER]()`
+
+### Deprecated
+
+ * `PrivateKey.generate()`, use `PrivateKey.generate[ED25519|ECDSA]()` instead.
 
 ## v2.5.0
 

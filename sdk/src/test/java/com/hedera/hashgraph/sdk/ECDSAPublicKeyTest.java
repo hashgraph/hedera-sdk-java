@@ -9,14 +9,11 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class Ed25519PublicKeyTest {
-    private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
-    private static final String TEST_KEY_STR_RAW = "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
-
+public class ECDSAPublicKeyTest {
     @Test
     @DisplayName("public key can be recovered from bytes")
     void keyByteSerialization() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         byte[] key1Bytes = key1.toBytes();
         PublicKey key2 = PublicKey.fromBytes(key1Bytes);
         byte[] key2Bytes = key2.toBytes();
@@ -27,21 +24,20 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("public key can be recovered from raw bytes")
     void keyByteSerialization2() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         byte[] key1Bytes = key1.toBytesRaw();
-        PublicKey key2 = PublicKey.fromBytesED25519(key1Bytes);
+        PublicKey key2 = PublicKey.fromBytesECDSA(key1Bytes);
         byte[] key2Bytes = key2.toBytesRaw();
-        PublicKey key3 = PublicKey.fromBytes(key1Bytes);
-        byte[] key3Bytes = key3.toBytesRaw();
+        // cannot use PrivateKey.fromBytes() to parse raw ECDSA bytes
+        // because they're indistinguishable from ED25519 raw bytes
 
         assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
     }
 
     @Test
     @DisplayName("public key can be recovered from DER bytes")
     void keyByteSerialization3() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         byte[] key1Bytes = key1.toBytesDER();
         PublicKey key2 = PublicKey.fromBytesDER(key1Bytes);
         byte[] key2Bytes = key2.toBytesDER();
@@ -55,14 +51,14 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("public key can be recovered from string")
     void keyStringSerialization() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         String key1Str = key1.toString();
         PublicKey key2 = PublicKey.fromString(key1Str);
         String key2Str = key2.toString();
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toString();
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
+        assertEquals(PublicKeyECDSA.class, key3.getClass());
         assertEquals(key1Str, key2Str);
         assertEquals(key1Str, key3Str);
     }
@@ -70,14 +66,16 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("public key can be recovered from raw string")
     void keyStringSerialization2() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         String key1Str = key1.toStringRaw();
-        PublicKey key2 = PublicKey.fromStringED25519(key1Str);
+        PublicKey key2 = PublicKey.fromStringECDSA(key1Str);
         String key2Str = key2.toStringRaw();
-        PublicKey key3 = PublicKey.fromString(key1Str);
+        PublicKey key3 = PublicKey.fromStringECDSA(key2Str);
         String key3Str = key3.toStringRaw();
+        // cannot use PublicKey.fromString() to parse raw ECDSA string
+        // because it's indistinguishable from ED25519 raw bytes
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
+        assertEquals(PublicKeyECDSA.class, key3.getClass());
         assertEquals(key1Str, key2Str);
         assertEquals(key1Str, key3Str);
     }
@@ -85,41 +83,15 @@ class Ed25519PublicKeyTest {
     @Test
     @DisplayName("public key can be recovered from DER string")
     void keyStringSerialization3() {
-        PublicKey key1 = PrivateKey.generateED25519().getPublicKey();
+        PublicKey key1 = PrivateKey.generateECDSA().getPublicKey();
         String key1Str = key1.toStringDER();
         PublicKey key2 = PublicKey.fromStringDER(key1Str);
         String key2Str = key2.toStringDER();
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toStringDER();
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
+        assertEquals(PublicKeyECDSA.class, key3.getClass());
         assertEquals(key1Str, key2Str);
         assertEquals(key1Str, key3Str);
-    }
-
-    @ParameterizedTest
-    @DisplayName("public key can be recovered from external string")
-    @ValueSource(strings = {
-        // ASN1 encoded hex
-        "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
-        // raw hex
-        "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
-    })
-    void externalKeyDeserialize(String keyStr) {
-        PublicKey key = PublicKey.fromString(keyStr);
-        assertNotNull(key);
-        // the above are all the same key
-        assertEquals(TEST_KEY_STR, key.toString());
-        assertEquals(TEST_KEY_STR, key.toStringDER());
-        assertEquals(TEST_KEY_STR_RAW, key.toStringRaw());
-    }
-
-    @Test
-    @DisplayName("public key can be encoded to a string")
-    void keyToString() {
-        PublicKey key = PublicKey.fromString(TEST_KEY_STR);
-
-        assertNotNull(key);
-        assertEquals(TEST_KEY_STR, key.toString());
     }
 }

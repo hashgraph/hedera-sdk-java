@@ -24,7 +24,7 @@ class AccountCreateIntegrationTest {
     void canCreateAccountWithOnlyInitialBalanceAndKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -53,7 +53,7 @@ class AccountCreateIntegrationTest {
     void canCreateAccountWithNoInitialBalance() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -99,7 +99,7 @@ class AccountCreateIntegrationTest {
     void canCreateWithAliasKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var aliasId = key.toAccountId(0, 0);
 

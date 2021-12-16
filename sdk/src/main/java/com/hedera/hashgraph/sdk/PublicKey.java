@@ -34,18 +34,32 @@ public abstract class PublicKey extends Key {
         return PublicKeyED25519.fromBytesInternal(publicKey);
     }
 
+    public static PublicKey fromBytesECDSA(byte[] publicKey) {
+        return PublicKeyECDSA.fromBytesInternal(publicKey);
+    }
+
     public static PublicKey fromString(String publicKey) {
         return PublicKey.fromBytes(Hex.decode(publicKey));
     }
 
+    public static PublicKey fromStringED25519(String publicKey) {
+        return fromBytesED25519(Hex.decode(publicKey));
+    }
+
+    public static PublicKey fromStringECDSA(String publicKey) {
+        return fromBytesECDSA(Hex.decode(publicKey));
+    }
+
+    public static PublicKey fromStringDER(String publicKey) {
+        return fromBytesDER(Hex.decode(publicKey));
+    }
+
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        // TODO: detect type and switch
-        // TODO: static final AlgorithmIdentifiers?
         if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PublicKeyED25519.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
         } else {
-            // TODO: assume ECDSA
-            return null;
+            // assume ECDSA
+            return PublicKeyECDSA.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
         }
     }
 

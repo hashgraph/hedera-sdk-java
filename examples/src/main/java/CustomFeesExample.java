@@ -49,7 +49,7 @@ public final class CustomFeesExample {
         // Create three accounts, Alice, Bob, and Charlie.  Alice will be the treasury for our example token.
         // Fees only apply in transactions not involving the treasury, so we need two other accounts.
 
-        PrivateKey aliceKey = PrivateKey.generate();
+        PrivateKey aliceKey = PrivateKey.generateED25519();
         AccountId aliceId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
             .setKey(aliceKey)
@@ -59,7 +59,7 @@ public final class CustomFeesExample {
             .getReceipt(client)
             .accountId;
 
-        PrivateKey bobKey = PrivateKey.generate();
+        PrivateKey bobKey = PrivateKey.generateED25519();
         AccountId bobId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
             .setKey(bobKey)
@@ -69,7 +69,7 @@ public final class CustomFeesExample {
             .getReceipt(client)
             .accountId;
 
-        PrivateKey charlieKey = PrivateKey.generate();
+        PrivateKey charlieKey = PrivateKey.generateED25519();
         AccountId charlieId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
             .setKey(charlieKey)

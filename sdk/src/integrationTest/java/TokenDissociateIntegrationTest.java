@@ -22,7 +22,7 @@ class TokenDissociateIntegrationTest {
     void canAssociateAccountWithToken() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -73,7 +73,7 @@ class TokenDissociateIntegrationTest {
     void canExecuteTokenDissociateTransactionEvenWhenTokenIDsAreNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -97,7 +97,7 @@ class TokenDissociateIntegrationTest {
     void cannotDissociateAccountWithTokensWhenAccountIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -124,7 +124,7 @@ class TokenDissociateIntegrationTest {
     void cannotDissociateAccountWhenAccountDoesNotSignTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -169,7 +169,7 @@ class TokenDissociateIntegrationTest {
     void cannotDissociateAccountFromTokenWhenAccountWasNotAssociatedWith() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
