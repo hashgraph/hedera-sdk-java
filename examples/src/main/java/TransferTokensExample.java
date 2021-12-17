@@ -39,8 +39,8 @@ public final class TransferTokensExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
+        PrivateKey key1 = PrivateKey.generateED25519();
+        PrivateKey key2 = PrivateKey.generateED25519();
 
         System.out.println("private key = " + key1);
         System.out.println("public key = " + key1.getPublicKey());

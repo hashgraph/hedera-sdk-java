@@ -170,7 +170,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var error = assertThrows(ReceiptStatusException.class, () -> {
             new TokenCreateTransaction()

@@ -66,7 +66,7 @@ public final class ScheduledTransferExample {
          * executed immediately.
          */
 
-        PrivateKey bobsKey = PrivateKey.generate();
+        PrivateKey bobsKey = PrivateKey.generateED25519();
         AccountId bobsId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setKey(bobsKey)

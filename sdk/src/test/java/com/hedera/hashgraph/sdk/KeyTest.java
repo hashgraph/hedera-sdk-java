@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.Key;
 import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.ThresholdKey;
@@ -25,12 +26,26 @@ class KeyTest {
     @DisplayName("can sign and verify a message")
     void signatureVerified() {
         var message = "Hello, World".getBytes(UTF_8);
-        var privateKey = PrivateKey.generate();
+        var privateKey = PrivateKey.generateED25519();
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
 
         assertEquals(64, signature.length);
         assertTrue(publicKey.verify(message, signature));
+    }
+
+    @Test
+    @DisplayName("can sign and verify a message with ECDSA")
+    void signatureVerifiedECDSA() {
+        var message = "Hello, World".getBytes(UTF_8);
+        var privateKey = PrivateKey.generateECDSA();
+        var publicKey = privateKey.getPublicKey();
+        var signature = privateKey.sign(message);
+        assertEquals(64, signature.length);
+        assertTrue(publicKey.verify(message, signature));
+        // muck with the signature a little and make sure it breaks
+        signature[5] += 1;
+        assertFalse(publicKey.verify(message, signature));
     }
 
     @Test
@@ -41,8 +56,20 @@ class KeyTest {
 
         var cut = PublicKey.fromProtobufKey(protoKey);
 
-        assertEquals(PublicKey.class, cut.getClass());
+        assertEquals(PublicKeyED25519.class, cut.getClass());
         assertArrayEquals(keyBytes, ((PublicKey) cut).toBytes());
+    }
+
+    @Test
+    @DisplayName("can convert from protobuf ECDSA key to PublicKey")
+    void fromProtoKeyECDSA() throws InvalidProtocolBufferException {
+        var keyProtobufBytes = Hex.decode("3a21034e0441201f2bf9c7d9873c2a9dc3fd451f64b7c05e17e4d781d916e3a11dfd99");
+        var protoKey = Key.parseFrom(keyProtobufBytes);
+
+        var cut = PublicKey.fromProtobufKey(protoKey);
+
+        assertEquals(PublicKeyECDSA.class, cut.getClass());
+        assertArrayEquals(keyProtobufBytes, ((PublicKey) cut).toProtobufKey().toByteArray());
     }
 
     @Test
