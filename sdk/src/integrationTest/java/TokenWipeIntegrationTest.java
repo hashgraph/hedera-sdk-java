@@ -26,7 +26,7 @@ class TokenWipeIntegrationTest {
     void canWipeAccountsBalance() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -89,7 +89,7 @@ class TokenWipeIntegrationTest {
     void canWipeAccountsNfts() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -158,7 +158,7 @@ class TokenWipeIntegrationTest {
     void cannotWipeAccountsNftsIfNotOwned() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -226,7 +226,7 @@ class TokenWipeIntegrationTest {
     void cannotWipeAccountsBalanceWhenAccountIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -291,7 +291,7 @@ class TokenWipeIntegrationTest {
     void cannotWipeAccountsBalanceWhenTokenIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -356,7 +356,7 @@ class TokenWipeIntegrationTest {
     void cannotWipeAccountsBalanceWhenAmountIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)

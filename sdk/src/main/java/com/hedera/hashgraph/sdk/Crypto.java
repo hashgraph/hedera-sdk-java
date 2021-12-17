@@ -5,6 +5,7 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
 
 import javax.annotation.Nullable;
 import javax.crypto.BadPaddingException;
@@ -132,6 +133,12 @@ final class Crypto {
         hmacSha384.doFinal(output, 0);
 
         return output;
+    }
+
+    static byte[] calcKeccak256(byte[] message) {
+        var digest = new Keccak.Digest256();
+        digest.update(message);
+        return digest.digest();
     }
 
     static byte[] randomBytes(int len) {

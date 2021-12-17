@@ -126,6 +126,7 @@ public final class ScheduleInfo {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("scheduleId", scheduleId)
+            .add("scheduledTransactionId", scheduledTransactionId)
             .add("creatorAccountId", creatorAccountId)
             .add("payerAccountId", payerAccountId)
             .add("signatories", signatories)

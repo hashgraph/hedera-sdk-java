@@ -33,7 +33,7 @@ public final class CreateAccountExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey newKey = PrivateKey.generate();
+        PrivateKey newKey = PrivateKey.generateED25519();
         PublicKey newPublicKey = newKey.getPublicKey();
 
         System.out.println("private key = " + newKey);

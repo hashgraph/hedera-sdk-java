@@ -1224,7 +1224,24 @@ public enum Status {
      * Consensus throttle did not allow execution of this transaction. System is throttled at
      * consensus level.
      */
-    CONSENSUS_GAS_EXHAUSTED(ResponseCodeEnum.CONSENSUS_GAS_EXHAUSTED);
+    CONSENSUS_GAS_EXHAUSTED(ResponseCodeEnum.CONSENSUS_GAS_EXHAUSTED),
+
+    /**
+     * A precompiled contract succeeded, but was later reverted.
+     */
+    REVERTED_SUCCESS(ResponseCodeEnum.REVERTED_SUCCESS),
+
+    /**
+     * All contract storage allocated to the current price regime has been consumed.
+     */
+    MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED(ResponseCodeEnum.MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED),
+
+    /**
+     * An alias used in a CryptoTransfer transaction is not the serialization of a primitive Key
+     * message--that is, a Key with a single Ed25519 or ECDSA(secp256k1) public key and no
+     * unknown protobuf fields.
+     */
+    INVALID_ALIAS_KEY(ResponseCodeEnum.INVALID_ALIAS_KEY);
 
     final ResponseCodeEnum code;
 
@@ -1710,6 +1727,12 @@ public enum Status {
                 return UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED;
             case CONSENSUS_GAS_EXHAUSTED:
                 return CONSENSUS_GAS_EXHAUSTED;
+            case REVERTED_SUCCESS:
+                return REVERTED_SUCCESS;
+            case MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED:
+                return MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED;
+            case INVALID_ALIAS_KEY:
+                return INVALID_ALIAS_KEY;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

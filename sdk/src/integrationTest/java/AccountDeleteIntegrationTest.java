@@ -24,7 +24,7 @@ class AccountDeleteIntegrationTest {
     void canDeleteAccount() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -70,7 +70,7 @@ class AccountDeleteIntegrationTest {
     void cannotDeleteAccountThatHasNotSignedTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)

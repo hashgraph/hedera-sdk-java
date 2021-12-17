@@ -4,6 +4,8 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TransferTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -22,7 +24,7 @@ class AccountCreateIntegrationTest {
     void canCreateAccountWithOnlyInitialBalanceAndKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -51,7 +53,7 @@ class AccountCreateIntegrationTest {
     void canCreateAccountWithNoInitialBalance() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -89,5 +91,30 @@ class AccountCreateIntegrationTest {
         assertTrue(error.getMessage().contains(Status.KEY_REQUIRED.toString()));
 
         testEnv.close();
+    }
+
+    @Test
+    @Disabled
+    @DisplayName("Can create account using aliasKey")
+    void canCreateWithAliasKey() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var key = PrivateKey.generateED25519();
+
+        var aliasId = key.toAccountId(0, 0);
+
+        new TransferTransaction()
+            .addHbarTransfer(testEnv.operatorId, new Hbar(10).negated())
+            .addHbarTransfer(aliasId, new Hbar(10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var info = new AccountInfoQuery()
+            .setAccountId(aliasId)
+            .execute(testEnv.client);
+
+        assertEquals(key.getPublicKey(), info.aliasKey);
+
+        testEnv.close(aliasId, key);
     }
 }

@@ -451,7 +451,7 @@ public abstract class Transaction<T extends Transaction<T>>
             .setScheduledTransactionBody(schedulable.build());
 
         if (!transactionIds.isEmpty()) {
-            scheduled.setTransactionId(transactionIds.get(0).setScheduled(true));
+            scheduled.setTransactionId(transactionIds.get(0));
         }
 
         return scheduled;
@@ -892,7 +892,7 @@ public abstract class Transaction<T extends Transaction<T>>
             if (signers.get(i) == null) {
                 continue;
             }
-            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytes()), thisSigPairList)) {
+            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytesRaw()), thisSigPairList)) {
                 continue;
             }
 

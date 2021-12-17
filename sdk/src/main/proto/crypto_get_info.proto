@@ -157,6 +157,11 @@ message CryptoGetInfoResponse {
          * The maximum number of tokens that an Account can be implicitly associated with.
          */
         int32 max_automatic_token_associations = 18;
+
+        /**
+         * The alias of this account
+         */
+        bytes alias = 19;
     }
 
     /**

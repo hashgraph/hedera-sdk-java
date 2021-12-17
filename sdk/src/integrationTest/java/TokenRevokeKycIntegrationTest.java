@@ -22,7 +22,7 @@ class TokenRevokeKycIntegrationTest {
     void canRevokeKycAccountWithToken() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -73,7 +73,7 @@ class TokenRevokeKycIntegrationTest {
     void cannotRevokeKycToAccountOnTokenWhenTokenIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -101,7 +101,7 @@ class TokenRevokeKycIntegrationTest {
     void cannotRevokeKycToAccountOnTokenWhenAccountIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -138,7 +138,7 @@ class TokenRevokeKycIntegrationTest {
     void cannotRevokeKycToAccountOnTokenWhenAccountWasNotAssociatedWith() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)

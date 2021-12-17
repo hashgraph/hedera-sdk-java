@@ -177,7 +177,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
 
         var list = TransferList.newBuilder();
-        for (var entry : hbarTransfers.entrySet()) {
+        for (var entry : hbarTransferList) {
             list.addAccountAmounts(AccountAmount.newBuilder()
                 .setAccountID(entry.getKey().toProtobuf())
                 .setAmount(entry.getValue().toTinybars())
