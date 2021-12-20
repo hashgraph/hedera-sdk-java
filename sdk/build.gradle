@@ -41,7 +41,7 @@ dependencies {
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
 	implementation "io.grpc:grpc-core:1.42.1"
-	implementation "io.grpc:grpc-protobuf-lite:1.42.1"
+	implementation "io.grpc:grpc-protobuf-lite:1.43.0"
 	implementation "io.grpc:grpc-stub:1.42.1"
 
 	testCompile "org.assertj:assertj-core:3.21.0"
