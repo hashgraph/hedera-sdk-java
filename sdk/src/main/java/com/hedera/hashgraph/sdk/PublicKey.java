@@ -91,10 +91,17 @@ public abstract class PublicKey extends Key {
             transaction.freeze();
         }
 
+        for (var publicKey : transaction.publicKeys) {
+            if (publicKey.equals(this)) {
+                return true;
+            }
+        }
+
         for (var signedTransaction : transaction.innerSignedTransactions) {
             @Var var found = false;
+
             for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
-                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
+                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytesRaw()))) {
                     found = true;
 
                     if (!verify(signedTransaction.getBodyBytes().toByteArray(), extractSignatureFromProtobuf(sigPair).toByteArray())) {
