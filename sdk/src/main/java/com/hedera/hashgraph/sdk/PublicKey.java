@@ -84,6 +84,8 @@ public abstract class PublicKey extends Key {
      */
     public abstract boolean verify(byte[] message, byte[] signature);
 
+    abstract ByteString extractSignatureFromProtobuf(SignaturePair pair);
+
     public boolean verifyTransaction(Transaction<?> transaction) {
         if (!transaction.isFrozen()) {
             transaction.freeze();
@@ -95,7 +97,7 @@ public abstract class PublicKey extends Key {
                 if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
                     found = true;
 
-                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getEd25519().toByteArray())) {
+                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), extractSignatureFromProtobuf(sigPair).toByteArray())) {
                         return false;
                     }
                 }

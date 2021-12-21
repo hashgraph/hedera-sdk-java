@@ -40,6 +40,11 @@ public class PublicKeyECDSA extends PublicKey {
     }
 
     @Override
+    ByteString extractSignatureFromProtobuf(SignaturePair pair) {
+        return pair.getECDSA384();
+    }
+
+    @Override
     public boolean verify(byte[] message, byte[] signature) {
         var hash = Crypto.calcKeccak256(message);
 

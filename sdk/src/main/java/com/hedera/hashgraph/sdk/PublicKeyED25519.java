@@ -32,6 +32,11 @@ class PublicKeyED25519 extends PublicKey {
     }
 
     @Override
+    ByteString extractSignatureFromProtobuf(SignaturePair pair) {
+        return pair.getEd25519();
+    }
+
+    @Override
     public boolean verify(byte[] message, byte[] signature) {
         return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
     }
