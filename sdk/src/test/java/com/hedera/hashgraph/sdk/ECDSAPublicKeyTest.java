@@ -1,15 +1,31 @@
 package com.hedera.hashgraph.sdk;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ECDSAPublicKeyTest {
+    @Test
+    void verifyTransaction() {
+        var transaction = new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                .setTransactionId(TransactionId.generate(new AccountId(4)))
+                .freeze();
+
+        var key = PrivateKey.fromStringECDSA("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
+        key.signTransaction(transaction);
+
+        Assertions.assertTrue(key.getPublicKey().verifyTransaction(transaction));
+    }
+
     @Test
     @DisplayName("public key can be recovered from bytes")
     void keyByteSerialization() {

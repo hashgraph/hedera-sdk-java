@@ -1,9 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,6 +15,19 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
     private static final String TEST_KEY_STR_RAW = "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
+
+    @Test
+    void verifyTransaction() {
+        var transaction = new TransferTransaction()
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                .setTransactionId(TransactionId.generate(new AccountId(4)))
+                .freeze();
+
+        var key = PrivateKey.fromStringED25519("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
+        key.signTransaction(transaction);
+
+        Assertions.assertTrue(key.getPublicKey().verifyTransaction(transaction));
+    }
 
     @Test
     @DisplayName("public key can be recovered from bytes")
