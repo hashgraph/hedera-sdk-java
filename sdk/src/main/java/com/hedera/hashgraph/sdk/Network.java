@@ -255,7 +255,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     @Override
-    Network setLedgerId(@Nullable LedgerId ledgerId) {
+    synchronized Network setLedgerId(@Nullable LedgerId ledgerId) {
         super.setLedgerId(ledgerId);
 
         addressBook = (ledgerId == null || !ledgerId.isKnownNetwork()) ? null : readAddressBookResource("addressbook/" + ledgerId + ".pb");
