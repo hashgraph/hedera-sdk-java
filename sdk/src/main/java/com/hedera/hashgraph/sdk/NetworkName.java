@@ -9,7 +9,7 @@ public enum NetworkName {
     @Deprecated
     PREVIEWNET(2),
     @Deprecated
-    OTHER(3);
+    OTHER(Integer.MAX_VALUE);
 
     final int id;
 

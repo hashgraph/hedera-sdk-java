@@ -65,6 +65,10 @@ public class LedgerId {
         return this.equals(PREVIEWNET);
     }
 
+    boolean isKnownNetwork() {
+        return isMainnet() || isTestnet() || isPreviewnet();
+    }
+
     public String toString() {
         if (isMainnet()) {
             return "mainnet";
