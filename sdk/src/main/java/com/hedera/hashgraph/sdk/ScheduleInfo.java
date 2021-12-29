@@ -28,6 +28,7 @@ public final class ScheduleInfo {
     @Nullable
     public final Instant deletedAt;
     final SchedulableTransactionBody transactionBody;
+    final LedgerId ledgerId;
 
     private ScheduleInfo(
         ScheduleId scheduleId,
@@ -40,7 +41,8 @@ public final class ScheduleInfo {
         String memo,
         @Nullable Instant expirationTime,
         @Nullable Instant executed,
-        @Nullable Instant deleted
+        @Nullable Instant deleted,
+        LedgerId ledgerId
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -53,6 +55,7 @@ public final class ScheduleInfo {
         this.expirationTime = expirationTime;
         this.executedAt = executed;
         this.deletedAt = deleted;
+        this.ledgerId = ledgerId;
     }
 
     static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo) {
@@ -77,7 +80,8 @@ public final class ScheduleInfo {
             info.getMemo(),
             info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null,
             info.hasExecutionTime() ? InstantConverter.fromProtobuf(info.getExecutionTime()) : null,
-            info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null
+            info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null,
+            LedgerId.fromByteString(info.getLedgerId())
         );
     }
 
@@ -115,6 +119,7 @@ public final class ScheduleInfo {
             .setPayerAccountID(payerAccountId.toProtobuf())
             .setSigners(signatories.toProtobuf())
             .setMemo(memo)
+            .setLedgerId(ledgerId.toByteString())
             .build();
     }
 
@@ -135,6 +140,7 @@ public final class ScheduleInfo {
             .add("memo", memo)
             .add("executedAt", executedAt)
             .add("deletedAt", deletedAt)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

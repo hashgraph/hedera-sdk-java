@@ -1,15 +1,15 @@
 com.hedera.hashgraph.sdk.FileInfoTest.fromBytes=[
-  "FileInfo{fileId=0.0.1, size=2, expirationTime=1970-01-01T00:00:00.003Z, isDeleted=true, keys=KeyList{threshold=null, keys=[302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7]}, fileMemo=}"
+  "FileInfo{fileId=0.0.1, size=2, expirationTime=1970-01-01T00:00:00.003Z, isDeleted=true, keys=KeyList{threshold=null, keys=[302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7]}, fileMemo=, ledgerId=mainnet}"
 ]
 
 
 com.hedera.hashgraph.sdk.FileInfoTest.fromProtobuf=[
-  "FileInfo{fileId=0.0.1, size=2, expirationTime=1970-01-01T00:00:00.003Z, isDeleted=true, keys=KeyList{threshold=null, keys=[302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7]}, fileMemo=}"
+  "FileInfo{fileId=0.0.1, size=2, expirationTime=1970-01-01T00:00:00.003Z, isDeleted=true, keys=KeyList{threshold=null, keys=[302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7]}, fileMemo=, ledgerId=mainnet}"
 ]
 
 
 com.hedera.hashgraph.sdk.FileInfoTest.toBytes=[
-  "0a02180110021a0510c08db70120012a240a221220e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7"
+  "0a02180110021a0510c08db70120012a240a221220e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b73a0100"
 ]
 
 
@@ -91,9 +91,9 @@ com.hedera.hashgraph.sdk.FileInfoTest.toProtobuf=[
     "memo_": "",
     "ledgerId_": {
       "hash": 0,
-      "bytes": "",
+      "bytes": "AA==",
       "validUtf8": true,
-      "empty": true
+      "empty": false
     },
     "initialized": true
   }

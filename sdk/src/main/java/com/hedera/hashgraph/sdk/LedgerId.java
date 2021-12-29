@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
@@ -32,6 +33,10 @@ public class LedgerId {
 
     public static LedgerId fromBytes(byte[] bytes) {
         return new LedgerId(bytes);
+    }
+
+    static LedgerId fromByteString(ByteString byteString) {
+        return fromBytes(byteString.toByteArray());
     }
 
     @Deprecated
@@ -74,6 +79,10 @@ public class LedgerId {
 
     public byte[] toBytes() {
         return idBytes;
+    }
+
+    ByteString toByteString() {
+        return ByteString.copyFrom(idBytes);
     }
 
     @Deprecated
