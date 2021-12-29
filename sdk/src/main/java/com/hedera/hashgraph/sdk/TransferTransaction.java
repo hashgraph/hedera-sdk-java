@@ -199,6 +199,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             var listBuilder = TokenTransferList.newBuilder()
                 .setToken(list.tokenId.toProtobuf());
 
+            if (list.expectedDecimals != null) {
+                listBuilder.setExpectedDecimals(list.expectedDecimals);
+            }
+
             for (var transfer : list.transfers) {
                 listBuilder.addTransfers(AccountAmount.newBuilder()
                     .setAccountID(transfer.getKey().toProtobuf())
