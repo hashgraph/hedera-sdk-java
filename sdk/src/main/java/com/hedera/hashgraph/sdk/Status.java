@@ -1241,7 +1241,13 @@ public enum Status {
      * message--that is, a Key with a single Ed25519 or ECDSA(secp256k1) public key and no
      * unknown protobuf fields.
      */
-    INVALID_ALIAS_KEY(ResponseCodeEnum.INVALID_ALIAS_KEY);
+    INVALID_ALIAS_KEY(ResponseCodeEnum.INVALID_ALIAS_KEY),
+
+    /**
+     * A fungible token transfer expected a different number of decimals than the involved
+     * type actually has.
+     */
+    UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS);
 
     final ResponseCodeEnum code;
 
@@ -1733,6 +1739,8 @@ public enum Status {
                 return MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED;
             case INVALID_ALIAS_KEY:
                 return INVALID_ALIAS_KEY;
+            case UNEXPECTED_TOKEN_DECIMALS:
+                return UNEXPECTED_TOKEN_DECIMALS;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
