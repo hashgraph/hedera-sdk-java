@@ -1,9 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
+@Deprecated
 public enum NetworkName {
+    @Deprecated
     MAINNET(0),
+    @Deprecated
     TESTNET(1),
-    PREVIEWNET(2);
+    @Deprecated
+    PREVIEWNET(2),
+    @Deprecated
+    OTHER(3);
 
     final int id;
 

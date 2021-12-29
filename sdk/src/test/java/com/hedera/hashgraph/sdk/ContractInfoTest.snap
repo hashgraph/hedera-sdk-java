@@ -88,6 +88,12 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
     "balance_": 8,
     "deleted_": false,
     "tokenRelationships_": [ ],
+    "ledgerId_": {
+      "hash": 0,
+      "bytes": "",
+      "validUtf8": true,
+      "empty": true
+    },
     "initialized": true
   }
 ]

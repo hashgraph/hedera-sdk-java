@@ -138,6 +138,12 @@ com.hedera.hashgraph.sdk.TopicInfoTest.toProtobuf=[
         "realmNum_": 0,
         "initialized": true
       },
+      "ledgerId_": {
+        "hash": 0,
+        "bytes": "",
+        "validUtf8": true,
+        "empty": true
+      },
       "initialized": true
     },
     "initialized": true
