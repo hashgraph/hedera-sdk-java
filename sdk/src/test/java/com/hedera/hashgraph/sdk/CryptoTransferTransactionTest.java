@@ -9,6 +9,8 @@ import org.threeten.bp.Instant;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CryptoTransferTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -41,8 +43,8 @@ public class CryptoTransferTransactionTest {
             .addHbarTransfer(AccountId.fromString("0.0.5006"), Hbar.fromTinybars(800).negated())
             .addHbarTransfer(AccountId.fromString("0.0.5007"), Hbar.fromTinybars(400))
             .addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.5008"), 400)
-            .addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.5006"), -800)
-            .addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.5007"), 400)
+            .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.5006"), -800, 3)
+            .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.5007"), 400, 3)
             .addTokenTransfer(TokenId.fromString("0.0.4"), AccountId.fromString("0.0.5008"), 1)
             .addTokenTransfer(TokenId.fromString("0.0.4"), AccountId.fromString("0.0.5006"), -1)
             .addNftTransfer(TokenId.fromString("0.0.3").nft(2), AccountId.fromString("0.0.5008"), AccountId.fromString("0.0.5007"))
@@ -60,5 +62,24 @@ public class CryptoTransferTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = TransferTransaction.fromBytes(tx.toBytes());
         assertEquals(tx.toString(), tx2.toString());
+    }
+
+    @Test
+    void decimalsMustBeConsistent() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            new TransferTransaction()
+                .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.8"), 100, 2)
+                .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.7"), -100, 3);
+        });
+    }
+
+    @Test
+    void canGetDecimals() {
+        var tx = new TransferTransaction();
+        assertNull(tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
+        tx.addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.8"), 100);
+        assertNull(tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
+        tx.addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.7"), -100, 5);
+        assertEquals(5, tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
     }
 }

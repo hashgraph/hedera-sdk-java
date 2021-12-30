@@ -446,22 +446,50 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Current name of the network; corresponds to ledger ID in entity ID checksum calculations.
      *
+     * @deprecated use {@link #getLedgerId()} instead
+     *
      * @return
      */
     @Nullable
+    @Deprecated
     public synchronized NetworkName getNetworkName() {
-        return network.getNetworkName();
+        var ledgerId = network.getLedgerId();
+        return ledgerId == null ? null : ledgerId.toNetworkName();
     }
 
     /**
      * Set the network name to a particular value. Useful when constructing a network which is a subset of an existing
      * known network.
      *
+     * @deprecated use {@link #setLedgerId(LedgerId)} instead
+     *
      * @param networkName
      * @return
      */
+    @Deprecated
     public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
-        this.network.setNetworkName(networkName);
+        this.network.setLedgerId(networkName == null ? null : LedgerId.fromNetworkName(networkName));
+        return this;
+    }
+
+    /**
+     * Current LedgerId of the network; corresponds to ledger ID in entity ID checksum calculations.
+     *
+     * @return
+     */
+    public synchronized LedgerId getLedgerId() {
+        return network.getLedgerId();
+    }
+
+    /**
+     * Set the LedgerId to a particular value. Useful when constructing a network which is a subset of an existing
+     * known network.
+     *
+     * @param ledgerId
+     * @return
+     */
+    public synchronized Client setLedgerId(@Nullable LedgerId ledgerId) {
+        this.network.setLedgerId(ledgerId);
         return this;
     }
 

@@ -154,6 +154,11 @@ public class TokenInfo {
     @Nullable
     public final Boolean pauseStatus;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     TokenInfo(
         TokenId tokenId,
         String name,
@@ -179,7 +184,8 @@ public class TokenInfo {
         TokenSupplyType supplyType,
         long maxSupply,
         @Nullable Key pauseKey,
-        @Nullable Boolean pauseStatus
+        @Nullable Boolean pauseStatus,
+        LedgerId ledgerId
     ) {
         this.tokenId = tokenId;
         this.name = name;
@@ -206,6 +212,7 @@ public class TokenInfo {
         this.maxSupply = maxSupply;
         this.pauseKey = pauseKey;
         this.pauseStatus = pauseStatus;
+        this.ledgerId = ledgerId;
     }
 
     @Nullable
@@ -251,7 +258,8 @@ public class TokenInfo {
             TokenSupplyType.valueOf(info.getSupplyType()),
             info.getMaxSupply(),
             info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
-            pauseStatusFromProtobuf(info.getPauseStatus())
+            pauseStatusFromProtobuf(info.getPauseStatus()),
+            LedgerId.fromByteString(info.getLedgerId())
         );
     }
 
@@ -294,7 +302,8 @@ public class TokenInfo {
             .setTokenType(tokenType.code)
             .setSupplyType(supplyType.code)
             .setMaxSupply(maxSupply)
-            .setPauseStatus(pauseStatusToProtobuf(pauseStatus));
+            .setPauseStatus(pauseStatusToProtobuf(pauseStatus))
+            .setLedgerId(ledgerId.toByteString());
         if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
@@ -359,6 +368,7 @@ public class TokenInfo {
             .add("maxSupply", maxSupply)
             .add("pauseKey", pauseKey)
             .add("pauseStatus", pauseStatus)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

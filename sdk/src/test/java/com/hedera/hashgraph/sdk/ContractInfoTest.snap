@@ -1,15 +1,15 @@
 com.hedera.hashgraph.sdk.ContractInfoTest.fromBytes=[
-  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}}"
+  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet}"
 ]
 
 
 com.hedera.hashgraph.sdk.ContractInfoTest.fromProtobuf=[
-  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}}"
+  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet}"
 ]
 
 
 com.hedera.hashgraph.sdk.ContractInfoTest.toBytes=[
-  "0a021801120218021a01332a05108092f40132040880af1a38064201374808"
+  "0a021801120218021a01332a05108092f40132040880af1a38064201374808620101"
 ]
 
 
@@ -88,6 +88,12 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
     "balance_": 8,
     "deleted_": false,
     "tokenRelationships_": [ ],
+    "ledgerId_": {
+      "hash": 0,
+      "bytes": "AQ==",
+      "validUtf8": true,
+      "empty": false
+    },
     "initialized": true
   }
 ]
