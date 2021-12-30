@@ -80,6 +80,11 @@ public final class ContractInfo {
      */
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     private ContractInfo(
         ContractId contractId,
         AccountId accountId,
@@ -91,7 +96,8 @@ public final class ContractInfo {
         String contractMemo,
         Hbar balance,
         boolean isDeleted,
-        Map<TokenId, TokenRelationship> tokenRelationships
+        Map<TokenId, TokenRelationship> tokenRelationships,
+        LedgerId ledgerId
     ) {
         this.contractId = contractId;
         this.accountId = accountId;
@@ -104,6 +110,7 @@ public final class ContractInfo {
         this.balance = balance;
         this.isDeleted = isDeleted;
         this.tokenRelationships = tokenRelationships;
+        this.ledgerId = ledgerId;
     }
 
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
@@ -131,7 +138,8 @@ public final class ContractInfo {
             contractInfo.getMemo(),
             Hbar.fromTinybars(contractInfo.getBalance()),
             contractInfo.getDeleted(),
-            tokenRelationships
+            tokenRelationships,
+            LedgerId.fromByteString(contractInfo.getLedgerId())
         );
     }
 
@@ -148,7 +156,8 @@ public final class ContractInfo {
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .setStorage(storage)
             .setMemo(contractMemo)
-            .setBalance(balance.toTinybars());
+            .setBalance(balance.toTinybars())
+            .setLedgerId(ledgerId.toByteString());
 
         if (adminKey != null) {
             contractInfoBuilder.setAdminKey(adminKey.toProtobufKey());
@@ -171,6 +180,7 @@ public final class ContractInfo {
             .add("balance", balance)
             .add("isDeleted", isDeleted)
             .add("tokenRelationships", tokenRelationships)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

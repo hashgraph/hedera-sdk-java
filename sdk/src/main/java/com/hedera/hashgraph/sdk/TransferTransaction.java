@@ -1,10 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.UInt32Value;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenBalance;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
@@ -21,9 +23,28 @@ import java.util.Map;
 import java.util.Objects;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
-    private final Map<TokenId, Map<AccountId, Long>> tokenTransfers = new HashMap<>();
+    private final Map<TokenId, TokenTransferMap> tokenTransfers = new HashMap<>();
     private final Map<TokenId, List<TokenNftTransfer>> nftTransfers = new HashMap<>();
     private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
+
+    private static class TokenTransferMap {
+        public final Map<AccountId, Long> transfers = new HashMap<>();
+        @Nullable
+        private UInt32Value expectedDecimals = null;
+
+        @Nullable
+        public UInt32Value getExpectedDecimals() {
+            return expectedDecimals;
+        }
+
+        public TokenTransferMap setExpectedDecimals(UInt32Value amount) {
+            if (expectedDecimals != null && !amount.equals(expectedDecimals)) {
+                throw new IllegalArgumentException("expected decimals for a token in a token transfer cannot be changed after being set");
+            }
+            expectedDecimals = amount;
+            return this;
+        }
+    }
 
     public TransferTransaction() {
         defaultMaxTransactionFee = new Hbar(1);
@@ -39,6 +60,16 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         initFromTransactionBody();
     }
 
+    @Nullable
+    public Integer getTokenIdDecimals(TokenId tokenId) {
+        var transferMap = tokenTransfers.get(tokenId);
+        if (transferMap == null) {
+            return null;
+        }
+        var decimals = transferMap.getExpectedDecimals();
+        return decimals == null ? null : decimals.getValue();
+    }
+
     private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
         Objects.requireNonNull(tokenTransferMap);
         Objects.requireNonNull(accountId);
@@ -49,17 +80,27 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
-        return tokenTransfers;
+        Map<TokenId, Map<AccountId, Long>> retval = new HashMap<>();
+        for (var entry : tokenTransfers.entrySet()) {
+            retval.put(entry.getKey(), entry.getValue().transfers);
+        }
+        return retval;
     }
 
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         requireNotFrozen();
-        doAddTokenTransfer(getTokenTransferMap(tokenId), accountId, value);
+        doAddTokenTransfer(getTokenTransferMap(tokenId).transfers, accountId, value);
+        return this;
+    }
+
+    public TransferTransaction addTokenTransferWithDecimals(TokenId tokenId, AccountId accountId, long value, int decimals) {
+        requireNotFrozen();
+        doAddTokenTransfer(getTokenTransferMap(tokenId).setExpectedDecimals(UInt32Value.of(decimals)).transfers, accountId, value);
         return this;
     }
 
     public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
-        return nftTransfers;
+        return new HashMap<>(nftTransfers);
     }
 
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
@@ -69,7 +110,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     public Map<AccountId, Hbar> getHbarTransfers() {
-        return hbarTransfers;
+        return new HashMap<>(hbarTransfers);
     }
 
     public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
@@ -80,26 +121,31 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     private static class SortableTokenTransferList implements Comparable<SortableTokenTransferList> {
         public final TokenId tokenId;
+        @Nullable
+        public final UInt32Value expectedDecimals;
         public final List<Map.Entry<AccountId, Long>> transfers;
         public final List<TokenNftTransfer> nftTransfers;
 
         private SortableTokenTransferList(
             TokenId tokenId,
+            @Nullable UInt32Value expectedDecimals,
             List<Map.Entry<AccountId, Long>> transfers,
             List<TokenNftTransfer> nftTransfers
         ) {
             this.tokenId = tokenId;
+            this.expectedDecimals = expectedDecimals;
             this.transfers = transfers;
             this.nftTransfers = nftTransfers;
         }
 
-        public static SortableTokenTransferList forTransfers(Map.Entry<TokenId, Map<AccountId, Long>> transfersEntry) {
+        public static SortableTokenTransferList forTransfers(Map.Entry<TokenId, TokenTransferMap> transfersEntry) {
             var retval = new SortableTokenTransferList(
                 transfersEntry.getKey(),
+                transfersEntry.getValue().getExpectedDecimals(),
                 new ArrayList<>(),
                 Collections.emptyList()
             );
-            retval.transfers.addAll(transfersEntry.getValue().entrySet());
+            retval.transfers.addAll(transfersEntry.getValue().transfers.entrySet());
             Collections.sort(retval.transfers, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
             return retval;
         }
@@ -107,6 +153,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         public static SortableTokenTransferList forNftTransfers(Map.Entry<TokenId, List<TokenNftTransfer>> nftTransfersEntry) {
             var retval = new SortableTokenTransferList(
                 nftTransfersEntry.getKey(),
+                null,
                 Collections.emptyList(),
                 nftTransfersEntry.getValue()
             );
@@ -162,6 +209,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             var listBuilder = TokenTransferList.newBuilder()
                 .setToken(list.tokenId.toProtobuf());
 
+            if (list.expectedDecimals != null) {
+                listBuilder.setExpectedDecimals(list.expectedDecimals);
+            }
+
             for (var transfer : list.transfers) {
                 listBuilder.addTransfers(AccountAmount.newBuilder()
                     .setAccountID(transfer.getKey().toProtobuf())
@@ -206,7 +257,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         for (var entry : tokenTransfers.entrySet()) {
             entry.getKey().validateChecksum(client);
 
-            for (var a : entry.getValue().keySet()) {
+            for (var a : entry.getValue().transfers.keySet()) {
                 a.validateChecksum(client);
             }
         }
@@ -227,11 +278,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         scheduled.setCryptoTransfer(build());
     }
 
-    private Map<AccountId, Long> getTokenTransferMap(TokenId tokenId) {
+    private TokenTransferMap getTokenTransferMap(TokenId tokenId) {
         // Cannot use `Map.merge()` as it uses `BiFunction`
         var map = tokenTransfers.containsKey(tokenId) ?
             Objects.requireNonNull(tokenTransfers.get(tokenId)) :
-            new HashMap<AccountId, Long>();
+            new TokenTransferMap();
         tokenTransfers.put(tokenId, map);
         return map;
     }
@@ -267,9 +318,12 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
             if (tokenTransferList.getTransfersCount() > 0) {
                 var map = getTokenTransferMap(token);
+                if (tokenTransferList.hasExpectedDecimals()) {
+                    map.setExpectedDecimals(tokenTransferList.getExpectedDecimals());
+                }
 
                 for (var aa : tokenTransferList.getTransfersList()) {
-                    doAddTokenTransfer(map, AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount());
+                    doAddTokenTransfer(map.transfers, AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount());
                 }
             }
 

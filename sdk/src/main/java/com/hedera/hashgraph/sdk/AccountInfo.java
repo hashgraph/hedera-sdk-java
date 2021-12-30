@@ -101,6 +101,11 @@ public final class AccountInfo {
 
     public final int maxAutomaticTokenAssociations;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     @Nullable
     public final PublicKey aliasKey;
 
@@ -122,7 +127,8 @@ public final class AccountInfo {
         String accountMemo,
         long ownedNfts,
         int maxAutomaticTokenAssociations,
-        @Nullable PublicKey aliasKey
+        @Nullable PublicKey aliasKey,
+        LedgerId ledgerId
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -142,6 +148,7 @@ public final class AccountInfo {
         this.ownedNfts = ownedNfts;
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         this.aliasKey = aliasKey;
+        this.ledgerId = ledgerId;
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -183,7 +190,8 @@ public final class AccountInfo {
             accountInfo.getMemo(),
             accountInfo.getOwnedNfts(),
             accountInfo.getMaxAutomaticTokenAssociations(),
-            aliasKey
+            aliasKey,
+            LedgerId.fromByteString(accountInfo.getLedgerId())
         );
     }
 
@@ -210,7 +218,8 @@ public final class AccountInfo {
             .addAllLiveHashes(hashes)
             .setMemo(accountMemo)
             .setOwnedNfts(ownedNfts)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setLedgerId(ledgerId.toByteString());
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -248,6 +257,7 @@ public final class AccountInfo {
             .add("ownedNfts", ownedNfts)
             .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
             .add("aliasKey", aliasKey)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 
