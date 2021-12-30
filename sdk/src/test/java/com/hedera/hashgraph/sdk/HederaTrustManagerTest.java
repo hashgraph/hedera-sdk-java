@@ -78,7 +78,7 @@ public class HederaTrustManagerTest {
         var client = Client.forNetwork(Map.of("0.previewnet.hedera.com:50211", new AccountId(3)))
             .setTransportSecurity(true)
             .setVerifyCertificates(true)
-            .setNetworkName(NetworkName.PREVIEWNET);
+            .setLedgerId(LedgerId.PREVIEWNET);
 
         var nodeAddress = Objects.requireNonNull(Objects.requireNonNull(client.network.addressBook).get(new AccountId(3)));
         new HederaTrustManager(nodeAddress.getCertHash(), client.isVerifyCertificates()).checkServerTrusted(CERTIFICATE_CHAIN, "");
@@ -89,7 +89,7 @@ public class HederaTrustManagerTest {
         var client = Client.forNetwork(Map.of("0.previewnet.hedera.com:50211", new AccountId(3)))
             .setTransportSecurity(true)
             .setVerifyCertificates(true)
-            .setNetworkName(NetworkName.PREVIEWNET);
+            .setLedgerId(LedgerId.PREVIEWNET);
 
         var nodeAddress = Objects.requireNonNull(Objects.requireNonNull(client.network.addressBook).get(new AccountId(4)));
         assertThatExceptionOfType(CertificateException.class).isThrownBy(() -> new HederaTrustManager(nodeAddress.getCertHash(), client.isVerifyCertificates()).checkServerTrusted(CERTIFICATE_CHAIN, ""));

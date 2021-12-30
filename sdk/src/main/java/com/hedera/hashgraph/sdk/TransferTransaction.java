@@ -60,6 +60,16 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         initFromTransactionBody();
     }
 
+    @Nullable
+    public Integer getDecimals(TokenId tokenId) {
+        var transferMap = tokenTransfers.get(tokenId);
+        if (transferMap == null) {
+            return null;
+        }
+        var decimals = transferMap.getExpectedDecimals();
+        return decimals == null ? null : decimals.getValue();
+    }
+
     private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
         Objects.requireNonNull(tokenTransferMap);
         Objects.requireNonNull(accountId);
