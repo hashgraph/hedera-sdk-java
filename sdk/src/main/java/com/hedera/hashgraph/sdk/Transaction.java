@@ -97,6 +97,8 @@ public abstract class Transaction<T extends Transaction<T>>
         var txCount = txs.keySet().size();
         var nodeCount = txs.values().iterator().next().size();
 
+        // TODO: lock transaction IDs
+
         nodeAccountIds = new ArrayList<>(nodeCount);
         sigPairLists = new ArrayList<>(nodeCount * txCount);
         outerTransactions = new ArrayList<>(nodeCount * txCount);
@@ -574,6 +576,8 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
+        // TODO: lock transaction IDs
+
         var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
 
         buildTransaction(index);
@@ -688,6 +692,8 @@ public abstract class Transaction<T extends Transaction<T>>
             // noinspection unchecked
             return (T) this;
         }
+
+        // TODO: lock transactionIds
 
         for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
@@ -841,6 +847,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     void buildAllTransactions() {
+        // TODO: lock transaction IDs
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
         }
@@ -920,6 +927,10 @@ public abstract class Transaction<T extends Transaction<T>>
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
 
+        // TODO: this behavior varies depending on whether transactionId is locked.
+        //       If not locked, transactionId is OVERRIDDEN on each request,
+        //       and the signaturelist at this index is overidden with a fresh one before buildTransaction
+        //       makeRequest() must take a Client parameter.
         buildTransaction(index);
 
         return outerTransactions.get(index);
