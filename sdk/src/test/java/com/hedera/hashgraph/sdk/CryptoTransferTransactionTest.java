@@ -76,10 +76,10 @@ public class CryptoTransferTransactionTest {
     @Test
     void canGetDecimals() {
         var tx = new TransferTransaction();
-        assertNull(tx.getDecimals(TokenId.fromString("0.0.5")));
+        assertNull(tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
         tx.addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.8"), 100);
-        assertNull(tx.getDecimals(TokenId.fromString("0.0.5")));
+        assertNull(tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
         tx.addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.7"), -100, 5);
-        assertEquals(5, tx.getDecimals(TokenId.fromString("0.0.5")));
+        assertEquals(5, tx.getTokenIdDecimals(TokenId.fromString("0.0.5")));
     }
 }

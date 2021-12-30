@@ -61,7 +61,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     @Nullable
-    public Integer getDecimals(TokenId tokenId) {
+    public Integer getTokenIdDecimals(TokenId tokenId) {
         var transferMap = tokenTransfers.get(tokenId);
         if (transferMap == null) {
             return null;
