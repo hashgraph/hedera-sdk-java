@@ -294,6 +294,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var nextTransactionId = initialTransactionId.toBuilder();
 
+        // TODO: the transactionIDs in this loop here need to be overridden on TRANSACTION_EXPIRED
         for (int i = 0; i < requiredChunks; i++) {
             var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;

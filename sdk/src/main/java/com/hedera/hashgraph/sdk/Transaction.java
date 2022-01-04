@@ -684,6 +684,7 @@ public abstract class Transaction<T extends Transaction<T>>
     public T addSignature(PublicKey publicKey, byte[] signature) {
         requireOneNodeAccountId();
 
+        // TODO: throw exception instead of freezing
         if (!isFrozen()) {
             freeze();
         }
@@ -824,6 +825,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
+        // TODO: the transactionID here needs to be overridden on TRANSACTION_EXPIRED
         frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());
         onFreeze(frozenBodyBuilder);
 
@@ -927,10 +929,6 @@ public abstract class Transaction<T extends Transaction<T>>
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
         var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
 
-        // TODO: this behavior varies depending on whether transactionId is locked.
-        //       If not locked, transactionId is OVERRIDDEN on each request,
-        //       and the signaturelist at this index is overidden with a fresh one before buildTransaction
-        //       makeRequest() must take a Client parameter.
         buildTransaction(index);
 
         return outerTransactions.get(index);
