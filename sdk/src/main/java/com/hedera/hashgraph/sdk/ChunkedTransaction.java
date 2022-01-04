@@ -105,6 +105,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
+        // TODO: lock TransactionIds
+
         buildAllTransactions();
 
         var txCount = transactionIds.size();
@@ -294,7 +296,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var nextTransactionId = initialTransactionId.toBuilder();
 
-        // TODO: the transactionIDs in this loop here need to be overridden on TRANSACTION_EXPIRED
+        // TODO: the transactionIDs in this loop here need to be overridden on TRANSACTION_EXPIRED if TransactionId not locked
         for (int i = 0; i < requiredChunks; i++) {
             var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;

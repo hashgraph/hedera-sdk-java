@@ -825,7 +825,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        // TODO: the transactionID here needs to be overridden on TRANSACTION_EXPIRED
+        // TODO: the transactionID here needs to be overridden on TRANSACTION_EXPIRED if TransactionId not locked
         frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());
         onFreeze(frozenBodyBuilder);
 
