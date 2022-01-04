@@ -60,14 +60,18 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         initFromTransactionBody();
     }
 
-    @Nullable
-    public Integer getTokenIdDecimals(TokenId tokenId) {
-        var transferMap = tokenTransfers.get(tokenId);
-        if (transferMap == null) {
-            return null;
+    public Map<TokenId, Integer> getTokenIdDecimals() {
+        Map<TokenId, Integer> decimalsMap = new HashMap<>();
+        for (var tokenEntry : tokenTransfers.entrySet()) {
+            if (tokenEntry.getValue() == null) {
+                continue;
+            }
+            var decimals = tokenEntry.getValue().getExpectedDecimals();
+            if (decimals != null) {
+                decimalsMap.put(tokenEntry.getKey(), decimals.getValue());
+            }
         }
-        var decimals = transferMap.getExpectedDecimals();
-        return decimals == null ? null : decimals.getValue();
+        return decimalsMap;
     }
 
     private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
