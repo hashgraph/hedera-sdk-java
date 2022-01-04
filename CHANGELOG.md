@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * `LedgerId`
  * `Client.[set|get]LedgerId()`
- * `TransferTransaction.addTokenTransferWithDecimals()`, `TransferTransaction.getDecimals()`.
+ * `TransferTransaction.addTokenTransferWithDecimals()`, `TransferTransaction.getTokenIdDecimals()`.
  * `ledgerId` fields in `AccountInfo`, `ContractInfo`, `FileInfo`, `ScheduleInfo`, `TokenInfo`, `TokenNftInfo`, and `TopicInfo`
  * `UNEXPECTED_TOKEN_DECIMALS` response code.
 
