@@ -1,13 +1,19 @@
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.AccountID;
+import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
+import java8.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -17,40 +23,76 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
 public class MockingTest {
+    @Test
+    void testSucceedsWithCorrectHbars() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        List<Object> responses1 = List.of(
+                Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
+                (Function<Object, Object>) o -> Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
+                Response.newBuilder()
+                        .setCryptogetAccountBalance(
+                                CryptoGetAccountBalanceResponse.newBuilder()
+                                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.OK).build())
+                                        .setAccountID(AccountID.newBuilder().setAccountNum(10).build())
+                                        .setBalance(100)
+                                        .build()
+                        ).build()
+        );
+
+        var responses = List.of(responses1);
+
+        try (var mocker = Mocker.withResponses(responses)) {
+            var balance = new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client);
+
+            Assertions.assertEquals(balance.hbars, Hbar.fromTinybars(100));
+        }
+    }
+
+    @Test
+    void exitOnAborted() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        List<Object> responses1 = List.of();
+
+        var responses = List.of(responses1);
+
+        try (var mocker = Mocker.withResponses(responses)) {
+            Assertions.assertThrows(StatusRuntimeException.class, () -> new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client));
+        }
+    }
 
     @ParameterizedTest(name = "[{2}] Executable retries on gRPC error with status {0} and description {1}")
     @CsvSource({
-        "INTERNAL, internal RST_STREAM error, sync",
-        "INTERNAL, rst stream, sync",
-        "RESOURCE_EXHAUSTED, , sync",
-        "UNAVAILABLE, , sync",
-        "INTERNAL, internal RST_STREAM error, async",
-        "INTERNAL, rst stream, async",
-        "RESOURCE_EXHAUSTED, , async",
-        "UNAVAILABLE, , async"
+            "INTERNAL, internal RST_STREAM error, sync",
+            "INTERNAL, rst stream, sync",
+            "RESOURCE_EXHAUSTED, , sync",
+            "UNAVAILABLE, , sync",
+            "INTERNAL, internal RST_STREAM error, async",
+            "INTERNAL, rst stream, async",
+            "RESOURCE_EXHAUSTED, , async",
+            "UNAVAILABLE, , async"
     })
     void shouldRetryExceptionallyFunctionsCorrectly(Status.Code code, String description, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("executableRetry", service);
 
         var exception = Status.fromCode(code)
-            .withDescription(description)
-            .asRuntimeException();
+                .withDescription(description)
+                .asRuntimeException();
 
         service.buffer
-            .enqueueResponse(TestResponse.error(exception))
-            .enqueueResponse(TestResponse.transactionOk());
+                .enqueueResponse(TestResponse.error(exception))
+                .enqueueResponse(TestResponse.transactionOk());
 
         if (sync.equals("sync")) {
             new AccountCreateTransaction()
-                .execute(server.client);
+                    .execute(server.client);
         } else {
             new AccountCreateTransaction()
-                .executeAsync(server.client)
-                .get();
+                    .executeAsync(server.client)
+                    .get();
         }
 
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
@@ -61,10 +103,10 @@ public class MockingTest {
 
     @ParameterizedTest(name = "[{2}] Executable should make max {1} attempts when there are {0} errors, and error")
     @CsvSource({
-        "2, 2, sync",
-        "2, 2, async"
+            "2, 2, sync",
+            "2, 2, async"
     })
-    void maxAttempts(Integer numberOfErrors ,Integer maxAttempts, String sync) throws Exception {
+    void maxAttempts(Integer numberOfErrors, Integer maxAttempts, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("executableMaxAttemptsSync", service);
 
@@ -79,20 +121,20 @@ public class MockingTest {
         if (sync.equals("sync")) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
-                    .setMaxAttempts(maxAttempts)
-                    .execute(server.client);
+                        .setMaxAttempts(maxAttempts)
+                        .execute(server.client);
             });
         } else {
             new AccountCreateTransaction()
-                .setMaxAttempts(2)
-                .executeAsync(server.client)
-                .handle((response, error) -> {
-                    Assertions.assertNotNull(error);
-                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+                    .setMaxAttempts(2)
+                    .executeAsync(server.client)
+                    .handle((response, error) -> {
+                        Assertions.assertNotNull(error);
+                        Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
-                    return null;
-                })
-                .get();
+                        return null;
+                    })
+                    .get();
         }
 
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
@@ -129,11 +171,11 @@ public class MockingTest {
 
         if (sync.equals("sync")) {
             new AccountCreateTransaction()
-                .execute(server.client);
+                    .execute(server.client);
         } else {
             new AccountCreateTransaction()
-                .executeAsync(server.client)
-                .get();
+                    .executeAsync(server.client)
+                    .get();
         }
 
         Assertions.assertEquals(numberOfErrors + 1, service.buffer.transactionRequestsReceived.size());
@@ -143,10 +185,10 @@ public class MockingTest {
 
     @ParameterizedTest(name = "[{2}] Executable retries on {1} Hedera status error(s) {0}")
     @CsvSource({
-        "BUSY, 2, sync",
-        "PLATFORM_TRANSACTION_NOT_CREATED, 2, sync",
-        "BUSY, 2, async",
-        "PLATFORM_TRANSACTION_NOT_CREATED, 2, async",
+            "BUSY, 2, sync",
+            "PLATFORM_TRANSACTION_NOT_CREATED, 2, sync",
+            "BUSY, 2, async",
+            "PLATFORM_TRANSACTION_NOT_CREATED, 2, async",
     })
     void shouldRetryErrorsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
         var service = new TestCryptoService();
@@ -161,18 +203,18 @@ public class MockingTest {
         if (sync.equals("sync")) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
-                    .execute(server.client);
+                        .execute(server.client);
             });
         } else {
             new AccountCreateTransaction()
-                .executeAsync(server.client)
-                .handle((response, error) -> {
-                    Assertions.assertNotNull(error);
-                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+                    .executeAsync(server.client)
+                    .handle((response, error) -> {
+                        Assertions.assertNotNull(error);
+                        Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
-                    return null;
-                })
-                .get();
+                        return null;
+                    })
+                    .get();
         }
 
         Assertions.assertEquals(numberOfErrors, service.buffer.transactionRequestsReceived.size());
@@ -187,26 +229,26 @@ public class MockingTest {
         var server = new TestServer("maxTransactionFee", service);
 
         service.buffer
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk());
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk());
 
         new AccountCreateTransaction()
-            .execute(server.client);
+                .execute(server.client);
 
         new AccountCreateTransaction()
-            .setMaxTransactionFee(new Hbar(5))
-            .execute(server.client);
+                .setMaxTransactionFee(new Hbar(5))
+                .execute(server.client);
 
         server.client.setDefaultMaxTransactionFee(new Hbar(1));
 
         new AccountCreateTransaction()
-            .execute(server.client);
+                .execute(server.client);
 
         new AccountCreateTransaction()
-            .setMaxTransactionFee(new Hbar(3))
-            .execute(server.client);
+                .setMaxTransactionFee(new Hbar(3))
+                .execute(server.client);
 
         Assertions.assertEquals(4, service.buffer.transactionRequestsReceived.size());
         var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
@@ -229,18 +271,18 @@ public class MockingTest {
         var server = new TestServer("queryPayment", service);
 
         var response = Response.newBuilder()
-            .setCryptogetAccountBalance(
-                new AccountBalance(
-                    new Hbar(0),
-                    new HashMap<TokenId, Long>(),
-                    new HashMap<TokenId, Integer>()
-                ).toProtobuf()
-            ).build();
+                .setCryptogetAccountBalance(
+                        new AccountBalance(
+                                new Hbar(0),
+                                new HashMap<TokenId, Long>(),
+                                new HashMap<TokenId, Integer>()
+                        ).toProtobuf()
+                ).build();
 
         service.buffer
-            .enqueueResponse(TestResponse.query(response))
-            .enqueueResponse(TestResponse.query(response))
-            .enqueueResponse(TestResponse.query(response));
+                .enqueueResponse(TestResponse.query(response))
+                .enqueueResponse(TestResponse.query(response))
+                .enqueueResponse(TestResponse.query(response));
 
         // TODO: this will take some work, since I have to contend with Query's getCost behavior
         // TODO: actually, because AccountBalanceQuery is free, I'll need some other query type to test this.
@@ -260,10 +302,10 @@ public class MockingTest {
         var aliceKey = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
-            .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))
-            .setNodeAccountIds(server.client.network.getNodeAccountIdsForExecute())
-            .freeze()
-            .sign(aliceKey);
+                .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))
+                .setNodeAccountIds(server.client.network.getNodeAccountIdsForExecute())
+                .freeze()
+                .sign(aliceKey);
 
         // This will cause the SDK Transaction to populate the sigPairLists list
         transaction.getTransactionHashPerNode();
@@ -281,8 +323,8 @@ public class MockingTest {
         var sigPairList = SignedTransaction.parseFrom(request.getSignedTransactionBytes()).getSigMap().getSigPairList();
         Assertions.assertEquals(2, sigPairList.size());
         Assertions.assertNotEquals(
-            sigPairList.get(0).getEd25519().toString(),
-            sigPairList.get(1).getEd25519().toString());
+                sigPairList.get(0).getEd25519().toString(),
+                sigPairList.get(1).getEd25519().toString());
 
         server.close();
     }
