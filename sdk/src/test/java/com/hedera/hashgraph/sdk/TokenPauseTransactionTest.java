@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
-import net.bytebuddy.description.ByteCodeElement;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

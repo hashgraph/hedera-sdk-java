@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 
