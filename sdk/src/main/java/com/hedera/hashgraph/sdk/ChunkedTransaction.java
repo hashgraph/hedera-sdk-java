@@ -105,7 +105,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        // TODO: lock TransactionIds
+        transactionIdsLocked = true;
 
         buildAllTransactions();
 
@@ -171,7 +171,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         var operatorId = client.getOperatorAccountId();
 
-        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionId().accountId))) {
+        if (operatorId != null && operatorId.equals(Objects.requireNonNull(getTransactionIdInternal().accountId))) {
             // on execute, sign each transaction with the operator, if present
             // and we are signing a transaction that used the default transaction ID
             signWithOperator(client);
@@ -273,10 +273,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     @Override
-    public T freezeWith(@Nullable Client client) {
-        super.freezeWith(client);
-
-        var initialTransactionId = Objects.requireNonNull(transactionIds.get(0)).toProtobuf();
+    int getRequiredChunks() {
         @Var var requiredChunks = (this.data.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
 
         if (requiredChunks == 0) {
@@ -288,15 +285,15 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 "message of " + this.data.size() + " bytes requires " + requiredChunks
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
+        return requiredChunks;
+    }
 
+    @Override
+    void wipeTransactionLists(int requiredChunks) {
         sigPairLists = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         outerTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
         innerSignedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
-        transactionIds = new ArrayList<>(requiredChunks);
 
-        var nextTransactionId = initialTransactionId.toBuilder();
-
-        // TODO: the transactionIDs in this loop here need to be overridden on TRANSACTION_EXPIRED if TransactionId not locked
         for (int i = 0; i < requiredChunks; i++) {
             var startIndex = i * CHUNK_SIZE;
             @Var var endIndex = startIndex + CHUNK_SIZE;
@@ -305,11 +302,9 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 endIndex = this.data.size();
             }
 
-            transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
-
             onFreezeChunk(
-                Objects.requireNonNull(frozenBodyBuilder).setTransactionID(nextTransactionId.build()),
-                initialTransactionId,
+                Objects.requireNonNull(frozenBodyBuilder).setTransactionID(transactionIds.get(i).toProtobuf()),
+                transactionIds.get(0).toProtobuf(),
                 startIndex,
                 endIndex,
                 i,
@@ -329,16 +324,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 );
                 outerTransactions.add(null);
             }
-
-            // add 1 ns to the validStart to make cascading transaction IDs
-            var nextValidStart = nextTransactionId.getTransactionValidStart().toBuilder();
-            nextValidStart.setNanos(nextValidStart.getNanos() + 1);
-
-            nextTransactionId.setTransactionValidStart(nextValidStart);
         }
-
-        // noinspection unchecked
-        return (T) this;
     }
 
     abstract void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);

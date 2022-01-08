@@ -360,7 +360,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     abstract MethodDescriptor<ProtoRequestT, ResponseT> getMethodDescriptor();
 
     @Nullable
-    abstract TransactionId getTransactionId();
+    abstract TransactionId getTransactionIdInternal();
 
     boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
@@ -453,7 +453,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         PrecheckStatusException mapStatusException() {
             // request to hedera failed in a non-recoverable way
-            return new PrecheckStatusException(responseStatus, Executable.this.getTransactionId());
+            return new PrecheckStatusException(responseStatus, Executable.this.getTransactionIdInternal());
         }
 
         O mapResponse() {

@@ -196,7 +196,7 @@ public class TopicMessageSubmitIntegrationTest {
 
         var transaction = Objects.requireNonNull(Transaction.fromBytes(transactionBytes));
 
-        String idString = Objects.requireNonNull(transaction.getTransactionId()).toString();
+        String idString = Objects.requireNonNull(transaction.getTransactionIdInternal()).toString();
         String transactionString = transaction.toString();
     }
 }

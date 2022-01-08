@@ -29,7 +29,7 @@ public final class TransactionReceiptQuery
 
     @Override
     @Nullable
-    public TransactionId getTransactionId() {
+    public TransactionId getTransactionIdInternal() {
         return transactionId;
     }
 

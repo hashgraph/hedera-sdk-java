@@ -90,4 +90,37 @@ class AccountCreateIntegrationTest {
 
         testEnv.close();
     }
+
+    @Test
+    @DisplayName("Regenerates TransactionIds in response to expiration")
+    void managesExpiration() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var key = PrivateKey.generate();
+
+        var accountCreateTx = new AccountCreateTransaction()
+            .setKey(key)
+            .setTransactionValidDuration(Duration.ofSeconds(25))
+            .freezeWith(testEnv.client);
+
+        Thread.sleep(30000);
+
+        var response = accountCreateTx.execute(testEnv.client);
+
+        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+        var info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
+
+        assertEquals(info.accountId, accountId);
+        assertFalse(info.isDeleted);
+        assertEquals(info.key.toString(), key.getPublicKey().toString());
+        assertEquals(info.balance, new Hbar(0));
+        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
+        assertNull(info.proxyAccountId);
+        assertEquals(info.proxyReceived, Hbar.ZERO);
+
+        testEnv.close(accountId, key);
+    }
 }
