@@ -101,10 +101,7 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        System.out.println("BIG CONTENTS: ");
-        System.out.println(Contents.BIG_CONTENTS);
-        System.out.println("\n\n\n\n\nFILE CONTENTS: ");
-        System.out.println(contents.toStringUtf8());
+        assertEquals("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS, contents.toStringUtf8());
 
         info = new FileInfoQuery()
             .setFileId(fileId)

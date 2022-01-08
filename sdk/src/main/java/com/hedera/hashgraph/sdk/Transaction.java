@@ -825,7 +825,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());;
+        frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());
         onFreeze(frozenBodyBuilder);
 
         int requiredChunks = getRequiredChunks();
@@ -860,7 +860,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     void wipeTransactionLists(int requiredChunks) {
-        frozenBodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
+        Objects.requireNonNull(frozenBodyBuilder).setTransactionID(getTransactionIdInternal().toProtobuf());
 
         outerTransactions = new ArrayList<>(nodeAccountIds.size());
         sigPairLists = new ArrayList<>(nodeAccountIds.size());
@@ -971,7 +971,7 @@ public abstract class Transaction<T extends Transaction<T>>
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
-        var transactionId = Objects.requireNonNull(transactionIds.get(0));
+        var transactionId = Objects.requireNonNull(getTransactionIdInternal());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
         return new TransactionResponse(nodeId, transactionId, hash, null);
