@@ -1,5 +1,6 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
@@ -95,6 +96,15 @@ public class FileAppendIntegrationTest {
             .setContents(Contents.BIG_CONTENTS)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
+
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        System.out.println("BIG CONTENTS: ");
+        System.out.println(Contents.BIG_CONTENTS);
+        System.out.println("\n\n\n\n\nFILE CONTENTS: ");
+        System.out.println(contents.toStringUtf8());
 
         info = new FileInfoQuery()
             .setFileId(fileId)

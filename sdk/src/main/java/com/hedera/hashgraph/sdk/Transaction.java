@@ -825,7 +825,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        frozenBodyBuilder = spawnBodyBuilder(client);
+        frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());;
         onFreeze(frozenBodyBuilder);
 
         int requiredChunks = getRequiredChunks();
