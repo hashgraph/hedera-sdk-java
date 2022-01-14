@@ -119,7 +119,7 @@ class AccountBalanceIntegrationTest {
     void shouldIgnoreUnresponsiveNodes() throws Exception {
         var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
-        network.put("35.242.233.154:50211", new AccountId(10));
+        network.put("35.242.233.155:50211", new AccountId(10));
 
         var client = Client.forNetwork(network);
 
