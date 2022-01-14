@@ -367,10 +367,6 @@ public class ScheduleCreateIntegrationTest {
 
         var scheduled = scheduledTx.freezeWith(testEnv.client);
 
-        var transactionId = scheduled.getTransactionId();
-
-        assertNotNull(transactionId);
-
         var scheduleId = Objects.requireNonNull(scheduled
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
