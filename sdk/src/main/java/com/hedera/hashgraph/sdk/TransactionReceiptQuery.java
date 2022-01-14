@@ -107,7 +107,7 @@ public final class TransactionReceiptQuery
                 break;
 
             default:
-                return ExecutionState.Error;
+                return ExecutionState.RequestError;
         }
 
         var receiptStatus =
@@ -122,7 +122,7 @@ public final class TransactionReceiptQuery
                 return ExecutionState.Retry;
 
             default:
-                return ExecutionState.Finished;
+                return ExecutionState.Success;
         }
     }
 }

@@ -85,7 +85,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     ExecutionState shouldRetry(Status status, Response response) {
         var retry = super.shouldRetry(status, response);
-        if (retry != ExecutionState.Finished) {
+        if (retry != ExecutionState.Success) {
             return retry;
         }
 
@@ -98,12 +98,12 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case OK:
                 // When fetching payment an `OK` in there query header means the cost is in the response
                 if (paymentTransactions == null || paymentTransactions.isEmpty()) {
-                    return ExecutionState.Finished;
+                    return ExecutionState.Success;
                 } else {
                     break;
                 }
             default:
-                return ExecutionState.Error;
+                return ExecutionState.RequestError;
         }
 
         var receiptStatus =
@@ -118,7 +118,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
                 return ExecutionState.Retry;
 
             default:
-                return ExecutionState.Finished;
+                return ExecutionState.Success;
         }
     }
 }
