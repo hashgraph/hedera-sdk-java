@@ -49,8 +49,14 @@ public final class TopicId implements Comparable<TopicId> {
         this.checksum = checksum;
     }
 
+    //Constructs a topic ID from string
     public static TopicId fromString(String id) {
         return EntityIdHelper.fromString(id, TopicId::new);
+    }
+    
+    //Constructs a topic ID from a solidity address
+    public static TopicId fromSolidityAddress(String address) {
+        return EntityIdHelper.fromSolidityAddress(address, TopicId::new);
     }
 
     static TopicId fromProtobuf(TopicID topicId) {
@@ -59,9 +65,16 @@ public final class TopicId implements Comparable<TopicId> {
         return new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
     }
 
+    //Constructs a topic ID from bytes
     public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
     }
+    
+    //Constructs a solidity address from topic ID
+    public String toSolidityAddress() {
+        return EntityIdHelper.toSolidityAddress(shard, realm, num);
+    }
+
 
     TopicID toProtobuf() {
         return TopicID.newBuilder()
