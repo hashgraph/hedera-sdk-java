@@ -1019,7 +1019,7 @@ public abstract class Transaction<T extends Transaction<T>>
         switch (status) {
             case TRANSACTION_EXPIRED:
                 if (transactionIdsLocked) {
-                    return ExecutionState.Error;
+                    return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
                     var accountId = Objects.requireNonNull(firstTransactionId.accountId);

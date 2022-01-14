@@ -469,7 +469,9 @@ class ExecutableTest {
 
         @Nullable
         @Override
-        TransactionId getTransactionId() { return null; }
+        TransactionId getTransactionIdInternal() {
+            return null;
+        }
     }
 
     static class DummyQuery extends Query<TransactionReceipt, TransactionReceiptQuery> {
