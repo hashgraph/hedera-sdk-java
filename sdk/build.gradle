@@ -29,7 +29,7 @@ dependencies {
 
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-	api "com.google.protobuf:protobuf-javalite:3.19.1"
+	api "com.google.protobuf:protobuf-javalite:3.19.2"
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
 	implementation 'org.slf4j:slf4j-api:1.7.32'
@@ -49,7 +49,7 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.32"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.42.1"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.43.2"
 	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.42.1'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
@@ -72,11 +72,11 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.19.1"
+		artifact = "com.google.protobuf:protoc:3.19.3"
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.42.1"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.43.2"
 		}
 	}
 	generateProtoTasks {

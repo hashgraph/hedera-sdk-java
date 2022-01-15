@@ -29,7 +29,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Nullable
     @Override
-    public TransactionId getTransactionId() {
+    public TransactionId getTransactionIdInternal() {
         return transactionId;
     }
 
