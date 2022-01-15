@@ -5,6 +5,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.6.0
+
+### Added
+
+ * `LedgerId`
+ * `Client.[set|get]LedgerId()`
+ * `TransferTransaction.addTokenTransferWithDecimals()`, `TransferTransaction.getTokenIdDecimals()`.
+ * `ledgerId` fields in `AccountInfo`, `ContractInfo`, `FileInfo`, `ScheduleInfo`, `TokenInfo`, `TokenNftInfo`, and `TopicInfo`
+ * `UNEXPECTED_TOKEN_DECIMALS` response code.
+ * `PublicKey.verifyTransaction()` should use the correct protobuf field per key type
+ * `AccountId.aliasKey`, including `AccountId.[to|from]String()` support.
+ * `[PublicKey|PrivateKey].toAccountId()`.
+ * `aliasKey` fields in `TransactionRecord` and `AccountInfo`.
+ * `nonce` field in `TransactionId`, including `TransactionId.[set|get]Nonce()`
+ * `children` fields in `TransactionRecord` and `TransactionReceipt`
+ * `duplicates` field in `TransactionReceipt`
+ * `[TransactionReceiptQuery|TransactionRecordQuery].[set|get]IncludeChildren()`
+ * `TransactionReceiptQuery.[set|get]IncludeDuplicates()`
+ * New response codes.
+ * Support for ECDSA SecP256K1 keys.
+ * `PrivateKey.generate[ED25519|ECDSA]()`
+ * `[Private|Public]Key.from[Bytes|String][DER|ED25519|ECDSA]()`
+ * `[Private|Public]Key.to[Bytes|String][Raw|DER]()`
+ * `DelegateContractId` to easily distingish between having a `ContractId` and `DelegateContractId` for a key
+
+### Deprecated
+
+ * `NetworkName`, `Client.[set|get]NetworkName()`, user `LedgerId` and `Client.[set|get]LedgerId()` instead.
+ * `PrivateKey.generate()`, use `PrivateKey.generate[ED25519|ECDSA]()` instead.
+
 ## v2.6.0-beta.3
 
 ### Added
