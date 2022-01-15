@@ -78,6 +78,7 @@ public abstract class Transaction<T extends Transaction<T>>
     private Hbar maxTransactionFee = null;
     private String memo = "";
     protected boolean transactionIdsLocked = false;
+    protected boolean regenerateTransactionId = false;
 
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
@@ -1018,7 +1019,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if (transactionIdsLocked) {
+                if (regenerateTransactionId && transactionIdsLocked) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
