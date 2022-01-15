@@ -39,7 +39,10 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     @Nullable
     public final Instant validStart;
 
-    boolean scheduled = false;
+    private boolean scheduled = false;
+
+    @Nullable
+    private Integer nonce = null;
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -72,19 +75,25 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
         var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
 
-        return new TransactionId(accountId, validStart).setScheduled(transactionID.getScheduled());
+        return new TransactionId(accountId, validStart)
+            .setScheduled(transactionID.getScheduled())
+            .setNonce((transactionID.getNonce() != 0) ? transactionID.getNonce() : null);
     }
 
     public static TransactionId fromString(String s) {
         @Var
-        var parts = s.split("\\?", 2);
+        var parts = s.split("/", 2);
+
+        var nonce = (parts.length == 2) ? Integer.parseInt(parts[1]) : null;
+
+        parts = parts[0].split("\\?", 2);
 
         var scheduled = parts.length == 2 && parts[1].equals("scheduled");
 
         parts = parts[0].split("@", 2);
 
         if (parts.length != 2) {
-            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}[?scheduled]");
+            throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}[?scheduled][/nonce]");
         }
 
         @Nullable AccountId accountId = AccountId.fromString(parts[0]);
@@ -99,7 +108,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
             Long.parseLong(validStartParts[0]),
             Long.parseLong(validStartParts[1]));
 
-        return new TransactionId(accountId, validStart).setScheduled(scheduled);
+        return new TransactionId(accountId, validStart).setScheduled(scheduled).setNonce(nonce);
     }
 
     public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -112,6 +121,16 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
 
     public TransactionId setScheduled(boolean scheduled) {
         this.scheduled = scheduled;
+        return this;
+    }
+
+    @Nullable
+    public Integer getNonce() {
+        return nonce;
+    }
+
+    public TransactionId setNonce(@Nullable Integer nonce) {
+        this.nonce = nonce;
         return this;
     }
 
@@ -160,7 +179,9 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     TransactionID toProtobuf() {
-        var id = TransactionID.newBuilder();
+        var id = TransactionID.newBuilder()
+            .setScheduled(scheduled)
+            .setNonce((nonce != null) ? nonce : 0);
 
         if (accountId != null) {
             id.setAccountID(accountId.toProtobuf());
@@ -173,10 +194,16 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         return id.build();
     }
 
+    private String toStringPostfix() {
+        Objects.requireNonNull(validStart);
+        return "@" + validStart.getEpochSecond() + "." + validStart.getNano() +
+            (scheduled ? "?scheduled" : "") + ((nonce != null) ? "/" + nonce : "");
+    }
+
     @Override
     public String toString() {
         if (accountId != null && validStart != null) {
-            return "" + accountId + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+            return "" + accountId + toStringPostfix();
         } else {
             throw new IllegalStateException("`TransactionId.toString()` is non-exhaustive");
         }
@@ -184,7 +211,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
 
     public String toStringWithChecksum(Client client) {
         if (accountId != null && validStart != null) {
-            return "" + accountId.toStringWithChecksum(client) + "@" + validStart.getEpochSecond() + "." + validStart.getNano() + (scheduled ? "?scheduled" : "");
+            return "" + accountId.toStringWithChecksum(client) + toStringPostfix();
         } else {
             throw new IllegalStateException("`TransactionId.toStringWithChecksum()` is non-exhaustive");
         }

@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.ExchangeRateSet;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -78,6 +79,10 @@ public final class TransactionReceipt {
 
     public final List<Long> serials;
 
+    public final List<TransactionReceipt> duplicates;
+
+    public final List<TransactionReceipt> children;
+
     private TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
@@ -91,7 +96,9 @@ public final class TransactionReceipt {
         Long totalSupply,
         @Nullable ScheduleId scheduleId,
         @Nullable TransactionId scheduledTransactionId,
-        List<Long> serials
+        List<Long> serials,
+        List<TransactionReceipt> duplicates,
+        List<TransactionReceipt> children
     ) {
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -106,9 +113,15 @@ public final class TransactionReceipt {
         this.scheduleId = scheduleId;
         this.scheduledTransactionId = scheduledTransactionId;
         this.serials = serials;
+        this.duplicates = duplicates;
+        this.children = children;
     }
 
-    static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
+    static TransactionReceipt fromProtobuf(
+        com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt,
+        List<TransactionReceipt> duplicates,
+        List<TransactionReceipt> children
+    ) {
         var status = Status.valueOf(transactionReceipt.getStatus());
 
         var rate = transactionReceipt.getExchangeRate();
@@ -176,8 +189,14 @@ public final class TransactionReceipt {
             totalSupply,
             scheduleId,
             scheduledTransactionId,
-            serials
+            serials,
+            duplicates,
+            children
         );
+    }
+
+    public static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
+        return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>());
     }
 
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -257,6 +276,8 @@ public final class TransactionReceipt {
             .add("scheduleId", scheduleId)
             .add("scheduledTransactionId", scheduledTransactionId)
             .add("serials", serials)
+            .add("duplicates", duplicates)
+            .add("children", children)
             .toString();
     }
 

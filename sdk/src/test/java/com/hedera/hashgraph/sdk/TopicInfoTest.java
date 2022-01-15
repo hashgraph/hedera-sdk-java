@@ -28,7 +28,8 @@ public class TopicInfoTest {
             .setAutoRenewPeriod(DurationConverter.toProtobuf(Duration.ofDays(5)))
             .setAdminKey(privateKey.getPublicKey().toProtobufKey())
             .setSubmitKey(privateKey.getPublicKey().toProtobufKey())
-            .setAutoRenewAccount(new AccountId(4).toProtobuf()))
+            .setAutoRenewAccount(new AccountId(4).toProtobuf())
+            .setLedgerId(LedgerId.TESTNET.toByteString()))
         .build();
 
 

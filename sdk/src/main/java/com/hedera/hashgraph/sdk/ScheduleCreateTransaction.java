@@ -133,7 +133,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
-        var transactionId = Objects.requireNonNull(getTransactionId()).setScheduled(true);
+        var transactionId = Objects.requireNonNull(getTransactionIdInternal()).setScheduled(true);
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
         return new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, transactionId, hash, transactionId);

@@ -21,7 +21,7 @@ class TokenAssociateIntegrationTest {
     void canAssociateAccountWithToken() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -64,7 +64,7 @@ class TokenAssociateIntegrationTest {
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -88,7 +88,7 @@ class TokenAssociateIntegrationTest {
     void cannotAssociateAccountWithTokensWhenAccountIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -115,7 +115,7 @@ class TokenAssociateIntegrationTest {
     void cannotAssociateAccountWhenAccountDoesNotSignTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)

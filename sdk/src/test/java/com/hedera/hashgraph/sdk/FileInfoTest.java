@@ -22,6 +22,7 @@ public class FileInfoTest {
         .setDeleted(true)
         .setKeys(KeyList.newBuilder()
             .addKeys(privateKey.getPublicKey().toProtobufKey()))
+        .setLedgerId(LedgerId.MAINNET.toByteString())
         .build();
 
     @BeforeAll

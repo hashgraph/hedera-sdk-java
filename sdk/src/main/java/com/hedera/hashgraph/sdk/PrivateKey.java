@@ -2,55 +2,47 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
  * A private key on the Hedera™ network.
  */
-public final class PrivateKey extends Key {
-    private final byte[] keyData;
-
-    @Nullable
-    private final KeyParameter chainCode;
-
+public abstract class PrivateKey extends Key {
     // Cache the derivation of the public key
     @Nullable
-    private PublicKey publicKey;
-
-    PrivateKey(byte[] keyData, @Nullable KeyParameter chainCode) {
-        this.keyData = keyData;
-        this.chainCode = chainCode;
-    }
+    protected PublicKey publicKey = null;
 
     /**
      * Generates a new <a href="https://ed25519.cr.yp.to/">Ed25519</a> private key.
      *
+     * @deprecated use {@link #generateED25519()} or {@link #generateECDSA()} instead
+     *
      * @return the new Ed25519 private key.
      */
     public static PrivateKey generate() {
-        // extra 32 bytes for chain code
-        byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
-        ThreadLocalSecureRandom.current().nextBytes(data);
+        return generateED25519();
+    }
 
-        return derivableKey(data);
+    public static PrivateKey generateED25519() {
+        return PrivateKeyED25519.generateInternal();
+    }
+
+    public static PrivateKey generateECDSA() {
+        return PrivateKeyECDSA.generateInternal();
     }
 
     /**
@@ -75,7 +67,7 @@ public final class PrivateKey extends Key {
         var derivedState = new byte[hmacSha512.getMacSize()];
         hmacSha512.doFinal(derivedState, 0);
 
-        @Var var derivedKey = derivableKey(derivedState);
+        @Var PrivateKey derivedKey = PrivateKeyED25519.derivableKeyED25519(derivedState);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index
@@ -106,32 +98,48 @@ public final class PrivateKey extends Key {
         return fromBytes(Hex.decode(privateKey));
     }
 
+    public static PrivateKey fromStringDER(String privateKey) {
+        return fromBytesDER(Hex.decode(privateKey));
+    }
+
+    public static PrivateKey fromStringED25519(String privateKey) {
+        return fromBytesED25519(Hex.decode(privateKey));
+    }
+
+    public static PrivateKey fromStringECDSA(String privateKey) {
+        return fromBytesECDSA(Hex.decode(privateKey));
+    }
+
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
-            return new PrivateKey(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
+            return new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
         }
 
         // Assume a DER-encoded private key descriptor
+        return fromBytesDER(privateKey);
+    }
+
+    public static PrivateKey fromBytesED25519(byte[] privateKey) {
+        return PrivateKeyED25519.fromBytesInternal(privateKey);
+    }
+
+    public static PrivateKey fromBytesECDSA(byte[] privateKey) {
+        return PrivateKeyECDSA.fromBytesInternal(privateKey);
+    }
+
+    public static PrivateKey fromBytesDER(byte[] privateKey) {
         return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
     }
 
     private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
-        try {
-            var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
-
-            return new PrivateKey(privateKey.getOctets(), null);
-        } catch (IOException e) {
-            throw new BadKeyException(e);
+        if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
+            return PrivateKeyED25519.fromPrivateKeyInfoInternal(privateKeyInfo);
+        } else {
+            // assume ECDSA
+            return PrivateKeyECDSA.fromPrivateKeyInfoInternal(privateKeyInfo);
         }
-    }
-
-    private static PrivateKey derivableKey(byte[] deriveData) {
-        var keyData = Arrays.copyOfRange(deriveData, 0, 32);
-        var chainCode = new KeyParameter(deriveData, 32, 32);
-
-        return new PrivateKey(keyData, chainCode);
     }
 
     /**
@@ -210,45 +218,11 @@ public final class PrivateKey extends Key {
         return readPem(new StringReader(encodedPem), password);
     }
 
-    static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
-        byte[] seed = new byte[entropy.length + 8];
-        Arrays.fill(seed, 0, seed.length, (byte) 0);
-        if (index == 0xffffffffffL) {
-            seed[entropy.length + 3] = (byte) 0xff;
-            Arrays.fill(seed, entropy.length + 4, seed.length, (byte) (index >>> 32));
-        } else {
-            if (index < 0) {
-                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) -1);
-            } else {
-                Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) 0);
-            }
-            Arrays.fill(seed, entropy.length + 4, seed.length, Long.valueOf(index).byteValue());
-        }
-        System.arraycopy(entropy, 0, seed, 0, entropy.length);
-
-        byte[] salt = new byte[1];
-        salt[0] = -1;
-        PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
-        pbkdf2.init(
-            seed,
-            salt,
-            2048);
-
-        KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
-        return key.getKey();
-    }
-
     public PrivateKey legacyDerive(int index) {
-        var keyBytes = legacyDeriveChildKey(this.keyData, (long) index);
-
-        return PrivateKey.fromBytes(keyBytes);
+        return legacyDerive((long) index);
     }
 
-    public PrivateKey legacyDerive(long index) {
-        var keyBytes = legacyDeriveChildKey(this.keyData, index);
-
-        return PrivateKey.fromBytes(keyBytes);
-    }
+    public abstract PrivateKey legacyDerive(long index);
 
     /**
      * Check if this private key supports derivation.
@@ -257,9 +231,7 @@ public final class PrivateKey extends Key {
      *
      * @return boolean
      */
-    public boolean isDerivable() {
-        return this.chainCode != null;
-    }
+    public abstract boolean isDerivable();
 
     /**
      * Given a wallet/account index, derive a child key compatible with the iOS and Android wallets.
@@ -271,32 +243,7 @@ public final class PrivateKey extends Key {
      * @throws IllegalStateException if this key does not support derivation.
      * @see #isDerivable()
      */
-    public PrivateKey derive(int index) {
-        if (this.chainCode == null) {
-            throw new IllegalStateException("this private key does not support derivation");
-        }
-
-        // SLIP-10 child key derivation
-        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
-        var hmacSha512 = new HMac(new SHA512Digest());
-
-        hmacSha512.init(chainCode);
-        hmacSha512.update((byte) 0);
-
-        hmacSha512.update(keyData, 0, Ed25519.SECRET_KEY_SIZE);
-
-        // write the index in big-endian order, setting the 31st bit to mark it "hardened"
-        var indexBytes = new byte[4];
-        ByteBuffer.wrap(indexBytes).order(ByteOrder.BIG_ENDIAN).putInt(index);
-        indexBytes[0] |= (byte) 0b10000000;
-
-        hmacSha512.update(indexBytes, 0, indexBytes.length);
-
-        var output = new byte[64];
-        hmacSha512.doFinal(output, 0);
-
-        return derivableKey(output);
-    }
+    public abstract PrivateKey derive(int index);
 
     /**
      * Derive a public key from this private key.
@@ -306,17 +253,7 @@ public final class PrivateKey extends Key {
      *
      * @return the corresponding public key for this private key.
      */
-    public PublicKey getPublicKey() {
-        if (publicKey != null) {
-            return publicKey;
-        }
-
-        byte[] publicKeyData = new byte[Ed25519.PUBLIC_KEY_SIZE];
-        Ed25519.generatePublicKey(keyData, 0, publicKeyData, 0);
-
-        publicKey = new PublicKey(publicKeyData);
-        return publicKey;
-    }
+    public abstract PublicKey getPublicKey();
 
     /**
      * Sign a message with this private key.
@@ -324,12 +261,7 @@ public final class PrivateKey extends Key {
      * @param message The array of bytes to sign with
      * @return the signature of the message.
      */
-    public byte[] sign(byte[] message) {
-        byte[] signature = new byte[Ed25519.SIGNATURE_SIZE];
-        Ed25519.sign(keyData, 0, message, 0, message.length, signature, 0);
-
-        return signature;
-    }
+    public abstract byte[] sign(byte[] message);
 
     public byte[] signTransaction(Transaction<?> transaction) {
         transaction.requireOneNodeAccountId();
@@ -347,20 +279,11 @@ public final class PrivateKey extends Key {
     }
 
     @Override
-    public byte[] toBytes() {
-        return keyData;
-    }
+    public abstract byte[] toBytes();
 
-    private byte[] toDER() {
-        try {
-            return new PrivateKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
-                new DEROctetString(keyData)
-            ).getEncoded("DER");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public abstract byte[] toBytesDER();
+
+    public abstract byte[] toBytesRaw();
 
     @Override
     public String toString() {
@@ -368,11 +291,15 @@ public final class PrivateKey extends Key {
     }
 
     public String toStringDER() {
-        return Hex.toHexString(toDER());
+        return Hex.toHexString(toBytesDER());
     }
 
     public String toStringRaw() {
-        return Hex.toHexString(keyData);
+        return Hex.toHexString(toBytesRaw());
+    }
+
+    public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
+        return getPublicKey().toAccountId(shard, realm);
     }
 
     @Override

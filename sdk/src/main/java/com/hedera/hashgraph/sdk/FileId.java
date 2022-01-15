@@ -58,19 +58,31 @@ public final class FileId implements Comparable<FileId> {
         this.checksum = checksum;
     }
 
+    //Construct a file ID from string
     public static FileId fromString(String id) {
         return EntityIdHelper.fromString(id, FileId::new);
     }
 
+    //Construct a file ID from bytes    
     public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
-
+    
     static FileId fromProtobuf(FileID fileId) {
         Objects.requireNonNull(fileId);
         return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
-
+    
+    //Construct a file ID from solidity
+    public static FileId fromSolidityAddress(String address) {
+        return EntityIdHelper.fromSolidityAddress(address, FileId::new);
+    }
+    
+    //Construct a solidity address from a file ID
+    public String toSolidityAddress() {
+        return EntityIdHelper.toSolidityAddress(shard, realm, num);
+    }
+    
     FileID toProtobuf() {
         return FileID.newBuilder()
             .setShardNum(shard)
