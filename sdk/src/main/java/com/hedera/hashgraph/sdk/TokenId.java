@@ -46,6 +46,7 @@ public class TokenId implements Comparable<TokenId> {
         this.checksum = checksum;
     }
 
+    //Construct a token ID from string
     public static TokenId fromString(String id) {
         return EntityIdHelper.fromString(id, TokenId::new);
     }
@@ -54,13 +55,24 @@ public class TokenId implements Comparable<TokenId> {
         Objects.requireNonNull(tokenId);
         return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
     }
-
+    
+    //Construct a token ID from bytes
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenID.parseFrom(bytes).toBuilder().build());
+    }
+    
+    //Construct a token ID from a solidity address
+    public static TokenId fromSolidityAddress(String address) {
+        return EntityIdHelper.fromSolidityAddress(address, TokenId::new);
     }
 
     public NftId nft(@Nonnegative long serial) {
         return new NftId(this, serial);
+    }
+    
+    //Construct a solidity address from a token ID
+    public String toSolidityAddress() {
+        return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
     TokenID toProtobuf() {

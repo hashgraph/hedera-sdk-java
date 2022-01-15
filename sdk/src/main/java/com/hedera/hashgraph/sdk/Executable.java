@@ -1,5 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.MethodDescriptor;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
@@ -37,8 +39,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     protected Duration minBackoff = null;
 
     protected int nextNodeIndex = 0;
+
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
+
+    // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
+    @VisibleForTesting
+    Function<GrpcRequest, ResponseT> blockingUnaryCall =
+        (grpcRequest) -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
 
     Executable() {
     }
@@ -203,43 +211,45 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             }
 
             GrpcRequest grpcRequest = new GrpcRequest(attempt);
+            Node node = grpcRequest.getNode();
+            ResponseT response = null;
 
-            // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
-            if (!grpcRequest.getNode().isHealthy()) {
-                delay(grpcRequest.getNode().getRemainingTimeForBackoff());
-            }
+            // If we get an unhealthy node here, we've cycled through all the "good" nodes that have failed
+            // and have no choice but to try a bad one.
+            if (!node.isHealthy())
+                delay(node.getRemainingTimeForBackoff());
 
-            if (grpcRequest.getNode().channelFailedToConnect()) {
+            if (node.channelFailedToConnect()) {
+                logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
                 lastException = grpcRequest.reactToConnectionFailure();
-                delay(grpcRequest.getDelay());
                 continue;
             }
 
-            ResponseT response = null;
-
             try {
-                response = ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
+                response = blockingUnaryCall.apply(grpcRequest);
             } catch (Throwable e) {
                 lastException = e;
             }
 
             if (response == null) {
                 if(grpcRequest.shouldRetryExceptionally(lastException)) {
-                    delay(grpcRequest.getDelay());
                     continue;
                 } else {
                     throw grpcRequest.mapStatusException();
                 }
             }
 
-            switch (grpcRequest.shouldRetry(response)) {
-                case Retry:
+            switch (grpcRequest.getStatus(response)) {
+                case ServerError:
                     lastException = grpcRequest.mapStatusException();
+                    continue;
+                case Retry:
+                    // Response is not ready yet from server, need to wait.
                     delay(grpcRequest.getDelay());
                     continue;
-                case Error:
+                case RequestError:
                     throw grpcRequest.mapStatusException();
-                case Finished:
+                case Success:
                 default:
                     return grpcRequest.mapResponse();
             }
@@ -259,7 +269,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         });
     }
 
-    private void setNodesFromNodeAccountIds(Client client) {
+    @VisibleForTesting
+    void setNodesFromNodeAccountIds(Client client) {
         for (var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.getNode(accountId);
@@ -270,15 +281,49 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
     }
 
-    private Node getNodeForExecute(int attempt) {
-        var node = nodes.get(nextNodeIndex);
+    /**
+     * Return the next node for execution. Will select the first node that is deemed healthy.
+     * If we cannot find such a node and have tried n nodes (n being the size of the node list), we will
+     * select the node with the smallest remaining delay. All delays MUST be executed in calling layer
+     * as this method will be called for sync + async scenarios.
+     */
+    @VisibleForTesting
+    Node getNodeForExecute(int attempt) {
+        Node node = null;
+        Node candidate = null;
+        long smallestDelay = Long.MAX_VALUE;
 
-        logger.trace("Sending request #{} to node {}: {}", attempt, node.getAccountId(), this);
+        for (int i = 0; i < nodes.size(); i++) {
+            node = nodes.get(nextNodeIndex);
 
-        var nodeIsHealthy = node.isHealthy();
-        if (!node.isHealthy()) {
-            logger.warn("Using unhealthy node {}. Delaying attempt #{} for {} ms", node.getAccountId(), attempt, node.getRemainingTimeForBackoff());
+            if (!node.isHealthy()) {
+                // Keep track of the node with the smallest delay seen thus far. If we go through the entire list
+                // (meaning all nodes are unhealthy) then we will select the node with the smallest delay.
+                long backoff = node.getRemainingTimeForBackoff();
+                if (backoff < smallestDelay) {
+                    candidate = node;
+                    smallestDelay = backoff;
+                }
+
+                node = null;
+                advanceRequest();
+            } else {
+                break; // got a good node, use it
+            }
         }
+
+        if (node == null) {
+            node = candidate;
+
+            // If we've tried all nodes, index will be +1 too far. Index increment happens outside
+            // this method so try to be consistent with happy path.
+            nextNodeIndex = Math.max(0, nextNodeIndex - 1);
+        }
+
+        // node won't be null at this point because execute() validates before this method is called.
+        // Add null check here to work around sonar NPE detection.
+        if (node != null)
+            logger.trace("Using node {} for request #{}: {}", node.getAccountId(), attempt, this);
 
         return node;
     }
@@ -310,8 +355,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return grpcRequest.getNode().channelFailedToConnectAsync().thenCompose(connectionFailed -> {
             if (connectionFailed) {
                 var connectionException = grpcRequest.reactToConnectionFailure();
-                return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
-                    .thenCompose((v) -> executeAsync(client, attempt + 1, connectionException));
+                return executeAsync(client, attempt + 1, connectionException);
             }
 
             return Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest()))).handle((response, error) -> {
@@ -325,13 +369,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     return CompletableFuture.<O>failedFuture(error);
                 }
 
-                switch (grpcRequest.shouldRetry(response)) {
+                switch (grpcRequest.getStatus(response)) {
+                    case ServerError:
+                        return executeAsync(client, attempt + 1, grpcRequest.mapStatusException());
                     case Retry:
                         return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
                             .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
-                    case Error:
+                    case RequestError:
                         return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
-                    case Finished:
+                    case Success:
                     default:
                         return CompletableFuture.completedFuture(grpcRequest.mapResponse());
                 }
@@ -361,7 +407,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     abstract MethodDescriptor<ProtoRequestT, ResponseT> getMethodDescriptor();
 
     @Nullable
-    abstract TransactionId getTransactionId();
+    abstract TransactionId getTransactionIdInternal();
 
     boolean shouldRetryExceptionally(@Nullable Throwable error) {
         if (error instanceof StatusRuntimeException) {
@@ -378,22 +424,25 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     }
 
     /**
-     * Called just after receiving the query response from Hedera. By default it triggers a retry
-     * when the pre-check status is {@code BUSY}.
+     * Default implementation, may be overridden in subclasses (especially for query case). Called just
+     * after receiving the query response from Hedera. By default it triggers a retry when the pre-check
+     * status is {@code BUSY}.
      */
     ExecutionState shouldRetry(Status status, ResponseT response) {
         switch (status) {
             case PLATFORM_TRANSACTION_NOT_CREATED:
+            case PLATFORM_NOT_ACTIVE:
             case BUSY:
-                return ExecutionState.Retry;
+                return ExecutionState.ServerError;
             case OK:
-                return ExecutionState.Finished;
+                return ExecutionState.Success;
             default:
-                return ExecutionState.Error;
+                return ExecutionState.RequestError;     // user error
         }
     }
 
-    private class GrpcRequest {
+    @VisibleForTesting
+    class GrpcRequest {
         private final Node node;
         private final int attempt;
         //private final ClientCall<ProtoRequestT, ResponseT> call;
@@ -407,8 +456,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         GrpcRequest(int attempt) {
             this.attempt = attempt;
-            this.node = Executable.this.getNodeForExecute(attempt);
-            this.request = Executable.this.getRequestForExecute();
+            this.node = getNodeForExecute(attempt);
+            this.request = getRequestForExecute();
             this.startAt = System.nanoTime();
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
@@ -454,7 +503,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         PrecheckStatusException mapStatusException() {
             // request to hedera failed in a non-recoverable way
-            return new PrecheckStatusException(responseStatus, Executable.this.getTransactionId());
+            return new PrecheckStatusException(responseStatus, Executable.this.getTransactionIdInternal());
         }
 
         O mapResponse() {
@@ -462,7 +511,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return Executable.this.mapResponse(response, node.getAccountId(), request);
         }
 
-        ExecutionState shouldRetry(ResponseT response) {
+        ExecutionState getStatus(ResponseT response) {
             node.decreaseDelay();
 
             this.response = response;
@@ -471,14 +520,18 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
                 responseStatus, latency, node.getAccountId(), attempt, response);
 
+            // Delegate interpretation of response status to subclass. Queries will initiate retries
+            // differently from transaction submissions.
             var executionState = Executable.this.shouldRetry(responseStatus, response);
-
             switch (executionState) {
                 case Retry:
-                    // the response has been identified as failing or otherwise
-                    // needing a retry let's do this again after a delay
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                         node.getAccountId(), delay, attempt, responseStatus);
+                    break;
+                case ServerError:
+                    logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
+                        node.getAccountId(), attempt, responseStatus);
+                    break;
                 default:
                     // Do nothing
             }

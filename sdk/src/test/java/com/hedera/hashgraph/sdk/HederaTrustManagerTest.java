@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 import java.util.Map;
 import java.util.Objects;
 
@@ -78,7 +76,7 @@ public class HederaTrustManagerTest {
         var client = Client.forNetwork(Map.of("0.previewnet.hedera.com:50211", new AccountId(3)))
             .setTransportSecurity(true)
             .setVerifyCertificates(true)
-            .setNetworkName(NetworkName.PREVIEWNET);
+            .setLedgerId(LedgerId.PREVIEWNET);
 
         var nodeAddress = Objects.requireNonNull(Objects.requireNonNull(client.network.addressBook).get(new AccountId(3)));
         new HederaTrustManager(nodeAddress.getCertHash(), client.isVerifyCertificates()).checkServerTrusted(CERTIFICATE_CHAIN, "");
@@ -89,7 +87,7 @@ public class HederaTrustManagerTest {
         var client = Client.forNetwork(Map.of("0.previewnet.hedera.com:50211", new AccountId(3)))
             .setTransportSecurity(true)
             .setVerifyCertificates(true)
-            .setNetworkName(NetworkName.PREVIEWNET);
+            .setLedgerId(LedgerId.PREVIEWNET);
 
         var nodeAddress = Objects.requireNonNull(Objects.requireNonNull(client.network.addressBook).get(new AccountId(4)));
         assertThatExceptionOfType(CertificateException.class).isThrownBy(() -> new HederaTrustManager(nodeAddress.getCertHash(), client.isVerifyCertificates()).checkServerTrusted(CERTIFICATE_CHAIN, ""));

@@ -22,6 +22,7 @@ public class ContractInfoTest {
             .setStorage(6)
             .setMemo("7")
             .setBalance(8)
+            .setLedgerId(LedgerId.TESTNET.toByteString())
             .build();
 
     @BeforeAll

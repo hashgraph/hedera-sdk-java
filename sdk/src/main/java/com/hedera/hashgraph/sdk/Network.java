@@ -156,7 +156,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         network.put("34.87.150.174:50211", new AccountId(26));
         network.put("13.228.103.14:50211", new AccountId(26));
 
-        return new Network(executor, network).setNetworkName(NetworkName.MAINNET);
+        return new Network(executor, network).setLedgerId(LedgerId.MAINNET);
     }
 
     static Network forTestnet(ExecutorService executor) {
@@ -197,7 +197,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         network.put("52.14.252.207:50211", new AccountId(9));
         network.put("52.165.17.231:50211", new AccountId(9));
 
-        return new Network(executor, network).setNetworkName(NetworkName.TESTNET);
+        return new Network(executor, network).setLedgerId(LedgerId.TESTNET);
     }
 
     static Network forPreviewnet(ExecutorService executor) {
@@ -237,7 +237,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         network.put("50.18.17.93:50211", new AccountId(9));
         network.put("20.150.136.89:50211", new AccountId(9));
 
-        return new Network(executor, network).setNetworkName(NetworkName.PREVIEWNET);
+        return new Network(executor, network).setLedgerId(LedgerId.PREVIEWNET);
     }
 
     boolean isVerifyCertificates() {
@@ -254,10 +254,11 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return this;
     }
 
-    Network setNetworkName(@Nullable NetworkName networkName) {
-        super.setNetworkName(networkName);
+    @Override
+    synchronized Network setLedgerId(@Nullable LedgerId ledgerId) {
+        super.setLedgerId(ledgerId);
 
-        addressBook = networkName == null ? null : readAddressBookResource("addressbook/" + networkName + ".pb");
+        addressBook = (ledgerId == null || !ledgerId.isKnownNetwork()) ? null : readAddressBookResource("addressbook/" + ledgerId + ".pb");
         for (var node : nodes) {
             node.setAddressBook(addressBook == null ? null : addressBook.get(node.getAccountId()));
         }

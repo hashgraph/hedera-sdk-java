@@ -82,7 +82,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
      */
     private void createTopicWithSubmitKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         // Generate a Ed25519 private, public key pair
-        submitKey = PrivateKey.generate();
+        submitKey = PrivateKey.generateED25519();
         PublicKey submitPublicKey = submitKey.getPublicKey();
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()

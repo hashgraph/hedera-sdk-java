@@ -264,7 +264,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
     @Override
     @Nullable
-    TransactionId getTransactionId() {
+    TransactionId getTransactionIdInternal() {
         // this is only called on an error about either the payment transaction or missing a payment transaction
         // as we make sure the latter can't happen, this will never be null
         return paymentTransactionId;

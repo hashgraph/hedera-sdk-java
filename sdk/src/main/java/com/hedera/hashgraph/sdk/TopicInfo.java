@@ -56,6 +56,11 @@ public final class TopicInfo {
     @Nullable
     public final AccountId autoRenewAccountId;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     private TopicInfo(
         TopicId topicId,
         String topicMemo,
@@ -65,7 +70,8 @@ public final class TopicInfo {
         @Nullable Key adminKey,
         @Nullable Key submitKey,
         Duration autoRenewPeriod,
-        @Nullable AccountId autoRenewAccountId
+        @Nullable AccountId autoRenewAccountId,
+        LedgerId ledgerId
     ) {
         this.topicId = topicId;
         this.topicMemo = topicMemo;
@@ -76,6 +82,7 @@ public final class TopicInfo {
         this.submitKey = submitKey;
         this.autoRenewPeriod = autoRenewPeriod;
         this.autoRenewAccountId = autoRenewAccountId;
+        this.ledgerId = ledgerId;
     }
 
     static TopicInfo fromProtobuf(ConsensusGetTopicInfoResponse topicInfoResponse) {
@@ -102,7 +109,8 @@ public final class TopicInfo {
             adminKey,
             submitKey,
             DurationConverter.fromProtobuf(topicInfo.getAutoRenewPeriod()),
-            autoRenewAccountId
+            autoRenewAccountId,
+            LedgerId.fromByteString(topicInfo.getLedgerId())
         );
     }
 
@@ -119,7 +127,8 @@ public final class TopicInfo {
             .setRunningHash(runningHash)
             .setSequenceNumber(sequenceNumber)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
+            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+            .setLedgerId(ledgerId.toByteString());
 
         if (adminKey != null) {
             topicInfoBuilder.setAdminKey(adminKey.toProtobufKey());
@@ -148,6 +157,7 @@ public final class TopicInfo {
             .add("submitKey", submitKey)
             .add("autoRenewPeriod", autoRenewPeriod)
             .add("autoRenewAccountId", autoRenewAccountId)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

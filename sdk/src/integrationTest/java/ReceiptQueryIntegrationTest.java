@@ -16,7 +16,7 @@ public class ReceiptQueryIntegrationTest {
     void canGetTransactionReceipt() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -33,7 +33,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Can get Record")
     void canGetTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -55,7 +55,7 @@ public class ReceiptQueryIntegrationTest {
     @SuppressWarnings("UnusedVariable")
     void getCostTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -80,7 +80,7 @@ public class ReceiptQueryIntegrationTest {
     @SuppressWarnings("UnusedVariable")
     void getCostBigMaxTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -105,7 +105,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Error at very small max, getRecord")
     void getCostSmallMaxTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)
@@ -134,7 +134,7 @@ public class ReceiptQueryIntegrationTest {
     @DisplayName("Insufficient transaction fee error for transaction record query")
     void getCostInsufficientTxFeeTransactionRecord() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key)

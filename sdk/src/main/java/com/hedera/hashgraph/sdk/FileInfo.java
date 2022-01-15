@@ -41,13 +41,19 @@ public final class FileInfo {
 
     public final String fileMemo;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     private FileInfo(
         FileId fileId,
         long size,
         Instant expirationTime,
         boolean isDeleted,
         @Nullable KeyList keys,
-        String fileMemo
+        String fileMemo,
+        LedgerId ledgerId
     ) {
         this.fileId = fileId;
         this.size = size;
@@ -55,6 +61,7 @@ public final class FileInfo {
         this.isDeleted = isDeleted;
         this.keys = keys;
         this.fileMemo = fileMemo;
+        this.ledgerId = ledgerId;
     }
 
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
@@ -68,7 +75,8 @@ public final class FileInfo {
             InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
             fileInfo.getDeleted(),
             keys,
-            fileInfo.getMemo()
+            fileInfo.getMemo(),
+            LedgerId.fromByteString(fileInfo.getLedgerId())
         );
     }
 
@@ -82,7 +90,8 @@ public final class FileInfo {
             .setSize(size)
             .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
             .setDeleted(isDeleted)
-            .setMemo(fileMemo);
+            .setMemo(fileMemo)
+            .setLedgerId(ledgerId.toByteString());
 
         if (keys != null) {
             var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
@@ -106,6 +115,7 @@ public final class FileInfo {
             .add("isDeleted", isDeleted)
             .add("keys", keys)
             .add("fileMemo", fileMemo)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

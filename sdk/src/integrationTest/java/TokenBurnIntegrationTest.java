@@ -202,7 +202,7 @@ class TokenBurnIntegrationTest {
             .getReceipt(testEnv.client)
             .serials;
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var accountId = new AccountCreateTransaction()
             .setKey(key)

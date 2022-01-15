@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 
@@ -79,6 +80,8 @@ public abstract class Transaction<T extends Transaction<T>>
     @Nullable
     private Hbar maxTransactionFee = null;
     private String memo = "";
+    protected boolean transactionIdsLocked = false;
+    protected boolean regenerateTransactionId = false;
 
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
@@ -99,6 +102,8 @@ public abstract class Transaction<T extends Transaction<T>>
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var txCount = txs.keySet().size();
         var nodeCount = txs.values().iterator().next().size();
+
+        transactionIdsLocked = true;
 
         nodeAccountIds = new ArrayList<>(nodeCount);
         sigPairLists = new ArrayList<>(nodeCount * txCount);
@@ -454,7 +459,7 @@ public abstract class Transaction<T extends Transaction<T>>
             .setScheduledTransactionBody(schedulable.build());
 
         if (!transactionIds.isEmpty()) {
-            scheduled.setTransactionId(transactionIds.get(0).setScheduled(true));
+            scheduled.setTransactionId(transactionIds.get(0));
         }
 
         return scheduled;
@@ -577,6 +582,8 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
+        transactionIdsLocked = true;
+
         var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
 
         buildTransaction(index);
@@ -601,10 +608,16 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
+    public final TransactionId getTransactionIdInternal() {
+        return transactionIds.get(nextTransactionIndex);
+    }
+
     public final TransactionId getTransactionId() {
         if (transactionIds.isEmpty() || !this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before getting the transaction ID, try calling `freeze`");
         }
+
+        transactionIdsLocked = true;
 
         return transactionIds.get(nextTransactionIndex);
     }
@@ -671,26 +684,21 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     protected boolean keyAlreadySigned(PublicKey key) {
-        for (var publicKey : publicKeys) {
-            if (publicKey.toString().equals(key.toString())) {
-                return true;
-            }
-        }
-
-        return false;
+        return publicKeys.contains(key);
     }
 
     public T addSignature(PublicKey publicKey, byte[] signature) {
         requireOneNodeAccountId();
-
         if (!isFrozen()) {
-            freeze();
+            throw new IllegalStateException("Adding signature requires transaction to be frozen");
         }
 
         if (keyAlreadySigned(publicKey)) {
             // noinspection unchecked
             return (T) this;
         }
+
+        transactionIdsLocked = true;
 
         for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
@@ -824,26 +832,59 @@ public abstract class Transaction<T extends Transaction<T>>
         frozenBodyBuilder = spawnBodyBuilder(client).setTransactionID(transactionIds.get(0).toProtobuf());
         onFreeze(frozenBodyBuilder);
 
+        int requiredChunks = getRequiredChunks();
+        generateTransactionIds(transactionIds.get(0), requiredChunks);
+        wipeTransactionLists(requiredChunks);
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    int getRequiredChunks() {
+        return 1;
+    }
+
+    void generateTransactionIds(TransactionId initialTransactionId, int count) {
+        if (count == 1) {
+            transactionIds = Collections.singletonList(initialTransactionId);
+            return;
+        }
+
+        var nextTransactionId = initialTransactionId.toProtobuf().toBuilder();
+        transactionIds = new ArrayList<TransactionId>(count);
+        for (int i = 0; i < count; i++) {
+            transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
+
+            // add 1 ns to the validStart to make cascading transaction IDs
+            var nextValidStart = nextTransactionId.getTransactionValidStart().toBuilder();
+            nextValidStart.setNanos(nextValidStart.getNanos() + 1);
+
+            nextTransactionId.setTransactionValidStart(nextValidStart);
+        }
+    }
+
+    void wipeTransactionLists(int requiredChunks) {
+        Objects.requireNonNull(frozenBodyBuilder).setTransactionID(getTransactionIdInternal().toProtobuf());
+
         outerTransactions = new ArrayList<>(nodeAccountIds.size());
         sigPairLists = new ArrayList<>(nodeAccountIds.size());
         innerSignedTransactions = new ArrayList<>(nodeAccountIds.size());
 
         for (AccountId nodeId : nodeAccountIds) {
             sigPairLists.add(SignatureMap.newBuilder());
-            innerSignedTransactions.add(com.hedera.hashgraph.sdk.proto.SignedTransaction.newBuilder()
-                .setBodyBytes(frozenBodyBuilder
+            innerSignedTransactions.add(SignedTransaction.newBuilder()
+                .setBodyBytes(Objects.requireNonNull(frozenBodyBuilder)
                     .setNodeAccountID(nodeId.toProtobuf())
                     .build()
                     .toByteString()
                 ));
             outerTransactions.add(null);
         }
-
-        // noinspection unchecked
-        return (T) this;
     }
 
     void buildAllTransactions() {
+        transactionIdsLocked = true;
+
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
         }
@@ -895,7 +936,7 @@ public abstract class Transaction<T extends Transaction<T>>
             if (signers.get(i) == null) {
                 continue;
             }
-            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytes()), thisSigPairList)) {
+            if (publicKeyIsInSigPairList(ByteString.copyFrom(publicKeys.get(i).toBytesRaw()), thisSigPairList)) {
                 continue;
             }
 
@@ -934,7 +975,7 @@ public abstract class Transaction<T extends Transaction<T>>
         AccountId nodeId,
         com.hedera.hashgraph.sdk.proto.Transaction request
     ) {
-        var transactionId = Objects.requireNonNull(getTransactionId());
+        var transactionId = Objects.requireNonNull(getTransactionIdInternal());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
         nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
         return new TransactionResponse(nodeId, transactionId, hash, null);
@@ -952,7 +993,7 @@ public abstract class Transaction<T extends Transaction<T>>
             freezeWith(client);
         }
 
-        var accountId = Objects.requireNonNull(Objects.requireNonNull(getTransactionId()).accountId);
+        var accountId = Objects.requireNonNull(Objects.requireNonNull(transactionIds.get(0)).accountId);
 
         if (client.isAutoValidateChecksumsEnabled()) {
             try {
@@ -975,6 +1016,24 @@ public abstract class Transaction<T extends Transaction<T>>
     CompletableFuture<Void> onExecuteAsync(Client client) {
         onExecute(client);
         return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+        switch (status) {
+            case TRANSACTION_EXPIRED:
+                if (regenerateTransactionId && transactionIdsLocked) {
+                    return ExecutionState.RequestError;
+                } else {
+                    var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
+                    var accountId = Objects.requireNonNull(firstTransactionId.accountId);
+                    generateTransactionIds(TransactionId.generate(accountId), transactionIds.size());
+                    wipeTransactionLists(transactionIds.size());
+                    return ExecutionState.Retry;
+                }
+            default:
+                return super.shouldRetry(status, response);
+        }
     }
 
     @Override

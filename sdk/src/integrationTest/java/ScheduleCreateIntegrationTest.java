@@ -42,7 +42,7 @@ public class ScheduleCreateIntegrationTest {
     void canCreateSchedule() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setKey(key)
@@ -71,7 +71,7 @@ public class ScheduleCreateIntegrationTest {
     void canGetTransactionSchedule() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setKey(key)
@@ -101,7 +101,7 @@ public class ScheduleCreateIntegrationTest {
     void canCreateWithSchedule() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setKey(key)
@@ -131,9 +131,9 @@ public class ScheduleCreateIntegrationTest {
     void canSignSchedule2() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
-        PrivateKey key3 = PrivateKey.generate();
+        PrivateKey key1 = PrivateKey.generateED25519();
+        PrivateKey key2 = PrivateKey.generateED25519();
+        PrivateKey key3 = PrivateKey.generateED25519();
 
         KeyList keyList = new KeyList();
 
@@ -207,7 +207,7 @@ public class ScheduleCreateIntegrationTest {
     void canScheduleTokenTransfer() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        PrivateKey key = PrivateKey.generate();
+        PrivateKey key = PrivateKey.generateED25519();
 
         var accountId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
@@ -278,7 +278,7 @@ public class ScheduleCreateIntegrationTest {
     void cannotScheduleTwoTransactions() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
         var accountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
             .setKey(key)
@@ -325,12 +325,12 @@ public class ScheduleCreateIntegrationTest {
         var testEnv = new IntegrationTestEnv(1);
 
         // Generate 3 random keys
-        var key1 = PrivateKey.generate();
+        var key1 = PrivateKey.generateED25519();
 
         // This is the submit key
-        var key2 = PrivateKey.generate();
+        var key2 = PrivateKey.generateED25519();
 
-        var key3 = PrivateKey.generate();
+        var key3 = PrivateKey.generateED25519();
 
         var keyList = new KeyList();
 
@@ -366,10 +366,6 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now());
 
         var scheduled = scheduledTx.freezeWith(testEnv.client);
-
-        var transactionId = scheduled.getTransactionId();
-
-        assertNotNull(transactionId);
 
         var scheduleId = Objects.requireNonNull(scheduled
             .execute(testEnv.client)

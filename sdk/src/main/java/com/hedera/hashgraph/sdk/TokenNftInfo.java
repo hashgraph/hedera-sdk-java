@@ -29,16 +29,23 @@ public class TokenNftInfo {
      */
     public final byte[] metadata;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
+    public final LedgerId ledgerId;
+
     private TokenNftInfo(
         NftId nftId,
         AccountId accountId,
         Instant creationTime,
-        byte[] metadata
+        byte[] metadata,
+        LedgerId ledgerId
     ) {
         this.nftId = nftId;
         this.accountId = accountId;
         this.creationTime = Objects.requireNonNull(creationTime);
         this.metadata = metadata;
+        this.ledgerId = ledgerId;
     }
 
     static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
@@ -46,7 +53,8 @@ public class TokenNftInfo {
             NftId.fromProtobuf(info.getNftID()),
             AccountId.fromProtobuf(info.getAccountID()),
             InstantConverter.fromProtobuf(info.getCreationTime()),
-            info.getMetadata().toByteArray()
+            info.getMetadata().toByteArray(),
+            LedgerId.fromByteString(info.getLedgerId())
         );
     }
 
@@ -61,6 +69,7 @@ public class TokenNftInfo {
                 .setAccountID(accountId.toProtobuf())
                 .setCreationTime(InstantConverter.toProtobuf(creationTime))
                 .setMetadata(ByteString.copyFrom(metadata))
+                .setLedgerId(ledgerId.toByteString())
         ).build();
     }
 
@@ -71,6 +80,7 @@ public class TokenNftInfo {
             .add("accountId", accountId)
             .add("creationTime", creationTime)
             .add("metadata", metadata)
+            .add("ledgerId", ledgerId)
             .toString();
     }
 

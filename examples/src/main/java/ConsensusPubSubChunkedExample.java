@@ -38,7 +38,7 @@ public final class ConsensusPubSubChunkedExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // generate a submit key to use with the topic
-        PrivateKey submitKey = PrivateKey.generate();
+        PrivateKey submitKey = PrivateKey.generateED25519();
 
         // make a new topic ID to use
         TopicId newTopicId = new TopicCreateTransaction()

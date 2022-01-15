@@ -2,42 +2,77 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * A public key on the Hedera™ network.
  */
-public final class PublicKey extends Key {
-    private final byte[] keyData;
-
-    PublicKey(byte[] keyData) {
-        this.keyData = keyData;
-    }
-
+public abstract class PublicKey extends Key {
     public static PublicKey fromBytes(byte[] publicKey) {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
             // If this is a 32 byte string, assume an Ed25519 public key
-            return new PublicKey(publicKey);
+            return new PublicKeyED25519(publicKey);
         }
 
         // Assume a DER-encoded private key descriptor
+        return fromBytesDER(publicKey);
+    }
+
+    public static PublicKey fromBytesDER(byte[] publicKey) {
         return PublicKey.fromSubjectKeyInfo(SubjectPublicKeyInfo.getInstance(publicKey));
+    }
+
+    public static PublicKey fromBytesED25519(byte[] publicKey) {
+        return PublicKeyED25519.fromBytesInternal(publicKey);
+    }
+
+    public static PublicKey fromBytesECDSA(byte[] publicKey) {
+        return PublicKeyECDSA.fromBytesInternal(publicKey);
     }
 
     public static PublicKey fromString(String publicKey) {
         return PublicKey.fromBytes(Hex.decode(publicKey));
     }
 
+    public static PublicKey fromStringED25519(String publicKey) {
+        return fromBytesED25519(Hex.decode(publicKey));
+    }
+
+    public static PublicKey fromStringECDSA(String publicKey) {
+        return fromBytesECDSA(Hex.decode(publicKey));
+    }
+
+    public static PublicKey fromStringDER(String publicKey) {
+        return fromBytesDER(Hex.decode(publicKey));
+    }
+
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        return new PublicKey(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+        if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
+            return PublicKeyED25519.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
+        } else {
+            // assume ECDSA
+            return PublicKeyECDSA.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
+        }
+    }
+
+    @Nullable
+    static PublicKey fromAliasBytes(ByteString aliasBytes) {
+        if (!aliasBytes.isEmpty()) {
+            try {
+                var key = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(aliasBytes));
+                return (key instanceof PublicKey) ? ((PublicKey) key) : null;
+            } catch (InvalidProtocolBufferException ignored) {
+            }
+        }
+        return null;
     }
 
     /**
@@ -47,22 +82,29 @@ public final class PublicKey extends Key {
      * @param signature The array of bytes representing the signature
      * @return boolean
      */
-    public boolean verify(byte[] message, byte[] signature) {
-        return Ed25519.verify(signature, 0, keyData, 0, message, 0, message.length);
-    }
+    public abstract boolean verify(byte[] message, byte[] signature);
+
+    abstract ByteString extractSignatureFromProtobuf(SignaturePair pair);
 
     public boolean verifyTransaction(Transaction<?> transaction) {
         if (!transaction.isFrozen()) {
             transaction.freeze();
         }
 
+        for (var publicKey : transaction.publicKeys) {
+            if (publicKey.equals(this)) {
+                return true;
+            }
+        }
+
         for (var signedTransaction : transaction.innerSignedTransactions) {
             @Var var found = false;
+
             for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
-                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytes()))) {
+                if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytesRaw()))) {
                     found = true;
 
-                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), sigPair.getEd25519().toByteArray())) {
+                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), extractSignatureFromProtobuf(sigPair).toByteArray())) {
                         return false;
                     }
                 }
@@ -76,38 +118,17 @@ public final class PublicKey extends Key {
         return true;
     }
 
-    @Override
-    com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
-        return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(keyData))
-            .build();
-    }
-
     /**
      * Serialize this key as a SignaturePair protobuf object
      */
-    SignaturePair toSignaturePairProtobuf(byte[] signature) {
-        return SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(keyData))
-            .setEd25519(ByteString.copyFrom(signature))
-            .build();
-    }
+    abstract SignaturePair toSignaturePairProtobuf(byte[] signature);
 
     @Override
-    public byte[] toBytes() {
-        return keyData;
-    }
+    public abstract byte[] toBytes();
 
-    private byte[] toDER() {
-        try {
-            return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
-                keyData
-            ).getEncoded("DER");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public abstract byte[] toBytesDER();
+
+    public abstract byte[] toBytesRaw();
 
     @Override
     public String toString() {
@@ -115,29 +136,14 @@ public final class PublicKey extends Key {
     }
 
     public String toStringDER() {
-        return Hex.toHexString(toDER());
+        return Hex.toHexString(toBytesDER());
     }
 
     public String toStringRaw() {
-        return Hex.toHexString(keyData);
+        return Hex.toHexString(toBytesRaw());
     }
 
-    @Override
-    public boolean equals(@Nullable Object o) {
-        if (this == o) {
-            return true;
-        }
-
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        PublicKey publicKey = (PublicKey) o;
-        return Arrays.equals(keyData, publicKey.keyData);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(keyData);
+    public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
+        return new AccountId(shard, realm, 0, null, this);
     }
 }

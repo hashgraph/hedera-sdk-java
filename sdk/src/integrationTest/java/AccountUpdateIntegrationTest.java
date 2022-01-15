@@ -24,8 +24,8 @@ class AccountUpdateIntegrationTest {
     void canUpdateAccountWithNewKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key1 = PrivateKey.generate();
-        var key2 = PrivateKey.generate();
+        var key1 = PrivateKey.generateED25519();
+        var key2 = PrivateKey.generateED25519();
 
         var response = new AccountCreateTransaction()
             .setKey(key1)

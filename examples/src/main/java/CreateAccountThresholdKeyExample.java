@@ -44,7 +44,7 @@ public final class CreateAccountThresholdKeyExample {
         PrivateKey[] privateKeys = new PrivateKey[3];
         PublicKey[] publicKeys = new PublicKey[3];
         for (int i = 0; i < 3; i++) {
-            PrivateKey key = PrivateKey.generate();
+            PrivateKey key = PrivateKey.generateED25519();
             privateKeys[i] = key;
             publicKeys[i] = key.getPublicKey();
         }
