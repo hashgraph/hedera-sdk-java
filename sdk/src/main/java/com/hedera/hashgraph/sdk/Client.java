@@ -66,6 +66,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean autoValidateChecksums = false;
 
+    private boolean defaultRegenerateTransactionId = true;
+
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
@@ -791,6 +793,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     @Deprecated
     public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
         return setDefaultMaxQueryPayment(maxQueryPayment);
+    }
+
+    public synchronized boolean getDefaultRegenerateTransactionId() {
+        return defaultRegenerateTransactionId;
+    }
+
+    public synchronized Client setDefaultRegenerateTransactionId(boolean regenerateTransactionId) {
+        this.defaultRegenerateTransactionId = regenerateTransactionId;
+        return this;
     }
 
     /**

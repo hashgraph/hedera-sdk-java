@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.MethodDescriptor;
 import io.grpc.Server;
 import io.grpc.ServerMethodDefinition;
@@ -21,7 +21,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Mocker implements AutoCloseable {
     private static final PrivateKey PRIVATE_KEY = PrivateKey.fromString("302e020100300506032b657004220420d45e1557156908c967804615af59a000be88c7aa7058bfcbe0f46b16c28f887d");
 
-    private final List<ServiceDescriptor> services = List.of(CryptoServiceGrpc.getServiceDescriptor());
+    private final List<ServiceDescriptor> services = List.of(
+        CryptoServiceGrpc.getServiceDescriptor(),
+        FileServiceGrpc.getServiceDescriptor(),
+        SmartContractServiceGrpc.getServiceDescriptor(),
+        ConsensusServiceGrpc.getServiceDescriptor(),
+        TokenServiceGrpc.getServiceDescriptor()
+    );
     private final List<List<Object>> responses;
     private final List<Server> servers = new ArrayList<>();
 
@@ -58,6 +64,8 @@ public class Mocker implements AutoCloseable {
                             if (r instanceof Function<?, ?>){
                                 r = ((Function<Object, Object>) r).apply(request);
                             }
+
+                            System.out.println(r);
 
                             if (r instanceof Throwable) {
                                 responseObserver.onError((Throwable) r);
