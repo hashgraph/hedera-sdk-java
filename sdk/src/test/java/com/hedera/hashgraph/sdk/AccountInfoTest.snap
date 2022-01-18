@@ -196,7 +196,7 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
     "ownedNfts_": 0,
     "maxAutomaticTokenAssociations_": 0,
     "alias_": {
-      "hash": 0,
+      "hash": 1,
       "bytes": "",
       "validUtf8": true,
       "empty": true
