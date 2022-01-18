@@ -59,7 +59,7 @@ public class MockingTest {
         var responses = List.of(responses1);
 
         try (var mocker = Mocker.withResponses(responses)) {
-            Assertions.assertThrows(StatusRuntimeException.class, () -> new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client));
+            Assertions.assertThrows(RuntimeException.class, () -> new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client));
         }
     }
 

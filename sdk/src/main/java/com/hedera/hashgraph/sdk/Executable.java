@@ -215,8 +215,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             // If we get an unhealthy node here, we've cycled through all the "good" nodes that have failed
             // and have no choice but to try a bad one.
-            if (!node.isHealthy())
+            if (!node.isHealthy()) {
                 delay(node.getRemainingTimeForBackoff());
+            }
 
             if (node.channelFailedToConnect()) {
                 logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
@@ -234,7 +235,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 if(grpcRequest.shouldRetryExceptionally(lastException)) {
                     continue;
                 } else {
-                    throw grpcRequest.mapStatusException();
+                    throw new RuntimeException(lastException);
                 }
             }
 
