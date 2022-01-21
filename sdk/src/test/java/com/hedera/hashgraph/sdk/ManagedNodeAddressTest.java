@@ -71,8 +71,8 @@ public class ManagedNodeAddressTest {
         var mirrorNodeAddressSecure = mirrorNodeAddress.toSecure();
         Assertions.assertNull(mirrorNodeAddressSecure.getName());
         Assertions.assertEquals(mirrorNodeAddressSecure.getAddress(), "hcs.mainnet.mirrornode.hedera.com");
-        Assertions.assertEquals(mirrorNodeAddressSecure.getPort(), 433);
-        Assertions.assertEquals(mirrorNodeAddressSecure.toString(), "hcs.mainnet.mirrornode.hedera.com:433");
+        Assertions.assertEquals(mirrorNodeAddressSecure.getPort(), 443);
+        Assertions.assertEquals(mirrorNodeAddressSecure.toString(), "hcs.mainnet.mirrornode.hedera.com:443");
 
         var mirrorNodeAddressInsecure = mirrorNodeAddressSecure.toInsecure();
         Assertions.assertNull(mirrorNodeAddressInsecure.getName());
@@ -80,7 +80,7 @@ public class ManagedNodeAddressTest {
         Assertions.assertEquals(mirrorNodeAddressInsecure.getPort(), 5600);
         Assertions.assertEquals(mirrorNodeAddressInsecure.toString(), "hcs.mainnet.mirrornode.hedera.com:5600");
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("this is a random string with spaces:433"));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("this is a random string with spaces:443"));
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:notarealport"));
     }
 }
