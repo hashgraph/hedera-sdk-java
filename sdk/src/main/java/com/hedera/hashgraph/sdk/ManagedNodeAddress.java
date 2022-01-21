@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 class ManagedNodeAddress {
     private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
     private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
-    private static final int PORT_MIRROR_PLAIN = 5600;
-    private static final int PORT_MIRROR_TLS = 443;
-    private static final int PORT_NODE_PLAIN = 50211;
-    private static final int PORT_NODE_TLS = 50212;
+    static final int PORT_MIRROR_PLAIN = 5600;
+    static final int PORT_MIRROR_TLS = 443;
+    static final int PORT_NODE_PLAIN = 50211;
+    static final int PORT_NODE_TLS = 50212;
 
     // If address is `in-process:.*` this will contain the right side of the `:`
     @Nullable
