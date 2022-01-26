@@ -1247,7 +1247,27 @@ public enum Status {
      * A fungible token transfer expected a different number of decimals than the involved
      * type actually has.
      */
-    UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS);
+    UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS),
+
+    /**
+     * The proxy account id is invalid or does not exist.
+     */
+    INVALID_PROXY_ACCOUNT_ID(ResponseCodeEnum.INVALID_PROXY_ACCOUNT_ID),
+
+    /**
+     * The transfer account id in CryptoDelete transaction is invalid or does not exist.
+     */
+    INVALID_TRANSFER_ACCOUNT_ID(ResponseCodeEnum.INVALID_TRANSFER_ACCOUNT_ID),
+
+    /**
+     * The fee collector account id in TokenFeeScheduleUpdate is invalid or does not exist.
+     */
+    INVALID_FEE_COLLECTOR_ACCOUNT_ID(ResponseCodeEnum.INVALID_FEE_COLLECTOR_ACCOUNT_ID),
+
+    /**
+     * The alias already set on an account cannot be updated using CryptoUpdate transaction.
+     */
+    ALIAS_IS_IMMUTABLE(ResponseCodeEnum.ALIAS_IS_IMMUTABLE);
 
     final ResponseCodeEnum code;
 
@@ -1741,6 +1761,14 @@ public enum Status {
                 return INVALID_ALIAS_KEY;
             case UNEXPECTED_TOKEN_DECIMALS:
                 return UNEXPECTED_TOKEN_DECIMALS;
+            case INVALID_PROXY_ACCOUNT_ID:
+                return INVALID_PROXY_ACCOUNT_ID;
+            case INVALID_TRANSFER_ACCOUNT_ID:
+                return INVALID_TRANSFER_ACCOUNT_ID;
+            case INVALID_FEE_COLLECTOR_ACCOUNT_ID:
+                return INVALID_FEE_COLLECTOR_ACCOUNT_ID;
+            case ALIAS_IS_IMMUTABLE:
+                return ALIAS_IS_IMMUTABLE;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
