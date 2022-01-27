@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
+import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import org.bouncycastle.util.encoders.Hex;
@@ -236,6 +237,19 @@ public final class TransactionRecord {
             }
 
             transactionRecord.addTokenTransferLists(tokenTransfersList);
+        }
+
+        for (var nftEntry : tokenNftTransfers.entrySet()) {
+            var nftTransferList = TokenTransferList.newBuilder()
+                .setToken(nftEntry.getKey().toProtobuf());
+            for (var aaEntry : nftEntry.getValue()) {
+                nftTransferList.addNftTransfers(NftTransfer.newBuilder()
+                    .setSenderAccountID(aaEntry.sender.toProtobuf())
+                    .setReceiverAccountID(aaEntry.receiver.toProtobuf())
+                    .setSerialNumber(aaEntry.serial).build());
+            }
+
+            transactionRecord.addTokenTransferLists(nftTransferList);
         }
 
         if (contractFunctionResult != null) {
