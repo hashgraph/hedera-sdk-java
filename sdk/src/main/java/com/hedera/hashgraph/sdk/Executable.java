@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
 import io.grpc.Status.Code;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
-
-// TODO: fix min/max backoff
 
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     static final Pattern RST_STREAM = Pattern
@@ -198,6 +197,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return execute(client, client.getRequestTimeout());
     }
 
+    @Override
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
 
@@ -206,9 +206,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         checkNodeAccountIds();
         setNodesFromNodeAccountIds(client);
 
+        var timeoutTime = Instant.now().plus(timeout);
+
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
             if (attempt > maxAttempts) {
                 throw new MaxAttemptsExceededException(lastException);
+            }
+
+            if (Instant.now().isAfter(timeoutTime)) {
+                throw new TimeoutException();
             }
 
             GrpcRequest grpcRequest = new GrpcRequest(attempt);
@@ -247,8 +253,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     continue;
                 case Retry:
                     // Response is not ready yet from server, need to wait.
-                    delay(grpcRequest.getDelay());
                     lastException = grpcRequest.mapStatusException();
+                    if (attempt < maxAttempts) {
+                        delay(grpcRequest.getDelay());
+                    }
                     continue;
                 case RequestError:
                     throw grpcRequest.mapStatusException();
@@ -376,7 +384,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     case ServerError:
                         return executeAsync(client, attempt + 1, grpcRequest.mapStatusException());
                     case Retry:
-                        return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
+                        return Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor)
                             .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
                     case RequestError:
                         return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
