@@ -229,7 +229,6 @@ public final class AccountInfo {
             accountInfoBuilder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
 
-        System.out.println("aliaskey = " + aliasKey);
         if (aliasKey != null) {
             accountInfoBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         }
