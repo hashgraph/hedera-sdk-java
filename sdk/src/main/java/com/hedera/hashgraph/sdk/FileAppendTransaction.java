@@ -29,10 +29,12 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         super();
 
         defaultMaxTransactionFee = new Hbar(5);
+        setChunkSize(2048);
     }
 
     FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
+
         initFromTransactionBody();
     }
 

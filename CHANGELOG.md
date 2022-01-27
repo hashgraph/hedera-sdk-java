@@ -16,6 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `ContractStateChange`
  * `StorageChange`
  * New response codes.
+ * `ChunkedTransaction.[set|get]ChunkSize()`, and changed default chunk size for `FileAppendTransaction` to 2048.
+
+### Fixed
+
+ * `TransactionId.setRegenerateTransactionId()`
+ * `Transaction.execute(client, timeout)`
 
 ### Deprecated
 
