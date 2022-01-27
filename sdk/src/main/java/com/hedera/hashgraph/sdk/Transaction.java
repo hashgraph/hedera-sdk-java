@@ -24,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+// TODO: mocking test to make sure setting regenerateTransactionIds to false prevents transaction IDs from being regenerated,
+//       and setting it to true causes transaction IDs to be regenerated
+
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
  *
@@ -1045,7 +1048,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if ((regenerateTransactionId == null || regenerateTransactionId) && transactionIdsLocked) {
+                if ((regenerateTransactionId != null && regenerateTransactionId) || transactionIdsLocked) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
