@@ -36,7 +36,6 @@ public class AccountInfoTest {
         .setAutoRenewPeriod(DurationConverter.toProtobuf(Duration.ofDays(7)))
         .setProxyAccountID(new AccountId(8).toProtobuf())
         .addLiveHashes(liveHash)
-        .setAlias(PublicKey.fromStringDER("302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toProtobufKey().toByteString())
         .setLedgerId(LedgerId.PREVIEWNET.toByteString())
         .build();
 
