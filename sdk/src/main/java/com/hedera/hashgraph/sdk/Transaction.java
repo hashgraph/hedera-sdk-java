@@ -605,7 +605,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    public final TransactionId getTransactionIdInternal() {
+    final TransactionId getTransactionIdInternal() {
         return transactionIds.get(nextTransactionIndex);
     }
 
