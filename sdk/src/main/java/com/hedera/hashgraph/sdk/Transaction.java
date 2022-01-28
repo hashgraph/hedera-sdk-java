@@ -24,9 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-// TODO: mocking test to make sure setting regenerateTransactionIds to false prevents transaction IDs from being regenerated,
-//       and setting it to true causes transaction IDs to be regenerated
-
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
  *

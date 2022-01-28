@@ -29,9 +29,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
-// TODO: fix request timeout
-// TODO: fix min/max backoff
-
 /**
  * Managed client for use on the Hedera Hashgraph network.
  */
