@@ -42,6 +42,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     protected List<AccountId> nodeAccountIds = Collections.emptyList();
     protected List<Node> nodes = new ArrayList<>();
 
+    protected boolean attemptedAllNodes = false;
+
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
     @VisibleForTesting
     Function<GrpcRequest, ResponseT> blockingUnaryCall =
@@ -215,8 +217,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             // If we get an unhealthy node here, we've cycled through all the "good" nodes that have failed
             // and have no choice but to try a bad one.
-            if (!node.isHealthy())
+            if (!node.isHealthy()) {
                 delay(node.getRemainingTimeForBackoff());
+            }
 
             if (node.channelFailedToConnect()) {
                 logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
@@ -329,6 +332,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     private ProtoRequestT getRequestForExecute() {
         var request = makeRequest();
+
+        if (nextNodeIndex == nodes.size() - 1) {
+            attemptedAllNodes = true;
+        }
 
         // advance the internal index
         // non-free queries and transactions map to more than 1 actual transaction and this will cause
@@ -522,6 +529,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             // Delegate interpretation of response status to subclass. Queries will initiate retries
             // differently from transaction submissions.
             var executionState = Executable.this.shouldRetry(responseStatus, response);
+            if (executionState == ExecutionState.ServerError && attemptedAllNodes) {
+                executionState = ExecutionState.Retry;
+                attemptedAllNodes = false;
+            }
             switch (executionState) {
                 case Retry:
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",

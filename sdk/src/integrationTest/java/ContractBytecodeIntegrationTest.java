@@ -9,6 +9,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +36,7 @@ public class ContractBytecodeIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -76,7 +77,7 @@ public class ContractBytecodeIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -121,7 +122,7 @@ public class ContractBytecodeIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -164,7 +165,7 @@ public class ContractBytecodeIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
