@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
 class ManagedNodeAddress {
     private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
     private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
+    static final int PORT_MIRROR_PLAIN = 5600;
+    static final int PORT_MIRROR_TLS = 443;
+    static final int PORT_NODE_PLAIN = 50211;
+    static final int PORT_NODE_TLS = 50212;
 
     // If address is `in-process:.*` this will contain the right side of the `:`
     @Nullable
@@ -55,18 +59,18 @@ class ManagedNodeAddress {
     }
 
     public boolean isTransportSecurity() {
-        return port == 50212 || port == 433;
+        return port == PORT_NODE_TLS || port == PORT_MIRROR_TLS;
     }
 
     public ManagedNodeAddress toInsecure() {
         var port = this.port;
 
         switch (this.port) {
-            case 50212:
-                port = 50211;
+            case PORT_NODE_TLS:
+                port = PORT_NODE_PLAIN;
                 break;
-            case 433:
-                port = 5600;
+            case PORT_MIRROR_TLS:
+                port = PORT_MIRROR_PLAIN;
         }
 
         return new ManagedNodeAddress(name, address, port);
@@ -76,11 +80,11 @@ class ManagedNodeAddress {
         var port = this.port;
 
         switch (this.port) {
-            case 50211:
-                port = 50212;
+            case PORT_NODE_PLAIN:
+                port = PORT_NODE_TLS;
                 break;
-            case 5600:
-                port = 433;
+            case PORT_MIRROR_PLAIN:
+                port = PORT_MIRROR_TLS;
         }
 
         return new ManagedNodeAddress(name, address, port);
