@@ -333,10 +333,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     private ProtoRequestT getRequestForExecute() {
         var request = makeRequest();
 
-        if (nextNodeIndex == nodes.size() - 1) {
-            attemptedAllNodes = true;
-        }
-
         // advance the internal index
         // non-free queries and transactions map to more than 1 actual transaction and this will cause
         // the next invocation of makeRequest to return the _next_ transaction
@@ -394,6 +390,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     abstract ProtoRequestT makeRequest();
 
     void advanceRequest() {
+        if (nextNodeIndex == nodes.size() - 1) {
+            attemptedAllNodes = true;
+        }
+
         // each time buildNext is called we move our cursor to the next transaction
         // wrapping around to ensure we are cycling
         nextNodeIndex = (nextNodeIndex + 1) % nodeAccountIds.size();
