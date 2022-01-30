@@ -248,6 +248,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 case Retry:
                     // Response is not ready yet from server, need to wait.
                     delay(grpcRequest.getDelay());
+                    lastException = grpcRequest.mapStatusException();
                     continue;
                 case RequestError:
                     throw grpcRequest.mapStatusException();
