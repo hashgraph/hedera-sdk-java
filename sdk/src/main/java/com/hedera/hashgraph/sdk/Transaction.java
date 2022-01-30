@@ -317,6 +317,12 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKEN_UNPAUSE:
                 return new TokenUnpauseTransaction(txs);
 
+            case CRYPTOAPPROVEALLOWANCE:
+                return new AccountAllowanceApproveTransaction(txs);
+
+            case CRYPTOADJUSTALLOWANCE:
+                return new AccountAllowanceAdjustTransaction(txs);
+
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
@@ -429,6 +435,12 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case SCHEDULEDELETE:
                 return new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
+
+            case CRYPTOAPPROVEALLOWANCE:
+                return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());
+
+            case CRYPTOADJUSTALLOWANCE:
+                return new AccountAllowanceAdjustTransaction(body.setCryptoAdjustAllowance(scheduled.getCryptoAdjustAllowance()).build());
 
             default:
                 throw new IllegalStateException("schedulable transaction did not have a transaction set");
