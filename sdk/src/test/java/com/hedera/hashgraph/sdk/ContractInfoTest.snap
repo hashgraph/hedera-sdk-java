@@ -34,9 +34,10 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
         "isMutable": false
       },
       "memoizedSerializedSize": -1,
+      "contractCase_": 3,
+      "contract_": 1,
       "shardNum_": 0,
       "realmNum_": 0,
-      "contractNum_": 1,
       "initialized": true
     },
     "accountID_": {
