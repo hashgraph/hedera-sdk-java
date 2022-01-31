@@ -52,6 +52,9 @@ public class CryptoTransferTransactionTest {
             .addNftTransfer(TokenId.fromString("0.0.3").nft(3), AccountId.fromString("0.0.5008"), AccountId.fromString("0.0.5006"))
             .addNftTransfer(TokenId.fromString("0.0.3").nft(4), AccountId.fromString("0.0.5007"), AccountId.fromString("0.0.5006"))
             .addNftTransfer(TokenId.fromString("0.0.2").nft(4), AccountId.fromString("0.0.5007"), AccountId.fromString("0.0.5006"))
+            .setHbarTransferApproval(AccountId.fromString("0.0.5007"), true)
+            .setTokenTransferApproval(TokenId.fromString("0.0.4"), AccountId.fromString("0.0.5006"), true)
+            .setNftTransferApproval(new NftId(TokenId.fromString("0.0.4"), 4), true)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
