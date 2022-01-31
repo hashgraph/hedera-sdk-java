@@ -85,6 +85,16 @@ public final class TransactionRecord {
      */
     public final List<TokenAssociation> automaticTokenAssociations;
 
+    @Nullable
+    public final PublicKey aliasKey;
+
+    public final List<TransactionRecord> children;
+
+    public final List<TransactionRecord> duplicates;
+
+    @Nullable
+    public final Instant parentConsensusTimestamp;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -98,7 +108,11 @@ public final class TransactionRecord {
         Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
         @Nullable ScheduleId scheduleRef,
         List<AssessedCustomFee> assessedCustomFees,
-        List<TokenAssociation> automaticTokenAssociations
+        List<TokenAssociation> automaticTokenAssociations,
+        @Nullable PublicKey aliasKey,
+        List<TransactionRecord> children,
+        List<TransactionRecord> duplicates,
+        @Nullable Instant parentConsensusTimestamp
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -113,9 +127,17 @@ public final class TransactionRecord {
         this.scheduleRef = scheduleRef;
         this.assessedCustomFees = assessedCustomFees;
         this.automaticTokenAssociations = automaticTokenAssociations;
+        this.aliasKey = aliasKey;
+        this.children = children;
+        this.duplicates = duplicates;
+        this.parentConsensusTimestamp = parentConsensusTimestamp;
     }
 
-    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
+    static TransactionRecord fromProtobuf(
+        com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
+        List<TransactionRecord> children,
+        List<TransactionRecord> duplicates
+    ) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
             transfers.add(Transfer.fromProtobuf(accountAmount));
@@ -156,6 +178,8 @@ public final class TransactionRecord {
             automaticTokenAssociations.add(TokenAssociation.fromProtobuf(tokenAssociation));
         }
 
+        var aliasKey = PublicKey.fromAliasBytes(transactionRecord.getAlias());
+
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -169,8 +193,17 @@ public final class TransactionRecord {
             tokenNftTransfers,
             transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
             fees,
-            automaticTokenAssociations
+            automaticTokenAssociations,
+            aliasKey,
+            children,
+            duplicates,
+            transactionRecord.hasParentConsensusTimestamp() ?
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
         );
+    }
+
+    static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
+        return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
     }
 
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -221,6 +254,14 @@ public final class TransactionRecord {
             transactionRecord.addAutomaticTokenAssociations(tokenAssociation.toProtobuf());
         }
 
+        if (aliasKey != null) {
+            transactionRecord.setAlias(aliasKey.toProtobufKey().toByteString());
+        }
+
+        if (parentConsensusTimestamp != null) {
+            transactionRecord.setParentConsensusTimestamp(InstantConverter.toProtobuf(parentConsensusTimestamp));
+        }
+
         return transactionRecord.build();
     }
 
@@ -240,6 +281,10 @@ public final class TransactionRecord {
             .add("scheduleRef", scheduleRef)
             .add("assessedCustomFees", assessedCustomFees)
             .add("automaticTokenAssociations", automaticTokenAssociations)
+            .add("aliasKey", aliasKey)
+            .add("children", children)
+            .add("duplicates", duplicates)
+            .add("parentConsensusTimestamp", parentConsensusTimestamp)
             .toString();
     }
 

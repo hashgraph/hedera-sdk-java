@@ -10,7 +10,7 @@ import java.util.Objects;
 /**
  * The ID for a smart contract instance on Hedera.
  */
-public final class ContractId extends Key implements Comparable<ContractId> {
+public class ContractId extends Key implements Comparable<ContractId> {
     /**
      * The shard number
      */

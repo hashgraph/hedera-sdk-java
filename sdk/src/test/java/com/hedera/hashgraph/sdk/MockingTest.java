@@ -257,7 +257,7 @@ public class MockingTest {
 
         service.buffer.enqueueResponse(TestResponse.transactionOk());
 
-        var aliceKey = PrivateKey.generate();
+        var aliceKey = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))

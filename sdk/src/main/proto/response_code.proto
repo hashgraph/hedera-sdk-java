@@ -1093,4 +1093,27 @@ enum ResponseCodeEnum {
    * consensus level.
    */
   CONSENSUS_GAS_EXHAUSTED = 279;
+
+  /**
+   * A precompiled contract succeeded, but was later reverted.
+   */
+  REVERTED_SUCCESS = 280;
+
+  /**
+   * All contract storage allocated to the current price regime has been consumed.
+   */
+  MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED = 281;
+
+  /**
+   * An alias used in a CryptoTransfer transaction is not the serialization of a primitive Key
+   * message--that is, a Key with a single Ed25519 or ECDSA(secp256k1) public key and no 
+   * unknown protobuf fields.
+   */
+  INVALID_ALIAS_KEY = 282;
+
+  /**
+   * A fungible token transfer expected a different number of decimals than the involved 
+   * type actually has.
+   */
+  UNEXPECTED_TOKEN_DECIMALS = 283;
 }

@@ -27,7 +27,7 @@ class TokenTransferIntegrationTest {
     void tokenTransferTest() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         @Var TransactionResponse response = new AccountCreateTransaction()
             .setKey(key)
@@ -83,8 +83,8 @@ class TokenTransferIntegrationTest {
     void insufficientBalanceForFee() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
+        PrivateKey key1 = PrivateKey.generateED25519();
+        PrivateKey key2 = PrivateKey.generateED25519();
         var accountId1 = new AccountCreateTransaction()
             .setKey(key1)
             .setInitialBalance(new Hbar(2))

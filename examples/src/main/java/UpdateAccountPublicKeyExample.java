@@ -37,8 +37,8 @@ public final class UpdateAccountPublicKeyExample {
 
         // First, we create a new account so we don't affect our account
 
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
+        PrivateKey key1 = PrivateKey.generateED25519();
+        PrivateKey key2 = PrivateKey.generateED25519();
 
         TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
             .setKey(key1.getPublicKey())

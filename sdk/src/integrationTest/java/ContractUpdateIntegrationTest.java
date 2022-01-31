@@ -36,7 +36,7 @@ public class ContractUpdateIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -53,7 +53,7 @@ public class ContractUpdateIntegrationTest {
         assertEquals(contractId.toString(), Objects.requireNonNull(info.accountId).toString());
         assertNotNull(info.adminKey);
         assertEquals(Objects.requireNonNull(testEnv.operatorKey).toString(), Objects.requireNonNull(info.adminKey).toString());
-        assertEquals(926, info.storage);
+        assertEquals(128, info.storage);
         assertEquals("[e2e::ContractCreateTransaction]", info.contractMemo);
 
         new ContractUpdateTransaction()
@@ -71,7 +71,7 @@ public class ContractUpdateIntegrationTest {
         assertEquals(contractId.toString(), Objects.requireNonNull(info.accountId).toString());
         assertNotNull(info.adminKey);
         assertEquals(Objects.requireNonNull(testEnv.operatorKey).toString(), Objects.requireNonNull(info.adminKey).toString());
-        assertEquals(926, info.storage);
+        assertEquals(128, info.storage);
         assertEquals("[e2e::ContractUpdateTransaction]", info.contractMemo);
 
         new ContractDeleteTransaction()
@@ -118,7 +118,7 @@ public class ContractUpdateIntegrationTest {
 
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
-                .setGas(75000)
+                .setGas(100000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")

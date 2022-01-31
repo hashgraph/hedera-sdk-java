@@ -60,7 +60,8 @@ public class TokenInfoTest {
             TokenSupplyType.FINITE,
             1000000,
             null,
-            true
+            true,
+            LedgerId.MAINNET
         );
     }
 
