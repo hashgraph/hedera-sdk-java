@@ -1045,7 +1045,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if ((regenerateTransactionId == null || regenerateTransactionId) && transactionIdsLocked) {
+                if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIdsLocked) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
