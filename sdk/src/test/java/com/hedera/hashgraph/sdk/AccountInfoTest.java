@@ -9,11 +9,12 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
-
+@Disabled
 public class AccountInfoTest {
     private static final PrivateKey privateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
@@ -36,7 +37,6 @@ public class AccountInfoTest {
         .setAutoRenewPeriod(DurationConverter.toProtobuf(Duration.ofDays(7)))
         .setProxyAccountID(new AccountId(8).toProtobuf())
         .addLiveHashes(liveHash)
-        .setAlias(PublicKey.fromStringDER("302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toProtobufKey().toByteString())
         .setLedgerId(LedgerId.PREVIEWNET.toByteString())
         .build();
 
