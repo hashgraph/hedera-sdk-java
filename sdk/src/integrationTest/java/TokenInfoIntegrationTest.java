@@ -25,11 +25,11 @@ class TokenInfoIntegrationTest {
     void canQueryTokenInfoWhenAllKeysAreDifferent() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key1 = PrivateKey.generate();
-        var key2 = PrivateKey.generate();
-        var key3 = PrivateKey.generate();
-        var key4 = PrivateKey.generate();
-        var key5 = PrivateKey.generate();
+        var key1 = PrivateKey.generateED25519();
+        var key2 = PrivateKey.generateED25519();
+        var key3 = PrivateKey.generateED25519();
+        var key4 = PrivateKey.generateED25519();
+        var key5 = PrivateKey.generateED25519();
 
         var response = new TokenCreateTransaction()
             .setTokenName("ffff")

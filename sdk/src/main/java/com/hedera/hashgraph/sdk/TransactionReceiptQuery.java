@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptQuery;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,14 +24,16 @@ public final class TransactionReceiptQuery
     extends Query<TransactionReceipt, TransactionReceiptQuery> {
 
     @Nullable
-    TransactionId transactionId = null;
+    private TransactionId transactionId = null;
+    private boolean includeChildren = false;
+    private boolean includeDuplicates = false;
 
     public TransactionReceiptQuery() {
     }
 
     @Override
     @Nullable
-    public TransactionId getTransactionId() {
+    public TransactionId getTransactionIdInternal() {
         return transactionId;
     }
 
@@ -42,6 +46,41 @@ public final class TransactionReceiptQuery
     public TransactionReceiptQuery setTransactionId(TransactionId transactionId) {
         Objects.requireNonNull(transactionId);
         this.transactionId = transactionId;
+        return this;
+    }
+
+    public boolean getIncludeChildren() {
+        return includeChildren;
+    }
+
+    /**
+     * Whether the response should include the records of any child transactions spawned by the
+     * top-level transaction with the given transactionID.
+     *
+     * @param value The value that includeChildren should be set to; true to include children, false to exclude
+     * @return {@code this}
+     */
+    public TransactionReceiptQuery setIncludeChildren(boolean value) {
+        includeChildren = value;
+        return this;
+    }
+
+    public boolean getIncludeDuplicates() {
+        return includeDuplicates;
+    }
+
+    /**
+     * Whether records of processing duplicate transactions should be returned along with the record
+     * of processing the first consensus transaction with the given id whose status was neither
+     * INVALID_NODE_ACCOUNT nor INVALID_PAYER_SIGNATURE or, if no such
+     * record exists, the record of processing the first transaction to reach consensus with the
+     * given transaction id.
+     *
+     * @param value The value that includeDuplicates should be set to; true to include duplicates, false to exclude
+     * @return {@code this}
+     */
+    public TransactionReceiptQuery setIncludeDuplicates(boolean value) {
+        includeDuplicates = value;
         return this;
     }
 
@@ -59,7 +98,9 @@ public final class TransactionReceiptQuery
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        var builder = TransactionGetReceiptQuery.newBuilder();
+        var builder = TransactionGetReceiptQuery.newBuilder()
+            .setIncludeChildReceipts(includeChildren)
+            .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -76,7 +117,20 @@ public final class TransactionReceiptQuery
 
     @Override
     TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt());
+        var receiptResponse = response.getTransactionGetReceipt();
+        var duplicates = mapReceiptList(receiptResponse.getDuplicateTransactionReceiptsList());
+        var children = mapReceiptList(receiptResponse.getChildTransactionReceiptsList());
+        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children);
+    }
+
+    private static List<TransactionReceipt> mapReceiptList(
+        List<com.hedera.hashgraph.sdk.proto.TransactionReceipt> protoReceiptList
+    ) {
+        List<TransactionReceipt> outList = new ArrayList<>(protoReceiptList.size());
+        for (var protoReceipt : protoReceiptList) {
+            outList.add(TransactionReceipt.fromProtobuf(protoReceipt));
+        }
+        return outList;
     }
 
     @Override
@@ -107,7 +161,7 @@ public final class TransactionReceiptQuery
                 break;
 
             default:
-                return ExecutionState.Error;
+                return ExecutionState.RequestError;
         }
 
         var receiptStatus =
@@ -122,7 +176,7 @@ public final class TransactionReceiptQuery
                 return ExecutionState.Retry;
 
             default:
-                return ExecutionState.Finished;
+                return ExecutionState.Success;
         }
     }
 }

@@ -74,26 +74,26 @@ abstract class ManagedNetwork<
      * The name of the network. This corresponds to ledger ID in entity ID checksum calculations
      */
     @Nullable
-    private NetworkName networkName;
+    private LedgerId ledgerId;
 
     protected ManagedNetwork(ExecutorService executor) {
         this.executor = executor;
     }
 
     @Nullable
-    NetworkName getNetworkName() {
-        return networkName;
+    LedgerId getLedgerId() {
+        return ledgerId;
     }
 
     /**
-     * Set the new network name for this network. Network names are used for TLS certificate checking and entity ID
+     * Set the new LedgerId for this network. LedgerIds are used for TLS certificate checking and entity ID
      * checksum validation.
      *
-     * @param networkName
+     * @param ledgerId
      * @return
      */
-    synchronized ManagedNetworkT setNetworkName(@Nullable NetworkName networkName) {
-        this.networkName = networkName;
+    synchronized ManagedNetworkT setLedgerId(@Nullable LedgerId ledgerId) {
+        this.ledgerId = ledgerId;
 
         // noinspection unchecked
         return (ManagedNetworkT) this;

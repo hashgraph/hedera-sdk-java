@@ -22,7 +22,7 @@ public class AutomaticAssociationTest {
     void autoAssociateTest() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
         var accountId = new AccountCreateTransaction()
             .setKey(key)
             .setInitialBalance(new Hbar(10))

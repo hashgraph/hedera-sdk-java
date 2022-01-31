@@ -84,7 +84,7 @@ public class IntegrationTestEnv {
     }
 
     public IntegrationTestEnv useThrowawayAccount(Hbar initialBalance) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
         operatorKey = key.getPublicKey();
         operatorId = new AccountCreateTransaction()
             .setInitialBalance(initialBalance)

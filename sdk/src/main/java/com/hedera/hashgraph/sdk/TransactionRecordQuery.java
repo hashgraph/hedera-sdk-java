@@ -8,6 +8,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -22,14 +24,16 @@ import java.util.Objects;
  */
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     @Nullable
-    TransactionId transactionId = null;
+    private TransactionId transactionId = null;
+    private boolean includeChildren = false;
+    private boolean includeDuplicates = false;
 
     public TransactionRecordQuery() {
     }
 
     @Nullable
     @Override
-    public TransactionId getTransactionId() {
+    public TransactionId getTransactionIdInternal() {
         return transactionId;
     }
 
@@ -45,6 +49,41 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         return this;
     }
 
+    public boolean getIncludeDuplicates() {
+        return includeDuplicates;
+    }
+
+    /**
+     * Whether records of processing duplicate transactions should be returned along with the record
+     * of processing the first consensus transaction with the given id whose status was neither
+     * INVALID_NODE_ACCOUNT nor INVALID_PAYER_SIGNATURE or, if no such
+     * record exists, the record of processing the first transaction to reach consensus with the
+     * given transaction id.
+     *
+     * @param value The value that includeDuplicates should be set to; true to include duplicates, false to exclude
+     * @return {@code this}
+     */
+    public TransactionRecordQuery setIncludeDuplicates(boolean value) {
+        includeDuplicates = value;
+        return this;
+    }
+
+    public boolean getIncludeChildren() {
+        return includeChildren;
+    }
+
+    /**
+     * Whether the response should include the records of any child transactions spawned by the
+     * top-level transaction with the given transactionID.
+     *
+     * @param value The value that includeChildren should be set to; true to include children, false to exclude
+     * @return {@code this}
+     */
+    public TransactionRecordQuery setIncludeChildren(boolean value) {
+        includeChildren = value;
+        return this;
+    }
+
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (transactionId != null) {
@@ -54,7 +93,9 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Override
     void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        var builder = TransactionGetRecordQuery.newBuilder();
+        var builder = TransactionGetRecordQuery.newBuilder()
+            .setIncludeChildRecords(includeChildren)
+            .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -74,7 +115,20 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
 
     @Override
     TransactionRecord mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
+        var recordResponse = response.getTransactionGetRecord();
+        List<TransactionRecord> children = mapRecordList(recordResponse.getChildTransactionRecordsList());
+        List<TransactionRecord> duplicates = mapRecordList(recordResponse.getDuplicateTransactionRecordsList());
+        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children, duplicates);
+    }
+
+    private List<TransactionRecord> mapRecordList(
+        List<com.hedera.hashgraph.sdk.proto.TransactionRecord> protoRecordList
+    ) {
+        List<TransactionRecord> outList = new ArrayList<>(protoRecordList.size());
+        for (var protoRecord : protoRecordList) {
+            outList.add(TransactionRecord.fromProtobuf(protoRecord));
+        }
+        return outList;
     }
 
     @Override
@@ -85,7 +139,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     ExecutionState shouldRetry(Status status, Response response) {
         var retry = super.shouldRetry(status, response);
-        if (retry != ExecutionState.Finished) {
+        if (retry != ExecutionState.Success) {
             return retry;
         }
 
@@ -98,12 +152,12 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case OK:
                 // When fetching payment an `OK` in there query header means the cost is in the response
                 if (paymentTransactions == null || paymentTransactions.isEmpty()) {
-                    return ExecutionState.Finished;
+                    return ExecutionState.Success;
                 } else {
                     break;
                 }
             default:
-                return ExecutionState.Error;
+                return ExecutionState.RequestError;
         }
 
         var receiptStatus =
@@ -118,7 +172,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
                 return ExecutionState.Retry;
 
             default:
-                return ExecutionState.Finished;
+                return ExecutionState.Success;
         }
     }
 }

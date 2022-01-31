@@ -104,12 +104,16 @@ public class MockingTest {
     @CsvSource({
         "BUSY, 1, sync",
         "PLATFORM_TRANSACTION_NOT_CREATED, 1, sync",
+        "TRANSACTION_EXPIRED, 1, sync",
         "BUSY, 3, sync",
         "PLATFORM_TRANSACTION_NOT_CREATED, 3, sync",
+        "TRANSACTION_EXPIRED, 3, sync",
         "BUSY, 1, async",
         "PLATFORM_TRANSACTION_NOT_CREATED, 1, async",
+        "TRANSACTION_EXPIRED, 1, async",
         "BUSY, 3, async",
         "PLATFORM_TRANSACTION_NOT_CREATED, 3, async",
+        "TRANSACTION_EXPIRED, 3, async"
     })
     void shouldRetryFunctionsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
         var service = new TestCryptoService();
@@ -253,7 +257,7 @@ public class MockingTest {
 
         service.buffer.enqueueResponse(TestResponse.transactionOk());
 
-        var aliceKey = PrivateKey.generate();
+        var aliceKey = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))

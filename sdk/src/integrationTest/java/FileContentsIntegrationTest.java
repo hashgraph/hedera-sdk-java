@@ -18,20 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class FileContentsIntegrationTest {
-    @Test
-    void downloadAddressBook() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
-
-        var contents = new FileContentsQuery()
-            .setFileId(FileId.ADDRESS_BOOK)
-            .execute(testEnv.client);
-
-        try (FileOutputStream outputStream = new FileOutputStream(new File("previewnet.pb"))) {
-            outputStream.write(contents.toByteArray());
-        }
-
-        testEnv.close();
-    }
 
     @Test
     @DisplayName("Can query file contents")

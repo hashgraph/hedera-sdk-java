@@ -24,9 +24,9 @@ public final class MultiAppTransferExample {
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     // the exchange should possess this key, we're only generating it for demonstration purposes
-    private static final PrivateKey exchangeKey = PrivateKey.generate();
+    private static final PrivateKey exchangeKey = PrivateKey.generateED25519();
     // this is the only key we should actually possess
-    private static final PrivateKey userKey = PrivateKey.generate();
+    private static final PrivateKey userKey = PrivateKey.generateED25519();
     private static final Client client;
 
     static {

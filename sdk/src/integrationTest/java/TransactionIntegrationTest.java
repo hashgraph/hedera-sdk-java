@@ -36,7 +36,7 @@ public class TransactionIntegrationTest {
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setKey(key)
@@ -62,7 +62,7 @@ public class TransactionIntegrationTest {
     void transactionFromToBytes() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generate();
+        var key = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
             .setKey(key)

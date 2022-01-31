@@ -42,9 +42,9 @@ public class ScheduleMultiSigTransactionExample {
         AccountId operatorId = Objects.requireNonNull(client.getOperatorAccountId());
 
         // Generate 3 random keys
-        PrivateKey key1 = PrivateKey.generate();
-        PrivateKey key2 = PrivateKey.generate();
-        PrivateKey key3 = PrivateKey.generate();
+        PrivateKey key1 = PrivateKey.generateED25519();
+        PrivateKey key2 = PrivateKey.generateED25519();
+        PrivateKey key3 = PrivateKey.generateED25519();
 
         // Create a keylist from those keys. This key will be used as the new account's key
         // The reason we want to use a `KeyList` is to simulate a multi-party system where
