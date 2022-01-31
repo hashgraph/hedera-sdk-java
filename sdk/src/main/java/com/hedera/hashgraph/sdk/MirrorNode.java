@@ -15,10 +15,17 @@ class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
         super(node, address);
     }
 
+    @Override
+    protected String getAuthority() {
+        return null;
+    }
+
+    @Override
     MirrorNode toInsecure() {
         return new MirrorNode(this, address.toInsecure());
     }
 
+    @Override
     MirrorNode toSecure() {
         return new MirrorNode(this, address.toSecure());
     }
