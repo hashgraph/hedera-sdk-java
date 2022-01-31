@@ -35,7 +35,7 @@ public class ContractDeleteIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -52,7 +52,7 @@ public class ContractDeleteIntegrationTest {
         assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
         assertNotNull(info.adminKey);
         assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         new ContractDeleteTransaction()
@@ -81,7 +81,7 @@ public class ContractDeleteIntegrationTest {
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
         var contractId = Objects.requireNonNull(new ContractCreateTransaction()
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -99,7 +99,7 @@ public class ContractDeleteIntegrationTest {
         assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
         assertNotNull(info.adminKey);
         // assertEquals(info.adminKey, contractId);
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         var error = assertThrows(ReceiptStatusException.class, () -> {
