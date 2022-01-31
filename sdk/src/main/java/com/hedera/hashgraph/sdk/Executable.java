@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -279,7 +280,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             setNodesFromNodeAccountIds(client);
 
             return executeAsync(client, 1, null);
-        });
+        })
+            .orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
     }
 
     @VisibleForTesting
