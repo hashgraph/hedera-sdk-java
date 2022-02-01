@@ -81,7 +81,7 @@ public abstract class Transaction<T extends Transaction<T>>
     private Hbar maxTransactionFee = null;
     private String memo = "";
     protected boolean transactionIdsLocked = false;
-    protected boolean regenerateTransactionId = false;
+    protected Boolean regenerateTransactionId = null;
 
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
@@ -161,10 +161,10 @@ public abstract class Transaction<T extends Transaction<T>>
                 txBody = TransactionBody.parseFrom(transaction.getBodyBytes());
 
                 transaction.setSignedTransactionBytes(SignedTransaction.newBuilder()
-                    .setBodyBytes(transaction.getBodyBytes())
-                    .setSigMap(transaction.getSigMap())
-                    .build()
-                    .toByteString())
+                        .setBodyBytes(transaction.getBodyBytes())
+                        .setSigMap(transaction.getSigMap())
+                        .build()
+                        .toByteString())
                     .clearBodyBytes()
                     .clearSigMap();
             } else {
@@ -608,7 +608,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    public final TransactionId getTransactionIdInternal() {
+    final TransactionId getTransactionIdInternal() {
         return transactionIds.get(nextTransactionIndex);
     }
 
@@ -639,6 +639,17 @@ public abstract class Transaction<T extends Transaction<T>>
     public final T setTransactionId(TransactionId transactionId) {
         requireNotFrozen();
         transactionIds = Collections.singletonList(transactionId);
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
+    public final Boolean getRegenerateTransactionId() {
+        return regenerateTransactionId;
+    }
+
+    public final T setRegenerateTransactionId(boolean regenerateTransactionId) {
+        this.regenerateTransactionId = regenerateTransactionId;
 
         // noinspection unchecked
         return (T) this;
@@ -836,6 +847,9 @@ public abstract class Transaction<T extends Transaction<T>>
         generateTransactionIds(transactionIds.get(0), requiredChunks);
         wipeTransactionLists(requiredChunks);
 
+        var clientDefaultRegenerateTransactionId = client != null ? client.getDefaultRegenerateTransactionId() : null;
+        regenerateTransactionId = regenerateTransactionId != null ? regenerateTransactionId : clientDefaultRegenerateTransactionId;
+
         // noinspection unchecked
         return (T) this;
     }
@@ -916,8 +930,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     private static boolean publicKeyIsInSigPairList(ByteString publicKeyBytes, List<SignaturePair> sigPairList) {
-        for(var pair : sigPairList) {
-            if(pair.getPubKeyPrefix().equals(publicKeyBytes)) {
+        for (var pair : sigPairList) {
+            if (pair.getPubKeyPrefix().equals(publicKeyBytes)) {
                 return true;
             }
         }
@@ -1022,7 +1036,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if (regenerateTransactionId && transactionIdsLocked) {
+                if ((regenerateTransactionId == null || regenerateTransactionId) && transactionIdsLocked) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));

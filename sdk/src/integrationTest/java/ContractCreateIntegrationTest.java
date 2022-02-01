@@ -34,7 +34,7 @@ public class ContractCreateIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -51,7 +51,7 @@ public class ContractCreateIntegrationTest {
         assertEquals(Objects.requireNonNull(info.accountId).toString(), Objects.requireNonNull(contractId).toString());
         assertNotNull(info.adminKey);
         assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         new ContractDeleteTransaction()
@@ -80,7 +80,7 @@ public class ContractCreateIntegrationTest {
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
         response = new ContractCreateTransaction()
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -97,7 +97,7 @@ public class ContractCreateIntegrationTest {
         assertEquals(Objects.requireNonNull(info.accountId).toString(), Objects.requireNonNull(contractId).toString());
         assertNotNull(info.adminKey);
         // assertEquals(info.adminKey, contractId);
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         testEnv.close();
@@ -150,7 +150,7 @@ public class ContractCreateIntegrationTest {
         var error = assertThrows(ReceiptStatusException.class, () -> {
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(75000)
+                .setGas(100000)
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .execute(testEnv.client)
@@ -175,7 +175,7 @@ public class ContractCreateIntegrationTest {
         var error = assertThrows(ReceiptStatusException.class, () -> {
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(75000)
+                .setGas(100000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setContractMemo("[e2e::ContractCreateTransaction]")
                 .execute(testEnv.client)

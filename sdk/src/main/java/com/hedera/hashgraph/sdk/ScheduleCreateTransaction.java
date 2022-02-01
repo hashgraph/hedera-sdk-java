@@ -129,18 +129,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     @Override
-    final com.hedera.hashgraph.sdk.TransactionResponse mapResponse(
-        TransactionResponse transactionResponse,
-        AccountId nodeId,
-        com.hedera.hashgraph.sdk.proto.Transaction request
-    ) {
-        var transactionId = Objects.requireNonNull(getTransactionIdInternal()).setScheduled(true);
-        var hash = hash(request.getSignedTransactionBytes().toByteArray());
-        nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
-        return new com.hedera.hashgraph.sdk.TransactionResponse(nodeId, transactionId, hash, transactionId);
-    }
-
-    @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
         throw new IllegalStateException("Cannot schedule `ScheduleCreateTransaction`");
     }

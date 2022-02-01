@@ -92,6 +92,10 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.useCount = node.useCount;
     }
 
+    protected String getAuthority() {
+        return "127.0.0.1";
+    }
+
     /**
      * Create an insecure version of this node
      *
@@ -232,7 +236,12 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         if (address.isInProcess()) {
             channelBuilder = InProcessChannelBuilder.forName(Objects.requireNonNull(address.getName()));
         } else if (address.isTransportSecurity()) {
-            channelBuilder = Grpc.newChannelBuilder(address.toString(), getChannelCredentials()).overrideAuthority("127.0.0.1");
+            channelBuilder = Grpc.newChannelBuilder(address.toString(), getChannelCredentials());
+
+            String authority = getAuthority();
+            if (authority != null) {
+                channelBuilder = channelBuilder.overrideAuthority(authority);
+            }
         } else {
             channelBuilder = ManagedChannelBuilder.forTarget(address.toString()).usePlaintext();
         }
