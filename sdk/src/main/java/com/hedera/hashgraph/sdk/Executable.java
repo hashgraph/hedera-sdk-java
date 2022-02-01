@@ -9,17 +9,20 @@ import io.grpc.Status.Code;
 import io.grpc.stub.ClientCalls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;
 import net.javacrumbs.futureconverter.java8common.Java8FutureUtils;
 
 import javax.annotation.Nullable;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.concurrent.CompletableFuture;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -199,6 +202,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return execute(client, client.getRequestTimeout());
     }
 
+    @Override
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
 
@@ -207,9 +211,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         checkNodeAccountIds();
         setNodesFromNodeAccountIds(client);
 
+        var timeoutTime = Instant.now().plus(timeout);
+
         for (int attempt = 1; /* condition is done within loop */; attempt++) {
             if (attempt > maxAttempts) {
                 throw new MaxAttemptsExceededException(lastException);
+            }
+
+            if (Instant.now().isAfter(timeoutTime)) {
+                throw new TimeoutException();
             }
 
             GrpcRequest grpcRequest = new GrpcRequest(attempt);
@@ -248,7 +258,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     continue;
                 case Retry:
                     // Response is not ready yet from server, need to wait.
-                    delay(grpcRequest.getDelay());
+                    lastException = grpcRequest.mapStatusException();
+                    if (attempt < maxAttempts) {
+                        delay(grpcRequest.getDelay());
+                    }
                     continue;
                 case RequestError:
                     throw grpcRequest.mapStatusException();
@@ -269,7 +282,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             setNodesFromNodeAccountIds(client);
 
             return executeAsync(client, 1, null);
-        });
+        })
+            .orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
     }
 
     @VisibleForTesting
@@ -376,7 +390,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                     case ServerError:
                         return executeAsync(client, attempt + 1, grpcRequest.mapStatusException());
                     case Retry:
-                        return Delayer.delayFor(grpcRequest.getDelay(), client.executor)
+                        return Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor)
                             .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
                     case RequestError:
                         return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());

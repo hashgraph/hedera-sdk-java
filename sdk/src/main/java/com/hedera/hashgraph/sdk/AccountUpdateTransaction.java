@@ -51,6 +51,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     private String accountMemo = null;
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
+    @Nullable
+    private Key aliasKey;
 
     public AccountUpdateTransaction() {
     }
@@ -98,6 +100,24 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         Objects.requireNonNull(key);
         requireNotFrozen();
         this.key = key;
+        return this;
+    }
+
+    @Nullable
+    public Key getAliasKey() {
+        return aliasKey;
+    }
+
+    /**
+     * Sets the new key.
+     *
+     * @param aliasKey The Key to be set
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction setAliasKey(Key aliasKey) {
+        Objects.requireNonNull(aliasKey);
+        requireNotFrozen();
+        this.aliasKey = aliasKey;
         return this;
     }
 
@@ -251,6 +271,17 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasMaxAutomaticTokenAssociations()) {
             maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
         }
+        if (!body.getAlias().isEmpty()) {
+            try {
+                aliasKey = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(body.getAlias()));
+
+                if (!(aliasKey instanceof PublicKey)) {
+                    aliasKey = null;
+                }
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     @Override
@@ -284,7 +315,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (maxAutomaticTokenAssociations != null) {
             builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
         }
-
+        if (aliasKey != null) {
+            builder.setAlias(aliasKey.toProtobufKey().toByteString());
+        }
         return builder;
     }
 

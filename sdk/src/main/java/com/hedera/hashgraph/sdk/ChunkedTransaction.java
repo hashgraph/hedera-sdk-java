@@ -23,7 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
-    private static final int CHUNK_SIZE = 1024;
+    private int chunkSize = 1024;
     protected ByteString data = ByteString.EMPTY;
     /**
      * Maximum number of chunks this message will get broken up into when
@@ -83,6 +83,18 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    public int getChunkSize() {
+        return chunkSize;
+    }
+
+    public T setChunkSize(int chunkSize) {
+        requireNotFrozen();
+        this.chunkSize = chunkSize;
+
+        // noinspection unchecked
+        return (T) this;
+    }
+
     @Override
     public byte[] getTransactionHash() {
         if (outerTransactions.size() > nodeAccountIds.size()) {
@@ -132,16 +144,16 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     @Override
     public T addSignature(PublicKey publicKey, byte[] signature) {
-        if (data.size() > CHUNK_SIZE) {
-            throw new IllegalStateException("Cannot manually add signature to chunked transaction with length greater than " + CHUNK_SIZE);
+        if (data.size() > chunkSize) {
+            throw new IllegalStateException("Cannot manually add signature to chunked transaction with length greater than " + chunkSize);
         }
         return super.addSignature(publicKey, signature);
     }
 
     @Override
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
-        if (data.size() > CHUNK_SIZE) {
-            throw new IllegalStateException("Cannot call getSignatures() on a chunked transaction with length greater than " + CHUNK_SIZE);
+        if (data.size() > chunkSize) {
+            throw new IllegalStateException("Cannot call getSignatures() on a chunked transaction with length greater than " + chunkSize);
         }
         return super.getSignatures();
     }
@@ -253,8 +265,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 "The underlying transaction for a scheduled transaction cannot have node account IDs set"
             );
         }
-        if (data.size() > CHUNK_SIZE) {
-            throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + CHUNK_SIZE);
+        if (data.size() > chunkSize) {
+            throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + chunkSize);
         }
 
         var bodyBuilder = spawnBodyBuilder(null);
@@ -275,7 +287,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     @Override
     int getRequiredChunks() {
-        @Var var requiredChunks = (this.data.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE;
+        @Var var requiredChunks = (this.data.size() + (chunkSize - 1)) / chunkSize;
 
         if (requiredChunks == 0) {
             requiredChunks = 1;
@@ -296,8 +308,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         innerSignedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
 
         for (int i = 0; i < requiredChunks; i++) {
-            var startIndex = i * CHUNK_SIZE;
-            @Var var endIndex = startIndex + CHUNK_SIZE;
+            var startIndex = i * chunkSize;
+            @Var var endIndex = startIndex + chunkSize;
 
             if (endIndex > this.data.size()) {
                 endIndex = this.data.size();

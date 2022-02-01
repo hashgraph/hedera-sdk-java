@@ -3,31 +3,59 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NftTransfer;
+import com.hedera.hashgraph.sdk.proto.TokenID;
+import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
+    public final TokenId tokenId;
     public final AccountId sender;
     public final AccountId receiver;
     public final long serial;
+    public boolean isApproved;
 
-    TokenNftTransfer(AccountId sender, AccountId receiver, long serial) {
+    TokenNftTransfer(TokenId tokenId, AccountId sender, AccountId receiver, long serial, boolean isApproved) {
+        this.tokenId = tokenId;
         this.sender = sender;
         this.receiver = receiver;
         this.serial = serial;
+        this.isApproved = isApproved;
     }
 
-    static TokenNftTransfer fromProtobuf(NftTransfer nftTransfer) {
-        return new TokenNftTransfer(
-            AccountId.fromProtobuf(nftTransfer.getSenderAccountID()),
-            AccountId.fromProtobuf(nftTransfer.getReceiverAccountID()),
-            nftTransfer.getSerialNumber()
-        );
+    static ArrayList<TokenNftTransfer> fromProtobuf(List<TokenTransferList> tokenTransferList) {
+        var transfers = new ArrayList<TokenNftTransfer>();
+
+        for (var tokenTransfer : tokenTransferList) {
+            var tokenId = TokenId.fromProtobuf(tokenTransfer.getToken());
+
+            for (var transfer : tokenTransfer.getNftTransfersList()) {
+                transfers.add(new TokenNftTransfer(
+                    tokenId,
+                    AccountId.fromProtobuf(transfer.getSenderAccountID()),
+                    AccountId.fromProtobuf(transfer.getReceiverAccountID()),
+                    transfer.getSerialNumber(),
+                    transfer.getIsApproval()
+                ));
+            }
+        }
+
+        return transfers;
     }
 
+    @Deprecated
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(NftTransfer.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+            List.of(
+                TokenTransferList.newBuilder()
+                    .setToken(TokenID.newBuilder().build())
+                    .addNftTransfers(NftTransfer.parseFrom(bytes))
+                    .build()
+            )
+        ).get(0);
     }
 
     NftTransfer toProtobuf() {
@@ -35,18 +63,22 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
             .setSenderAccountID(sender.toProtobuf())
             .setReceiverAccountID(receiver.toProtobuf())
             .setSerialNumber(serial)
+            .setIsApproval(isApproved)
             .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+            .add("tokenId", tokenId)
             .add("sender", sender)
             .add("receiver", receiver)
             .add("serial", serial)
+            .add("isApproved", isApproved)
             .toString();
     }
 
+    @Deprecated
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
