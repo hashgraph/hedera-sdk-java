@@ -32,7 +32,7 @@ dependencies {
 	api "com.google.protobuf:protobuf-javalite:3.19.3"
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	implementation 'org.slf4j:slf4j-api:1.7.33'
+	implementation 'org.slf4j:slf4j-api:1.7.35'
 
 	// Toggle which slf4j library to use to enable/disable logging
 	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
