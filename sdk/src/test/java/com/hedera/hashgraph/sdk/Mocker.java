@@ -56,7 +56,6 @@ public class Mocker implements AutoCloseable {
                             var responseIndex = index.getAndIncrement();
 
                             if (responseIndex >= response.size()) {
-                                System.out.println("AAAAAAAAA");
                                 responseObserver.onError(Status.Code.ABORTED.toStatus().asRuntimeException());
                                 return;
                             }
@@ -66,8 +65,6 @@ public class Mocker implements AutoCloseable {
                             if (r instanceof Function<?, ?>){
                                 r = ((Function<Object, Object>) r).apply(request);
                             }
-
-                            System.out.println(r);
 
                             if (r instanceof Throwable) {
                                 responseObserver.onError((Throwable) r);
