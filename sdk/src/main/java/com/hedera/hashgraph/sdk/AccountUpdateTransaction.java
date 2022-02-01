@@ -270,7 +270,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasMaxAutomaticTokenAssociations()) {
             maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
         }
-        if (body.getAlias().isEmpty()) {
+        if (!body.getAlias().isEmpty()) {
             try {
                 aliasKey = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(body.getAlias()));
 
