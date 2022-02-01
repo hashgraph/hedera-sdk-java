@@ -4,6 +4,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
+import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import org.bouncycastle.util.encoders.Hex;
@@ -73,6 +74,8 @@ public final class TransactionRecord {
 
     public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
 
+    public final List<TokenTransfer> tokenTransferList;
+
     public final Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers;
 
     @Nullable
@@ -105,6 +108,7 @@ public final class TransactionRecord {
         @Nullable ContractFunctionResult contractFunctionResult,
         List<Transfer> transfers,
         Map<TokenId, Map<AccountId, Long>> tokenTransfers,
+        List<TokenTransfer> tokenTransferList,
         Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
         @Nullable ScheduleId scheduleRef,
         List<AssessedCustomFee> assessedCustomFees,
@@ -123,6 +127,7 @@ public final class TransactionRecord {
         this.contractFunctionResult = contractFunctionResult;
         this.transactionFee = Hbar.fromTinybars(transactionFee);
         this.tokenTransfers = tokenTransfers;
+        this.tokenTransferList = tokenTransferList;
         this.tokenNftTransfers = tokenNftTransfers;
         this.scheduleRef = scheduleRef;
         this.assessedCustomFees = assessedCustomFees;
@@ -145,20 +150,20 @@ public final class TransactionRecord {
 
         var tokenTransfers = new HashMap<TokenId, Map<AccountId, Long>>();
         var tokenNftTransfers = new HashMap<TokenId, List<TokenNftTransfer>>();
-        for (var tokenTransfersList : transactionRecord.getTokenTransferListsList()) {
-            if (tokenTransfersList.getTransfersCount() > 0) {
-                var accountAmounts = new HashMap<AccountId, Long>();
-                for (var accountAmount : tokenTransfersList.getTransfersList()) {
-                    accountAmounts.put(AccountId.fromProtobuf(accountAmount.getAccountID()), accountAmount.getAmount());
-                }
-                tokenTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), accountAmounts);
-            } else if (tokenTransfersList.getNftTransfersCount() > 0) {
-                var nftTransfers = new ArrayList<TokenNftTransfer>();
-                for (var transfer : tokenTransfersList.getNftTransfersList()) {
-                    nftTransfers.add(TokenNftTransfer.fromProtobuf(transfer));
-                }
-                tokenNftTransfers.put(TokenId.fromProtobuf(tokenTransfersList.getToken()), nftTransfers);
-            }
+
+        var tokenTransfersList = TokenTransfer.fromProtobuf(transactionRecord.getTokenTransferListsList());
+        var nftTransfersList = TokenNftTransfer.fromProtobuf(transactionRecord.getTokenTransferListsList());
+
+        for (var transfer : tokenTransfersList) {
+            var current = tokenTransfers.containsKey(transfer.tokenId) ? tokenTransfers.get(transfer.tokenId) : new HashMap<AccountId, Long>();
+            current.put(transfer.accountId, transfer.amount);
+            tokenTransfers.put(transfer.tokenId, current);
+        }
+
+        for (var transfer : nftTransfersList) {
+            var current = tokenNftTransfers.containsKey(transfer.tokenId) ? tokenNftTransfers.get(transfer.tokenId) : new ArrayList<TokenNftTransfer>();
+            current.add(transfer);
+            tokenNftTransfers.put(transfer.tokenId, current);
         }
 
         var fees = new ArrayList<AssessedCustomFee>(transactionRecord.getAssessedCustomFeesCount());
@@ -190,6 +195,7 @@ public final class TransactionRecord {
             contractFunctionResult,
             transfers,
             tokenTransfers,
+            tokenTransfersList,
             tokenNftTransfers,
             transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
             fees,
@@ -236,6 +242,19 @@ public final class TransactionRecord {
             }
 
             transactionRecord.addTokenTransferLists(tokenTransfersList);
+        }
+
+        for (var nftEntry : tokenNftTransfers.entrySet()) {
+            var nftTransferList = TokenTransferList.newBuilder()
+                .setToken(nftEntry.getKey().toProtobuf());
+            for (var aaEntry : nftEntry.getValue()) {
+                nftTransferList.addNftTransfers(NftTransfer.newBuilder()
+                    .setSenderAccountID(aaEntry.sender.toProtobuf())
+                    .setReceiverAccountID(aaEntry.receiver.toProtobuf())
+                    .setSerialNumber(aaEntry.serial).build());
+            }
+
+            transactionRecord.addTokenTransferLists(nftTransferList);
         }
 
         if (contractFunctionResult != null) {

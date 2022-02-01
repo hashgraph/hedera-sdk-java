@@ -1,11 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.BytesValue;
+import com.hedera.hashgraph.sdk.proto.ContractID;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -42,7 +45,20 @@ public class ContractFunctionResultTest {
     void providesResultsCorrectly() {
         var result = new ContractFunctionResult(
             com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+                .setContractID(ContractId.fromString("1.2.3").toProtobuf())
                 .setContractCallResult(ByteString.copyFrom(callResult))
+                .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())
+                .addStateChanges(
+                    new ContractStateChange(
+                        ContractId.fromString("1.2.3"),
+                        Collections.singletonList(
+                            new StorageChange(
+                                BigInteger.valueOf(555),
+                                BigInteger.valueOf(666),
+                                BigInteger.valueOf(777)
+                            )
+                        )
+                    ).toProtobuf())
         );
 
         // interpretation varies based on width
@@ -63,10 +79,21 @@ public class ContractFunctionResultTest {
 
         assertEquals("Hello, world!", result.getString(4));
         assertEquals("Hello, world, again!", result.getString(5));
+
+        assertEquals(ContractId.fromString("1.2.3"), result.contractId);
+        assertEquals(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"), result.evmAddress);
+        assertEquals(1, result.stateChanges.size());
+        ContractStateChange resultStateChange = result.stateChanges.get(0);
+        assertEquals(ContractId.fromString("1.2.3"), resultStateChange.contractId);
+        assertEquals(1, resultStateChange.storageChanges.size());
+        StorageChange resultStorageChange = resultStateChange.storageChanges.get(0);
+        assertEquals(BigInteger.valueOf(555), resultStorageChange.slot);
+        assertEquals(BigInteger.valueOf(666), resultStorageChange.valueRead);
+        assertEquals(BigInteger.valueOf(777), resultStorageChange.valueWritten);
     }
 
     @Test
-    @DisplayName("can get string array reuslt")
+    @DisplayName("can get string array result")
     void canGetStringArrayResult() {
         var result = new ContractFunctionResult(
             com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
@@ -76,5 +103,11 @@ public class ContractFunctionResultTest {
         var strings = result.getStringArray(0);
         assertEquals(strings.get(0), "random bytes");
         assertEquals(strings.get(1), "random bytes");
+    }
+
+    @Test
+    @DisplayName("Can to/from bytes with state changes")
+    void canToFromBytesStateChanges() {
+
     }
 }

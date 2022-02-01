@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
+import com.google.protobuf.BytesValue;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import java8.util.stream.Collectors;
 import java8.util.stream.StreamSupport;
@@ -13,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Result of invoking a contract via {@link ContractCallQuery},
@@ -31,6 +33,9 @@ public final class ContractFunctionResult {
     public final ContractId contractId;
 
     @Nullable
+    public final ContractId evmAddress;
+
+    @Nullable
     public final String errorMessage;
 
     public final ByteString bloom;
@@ -39,12 +44,18 @@ public final class ContractFunctionResult {
 
     public final List<ContractLogInfo> logs;
 
+    @Deprecated
     public final List<ContractId> createdContractIds;
+
+    public final List<ContractStateChange> stateChanges;
 
     private final ByteString rawResult;
 
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
+
+        evmAddress = inner.hasEvmAddress() ?
+            new ContractId(contractId.shard, contractId.realm, inner.getEvmAddress().getValue().toByteArray()) : null;
 
         String errMsg = inner.getErrorMessage();
         errorMessage = !errMsg.isEmpty() ? errMsg : null;
@@ -68,6 +79,11 @@ public final class ContractFunctionResult {
         logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
 
         createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
+
+        stateChanges = new ArrayList<>(inner.getStateChangesCount());
+        for (var stateChangeProto : inner.getStateChangesList()) {
+            stateChanges.add(ContractStateChange.fromProtobuf(stateChangeProto));
+        }
     }
 
     /**
@@ -323,6 +339,13 @@ public final class ContractFunctionResult {
             .setBloom(bloom)
             .setGasUsed(gasUsed);
 
+        if (evmAddress != null) {
+            contractFunctionResult.setEvmAddress(BytesValue.newBuilder()
+                .setValue(ByteString.copyFrom(Objects.requireNonNull(evmAddress.evmAddress)))
+                .build()
+            );
+        }
+
         if (errorMessage != null) {
             contractFunctionResult.setErrorMessage(errorMessage);
         }
@@ -335,6 +358,10 @@ public final class ContractFunctionResult {
             contractFunctionResult.addCreatedContractIDs(contractId.toProtobuf());
         }
 
+        for (var stateChange : stateChanges) {
+            contractFunctionResult.addStateChanges(stateChange.toProtobuf());
+        }
+
         return contractFunctionResult.build();
     }
 
@@ -342,12 +369,14 @@ public final class ContractFunctionResult {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("contractId", contractId)
+            .add("evmAddress", evmAddress)
             .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
             .add("bloom", Hex.toHexString(bloom.toByteArray()))
             .add("gasUsed", gasUsed)
             .add("errorMessage", errorMessage)
             .add("logs", logs)
             .add("createdContractIds", createdContractIds)
+            .add("stateChanges", stateChanges)
             .toString();
     }
 }
