@@ -20,10 +20,10 @@ Select _one_ of the following depending on your target platform.
 
 ```groovy
 // Android, Corda DJVM, Java 7+
-implementation 'com.hedera.hashgraph:sdk-jdk7:2.7.0'
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.8.0-beta.1'
 
 // Java 9+, Kotlin
-implementation 'com.hedera.hashgraph:sdk:2.7.0'
+implementation 'com.hedera.hashgraph:sdk:2.8.0-beta.1'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
@@ -61,14 +61,14 @@ Select _one_ of the following depending on your target platform.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk-jdk7</artifactId>
-  <version>2.7.0</version>
+  <version>2.8.0-beta.1</version>
 </dependency>
 
 <!-- Java 9+, Kotlin -->
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.7.0</version>
+  <version>2.8.0-beta.1</version>
 </dependency>
 ```
 
