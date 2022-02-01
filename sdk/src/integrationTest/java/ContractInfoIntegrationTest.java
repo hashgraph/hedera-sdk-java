@@ -36,7 +36,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -53,7 +53,7 @@ public class ContractInfoIntegrationTest {
         assertEquals(Objects.requireNonNull(info.accountId).toString(), contractId.toString());
         assertNotNull(info.adminKey);
         assertEquals(Objects.requireNonNull(info.adminKey).toString(), Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         new ContractDeleteTransaction()
@@ -82,7 +82,7 @@ public class ContractInfoIntegrationTest {
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
         response = new ContractCreateTransaction()
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -100,7 +100,7 @@ public class ContractInfoIntegrationTest {
         assertNotNull(info.adminKey);
         // TODO: Fix this when we know it's correct
         // assertEquals(info.adminKey, contractId);
-        assertEquals(info.storage, 926);
+        assertEquals(128, info.storage);
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         testEnv.close();
@@ -136,7 +136,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -180,7 +180,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -223,7 +223,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(75000)
+            .setGas(100000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
