@@ -237,7 +237,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 if(grpcRequest.shouldRetryExceptionally(lastException)) {
                     continue;
                 } else {
-                    throw grpcRequest.mapStatusException();
+                    throw new RuntimeException(lastException);
                 }
             }
 
