@@ -122,7 +122,8 @@ class EntityIdHelper {
             }
         }
         for (byte b : h) {
-            sh = (w * sh + b) % p5;
+            // byte is signed in java, have to fake it to make bytes act like they're unsigned
+            sh = (w * sh + (b < 0 ? 256 + b : b)) % p5;
         }
         c = ((((addr.length() % 5) * 11 + s0) * 11 + s1) * p3 + s + sh) % p5;
         c = (c * m) % p5;
