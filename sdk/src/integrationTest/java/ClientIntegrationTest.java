@@ -70,7 +70,7 @@ public class ClientIntegrationTest {
             client.setAutoValidateChecksums(true);
 
             new AccountCreateTransaction()
-                .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-rmkyk")))
+                .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-esxsf")))
                 .execute(client);
             client.close();
         });

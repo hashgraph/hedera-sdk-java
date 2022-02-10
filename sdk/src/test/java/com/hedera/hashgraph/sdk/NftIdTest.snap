@@ -14,12 +14,12 @@ com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnMainnet=[
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnPreviewnet=[
-  "0.0.123-ntjly/487302"
+  "0.0.123-ogizo/487302"
 ]
 
 
 com.hedera.hashgraph.sdk.NftIdTest.fromStringWithChecksumOnTestnet=[
-  "0.0.123-rmkyk/584903"
+  "0.0.123-esxsf/584903"
 ]
 
 

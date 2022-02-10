@@ -43,12 +43,12 @@ class NftIdTest {
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-rmkyk@584903").toStringWithChecksum(testnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-esxsf@584903").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly/487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-ogizo/487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test

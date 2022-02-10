@@ -45,12 +45,12 @@ class AccountIdTest {
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-rmkyk").toStringWithChecksum(testnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-esxsf").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ntjly").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ogizo").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test
@@ -60,12 +60,12 @@ class AccountIdTest {
 
     @Test
     void goodChecksumOnTestnet() throws BadEntityIdException {
-        AccountId.fromString("0.0.123-rmkyk").validateChecksum(testnetClient);
+        AccountId.fromString("0.0.123-esxsf").validateChecksum(testnetClient);
     }
 
     @Test
     void goodChecksumOnPreviewnet() throws BadEntityIdException {
-        AccountId.fromString("0.0.123-ntjly").validateChecksum(previewnetClient);
+        AccountId.fromString("0.0.123-ogizo").validateChecksum(previewnetClient);
     }
 
     @Test

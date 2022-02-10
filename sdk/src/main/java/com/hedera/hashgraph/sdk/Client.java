@@ -479,6 +479,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return
      */
+    @Nullable
     public synchronized LedgerId getLedgerId() {
         return network.getLedgerId();
     }
