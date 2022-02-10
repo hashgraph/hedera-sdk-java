@@ -10,11 +10,19 @@ public class TokenAllowance {
     @Nullable
     public final TokenId tokenId;
     @Nullable
+    public final AccountId ownerAccountId;
+    @Nullable
     public final AccountId spenderAccountId;
     public final long amount;
 
-    TokenAllowance(@Nullable TokenId tokenId, @Nullable AccountId spenderAccountId, long amount) {
+    TokenAllowance(
+        @Nullable TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        @Nullable AccountId spenderAccountId,
+        long amount
+    ) {
         this.tokenId = tokenId;
+        this.ownerAccountId = ownerAccountId;
         this.spenderAccountId = spenderAccountId;
         this.amount = amount;
     }
@@ -22,6 +30,7 @@ public class TokenAllowance {
     static TokenAllowance fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance allowanceProto) {
         return new TokenAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
             allowanceProto.getAmount()
         );
@@ -37,6 +46,9 @@ public class TokenAllowance {
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }
+        if (ownerAccountId != null) {
+            builder.setOwner(ownerAccountId.toProtobuf());
+        }
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
@@ -51,6 +63,7 @@ public class TokenAllowance {
     public String toString() {
         return MoreObjects.toStringHelper(this)
             .add("tokenId", tokenId)
+            .add("ownerAccountId", ownerAccountId)
             .add("spenderAccountId", spenderAccountId)
             .add("amount", amount)
             .toString();

@@ -59,6 +59,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
 
     public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         hbarAllowances.add(new HbarAllowance(
+            null,
             Objects.requireNonNull(spenderAccountId),
             Objects.requireNonNull(amount)
         ));
@@ -72,6 +73,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     public AccountAllowanceAdjustTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
+            null,
             Objects.requireNonNull(spenderAccountId),
             amount
         ));
@@ -99,7 +101,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
 
     private List<Long> newNftSerials(AccountId spenderAccountId, TokenId tokenId, Map<TokenId, Integer> innerMap) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, spenderAccountId, new ArrayList<>());
+        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, null, spenderAccountId, new ArrayList<>());
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
@@ -110,7 +112,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     }
 
     public AccountAllowanceAdjustTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(tokenId, spenderAccountId, null));
+        nftAllowances.add(new TokenNftAllowance(tokenId, null, spenderAccountId, null));
         return this;
     }
 
