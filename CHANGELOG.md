@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * `owner` field to `*Allowance` classes.
 
+### Fixed
+
+ * `AccountAllowanceAdjustTransaction` now deserializes correctly with `Transaction.fromBytes()`
+
 ## v2.8.0-beta.1
 
 ### Added

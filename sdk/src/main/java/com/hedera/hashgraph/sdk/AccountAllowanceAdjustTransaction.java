@@ -38,7 +38,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     }
 
     private void initFromTransactionBody() {
-        var body = sourceTransactionBody.getCryptoApproveAllowance();
+        var body = sourceTransactionBody.getCryptoAdjustAllowance();
         for (var allowanceProto : body.getCryptoAllowancesList()) {
             hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
         }
