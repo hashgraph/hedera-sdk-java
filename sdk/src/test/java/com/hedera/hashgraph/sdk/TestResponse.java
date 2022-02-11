@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.StatusRuntimeException;
 
@@ -42,6 +44,19 @@ public class TestResponse {
 
     public static TestResponse query(Response queryResponse) {
         return new TestResponse(null, queryResponse, null);
+    }
+
+    public static TestResponse receipt(Status status) {
+        var response = Response.newBuilder().setTransactionGetReceipt(
+            TransactionGetReceiptResponse.newBuilder().setReceipt(
+                TransactionReceipt.newBuilder().setStatus(status.code).build()
+            ).build()
+        ).build();
+        return new TestResponse(null, response, null);
+    }
+
+    public static TestResponse successfulReceipt() {
+        return receipt(Status.SUCCESS);
     }
 
     public static TestResponse error(StatusRuntimeException exception) {

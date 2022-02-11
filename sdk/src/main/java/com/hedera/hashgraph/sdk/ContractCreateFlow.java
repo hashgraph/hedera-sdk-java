@@ -14,7 +14,7 @@ import java.util.concurrent.TimeoutException;
 
 // Re-use the WithExecute interface that was generated for Executable
 public class ContractCreateFlow implements WithExecute<TransactionResponse> {
-    private static final int FILE_CREATE_MAX_BYTES = 2048;
+    static final int FILE_CREATE_MAX_BYTES = 2048;
 
     private String bytecode = "";
     @Nullable
@@ -30,8 +30,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private String contractMemo = null;
     @Nullable
     private List<AccountId> nodeAccountIds = null;
-    private byte[] createBytes = {};
-    private byte[] appendBytes = {};
+    private String createBytecode = "";
+    private String appendBytecode = "";
 
     public ContractCreateFlow() {
     }
@@ -239,20 +239,19 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
-    private void splitBytes() {
-        byte[] bytes = Hex.decode(bytecode);
-        if(bytes.length > FILE_CREATE_MAX_BYTES) {
-            createBytes = Arrays.copyOfRange(bytes, 0, FILE_CREATE_MAX_BYTES);
-            appendBytes = Arrays.copyOfRange(bytes, FILE_CREATE_MAX_BYTES, bytes.length);
+    private void splitBytecode() {
+        if(bytecode.length() > FILE_CREATE_MAX_BYTES) {
+            createBytecode = bytecode.substring(0, FILE_CREATE_MAX_BYTES);
+            appendBytecode = bytecode.substring(FILE_CREATE_MAX_BYTES);
         } else {
-            createBytes = bytes;
-            appendBytes = new byte[]{};
+            createBytecode = bytecode;
+            appendBytecode = "";
         }
     }
 
     private FileCreateTransaction spawnFileCreateTransaction() {
         var fileCreateTx = new FileCreateTransaction()
-            .setContents(createBytes);
+            .setContents(createBytecode);
         if (nodeAccountIds != null) {
             fileCreateTx.setNodeAccountIds(nodeAccountIds);
         }
@@ -262,7 +261,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private FileAppendTransaction spawnFileAppendTransaction(FileId fileId) {
         var fileAppendTx = new FileAppendTransaction()
             .setFileId(fileId)
-            .setContents(appendBytes);
+            .setContents(appendBytecode);
         if (nodeAccountIds != null) {
             fileAppendTx.setNodeAccountIds(nodeAccountIds);
         }
@@ -301,14 +300,14 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
 
     @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
-        splitBytes();
+        splitBytecode();
         var fileCreateResponse = spawnFileCreateTransaction()
             .execute(client);
         var fileId = spawnTransactionReceiptQuery(fileCreateResponse)
             .execute(client)
             .fileId;
         Objects.requireNonNull(fileId);
-        if (appendBytes.length > 0) {
+        if (!appendBytecode.isEmpty()) {
             spawnFileAppendTransaction(fileId)
                 .execute(client);
         }
@@ -317,15 +316,14 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
 
     @Override
     public CompletableFuture<TransactionResponse> executeAsync(Client client) {
-        splitBytes();
+        splitBytecode();
         return spawnFileCreateTransaction().executeAsync(client).thenCompose(fileCreateResponse -> {
             return spawnTransactionReceiptQuery(fileCreateResponse)
                 .executeAsync(client)
                 .thenApply(receipt -> receipt.fileId);
         }).thenCompose(fileId -> {
-            CompletableFuture<Void> appendFuture =  appendBytes.length > 0 ?
-                spawnFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null) :
-                CompletableFuture.completedFuture(null);
+            CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
+                spawnFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
                 return spawnContractCreateTransaction(fileId).executeAsync(client);
             });
