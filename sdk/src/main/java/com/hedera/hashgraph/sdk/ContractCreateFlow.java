@@ -315,7 +315,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         var response = spawnContractCreateTransaction(fileId).execute(client);
         new FileDeleteTransaction()
             .setFileId(fileId)
-            .executeAsync(client);
+            .execute(client);
         return response;
     }
 
