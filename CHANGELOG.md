@@ -11,6 +11,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * `ContractCreateFlow` to simplify contract creation.
 
+## v2.8.0-beta.1
+
+### Added
+
+ * CREATE2 Solidity addresses can now be represented by a `ContractId` with `evmAddress` set.
+ * `ContractId.fromEvmAddress()`
+ * `ContractFunctionResult.stateChanges`
+ * `ContractFunctionResult.evmAddress`
+ * `ContractStateChange`
+ * `StorageChange`
+ * New response codes.
+ * `ChunkedTransaction.[set|get]ChunkSize()`, and changed default chunk size for `FileAppendTransaction` to 2048.
+ * `AccountAllowance[Adjust|Approve]Transaction`
+ * `AccountInfo.[hbar|token|tokenNft]Allowances`
+ * `[Hbar|Token|TokenNft]Allowance`
+ * `[Hbar|Token|TokenNft]Allowance`
+ * `TransferTransaction.set[Hbar|Token|TokenNft]TransferApproval()`
+
+### Fixed
+
+ * `TransactionId.setRegenerateTransactionId()`
+ * `Transaction.execute(client, timeout)`
+
+### Deprecated
+
+* `ContractId.fromSolidityAddress()`, use `ContractId.fromEvmAddress()` instead.
+
 ## v2.7.0
 
 ### Added
@@ -23,7 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responsed with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 
