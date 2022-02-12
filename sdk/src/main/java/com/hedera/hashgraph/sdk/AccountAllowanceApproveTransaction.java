@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -128,14 +129,19 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();
+
+        @Nullable
+        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
+            transactionIds.get(0).accountId : null;
+
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.toProtobuf());
+            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.toProtobuf());
+            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.toProtobuf());
+            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         return builder;
     }

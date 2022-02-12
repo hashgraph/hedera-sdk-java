@@ -40,6 +40,10 @@ public class TokenAllowance {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
+    TokenAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
+        return new TokenAllowance(tokenId, newOwnerAccountId, spenderAccountId, amount);
+    }
+
     com.hedera.hashgraph.sdk.proto.TokenAllowance toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.TokenAllowance.newBuilder()
             .setAmount(amount);

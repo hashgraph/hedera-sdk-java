@@ -131,14 +131,19 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
 
     CryptoAdjustAllowanceTransactionBody.Builder build() {
         var builder = CryptoAdjustAllowanceTransactionBody.newBuilder();
+
+        @Nullable
+        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
+            transactionIds.get(0).accountId : null;
+
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.toProtobuf());
+            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.toProtobuf());
+            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.toProtobuf());
+            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         return builder;
     }

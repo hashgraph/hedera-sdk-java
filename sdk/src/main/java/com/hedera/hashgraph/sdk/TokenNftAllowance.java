@@ -59,6 +59,10 @@ public class TokenNftAllowance {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
+    TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
+        return new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers);
+    }
+
     NftAllowance toProtobuf() {
         var builder = NftAllowance.newBuilder();
         if (tokenId != null) {

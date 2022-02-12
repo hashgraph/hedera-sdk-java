@@ -32,6 +32,10 @@ public class HbarAllowance {
         return fromProtobuf(CryptoAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
+    HbarAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
+        return new HbarAllowance(newOwnerAccountId, spenderAccountId, amount);
+    }
+
     CryptoAllowance toProtobuf() {
         var builder = CryptoAllowance.newBuilder()
             .setAmount(amount.toTinybars());
