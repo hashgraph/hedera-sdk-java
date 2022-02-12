@@ -92,6 +92,7 @@ public class MockingTest {
         )).enqueueResponse(TestResponse.successfulReceipt());
         fileService.buffer
             .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk())
             .enqueueResponse(TestResponse.transactionOk());
 
         contractService.buffer.enqueueResponse(TestResponse.transactionOk());
@@ -111,8 +112,10 @@ public class MockingTest {
             flow.executeAsync(server.client).get();
         }
 
+        Thread.sleep(1000);
+
         Assertions.assertEquals(2, cryptoService.buffer.queryRequestsReceived.size());
-        Assertions.assertEquals(2, fileService.buffer.transactionRequestsReceived.size());
+        Assertions.assertEquals(3, fileService.buffer.transactionRequestsReceived.size());
         Assertions.assertEquals(1, contractService.buffer.transactionRequestsReceived.size());
         var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
         for (var request : fileService.buffer.transactionRequestsReceived) {
@@ -138,8 +141,8 @@ public class MockingTest {
             fileAppendTx.getContents().size()
         );
 
-        Assertions.assertInstanceOf(ContractCreateTransaction.class, transactions.get(2));
-        var contractCreateTx = (ContractCreateTransaction) transactions.get(2);
+        Assertions.assertInstanceOf(ContractCreateTransaction.class, transactions.get(3));
+        var contractCreateTx = (ContractCreateTransaction) transactions.get(3);
         Assertions.assertEquals("memo goes here", contractCreateTx.getContractMemo());
         Assertions.assertEquals(fileId, contractCreateTx.getBytecodeFileId());
         Assertions.assertEquals(ByteString.copyFrom(new byte[]{1, 2, 3}), contractCreateTx.getConstructorParameters());
@@ -147,6 +150,8 @@ public class MockingTest {
         Assertions.assertEquals(adminKey, contractCreateTx.getAdminKey());
         Assertions.assertEquals(100, contractCreateTx.getGas());
         Assertions.assertEquals(new Hbar(3), contractCreateTx.getInitialBalance());
+
+        Assertions.assertInstanceOf(FileDeleteTransaction.class, transactions.get(2));
 
         server.close();
     }
@@ -467,6 +472,11 @@ public class MockingTest {
 
         @Override
         public void appendContent(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void deleteFile(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
             respondToTransactionFromQueue(request, responseObserver);
         }
     }
