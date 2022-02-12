@@ -74,8 +74,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.executor = executor;
         this.address = address;
         this.currentBackoff = Client.DEFAULT_MIN_BACKOFF;
-        this.minBackoff = Client.DEFAULT_MIN_BACKOFF;
-        this.maxBackoff = Client.DEFAULT_MAX_BACKOFF;
+        this.minBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
+        this.maxBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
     }
 
     protected ManagedNode(N node, ManagedNodeAddress address) {
