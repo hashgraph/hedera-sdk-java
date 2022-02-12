@@ -326,7 +326,7 @@ abstract class ManagedNetwork<
             for (int i = nodes.size() - 1; i >= 0; i--) {
                 var node = Objects.requireNonNull(nodes.get(i));
 
-                if (node.getAttempts() >= maxNodeAttempts) {
+                if (node.getBadGrpcStatusCount() >= maxNodeAttempts) {
                     node.close(closeTimeout);
                     removeNodeFromNetwork(node);
                     nodes.remove(i);

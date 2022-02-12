@@ -65,7 +65,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Number of times this node has received a bad gRPC status
      */
-    protected long attempts;
+    protected long badGrpcStatusCount;
 
     @Nullable
     protected ManagedChannel channel = null;
@@ -86,7 +86,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.maxBackoff = node.maxBackoff;
         this.backoffUntil = node.backoffUntil;
         this.currentBackoff = node.currentBackoff;
-        this.attempts = node.attempts;
+        this.badGrpcStatusCount = node.badGrpcStatusCount;
         this.lastUsed = node.lastUsed;
         this.useCount = node.useCount;
     }
@@ -165,8 +165,12 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * Get the number of times this node has received a bad gRPC status
      * @return
      */
-    long getAttempts() {
-        return attempts;
+    long getBadGrpcStatusCount() {
+        return badGrpcStatusCount;
+    }
+
+    long unhealthyBackoffRemaining() {
+        return Math.max(0, backoffUntil - System.currentTimeMillis());
     }
 
     /**
@@ -184,7 +188,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * Used when a node has received a bad gRPC status
      */
     synchronized void increaseDelay() {
-        this.attempts++;
+        this.badGrpcStatusCount++;
         this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
         this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, this.maxBackoff.toMillis()));
     }
@@ -302,41 +306,30 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
-     * Compares one node to another. The order is determined by health. If both nodes are healthy then their {@link ManagedNode#useCount}
-     * and {@link ManagedNode#lastUsed} values are used to determine order. The node which is used less will be
-     * considered more healthy, and if the use count is the same, then the node which was used least recently will be
-     * considered more healthy.
+     * Compares one node to another.  If node a < node b, use of node a will be prioritized over node b.
      *
      * @param node
      * @return
      */
     @Override
     public int compareTo(ManagedNode<N, KeyT> node) {
-        if (this.isHealthy() && node.isHealthy()) {
-            return compareToSameHealth(node);
-        } else if (this.isHealthy() && !node.isHealthy()) {
-            return -1;
-        } else if (!this.isHealthy() && node.isHealthy()) {
-            return 1;
-        } else {
-            return compareToSameHealth(node);
+        int backoffRemainingComparison = Long.compare(this.unhealthyBackoffRemaining(), node.unhealthyBackoffRemaining());
+        if (backoffRemainingComparison != 0) {
+            return backoffRemainingComparison;
         }
-    }
-
-    private int compareToSameHealth(ManagedNode<N, KeyT> node) {
-        if (this.useCount < node.useCount) {
-            return -1;
-        } else if (this.useCount > node.useCount) {
-            return 1;
-        } else {
-            if (this.lastUsed < node.lastUsed) {
-                return -1;
-            } else if (this.lastUsed > node.lastUsed) {
-                return 1;
-            } else {
-                return 0;
-            }
+        int currentBackoffComparison = this.currentBackoff.compareTo(node.currentBackoff);
+        if (currentBackoffComparison != 0) {
+            return currentBackoffComparison;
         }
+        int badGrpcComparison = Long.compare(this.badGrpcStatusCount, node.badGrpcStatusCount);
+        if (badGrpcComparison != 0) {
+            return badGrpcComparison;
+        }
+        int useCountComparison = Long.compare(this.useCount, node.useCount);
+        if (useCountComparison != 0) {
+            return useCountComparison;
+        }
+        return Long.compare(this.lastUsed, node.lastUsed);
     }
 
     private String getUserAgent() {
