@@ -400,7 +400,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
     }
 
-    /*
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -408,5 +407,5 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             .add("tokenTransfers", Arrays.toString(tokenTransfers.toArray()))
 //            .add("nftTransfers", Arrays.toString(nftTransfers.toArray()))
             .toString();
-    }*/
+    }
 }
