@@ -6,7 +6,6 @@ import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -249,7 +248,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         }
     }
 
-    private FileCreateTransaction spawnFileCreateTransaction(Client client) {
+    private FileCreateTransaction createFileCreateTransaction(Client client) {
         var fileCreateTx = new FileCreateTransaction()
             .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()))
             .setContents(createBytecode);
@@ -259,7 +258,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return fileCreateTx;
     }
 
-    private FileAppendTransaction spawnFileAppendTransaction(FileId fileId) {
+    private FileAppendTransaction createFileAppendTransaction(FileId fileId) {
         var fileAppendTx = new FileAppendTransaction()
             .setFileId(fileId)
             .setContents(appendBytecode);
@@ -269,7 +268,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return fileAppendTx;
     }
 
-    private ContractCreateTransaction spawnContractCreateTransaction(FileId fileId) {
+    private ContractCreateTransaction createContractCreateTransaction(FileId fileId) {
         var contractCreateTx = new ContractCreateTransaction()
             .setBytecodeFileId(fileId)
             .setConstructorParameters(constructorParameters)
@@ -293,7 +292,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return contractCreateTx;
     }
 
-    TransactionReceiptQuery spawnTransactionReceiptQuery(TransactionResponse response) {
+    TransactionReceiptQuery createTransactionReceiptQuery(TransactionResponse response) {
         return new TransactionReceiptQuery()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setTransactionId(response.transactionId);
@@ -302,17 +301,17 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
         splitBytecode();
-        var fileCreateResponse = spawnFileCreateTransaction(client)
+        var fileCreateResponse = createFileCreateTransaction(client)
             .execute(client);
-        var fileId = spawnTransactionReceiptQuery(fileCreateResponse)
+        var fileId = createTransactionReceiptQuery(fileCreateResponse)
             .execute(client)
             .fileId;
         Objects.requireNonNull(fileId);
         if (!appendBytecode.isEmpty()) {
-            spawnFileAppendTransaction(fileId)
+            createFileAppendTransaction(fileId)
                 .execute(client);
         }
-        var response = spawnContractCreateTransaction(fileId).execute(client);
+        var response = createContractCreateTransaction(fileId).execute(client);
         new FileDeleteTransaction()
             .setFileId(fileId)
             .execute(client);
@@ -322,15 +321,15 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     @Override
     public CompletableFuture<TransactionResponse> executeAsync(Client client) {
         splitBytecode();
-        return spawnFileCreateTransaction(client).executeAsync(client).thenCompose(fileCreateResponse -> {
-            return spawnTransactionReceiptQuery(fileCreateResponse)
+        return createFileCreateTransaction(client).executeAsync(client).thenCompose(fileCreateResponse -> {
+            return createTransactionReceiptQuery(fileCreateResponse)
                 .executeAsync(client)
                 .thenApply(receipt -> receipt.fileId);
         }).thenCompose(fileId -> {
             CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
-                spawnFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
+                createFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
-                return spawnContractCreateTransaction(fileId).executeAsync(client).thenApply(contractCreateResponse -> {
+                return createContractCreateTransaction(fileId).executeAsync(client).thenApply(contractCreateResponse -> {
                     new FileDeleteTransaction()
                         .setFileId(fileId)
                         .executeAsync(client);
