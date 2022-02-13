@@ -36,6 +36,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
+    static final Duration DEFAULT_MAX_NODE_BACKOFF = Duration.ofHours(1L);
+    static final Duration DEFAULT_MIN_NODE_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_CLOSE_TIMEOUT = Duration.ofSeconds(30L);
     static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(2L);
 
@@ -620,7 +622,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     public synchronized Duration getNodeMinBackoff() {
-        return network.getMinBackoff();
+        return network.getMinNodeBackoff();
     }
 
     /**
@@ -630,7 +632,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     public synchronized Client setNodeMinBackoff(Duration minBackoff) {
-        network.setMinBackoff(minBackoff);
+        network.setMinNodeBackoff(minBackoff);
         return this;
     }
 
@@ -640,7 +642,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     public synchronized Duration getNodeMaxBackoff() {
-        return network.getMaxBackoff();
+        return network.getMaxNodeBackoff();
     }
 
     /**
@@ -650,7 +652,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     public synchronized Client setNodeMaxBackoff(Duration maxBackoff) {
-        network.setMaxBackoff(maxBackoff);
+        network.setMaxNodeBackoff(maxBackoff);
         return this;
     }
 
