@@ -1310,7 +1310,34 @@ public enum Status {
     /**
      * No allowances have been specified in the approval/adjust transaction.
      */
-    EMPTY_ALLOWANCES(ResponseCodeEnum.EMPTY_ALLOWANCES);
+    EMPTY_ALLOWANCES(ResponseCodeEnum.EMPTY_ALLOWANCES),
+
+    /**
+     * Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
+     * CryptoApproveAllowance or CryptoAdjustAllowance transaction.
+     */
+    SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES(ResponseCodeEnum.SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES),
+
+    /**
+     * Serial numbers are repeated in nft allowance for a single spender account
+     */
+    REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES(ResponseCodeEnum.REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES),
+
+    /**
+     * Fungible common token used in NFT allowances
+     */
+    FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES(ResponseCodeEnum.FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES),
+
+    /**
+     * Non fungible token used in fungible token allowances
+     */
+    NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES(ResponseCodeEnum.NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES),
+
+    /**
+     * An approval/adjustment transaction was submitted where the payer and owner account are
+     * not the same. Currently only the owner is permitted to perform these operations.
+     */
+    PAYER_AND_OWNER_NOT_EQUAL(ResponseCodeEnum.PAYER_AND_OWNER_NOT_EQUAL);
 
     final ResponseCodeEnum code;
 
@@ -1828,6 +1855,16 @@ public enum Status {
                 return MAX_ALLOWANCES_EXCEEDED;
             case EMPTY_ALLOWANCES:
                 return EMPTY_ALLOWANCES;
+            case SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES:
+                return SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES;
+            case REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES:
+                return REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES;
+            case FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES:
+                return FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
+            case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES:
+                return NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
+            case PAYER_AND_OWNER_NOT_EQUAL:
+                return PAYER_AND_OWNER_NOT_EQUAL;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

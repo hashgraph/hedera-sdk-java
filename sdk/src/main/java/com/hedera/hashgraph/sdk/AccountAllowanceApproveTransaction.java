@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -56,6 +57,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         hbarAllowances.add(new HbarAllowance(
+            null,
             Objects.requireNonNull(spenderAccountId),
             Objects.requireNonNull(amount)
         ));
@@ -69,6 +71,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     public AccountAllowanceApproveTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
+            null,
             Objects.requireNonNull(spenderAccountId),
             amount
         ));
@@ -96,7 +99,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     private List<Long> newNftSerials(AccountId spenderAccountId, TokenId tokenId, Map<TokenId, Integer> innerMap) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, spenderAccountId, new ArrayList<>());
+        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, null,spenderAccountId, new ArrayList<>());
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
@@ -107,7 +110,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(tokenId, spenderAccountId, null));
+        nftAllowances.add(new TokenNftAllowance(tokenId, null, spenderAccountId, null));
         return this;
     }
 
@@ -126,14 +129,19 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();
+
+        @Nullable
+        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
+            transactionIds.get(0).accountId : null;
+
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.toProtobuf());
+            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.toProtobuf());
+            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.toProtobuf());
+            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
         }
         return builder;
     }
