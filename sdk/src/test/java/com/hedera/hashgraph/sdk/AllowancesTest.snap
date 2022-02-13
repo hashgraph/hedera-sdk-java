@@ -1,0 +1,56 @@
+com.hedera.hashgraph.sdk.AllowancesTest.shouldSerialize=[
+  {
+    "ownerAccountId": {
+      "shard": 1,
+      "realm": 1,
+      "num": 1
+    },
+    "spenderAccountId": {
+      "shard": 2,
+      "realm": 2,
+      "num": 2
+    },
+    "amount": {
+      "valueInTinybar": 300000000
+    }
+  },
+  {
+    "tokenId": {
+      "shard": 1,
+      "realm": 2,
+      "num": 3
+    },
+    "ownerAccountId": {
+      "shard": 4,
+      "realm": 5,
+      "num": 6
+    },
+    "spenderAccountId": {
+      "shard": 5,
+      "realm": 5,
+      "num": 5
+    },
+    "amount": 777
+  },
+  {
+    "tokenId": {
+      "shard": 1,
+      "realm": 1,
+      "num": 1
+    },
+    "ownerAccountId": {
+      "shard": 2,
+      "realm": 2,
+      "num": 2
+    },
+    "spenderAccountId": {
+      "shard": 3,
+      "realm": 3,
+      "num": 3
+    },
+    "serialNumbers": [
+      123,
+      456
+    ]
+  }
+]
