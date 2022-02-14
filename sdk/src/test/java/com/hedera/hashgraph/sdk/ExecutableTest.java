@@ -77,6 +77,10 @@ class ExecutableTest {
         when(node3.isHealthy()).thenReturn(true);
 
         var tx = new DummyTransaction();
+        tx.setNodeAccountIds(nodeAccountIds);
+        tx.setNodesFromNodeAccountIds(client);
+        tx.setMinBackoff(Duration.ofMillis(10));
+        tx.setMaxBackoff(Duration.ofMillis(1000));
         tx.setGrpcDeadline(Duration.ofSeconds(10));
 
         var grpcRequest = tx.getGrpcRequest(1);
