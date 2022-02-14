@@ -3,6 +3,16 @@ com.hedera.hashgraph.sdk.ContractIdTest.fromBytes=[
 ]
 
 
+com.hedera.hashgraph.sdk.ContractIdTest.fromEvmAddress=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.fromEvmAddressWith0x=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
 com.hedera.hashgraph.sdk.ContractIdTest.fromSolidityAddress=[
   "0.0.5005"
 ]
@@ -18,8 +28,18 @@ com.hedera.hashgraph.sdk.ContractIdTest.fromString=[
 ]
 
 
+com.hedera.hashgraph.sdk.ContractIdTest.fromStringWithEvmAddress=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
 com.hedera.hashgraph.sdk.ContractIdTest.toBytes=[
   "188d27"
+]
+
+
+com.hedera.hashgraph.sdk.ContractIdTest.toSolidityAddress2=[
+  "98329e006610472e6b372c080833f6d79ed833cf"
 ]
 
 
