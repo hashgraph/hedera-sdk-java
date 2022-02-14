@@ -5,6 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.8.0
+
+### Added
+
+ * CREATE2 Solidity addresses can now be represented by a `ContractId` with `evmAddress` set.
+ * `ContractId.fromEvmAddress()`
+ * `ContractFunctionResult.stateChanges`
+ * `ContractFunctionResult.evmAddress`
+ * `ContractStateChange`
+ * `StorageChange`
+ * New response codes.
+ * `ChunkedTransaction.[set|get]ChunkSize()`, and changed default chunk size for `FileAppendTransaction` to 2048.
+
+### Fixed
+
+ * `TransactionId.setRegenerateTransactionId()`
+ * `Transaction.execute(client, timeout)`
+
+### Deprecated
+
+* `ContractId.fromSolidityAddress()`, use `ContractId.fromEvmAddress()` instead.
+
 ## v2.8.0-beta.1
 
 ### Added
