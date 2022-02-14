@@ -76,7 +76,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         this.mirrorNetwork = mirrorNetwork;
     }
 
-    private static ExecutorService createExecutor() {
+    static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
             .setDaemon(true)
