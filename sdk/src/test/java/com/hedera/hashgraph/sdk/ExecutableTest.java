@@ -350,7 +350,7 @@ class ExecutableTest {
                 throw new StatusRuntimeException(io.grpc.Status.ABORTED);
         };
 
-        assertThrows(PrecheckStatusException.class, () ->  tx.execute(client));
+        assertThrows(RuntimeException.class, () ->  tx.execute(client));
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
