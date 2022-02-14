@@ -73,7 +73,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     protected ManagedNode(ManagedNodeAddress address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
-        this.currentBackoff = Client.DEFAULT_MIN_BACKOFF;
+        this.currentBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.minBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.maxBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
     }
@@ -221,14 +221,18 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return TlsChannelCredentials.create();
     }
 
+    synchronized void inUse() {
+        useCount++;
+        lastUsed = System.currentTimeMillis();
+    }
+
     /**
      * Get the gRPC channel for this node
      *
      * @return
      */
     synchronized ManagedChannel getChannel() {
-        useCount++;
-        lastUsed = System.currentTimeMillis();
+        inUse();
 
         if (channel != null) {
             return channel;
@@ -317,18 +321,22 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         if (backoffRemainingComparison != 0) {
             return backoffRemainingComparison;
         }
+
         int currentBackoffComparison = this.currentBackoff.compareTo(node.currentBackoff);
         if (currentBackoffComparison != 0) {
             return currentBackoffComparison;
         }
+
         int badGrpcComparison = Long.compare(this.badGrpcStatusCount, node.badGrpcStatusCount);
         if (badGrpcComparison != 0) {
             return badGrpcComparison;
         }
+
         int useCountComparison = Long.compare(this.useCount, node.useCount);
         if (useCountComparison != 0) {
             return useCountComparison;
         }
+
         return Long.compare(this.lastUsed, node.lastUsed);
     }
 

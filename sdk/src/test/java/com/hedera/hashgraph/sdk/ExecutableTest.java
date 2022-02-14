@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import java8.util.concurrent.CompletableFuture;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
@@ -15,6 +16,7 @@ import org.threeten.bp.Duration;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,6 +69,21 @@ class ExecutableTest {
 
         var node = tx.getNodeForExecute(1);
         assertEquals(node3, node);
+    }
+
+
+    @Test
+    void calloptionsShouldRespectGrpcDeadline() {
+        when(node3.isHealthy()).thenReturn(true);
+
+        var tx = new DummyTransaction();
+        tx.setGrpcDeadline(Duration.ofSeconds(10));
+
+        var grpcRequest = tx.getGrpcRequest(1);
+
+        var timeRemaining = grpcRequest.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
+        Assertions.assertTrue(timeRemaining < 10000);
+        Assertions.assertTrue(timeRemaining > 9000);
     }
 
     @Test
@@ -181,7 +198,7 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -221,7 +238,7 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -275,7 +292,7 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -310,7 +327,7 @@ class ExecutableTest {
         when(node5.channelFailedToConnect()).thenReturn(true);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -330,7 +347,7 @@ class ExecutableTest {
         when(node4.channelFailedToConnect()).thenReturn(false);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -350,7 +367,7 @@ class ExecutableTest {
                 throw new StatusRuntimeException(io.grpc.Status.ABORTED);
         };
 
-        assertThrows(RuntimeException.class, () ->  tx.execute(client));
+        assertThrows(RuntimeException.class, () -> tx.execute(client));
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
@@ -376,7 +393,7 @@ class ExecutableTest {
                 return i.getAndIncrement() == 0 ? ExecutionState.Retry : ExecutionState.Success;
             }
         };
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -406,9 +423,11 @@ class ExecutableTest {
 
         var tx = new DummyTransaction() {
             @Override
-            Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) { return Status.ACCOUNT_DELETED; }
+            Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+                return Status.ACCOUNT_DELETED;
+            }
         };
-        var nodeAccountIds = new ArrayList<AccountId>(){{
+        var nodeAccountIds = new ArrayList<AccountId>() {{
             add(new AccountId(3));
             add(new AccountId(4));
             add(new AccountId(5));
@@ -422,7 +441,7 @@ class ExecutableTest {
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        assertThrows(PrecheckStatusException.class, () ->  tx.execute(client));
+        assertThrows(PrecheckStatusException.class, () -> tx.execute(client));
 
         verify(node3).channelFailedToConnect();
     }
@@ -442,15 +461,20 @@ class ExecutableTest {
         extends Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
 
         @Override
-        void onExecute(Client client) { }
+        void onExecute(Client client) {
+        }
 
         @Nullable
         @Override
-        CompletableFuture<Void> onExecuteAsync(Client client) { return null; }
+        CompletableFuture<Void> onExecuteAsync(Client client) {
+            return null;
+        }
 
         @Nullable
         @Override
-        com.hedera.hashgraph.sdk.proto.Transaction makeRequest() { return null; }
+        com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
+            return null;
+        }
 
         @Nullable
         @Override
@@ -459,7 +483,9 @@ class ExecutableTest {
         }
 
         @Override
-        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) { return Status.OK; }
+        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+            return Status.OK;
+        }
 
         @Nullable
         @Override
@@ -476,7 +502,8 @@ class ExecutableTest {
 
     static class DummyQuery extends Query<TransactionReceipt, TransactionReceiptQuery> {
         @Override
-        void onExecute(Client client) { }
+        void onExecute(Client client) {
+        }
 
         @Override
         TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
@@ -484,21 +511,31 @@ class ExecutableTest {
         }
 
         @Override
-        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.Response response) { return Status.OK; }
+        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.Response response) {
+            return Status.OK;
+        }
 
         @Override
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() { return null; }
+        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
+            return null;
+        }
 
         @Override
-        void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) { }
+        void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        }
 
         @Override
-        ResponseHeader mapResponseHeader(Response response) { return null; }
+        ResponseHeader mapResponseHeader(Response response) {
+            return null;
+        }
 
         @Override
-        QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) { return null; }
+        QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
+            return null;
+        }
 
         @Override
-        void validateChecksums(Client client) { }
+        void validateChecksums(Client client) {
+        }
     }
 }
