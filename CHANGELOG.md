@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## v2.10.0-beta.1
+
+### Added
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+
 ## v2.8.0
 
 ### Added
@@ -53,7 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
- * Support for regenerating transaction IDs on demand if a request 
+ * Support for regenerating transaction IDs on demand if a request
    responsed with `TRANSACITON_EXPIRED`
 
 ## v2.7.0-beta.1
