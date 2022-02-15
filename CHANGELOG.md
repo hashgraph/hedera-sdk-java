@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * `owner` field to `*Allowance` classes.
+ * `Executable.[set|get]GrpcDeadline()`
 
 ### Fixed
 
