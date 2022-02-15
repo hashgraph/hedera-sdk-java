@@ -1,48 +1,93 @@
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.UInt32Value;
-import com.hedera.hashgraph.sdk.proto.AccountAmount;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenBalance;
-import com.hedera.hashgraph.sdk.proto.TokenTransferList;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
-    private final Map<TokenId, TokenTransferMap> tokenTransfers = new HashMap<>();
-    private final Map<TokenId, List<TokenNftTransfer>> nftTransfers = new HashMap<>();
-    private final Map<AccountId, Hbar> hbarTransfers = new HashMap<>();
+    private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
+    private final ArrayList<TokenNftTransfer> nftTransfers = new ArrayList<>();
+    private final ArrayList<HbarTransfer> hbarTransfers = new ArrayList<>();
 
-    private static class TokenTransferMap {
-        public final Map<AccountId, Long> transfers = new HashMap<>();
-        @Nullable
-        private UInt32Value expectedDecimals = null;
+    private static class HbarTransfer {
+        final AccountId accountId;
+        Hbar amount;
+        boolean isApproved;
 
-        @Nullable
-        public UInt32Value getExpectedDecimals() {
-            return expectedDecimals;
+        HbarTransfer(AccountId accountId, Hbar amount, boolean isApproved) {
+            this.accountId = accountId;
+            this.amount = amount;
+            this.isApproved = isApproved;
         }
 
-        public TokenTransferMap setExpectedDecimals(UInt32Value amount) {
-            if (expectedDecimals != null && !amount.equals(expectedDecimals)) {
-                throw new IllegalArgumentException("expected decimals for a token in a token transfer cannot be changed after being set");
+        AccountAmount toProtobuf() {
+            return AccountAmount.newBuilder()
+                .setAccountID(accountId.toProtobuf())
+                .setAmount(amount.toTinybars())
+                .setIsApproval(isApproved)
+                .build();
+        }
+
+        @Override
+        public String toString() {
+            return MoreObjects.toStringHelper(this)
+                .add("accountId", accountId)
+                .add("amount", amount)
+                .add("isApproved", isApproved)
+                .toString();
+        }
+    }
+
+    private static class TokenTransferList {
+        final TokenId tokenId;
+
+        @Nullable
+        final Integer expectDecimals;
+
+        List<TokenTransfer> transfers = new ArrayList<>();
+        List<TokenNftTransfer> nftTransfers = new ArrayList<>();
+
+        TokenTransferList(TokenId tokenId, @Nullable Integer expectDecimals, @Nullable TokenTransfer transfer, @Nullable TokenNftTransfer nftTransfer) {
+            this.tokenId = tokenId;
+            this.expectDecimals = expectDecimals;
+
+            if (transfer != null) {
+                this.transfers.add(transfer);
             }
-            expectedDecimals = amount;
-            return this;
+
+            if (nftTransfer != null) {
+                this.nftTransfers.add(nftTransfer);
+            }
+        }
+
+        com.hedera.hashgraph.sdk.proto.TokenTransferList toProtobuf() {
+            var transfers = new ArrayList<AccountAmount>();
+            var nftTransfers = new ArrayList<NftTransfer>();
+
+            for (var transfer : this.transfers) {
+                transfers.add(transfer.toProtobuf());
+            }
+
+            for (var transfer : this.nftTransfers) {
+                nftTransfers.add(transfer.toProtobuf());
+            }
+
+            var builder = com.hedera.hashgraph.sdk.proto.TokenTransferList.newBuilder()
+                .setToken(tokenId.toProtobuf())
+                .addAllTransfers(transfers)
+                .addAllNftTransfers(nftTransfers);
+
+            if (expectDecimals != null) {
+                builder.setExpectedDecimals(UInt32Value.newBuilder().setValue(expectDecimals).build());
+            }
+
+            return builder.build();
         }
     }
 
@@ -62,208 +107,245 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     public Map<TokenId, Integer> getTokenIdDecimals() {
         Map<TokenId, Integer> decimalsMap = new HashMap<>();
-        for (var tokenEntry : tokenTransfers.entrySet()) {
-            if (tokenEntry.getValue() == null) {
-                continue;
-            }
-            var decimals = tokenEntry.getValue().getExpectedDecimals();
-            if (decimals != null) {
-                decimalsMap.put(tokenEntry.getKey(), decimals.getValue());
-            }
+
+        for (var transfer : tokenTransfers) {
+            decimalsMap.put(transfer.tokenId, transfer.expectedDecimals);
         }
+
         return decimalsMap;
     }
 
-    private static void doAddTokenTransfer(Map<AccountId, Long> tokenTransferMap, AccountId accountId, long amount) {
-        Objects.requireNonNull(tokenTransferMap);
-        Objects.requireNonNull(accountId);
-        var current = tokenTransferMap.containsKey(accountId) ?
-            Objects.requireNonNull(tokenTransferMap.get(accountId)) :
-            0L;
-        tokenTransferMap.put(accountId, current + amount);
-    }
-
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
-        Map<TokenId, Map<AccountId, Long>> retval = new HashMap<>();
-        for (var entry : tokenTransfers.entrySet()) {
-            retval.put(entry.getKey(), entry.getValue().transfers);
+        Map<TokenId, Map<AccountId, Long>> transfers = new HashMap<>();
+
+        for (var transfer : tokenTransfers) {
+            var current = transfers.get(transfer.tokenId) != null
+                ? transfers.get(transfer.tokenId) : new HashMap<AccountId, Long>();
+            current.put(transfer.accountId, transfer.amount);
+            transfers.put(transfer.tokenId, current);
         }
-        return retval;
+
+        return transfers;
     }
 
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         requireNotFrozen();
-        doAddTokenTransfer(getTokenTransferMap(tokenId).transfers, accountId, value);
+
+        for (var transfer : tokenTransfers) {
+            if (transfer.tokenId.equals(tokenId) && transfer.accountId.equals(accountId)) {
+                transfer.amount = transfer.amount + value;
+                return this;
+            }
+        }
+
+        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value));
         return this;
     }
 
     public TransferTransaction addTokenTransferWithDecimals(TokenId tokenId, AccountId accountId, long value, int decimals) {
         requireNotFrozen();
-        doAddTokenTransfer(getTokenTransferMap(tokenId).setExpectedDecimals(UInt32Value.of(decimals)).transfers, accountId, value);
+
+        var found = false;
+
+        for (var transfer : tokenTransfers) {
+            if (transfer.tokenId.equals(tokenId)) {
+                if (transfer.expectedDecimals != null && transfer.expectedDecimals != decimals) {
+                    throw new IllegalArgumentException("expected decimals for a token in a token transfer cannot be changed after being set");
+                }
+
+                transfer.expectedDecimals = decimals;
+
+                if (transfer.accountId.equals(accountId)) {
+                    transfer.amount = transfer.amount + value;
+                    found = true;
+                }
+
+            }
+        }
+
+        if (found) {
+            return this;
+        }
+
+        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value, decimals, false));
+
+        return this;
+    }
+
+    public TransferTransaction setTokenTransferApproval(TokenId tokenId, AccountId accountId, boolean isApproved) {
+        requireNotFrozen();
+
+        for (var transfer : tokenTransfers) {
+            if (transfer.tokenId.equals(tokenId) && transfer.accountId.equals(accountId)) {
+                transfer.isApproved = isApproved;
+                return this;
+            }
+        }
+
         return this;
     }
 
     public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
-        return new HashMap<>(nftTransfers);
+        Map<TokenId, List<TokenNftTransfer>> transfers = new HashMap<>();
+
+        for (var transfer : nftTransfers) {
+            var current = transfers.get(transfer.tokenId) != null
+                ? transfers.get(transfer.tokenId) : new ArrayList<TokenNftTransfer>();
+            current.add(transfer);
+            transfers.put(transfer.tokenId, current);
+        }
+
+        return transfers;
     }
 
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         requireNotFrozen();
-        getNftTransferList(nftId.tokenId).add(new TokenNftTransfer(sender, receiver, nftId.serial));
+        nftTransfers.add(new TokenNftTransfer(nftId.tokenId, sender, receiver, nftId.serial, false));
+        return this;
+    }
+
+    public TransferTransaction setNftTransferApproval(NftId nftId, boolean isApproved) {
+        requireNotFrozen();
+
+        for (var transfer : nftTransfers) {
+            if (transfer.tokenId.equals(nftId.tokenId) && transfer.serial == nftId.serial) {
+                transfer.isApproved = isApproved;
+                return this;
+            }
+        }
+
         return this;
     }
 
     public Map<AccountId, Hbar> getHbarTransfers() {
-        return new HashMap<>(hbarTransfers);
+        Map<AccountId, Hbar> transfers = new HashMap<>();
+
+        for (var transfer : hbarTransfers) {
+            transfers.put(transfer.accountId, transfer.amount);
+        }
+
+        return transfers;
     }
 
     public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
         requireNotFrozen();
-        doAddHbarTransfer(accountId, value.toTinybars());
+
+        for (var transfer : hbarTransfers) {
+            if (transfer.accountId.equals(accountId)) {
+                transfer.amount = Hbar.fromTinybars(transfer.amount.toTinybars() + value.toTinybars());
+                return this;
+            }
+        }
+
+        hbarTransfers.add(new HbarTransfer(accountId, value, false));
         return this;
     }
 
-    private static class SortableTokenTransferList implements Comparable<SortableTokenTransferList> {
-        public final TokenId tokenId;
-        @Nullable
-        public final UInt32Value expectedDecimals;
-        public final List<Map.Entry<AccountId, Long>> transfers;
-        public final List<TokenNftTransfer> nftTransfers;
+    public TransferTransaction setHbarTransferApproval(AccountId accountId, boolean isApproved) {
+        requireNotFrozen();
 
-        private SortableTokenTransferList(
-            TokenId tokenId,
-            @Nullable UInt32Value expectedDecimals,
-            List<Map.Entry<AccountId, Long>> transfers,
-            List<TokenNftTransfer> nftTransfers
-        ) {
-            this.tokenId = tokenId;
-            this.expectedDecimals = expectedDecimals;
-            this.transfers = transfers;
-            this.nftTransfers = nftTransfers;
-        }
-
-        public static SortableTokenTransferList forTransfers(Map.Entry<TokenId, TokenTransferMap> transfersEntry) {
-            var retval = new SortableTokenTransferList(
-                transfersEntry.getKey(),
-                transfersEntry.getValue().getExpectedDecimals(),
-                new ArrayList<>(),
-                Collections.emptyList()
-            );
-            retval.transfers.addAll(transfersEntry.getValue().transfers.entrySet());
-            Collections.sort(retval.transfers, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
-            return retval;
-        }
-
-        public static SortableTokenTransferList forNftTransfers(Map.Entry<TokenId, List<TokenNftTransfer>> nftTransfersEntry) {
-            var retval = new SortableTokenTransferList(
-                nftTransfersEntry.getKey(),
-                null,
-                Collections.emptyList(),
-                nftTransfersEntry.getValue()
-            );
-            Collections.sort(retval.nftTransfers);
-            return retval;
-        }
-
-        @Override
-        public int compareTo(SortableTokenTransferList o) {
-            return tokenId.compareTo(o.tokenId);
-        }
-
-        @Override
-        public boolean equals(@Nullable Object o) {
-            if (this == o) {
-                return true;
+        for (var transfer : hbarTransfers) {
+            if (transfer.accountId.equals(accountId)) {
+                transfer.isApproved = isApproved;
+                return this;
             }
-
-            if (!(o instanceof SortableTokenTransferList)) {
-                return false;
-            }
-
-            SortableTokenTransferList otherTransferList = (SortableTokenTransferList) o;
-            return tokenId.equals(otherTransferList.tokenId);
         }
 
-        @Override
-        public int hashCode() {
-            return tokenId.hashCode();
-        }
+        return this;
     }
 
     CryptoTransferTransactionBody.Builder build() {
-        List<SortableTokenTransferList> transferLists = new ArrayList<>();
+        var tokenTransfers = new ArrayList<TokenTransferList>();
 
-        for (var entry : tokenTransfers.entrySet()) {
-            transferLists.add(SortableTokenTransferList.forTransfers(entry));
-        }
+        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId));
+        this.tokenTransfers.sort(Comparator.comparing((TokenTransfer a) -> a.tokenId).thenComparing(a -> a.accountId));
+        this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver));
 
-        for (var entry : nftTransfers.entrySet()) {
-            transferLists.add(SortableTokenTransferList.forNftTransfers(entry));
-        }
+        var i = 0;
+        var j = 0;
 
-        Collections.sort(transferLists);
+        // Effectively merge sort
+        while (i < this.tokenTransfers.size() || j < this.nftTransfers.size()) {
+            if (i < this.tokenTransfers.size() && j < this.nftTransfers.size()) {
+                var iTokenId = this.tokenTransfers.get(i).tokenId;
+                var jTokenId = this.nftTransfers.get(j).tokenId;
+                var last = !tokenTransfers.isEmpty() ? tokenTransfers.get(tokenTransfers.size() - 1) : null;
+                var lastTokenId = last != null ? last.tokenId : null;
 
-        List<Map.Entry<AccountId, Hbar>> hbarTransferList = new ArrayList<>();
-        hbarTransferList.addAll(hbarTransfers.entrySet());
-        Collections.sort(hbarTransferList, (o1, o2) -> o1.getKey().compareTo(o2.getKey()));
+                if (last != null && iTokenId.compareTo(lastTokenId) == 0) {
+                    last.transfers.add(this.tokenTransfers.get(i++));
+                    continue;
+                }
 
-        var txBuilder = CryptoTransferTransactionBody.newBuilder();
+                if (last != null && jTokenId.compareTo(lastTokenId) == 0) {
+                    last.nftTransfers.add(this.nftTransfers.get(j++));
+                    continue;
+                }
 
-        for (var list : transferLists) {
-            var listBuilder = TokenTransferList.newBuilder()
-                .setToken(list.tokenId.toProtobuf());
+                var result = iTokenId.compareTo(jTokenId);
 
-            if (list.expectedDecimals != null) {
-                listBuilder.setExpectedDecimals(list.expectedDecimals);
+                if (result == 0) {
+                    tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), this.nftTransfers.get(j++)));
+                } else if (result < 0) {
+                    tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
+                } else {
+                    tokenTransfers.add(new TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
+                }
+            } else if (i < this.tokenTransfers.size()) {
+                var iTokenId = this.tokenTransfers.get(i).tokenId;
+                var last = !tokenTransfers.isEmpty() ? tokenTransfers.get(tokenTransfers.size() - 1) : null;
+                var lastTokenId = last != null ? last.tokenId : null;
+
+                if (last != null && iTokenId.compareTo(lastTokenId) == 0) {
+                    last.transfers.add(this.tokenTransfers.get(i++));
+                    continue;
+                }
+
+                tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
+            } else {
+                var jTokenId = this.nftTransfers.get(j).tokenId;
+                var last = !tokenTransfers.isEmpty() ? tokenTransfers.get(tokenTransfers.size() - 1) : null;
+                var lastTokenId = last != null ? last.tokenId : null;
+
+                if (last != null && jTokenId.compareTo(lastTokenId) == 0) {
+                    last.nftTransfers.add(this.nftTransfers.get(j++));
+                    continue;
+                }
+
+                tokenTransfers.add(new TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
             }
-
-            for (var transfer : list.transfers) {
-                listBuilder.addTransfers(AccountAmount.newBuilder()
-                    .setAccountID(transfer.getKey().toProtobuf())
-                    .setAmount(transfer.getValue())
-                );
-            }
-
-            for (var nftTransfer : list.nftTransfers) {
-                listBuilder.addNftTransfers(nftTransfer.toProtobuf());
-            }
-
-            txBuilder.addTokenTransfers(listBuilder);
         }
 
-        var list = TransferList.newBuilder();
-        for (var entry : hbarTransferList) {
-            list.addAccountAmounts(AccountAmount.newBuilder()
-                .setAccountID(entry.getKey().toProtobuf())
-                .setAmount(entry.getValue().toTinybars())
-            );
-        }
-        txBuilder.setTransfers(list);
+        var builder = CryptoTransferTransactionBody.newBuilder();
 
-        return txBuilder;
+        var transfers = TransferList.newBuilder();
+        for (var transfer : hbarTransfers) {
+            transfers.addAccountAmounts(transfer.toProtobuf());
+        }
+        builder.setTransfers(transfers);
+
+        for (var transfer : tokenTransfers) {
+            builder.addTokenTransfers(transfer.toProtobuf());
+        }
+
+        return builder;
     }
 
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
-        for (var a : hbarTransfers.keySet()) {
-            a.validateChecksum(client);
+        for (var transfer : hbarTransfers) {
+            transfer.accountId.validateChecksum(client);
         }
 
-        for (var entry : nftTransfers.entrySet()) {
-            entry.getKey().validateChecksum(client);
-
-            for (var nftTransfer : entry.getValue()) {
-                nftTransfer.sender.validateChecksum(client);
-                nftTransfer.receiver.validateChecksum(client);
-            }
+        for (var transfer : nftTransfers) {
+            transfer.tokenId.validateChecksum(client);
+            transfer.sender.validateChecksum(client);
+            transfer.receiver.validateChecksum(client);
         }
 
-        for (var entry : tokenTransfers.entrySet()) {
-            entry.getKey().validateChecksum(client);
-
-            for (var a : entry.getValue().transfers.keySet()) {
-                a.validateChecksum(client);
-            }
+        for (var transfer : tokenTransfers) {
+            transfer.tokenId.validateChecksum(client);
+            transfer.accountId.validateChecksum(client);
         }
     }
 
@@ -282,61 +364,48 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         scheduled.setCryptoTransfer(build());
     }
 
-    private TokenTransferMap getTokenTransferMap(TokenId tokenId) {
-        // Cannot use `Map.merge()` as it uses `BiFunction`
-        var map = tokenTransfers.containsKey(tokenId) ?
-            Objects.requireNonNull(tokenTransfers.get(tokenId)) :
-            new TokenTransferMap();
-        tokenTransfers.put(tokenId, map);
-        return map;
-    }
-
-    private List<TokenNftTransfer> getNftTransferList(TokenId tokenId) {
-        // Cannot use `Map.merge()` as it uses `BiFunction`
-        var list = nftTransfers.containsKey(tokenId) ?
-            Objects.requireNonNull(nftTransfers.get(tokenId)) :
-            new ArrayList<TokenNftTransfer>();
-        nftTransfers.put(tokenId, list);
-        return list;
-    }
-
-    private void doAddHbarTransfer(AccountId accountId, long amount) {
-        Objects.requireNonNull(accountId);
-        var current = hbarTransfers.containsKey(accountId) ?
-            Objects.requireNonNull(hbarTransfers.get(accountId)).toTinybars() :
-            0L;
-
-        hbarTransfers.put(accountId, Hbar.fromTinybars(current + amount));
-    }
-
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoTransfer();
-        if (body.hasTransfers()) {
-            for (var transfer : body.getTransfers().getAccountAmountsList()) {
-                doAddHbarTransfer(AccountId.fromProtobuf(transfer.getAccountID()), transfer.getAmount());
-            }
+
+        for (var transfer : body.getTransfers().getAccountAmountsList()) {
+            hbarTransfers.add(new HbarTransfer(
+                AccountId.fromProtobuf(transfer.getAccountID()),
+                Hbar.fromTinybars(transfer.getAmount()),
+                transfer.getIsApproval()
+            ));
         }
 
         for (var tokenTransferList : body.getTokenTransfersList()) {
             var token = TokenId.fromProtobuf(tokenTransferList.getToken());
 
-            if (tokenTransferList.getTransfersCount() > 0) {
-                var map = getTokenTransferMap(token);
-                if (tokenTransferList.hasExpectedDecimals()) {
-                    map.setExpectedDecimals(tokenTransferList.getExpectedDecimals());
-                }
-
-                for (var aa : tokenTransferList.getTransfersList()) {
-                    doAddTokenTransfer(map.transfers, AccountId.fromProtobuf(aa.getAccountID()), aa.getAmount());
-                }
+            for (var transfer : tokenTransferList.getTransfersList()) {
+                tokenTransfers.add(new TokenTransfer(
+                    token,
+                    AccountId.fromProtobuf(transfer.getAccountID()),
+                    transfer.getAmount(),
+                    tokenTransferList.hasExpectedDecimals() ? tokenTransferList.getExpectedDecimals().getValue() : null,
+                    transfer.getIsApproval()
+                ));
             }
 
-            if (tokenTransferList.getNftTransfersCount() > 0) {
-                var list = getNftTransferList(token);
-                for (var nftTransfer : tokenTransferList.getNftTransfersList()) {
-                    list.add(TokenNftTransfer.fromProtobuf(nftTransfer));
-                }
+            for (var transfer : tokenTransferList.getNftTransfersList()) {
+                nftTransfers.add(new TokenNftTransfer(
+                    token,
+                    AccountId.fromProtobuf(transfer.getSenderAccountID()),
+                    AccountId.fromProtobuf(transfer.getReceiverAccountID()),
+                    transfer.getSerialNumber(),
+                    transfer.getIsApproval()
+                ));
             }
         }
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("hbarTransfers", Arrays.toString(hbarTransfers.toArray()))
+            .add("tokenTransfers", Arrays.toString(tokenTransfers.toArray()))
+//            .add("nftTransfers", Arrays.toString(nftTransfers.toArray()))
+            .toString();
     }
 }

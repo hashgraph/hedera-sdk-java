@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.hedera.hashgraph"
-version = "2.7.0"
+version = "2.8.0"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
@@ -29,10 +29,10 @@ dependencies {
 
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-	api "com.google.protobuf:protobuf-javalite:3.19.3"
+	api "com.google.protobuf:protobuf-javalite:3.19.4"
 
 	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	implementation 'org.slf4j:slf4j-api:1.7.33'
+	implementation 'org.slf4j:slf4j-api:1.7.36'
 
 	// Toggle which slf4j library to use to enable/disable logging
 	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
@@ -40,17 +40,17 @@ dependencies {
 	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-core:1.43.2"
-	implementation "io.grpc:grpc-protobuf-lite:1.42.1"
-	implementation "io.grpc:grpc-stub:1.43.2"
+	implementation "io.grpc:grpc-core:1.44.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.44.0"
+	implementation "io.grpc:grpc-stub:1.44.0"
 
 	testCompile "org.assertj:assertj-core:3.22.0"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.35"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.43.2"
-	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.42.1'
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.44.0"
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -72,11 +72,11 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.19.3"
+		artifact = "com.google.protobuf:protoc:3.19.4"
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.43.2"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.44.0"
 		}
 	}
 	generateProtoTasks {
