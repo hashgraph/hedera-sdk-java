@@ -54,6 +54,16 @@ public abstract class PublicKey extends Key {
         return fromBytesDER(Hex.decode(publicKey));
     }
 
+    public static Boolean isED25519(byte[] publicKey) {
+        // If this is a 32 byte string, assume an Ed25519 public key
+        return publicKey.length == Ed25519.PUBLIC_KEY_SIZE;
+    }
+
+    public static Boolean isECDSA(byte[] publicKey) {
+        // If this is a 32 byte string, assume an Ed25519 public key
+        return publicKey.length == Ed25519.PUBLIC_KEY_SIZE;
+    }
+
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
         if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PublicKeyED25519.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);

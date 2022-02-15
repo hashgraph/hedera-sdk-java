@@ -133,6 +133,16 @@ public abstract class PrivateKey extends Key {
         return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    public static Boolean isED25519(byte[] privateKey) {
+        // If this is a 32 byte string, assume an Ed25519 public key
+        return privateKey.length == Ed25519.SECRET_KEY_SIZE;
+    }
+
+    public static Boolean isECDSA(byte[] privateKey) {
+        // If this is a 32 byte string, assume an Ed25519 public key
+        return privateKey.length == Ed25519.SECRET_KEY_SIZE;
+    }
+
     private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
         if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PrivateKeyED25519.fromPrivateKeyInfoInternal(privateKeyInfo);
