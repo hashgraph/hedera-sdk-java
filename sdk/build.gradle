@@ -62,7 +62,7 @@ dependencies {
 	// NOTE: This is to support Android API < 26.
 	api "org.threeten:threetenbp:1.5.2"
 
-	implementation "com.google.code.gson:gson:2.8.9"
+	implementation "com.google.code.gson:gson:2.9.0"
 
 	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 
