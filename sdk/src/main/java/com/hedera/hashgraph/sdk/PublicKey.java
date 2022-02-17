@@ -146,4 +146,8 @@ public abstract class PublicKey extends Key {
     public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
         return new AccountId(shard, realm, 0, null, this);
     }
+
+    abstract public boolean isED25519();
+
+    abstract public boolean isECDSA();
 }

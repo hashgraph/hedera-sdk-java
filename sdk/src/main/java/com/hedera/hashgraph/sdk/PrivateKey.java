@@ -307,4 +307,8 @@ public abstract class PrivateKey extends Key {
         // Forward to the corresponding public key.
         return getPublicKey().toProtobufKey();
     }
+
+    abstract public boolean isED25519();
+
+    abstract public boolean isECDSA();
 }

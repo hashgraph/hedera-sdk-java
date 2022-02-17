@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.10.0-beta.1
+
+### Added
+
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PrivateKeyED25519.isED25519()`
+ * `PrivateKeyED25519.isECDSA()`
+ * `PrivateKeyECDSA.isED25519()`
+ * `PrivateKeyECDSA.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+ * `PublicKeyED25519.isED25519()`
+ * `PublicKeyED25519.isECDSA()`
+ * `PublicKeyECDSA.isED25519()`
+ * `PublicKeyECDSA.isECDSA()`
+
 ## v2.9.0-beta.1
 
 ### Added

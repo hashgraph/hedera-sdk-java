@@ -8,9 +8,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
@@ -137,5 +136,21 @@ class Ed25519PublicKeyTest {
 
         assertNotNull(key);
         assertEquals(TEST_KEY_STR, key.toString());
+    }
+
+    @Test
+    @DisplayName("public key is is ECDSA")
+    void keyIsECDSA() {
+        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+
+        assertTrue(key.isECDSA());
+    }
+
+    @Test
+    @DisplayName("public key is is not Ed25519")
+    void keyIsNotEd25519() {
+        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+
+        assertFalse(key.isED25519());
     }
 }
