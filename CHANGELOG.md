@@ -22,6 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `PublicKeyECDSA.isED25519()`
  * `PublicKeyECDSA.isECDSA()`
 
+## Unreleased
+
+### Added
+
+ * `ContractCreateFlow` to simplify contract creation.
+
 ## v2.9.0-beta.1
 
 ### Added
@@ -94,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responds with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 
