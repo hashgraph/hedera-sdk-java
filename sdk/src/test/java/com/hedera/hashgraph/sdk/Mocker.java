@@ -10,6 +10,7 @@ import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.ServerCalls;
 import java8.util.function.Function;
+import org.threeten.bp.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -87,7 +88,10 @@ public class Mocker implements AutoCloseable {
             }
         }
 
-        this.client = Client.forNetwork(network).setOperator(new AccountId(1800), PRIVATE_KEY);
+        this.client = Client.forNetwork(network)
+            .setOperator(new AccountId(1800), PRIVATE_KEY)
+            .setMinBackoff(Duration.ofMillis(10))
+            .setNodeMinBackoff(Duration.ofMillis(10));
     }
 
     public static Mocker withResponses(List<List<Object>> responses) {
