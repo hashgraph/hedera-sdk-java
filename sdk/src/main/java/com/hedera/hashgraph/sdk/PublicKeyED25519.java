@@ -98,8 +98,12 @@ class PublicKeyED25519 extends PublicKey {
     }
 
     @Override
-    public boolean isED25519() { return true; }
+    public boolean isED25519() {
+        return true;
+    }
 
     @Override
-    public boolean isECDSA() { return false; }
+    public boolean isECDSA() {
+        return false;
+    }
 }

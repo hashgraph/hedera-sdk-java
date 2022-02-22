@@ -175,8 +175,12 @@ class PrivateKeyED25519 extends PrivateKey {
     }
 
     @Override
-    public boolean isED25519() { return false; }
+    public boolean isED25519() {
+        return false;
+    }
 
     @Override
-    public boolean isECDSA() { return true; }
+    public boolean isECDSA() {
+        return true;
+    }
 }
