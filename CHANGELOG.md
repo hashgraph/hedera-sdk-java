@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `PublicKeyECDSA.isED25519()`
  * `PublicKeyECDSA.isECDSA()`
 
+## Fixed
+
+ * Regenerated AccountIDTest.snap
+
 ## Unreleased
 
 ### Added
