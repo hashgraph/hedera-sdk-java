@@ -13,7 +13,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public final class GetFileExchangeRateExample {
+public final class GetExchangeRateSetExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
@@ -21,7 +21,7 @@ public final class GetFileExchangeRateExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetFileExchangeRateExample() {
+    private GetExchangeRateSetExample() {
     }
 
     public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InvalidProtocolBufferException {
@@ -36,19 +36,19 @@ public final class GetFileExchangeRateExample {
             .setFileId(FileId.fromString("0.0.112"))
             .execute(client);
 
-        System.out.println(Hex.decode());
-
         byte[] fileContents = fileContentsByteString.toByteArray();
 
         ExchangeRateSet exchangeRateSet = ExchangeRateSet.fromBytes(fileContents);
 
         // Prints query results to console
-        System.out.println("Current: " + exchangeRateSet.currentRate.hbars);
-        System.out.println("Current: " + exchangeRateSet.currentRate.cents);
-        System.out.println("Current: " + exchangeRateSet.currentRate.expirationTime.toString());
+        System.out.println("Current numerator: " + exchangeRateSet.currentRate.cents);
+        System.out.println("Current denominator: " + exchangeRateSet.currentRate.hbars);
+        System.out.println("Current expiration time: " + exchangeRateSet.currentRate.expirationTime.toString());
+        System.out.println("Current Exchange Rate: " + exchangeRateSet.currentRate.exchangeRate);
 
-        System.out.println("Next: " + exchangeRateSet.nextRate.hbars);
-        System.out.println("Next: " + exchangeRateSet.nextRate.cents);
-        System.out.println("Next: " + exchangeRateSet.nextRate.expirationTime.toString());
+        System.out.println("Next numerator: " + exchangeRateSet.nextRate.cents);
+        System.out.println("Next denominator: " + exchangeRateSet.nextRate.hbars);
+        System.out.println("Next expiration time: " + exchangeRateSet.nextRate.expirationTime.toString());
+        System.out.println("Next Exchange Rate: " + exchangeRateSet.nextRate.exchangeRate);
     }
 }

@@ -21,10 +21,12 @@ public class ExchangeRateSetTest {
         assertEquals(30000, exchangeRateSet.currentRate.hbars);
         Instant currentExpirationTime = Instant.ofEpochSecond(1645714800);
         assertEquals(currentExpirationTime, exchangeRateSet.currentRate.expirationTime);
+        assertEquals(19.338333333333335, exchangeRateSet.currentRate.exchangeRate);
 
         assertEquals(587660, exchangeRateSet.nextRate.cents);
         assertEquals(30000, exchangeRateSet.nextRate.hbars);
         Instant nextExpirationTime = Instant.ofEpochSecond(1645718400);
         assertEquals(nextExpirationTime, exchangeRateSet.nextRate.expirationTime);
+        assertEquals(19.588666666666665, exchangeRateSet.nextRate.exchangeRate);
     }
 }
