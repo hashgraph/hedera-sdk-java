@@ -517,16 +517,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         public ClientCall<ProtoRequestT, ResponseT> createCall() {
-            // SECTION 1
-            System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
-            System.out.format("  Timestamp %s", System.currentTimeMillis());
-            System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
-            System.out.println(" ::");
-            logger.trace("Node IP {} Timestamp {} Transaction Type {}",
-                node.address != null ? node.address.getAddress().toString() : "NULL",
-                System.currentTimeMillis(),
-                this.getClass().getSimpleName()
-            );
+            verboseLog(node);
             return this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), getCallOptions());
         }
 
@@ -542,16 +533,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             node.increaseDelay();
             logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
                 node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
-            // SECTION 2
-            System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
-            System.out.format("  Timestamp %s", System.currentTimeMillis());
-            System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
-            System.out.println(" ::");
-            logger.trace("Node IP {} Timestamp {} Transaction Type {}",
-                node.address != null ? node.address.getAddress().toString() : "NULL",
-                System.currentTimeMillis(),
-                this.getClass().getSimpleName()
-            );
+            verboseLog(node);
             return new IllegalStateException("Failed to connect to node " + node.getAccountId());
         }
 
@@ -564,17 +546,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 node.increaseDelay();
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                     node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
-                // SECTION 3
-                System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
-                System.out.format("  Timestamp %s", System.currentTimeMillis());
-                System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
-                System.out.println(" ::");
-                logger.trace("Node IP {} Timestamp {} Transaction Type {}",
-                    node.address != null ? node.address.getAddress().toString() : "NULL",
-                    System.currentTimeMillis(),
-                    this.getClass().getSimpleName()
-                );
-                // Timestamp startAt or validStart from transactionIds or System.getCurrentTimeMillis()
+                verboseLog(node);
             }
 
             return retry;
@@ -610,17 +582,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 case Retry:
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                         node.getAccountId(), delay, attempt, responseStatus);
-                    // SECTION 4
-                    System.out.println(node);
-                    System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
-                    System.out.format("  Timestamp %s", System.currentTimeMillis());
-                    System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
-                    System.out.println(" ::");
-                    logger.trace("Node IP {} Timestamp {} Transaction Type {}",
-                        node.address != null ? node.address.getAddress().toString() : "NULL",
-                        System.currentTimeMillis(),
-                        this.getClass().getSimpleName()
-                    );
+                    verboseLog(node);
                     break;
                 case ServerError:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
@@ -631,6 +593,18 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             }
 
             return executionState;
+        }
+
+        void verboseLog(Node node) {
+            System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
+            System.out.format("  Timestamp %s", System.currentTimeMillis());
+            System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
+            System.out.println(" ::");
+            logger.trace("Node IP {} Timestamp {} Transaction Type {}",
+                node.address != null ? node.address.getAddress().toString() : "NULL",
+                System.currentTimeMillis(),
+                this.getClass().getSimpleName()
+            );
         }
     }
 }
