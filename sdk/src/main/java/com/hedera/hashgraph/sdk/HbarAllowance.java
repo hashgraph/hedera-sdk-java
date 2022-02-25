@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoAllowance;
+import com.hedera.hashgraph.sdk.proto.GrantedCryptoAllowance;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -28,12 +29,20 @@ public class HbarAllowance {
         );
     }
 
+    static HbarAllowance fromProtobuf(GrantedCryptoAllowance allowanceProto) {
+        return new HbarAllowance(
+            null,
+            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            Hbar.fromTinybars(allowanceProto.getAmount())
+        );
+    }
+
     public static HbarAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
     HbarAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return new HbarAllowance(newOwnerAccountId, spenderAccountId, amount);
+        return ownerAccountId != null ? this : new HbarAllowance(newOwnerAccountId, spenderAccountId, amount);
     }
 
     CryptoAllowance toProtobuf() {
@@ -42,6 +51,15 @@ public class HbarAllowance {
         if (ownerAccountId != null) {
             builder.setOwner(ownerAccountId.toProtobuf());
         }
+        if (spenderAccountId != null) {
+            builder.setSpender(spenderAccountId.toProtobuf());
+        }
+        return builder.build();
+    }
+
+    GrantedCryptoAllowance toGrantedProtobuf() {
+        var builder = GrantedCryptoAllowance.newBuilder()
+            .setAmount(amount.toTinybars());
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }

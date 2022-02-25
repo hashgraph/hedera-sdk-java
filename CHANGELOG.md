@@ -9,7 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* `ContractCreateFlow` to simplify contract creation.
+ * `ContractCreateFlow` to simplify contract creation.
+ * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
 
 ### Fixed
 
@@ -99,7 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responds with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 
