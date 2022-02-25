@@ -22,10 +22,16 @@ public final class ExchangeRate {
      */
     public final Instant expirationTime;
 
+    /**
+     * Calculated exchange rate
+     */
+    public final double exchangeRateInCents;
+
     private ExchangeRate(int hbars, int cents, Instant expirationTime) {
         this.hbars = hbars;
         this.cents = cents;
         this.expirationTime = expirationTime;
+        this.exchangeRateInCents = (double) cents / (double) hbars;
     }
 
     static ExchangeRate fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRate pb) {
@@ -42,6 +48,7 @@ public final class ExchangeRate {
             .add("hbars", hbars)
             .add("cents", cents)
             .add("expirationTime", expirationTime)
+            .add("exchangeRateInCents", exchangeRateInCents)
             .toString();
     }
 }
