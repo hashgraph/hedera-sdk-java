@@ -22,12 +22,15 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
 private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances =  new ArrayList<>();
     private final List<TokenNftAllowance> nftAllowances = new ArrayList<>();
-    private final Map<AccountId, Map<TokenId, Integer>> nftMap = new HashMap<>();
+    // key is "{ownerId}:{spenderId}".  OwnerId may be "FEE_PAYER"
+    private final Map<String, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
     public AccountAllowanceAdjustTransaction() {
     }
 
-    AccountAllowanceAdjustTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    AccountAllowanceAdjustTransaction(
+        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs
+    ) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -50,6 +53,7 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
                 nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
             } else {
                 getNftSerials(
+                    AccountId.fromProtobuf(allowanceProto.getOwner()),
                     AccountId.fromProtobuf(allowanceProto.getSpender()),
                     TokenId.fromProtobuf(allowanceProto.getTokenId())
                 ).addAll(allowanceProto.getSerialNumbersList());
@@ -60,6 +64,19 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         hbarAllowances.add(new HbarAllowance(
             null,
+            Objects.requireNonNull(spenderAccountId),
+            Objects.requireNonNull(amount)
+        ));
+        return this;
+    }
+
+    public AccountAllowanceAdjustTransaction addHbarAllowanceWithOwner(
+        AccountId spenderAccountId,
+        Hbar amount,
+        AccountId ownerAccountId
+    ) {
+        hbarAllowances.add(new HbarAllowance(
+            Objects.requireNonNull(ownerAccountId),
             Objects.requireNonNull(spenderAccountId),
             Objects.requireNonNull(amount)
         ));
@@ -80,39 +97,102 @@ private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
         return this;
     }
 
+    public AccountAllowanceAdjustTransaction addTokenAllowanceWithOwner(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        long amount,
+        AccountId ownerAccountId
+    ) {
+        tokenAllowances.add(new TokenAllowance(
+            Objects.requireNonNull(tokenId),
+            Objects.requireNonNull(ownerAccountId),
+            Objects.requireNonNull(spenderAccountId),
+            amount
+        ));
+        return this;
+    }
+
     public List<TokenAllowance> getTokenAllowances() {
         return new ArrayList<>(tokenAllowances);
     }
 
-    private List<Long> getNftSerials(AccountId spenderAccountId, TokenId tokenId) {
-        if (nftMap.containsKey(spenderAccountId)) {
-            var innerMap = nftMap.get(spenderAccountId);
+    private static String ownerToString(@Nullable AccountId ownerAccountId) {
+        return ownerAccountId != null ? ownerAccountId.toString() : "FEE_PAYER";
+    }
+
+    private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, AccountId spenderAccountId, TokenId tokenId) {
+        var key = ownerToString(ownerAccountId) + ":" + spenderAccountId;
+        if (nftMap.containsKey(key)) {
+            var innerMap = nftMap.get(key);
             if (innerMap.containsKey(tokenId)) {
                 return Objects.requireNonNull(nftAllowances.get(innerMap.get(tokenId)).serialNumbers);
             } else {
-                return newNftSerials(spenderAccountId, tokenId, innerMap);
+                return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
             }
         } else {
             Map<TokenId, Integer> innerMap = new HashMap<>();
-            nftMap.put(spenderAccountId, innerMap);
-            return newNftSerials(spenderAccountId, tokenId, innerMap);
+            nftMap.put(key, innerMap);
+            return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
         }
     }
 
-    private List<Long> newNftSerials(AccountId spenderAccountId, TokenId tokenId, Map<TokenId, Integer> innerMap) {
+    private List<Long> newNftSerials(
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        TokenId tokenId,
+        Map<TokenId, Integer> innerMap
+    ) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, null, spenderAccountId, new ArrayList<>());
+        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, new ArrayList<>());
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
 
     public AccountAllowanceAdjustTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
-        getNftSerials(spenderAccountId, nftId.tokenId).add(nftId.serial);
+        Objects.requireNonNull(nftId);
+        getNftSerials(
+            null,
+            Objects.requireNonNull(spenderAccountId),
+            nftId.tokenId
+        ).add(nftId.serial);
         return this;
     }
 
     public AccountAllowanceAdjustTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(tokenId, null, spenderAccountId, null));
+        nftAllowances.add(new TokenNftAllowance(
+            Objects.requireNonNull(tokenId),
+            null,
+            Objects.requireNonNull(spenderAccountId),
+            null
+        ));
+        return this;
+    }
+
+    public AccountAllowanceAdjustTransaction addTokenNftAllowanceWithOwner(
+        NftId nftId,
+        AccountId spenderAccountId,
+        AccountId ownerAccountId
+    ) {
+        Objects.requireNonNull(nftId);
+        getNftSerials(
+            Objects.requireNonNull(ownerAccountId),
+            Objects.requireNonNull(spenderAccountId),
+            nftId.tokenId
+        ).add(nftId.serial);
+        return this;
+    }
+
+    public AccountAllowanceAdjustTransaction addAllTokenNftAllowanceWithOwner(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        AccountId ownerAccountId
+    ) {
+        nftAllowances.add(new TokenNftAllowance(
+            Objects.requireNonNull(tokenId),
+            Objects.requireNonNull(ownerAccountId),
+            Objects.requireNonNull(spenderAccountId),
+            null
+        ));
         return this;
     }
 

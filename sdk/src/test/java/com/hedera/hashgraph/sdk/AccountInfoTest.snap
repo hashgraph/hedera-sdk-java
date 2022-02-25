@@ -207,9 +207,9 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
       "validUtf8": true,
       "empty": false
     },
-    "cryptoAllowances_": [ ],
-    "nftAllowances_": [ ],
-    "tokenAllowances_": [ ],
+    "grantedCryptoAllowances_": [ ],
+    "grantedNftAllowances_": [ ],
+    "grantedTokenAllowances_": [ ],
     "initialized": true
   }
 ]
