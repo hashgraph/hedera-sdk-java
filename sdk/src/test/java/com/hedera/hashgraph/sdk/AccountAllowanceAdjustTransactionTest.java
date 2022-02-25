@@ -28,6 +28,7 @@ public class AccountAllowanceAdjustTransactionTest {
     }
 
     AccountAllowanceAdjustTransaction spawnTestTransaction() {
+        var ownerId = AccountId.fromString("5.6.7");
         return new AccountAllowanceAdjustTransaction()
             .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
@@ -38,6 +39,13 @@ public class AccountAllowanceAdjustTransactionTest {
             .addTokenNftAllowance(TokenId.fromString("8.8.8").nft(456), AccountId.fromString("5.5.5"))
             .addTokenNftAllowance(TokenId.fromString("4.4.4").nft(789), AccountId.fromString("9.9.9"))
             .addAllTokenNftAllowance(TokenId.fromString("6.6.6"), AccountId.fromString("7.7.7"))
+            .addHbarAllowanceWithOwner(AccountId.fromString("1.1.1"), new Hbar(3), ownerId)
+            .addTokenAllowanceWithOwner(TokenId.fromString("2.2.2"), AccountId.fromString("3.3.3"), 6, ownerId)
+            .addTokenNftAllowanceWithOwner(TokenId.fromString("4.4.4").nft(123), AccountId.fromString("5.5.5"), ownerId)
+            .addTokenNftAllowanceWithOwner(TokenId.fromString("4.4.4").nft(456), AccountId.fromString("5.5.5"), ownerId)
+            .addTokenNftAllowanceWithOwner(TokenId.fromString("8.8.8").nft(456), AccountId.fromString("5.5.5"), ownerId)
+            .addTokenNftAllowanceWithOwner(TokenId.fromString("4.4.4").nft(789), AccountId.fromString("9.9.9"), ownerId)
+            .addAllTokenNftAllowanceWithOwner(TokenId.fromString("6.6.6"), AccountId.fromString("7.7.7"), ownerId)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);

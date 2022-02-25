@@ -1334,10 +1334,14 @@ public enum Status {
     NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES(ResponseCodeEnum.NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES),
 
     /**
-     * An approval/adjustment transaction was submitted where the payer and owner account are
-     * not the same. Currently only the owner is permitted to perform these operations.
+     * The account id specified as the owner is invalid or does not exist.
      */
-    PAYER_AND_OWNER_NOT_EQUAL(ResponseCodeEnum.PAYER_AND_OWNER_NOT_EQUAL);
+    INVALID_ALLOWANCE_OWNER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_OWNER_ID),
+
+    /**
+     * The account id specified as the spender is invalid or does not exist.
+     */
+    INVALID_ALLOWANCE_SPENDER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_SPENDER_ID);
 
     final ResponseCodeEnum code;
 
@@ -1863,8 +1867,10 @@ public enum Status {
                 return FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
             case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES:
                 return NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
-            case PAYER_AND_OWNER_NOT_EQUAL:
-                return PAYER_AND_OWNER_NOT_EQUAL;
+            case INVALID_ALLOWANCE_OWNER_ID:
+                return INVALID_ALLOWANCE_OWNER_ID;
+            case INVALID_ALLOWANCE_SPENDER_ID:
+                return INVALID_ALLOWANCE_SPENDER_ID;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
