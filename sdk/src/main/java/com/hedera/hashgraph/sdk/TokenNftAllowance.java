@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
 
 import javax.annotation.Nullable;
@@ -55,12 +56,21 @@ public class TokenNftAllowance {
         );
     }
 
+    static TokenNftAllowance fromProtobuf(GrantedNftAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            null,
+            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            allowanceProto.getApprovedForAll() ? null : allowanceProto.getSerialNumbersList()
+        );
+    }
+
     public static TokenNftAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
     TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers);
+        return ownerAccountId != null ? this : new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers);
     }
 
     NftAllowance toProtobuf() {
@@ -78,6 +88,22 @@ public class TokenNftAllowance {
             builder.addAllSerialNumbers(serialNumbers);
         } else {
             builder.setApprovedForAll(BoolValue.newBuilder().setValue(true).build());
+        }
+        return builder.build();
+    }
+
+    GrantedNftAllowance toGrantedProtobuf() {
+        var builder = GrantedNftAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
+        }
+        if (spenderAccountId != null) {
+            builder.setSpender(spenderAccountId.toProtobuf());
+        }
+        if (serialNumbers != null) {
+            builder.addAllSerialNumbers(serialNumbers);
+        } else {
+            builder.setApprovedForAll(true);
         }
         return builder.build();
     }
