@@ -6,7 +6,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 /**
  * Contains a set of Exchange Rates (current and next).
  */
-public final class ExchangeRateSet {
+public final class ExchangeRates {
     /**
      * Current Exchange Rate
      */
@@ -17,19 +17,19 @@ public final class ExchangeRateSet {
      */
     public final ExchangeRate nextRate;
 
-    private ExchangeRateSet(ExchangeRate currentRate, ExchangeRate nextRate) {
+    private ExchangeRates(ExchangeRate currentRate, ExchangeRate nextRate) {
         this.currentRate = currentRate;
         this.nextRate = nextRate;
     }
 
-    static ExchangeRateSet fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRateSet pb) {
-        return new ExchangeRateSet(
+    static ExchangeRates fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRateSet pb) {
+        return new ExchangeRates(
             ExchangeRate.fromProtobuf(pb.getCurrentRate()),
             ExchangeRate.fromProtobuf(pb.getNextRate())
         );
     }
 
-    public static ExchangeRateSet fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    public static ExchangeRates fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRateSet.parseFrom(bytes).toBuilder().build());
     }
 
