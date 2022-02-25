@@ -1,6 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
-class IPv4AddressPart {
+public class IPv4AddressPart {
     byte left;
     byte right;
 

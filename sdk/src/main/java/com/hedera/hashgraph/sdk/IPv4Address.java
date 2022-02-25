@@ -5,7 +5,7 @@ import com.google.protobuf.ByteString;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-class IPv4Address {
+public class IPv4Address {
     @Nullable
     IPv4AddressPart network;
 
@@ -28,21 +28,21 @@ class IPv4Address {
     }
 
     @Nullable
-    IPv4AddressPart getNetwork() {
+    public IPv4AddressPart getNetwork() {
         return network;
     }
 
-    IPv4Address setNetwork(IPv4AddressPart network) {
+    public IPv4Address setNetwork(IPv4AddressPart network) {
         this.network = network;
         return this;
     }
 
     @Nullable
-    IPv4AddressPart getHost() {
+    public IPv4AddressPart getHost() {
         return host;
     }
 
-    IPv4Address setHost(IPv4AddressPart host) {
+    public IPv4Address setHost(IPv4AddressPart host) {
         this.host = host;
         return this;
     }
