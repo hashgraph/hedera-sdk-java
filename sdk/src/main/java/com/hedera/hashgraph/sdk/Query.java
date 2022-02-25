@@ -271,7 +271,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     @Nullable
-    TransactionId getTransactionID() {
+    TransactionId getTransactionId() {
         return paymentTransactionId;
     }
 
