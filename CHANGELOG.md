@@ -47,7 +47,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AddressBookQuery`
  * Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
    regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
- * `ContractCreateFlow` to simplify contract creation.
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+* `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
 
 ### Fixed
 
@@ -169,7 +173,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responds with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 
