@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk;
 import java8.util.Lists;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +54,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
 
     @Override
     protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, ManagedNodeAddress> entry) {
-        return new MirrorNode(entry.getKey(), executor).setMinBackoff(minBackoff);
+        return new MirrorNode(entry.getKey(), executor).setMinBackoff(minNodeBackoff).setMaxBackoff(maxNodeBackoff);
     }
 
     synchronized MirrorNode getNextMirrorNode() throws InterruptedException {
