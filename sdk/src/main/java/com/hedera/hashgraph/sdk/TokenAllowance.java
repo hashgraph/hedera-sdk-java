@@ -2,6 +2,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.GrantedTokenAllowance;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -36,12 +37,21 @@ public class TokenAllowance {
         );
     }
 
+    static TokenAllowance fromProtobuf(GrantedTokenAllowance allowanceProto) {
+        return new TokenAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            null,
+            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            allowanceProto.getAmount()
+        );
+    }
+
     public static TokenAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
     TokenAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return new TokenAllowance(tokenId, newOwnerAccountId, spenderAccountId, amount);
+        return ownerAccountId != null ? this : new TokenAllowance(tokenId, newOwnerAccountId, spenderAccountId, amount);
     }
 
     com.hedera.hashgraph.sdk.proto.TokenAllowance toProtobuf() {
@@ -52,6 +62,18 @@ public class TokenAllowance {
         }
         if (ownerAccountId != null) {
             builder.setOwner(ownerAccountId.toProtobuf());
+        }
+        if (spenderAccountId != null) {
+            builder.setSpender(spenderAccountId.toProtobuf());
+        }
+        return builder.build();
+    }
+
+    GrantedTokenAllowance toGrantedProtobuf() {
+        var builder = GrantedTokenAllowance.newBuilder()
+            .setAmount(amount);
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
         }
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
