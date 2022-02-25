@@ -596,14 +596,25 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         void verboseLog(Node node) {
-            System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
-            System.out.format("  Timestamp %s", System.currentTimeMillis());
-            System.out.format("  Transaction Type %s", this.getClass().getSimpleName());
-            System.out.println(" ::");
+            String ipAddress = "";
+            if (node.address == null) {
+                ipAddress = "NULL";
+            } else if (node.address.getAddress() == null) {
+                ipAddress = "NULL";
+            } else {
+                ipAddress = node.address.getAddress().toString();
+            }
+//            System.out.format("Node: %s", node.address != null ? node.address.getAddress().toString() : "NULL");
+//            System.out.format("Node :: %s :: ", node);
+//            System.out.format("Node Address :: %s :: ", node.address);
+//            System.out.format("Node Address IP :: %s :: ", ipAddress);
+//            System.out.format(" Timestamp :: %s :: ", System.currentTimeMillis());
+//            System.out.format(" Transaction Type :: %s", this.getClass() != null ? this.getClass().getSimpleName() : "NULL");
+//            System.out.println(" ::");
             logger.trace("Node IP {} Timestamp {} Transaction Type {}",
-                node.address != null ? node.address.getAddress().toString() : "NULL",
+                ipAddress,
                 System.currentTimeMillis(),
-                this.getClass().getSimpleName()
+                this.getClass() != null ? this.getClass().getSimpleName() : "NULL"
             );
         }
     }
