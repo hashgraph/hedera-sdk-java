@@ -242,7 +242,7 @@ class ClientTest {
         long secondsTaken = java.time.Duration.between(start, Instant.now()).toSeconds();
 
         // 20 seconds would indicate we tried 2 times to connect
-        assertThat(secondsTaken).isLessThan(6);
+        assertThat(secondsTaken).isLessThan(7);
     }
 
     @Test

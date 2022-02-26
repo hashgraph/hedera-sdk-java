@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+ * `ContractCreateFlow` to simplify contract creation.
  * `PrivateKey.isED25519()`
  * `PrivateKey.isECDSA()`
  * `PrivateKeyED25519.isED25519()`
@@ -26,11 +27,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * Regenerated AccountIDTest.snap
 
-## Unreleased
+### Deprecated
 
-### Added
-
- * `ContractCreateFlow` to simplify contract creation.
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
 
 ## v2.9.0-beta.1
 
