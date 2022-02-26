@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class NodeAddress {
+public class NodeAddress {
     @Nullable
     String publicKey;
 
@@ -64,68 +64,68 @@ class NodeAddress {
     }
 
     @Nullable
-    String getPublicKey() {
+    public String getPublicKey() {
         return publicKey;
     }
 
-    NodeAddress setPublicKey(String publicKey) {
+    public NodeAddress setPublicKey(String publicKey) {
         this.publicKey = publicKey;
         return this;
     }
 
     @Nullable
-    AccountId getAccountId() {
+    public AccountId getAccountId() {
         return accountId;
     }
 
-    NodeAddress setAccountId(AccountId accountId) {
+    public NodeAddress setAccountId(AccountId accountId) {
         this.accountId = accountId;
         return this;
     }
 
-    long getNodeId() {
+    public long getNodeId() {
         return nodeId;
     }
 
-    NodeAddress setNodeId(long nodeId) {
+    public NodeAddress setNodeId(long nodeId) {
         this.nodeId = nodeId;
         return this;
     }
 
     @Nullable
-    ByteString getCertHash() {
+    public ByteString getCertHash() {
         return certHash;
     }
 
-    NodeAddress setCertHash(ByteString certHash) {
+    public NodeAddress setCertHash(ByteString certHash) {
         this.certHash = certHash;
         return this;
     }
 
-    List<Endpoint> getAddresses() {
+    public List<Endpoint> getAddresses() {
         return addresses;
     }
 
-    NodeAddress setAddresses(List<Endpoint> addresses) {
+    public NodeAddress setAddresses(List<Endpoint> addresses) {
         this.addresses = addresses;
         return this;
     }
 
     @Nullable
-    String getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    NodeAddress setDescription(String description) {
+    public NodeAddress setDescription(String description) {
         this.description = description;
         return this;
     }
 
-    long getStake() {
+    public long getStake() {
         return stake;
     }
 
-    NodeAddress setStake(long stake) {
+    public NodeAddress setStake(long stake) {
         this.stake = stake;
         return this;
     }
