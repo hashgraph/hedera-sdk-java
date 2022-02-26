@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Fixed
 
  * Regenerated AccountIDTest.snap
+ * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+ * `AddressBookQuery`
 
 ### Deprecated
 
