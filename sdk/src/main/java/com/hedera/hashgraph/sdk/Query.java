@@ -270,6 +270,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return paymentTransactionId;
     }
 
+    @Nullable
+    public TransactionId getTransactionId() {
+        return paymentTransactionId;
+    }
+
     @Override
     @SuppressWarnings("LiteProtoToString")
     public String toString() {
