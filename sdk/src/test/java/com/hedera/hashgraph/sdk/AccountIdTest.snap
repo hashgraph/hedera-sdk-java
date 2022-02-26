@@ -29,7 +29,9 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasKey=[
     "realm": 0,
     "num": 0,
     "aliasKey": {
-      "keyData": "EU5qvDcbgtq1wV6hSfAtNKASCHsWNRbdcPRKyvq/d3c="
+      "keyData": "EU5qvDcbgtq1wV6hSfAtNKASCHsWNRbdcPRKyvq/d3c=",
+      "ecdsa": false,
+      "ed25519": true
     }
   }
 ]
