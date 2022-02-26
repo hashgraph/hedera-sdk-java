@@ -3,15 +3,15 @@ package com.hedera.hashgraph.sdk;
 import java.util.concurrent.ExecutorService;
 
 class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
-    MirrorNode(ManagedNodeAddress address, ExecutorService executor) {
+    public MirrorNode(ManagedNodeAddress address, ExecutorService executor) {
         super(address, executor);
     }
 
-    MirrorNode(String address, ExecutorService executor) {
+    public MirrorNode(String address, ExecutorService executor) {
         this(ManagedNodeAddress.fromString(address), executor);
     }
 
-    public MirrorNode(MirrorNode node, ManagedNodeAddress address) {
+    private MirrorNode(MirrorNode node, ManagedNodeAddress address) {
         super(node, address);
     }
 
