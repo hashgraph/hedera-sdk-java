@@ -16,12 +16,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class Ed25519PrivateKeyTest {
     private static final String TEST_KEY_STR = "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10";
@@ -318,5 +313,20 @@ class Ed25519PrivateKeyTest {
             SIG_STR,
             Hex.toHexString(signature)
         );
+    }
+    @Test
+    @DisplayName("private key is is ECDSA")
+    void keyIsECDSA() {
+        PrivateKey key = PrivateKey.generateECDSA();
+
+        assertTrue(key.isECDSA());
+    }
+
+    @Test
+    @DisplayName("private key is is not Ed25519")
+    void keyIsNotEd25519() {
+        PrivateKey key = PrivateKey.generateECDSA();
+
+        assertFalse(key.isED25519());
     }
 }
