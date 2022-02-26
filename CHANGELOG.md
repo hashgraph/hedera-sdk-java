@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `ContractCreateFlow` to simplify contract creation.
  * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
 
+### Fixed
+
+ * Changed MirrorNode endpoint to public
+
 ### Deprecated
 
 * `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.

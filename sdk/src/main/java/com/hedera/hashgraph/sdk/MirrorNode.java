@@ -11,7 +11,7 @@ class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
         this(ManagedNodeAddress.fromString(address), executor);
     }
 
-    private MirrorNode(MirrorNode node, ManagedNodeAddress address) {
+    public MirrorNode(MirrorNode node, ManagedNodeAddress address) {
         super(node, address);
     }
 
