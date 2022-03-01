@@ -54,7 +54,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
 
     @Override
     protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, ManagedNodeAddress> entry) {
-        return new MirrorNode(entry.getKey(), executor).setMinBackoff(minNodeBackoff).setMaxBackoff(maxNodeBackoff);
+        return new MirrorNode(entry.getKey(), executor);
     }
 
     synchronized MirrorNode getNextMirrorNode() throws InterruptedException {
