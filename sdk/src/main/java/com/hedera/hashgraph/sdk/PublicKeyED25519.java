@@ -96,4 +96,14 @@ class PublicKeyED25519 extends PublicKey {
     public int hashCode() {
         return Arrays.hashCode(keyData);
     }
+
+    @Override
+    public boolean isED25519() {
+        return true;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return false;
+    }
 }

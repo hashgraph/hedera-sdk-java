@@ -8,17 +8,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class NodeAddressBook {
+public class NodeAddressBook {
     List<NodeAddress> nodeAddresses = Collections.emptyList();
 
     NodeAddressBook() {
     }
 
-    List<NodeAddress> getNodeAddresses() {
+    public List<NodeAddress> getNodeAddresses() {
         return nodeAddresses;
     }
 
-    NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
+    public NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
         this.nodeAddresses = nodeAddresses;
         return this;
     }
@@ -33,7 +33,7 @@ class NodeAddressBook {
         return new NodeAddressBook().setNodeAddresses(addresses);
     }
 
-    static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
+    public static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.NodeAddressBook.parseFrom(bytes));
     }
 
@@ -47,7 +47,7 @@ class NodeAddressBook {
         return builder.build();
     }
 
-    ByteString toBytes() {
+    public ByteString toBytes() {
         return toProtobuf().toByteString();
     }
 

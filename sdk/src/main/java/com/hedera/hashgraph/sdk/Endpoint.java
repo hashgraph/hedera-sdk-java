@@ -6,7 +6,7 @@ import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
-class Endpoint {
+public class Endpoint {
     @Nullable
     IPv4Address address = null;
 
@@ -28,20 +28,20 @@ class Endpoint {
     }
 
     @Nullable
-    IPv4Address getAddress() {
+    public IPv4Address getAddress() {
         return address;
     }
 
-    Endpoint setAddress(IPv4Address address) {
+    public Endpoint setAddress(IPv4Address address) {
         this.address = address;
         return this;
     }
 
-    int getPort() {
+    public int getPort() {
         return port;
     }
 
-    Endpoint setPort(int port) {
+    public Endpoint setPort(int port) {
         this.port = port;
         return this;
     }

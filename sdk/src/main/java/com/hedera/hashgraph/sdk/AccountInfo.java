@@ -181,18 +181,18 @@ public final class AccountInfo {
             relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
         }
 
-        List<HbarAllowance> hbarAllowances = new ArrayList<>(accountInfo.getCryptoAllowancesCount());
-        for (var allowanceProto : accountInfo.getCryptoAllowancesList()) {
+        List<HbarAllowance> hbarAllowances = new ArrayList<>(accountInfo.getGrantedCryptoAllowancesCount());
+        for (var allowanceProto : accountInfo.getGrantedCryptoAllowancesList()) {
             hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
         }
 
-        List<TokenAllowance> tokenAllowances = new ArrayList<>(accountInfo.getTokenAllowancesCount());
-        for (var allowanceProto : accountInfo.getTokenAllowancesList()) {
+        List<TokenAllowance> tokenAllowances = new ArrayList<>(accountInfo.getGrantedTokenAllowancesCount());
+        for (var allowanceProto : accountInfo.getGrantedTokenAllowancesList()) {
             tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto));
         }
 
-        List<TokenNftAllowance> nftAllowances = new ArrayList<>(accountInfo.getNftAllowancesCount());
-        for (var allowanceProto : accountInfo.getNftAllowancesList()) {
+        List<TokenNftAllowance> nftAllowances = new ArrayList<>(accountInfo.getGrantedNftAllowancesCount());
+        for (var allowanceProto : accountInfo.getGrantedNftAllowancesList()) {
             nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
         }
 
@@ -264,15 +264,15 @@ public final class AccountInfo {
         }
 
         for (var allowance : hbarAllowances) {
-            accountInfoBuilder.addCryptoAllowances(allowance.toProtobuf());
+            accountInfoBuilder.addGrantedCryptoAllowances(allowance.toGrantedProtobuf());
         }
 
         for (var allowance : tokenAllowances) {
-            accountInfoBuilder.addTokenAllowances(allowance.toProtobuf());
+            accountInfoBuilder.addGrantedTokenAllowances(allowance.toGrantedProtobuf());
         }
 
         for (var allowance : tokenNftAllowances) {
-            accountInfoBuilder.addNftAllowances(allowance.toProtobuf());
+            accountInfoBuilder.addGrantedNftAllowances(allowance.toGrantedProtobuf());
         }
 
         return accountInfoBuilder.build();
