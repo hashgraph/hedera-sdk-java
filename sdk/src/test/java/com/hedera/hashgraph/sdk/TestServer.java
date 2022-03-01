@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessServerBuilder;
+import org.threeten.bp.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -25,8 +26,10 @@ public class TestServer {
 
         var network = new HashMap<String, AccountId>();
         network.put("in-process:" + name, AccountId.fromString("1.1.1"));
-        client = Client.forNetwork(network);
-        client.setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
+        client = Client.forNetwork(network)
+            .setMinBackoff(Duration.ofMillis(10))
+            .setNodeMinBackoff(Duration.ofMillis(10))
+            .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
     }
 
     public void close() throws TimeoutException, InterruptedException {

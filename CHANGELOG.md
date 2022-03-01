@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.9.0-beta.1
+
+### Added
+
+ * `owner` field to `*Allowance` classes.
+ * `Executable.[set|get]GrpcDeadline()`
+
+### Fixed
+
+ * `AccountAllowanceAdjustTransaction` now deserializes correctly with `Transaction.fromBytes()`
+
 ## v2.8.0
 
 ### Added
@@ -39,6 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `StorageChange`
  * New response codes.
  * `ChunkedTransaction.[set|get]ChunkSize()`, and changed default chunk size for `FileAppendTransaction` to 2048.
+ * `AccountAllowance[Adjust|Approve]Transaction`
+ * `AccountInfo.[hbar|token|tokenNft]Allowances`
+ * `[Hbar|Token|TokenNft]Allowance`
+ * `[Hbar|Token|TokenNft]Allowance`
+ * `TransferTransaction.set[Hbar|Token|TokenNft]TransferApproval()`
 
 ### Fixed
 
@@ -53,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
- * Support for regenerating transaction IDs on demand if a request 
+ * Support for regenerating transaction IDs on demand if a request
    responsed with `TRANSACITON_EXPIRED`
 
 ## v2.7.0-beta.1

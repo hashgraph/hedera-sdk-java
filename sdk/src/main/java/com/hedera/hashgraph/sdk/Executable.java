@@ -51,7 +51,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     Function<GrpcRequest, ResponseT> blockingUnaryCall =
         (grpcRequest) -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
 
+    @Nullable
+    protected Duration grpcDeadline;
+
     Executable() {
+    }
+
+    @Nullable
+    public final Duration grpcDeadline() {
+        return grpcDeadline;
+    }
+
+    public final SdkRequestT setGrpcDeadline(Duration grpcDeadline) {
+        this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
+
+        // noinspection unchecked
+        return (SdkRequestT) this;
     }
 
     /**
@@ -402,6 +417,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     abstract ProtoRequestT makeRequest();
 
+    GrpcRequest getGrpcRequest(int attempt) {
+        return new GrpcRequest(attempt);
+    }
+
     void advanceRequest() {
         if (nextNodeIndex == nodes.size() - 1) {
             attemptedAllNodes = true;
@@ -483,12 +502,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1), Objects.requireNonNull(maxBackoff).toMillis());
         }
 
+        public CallOptions getCallOptions() {
+            var options = CallOptions.DEFAULT;
+
+            if (Executable.this.grpcDeadline != null) {
+                return options.withDeadlineAfter(Executable.this.grpcDeadline.toMillis(), TimeUnit.MILLISECONDS);
+            } else {
+                return options;
+            }
+        }
+
         public Node getNode() {
             return node;
         }
 
         public ClientCall<ProtoRequestT, ResponseT> createCall() {
-            return this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), CallOptions.DEFAULT);
+            return this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), getCallOptions());
         }
 
         public ProtoRequestT getRequest() {
