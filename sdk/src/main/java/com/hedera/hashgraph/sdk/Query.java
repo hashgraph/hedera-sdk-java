@@ -229,7 +229,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         if (paymentTx != null) {
             return paymentTx;
         } else {
-            paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            if (paymentTransactionId == null) {
+                paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            }
+
             var newPaymentTx = makePaymentTransaction(
                 paymentTransactionId,
                 nodeAccountIds.get(index),
@@ -271,8 +274,16 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     @Nullable
-    public TransactionId getTransactionId() {
+    public TransactionId getPaymentTransactionId() {
         return paymentTransactionId;
+    }
+
+    @Nullable
+    public T setPaymentTransactionId(TransactionId paymentTransactionId) {
+        this.paymentTransactionId = paymentTransactionId;
+
+        // noinspection unchecked
+        return (T) this;
     }
 
     @Override

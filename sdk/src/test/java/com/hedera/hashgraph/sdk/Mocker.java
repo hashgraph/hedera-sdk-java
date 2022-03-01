@@ -90,8 +90,10 @@ public class Mocker implements AutoCloseable {
 
         this.client = Client.forNetwork(network)
             .setOperator(new AccountId(1800), PRIVATE_KEY)
-            .setMinBackoff(Duration.ofMillis(10))
-            .setNodeMinBackoff(Duration.ofMillis(10));
+            .setMinBackoff(Duration.ofMillis(1))
+            .setMaxBackoff(Duration.ofMillis(1))
+            .setNodeMinBackoff(Duration.ofMillis(1))
+            .setNodeMaxBackoff(Duration.ofMillis(1));
     }
 
     public static Mocker withResponses(List<List<Object>> responses) {
