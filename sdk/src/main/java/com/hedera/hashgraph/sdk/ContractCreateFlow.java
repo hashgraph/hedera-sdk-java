@@ -1,11 +1,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import java8.util.concurrent.CompletableFuture;
 import org.bouncycastle.util.encoders.Hex;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.CompletableFuture;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
