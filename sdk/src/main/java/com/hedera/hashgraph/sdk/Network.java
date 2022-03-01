@@ -291,8 +291,6 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     @Override
     protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
         return new Node(entry.getValue(), entry.getKey(), executor)
-            .setMinBackoff(minNodeBackoff)
-            .setMaxBackoff(maxNodeBackoff)
             .setVerifyCertificates(verifyCertificates);
     }
 
