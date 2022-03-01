@@ -24,7 +24,7 @@ class Node extends ManagedNode<Node, AccountId> {
         this(accountId, ManagedNodeAddress.fromString(address), executor);
     }
 
-    private Node(Node node, ManagedNodeAddress address) {
+    Node(Node node, ManagedNodeAddress address) {
         super(node, address);
 
         this.accountId = node.accountId;

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -47,13 +46,13 @@ abstract class ManagedNetwork<
      * The current minimum backoff for the nodes in the network. This backoff is used when nodes return a bad
      * gRPC status.
      */
-    protected Duration minBackoff = Client.DEFAULT_MIN_BACKOFF;
+    protected Duration minNodeBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
 
     /**
      * The current maximum backoff for the nodes in the network. This backoff is used when nodes return a bad
      * gRPC status.
      */
-    protected Duration maxBackoff = Client.DEFAULT_MAX_BACKOFF;
+    protected Duration maxNodeBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
 
     /**
      * Timeout for closing either a single node when setting a new network, or closing the entire network.
@@ -116,42 +115,42 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-    Duration getMinBackoff() {
-        return minBackoff;
+    Duration getMinNodeBackoff() {
+        return minNodeBackoff;
     }
 
     /**
      * Set the minimum backoff a node should use when receiving a bad gRPC status.
      *
-     * @param minBackoff
+     * @param minNodeBackoff
      * @return
      */
-    synchronized ManagedNetworkT setMinBackoff(Duration minBackoff) {
-        this.minBackoff = minBackoff;
+    synchronized ManagedNetworkT setMinNodeBackoff(Duration minNodeBackoff) {
+        this.minNodeBackoff = minNodeBackoff;
 
         for (var node : nodes) {
-            node.setMinBackoff(minBackoff);
+            node.setMinBackoff(minNodeBackoff);
         }
 
         // noinspection unchecked
         return (ManagedNetworkT) this;
     }
 
-    Duration getMaxBackoff() {
-        return maxBackoff;
+    Duration getMaxNodeBackoff() {
+        return maxNodeBackoff;
     }
 
     /**
      * Set the maximum backoff a node should use when receiving a bad gRPC status.
      *
-     * @param maxBackoff
+     * @param maxNodeBackoff
      * @return
      */
-    synchronized ManagedNetworkT setMaxBackoff(Duration maxBackoff) {
-        this.maxBackoff = maxBackoff;
+    synchronized ManagedNetworkT setMaxNodeBackoff(Duration maxNodeBackoff) {
+        this.maxNodeBackoff = maxNodeBackoff;
 
         for (var node : nodes) {
-            node.setMaxBackoff(maxBackoff);
+            node.setMaxBackoff(maxNodeBackoff);
         }
 
         // noinspection unchecked
@@ -327,7 +326,7 @@ abstract class ManagedNetwork<
             for (int i = nodes.size() - 1; i >= 0; i--) {
                 var node = Objects.requireNonNull(nodes.get(i));
 
-                if (node.getAttempts() >= maxNodeAttempts) {
+                if (node.getBadGrpcStatusCount() >= maxNodeAttempts) {
                     node.close(closeTimeout);
                     removeNodeFromNetwork(node);
                     nodes.remove(i);

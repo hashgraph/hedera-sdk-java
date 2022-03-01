@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.collect.HashBiMap;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Resources;
 import com.google.protobuf.ByteString;
@@ -9,13 +8,10 @@ import javax.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
@@ -294,7 +290,8 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     @Override
     protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
         return new Node(entry.getValue(), entry.getKey(), executor)
-            .setMinBackoff(minBackoff)
+            .setMinBackoff(minNodeBackoff)
+            .setMaxBackoff(maxNodeBackoff)
             .setVerifyCertificates(verifyCertificates);
     }
 
