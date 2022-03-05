@@ -1,8 +1,8 @@
 plugins {
 	id "java-library"
 	id "idea"
-	id "maven"
-	id "com.bmuschko.nexus" version "2.3.1"
+	// id "maven-publish"
+	// id "com.bmuschko.nexus" version "2.3.1"
 	id "com.google.protobuf" version "0.8.18"
 }
 
@@ -44,7 +44,7 @@ dependencies {
 	implementation "io.grpc:grpc-protobuf-lite:1.44.1"
 	implementation "io.grpc:grpc-stub:1.44.1"
 
-	testCompile "org.assertj:assertj-core:3.22.0"
+	testImplementation "org.assertj:assertj-core:3.22.0"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
@@ -193,45 +193,45 @@ jar {
 	includeEmptyDirs = false
 }
 
-modifyPom {
-	project {
-		description 'Hedera™ Hashgraph SDK for Java'
-		name 'sdk'
-		url 'https://github.com/hashgraph/hedera-sdk-java'
-		organization {
-			name 'Hedera Hashgraph'
-			url 'https://www.hedera.com'
-		}
-		issueManagement {
-			system 'GitHub'
-			url 'https://github.com/hashgraph/hedera-sdk-java/issues'
-		}
-		licenses {
-			license {
-				name 'Apache License, Version 2.0'
-				url 'https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE'
-				distribution 'repo'
-			}
-		}
-		scm {
-			url 'https://github.com/hashgraph/hedera-sdk-java'
-			connection 'scm:git:https://github.com/hashgraph/hedera-sdk-java.git'
-			developerConnection 'scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git'
-		}
-		developers {
-			developer {
-				name 'Ryan Leckey'
-			}
-		}
-	}
-}
+// modifyPom {
+// 	project {
+// 		description 'Hedera™ Hashgraph SDK for Java'
+// 		name 'sdk'
+// 		url 'https://github.com/hashgraph/hedera-sdk-java'
+// 		organization {
+// 			name 'Hedera Hashgraph'
+// 			url 'https://www.hedera.com'
+// 		}
+// 		issueManagement {
+// 			system 'GitHub'
+// 			url 'https://github.com/hashgraph/hedera-sdk-java/issues'
+// 		}
+// 		licenses {
+// 			license {
+// 				name 'Apache License, Version 2.0'
+// 				url 'https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE'
+// 				distribution 'repo'
+// 			}
+// 		}
+// 		scm {
+// 			url 'https://github.com/hashgraph/hedera-sdk-java'
+// 			connection 'scm:git:https://github.com/hashgraph/hedera-sdk-java.git'
+// 			developerConnection 'scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git'
+// 		}
+// 		developers {
+// 			developer {
+// 				name 'Ryan Leckey'
+// 			}
+// 		}
+// 	}
+// }
 
-extraArchive {
-	sources = true
-	tests = false
-}
+// extraArchive {
+// 	sources = true
+// 	tests = false
+// }
 
-nexus {
-	sign = true
-	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-}
+// nexus {
+// 	sign = true
+// 	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+// }
