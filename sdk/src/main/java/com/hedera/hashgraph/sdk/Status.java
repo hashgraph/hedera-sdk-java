@@ -1247,7 +1247,97 @@ public enum Status {
      * A fungible token transfer expected a different number of decimals than the involved
      * type actually has.
      */
-    UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS);
+    UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS),
+
+    /**
+     * The proxy account id is invalid or does not exist.
+     */
+    INVALID_PROXY_ACCOUNT_ID(ResponseCodeEnum.INVALID_PROXY_ACCOUNT_ID),
+
+    /**
+     * The transfer account id in CryptoDelete transaction is invalid or does not exist.
+     */
+    INVALID_TRANSFER_ACCOUNT_ID(ResponseCodeEnum.INVALID_TRANSFER_ACCOUNT_ID),
+
+    /**
+     * The fee collector account id in TokenFeeScheduleUpdate is invalid or does not exist.
+     */
+    INVALID_FEE_COLLECTOR_ACCOUNT_ID(ResponseCodeEnum.INVALID_FEE_COLLECTOR_ACCOUNT_ID),
+
+    /**
+     * The alias already set on an account cannot be updated using CryptoUpdate transaction.
+     */
+    ALIAS_IS_IMMUTABLE(ResponseCodeEnum.ALIAS_IS_IMMUTABLE),
+
+    /**
+     * An approved allowance specifies a spender account that is the same as the hbar/token
+     * owner account.
+     */
+    SPENDER_ACCOUNT_SAME_AS_OWNER(ResponseCodeEnum.SPENDER_ACCOUNT_SAME_AS_OWNER),
+
+    /**
+     * The establishment or adjustment of an approved allowance cause the token allowance
+     * to exceed the token maximum supply.
+     */
+    AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY(ResponseCodeEnum.AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY),
+
+    /**
+     * The specified amount for an approved allowance cannot be negative.
+     */
+    NEGATIVE_ALLOWANCE_AMOUNT(ResponseCodeEnum.NEGATIVE_ALLOWANCE_AMOUNT),
+
+    /**
+     * The approveForAll flag cannot be set for a fungible token.
+     */
+    CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON(ResponseCodeEnum.CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON),
+
+    /**
+     * The spender does not have an existing approved allowance with the hbar/token owner.
+     */
+    SPENDER_DOES_NOT_HAVE_ALLOWANCE(ResponseCodeEnum.SPENDER_DOES_NOT_HAVE_ALLOWANCE),
+
+    /**
+     * The transfer amount exceeds the current approved allowance for the spender account.
+     */
+    AMOUNT_EXCEEDS_ALLOWANCE(ResponseCodeEnum.AMOUNT_EXCEEDS_ALLOWANCE),
+
+    /**
+     * The payer account of an approveAllowances or adjustAllowance transaction is attempting
+     * to go beyond the maximum allowed number of allowances.
+     */
+    MAX_ALLOWANCES_EXCEEDED(ResponseCodeEnum.MAX_ALLOWANCES_EXCEEDED),
+
+    /**
+     * No allowances have been specified in the approval/adjust transaction.
+     */
+    EMPTY_ALLOWANCES(ResponseCodeEnum.EMPTY_ALLOWANCES),
+
+    /**
+     * Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
+     * CryptoApproveAllowance or CryptoAdjustAllowance transaction.
+     */
+    SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES(ResponseCodeEnum.SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES),
+
+    /**
+     * Serial numbers are repeated in nft allowance for a single spender account
+     */
+    REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES(ResponseCodeEnum.REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES),
+
+    /**
+     * Fungible common token used in NFT allowances
+     */
+    FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES(ResponseCodeEnum.FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES),
+
+    /**
+     * Non fungible token used in fungible token allowances
+     */
+    NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES(ResponseCodeEnum.NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES),
+
+    /**
+     * An approval/adjustment transaction was submitted where the payer and owner account are
+     * not the same. Currently only the owner is permitted to perform these operations.
+     */
+    PAYER_AND_OWNER_NOT_EQUAL(ResponseCodeEnum.PAYER_AND_OWNER_NOT_EQUAL);
 
     final ResponseCodeEnum code;
 
@@ -1741,6 +1831,40 @@ public enum Status {
                 return INVALID_ALIAS_KEY;
             case UNEXPECTED_TOKEN_DECIMALS:
                 return UNEXPECTED_TOKEN_DECIMALS;
+            case INVALID_PROXY_ACCOUNT_ID:
+                return INVALID_PROXY_ACCOUNT_ID;
+            case INVALID_TRANSFER_ACCOUNT_ID:
+                return INVALID_TRANSFER_ACCOUNT_ID;
+            case INVALID_FEE_COLLECTOR_ACCOUNT_ID:
+                return INVALID_FEE_COLLECTOR_ACCOUNT_ID;
+            case ALIAS_IS_IMMUTABLE:
+                return ALIAS_IS_IMMUTABLE;
+            case SPENDER_ACCOUNT_SAME_AS_OWNER:
+                return SPENDER_ACCOUNT_SAME_AS_OWNER;
+            case AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY:
+                return AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY;
+            case NEGATIVE_ALLOWANCE_AMOUNT:
+                return NEGATIVE_ALLOWANCE_AMOUNT;
+            case CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON:
+                return CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON;
+            case SPENDER_DOES_NOT_HAVE_ALLOWANCE:
+                return SPENDER_DOES_NOT_HAVE_ALLOWANCE;
+            case AMOUNT_EXCEEDS_ALLOWANCE:
+                return AMOUNT_EXCEEDS_ALLOWANCE;
+            case MAX_ALLOWANCES_EXCEEDED:
+                return MAX_ALLOWANCES_EXCEEDED;
+            case EMPTY_ALLOWANCES:
+                return EMPTY_ALLOWANCES;
+            case SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES:
+                return SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES;
+            case REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES:
+                return REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES;
+            case FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES:
+                return FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
+            case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES:
+                return NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
+            case PAYER_AND_OWNER_NOT_EQUAL:
+                return PAYER_AND_OWNER_NOT_EQUAL;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

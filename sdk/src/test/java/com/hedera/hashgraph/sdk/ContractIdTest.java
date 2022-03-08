@@ -7,6 +7,8 @@ import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class ContractIdTest {
     @BeforeAll
     public static void beforeAll() {
@@ -34,6 +36,29 @@ class ContractIdTest {
     }
 
     @Test
+    void fromEvmAddress() {
+        SnapshotMatcher.expect(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromEvmAddressWith0x() {
+        SnapshotMatcher.expect(ContractId.fromEvmAddress(1, 2, "0x98329e006610472e6B372C080833f6D79ED833cf").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithEvmAddress() {
+        SnapshotMatcher.expect(ContractId.fromString("1.2.98329e006610472e6B372C080833f6D79ED833cf").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void toFromBytes() throws InvalidProtocolBufferException {
+        ContractId a = ContractId.fromString("1.2.3");
+        assertEquals(a, ContractId.fromBytes(a.toBytes()));
+        ContractId b = ContractId.fromEvmAddress(1, 2, "0x98329e006610472e6B372C080833f6D79ED833cf");
+        assertEquals(b, ContractId.fromBytes(b.toBytes()));
+    }
+
+    @Test
     void toBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(Hex.toHexString(new ContractId(5005).toBytes())).toMatchSnapshot();
     }
@@ -46,5 +71,10 @@ class ContractIdTest {
     @Test
     void toSolidityAddress() {
         SnapshotMatcher.expect(new ContractId(5005).toSolidityAddress()).toMatchSnapshot();
+    }
+
+    @Test
+    void toSolidityAddress2() {
+        SnapshotMatcher.expect(ContractId.fromEvmAddress(1, 2, "0x98329e006610472e6B372C080833f6D79ED833cf").toSolidityAddress()).toMatchSnapshot();
     }
 }

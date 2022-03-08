@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class NftIdTest {
 
     static Client mainnetClient;
@@ -34,6 +36,18 @@ class NftIdTest {
     @Test
     void fromString() {
         SnapshotMatcher.expect(NftId.fromString("0.0.5005@1234").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromString2() {
+        SnapshotMatcher.expect(NftId.fromString("0.0.5005/1234").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void toFromString() {
+        var id1 = NftId.fromString("0.0.5005@1234");
+        var id2 = NftId.fromString(id1.toString());
+        assertEquals(id1.toString(), id2.toString());
     }
 
     @Test

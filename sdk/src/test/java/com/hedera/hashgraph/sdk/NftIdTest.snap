@@ -3,6 +3,11 @@ com.hedera.hashgraph.sdk.NftIdTest.fromBytes=[
 ]
 
 
+com.hedera.hashgraph.sdk.NftIdTest.fromString2=[
+  "0.0.5005/1234"
+]
+
+
 com.hedera.hashgraph.sdk.NftIdTest.fromString=[
   "0.0.5005/1234"
 ]

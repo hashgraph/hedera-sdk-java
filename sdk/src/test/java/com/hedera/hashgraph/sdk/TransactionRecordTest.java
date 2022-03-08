@@ -5,7 +5,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
+import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.Response;
+import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransactionGetRecordResponse;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import org.junit.jupiter.api.DisplayName;
@@ -23,12 +25,28 @@ public class TransactionRecordTest {
     @Test
     @DisplayName("using toBytes and fromBytes will produce the correct response")
     void toFromBytes() throws InvalidProtocolBufferException {
-        var transfer = AccountAmount.newBuilder()
+        var hbarTransfer = AccountAmount.newBuilder()
             .setAccountID(AccountId.fromString("0.0.5005").toProtobuf())
             .setAmount(100_000);
 
-        var transferList = TransferList.newBuilder();
-        transferList.addAccountAmounts(transfer);
+        var hbarTransferList = TransferList.newBuilder();
+        hbarTransferList.addAccountAmounts(hbarTransfer);
+
+        var tokenTransfer = AccountAmount.newBuilder()
+            .setAccountID(AccountId.fromString("0.0.5006").toProtobuf())
+            .setAmount(100_000);
+
+        var tokenTransferList = TokenTransferList.newBuilder()
+            .setToken(TokenId.fromString("0.0.5007").toProtobuf());
+        tokenTransferList.addTransfers(tokenTransfer);
+
+        var nftTransfer = NftTransfer.newBuilder()
+            .setSenderAccountID(AccountId.fromString("0.0.5006").toProtobuf())
+            .setReceiverAccountID(AccountId.fromString("0.0.5007").toProtobuf())
+            .setSerialNumber(888);
+
+        var nftTransferList = TokenTransferList.newBuilder();
+        nftTransferList.addNftTransfers(nftTransfer);
 
         Response response = Response.newBuilder()
             .setTransactionGetRecord(
@@ -40,7 +58,9 @@ public class TransactionRecordTest {
                         .setTransactionID(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), exampleInstant).toProtobuf())
                         .setMemo("hola")
                         .setTransactionFee(100_000)
-                        .setTransferList(transferList)
+                        .setTransferList(hbarTransferList)
+                        .addTokenTransferLists(tokenTransferList)
+                        .addTokenTransferLists(nftTransferList)
                         .setContractCallResult(ContractFunctionResult.newBuilder()
                             .addLogInfo(ContractLoginfo.newBuilder()
                                 .addTopic(ByteString.copyFrom("aloha", StandardCharsets.UTF_8))
