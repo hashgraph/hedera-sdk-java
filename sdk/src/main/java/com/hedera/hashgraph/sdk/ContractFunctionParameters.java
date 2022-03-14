@@ -105,21 +105,21 @@ public final class ContractFunctionParameters {
         return ByteString.copyFrom(head).concat(ByteString.copyFrom(elements));
     }
 
-    private static void checkBigInt(BigInteger val) {
+    private static void checkBigInt(BigInteger val, int bitWidth) {
         // bitLength() does not include the sign bit
-        if (val.bitLength() > 255) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
+        if (val.bitLength() > (bitWidth - 1)) {
+            throw new IllegalArgumentException("BigInteger out of range for bitwidth of " + bitWidth);
         }
     }
 
-    private static void checkBigUint(BigInteger val) {
+    private static void checkBigUint(BigInteger val, int bitWidth) {
         if (val.signum() < 0) {
             throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
         }
 
         // bitLength() does not include the sign bit
         if (val.bitLength() > 256) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
+            throw new IllegalArgumentException("BigInteger out of range for bitwidth of " + bitWidth);
         }
     }
 
@@ -144,7 +144,7 @@ public final class ContractFunctionParameters {
         return leftPad32(output.toByteString(), signed && val < 0);
     }
 
-    static ByteString int256(BigInteger bigInt) {
+    static ByteString int256(BigInteger bigInt, int bitWidth) {
         return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
     }
 
@@ -310,7 +310,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt8(byte value) {
-        args.add(new Argument("int8", int256(value, 32), false));
+        args.add(new Argument("int8", int256(value, 8), false));
 
         return this;
     }
@@ -348,7 +348,6 @@ public final class ContractFunctionParameters {
      *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256(BigInteger bigInt) {
-        checkBigInt(bigInt);
         args.add(new Argument("int256", int256(bigInt), false));
 
         return this;
@@ -489,7 +488,6 @@ public final class ContractFunctionParameters {
      *                                  {@code bigUint.signum() < 0}.
      */
     public ContractFunctionParameters addUint256(@Nonnegative BigInteger bigUint) {
-        checkBigUint(bigUint);
         args.add(new Argument("uint256", uint256(bigUint), false));
 
         return this;
