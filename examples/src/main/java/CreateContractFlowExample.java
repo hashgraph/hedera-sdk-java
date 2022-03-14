@@ -3,6 +3,7 @@ import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCallQuery;
+import com.hedera.hashgraph.sdk.ContractCreateFlow;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
@@ -25,7 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public final class CreateSimpleContractExample {
+public final class CreateContractFlowExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -34,7 +35,7 @@ public final class CreateSimpleContractExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateSimpleContractExample() {
+    private CreateContractFlowExample() {
     }
 
     public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
@@ -62,27 +63,10 @@ public final class CreateSimpleContractExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // create the contract's bytecode file
-        TransactionResponse fileTransactionResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY)
-            .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
-            .setMaxTransactionFee(new Hbar(2))
-            .execute(client);
-
-
-        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
-
-        System.out.println("contract bytecode file: " + newFileId);
-
-        // create the contract itself
-        TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
+        TransactionResponse contractTransactionResponse = new ContractCreateFlow()
+            .setBytecode(byteCodeHex)
             .setGas(100_000)
-            .setBytecodeFileId(newFileId)
-            // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY)
-            .setMaxTransactionFee(new Hbar(16))
             .execute(client);
 
 
@@ -112,7 +96,7 @@ public final class CreateSimpleContractExample {
 
         // now delete the contract
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
-            .setTransferAccountId(client.getOperatorAccountId())
+            .setTransferAccountId(OPERATOR_ID)
             .setContractId(newContractId)
             .setMaxTransactionFee(new Hbar(1))
             .execute(client)
