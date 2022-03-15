@@ -273,7 +273,9 @@ abstract class ManagedNetwork<
 
             // Only add nodes which don't already exist in our network map
             if (!addressIsInNodeList(entry.getKey(), nodesForKey)) {
-                var node = createNodeFromNetworkEntry(entry);
+                var node = createNodeFromNetworkEntry(entry)
+                    .setMinBackoff(minNodeBackoff)
+                    .setMaxBackoff(maxNodeBackoff);
                 nodesForKey.add(node);
                 this.nodes.add(node);
             }

@@ -33,6 +33,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 * `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
 
+### Fixed
+
+* Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
+  regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
+
 ## v2.9.0
 
 ### Added
