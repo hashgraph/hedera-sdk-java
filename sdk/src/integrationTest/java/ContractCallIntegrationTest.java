@@ -57,6 +57,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -101,6 +102,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -149,6 +151,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -195,6 +198,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -243,6 +247,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -288,6 +293,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -335,6 +341,7 @@ public class ContractCallIntegrationTest {
 
         new ContractDeleteTransaction()
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
