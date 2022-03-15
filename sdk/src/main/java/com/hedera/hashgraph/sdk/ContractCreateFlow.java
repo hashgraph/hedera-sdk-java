@@ -300,24 +300,26 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
 
     @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
-        splitBytecode();
-        var fileCreateResponse = createFileCreateTransaction(client)
-            .execute(client);
-        var fileId = createTransactionReceiptQuery(fileCreateResponse)
-            .execute(client)
-            .fileId;
-        Objects.requireNonNull(fileId);
-        if (!appendBytecode.isEmpty()) {
-            createFileAppendTransaction(fileId)
+        try {
+            splitBytecode();
+            var fileId = createFileCreateTransaction(client)
+                .execute(client)
+                .getReceipt(client)
+                .fileId;
+            Objects.requireNonNull(fileId);
+            if (!appendBytecode.isEmpty()) {
+                createFileAppendTransaction(fileId)
+                    .execute(client);
+            }
+            var response = createContractCreateTransaction(fileId).execute(client);
+            response.getReceipt(client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
                 .execute(client);
+            return response;
+        } catch (ReceiptStatusException e) {
+            throw new RuntimeException(e);
         }
-        var response = createContractCreateTransaction(fileId).execute(client);
-        /*
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(client);
-         */
-        return response;
     }
 
     @Override
@@ -331,12 +333,17 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
             CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
                 createFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
-                return createContractCreateTransaction(fileId).executeAsync(client);/*.thenApply(contractCreateResponse -> {
-                    new FileDeleteTransaction()
-                        .setFileId(fileId)
-                        .executeAsync(client);
-                    return contractCreateResponse;
-                });*/
+                return createContractCreateTransaction(fileId).executeAsync(client).thenCompose(contractCreateResponse -> {
+                    return contractCreateResponse.getReceiptAsync(client).thenCompose(contractReceipt -> {
+                        return new FileDeleteTransaction()
+                            .setFileId(fileId)
+                            .executeAsync(client);
+                    }).thenCompose(deleteResponse -> {
+                        return deleteResponse.getReceiptAsync(client);
+                    }).thenApply(deleteReceipt -> {
+                        return contractCreateResponse;
+                    });
+                });
             });
         });
     }
