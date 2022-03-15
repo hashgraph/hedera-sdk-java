@@ -105,24 +105,6 @@ public final class ContractFunctionParameters {
         return ByteString.copyFrom(head).concat(ByteString.copyFrom(elements));
     }
 
-    private static void checkBigInt(BigInteger val, int bitWidth) {
-        // bitLength() does not include the sign bit
-        if (val.bitLength() > (bitWidth - 1)) {
-            throw new IllegalArgumentException("BigInteger out of range for bitwidth of " + bitWidth);
-        }
-    }
-
-    private static void checkBigUint(BigInteger val, int bitWidth) {
-        if (val.signum() < 0) {
-            throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
-        }
-
-        // bitLength() does not include the sign bit
-        if (val.bitLength() > 256) {
-            throw new IllegalArgumentException("BigInteger out of range for bitwidth of " + bitWidth);
-        }
-    }
-
     static ByteString int256(long val, int bitWidth) {
         return int256(val, bitWidth, true);
     }
@@ -144,22 +126,27 @@ public final class ContractFunctionParameters {
         return leftPad32(output.toByteString(), signed && val < 0);
     }
 
+    static byte[] getTruncatedBytes(BigInteger bigInt, int bitWidth) {
+        byte[] bytes = bigInt.toByteArray();
+        int expectedBytes = bitWidth/8;
+        return bytes.length <= expectedBytes ?
+            bytes :
+            Arrays.copyOfRange(bytes, bytes.length - expectedBytes, bytes.length);
+    }
+
     static ByteString int256(BigInteger bigInt, int bitWidth) {
-        return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
+        return leftPad32(getTruncatedBytes(bigInt, bitWidth), bigInt.signum() < 0);
     }
 
     static ByteString uint256(long val, int bitWidth) {
         return int256(val, bitWidth, false);
     }
 
-    static ByteString uint256(BigInteger bigInt) {
-        if (bigInt.bitLength() == 256) {
-            // we have to chop off the sign bit or else we'll have a 33 byte value
-            // we have no choice but to copy twice here but hopefully the JIT elides one
-            return ByteString.copyFrom(bigInt.toByteArray(), 1, 32);
+    static ByteString uint256(BigInteger bigInt, int bitWidth) {
+        if (bigInt.signum() < 0) {
+            throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
         }
-
-        return leftPad32(bigInt.toByteArray(), false);
+        return leftPad32(getTruncatedBytes(bigInt, bitWidth), false);
     }
 
     static ByteString leftPad32(ByteString input) {
@@ -344,11 +331,9 @@ public final class ContractFunctionParameters {
      *
      * @param bigInt The BigInteger to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
-     *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256(BigInteger bigInt) {
-        args.add(new Argument("int256", int256(bigInt), false));
+        args.add(new Argument("int256", int256(bigInt, 256), false));
 
         return this;
     }
@@ -421,7 +406,7 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::int256)
+            J8Arrays.stream(intArray).map(bigInt -> int256(bigInt, 256))
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
@@ -483,12 +468,10 @@ public final class ContractFunctionParameters {
      *
      * @param bigUint The integer to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code bigUint.bitLength() > 256}
-     *                                  (max range including the sign bit) or
-     *                                  {@code bigUint.signum() < 0}.
+     * @throws IllegalArgumentException if {@code bigUint.signum() < 0}.
      */
     public ContractFunctionParameters addUint256(@Nonnegative BigInteger bigUint) {
-        args.add(new Argument("uint256", uint256(bigUint), false));
+        args.add(new Argument("uint256", uint256(bigUint, 256), false));
 
         return this;
     }
@@ -570,7 +553,7 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::uint256)
+            J8Arrays.stream(intArray).map(bigInt -> uint256(bigInt, 256))
                 .collect(Collectors.toList()));
 
         arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
