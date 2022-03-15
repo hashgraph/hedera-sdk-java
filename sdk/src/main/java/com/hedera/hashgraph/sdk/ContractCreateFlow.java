@@ -312,9 +312,11 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
                 .execute(client);
         }
         var response = createContractCreateTransaction(fileId).execute(client);
+        /*
         new FileDeleteTransaction()
             .setFileId(fileId)
             .execute(client);
+         */
         return response;
     }
 
@@ -329,12 +331,12 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
             CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
                 createFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
-                return createContractCreateTransaction(fileId).executeAsync(client).thenApply(contractCreateResponse -> {
+                return createContractCreateTransaction(fileId).executeAsync(client);/*.thenApply(contractCreateResponse -> {
                     new FileDeleteTransaction()
                         .setFileId(fileId)
                         .executeAsync(client);
                     return contractCreateResponse;
-                });
+                });*/
             });
         });
     }
