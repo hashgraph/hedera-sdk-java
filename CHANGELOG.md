@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+ * Support for `ContractFunctionParameters` integers with different bit widths.
+
 ### Fixed
 
  * Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
