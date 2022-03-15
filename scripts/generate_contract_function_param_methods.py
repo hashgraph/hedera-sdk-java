@@ -8,7 +8,7 @@ uint_array_versions = []
 
 # does not generate 8 bit versions because those require some special treatment.
 
-def add_with_param_type(bit_width, param_type, exception_comment = ""):
+def add_with_param_type(bit_width, param_type, map_method_name, exception_comment = ""):
     int_versions.append(
         "/*\n"
         "* Add a " + str(bit_width) + "-bit integer.\n"
@@ -48,7 +48,7 @@ def add_with_param_type(bit_width, param_type, exception_comment = ""):
         "*/\n"
         "public ContractFunctionParameters addInt" + str(bit_width) + "Array(" + param_type + "[] intArray) {\n"
         "    @Var ByteString arrayBytes = ByteString.copyFrom(\n"
-        "        J8Arrays.stream(intArray).mapToObj(i -> int256(i, " + str(bit_width) + "))\n"
+        "        J8Arrays.stream(intArray)." + map_method_name + "(i -> int256(i, " + str(bit_width) + "))\n"
         "        .collect(Collectors.toList()));\n"
         "\n"
         "    arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);\n"
@@ -71,7 +71,7 @@ def add_with_param_type(bit_width, param_type, exception_comment = ""):
         "*/\n"
         "public ContractFunctionParameters addUint" + str(bit_width) + "Array(" + param_type + "[] intArray) {\n"
         "    @Var ByteString arrayBytes = ByteString.copyFrom(\n"
-        "        J8Arrays.stream(intArray).mapToObj(i -> uint256(i, " + str(bit_width) + "))\n"
+        "        J8Arrays.stream(intArray)." + map_method_name + "(i -> uint256(i, " + str(bit_width) + "))\n"
         "        .collect(Collectors.toList()));\n"
         "\n"
         "    arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);\n"
@@ -85,11 +85,11 @@ def add_with_param_type(bit_width, param_type, exception_comment = ""):
 
 for bit_width in range(16, 257, 8):
     if bit_width <= 32:
-        add_with_param_type(bit_width, "int")
+        add_with_param_type(bit_width, "int", "mapToObj")
     elif bit_width <= 64:
-        add_with_param_type(bit_width, "long")
+        add_with_param_type(bit_width, "long", "mapToObj")
     else:
-        add_with_param_type(bit_width, "BigInteger", "* @throws IllegalArgumentException if {@code bigInt.signum() < 0}.\n")
+        add_with_param_type(bit_width, "BigInteger", "map", "* @throws IllegalArgumentException if {@code bigInt.signum() < 0}.\n")
 
 f = open("output.txt", "w")
 
