@@ -24,7 +24,6 @@ public class AccountAllowanceIntegrationTest {
     @Test
     @Disabled
     @DisplayName("Can spend hbar allowance")
-    // TODO: this currently is not passing, and I don't know why.
     void canSpendHbarAllowance() throws Throwable {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -52,7 +51,6 @@ public class AccountAllowanceIntegrationTest {
             .setTransactionId(TransactionId.generate(bobId))
             .freezeWith(testEnv.client)
             .sign(bobKey);
-        System.out.println(allowanceTx);
         allowanceTx
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -64,13 +62,11 @@ public class AccountAllowanceIntegrationTest {
             .setTransactionId(TransactionId.generate(aliceId))
             .freezeWith(testEnv.client)
             .sign(aliceKey);
-        System.out.println(transferTx);
         var transferRecord = transferTx
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
         var transferFound = false;
-        System.out.println(transferRecord);
         for (var transfer : transferRecord.transfers) {
             if (transfer.accountId.equals(testEnv.operatorId) && transfer.amount.equals(new Hbar(5))) {
                 transferFound = true;
@@ -81,6 +77,7 @@ public class AccountAllowanceIntegrationTest {
 
         new AccountDeleteTransaction()
             .setAccountId(bobId)
+            .setTransferAccountId(testEnv.operatorId)
             .freezeWith(testEnv.client)
             .sign(bobKey)
             .execute(testEnv.client)

@@ -57,6 +57,7 @@ public class ContractInfoIntegrationTest {
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -154,6 +155,7 @@ public class ContractInfoIntegrationTest {
             .execute(testEnv.client);
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -197,6 +199,7 @@ public class ContractInfoIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -242,6 +245,7 @@ public class ContractInfoIntegrationTest {
         assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
