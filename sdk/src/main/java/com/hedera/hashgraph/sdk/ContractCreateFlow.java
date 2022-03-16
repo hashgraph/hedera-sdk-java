@@ -334,13 +334,10 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
                 createFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
                 return createContractCreateTransaction(fileId).executeAsync(client).thenCompose(contractCreateResponse -> {
-                    return contractCreateResponse.getReceiptAsync(client).thenCompose(contractReceipt -> {
-                        return new FileDeleteTransaction()
+                    return contractCreateResponse.getReceiptAsync(client).thenApply(contractReceipt -> {
+                        new FileDeleteTransaction()
                             .setFileId(fileId)
                             .executeAsync(client);
-                    }).thenCompose(deleteResponse -> {
-                        return deleteResponse.getReceiptAsync(client);
-                    }).thenApply(deleteReceipt -> {
                         return contractCreateResponse;
                     });
                 });
