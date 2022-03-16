@@ -42,6 +42,7 @@ public class ContractCreateFlowIntegrationTest {
         assertEquals(Status.SUCCESS, receipt.status);
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
