@@ -74,6 +74,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
+     */
     @Deprecated
     public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         return doApproveHbarAllowance(null, spenderAccountId, amount);
@@ -87,6 +90,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return doApproveHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
+    /**
+     * @deprecated - Use {@link #getHbarApprovals()} instead
+     */
     @Deprecated
     public List<HbarAllowance> getHbarAllowances() {
         return getHbarApprovals();
@@ -115,6 +121,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     */
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenAllowance(
         TokenId tokenId,
@@ -133,9 +142,12 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return doApproveTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
+    /**
+     * @deprecated - Use {@link #getTokenApprovals()} instead
+     */
     @Deprecated
     public List<TokenAllowance> getTokenAllowances() {
-        return new ArrayList<>(tokenAllowances);
+        return getTokenApprovals();
     }
 
     public List<TokenAllowance> getTokenApprovals() {
@@ -174,6 +186,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return newAllowance.serialNumbers;
     }
 
+    /**
+     * @deprecated - Use {@link #approveTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     */
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
         requireNotFrozen();
@@ -181,6 +196,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #approveTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} instead
+     */
     @Deprecated
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
         requireNotFrozen();
@@ -224,6 +242,9 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #getTokenNftApprovals()} instead
+     */
     @Deprecated
     public List<TokenNftAllowance> getTokenNftAllowances() {
         return getTokenNftApprovals();

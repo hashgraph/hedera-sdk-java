@@ -204,6 +204,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return doAddTokenTransferWithDecimals(tokenId, accountId, value, decimals, true);
     }
 
+    /**
+     * @deprecated - Use {@link #addApprovedTokenTransfer(TokenId, AccountId, long)} instead
+     */
     @Deprecated
     public TransferTransaction setTokenTransferApproval(TokenId tokenId, AccountId accountId, boolean isApproved) {
         requireNotFrozen();
@@ -245,6 +248,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return doAddNftTransfer(nftId, sender, receiver, true);
     }
 
+    /**
+     * @deprecated - Use {@link #addApprovedNftTransfer(NftId, AccountId, AccountId)} instead
+     */
     @Deprecated
     public TransferTransaction setNftTransferApproval(NftId nftId, boolean isApproved) {
         requireNotFrozen();
@@ -291,6 +297,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return doAddHbarTransfer(accountId, value, true);
     }
 
+    /**
+     * @deprecated - Use {@link #addApprovedHbarTransfer(AccountId, Hbar)} instead
+     */
     @Deprecated
     public TransferTransaction setHbarTransferApproval(AccountId accountId, boolean isApproved) {
         requireNotFrozen();

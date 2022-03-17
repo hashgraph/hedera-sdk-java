@@ -73,6 +73,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #grantHbarAllowance(AccountId, AccountId, Hbar)} or
+     * {@link #revokeHbarAllowance(AccountId, AccountId, Hbar)} instead
+     */
     @Deprecated
     public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         return adjustHbarAllowance(null, spenderAccountId, Objects.requireNonNull(amount));
@@ -122,6 +126,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #grantTokenAllowance(TokenId, AccountId, AccountId, long)} or
+     * {@link #revokeTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     */
     @Deprecated
     public AccountAllowanceAdjustTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
         return adjustTokenAllowance(tokenId, null, spenderAccountId, amount);
@@ -215,12 +223,20 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #grantTokenNftAllowance(NftId, AccountId, AccountId)} or
+     * {@link #revokeTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     */
     @Deprecated
     public AccountAllowanceAdjustTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
         Objects.requireNonNull(nftId);
         return adjustNftAllowance(nftId.tokenId, nftId.serial, null, spenderAccountId);
     }
 
+    /**
+     * @deprecated - Use {@link #grantTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} or
+     * {@link #revokeTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} instead
+     */
     @Deprecated
     public AccountAllowanceAdjustTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
         return adjustNftAllowanceAllSerials(tokenId, true, null, spenderAccountId);
