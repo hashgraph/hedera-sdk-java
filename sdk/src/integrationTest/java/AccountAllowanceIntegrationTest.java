@@ -24,7 +24,6 @@ public class AccountAllowanceIntegrationTest {
     @Test
     @Disabled
     @DisplayName("Can spend hbar allowance")
-    // TODO: this currently is not passing, and I don't know why.
     void canSpendHbarAllowance() throws Throwable {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -48,8 +47,7 @@ public class AccountAllowanceIntegrationTest {
         Objects.requireNonNull(bobId);
 
         var allowanceTx = new AccountAllowanceApproveTransaction()
-            .addHbarAllowance(aliceId, new Hbar(10))
-            .setTransactionId(TransactionId.generate(bobId))
+            .grantHbarAllowance(bobId, aliceId, new Hbar(10))
             .freezeWith(testEnv.client)
             .sign(bobKey);
         System.out.println(allowanceTx);
@@ -81,6 +79,7 @@ public class AccountAllowanceIntegrationTest {
 
         new AccountDeleteTransaction()
             .setAccountId(bobId)
+            .setTransferAccountId(testEnv.operatorId)
             .freezeWith(testEnv.client)
             .sign(bobKey)
             .execute(testEnv.client)

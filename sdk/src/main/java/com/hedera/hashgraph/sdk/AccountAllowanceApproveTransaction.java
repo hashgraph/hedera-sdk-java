@@ -10,6 +10,7 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -59,6 +60,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
+    @Deprecated
     public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         hbarAllowances.add(new HbarAllowance(
             null,
@@ -68,10 +70,10 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
-    public AccountAllowanceApproveTransaction addHbarAllowanceWithOwner(
+    public AccountAllowanceApproveTransaction grantHbarAllowance(
+        AccountId ownerAccountId,
         AccountId spenderAccountId,
-        Hbar amount,
-        AccountId ownerAccountId
+        Hbar amount
     ) {
         hbarAllowances.add(new HbarAllowance(
             Objects.requireNonNull(ownerAccountId),
@@ -85,6 +87,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return new ArrayList<>(hbarAllowances);
     }
 
+    @Deprecated
     public AccountAllowanceApproveTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
@@ -95,11 +98,11 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
-    public AccountAllowanceApproveTransaction addTokenAllowanceWithOwner(
+    public AccountAllowanceApproveTransaction grantTokenAllowance(
         TokenId tokenId,
+        AccountId ownerAccountId,
         AccountId spenderAccountId,
-        long amount,
-        AccountId ownerAccountId
+        long amount
     ) {
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
@@ -141,25 +144,31 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         Map<TokenId, Integer> innerMap
     ) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, new ArrayList<>());
+        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, new ArrayList<>(), null);
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
 
+    @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
         getNftSerials(null, spenderAccountId, nftId.tokenId).add(nftId.serial);
         return this;
     }
 
+    @Deprecated
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(tokenId, null, spenderAccountId, null));
+        nftAllowances.add(new TokenNftAllowance(
+            tokenId,
+            null, spenderAccountId,
+            Collections.emptyList(),
+            true));
         return this;
     }
 
-    public AccountAllowanceApproveTransaction addTokenNftAllowanceWithOwner(
+    public AccountAllowanceApproveTransaction grantTokenNftAllowance(
         NftId nftId,
-        AccountId spenderAccountId,
-        AccountId ownerAccountId
+        AccountId ownerAccountId,
+        AccountId spenderAccountId
     ) {
         Objects.requireNonNull(nftId);
         getNftSerials(
@@ -170,16 +179,17 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
-    public AccountAllowanceApproveTransaction addAllTokenNftAllowanceWithOwner(
+    public AccountAllowanceApproveTransaction grantTokenNftAllowanceAllSerials(
         TokenId tokenId,
-        AccountId spenderAccountId,
-        AccountId ownerAccountId
+        AccountId ownerAccountId,
+        AccountId spenderAccountId
     ) {
         nftAllowances.add(new TokenNftAllowance(
             Objects.requireNonNull(tokenId),
             Objects.requireNonNull(ownerAccountId),
             Objects.requireNonNull(spenderAccountId),
-            null
+            Collections.emptyList(),
+            true
         ));
         return this;
     }
