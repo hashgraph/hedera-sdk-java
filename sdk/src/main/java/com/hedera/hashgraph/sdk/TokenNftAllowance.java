@@ -116,11 +116,8 @@ public class TokenNftAllowance {
     @Override
     public String toString() {
         var stringHelper = MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId);
-        if (ownerAccountId != null) {
-            stringHelper.add("ownerAccountId", ownerAccountId);
-        }
-        stringHelper
+            .add("tokenId", tokenId)
+            .add("ownerAccountId", ownerAccountId)
             .add("spenderAccountId", spenderAccountId);
         if (allSerials != null) {
             stringHelper.add("allSerials", allSerials);

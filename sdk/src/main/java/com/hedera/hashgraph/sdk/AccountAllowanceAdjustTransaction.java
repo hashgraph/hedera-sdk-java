@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,57 +63,92 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         }
     }
 
-    @Deprecated
-    public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
-        hbarAllowances.add(new HbarAllowance(
-            null,
-            Objects.requireNonNull(spenderAccountId),
-            Objects.requireNonNull(amount)
-        ));
+    private AccountAllowanceAdjustTransaction adjustHbarAllowance(
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        Hbar amount
+    ) {
+        requireNotFrozen();
+        hbarAllowances.add(new HbarAllowance(ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
     }
 
-    public AccountAllowanceAdjustTransaction adjustHbarAllowance(
+    @Deprecated
+    public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
+        return adjustHbarAllowance(null, spenderAccountId, Objects.requireNonNull(amount));
+    }
+
+    public AccountAllowanceAdjustTransaction grantHbarAllowance(
         AccountId ownerAccountId,
         AccountId spenderAccountId,
         Hbar amount
     ) {
-        hbarAllowances.add(new HbarAllowance(
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            Objects.requireNonNull(amount)
-        ));
-        return this;
+        Objects.requireNonNull(amount);
+        if (amount.compareTo(Hbar.ZERO) < 0) {
+            throw new IllegalArgumentException("amount passed to grantHbarAllowance must be positive");
+        }
+        return adjustHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
+    }
+
+    public AccountAllowanceAdjustTransaction revokeHbarAllowance(
+        AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        Hbar amount
+    ) {
+        Objects.requireNonNull(amount);
+        if (amount.compareTo(Hbar.ZERO) < 0) {
+            throw new IllegalArgumentException("amount passed to revokeHbarAllowance must be positive");
+        }
+        return adjustHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount.negated());
     }
 
     public List<HbarAllowance> getHbarAllowances() {
         return new ArrayList<>(hbarAllowances);
     }
 
-    @Deprecated
-    public AccountAllowanceAdjustTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
+    private AccountAllowanceAdjustTransaction adjustTokenAllowance(
+        TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        requireNotFrozen();
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
-            null,
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             amount
         ));
         return this;
     }
 
-    public AccountAllowanceAdjustTransaction adjustTokenAllowance(
+    @Deprecated
+    public AccountAllowanceAdjustTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
+        return adjustTokenAllowance(tokenId, null, spenderAccountId, amount);
+    }
+
+    public AccountAllowanceAdjustTransaction grantTokenAllowance(
         TokenId tokenId,
         AccountId ownerAccountId,
         AccountId spenderAccountId,
-        long amount
+        @Nonnegative long amount
     ) {
-        tokenAllowances.add(new TokenAllowance(
-            Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            amount
-        ));
-        return this;
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount passed to grantTokenAllowance must be positive");
+        }
+        return adjustTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
+    }
+
+    public AccountAllowanceAdjustTransaction revokeTokenAllowance(
+        TokenId tokenId,
+        AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        @Nonnegative long amount
+    ) {
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount passed to revokeTokenAllowance must be positive");
+        }
+        return adjustTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, -amount);
     }
 
     public List<TokenAllowance> getTokenAllowances() {
@@ -151,27 +187,43 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return newAllowance.serialNumbers;
     }
 
-    @Deprecated
-    public AccountAllowanceAdjustTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
-        Objects.requireNonNull(nftId);
-        getNftSerials(
-            null,
+    private AccountAllowanceAdjustTransaction adjustNftAllowance(
+        TokenId tokenId,
+        long serial,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId
+    ) {
+        requireNotFrozen();
+        getNftSerials(ownerAccountId, Objects.requireNonNull(spenderAccountId), tokenId).add(serial);
+        return this;
+    }
+
+    private AccountAllowanceAdjustTransaction adjustNftAllowanceAllSerials(
+        TokenId tokenId,
+        boolean allSerials,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId
+    ) {
+        requireNotFrozen();
+        nftAllowances.add(new TokenNftAllowance(
+            Objects.requireNonNull(tokenId),
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
-            nftId.tokenId
-        ).add(nftId.serial);
+            Collections.emptyList(),
+            allSerials
+        ));
         return this;
     }
 
     @Deprecated
+    public AccountAllowanceAdjustTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
+        Objects.requireNonNull(nftId);
+        return adjustNftAllowance(nftId.tokenId, nftId.serial, null, spenderAccountId);
+    }
+
+    @Deprecated
     public AccountAllowanceAdjustTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(
-            Objects.requireNonNull(tokenId),
-            null,
-            Objects.requireNonNull(spenderAccountId),
-            Collections.emptyList(),
-            true
-        ));
-        return this;
+        return adjustNftAllowanceAllSerials(tokenId, true, null, spenderAccountId);
     }
 
     public AccountAllowanceAdjustTransaction grantTokenNftAllowance(
@@ -180,12 +232,8 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         AccountId spenderAccountId
     ) {
         Objects.requireNonNull(nftId);
-        getNftSerials(
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            nftId.tokenId
-        ).add(nftId.serial);
-        return this;
+        Objects.requireNonNull(ownerAccountId);
+        return adjustNftAllowance(nftId.tokenId, nftId.serial, ownerAccountId, spenderAccountId);
     }
 
     public AccountAllowanceAdjustTransaction grantTokenNftAllowanceAllSerials(
@@ -193,14 +241,8 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
-        nftAllowances.add(new TokenNftAllowance(
-            Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            Collections.emptyList(),
-            true
-        ));
-        return this;
+        Objects.requireNonNull(ownerAccountId);
+        return adjustNftAllowanceAllSerials(tokenId, true, ownerAccountId, spenderAccountId);
     }
 
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowance(
@@ -209,12 +251,8 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         AccountId spenderAccountId
     ) {
         Objects.requireNonNull(nftId);
-        getNftSerials(
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            nftId.tokenId
-        ).add(-nftId.serial);
-        return this;
+        Objects.requireNonNull(ownerAccountId);
+        return adjustNftAllowance(nftId.tokenId, -nftId.serial, ownerAccountId, spenderAccountId);
     }
 
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowanceAllSerials(
@@ -222,14 +260,8 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
-        nftAllowances.add(new TokenNftAllowance(
-            Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            Collections.emptyList(),
-            false
-        ));
-        return this;
+        Objects.requireNonNull(ownerAccountId);
+        return adjustNftAllowanceAllSerials(tokenId, false, ownerAccountId, spenderAccountId);
     }
 
     public List<TokenNftAllowance> getTokenNftAllowances() {

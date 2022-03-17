@@ -60,60 +60,85 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
-    @Deprecated
-    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
-        hbarAllowances.add(new HbarAllowance(
-            null,
-            Objects.requireNonNull(spenderAccountId),
-            Objects.requireNonNull(amount)
-        ));
+    private AccountAllowanceApproveTransaction doApproveHbarAllowance(
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        Hbar amount
+    ) {
+        requireNotFrozen();
+        Objects.requireNonNull(amount);
+        if (amount.compareTo(Hbar.ZERO) < 0) {
+            throw new IllegalArgumentException("amount passed to approveHbarAllowance must be positive");
+        }
+        hbarAllowances.add(new HbarAllowance(ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
     }
 
-    public AccountAllowanceApproveTransaction grantHbarAllowance(
+    @Deprecated
+    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
+        return doApproveHbarAllowance(null, spenderAccountId, amount);
+    }
+
+    public AccountAllowanceApproveTransaction approveHbarAllowance(
         AccountId ownerAccountId,
         AccountId spenderAccountId,
         Hbar amount
     ) {
-        hbarAllowances.add(new HbarAllowance(
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            Objects.requireNonNull(amount)
-        ));
-        return this;
-    }
-
-    public List<HbarAllowance> getHbarAllowances() {
-        return new ArrayList<>(hbarAllowances);
+        return doApproveHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
     @Deprecated
-    public AccountAllowanceApproveTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
+    public List<HbarAllowance> getHbarAllowances() {
+        return getHbarApprovals();
+    }
+
+    public List<HbarAllowance> getHbarApprovals() {
+        return new ArrayList<>(hbarAllowances);
+    }
+
+    private AccountAllowanceApproveTransaction doApproveTokenAllowance(
+        TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        requireNotFrozen();
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount given to approveTokenAllowance must be positive");
+        }
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
-            null,
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             amount
         ));
         return this;
     }
 
-    public AccountAllowanceApproveTransaction grantTokenAllowance(
+    @Deprecated
+    public AccountAllowanceApproveTransaction addTokenAllowance(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        return doApproveTokenAllowance(tokenId, null, spenderAccountId, amount);
+    }
+
+    public AccountAllowanceApproveTransaction approveTokenAllowance(
         TokenId tokenId,
         AccountId ownerAccountId,
         AccountId spenderAccountId,
         long amount
     ) {
-        tokenAllowances.add(new TokenAllowance(
-            Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
-            Objects.requireNonNull(spenderAccountId),
-            amount
-        ));
-        return this;
+        return doApproveTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
+    @Deprecated
     public List<TokenAllowance> getTokenAllowances() {
+        return new ArrayList<>(tokenAllowances);
+    }
+
+    public List<TokenAllowance> getTokenApprovals() {
         return new ArrayList<>(tokenAllowances);
     }
 
@@ -151,25 +176,29 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
+        requireNotFrozen();
         getNftSerials(null, spenderAccountId, nftId.tokenId).add(nftId.serial);
         return this;
     }
 
     @Deprecated
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
+        requireNotFrozen();
         nftAllowances.add(new TokenNftAllowance(
             tokenId,
             null, spenderAccountId,
             Collections.emptyList(),
-            true));
+            true
+        ));
         return this;
     }
 
-    public AccountAllowanceApproveTransaction grantTokenNftAllowance(
+    public AccountAllowanceApproveTransaction approveTokenNftAllowance(
         NftId nftId,
         AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
+        requireNotFrozen();
         Objects.requireNonNull(nftId);
         getNftSerials(
             Objects.requireNonNull(ownerAccountId),
@@ -179,11 +208,12 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
-    public AccountAllowanceApproveTransaction grantTokenNftAllowanceAllSerials(
+    public AccountAllowanceApproveTransaction approveTokenNftAllowanceAllSerials(
         TokenId tokenId,
         AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
+        requireNotFrozen();
         nftAllowances.add(new TokenNftAllowance(
             Objects.requireNonNull(tokenId),
             Objects.requireNonNull(ownerAccountId),
@@ -194,7 +224,12 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    @Deprecated
     public List<TokenNftAllowance> getTokenNftAllowances() {
+        return getTokenNftApprovals();
+    }
+
+    public List<TokenNftAllowance> getTokenNftApprovals() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {
             retval.add(TokenNftAllowance.copyFrom(allowance));
