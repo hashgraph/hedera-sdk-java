@@ -78,7 +78,7 @@ public final class CreateSimpleContractExample {
 
         // create the contract itself
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
-            .setGas(500)
+            .setGas(500000)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
             .setAdminKey(OPERATOR_KEY)
@@ -95,10 +95,10 @@ public final class CreateSimpleContractExample {
         System.out.println("new contract ID: " + newContractId);
 
         ContractFunctionResult contractCallResult = new ContractCallQuery()
-            .setGas(600)
+            .setGas(600000)
             .setContractId(newContractId)
             .setFunction("greet")
-            .setMaxQueryPayment(new Hbar(1))
+            .setQueryPayment(new Hbar(1))
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
