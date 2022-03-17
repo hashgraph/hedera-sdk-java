@@ -50,7 +50,6 @@ public class AccountAllowanceIntegrationTest {
             .grantHbarAllowance(bobId, aliceId, new Hbar(10))
             .freezeWith(testEnv.client)
             .sign(bobKey);
-        System.out.println(allowanceTx);
         allowanceTx
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -62,13 +61,11 @@ public class AccountAllowanceIntegrationTest {
             .setTransactionId(TransactionId.generate(aliceId))
             .freezeWith(testEnv.client)
             .sign(aliceKey);
-        System.out.println(transferTx);
         var transferRecord = transferTx
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
         var transferFound = false;
-        System.out.println(transferRecord);
         for (var transfer : transferRecord.transfers) {
             if (transfer.accountId.equals(testEnv.operatorId) && transfer.amount.equals(new Hbar(5))) {
                 transferFound = true;
