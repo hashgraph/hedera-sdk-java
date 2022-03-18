@@ -319,7 +319,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
         this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
         this.tokenTransfers.sort(Comparator.comparing((TokenTransfer a) -> a.tokenId).thenComparing(a -> a.accountId).thenComparing(a -> a.isApproved));
-        this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver));
+        this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver).thenComparing(a -> a.serial));
 
         var i = 0;
         var j = 0;
@@ -458,14 +458,5 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 ));
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("hbarTransfers", Arrays.toString(hbarTransfers.toArray()))
-            .add("tokenTransfers", Arrays.toString(tokenTransfers.toArray()))
-//            .add("nftTransfers", Arrays.toString(nftTransfers.toArray()))
-            .toString();
     }
 }
