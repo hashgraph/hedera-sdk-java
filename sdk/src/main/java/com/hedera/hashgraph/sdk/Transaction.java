@@ -144,7 +144,12 @@ public abstract class Transaction<T extends Transaction<T>>
                 if (firstTxBody == null) {
                     firstTxBody = txBody;
                 } else {
-                    requireProtoMatches(firstTxBody, txBody, new HashSet<>(Arrays.asList("NodeAccountID")), "TransactionBody");
+                    requireProtoMatches(
+                        firstTxBody,
+                        txBody,
+                        new HashSet<>(Arrays.asList("NodeAccountID")),
+                        "TransactionBody"
+                    );
                 }
             }
         }
@@ -502,14 +507,15 @@ public abstract class Transaction<T extends Transaction<T>>
             if (method.getParameterCount() != 0) {
                 continue;
             }
-            if (!Modifier.isPublic(method.getModifiers())) {
+            int methodModifiers = method.getModifiers();
+            if ((!Modifier.isPublic(methodModifiers)) || Modifier.isStatic(methodModifiers)) {
                 continue;
             }
             var methodName = method.getName();
             if (!methodName.startsWith("get")) {
                 continue;
             }
-            var isList = methodName.endsWith("List");
+            var isList = methodName.endsWith("List") && List.class.isAssignableFrom(method.getReturnType());
             var methodFieldName = methodName.substring(3, methodName.length() - (isList ? 4 : 0));
             if (ignoreSet.contains(methodFieldName) || methodFieldName.equals("DefaultInstance")) {
                 continue;
