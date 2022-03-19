@@ -499,6 +499,7 @@ public abstract class Transaction<T extends Transaction<T>>
             protoA instanceof String ||
             protoA instanceof ByteString
         ) {
+            // System.out.println("values A = " + protoA.toString() + ", B = " + protoB.toString());
             if (!protoA.equals(protoB)) {
                 throwProtoMatchException(thisFieldName, protoA.toString(), protoB.toString());
             }
@@ -533,6 +534,8 @@ public abstract class Transaction<T extends Transaction<T>>
                     }
                 } catch (NoSuchMethodException ignored) {
                     // pass if there is no has method
+                } catch (IllegalArgumentException error) {
+                    throw error;
                 } catch (Throwable error) {
                     throw new IllegalArgumentException("fromBytes() failed due to error", error);
                 }
@@ -547,11 +550,15 @@ public abstract class Transaction<T extends Transaction<T>>
                         throwProtoMatchException(methodFieldName, "of size " + listA.size(), "of size " + listB.size());
                     }
                     for (@Var int i = 0; i < listA.size(); i++) {
+                        // System.out.println("comparing " + thisFieldName + "." + methodFieldName + "[" + i + "]");
                         requireProtoMatches(listA.get(i), listB.get(i), ignoreSet, methodFieldName + "[" + i + "]");
                     }
                 } else {
+                    // System.out.println("comparing " + thisFieldName + "." + methodFieldName);
                     requireProtoMatches(retvalA, retvalB, ignoreSet, methodFieldName);
                 }
+            } catch (IllegalArgumentException error) {
+                throw error;
             } catch (Throwable error) {
                 throw new IllegalArgumentException("fromBytes() failed due to error", error);
             }
