@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AccountAllowanceAdjustTransaction.[grant|revoke]TokenNftAllowanceAllSerials()`
  * `TransactionRecord.[hbar|token|tokenNft]AllowanceAdjustments`
  * `TransferTransaction.addApproved[Hbar|Token|Nft]Transfer()`
+ * `AccountInfoFlow`
 
 ### Deprecated
 
@@ -22,6 +23,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AccountAllowanceApproveTransaction.add[Hbar|Token|TokenNft]Allowance[WithOwner]()`, use `approve*Allowance()` instead.
  * `AccountAllowanceAdjustTransaction.add[Hbar|Token|TokenNft]Allowance[WithOwner]()`, use `[grant|revoke]*Allowance()` instead.
  * `TransferTransaction.set[Hbar|Token|Nft]TransferApproval()`, use `addApproved*Transfer()` instead.
+ * Support for `ContractFunctionParameters` integers with different bit widths.
+
+### Fixed
+
+ * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
 
 ## v2.10.0-beta.1
 

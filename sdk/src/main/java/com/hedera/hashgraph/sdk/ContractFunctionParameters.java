@@ -105,24 +105,6 @@ public final class ContractFunctionParameters {
         return ByteString.copyFrom(head).concat(ByteString.copyFrom(elements));
     }
 
-    private static void checkBigInt(BigInteger val) {
-        // bitLength() does not include the sign bit
-        if (val.bitLength() > 255) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
-        }
-    }
-
-    private static void checkBigUint(BigInteger val) {
-        if (val.signum() < 0) {
-            throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
-        }
-
-        // bitLength() does not include the sign bit
-        if (val.bitLength() > 256) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
-        }
-    }
-
     static ByteString int256(long val, int bitWidth) {
         return int256(val, bitWidth, true);
     }
@@ -144,22 +126,27 @@ public final class ContractFunctionParameters {
         return leftPad32(output.toByteString(), signed && val < 0);
     }
 
-    static ByteString int256(BigInteger bigInt) {
-        return leftPad32(bigInt.toByteArray(), bigInt.signum() < 0);
+    static byte[] getTruncatedBytes(BigInteger bigInt, int bitWidth) {
+        byte[] bytes = bigInt.toByteArray();
+        int expectedBytes = bitWidth/8;
+        return bytes.length <= expectedBytes ?
+            bytes :
+            Arrays.copyOfRange(bytes, bytes.length - expectedBytes, bytes.length);
+    }
+
+    static ByteString int256(BigInteger bigInt, int bitWidth) {
+        return leftPad32(getTruncatedBytes(bigInt, bitWidth), bigInt.signum() < 0);
     }
 
     static ByteString uint256(long val, int bitWidth) {
         return int256(val, bitWidth, false);
     }
 
-    static ByteString uint256(BigInteger bigInt) {
-        if (bigInt.bitLength() == 256) {
-            // we have to chop off the sign bit or else we'll have a 33 byte value
-            // we have no choice but to copy twice here but hopefully the JIT elides one
-            return ByteString.copyFrom(bigInt.toByteArray(), 1, 32);
+    static ByteString uint256(BigInteger bigInt, int bitWidth) {
+        if (bigInt.signum() < 0) {
+            throw new IllegalArgumentException("negative BigInteger passed to unsigned function");
         }
-
-        return leftPad32(bigInt.toByteArray(), false);
+        return leftPad32(getTruncatedBytes(bigInt, bitWidth), false);
     }
 
     static ByteString leftPad32(ByteString input) {
@@ -310,12 +297,36 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt8(byte value) {
-        args.add(new Argument("int8", int256(value, 32), false));
+        args.add(new Argument("int8", int256(value, 8), false));
 
         return this;
     }
 
-    /**
+    /*
+     * Add a 16-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt16(int value) {
+        args.add(new Argument("int16", int256(value, 16), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 24-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt24(int value) {
+        args.add(new Argument("int24", int256(value, 24), false));
+
+        return this;
+    }
+
+    /*
      * Add a 32-bit integer.
      *
      * @param value The integer to be added
@@ -327,10 +338,46 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /**
+    /*
+     * Add a 40-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt40(long value) {
+        args.add(new Argument("int40", int256(value, 40), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 48-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt48(long value) {
+        args.add(new Argument("int48", int256(value, 48), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 56-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt56(long value) {
+        args.add(new Argument("int56", int256(value, 56), false));
+
+        return this;
+    }
+
+    /*
      * Add a 64-bit integer.
      *
-     * @param value The long to be added
+     * @param value The integer to be added
      * @return {@code this}
      */
     public ContractFunctionParameters addInt64(long value) {
@@ -339,17 +386,290 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /**
+    /*
+     * Add a 72-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt72(BigInteger value) {
+        args.add(new Argument("int72", int256(value, 72), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 80-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt80(BigInteger value) {
+        args.add(new Argument("int80", int256(value, 80), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 88-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt88(BigInteger value) {
+        args.add(new Argument("int88", int256(value, 88), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 96-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt96(BigInteger value) {
+        args.add(new Argument("int96", int256(value, 96), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 104-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt104(BigInteger value) {
+        args.add(new Argument("int104", int256(value, 104), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 112-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt112(BigInteger value) {
+        args.add(new Argument("int112", int256(value, 112), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 120-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt120(BigInteger value) {
+        args.add(new Argument("int120", int256(value, 120), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 128-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt128(BigInteger value) {
+        args.add(new Argument("int128", int256(value, 128), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 136-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt136(BigInteger value) {
+        args.add(new Argument("int136", int256(value, 136), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 144-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt144(BigInteger value) {
+        args.add(new Argument("int144", int256(value, 144), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 152-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt152(BigInteger value) {
+        args.add(new Argument("int152", int256(value, 152), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 160-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt160(BigInteger value) {
+        args.add(new Argument("int160", int256(value, 160), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 168-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt168(BigInteger value) {
+        args.add(new Argument("int168", int256(value, 168), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 176-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt176(BigInteger value) {
+        args.add(new Argument("int176", int256(value, 176), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 184-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt184(BigInteger value) {
+        args.add(new Argument("int184", int256(value, 184), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 192-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt192(BigInteger value) {
+        args.add(new Argument("int192", int256(value, 192), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 200-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt200(BigInteger value) {
+        args.add(new Argument("int200", int256(value, 200), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 208-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt208(BigInteger value) {
+        args.add(new Argument("int208", int256(value, 208), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 216-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt216(BigInteger value) {
+        args.add(new Argument("int216", int256(value, 216), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 224-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt224(BigInteger value) {
+        args.add(new Argument("int224", int256(value, 224), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 232-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt232(BigInteger value) {
+        args.add(new Argument("int232", int256(value, 232), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 240-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt240(BigInteger value) {
+        args.add(new Argument("int240", int256(value, 240), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 248-bit integer.
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt248(BigInteger value) {
+        args.add(new Argument("int248", int256(value, 248), false));
+
+        return this;
+    }
+
+    /*
      * Add a 256-bit integer.
      *
-     * @param bigInt The BigInteger to be added
+     * @param value The integer to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code bigInt.bitLength() > 255}
-     *                                  (max range including the sign bit).
      */
-    public ContractFunctionParameters addInt256(BigInteger bigInt) {
-        checkBigInt(bigInt);
-        args.add(new Argument("int256", int256(bigInt), false));
+    public ContractFunctionParameters addInt256(BigInteger value) {
+        args.add(new Argument("int256", int256(value, 256), false));
 
         return this;
     }
@@ -377,6 +697,42 @@ public final class ContractFunctionParameters {
     }
 
     /**
+     * Add a dynamic array of 16-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt16Array(int[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 16))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int16[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 24-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt24Array(int[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 24))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int24[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
      * Add a dynamic array of 32-bit integers.
      *
      * @param intArray The array of integers to be added
@@ -395,6 +751,60 @@ public final class ContractFunctionParameters {
     }
 
     /**
+     * Add a dynamic array of 40-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt40Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 40))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int40[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 48-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt48Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 48))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int48[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 56-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt56Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> int256(i, 56))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int56[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
      * Add a dynamic array of 64-bit integers.
      *
      * @param intArray The array of integers to be added
@@ -405,9 +815,423 @@ public final class ContractFunctionParameters {
             J8Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
                 .collect(Collectors.toList()));
 
-        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
         args.add(new Argument("int64[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 72-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt72Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 72))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int72[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 80-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt80Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 80))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int80[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 88-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt88Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 88))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int88[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 96-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt96Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 96))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int96[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 104-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt104Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 104))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int104[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 112-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt112Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 112))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int112[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 120-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt120Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 120))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int120[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 128-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt128Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 128))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int128[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 136-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt136Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 136))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int136[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 144-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt144Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 144))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int144[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 152-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt152Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 152))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int152[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 160-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt160Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 160))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int160[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 168-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt168Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 168))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int168[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 176-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt176Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 176))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int176[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 184-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt184Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 184))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int184[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 192-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt192Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 192))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int192[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 200-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt200Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 200))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int200[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 208-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt208Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 208))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int208[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 216-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt216Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 216))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int216[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 224-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt224Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 224))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int224[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 232-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt232Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 232))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int232[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 240-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt240Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 240))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int240[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 248-bit integers.
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addInt248Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> int256(i, 248))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("int248[]", arrayBytes, true));
 
         return this;
     }
@@ -417,15 +1241,13 @@ public final class ContractFunctionParameters {
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if any value's {@code .bitLength() > 255}
-     *                                  (max range including the sign bit).
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::int256)
+            J8Arrays.stream(intArray).map(i -> int256(i, 256))
                 .collect(Collectors.toList()));
 
-        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
         args.add(new Argument("int256[]", arrayBytes, true));
 
@@ -446,9 +1268,39 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /**
+    /*
+     * Add a 16-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint16(int value) {
+        args.add(new Argument("uint16", uint256(value, 16), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 24-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint24(int value) {
+        args.add(new Argument("uint24", uint256(value, 24), false));
+
+        return this;
+    }
+
+    /*
      * Add a 32-bit unsigned integer.
-     * <p>
+
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
@@ -461,9 +1313,54 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /**
+    /*
+     * Add a 40-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint40(long value) {
+        args.add(new Argument("uint40", uint256(value, 40), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 48-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint48(long value) {
+        args.add(new Argument("uint48", uint256(value, 48), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 56-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint56(long value) {
+        args.add(new Argument("uint56", uint256(value, 56), false));
+
+        return this;
+    }
+
+    /*
      * Add a 64-bit unsigned integer.
-     * <p>
+
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
@@ -476,21 +1373,386 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /**
-     * Add a 256-bit unsigned integer.
-     * <p>
+    /*
+     * Add a 72-bit unsigned integer.
+
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
-     * @param bigUint The integer to be added
+     * @param value The integer to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code bigUint.bitLength() > 256}
-     *                                  (max range including the sign bit) or
-     *                                  {@code bigUint.signum() < 0}.
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
-    public ContractFunctionParameters addUint256(@Nonnegative BigInteger bigUint) {
-        checkBigUint(bigUint);
-        args.add(new Argument("uint256", uint256(bigUint), false));
+    public ContractFunctionParameters addUint72(BigInteger value) {
+        args.add(new Argument("uint72", uint256(value, 72), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 80-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint80(BigInteger value) {
+        args.add(new Argument("uint80", uint256(value, 80), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 88-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint88(BigInteger value) {
+        args.add(new Argument("uint88", uint256(value, 88), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 96-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint96(BigInteger value) {
+        args.add(new Argument("uint96", uint256(value, 96), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 104-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint104(BigInteger value) {
+        args.add(new Argument("uint104", uint256(value, 104), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 112-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint112(BigInteger value) {
+        args.add(new Argument("uint112", uint256(value, 112), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 120-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint120(BigInteger value) {
+        args.add(new Argument("uint120", uint256(value, 120), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 128-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint128(BigInteger value) {
+        args.add(new Argument("uint128", uint256(value, 128), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 136-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint136(BigInteger value) {
+        args.add(new Argument("uint136", uint256(value, 136), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 144-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint144(BigInteger value) {
+        args.add(new Argument("uint144", uint256(value, 144), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 152-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint152(BigInteger value) {
+        args.add(new Argument("uint152", uint256(value, 152), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 160-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint160(BigInteger value) {
+        args.add(new Argument("uint160", uint256(value, 160), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 168-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint168(BigInteger value) {
+        args.add(new Argument("uint168", uint256(value, 168), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 176-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint176(BigInteger value) {
+        args.add(new Argument("uint176", uint256(value, 176), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 184-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint184(BigInteger value) {
+        args.add(new Argument("uint184", uint256(value, 184), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 192-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint192(BigInteger value) {
+        args.add(new Argument("uint192", uint256(value, 192), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 200-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint200(BigInteger value) {
+        args.add(new Argument("uint200", uint256(value, 200), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 208-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint208(BigInteger value) {
+        args.add(new Argument("uint208", uint256(value, 208), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 216-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint216(BigInteger value) {
+        args.add(new Argument("uint216", uint256(value, 216), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 224-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint224(BigInteger value) {
+        args.add(new Argument("uint224", uint256(value, 224), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 232-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint232(BigInteger value) {
+        args.add(new Argument("uint232", uint256(value, 232), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 240-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint240(BigInteger value) {
+        args.add(new Argument("uint240", uint256(value, 240), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 248-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint248(BigInteger value) {
+        args.add(new Argument("uint248", uint256(value, 248), false));
+
+        return this;
+    }
+
+    /*
+     * Add a 256-bit unsigned integer.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param value The integer to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint256(BigInteger value) {
+        args.add(new Argument("uint256", uint256(value, 256), false));
 
         return this;
     }
@@ -518,9 +1780,51 @@ public final class ContractFunctionParameters {
     }
 
     /**
+     * Add a dynamic array of 16-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint16Array(int[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 16))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint16[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 24-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint24Array(int[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 24))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint24[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
      * Add a dynamic array of 32-bit unsigned integers.
-     * <p>
-     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
      * @param intArray The array of integers to be added
@@ -539,9 +1843,72 @@ public final class ContractFunctionParameters {
     }
 
     /**
+     * Add a dynamic array of 40-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint40Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 40))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint40[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 48-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint48Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 48))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint48[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 56-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addUint56Array(long[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 56))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint56[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
      * Add a dynamic array of 64-bit unsigned integers.
-     * <p>
-     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
      * @param intArray The array of integers to be added
@@ -552,7 +1919,7 @@ public final class ContractFunctionParameters {
             J8Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
                 .collect(Collectors.toList()));
 
-        arrayBytes = uint256(intArray.length, 64).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
         args.add(new Argument("uint64[]", arrayBytes, true));
 
@@ -560,22 +1927,527 @@ public final class ContractFunctionParameters {
     }
 
     /**
-     * Add a dynamic array of 256-bit unsigned integers.
-     * <p>
-     * Each value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * Add a dynamic array of 72-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
      * sign-extended to 32 bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if any value has a {@code .bitLength() > 256}
-     *                                  (max range including the sign bit) or is negative.
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint72Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 72))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint72[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 80-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint80Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 80))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint80[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 88-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint88Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 88))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint88[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 96-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint96Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 96))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint96[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 104-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint104Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 104))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint104[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 112-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint112Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 112))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint112[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 120-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint120Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 120))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint120[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 128-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint128Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 128))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint128[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 136-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint136Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 136))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint136[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 144-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint144Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 144))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint144[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 152-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint152Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 152))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint152[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 160-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint160Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 160))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint160[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 168-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint168Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 168))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint168[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 176-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint176Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 176))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint176[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 184-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint184Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 184))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint184[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 192-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint192Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 192))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint192[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 200-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint200Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 200))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint200[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 208-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint208Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 208))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint208[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 216-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint216Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 216))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint216[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 224-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint224Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 224))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint224[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 232-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint232Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 232))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint232[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 240-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint240Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 240))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint240[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 248-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
+     */
+    public ContractFunctionParameters addUint248Array(BigInteger[] intArray) {
+        @Var ByteString arrayBytes = ByteString.copyFrom(
+            J8Arrays.stream(intArray).map(i -> uint256(i, 248))
+                .collect(Collectors.toList()));
+
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
+
+        args.add(new Argument("uint248[]", arrayBytes, true));
+
+        return this;
+    }
+
+    /**
+     * Add a dynamic array of 256-bit unsigned integers.
+
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
+     * sign-extended to 32 bytes).
+     *
+     * @param intArray The array of integers to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
-            J8Arrays.stream(intArray).map(ContractFunctionParameters::uint256)
+            J8Arrays.stream(intArray).map(i -> uint256(i, 256))
                 .collect(Collectors.toList()));
 
-        arrayBytes = uint256(intArray.length, 256).concat(arrayBytes);
+        arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
         args.add(new Argument("uint256[]", arrayBytes, true));
 
