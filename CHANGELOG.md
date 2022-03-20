@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
 
+### Added
+
+ * `AccountInfoFlow`
+
 ## v2.10.0-beta.1
 
 ### Added
