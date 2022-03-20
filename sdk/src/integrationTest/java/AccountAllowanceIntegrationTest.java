@@ -1,20 +1,14 @@
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionRecordQuery;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,8 +41,7 @@ public class AccountAllowanceIntegrationTest {
         Objects.requireNonNull(bobId);
 
         var allowanceTx = new AccountAllowanceApproveTransaction()
-            .addHbarAllowance(aliceId, new Hbar(10))
-            .setTransactionId(TransactionId.generate(bobId))
+            .approveHbarAllowance(bobId, aliceId, new Hbar(10))
             .freezeWith(testEnv.client)
             .sign(bobKey);
         allowanceTx

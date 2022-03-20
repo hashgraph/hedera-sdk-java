@@ -128,21 +128,35 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
+    private TransferTransaction doAddTokenTransfer(TokenId tokenId, AccountId accountId, long value, boolean isApproved) {
         requireNotFrozen();
 
         for (var transfer : tokenTransfers) {
-            if (transfer.tokenId.equals(tokenId) && transfer.accountId.equals(accountId)) {
+            if (transfer.tokenId.equals(tokenId) && transfer.accountId.equals(accountId) && transfer.isApproved == isApproved) {
                 transfer.amount = transfer.amount + value;
                 return this;
             }
         }
 
-        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value));
+        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value, isApproved));
         return this;
     }
 
-    public TransferTransaction addTokenTransferWithDecimals(TokenId tokenId, AccountId accountId, long value, int decimals) {
+    public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
+        return doAddTokenTransfer(tokenId, accountId, value, false);
+    }
+
+    public TransferTransaction addApprovedTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
+        return doAddTokenTransfer(tokenId, accountId, value, true);
+    }
+
+    private TransferTransaction doAddTokenTransferWithDecimals(
+        TokenId tokenId,
+        AccountId accountId,
+        long value,
+        int decimals,
+        boolean isApproved
+    ) {
         requireNotFrozen();
 
         var found = false;
@@ -155,7 +169,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
                 transfer.expectedDecimals = decimals;
 
-                if (transfer.accountId.equals(accountId)) {
+                if (transfer.accountId.equals(accountId) && transfer.isApproved == isApproved) {
                     transfer.amount = transfer.amount + value;
                     found = true;
                 }
@@ -167,11 +181,33 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
             return this;
         }
 
-        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value, decimals, false));
+        tokenTransfers.add(new TokenTransfer(tokenId, accountId, value, decimals, isApproved));
 
         return this;
     }
 
+    public TransferTransaction addTokenTransferWithDecimals(
+        TokenId tokenId,
+        AccountId accountId,
+        long value,
+        int decimals
+    ) {
+        return doAddTokenTransferWithDecimals(tokenId, accountId, value, decimals, false);
+    }
+
+    public TransferTransaction addApprovedTokenTransferWithDecimals(
+        TokenId tokenId,
+        AccountId accountId,
+        long value,
+        int decimals
+    ) {
+        return doAddTokenTransferWithDecimals(tokenId, accountId, value, decimals, true);
+    }
+
+    /**
+     * @deprecated - Use {@link #addApprovedTokenTransfer(TokenId, AccountId, long)} instead
+     */
+    @Deprecated
     public TransferTransaction setTokenTransferApproval(TokenId tokenId, AccountId accountId, boolean isApproved) {
         requireNotFrozen();
 
@@ -198,12 +234,24 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+    private TransferTransaction doAddNftTransfer(NftId nftId, AccountId sender, AccountId receiver, boolean isApproved) {
         requireNotFrozen();
-        nftTransfers.add(new TokenNftTransfer(nftId.tokenId, sender, receiver, nftId.serial, false));
+        nftTransfers.add(new TokenNftTransfer(nftId.tokenId, sender, receiver, nftId.serial, isApproved));
         return this;
     }
 
+    public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+        return doAddNftTransfer(nftId, sender, receiver, false);
+    }
+
+    public TransferTransaction addApprovedNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+        return doAddNftTransfer(nftId, sender, receiver, true);
+    }
+
+    /**
+     * @deprecated - Use {@link #addApprovedNftTransfer(NftId, AccountId, AccountId)} instead
+     */
+    @Deprecated
     public TransferTransaction setNftTransferApproval(NftId nftId, boolean isApproved) {
         requireNotFrozen();
 
@@ -227,20 +275,32 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
+    public TransferTransaction doAddHbarTransfer(AccountId accountId, Hbar value, boolean isApproved) {
         requireNotFrozen();
 
         for (var transfer : hbarTransfers) {
-            if (transfer.accountId.equals(accountId)) {
+            if (transfer.accountId.equals(accountId) && transfer.isApproved == isApproved) {
                 transfer.amount = Hbar.fromTinybars(transfer.amount.toTinybars() + value.toTinybars());
                 return this;
             }
         }
 
-        hbarTransfers.add(new HbarTransfer(accountId, value, false));
+        hbarTransfers.add(new HbarTransfer(accountId, value, isApproved));
         return this;
     }
 
+    public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
+        return doAddHbarTransfer(accountId, value, false);
+    }
+
+    public TransferTransaction addApprovedHbarTransfer(AccountId accountId, Hbar value) {
+        return doAddHbarTransfer(accountId, value, true);
+    }
+
+    /**
+     * @deprecated - Use {@link #addApprovedHbarTransfer(AccountId, Hbar)} instead
+     */
+    @Deprecated
     public TransferTransaction setHbarTransferApproval(AccountId accountId, boolean isApproved) {
         requireNotFrozen();
 
@@ -257,9 +317,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     CryptoTransferTransactionBody.Builder build() {
         var tokenTransfers = new ArrayList<TokenTransferList>();
 
-        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId));
-        this.tokenTransfers.sort(Comparator.comparing((TokenTransfer a) -> a.tokenId).thenComparing(a -> a.accountId));
-        this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver));
+        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
+        this.tokenTransfers.sort(Comparator.comparing((TokenTransfer a) -> a.tokenId).thenComparing(a -> a.accountId).thenComparing(a -> a.isApproved));
+        this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver).thenComparing(a -> a.serial));
 
         var i = 0;
         var j = 0;
@@ -398,14 +458,5 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 ));
             }
         }
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("hbarTransfers", Arrays.toString(hbarTransfers.toArray()))
-            .add("tokenTransfers", Arrays.toString(tokenTransfers.toArray()))
-//            .add("nftTransfers", Arrays.toString(nftTransfers.toArray()))
-            .toString();
     }
 }
