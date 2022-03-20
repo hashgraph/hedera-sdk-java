@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ public class SystemUndeleteTransactionTest {
 
     private SystemUndeleteTransaction spawnTestTransactionFile() {
         return new SystemUndeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFileId(FileId.fromString("0.0.444"))
             .setMaxTransactionFee(new Hbar(1))
@@ -52,7 +53,7 @@ public class SystemUndeleteTransactionTest {
 
     private SystemUndeleteTransaction spawnTestTransactionContract() {
         return new SystemUndeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setContractId(ContractId.fromString("0.0.444"))
             .setMaxTransactionFee(new Hbar(1))

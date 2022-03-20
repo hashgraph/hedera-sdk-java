@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +37,7 @@ public class TokenUpdateTransactionTest {
 
     private TokenUpdateTransaction spawnTestTransaction() {
         return new TokenUpdateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTokenId(TokenId.fromString("1.2.3"))
             .setFeeScheduleKey(unusedPrivateKey)

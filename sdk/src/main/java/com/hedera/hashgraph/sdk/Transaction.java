@@ -8,7 +8,6 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
@@ -16,13 +15,17 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
@@ -131,6 +134,25 @@ public abstract class Transaction<T extends Transaction<T>>
         }
 
         nodeAccountIds.remove(new AccountId(0));
+
+        // Verify that transaction bodies match
+        for (@Var int i = 0; i < txCount; i++) {
+            @Var TransactionBody firstTxBody = null;
+            for (@Var int j = 0; j < nodeCount; j++) {
+                int k = i*nodeCount + j;
+                var txBody = TransactionBody.parseFrom(innerSignedTransactions.get(k).getBodyBytes());
+                if (firstTxBody == null) {
+                    firstTxBody = txBody;
+                } else {
+                    requireProtoMatches(
+                        firstTxBody,
+                        txBody,
+                        new HashSet<>(Arrays.asList("NodeAccountID")),
+                        "TransactionBody"
+                    );
+                }
+            }
+        }
 
         sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
 
@@ -444,6 +466,102 @@ public abstract class Transaction<T extends Transaction<T>>
 
             default:
                 throw new IllegalStateException("schedulable transaction did not have a transaction set");
+        }
+    }
+
+    private static void throwProtoMatchException(String fieldName, String aWas, String bWas) {
+        throw new IllegalArgumentException(
+            "fromBytes() failed because " + fieldName +
+                " fields in TransactionBody protobuf messages in the TransactionList did not match: A was " +
+                aWas + ", B was " + bWas
+        );
+    }
+
+    private static void requireProtoMatches(Object protoA, Object protoB, Set<String> ignoreSet, String thisFieldName) {
+        var aIsNull = protoA == null;
+        var bIsNull = protoB == null;
+        if (aIsNull != bIsNull) {
+            throwProtoMatchException(thisFieldName, aIsNull ? "null" : "not null", bIsNull ? "null" : "not null");
+        }
+        if (aIsNull) {
+            return;
+        }
+        var protoAClass = protoA.getClass();
+        var protoBClass = protoB.getClass();
+        if (!protoAClass.equals(protoBClass)) {
+            throwProtoMatchException(thisFieldName, "of class " + protoAClass, "of class " + protoBClass);
+        }
+        if (protoA instanceof Boolean ||
+            protoA instanceof Integer ||
+            protoA instanceof Long ||
+            protoA instanceof Float ||
+            protoA instanceof Double ||
+            protoA instanceof String ||
+            protoA instanceof ByteString
+        ) {
+            // System.out.println("values A = " + protoA.toString() + ", B = " + protoB.toString());
+            if (!protoA.equals(protoB)) {
+                throwProtoMatchException(thisFieldName, protoA.toString(), protoB.toString());
+            }
+        }
+        for (var method : protoAClass.getDeclaredMethods()) {
+            if (method.getParameterCount() != 0) {
+                continue;
+            }
+            int methodModifiers = method.getModifiers();
+            if ((!Modifier.isPublic(methodModifiers)) || Modifier.isStatic(methodModifiers)) {
+                continue;
+            }
+            var methodName = method.getName();
+            if (!methodName.startsWith("get")) {
+                continue;
+            }
+            var isList = methodName.endsWith("List") && List.class.isAssignableFrom(method.getReturnType());
+            var methodFieldName = methodName.substring(3, methodName.length() - (isList ? 4 : 0));
+            if (ignoreSet.contains(methodFieldName) || methodFieldName.equals("DefaultInstance")) {
+                continue;
+            }
+            if (!isList) {
+                try {
+                    var hasMethod = protoAClass.getMethod("has" + methodFieldName);
+                    var hasA = (Boolean) hasMethod.invoke(protoA);
+                    var hasB = (Boolean) hasMethod.invoke(protoB);
+                    if (!hasA.equals(hasB)) {
+                        throwProtoMatchException(methodFieldName, hasA ? "present" : "not present", hasB ? "present" : "not present");
+                    }
+                    if (!hasA) {
+                        continue;
+                    }
+                } catch (NoSuchMethodException ignored) {
+                    // pass if there is no has method
+                } catch (IllegalArgumentException error) {
+                    throw error;
+                } catch (Throwable error) {
+                    throw new IllegalArgumentException("fromBytes() failed due to error", error);
+                }
+            }
+            try {
+                var retvalA = method.invoke(protoA);
+                var retvalB = method.invoke(protoB);
+                if (isList) {
+                    var listA = (List<?>) retvalA;
+                    var listB = (List<?>) retvalB;
+                    if (listA.size() != listB.size()) {
+                        throwProtoMatchException(methodFieldName, "of size " + listA.size(), "of size " + listB.size());
+                    }
+                    for (@Var int i = 0; i < listA.size(); i++) {
+                        // System.out.println("comparing " + thisFieldName + "." + methodFieldName + "[" + i + "]");
+                        requireProtoMatches(listA.get(i), listB.get(i), ignoreSet, methodFieldName + "[" + i + "]");
+                    }
+                } else {
+                    // System.out.println("comparing " + thisFieldName + "." + methodFieldName);
+                    requireProtoMatches(retvalA, retvalB, ignoreSet, methodFieldName);
+                }
+            } catch (IllegalArgumentException error) {
+                throw error;
+            } catch (Throwable error) {
+                throw new IllegalArgumentException("fromBytes() failed due to error", error);
+            }
         }
     }
 

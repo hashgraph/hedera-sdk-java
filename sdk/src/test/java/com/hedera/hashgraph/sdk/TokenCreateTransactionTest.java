@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -43,7 +44,7 @@ public class TokenCreateTransactionTest {
 
     private TokenCreateTransaction spawnTestTransactionNft() {
         return new TokenCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setFeeScheduleKey(unusedPrivateKey)
             .setSupplyKey(unusedPrivateKey)
@@ -76,7 +77,7 @@ public class TokenCreateTransactionTest {
 
     private TokenCreateTransaction spawnTestTransaction() {
         return new TokenCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setInitialSupply(30)
             .setFeeScheduleKey(unusedPrivateKey)
