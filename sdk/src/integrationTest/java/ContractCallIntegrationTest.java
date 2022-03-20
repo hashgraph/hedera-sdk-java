@@ -56,6 +56,7 @@ public class ContractCallIntegrationTest {
         assertEquals("Hello from Hedera.", result.getString(0));
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -100,6 +101,7 @@ public class ContractCallIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -148,6 +150,7 @@ public class ContractCallIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -194,6 +197,7 @@ public class ContractCallIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -242,6 +246,7 @@ public class ContractCallIntegrationTest {
         assertEquals("Hello from Hedera.", result.getString(0));
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -287,6 +292,7 @@ public class ContractCallIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -334,6 +340,7 @@ public class ContractCallIntegrationTest {
         assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);

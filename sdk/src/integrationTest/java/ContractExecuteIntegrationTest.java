@@ -52,6 +52,7 @@ public class ContractExecuteIntegrationTest {
         assertEquals(Status.SUCCESS, receipt.status);
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -117,6 +118,7 @@ public class ContractExecuteIntegrationTest {
         assertTrue(error.getMessage().contains(Status.CONTRACT_REVERT_EXECUTED.toString()));
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -164,6 +166,7 @@ public class ContractExecuteIntegrationTest {
         assertTrue(error.getMessage().contains(Status.INSUFFICIENT_GAS.toString()));
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
