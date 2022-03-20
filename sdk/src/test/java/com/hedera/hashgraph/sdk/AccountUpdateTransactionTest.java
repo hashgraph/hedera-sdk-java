@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -30,7 +31,7 @@ public class AccountUpdateTransactionTest {
     AccountUpdateTransaction spawnTestTransaction() {
         return new AccountUpdateTransaction()
             .setKey(unusedPrivateKey)
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAccountId(AccountId.fromString("0.0.2002"))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -35,7 +36,7 @@ public class TokenBurnTransactionTest {
 
     private TokenBurnTransaction spawnTestTransaction() {
         return new TokenBurnTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTokenId(TokenId.fromString("0.0.111"))
             .setAmount(30)
@@ -53,7 +54,7 @@ public class TokenBurnTransactionTest {
 
     private TokenBurnTransaction spawnTestTransactionNft() {
         return new TokenBurnTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setTokenId(TokenId.fromString("0.0.111"))
             .setSerials(Collections.singletonList(444L))

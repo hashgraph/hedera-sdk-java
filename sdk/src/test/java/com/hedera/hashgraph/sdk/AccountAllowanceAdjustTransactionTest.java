@@ -30,7 +30,7 @@ public class AccountAllowanceAdjustTransactionTest {
     AccountAllowanceAdjustTransaction spawnTestTransaction() {
         var ownerId = AccountId.fromString("5.6.7");
         return new AccountAllowanceAdjustTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .addHbarAllowance(AccountId.fromString("1.1.1"), new Hbar(3))
             .addTokenAllowance(TokenId.fromString("2.2.2"), AccountId.fromString("3.3.3"), 6)
