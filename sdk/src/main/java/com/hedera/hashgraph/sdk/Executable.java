@@ -517,6 +517,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         public ClientCall<ProtoRequestT, ResponseT> createCall() {
+            verboseLog(node);
             return this.node.getChannel().newCall(Executable.this.getMethodDescriptor(), getCallOptions());
         }
 
@@ -532,6 +533,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             node.increaseDelay();
             logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
                 node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
+            verboseLog(node);
             return new IllegalStateException("Failed to connect to node " + node.getAccountId());
         }
 
@@ -544,6 +546,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 node.increaseDelay();
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                     node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
+                verboseLog(node);
             }
 
             return retry;
@@ -579,6 +582,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 case Retry:
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                         node.getAccountId(), delay, attempt, responseStatus);
+                    verboseLog(node);
                     break;
                 case ServerError:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
@@ -589,6 +593,22 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             }
 
             return executionState;
+        }
+
+        void verboseLog(Node node) {
+            String ipAddress;
+            if (node.address == null) {
+                ipAddress = "NULL";
+            } else if (node.address.getAddress() == null) {
+                ipAddress = "NULL";
+            } else {
+                ipAddress = node.address.getAddress();
+            }
+            logger.trace("Node IP {} Timestamp {} Transaction Type {}",
+                ipAddress,
+                System.currentTimeMillis(),
+                this.getClass() != null ? this.getClass().getSimpleName() : "NULL"
+            );
         }
     }
 }

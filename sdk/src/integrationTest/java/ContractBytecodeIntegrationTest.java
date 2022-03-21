@@ -51,6 +51,7 @@ public class ContractBytecodeIntegrationTest {
         assertEquals(798, bytecode.size());
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -96,6 +97,7 @@ public class ContractBytecodeIntegrationTest {
         assertEquals(798, bytecode.size());
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -139,6 +141,7 @@ public class ContractBytecodeIntegrationTest {
         });
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -184,6 +187,7 @@ public class ContractBytecodeIntegrationTest {
         assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);

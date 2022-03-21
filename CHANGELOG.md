@@ -5,6 +5,75 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.10.0
+
+### Added
+
+ * `ContractCreateFlow` to simplify contract creation.
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PrivateKeyED25519.isED25519()`
+ * `PrivateKeyED25519.isECDSA()`
+ * `PrivateKeyECDSA.isED25519()`
+ * `PrivateKeyECDSA.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+ * `PublicKeyED25519.isED25519()`
+ * `PublicKeyED25519.isECDSA()`
+ * `PublicKeyECDSA.isED25519()`
+ * `PublicKeyECDSA.isECDSA()`
+
+## Fixed
+
+ * Regenerated AccountIDTest.snap
+ * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+ * `AddressBookQuery`
+ * Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
+   regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+
+## v2.10.0-beta.1
+
+### Added
+
+ * `ContractCreateFlow` to simplify contract creation.
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PrivateKeyED25519.isED25519()`
+ * `PrivateKeyED25519.isECDSA()`
+ * `PrivateKeyECDSA.isED25519()`
+ * `PrivateKeyECDSA.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+ * `PublicKeyED25519.isED25519()`
+ * `PublicKeyED25519.isECDSA()`
+ * `PublicKeyECDSA.isED25519()`
+ * `PublicKeyECDSA.isECDSA()`
+
+## Fixed
+
+ * Regenerated AccountIDTest.snap
+ * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+ * `AddressBookQuery`
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+
+## v2.9.0
+
+### Added
+
+ * `owner` field to `*Allowance` classes.
+ * `Executable.[set|get]GrpcDeadline()`
+
+### Fixed
+
+ * `AccountAllowanceAdjustTransaction` now deserializes correctly with `Transaction.fromBytes()`
+
 ## v2.9.0-beta.1
 
 ### Added
@@ -77,7 +146,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responds with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 

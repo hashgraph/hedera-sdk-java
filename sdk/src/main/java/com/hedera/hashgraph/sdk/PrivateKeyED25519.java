@@ -173,4 +173,14 @@ class PrivateKeyED25519 extends PrivateKey {
             throw new RuntimeException(e);
         }
     }
+
+    @Override
+    public boolean isED25519() {
+        return false;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return true;
+    }
 }

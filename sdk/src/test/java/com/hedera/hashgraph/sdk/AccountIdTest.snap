@@ -29,7 +29,9 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasKey=[
     "realm": 0,
     "num": 0,
     "aliasKey": {
-      "keyData": "EU5qvDcbgtq1wV6hSfAtNKASCHsWNRbdcPRKyvq/d3c="
+      "keyData": "EU5qvDcbgtq1wV6hSfAtNKASCHsWNRbdcPRKyvq/d3c=",
+      "ecdsa": false,
+      "ed25519": true
     }
   }
 ]
@@ -41,12 +43,12 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnMainnet=[
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnPreviewnet=[
-  "0.0.123-ntjly"
+  "0.0.123-ogizo"
 ]
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnTestnet=[
-  "0.0.123-rmkyk"
+  "0.0.123-esxsf"
 ]
 
 

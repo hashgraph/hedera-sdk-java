@@ -83,7 +83,7 @@ class EntityIdHelper {
                 .array());
     }
 
-    static String checksum(String ledgerId, String addr) {
+    static String checksum(LedgerId ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
         List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
         @Var
@@ -103,11 +103,12 @@ class EntityIdHelper {
         long m = 1_000_003; //min prime greater than a million. Used for the final permutation.
         long w = 31; // Sum s of digit values weights them by powers of w. Should be coprime to p5.
 
-        var id = ledgerId + "000000000000";
-        List<Integer> h = new ArrayList<>();
-
-        for (var i = 0; i < id.length(); i += 2) {
-            h.add(Integer.parseInt(id.substring(i, Math.min(i + 2, id.length())), 16));
+        List<Byte> h = new ArrayList<>(ledgerId.toBytes().length + 6);
+        for (byte b : ledgerId.toBytes()) {
+            h.add(b);
+        }
+        for (int i = 0; i < 6; i++) {
+            h.add((byte) 0);
         }
         for (var i = 0; i < addr.length(); i++) {
             d.add(addr.charAt(i) == '.' ? 10 : Integer.parseInt(String.valueOf(addr.charAt(i)), 10));
@@ -120,8 +121,9 @@ class EntityIdHelper {
                 s1 = (s1 + d.get(i)) % 11;
             }
         }
-        for (Integer integer : h) {
-            sh = (w * sh + integer) % p5;
+        for (byte b : h) {
+            // byte is signed in java, have to fake it to make bytes act like they're unsigned
+            sh = (w * sh + (b < 0 ? 256 + b : b)) % p5;
         }
         c = ((((addr.length() % 5) * 11 + s0) * 11 + s1) * p3 + s + sh) % p5;
         c = (c * m) % p5;
@@ -140,7 +142,7 @@ class EntityIdHelper {
         }
         if (checksum != null) {
             String expectedChecksum = EntityIdHelper.checksum(
-                Integer.toString(client.getNetworkName().id),
+                client.getLedgerId(),
                 EntityIdHelper.toString(shard, realm, num)
             );
             if (!checksum.equals(expectedChecksum)) {
@@ -154,10 +156,10 @@ class EntityIdHelper {
     }
 
     static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
-        if (client.getNetworkName() != null) {
-            return "" + shard + "." + realm + "." + num + "-" + checksum(Integer.toString(client.getNetworkName().id), EntityIdHelper.toString(shard, realm, num));
+        if (client.getLedgerId() != null) {
+            return "" + shard + "." + realm + "." + num + "-" + checksum(client.getLedgerId(), EntityIdHelper.toString(shard, realm, num));
         } else {
-            throw new IllegalStateException("Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's network name is set.");
+            throw new IllegalStateException("Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's ledgerId is set.");
         }
     }
 

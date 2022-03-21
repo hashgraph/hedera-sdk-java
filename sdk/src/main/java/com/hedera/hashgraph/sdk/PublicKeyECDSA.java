@@ -115,4 +115,14 @@ public class PublicKeyECDSA extends PublicKey {
     public int hashCode() {
         return Arrays.hashCode(keyData);
     }
+
+    @Override
+    public boolean isED25519() {
+        return false;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return true;
+    }
 }

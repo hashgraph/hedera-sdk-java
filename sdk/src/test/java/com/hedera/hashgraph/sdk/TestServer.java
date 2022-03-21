@@ -27,8 +27,10 @@ public class TestServer {
         var network = new HashMap<String, AccountId>();
         network.put("in-process:" + name, AccountId.fromString("1.1.1"));
         client = Client.forNetwork(network)
-            .setMinBackoff(Duration.ofMillis(10))
-            .setNodeMinBackoff(Duration.ofMillis(10))
+            .setMinBackoff(Duration.ofMillis(1))
+            .setMaxBackoff(Duration.ofMillis(1))
+            .setNodeMinBackoff(Duration.ofMillis(1))
+            .setNodeMaxBackoff(Duration.ofMillis(1))
             .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
     }
 
