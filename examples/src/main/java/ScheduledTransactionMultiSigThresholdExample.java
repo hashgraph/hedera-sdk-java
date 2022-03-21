@@ -1,7 +1,26 @@
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalance;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.KeyList;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.ScheduleId;
+import com.hedera.hashgraph.sdk.ScheduleInfo;
+import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
+import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.TransactionRecordQuery;
+import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -27,7 +46,6 @@ public class ScheduledTransactionMultiSigThresholdExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-
         // Generate four new Ed25519 private, public key pairs.
         PrivateKey[] privateKeys = new PrivateKey[4];
         PublicKey[] publicKeys = new PublicKey[4];
@@ -51,7 +69,8 @@ public class ScheduledTransactionMultiSigThresholdExample {
 
         // This will wait for the receipt to become available
         TransactionReceipt txAccountCreateReceipt = transactionResponse.getReceipt(client);
-        AccountId multiSigAccountId = txAccountCreateReceipt.accountId;
+        AccountId multiSigAccountId = Objects.requireNonNull(txAccountCreateReceipt.accountId);
+
         System.out.println("3-of-4 multi-sig account ID: " + multiSigAccountId);
 
         AccountBalance balance = new AccountBalanceQuery()
@@ -62,7 +81,7 @@ public class ScheduledTransactionMultiSigThresholdExample {
         // schedule crypto transfer from multi-sig account to operator account
         TransactionResponse transferToSchedule = new TransferTransaction()
             .addHbarTransfer(multiSigAccountId, Hbar.fromTinybars(-1))
-            .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(1))
+            .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.fromTinybars(1))
             .schedule()
             .freezeWith(client)
             .sign(privateKeys[0])   // add 1 signature`
@@ -70,9 +89,9 @@ public class ScheduledTransactionMultiSigThresholdExample {
 
         TransactionReceipt txScheduleReceipt = transferToSchedule.getReceipt(client);
         System.out.println("Schedule status: " + txScheduleReceipt.status);
-        ScheduleId scheduleId = txScheduleReceipt.scheduleId;
+        ScheduleId scheduleId = Objects.requireNonNull(txScheduleReceipt.scheduleId);
         System.out.println("Schedule ID: " + scheduleId);
-        TransactionId scheduledTxId = txScheduleReceipt.scheduledTransactionId;
+        TransactionId scheduledTxId = Objects.requireNonNull(txScheduleReceipt.scheduledTransactionId);
         System.out.println("Scheduled tx ID: " + scheduledTxId);
 
         // add 2 signature
