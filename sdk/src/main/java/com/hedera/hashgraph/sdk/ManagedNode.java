@@ -135,6 +135,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @return
      */
     N setMinBackoff(Duration minBackoff) {
+        if (currentBackoff == this.minBackoff) {
+            currentBackoff = minBackoff;
+        }
         this.minBackoff = minBackoff;
 
         // noinspection unchecked

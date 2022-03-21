@@ -55,6 +55,7 @@ public class ContractCreateIntegrationTest {
         assertEquals(info.contractMemo, "[e2e::ContractCreateTransaction]");
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
