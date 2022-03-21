@@ -13,6 +13,7 @@ import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java8.util.concurrent.CompletableFuture;
+import org.threeten.bp.Instant;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -45,7 +46,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Timestamp of when this node will be considered healthy again
      */
-    protected long backoffUntil;
+    protected Instant readmitTime;
 
     /**
      * The current backoff duration. Uses exponential backoff so think 1s, 2s, 4s, 8s, etc until maxBackoff is hit
@@ -76,6 +77,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.currentBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.minBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.maxBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
+        this.readmitTime = Instant.now();
     }
 
     protected ManagedNode(N node, ManagedNodeAddress address) {
@@ -84,7 +86,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.executor = node.executor;
         this.minBackoff = node.minBackoff;
         this.maxBackoff = node.maxBackoff;
-        this.backoffUntil = node.backoffUntil;
+        this.readmitTime = node.readmitTime;
         this.currentBackoff = node.currentBackoff;
         this.badGrpcStatusCount = node.badGrpcStatusCount;
         this.lastUsed = node.lastUsed;
@@ -173,7 +175,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     long unhealthyBackoffRemaining() {
-        return Math.max(0, backoffUntil - System.currentTimeMillis());
+        return Math.max(0, readmitTime.toEpochMilli() - System.currentTimeMillis());
     }
 
     /**
@@ -184,16 +186,17 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @return
      */
     boolean isHealthy() {
-        return backoffUntil < System.currentTimeMillis();
+        return readmitTime.toEpochMilli() < Instant.now().toEpochMilli();
     }
 
     /**
      * Used when a node has received a bad gRPC status
      */
-    synchronized void increaseDelay() {
+    synchronized void increaseBackoff() {
         this.badGrpcStatusCount++;
-        this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
-        this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, this.maxBackoff.toMillis()));
+        this.readmitTime = Instant.now().plus(this.currentBackoff);
+        this.currentBackoff = currentBackoff.multipliedBy(2);
+        this.currentBackoff = currentBackoff.compareTo(maxBackoff) < 0 ? currentBackoff : maxBackoff;
     }
 
     /**
@@ -202,8 +205,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * this is to allow a node which has been performing poorly (receiving several bad gRPC status) to become used again
      * once it stops receiving bad gRPC statuses.
      */
-    synchronized void decreaseDelay() {
-        this.currentBackoff = Duration.ofMillis(Math.max(this.currentBackoff.toMillis() / 2, minBackoff.toMillis()));
+    synchronized void decreaseBackoff() {
+        this.currentBackoff = currentBackoff.dividedBy(2);
+        this.currentBackoff = currentBackoff.compareTo(minBackoff) > 0 ? currentBackoff : minBackoff;
     }
 
     /**
@@ -212,7 +216,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @return
      */
     long getRemainingTimeForBackoff() {
-        return backoffUntil - System.currentTimeMillis();
+        return readmitTime.toEpochMilli() - System.currentTimeMillis();
     }
 
     /**

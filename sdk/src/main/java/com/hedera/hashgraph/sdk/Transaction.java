@@ -57,7 +57,7 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<com.hedera.hashgraph.sdk.proto.Transaction> outerTransactions = Collections.emptyList();
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> sigPairLists = Collections.emptyList();
-    protected List<TransactionId> transactionIds = Collections.emptyList();
+    protected LockableList<TransactionId> transactionIds = new LockableList<>();
     // publicKeys and signers are parallel arrays.
     // If the signer associated with a public key is null, that means that the private key
     // associated with that public key has already contributed a signature to sigPairListBuilders, but
@@ -75,12 +75,10 @@ public abstract class Transaction<T extends Transaction<T>>
     //      { ID: 2, NodeAccountID: 3 }, // group = 1
     //      { ID: 2, NodeAccountID: 4 }  // group = 1
     // ]
-    int nextTransactionIndex = 0;
     private Duration transactionValidDuration;
     @Nullable
     private Hbar maxTransactionFee = null;
     private String memo = "";
-    protected boolean transactionIdsLocked = false;
     protected Boolean regenerateTransactionId = null;
 
     Transaction() {
@@ -103,13 +101,11 @@ public abstract class Transaction<T extends Transaction<T>>
         var txCount = txs.keySet().size();
         var nodeCount = txs.values().iterator().next().size();
 
-        transactionIdsLocked = true;
-
-        nodeAccountIds = new ArrayList<>(nodeCount);
+        nodeAccountIds.ensureCapacity(nodeCount);
         sigPairLists = new ArrayList<>(nodeCount * txCount);
         outerTransactions = new ArrayList<>(nodeCount * txCount);
         innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
-        transactionIds = new ArrayList<>(txCount);
+        transactionIds.ensureCapacity(txCount);
 
         for (var transactionEntry : txs.entrySet()) {
             transactionIds.add(transactionEntry.getKey());
@@ -133,7 +129,8 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        nodeAccountIds.remove(new AccountId(0));
+        nodeAccountIds.remove(new AccountId(0)).setLocked(true);
+        transactionIds.setLocked(true);
 
         // Verify that transaction bodies match
         for (@Var int i = 0; i < txCount; i++) {
@@ -709,9 +706,10 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
-        var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
+        var index = transactionIds.getIndex() * nodeAccountIds.size() + nodeAccountIds.getIndex();
 
         buildTransaction(index);
 
@@ -736,7 +734,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     final TransactionId getTransactionIdInternal() {
-        return transactionIds.get(nextTransactionIndex);
+        return transactionIds.getCurrent();
     }
 
     public final TransactionId getTransactionId() {
@@ -744,9 +742,7 @@ public abstract class Transaction<T extends Transaction<T>>
             throw new IllegalStateException("transaction must have been frozen before getting the transaction ID, try calling `freeze`");
         }
 
-        transactionIdsLocked = true;
-
-        return transactionIds.get(nextTransactionIndex);
+        return transactionIds.setLocked(true).getCurrent();
     }
 
     /**
@@ -765,7 +761,7 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setTransactionId(TransactionId transactionId) {
         requireNotFrozen();
-        transactionIds = Collections.singletonList(transactionId);
+        transactionIds.setList(Collections.singletonList(transactionId)).setLocked(true);
 
         // noinspection unchecked
         return (T) this;
@@ -836,7 +832,8 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
         for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
@@ -943,7 +940,7 @@ public abstract class Transaction<T extends Transaction<T>>
                 if (operator != null) {
                     // Set a default transaction ID, generated from the operator account ID
 
-                    transactionIds = Collections.singletonList(TransactionId.generate(operator.accountId));
+                    transactionIds.setList(Collections.singletonList(TransactionId.generate(operator.accountId)));
                 } else {
                     // no client means there must be an explicitly set node ID and transaction ID
                     throw new IllegalStateException(
@@ -961,7 +958,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
 
             try {
-                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+                nodeAccountIds.setList(client.network.getNodeAccountIdsForExecute());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -986,13 +983,17 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     void generateTransactionIds(TransactionId initialTransactionId, int count) {
+        var locked = transactionIds.isLocked();
+        transactionIds.setLocked(false);
+
         if (count == 1) {
-            transactionIds = Collections.singletonList(initialTransactionId);
+            transactionIds.setList(Collections.singletonList(initialTransactionId));
             return;
         }
 
         var nextTransactionId = initialTransactionId.toProtobuf().toBuilder();
-        transactionIds = new ArrayList<TransactionId>(count);
+        transactionIds.ensureCapacity(count);
+        transactionIds.clear();
         for (int i = 0; i < count; i++) {
             transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
 
@@ -1002,6 +1003,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
             nextTransactionId.setTransactionValidStart(nextValidStart);
         }
+
+        transactionIds.setLocked(locked);
     }
 
     void wipeTransactionLists(int requiredChunks) {
@@ -1024,7 +1027,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     void buildAllTransactions() {
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
@@ -1103,7 +1107,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
-        var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
+        var index = nodeAccountIds.getIndex() + (transactionIds.getIndex() * nodeAccountIds.size());
 
         buildTransaction(index);
 
@@ -1118,7 +1122,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ) {
         var transactionId = Objects.requireNonNull(getTransactionIdInternal());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
-        nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
+        transactionIds.advance();
         return new TransactionResponse(nodeId, transactionId, hash, null);
     }
 
@@ -1163,7 +1167,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIdsLocked) {
+                if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
