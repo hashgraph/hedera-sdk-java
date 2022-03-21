@@ -18,7 +18,6 @@ import java.util.concurrent.TimeoutException;
 
 public class SignTransactionExample {
 
-
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
@@ -56,7 +55,7 @@ public class SignTransactionExample {
 
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(receipt.accountId, Hbar.from(-1))
+            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
             .addHbarTransfer(new AccountId(3), new Hbar(1))
             .freezeWith(client);
 
