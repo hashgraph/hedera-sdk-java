@@ -64,7 +64,7 @@ public final class MultiSigOfflineExample {
         // create a transfer from new account to 0.0.3
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(receipt.accountId, Hbar.from(-1))
+            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
             .addHbarTransfer(new AccountId(3), new Hbar(1))
             .freezeWith(client);
 
@@ -84,6 +84,5 @@ public final class MultiSigOfflineExample {
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
         System.out.println(receipt.status);
-
     }
 }
