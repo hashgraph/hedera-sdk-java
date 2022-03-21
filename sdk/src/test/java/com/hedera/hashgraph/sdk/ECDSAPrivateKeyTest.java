@@ -10,11 +10,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.IOException;
 import java.io.StringReader;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ECDSAPrivateKeyTest {
     @Test
@@ -100,6 +96,22 @@ public class ECDSAPrivateKeyTest {
 
         assertEquals(key1String, key2String);
         assertEquals(key1String, key3String);
+    }
+
+    @Test
+    @DisplayName("private key is is ECDSA")
+    void keyIsECDSA() {
+        PrivateKey key = PrivateKey.generateECDSA();
+
+        assertTrue(key.isECDSA());
+    }
+
+    @Test
+    @DisplayName("private key is is not Ed25519")
+    void keyIsNotEd25519() {
+        PrivateKey key = PrivateKey.generateECDSA();
+
+        assertFalse(key.isED25519());
     }
 
     // TODO: get fromPem working, and test it
