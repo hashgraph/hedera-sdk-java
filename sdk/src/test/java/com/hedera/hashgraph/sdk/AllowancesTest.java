@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +41,18 @@ public class AllowancesTest {
             TokenId.fromString("1.1.1"),
             AccountId.fromString("2.2.2"),
             AccountId.fromString("3.3.3"),
-            serials
+            serials,
+            null
+        );
+    }
+
+    TokenNftAllowance spawnAllNftAllowance() {
+        return new TokenNftAllowance(
+            TokenId.fromString("1.1.1"),
+            AccountId.fromString("2.2.2"),
+            AccountId.fromString("3.3.3"),
+            Collections.emptyList(),
+            true
         );
     }
 
@@ -50,7 +62,12 @@ public class AllowancesTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(spawnHbarAllowance(), spawnTokenAllowance(), spawnNftAllowance()).toMatchSnapshot();
+        SnapshotMatcher.expect(
+            spawnHbarAllowance().toString(),
+            spawnTokenAllowance().toString(),
+            spawnNftAllowance().toString(),
+            spawnAllNftAllowance().toString()
+        ).toMatchSnapshot();
     }
 
     @Test
@@ -58,11 +75,14 @@ public class AllowancesTest {
         var hbar1 = spawnHbarAllowance();
         var token1 = spawnTokenAllowance();
         var nft1 = spawnNftAllowance();
+        var allNft1 = spawnAllNftAllowance();
         var hbar2 = HbarAllowance.fromBytes(hbar1.toBytes());
         var token2 = TokenAllowance.fromBytes(token1.toBytes());
         var nft2 = TokenNftAllowance.fromBytes(nft1.toBytes());
+        var allNft2 = TokenNftAllowance.fromBytes(allNft1.toBytes());
         assertEquals(hbar1.toString(), hbar2.toString());
         assertEquals(token1.toString(), token2.toString());
         assertEquals(nft1.toString(), nft2.toString());
+        assertEquals(allNft1.toString(), allNft2.toString());
     }
 }

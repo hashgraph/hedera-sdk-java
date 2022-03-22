@@ -98,6 +98,12 @@ public final class TransactionRecord {
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    public final List<HbarAllowance> hbarAllowanceAdjustments;
+
+    public final List<TokenAllowance> tokenAllowanceAdjustments;
+
+    public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -116,7 +122,10 @@ public final class TransactionRecord {
         @Nullable PublicKey aliasKey,
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp
+        @Nullable Instant parentConsensusTimestamp,
+        List<HbarAllowance> hbarAllowanceAdjustments,
+        List<TokenAllowance> tokenAllowanceAdjustments,
+        List<TokenNftAllowance> tokenNftAllowanceAdjustments
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -136,6 +145,9 @@ public final class TransactionRecord {
         this.children = children;
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
+        this.hbarAllowanceAdjustments = hbarAllowanceAdjustments;
+        this.tokenAllowanceAdjustments = tokenAllowanceAdjustments;
+        this.tokenNftAllowanceAdjustments = tokenNftAllowanceAdjustments;
     }
 
     static TransactionRecord fromProtobuf(
@@ -185,6 +197,21 @@ public final class TransactionRecord {
 
         var aliasKey = PublicKey.fromAliasBytes(transactionRecord.getAlias());
 
+        var hbarAllowanceAdjustments = new ArrayList<HbarAllowance>(transactionRecord.getCryptoAdjustmentsCount());
+        for (var hbarAdjustmentProto : transactionRecord.getCryptoAdjustmentsList()) {
+            hbarAllowanceAdjustments.add(HbarAllowance.fromProtobuf(hbarAdjustmentProto));
+        }
+
+        var tokenAllowanceAdjustments = new ArrayList<TokenAllowance>(transactionRecord.getTokenAdjustmentsCount());
+        for (var tokenAdjustmentProto : transactionRecord.getTokenAdjustmentsList()) {
+            tokenAllowanceAdjustments.add(TokenAllowance.fromProtobuf(tokenAdjustmentProto));
+        }
+
+        var tokenNftAllowanceAdjustments = new ArrayList<TokenNftAllowance>(transactionRecord.getNftAdjustmentsCount());
+        for (var nftAdjustmentProto : transactionRecord.getNftAdjustmentsList()) {
+            tokenNftAllowanceAdjustments.add(TokenNftAllowance.fromProtobuf(nftAdjustmentProto));
+        }
+
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -204,7 +231,10 @@ public final class TransactionRecord {
             children,
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
+            hbarAllowanceAdjustments,
+            tokenAllowanceAdjustments,
+            tokenNftAllowanceAdjustments
         );
     }
 
@@ -304,6 +334,9 @@ public final class TransactionRecord {
             .add("children", children)
             .add("duplicates", duplicates)
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
+            .add("hbarAllowanceAdjustments", hbarAllowanceAdjustments)
+            .add("tokenAllowanceAdjustments", tokenAllowanceAdjustments)
+            .add("tokenNftAllowanceAdjustments", tokenNftAllowanceAdjustments)
             .toString();
     }
 

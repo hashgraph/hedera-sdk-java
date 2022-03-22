@@ -18,8 +18,8 @@ public class TokenTransfer {
 
     boolean isApproved;
 
-    TokenTransfer(TokenId tokenId, AccountId accountId, long amount) {
-        this(tokenId, accountId, amount, null, false);
+    TokenTransfer(TokenId tokenId, AccountId accountId, long amount, boolean isApproved) {
+        this(tokenId, accountId, amount, null, isApproved);
     }
 
     TokenTransfer(TokenId tokenId, AccountId accountId, long amount, @Nullable Integer expectedDecimals, boolean isApproved) {
