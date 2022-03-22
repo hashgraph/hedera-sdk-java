@@ -183,17 +183,17 @@ public final class AccountInfo {
 
         List<HbarAllowance> hbarAllowances = new ArrayList<>(accountInfo.getGrantedCryptoAllowancesCount());
         for (var allowanceProto : accountInfo.getGrantedCryptoAllowancesList()) {
-            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
+            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
         }
 
         List<TokenAllowance> tokenAllowances = new ArrayList<>(accountInfo.getGrantedTokenAllowancesCount());
         for (var allowanceProto : accountInfo.getGrantedTokenAllowancesList()) {
-            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto));
+            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
         }
 
         List<TokenNftAllowance> nftAllowances = new ArrayList<>(accountInfo.getGrantedNftAllowancesCount());
         for (var allowanceProto : accountInfo.getGrantedNftAllowancesList()) {
-            nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
+            nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
         }
 
         @Nullable
