@@ -116,9 +116,7 @@ public class ContractCallIntegrationTest {
         testEnv.close();
     }
 
-    // `ContractCallQuery` throws `INSUFFICIENT_TX_FEE` instead of `INSUFFICIENT_GAS` now?
     @Test
-    @Disabled()
     @DisplayName("Cannot call contract function when gas is not set")
     void cannotCallContractFunctionWhenGasIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);

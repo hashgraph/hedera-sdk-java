@@ -41,6 +41,7 @@ class AccountBalanceIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("can connect to testnet with TLS")
     void canConnectToTestnetWithTLS() throws Exception {
         var client = Client.forTestnet()
