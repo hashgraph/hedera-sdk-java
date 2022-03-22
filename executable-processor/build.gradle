@@ -3,7 +3,7 @@ dependencies {
 
 	implementation 'com.squareup:javapoet:1.13.0'
 
-	implementation "org.threeten:threetenbp:1.5.2"
+	implementation "org.threeten:threetenbp:1.6.0"
 
 	implementation "net.sourceforge.streamsupport:streamsupport:1.7.4"
 	implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
