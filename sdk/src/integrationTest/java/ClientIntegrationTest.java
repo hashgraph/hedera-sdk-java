@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ClientIntegrationTest {
     @Test
-    @Disabled
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() throws Exception {
         @Var Map<String, AccountId> network = new HashMap<>();

@@ -35,6 +35,8 @@ public class TopicMessageIntegrationTest {
         assertEquals(0, info.sequenceNumber);
         assertEquals(testEnv.operatorKey, info.adminKey);
 
+        Thread.sleep(3000);
+
         var receivedMessage = new boolean[]{false};
         var start = Instant.now();
 
@@ -44,6 +46,8 @@ public class TopicMessageIntegrationTest {
             .subscribe(testEnv.client, (message) -> {
                 receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals("Hello, from HCS!");
             });
+
+        Thread.sleep(3000);
 
         new TopicMessageSubmitTransaction()
             .setTopicId(topicId)
