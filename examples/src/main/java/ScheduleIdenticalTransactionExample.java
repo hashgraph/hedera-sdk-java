@@ -1,5 +1,6 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -10,11 +11,11 @@ import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.ScheduleCreateTransaction;
 import com.hedera.hashgraph.sdk.ScheduleId;
+import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
 import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionRecord;
-import com.hedera.hashgraph.sdk.TransactionRecordQuery;
+import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -46,6 +47,7 @@ public class ScheduleIdenticalTransactionExample {
         System.out.println("threshold key example");
         System.out.println("Keys:");
 
+        PrivateKey[] privKeys = new PrivateKey[3];
         PublicKey[] pubKeys = new PublicKey[3];
         Client[] clients = new Client[3];
         AccountId[] accounts = new AccountId[3];
@@ -56,10 +58,11 @@ public class ScheduleIdenticalTransactionExample {
         // Loop to generate keys, clients, and accounts
         for (int i = 0; i < 3 ; i++) {
             PrivateKey newKey = PrivateKey.generateED25519();
+            privKeys[i] = newKey;
             pubKeys[i] = newKey.getPublicKey();
 
             System.out.println("Key #" + i + ":");
-            System.out.println("private = " + newKey);
+            System.out.println("private = " + privKeys[i]);
             System.out.println("public = " + pubKeys[i]);
 
             TransactionResponse createResponse = new AccountCreateTransaction()
@@ -71,7 +74,7 @@ public class ScheduleIdenticalTransactionExample {
             TransactionReceipt transactionReceipt = createResponse.getReceipt(client);
 
             Client newClient = Client.forName(HEDERA_NETWORK);
-            newClient.setOperator(transactionReceipt.accountId, newKey);
+            newClient.setOperator(Objects.requireNonNull(transactionReceipt.accountId), newKey);
             clients[i] = newClient;
             accounts[i] = transactionReceipt.accountId;
 
@@ -107,51 +110,70 @@ public class ScheduleIdenticalTransactionExample {
             for (AccountId account : accounts) {
                 tx.addHbarTransfer(account, new Hbar(1));
             }
-            tx.addHbarTransfer(thresholdAccount, new Hbar(3).negated());
-            tx.freezeWith(loopClient);
-            TransferTransaction signedTransaction = tx.signWithOperator(loopClient);
+            tx.addHbarTransfer(Objects.requireNonNull(thresholdAccount), new Hbar(3).negated());
 
-            @Var
             ScheduleCreateTransaction scheduledTx = new ScheduleCreateTransaction()
-                .setScheduledTransaction(signedTransaction);
+                .setScheduledTransaction(tx);
 
-            scheduledTx = scheduledTx.setPayerAccountId(thresholdAccount);
+            scheduledTx.setPayerAccountId(thresholdAccount);
 
             TransactionResponse response = scheduledTx.execute(loopClient);
 
-            TransactionRecord loopReceipt = new TransactionRecordQuery()
+            TransactionReceipt loopReceipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(loopClient);
 
-            System.out.println("operator [" + operatorId + "]: scheduleID = " + receipt.scheduleId);
+            System.out.println("operator [" + operatorId + "]: scheduleID = " + loopReceipt.scheduleId);
 
             // Save the schedule ID, so that it can be asserted for each loopClient submission
             if (scheduleID == null) {
-                scheduleID = loopReceipt.receipt.scheduleId;
+                scheduleID = loopReceipt.scheduleId;
             }
 
-            if (!Objects.equals(scheduleID, loopReceipt.receipt.scheduleId)) {
-                System.out.println("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.receipt.scheduleId);
+            if (!scheduleID.equals(Objects.requireNonNull(loopReceipt.scheduleId))) {
+                System.out.println("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.scheduleId);
                 return;
             }
 
             // If the status return by the receipt is related to already created, execute a schedule sign transaction
-            if (receipt.status == Status.IDENTICAL_SCHEDULE_ALREADY_CREATED) {
+            if (loopReceipt.status == Status.IDENTICAL_SCHEDULE_ALREADY_CREATED) {
                 TransactionResponse signTransaction = new ScheduleSignTransaction()
                     .setScheduleId(scheduleID)
                     .setNodeAccountIds(Collections.singletonList(createResponse.nodeId))
-                    .setScheduleId(loopReceipt.receipt.scheduleId)
+                    .setScheduleId(loopReceipt.scheduleId)
                     .execute(loopClient);
 
-                signTransaction.getReceipt(loopClient);
-//                if err != nil {
-//                    if err.Error() != "exceptional receipt status: SCHEDULE_ALREADY_EXECUTED" {
-//                        println(err.Error(), ": error while getting scheduled sign with operator ", operatorId);
-//                        return;
-//                    }
+                TransactionReceipt signReceipt = new TransactionReceiptQuery()
+                    .setTransactionId(signTransaction.transactionId)
+                    .execute(client);
+                if (signReceipt.status != Status.SUCCESS && signReceipt.status != Status.SCHEDULE_ALREADY_EXECUTED) {
+                    System.out.println("Bad status while getting receipt of schedule sign with operator " + operatorId + ": " + signReceipt.status);
+                    return;
                 }
             }
         }
 
+        System.out.println(new ScheduleInfoQuery().setScheduleId(scheduleID).execute(client));
+
+        AccountDeleteTransaction thresholdDeleteTx = new AccountDeleteTransaction()
+            .setAccountId(thresholdAccount)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client);
+
+        for (int i = 0; i < 3; i++) {
+            thresholdDeleteTx.sign(privKeys[i]);
+            new AccountDeleteTransaction()
+                .setAccountId(accounts[i])
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(privKeys[i])
+                .execute(client)
+                .getReceipt(client);
+        }
+
+        thresholdDeleteTx
+            .execute(client)
+            .getReceipt(client);
+    }
 }
