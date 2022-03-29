@@ -14,10 +14,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * Support for using any node from the entire network upon execution
    if node account IDs have no been locked for the request.
  * Support for `ContractFunctionParameters` integers with different bit widths.
+ * `CreateTopicExample`
+ * `GetAccountInfoExample`
+ * `MultiSigOfflineExample`
+ * `ScheduledTransactionMultiSigThresholdExample`
+ * `ScheduleIdenticalTransactionExample`
+ * `SignTransactionExample`
 
 ### Fixed
 
  * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
+ * `ConstructClientExample`
+ * `CreateSimpleContractExample`
+ * `CreateStatefulContractExample`
+ * `DeleteAccountExample`
 
 ## v2.10.1
 

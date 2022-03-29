@@ -1,7 +1,6 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
@@ -64,12 +63,5 @@ public final class DeleteAccountExample {
             .sign(newKey)
             .execute(client)
             .getReceipt(client);
-
-        new AccountInfoQuery()
-            .setAccountId(newAccountId)
-            .setQueryPayment(new Hbar(1))
-            .execute(client);
-
-        // note the above accountInfo will fail with ACCOUNT_DELETED due to a known issue on Hedera
     }
 }
