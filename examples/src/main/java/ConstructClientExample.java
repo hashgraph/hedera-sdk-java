@@ -92,5 +92,7 @@ public class ConstructClientExample {
         mainClient.close();
         namedNetworkClient.close();
         customClient.close();
+
+        System.out.println("Success!");
     }
 }
