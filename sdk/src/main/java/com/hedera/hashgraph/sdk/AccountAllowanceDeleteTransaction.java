@@ -55,17 +55,17 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         }
     }
 
-    public AccountAllowanceDeleteTransaction revokeHbarAllowance(AccountId ownerAccountId) {
+    public AccountAllowanceDeleteTransaction deleteAllHbarAllowances(AccountId ownerAccountId) {
         requireNotFrozen();
         hbarAllowances.add(new HbarAllowance(Objects.requireNonNull(ownerAccountId), null, null));
         return this;
     }
 
-    public List<HbarAllowance> getHbarAllowances() {
+    public List<HbarAllowance> getHbarAllowanceDeletions() {
         return new ArrayList<>(hbarAllowances);
     }
 
-    public AccountAllowanceDeleteTransaction revokeTokenAllowance(TokenId tokenId, AccountId ownerAccountId) {
+    public AccountAllowanceDeleteTransaction deleteAllTokenAllowances(TokenId tokenId, AccountId ownerAccountId) {
         requireNotFrozen();
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
@@ -76,18 +76,18 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         return this;
     }
 
-    public List<TokenAllowance> getTokenAllowances() {
+    public List<TokenAllowance> getTokenAllowanceDeletions() {
         return new ArrayList<>(tokenAllowances);
     }
 
-    public AccountAllowanceDeleteTransaction revokeTokenNftAllowance(NftId nftId, AccountId ownerAccountId) {
+    public AccountAllowanceDeleteTransaction deleteAllTokenNftAllowances(NftId nftId, AccountId ownerAccountId) {
         requireNotFrozen();
         Objects.requireNonNull(nftId);
         getNftSerials(Objects.requireNonNull(ownerAccountId), nftId.tokenId).add(nftId.serial);
         return this;
     }
 
-    public List<TokenNftAllowance> getTokenNftAllowances() {
+    public List<TokenNftAllowance> getTokenNftAllowanceDeletions() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {
             retval.add(TokenNftAllowance.copyFrom(allowance));
