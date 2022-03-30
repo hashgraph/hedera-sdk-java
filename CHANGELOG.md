@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AccountAllowanceDeleteTransaction`
  * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
 
+### Deprecated
+
+ * `AccountAllowanceAdjustTransaction.revokeTokenNftAllowance()` with no replacement.
+
 ## v2.11.0-beta.1
 
 ### Added

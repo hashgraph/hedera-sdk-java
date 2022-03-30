@@ -1346,7 +1346,23 @@ public enum Status {
     /**
      * If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
      */
-    REPEATED_ALLOWANCES_TO_DELETE(ResponseCodeEnum.REPEATED_ALLOWANCES_TO_DELETE);
+    REPEATED_ALLOWANCES_TO_DELETE(ResponseCodeEnum.REPEATED_ALLOWANCES_TO_DELETE),
+
+    /**
+     * If the account Id specified as the delegating spender is invalid or does not exist.
+     */
+    INVALID_DELEGATING_SPENDER(ResponseCodeEnum.INVALID_DELEGATING_SPENDER),
+
+    /**
+     * The delegating Spender cannot grant approveForAll allowance on a NFT token type for another spender.
+     */
+    DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL),
+
+    /**
+     * The delegating Spender cannot grant allowance on a NFT serial for another spender as it doesnt not have approveForAll
+     * granted on token-owner.
+     */
+    DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL);
 
     final ResponseCodeEnum code;
 
@@ -1878,6 +1894,12 @@ public enum Status {
                 return INVALID_ALLOWANCE_SPENDER_ID;
             case REPEATED_ALLOWANCES_TO_DELETE:
                 return REPEATED_ALLOWANCES_TO_DELETE;
+            case INVALID_DELEGATING_SPENDER:
+                return INVALID_DELEGATING_SPENDER;
+            case DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL:
+                return DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL;
+            case DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL:
+                return DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

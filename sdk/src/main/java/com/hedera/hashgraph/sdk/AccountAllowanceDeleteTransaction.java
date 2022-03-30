@@ -130,7 +130,7 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     @Override
     MethodDescriptor<Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getDeleteAllowanceMethod();
+        return CryptoServiceGrpc.getDeleteAllowancesMethod();
     }
 
     CryptoDeleteAllowanceTransactionBody.Builder build() {
@@ -142,7 +142,7 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
             builder.addTokenAllowances(allowance.toWipeProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.toWipeProtobuf());
+            builder.addNftAllowances(allowance.toRemoveProtobuf());
         }
         return builder;
     }

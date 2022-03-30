@@ -1215,4 +1215,20 @@ enum ResponseCodeEnum {
    * If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
    */
   REPEATED_ALLOWANCES_TO_DELETE = 302;
+
+  /**
+   * If the account Id specified as the delegating spender is invalid or does not exist.
+   */
+  INVALID_DELEGATING_SPENDER = 303;
+
+  /**
+   * The delegating Spender cannot grant approveForAll allowance on a NFT token type for another spender.
+   */
+  DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL = 304;
+
+  /**
+   * The delegating Spender cannot grant allowance on a NFT serial for another spender as it doesnt not have approveForAll
+   * granted on token-owner.
+   */
+  DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL = 305;
 }

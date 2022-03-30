@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoAllowance;
-import com.hedera.hashgraph.sdk.proto.CryptoWipeAllowance;
+import com.hedera.hashgraph.sdk.proto.CryptoRemoveAllowance;
 import com.hedera.hashgraph.sdk.proto.GrantedCryptoAllowance;
 
 import javax.annotation.Nullable;
@@ -39,7 +39,7 @@ public class HbarAllowance {
         );
     }
 
-    static HbarAllowance fromProtobuf(CryptoWipeAllowance allowanceProto) {
+    static HbarAllowance fromProtobuf(CryptoRemoveAllowance allowanceProto) {
         return new HbarAllowance(
             allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
             null,
@@ -85,8 +85,8 @@ public class HbarAllowance {
         return builder.build();
     }
 
-    CryptoWipeAllowance toWipeProtobuf() {
-        var builder = CryptoWipeAllowance.newBuilder();
+    CryptoRemoveAllowance toWipeProtobuf() {
+        var builder = CryptoRemoveAllowance.newBuilder();
         if (ownerAccountId != null) {
             builder.setOwner(ownerAccountId.toProtobuf());
         }

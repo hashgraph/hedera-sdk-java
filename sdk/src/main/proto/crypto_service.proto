@@ -58,14 +58,14 @@ service CryptoService {
     rpc approveAllowances (Transaction) returns (TransactionResponse);
 
     /**
-     * Adjusts the approved allowance for a spender to transfer the paying account's hbar or tokens.
+     * Adjusts the approved allowances for a spender to transfer the paying account's hbar or tokens.
      */
-    rpc adjustAllowance (Transaction) returns (TransactionResponse);
+    rpc adjustAllowances (Transaction) returns (TransactionResponse);
 
     /**
-     * Deletes the approved hbar or token allowance on an owner account.
+     * Deletes the approved hbar or token allowances on an owner account.
      */
-    rpc deleteAllowance (Transaction) returns (TransactionResponse);
+    rpc deleteAllowances (Transaction) returns (TransactionResponse);
 
     /**
      * (NOT CURRENTLY SUPPORTED) Adds a livehash

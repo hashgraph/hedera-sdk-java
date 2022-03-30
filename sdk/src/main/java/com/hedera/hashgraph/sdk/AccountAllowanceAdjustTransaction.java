@@ -261,6 +261,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustNftAllowanceAllSerials(tokenId, true, ownerAccountId, spenderAccountId);
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowance(
         NftId nftId,
         AccountId ownerAccountId,
@@ -290,7 +294,7 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getAdjustAllowanceMethod();
+        return CryptoServiceGrpc.getAdjustAllowancesMethod();
     }
 
     CryptoAdjustAllowanceTransactionBody.Builder build() {

@@ -5,11 +5,12 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
-import com.hedera.hashgraph.sdk.proto.NftWipeAllowance;
+import com.hedera.hashgraph.sdk.proto.NftRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -63,12 +64,12 @@ public class TokenNftAllowance {
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            allowanceProto.getSerialNumbersList(),
-            allowanceProto.getApprovedForAll()
+            Collections.emptyList(),
+            null
         );
     }
 
-    static TokenNftAllowance fromProtobuf(NftWipeAllowance allowanceProto) {
+    static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
         return new TokenNftAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
@@ -125,15 +126,11 @@ public class TokenNftAllowance {
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
-        builder.addAllSerialNumbers(serialNumbers);
-        if (allSerials != null) {
-            builder.setApprovedForAll(allSerials);
-        }
         return builder.build();
     }
 
-    NftWipeAllowance toWipeProtobuf() {
-        var builder = NftWipeAllowance.newBuilder();
+    NftRemoveAllowance toRemoveProtobuf() {
+        var builder = NftRemoveAllowance.newBuilder();
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }

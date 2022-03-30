@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedTokenAllowance;
-import com.hedera.hashgraph.sdk.proto.TokenWipeAllowance;
+import com.hedera.hashgraph.sdk.proto.TokenRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -47,7 +47,7 @@ public class TokenAllowance {
         );
     }
 
-    static TokenAllowance fromProtobuf(TokenWipeAllowance allowanceProto) {
+    static TokenAllowance fromProtobuf(TokenRemoveAllowance allowanceProto) {
         return new TokenAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
@@ -103,8 +103,8 @@ public class TokenAllowance {
         return builder.build();
     }
 
-    TokenWipeAllowance toWipeProtobuf() {
-        var builder = TokenWipeAllowance.newBuilder();
+    TokenRemoveAllowance toWipeProtobuf() {
+        var builder = TokenRemoveAllowance.newBuilder();
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }

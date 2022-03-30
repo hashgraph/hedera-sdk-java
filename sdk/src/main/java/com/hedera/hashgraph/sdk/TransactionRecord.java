@@ -12,6 +12,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,11 +208,6 @@ public final class TransactionRecord {
             tokenAllowanceAdjustments.add(TokenAllowance.fromProtobuf(tokenAdjustmentProto));
         }
 
-        var tokenNftAllowanceAdjustments = new ArrayList<TokenNftAllowance>(transactionRecord.getNftAdjustmentsCount());
-        for (var nftAdjustmentProto : transactionRecord.getNftAdjustmentsList()) {
-            tokenNftAllowanceAdjustments.add(TokenNftAllowance.fromProtobuf(nftAdjustmentProto));
-        }
-
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -234,7 +230,7 @@ public final class TransactionRecord {
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
             hbarAllowanceAdjustments,
             tokenAllowanceAdjustments,
-            tokenNftAllowanceAdjustments
+            Collections.emptyList()
         );
     }
 
