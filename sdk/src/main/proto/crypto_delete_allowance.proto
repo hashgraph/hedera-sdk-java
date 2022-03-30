@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+package proto;
+
+/*-
+ * ‌
+ * Hedera Network Services Protobuf
+ * ​
+ * Copyright (C) 2018 - 2022 Hedera Hashgraph, LLC
+ * ​
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ‍
+ */
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_multiple_files = true;
+
+import "basic_types.proto";
+
+/**
+ * Deletes one or more hbar/token approved allowances from an owner's account. This operation
+ * will remove the allowances granted to <b>all</b> spenders of an owner's hbar, a specific
+ * fungible token and/or a specific non-fungible token serial number. Each owner account
+ * listed as wiping an allowance must sign the transaction.
+ */
+message CryptoDeleteAllowanceTransactionBody {
+    /**
+     * List of hbar allowances to remove.
+     */
+    repeated CryptoWipeAllowance cryptoAllowances = 1;
+
+    /**
+     * List of non-fungible token allowances to remove.
+     */
+    repeated NftWipeAllowance nftAllowances = 2;
+
+    /**
+     * List of fungible token allowances to remove.
+     */
+    repeated TokenWipeAllowance tokenAllowances = 3;
+}
+
+/**
+ * Hbar allowances to be removed on an owner account
+ */
+message CryptoWipeAllowance {
+    /**
+     * The account ID of the hbar owner (ie. the grantor of the allowance).
+     */
+    AccountID owner = 1;
+}
+
+/**
+ * Nft allowances to be removed on an owner account
+ */
+message NftWipeAllowance {
+    /**
+     * The token that the allowance pertains to.
+     */
+    TokenID token_id = 1;
+
+    /**
+     * The account ID of the token owner (ie. the grantor of the allowance).
+     */
+    AccountID owner = 2;
+
+    /**
+     * The list of serial numbers to remove allowances from.
+     */
+    repeated int64 serial_numbers = 3;
+}
+
+/**
+ * Token allowances to be removed on an owner account
+ */
+message TokenWipeAllowance {
+    /**
+     * The token that the allowance pertains to.
+     */
+    TokenID token_id = 1;
+
+    /**
+     * The account ID of the token owner (ie. the grantor of the allowance).
+     */
+    AccountID owner = 2;
+}

@@ -5,6 +5,7 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
+import com.hedera.hashgraph.sdk.proto.NftWipeAllowance;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -67,6 +68,16 @@ public class TokenNftAllowance {
         );
     }
 
+    static TokenNftAllowance fromProtobuf(NftWipeAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+            null,
+            allowanceProto.getSerialNumbersList(),
+            null
+        );
+    }
+
     public static TokenNftAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
@@ -74,6 +85,18 @@ public class TokenNftAllowance {
     TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
         return ownerAccountId != null ?
             this : new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers, allSerials);
+    }
+
+    void validateChecksums(Client client) throws BadEntityIdException {
+        if (tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+        if (ownerAccountId != null) {
+            ownerAccountId.validateChecksum(client);
+        }
+        if (spenderAccountId != null) {
+            spenderAccountId.validateChecksum(client);
+        }
     }
 
     NftAllowance toProtobuf() {
@@ -106,6 +129,18 @@ public class TokenNftAllowance {
         if (allSerials != null) {
             builder.setApprovedForAll(allSerials);
         }
+        return builder.build();
+    }
+
+    NftWipeAllowance toWipeProtobuf() {
+        var builder = NftWipeAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
+        }
+        if (ownerAccountId != null) {
+            builder.setOwner(ownerAccountId.toProtobuf());
+        }
+        builder.addAllSerialNumbers(serialNumbers);
         return builder.build();
     }
 

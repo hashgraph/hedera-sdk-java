@@ -1341,7 +1341,12 @@ public enum Status {
     /**
      * The account id specified as the spender is invalid or does not exist.
      */
-    INVALID_ALLOWANCE_SPENDER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_SPENDER_ID);
+    INVALID_ALLOWANCE_SPENDER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_SPENDER_ID),
+
+    /**
+     * If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
+     */
+    REPEATED_ALLOWANCES_TO_DELETE(ResponseCodeEnum.REPEATED_ALLOWANCES_TO_DELETE);
 
     final ResponseCodeEnum code;
 
@@ -1871,6 +1876,8 @@ public enum Status {
                 return INVALID_ALLOWANCE_OWNER_ID;
             case INVALID_ALLOWANCE_SPENDER_ID:
                 return INVALID_ALLOWANCE_SPENDER_ID;
+            case REPEATED_ALLOWANCES_TO_DELETE:
+                return REPEATED_ALLOWANCES_TO_DELETE;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

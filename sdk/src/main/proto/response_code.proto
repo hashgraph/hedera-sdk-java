@@ -1210,4 +1210,9 @@ enum ResponseCodeEnum {
    * The account id specified as the spender is invalid or does not exist.
    */
   INVALID_ALLOWANCE_SPENDER_ID = 301;
+
+  /**
+   * If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
+   */
+  REPEATED_ALLOWANCES_TO_DELETE = 302;
 }

@@ -1109,14 +1109,19 @@ enum HederaFunctionality {
     TokenUnpause = 80;
 
     /**
-     * Approve allowance for a spender relative to the payer account
+     * Approve allowance for a spender relative to the owner account
      */
     CryptoApproveAllowance = 81;
 
     /**
-     * Adjust allowances for a spender relative to the payer account
+     * Adjust allowances for a spender relative to the owner account
      */
     CryptoAdjustAllowance = 82;
+
+    /**
+     * Deletes granted allowances on owner account
+     */
+    CryptoDeleteAllowance = 83;
 }
 
 /**

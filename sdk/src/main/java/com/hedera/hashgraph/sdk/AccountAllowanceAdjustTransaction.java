@@ -325,25 +325,13 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         for (var allowance : hbarAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : tokenAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : nftAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
     }
 }

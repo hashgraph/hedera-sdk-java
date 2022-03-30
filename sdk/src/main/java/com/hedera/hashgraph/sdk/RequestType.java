@@ -337,14 +337,19 @@ public enum RequestType {
     TOKEN_UNPAUSE(HederaFunctionality.TokenUnpause),
 
     /**
-     * Approve allowance for a spender relative to the payer account
+     * Approve allowance for a spender relative to the owner account
      */
     CRYPTO_APPROVE_ALLOWANCE(HederaFunctionality.CryptoApproveAllowance),
 
     /**
-     * Adjust allowances for a spender relative to the payer account
+     * Adjust allowances for a spender relative to the owner account
      */
-    CRYPTO_ADJUST_ALLOWANCE(HederaFunctionality.CryptoAdjustAllowance);
+    CRYPTO_ADJUST_ALLOWANCE(HederaFunctionality.CryptoAdjustAllowance),
+
+    /**
+     * Deletes granted allowances on owner account
+     */
+    CRYPTO_DELETE_ALLOWANCE(HederaFunctionality.CryptoDeleteAllowance);
 
     final HederaFunctionality code;
 
@@ -492,6 +497,8 @@ public enum RequestType {
                 return CRYPTO_APPROVE_ALLOWANCE;
             case CryptoAdjustAllowance:
                 return CRYPTO_ADJUST_ALLOWANCE;
+            case CryptoDeleteAllowance:
+                return CRYPTO_DELETE_ALLOWANCE;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -638,6 +645,8 @@ public enum RequestType {
                 return "CRYPTO_APPROVE_ALLOWANCE";
             case CRYPTO_ADJUST_ALLOWANCE:
                 return "CRYPTO_ADJUST_ALLOWANCE";
+            case CRYPTO_DELETE_ALLOWANCE:
+                return "CRYPTO_DELETE_ALLOWANCE";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }
