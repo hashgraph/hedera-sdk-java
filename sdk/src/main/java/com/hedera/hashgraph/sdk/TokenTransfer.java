@@ -6,7 +6,6 @@ import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class TokenTransfer {
     final TokenId tokenId;

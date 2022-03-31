@@ -3,12 +3,23 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.UInt32Value;
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.AccountAmount;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
+import com.hedera.hashgraph.sdk.proto.NftTransfer;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
