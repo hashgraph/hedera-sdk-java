@@ -132,6 +132,31 @@ message ContractFunctionResult {
      * EVM address described above.)
      */
      google.protobuf.BytesValue evm_address = 9;
+
+    /**
+     * The amount of gas available for the call, aka the gasLimit. 
+     *
+     * This field should only be populated when the paired TransactionBody in the record stream is not a
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
+     */
+    int64 gas = 10;
+
+    /**
+     * Number of tinybars sent (the function must be payable if this is nonzero).
+     *
+     * This field should only be populated when the paired TransactionBody in the record stream is not a
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
+     */
+    int64 amount = 11;
+
+    /**
+     * The parameters passed into the contract call.
+     *
+     * This field should only be populated when the paired TransactionBody in the record stream is not a
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
+     */
+    bytes functionParameters = 12;
+     
 }
 
 /**
