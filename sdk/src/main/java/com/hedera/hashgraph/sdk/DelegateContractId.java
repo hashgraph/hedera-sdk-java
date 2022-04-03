@@ -57,7 +57,8 @@ public final class DelegateContractId extends ContractId {
             return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
         } else if (o instanceof ContractId) {
             ContractId otherId = (ContractId) o;
-            return shard == otherId.shard && realm == otherId.realm && num == otherId.num;        } else {
+            return shard == otherId.shard && realm == otherId.realm && num == otherId.num;
+        } else {
             return false;
         }
 

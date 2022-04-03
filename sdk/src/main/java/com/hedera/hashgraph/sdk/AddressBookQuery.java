@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.mirror.MirrorNetworkService;
 import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
@@ -14,14 +12,12 @@ import java8.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
-import org.w3c.dom.Node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class AddressBookQuery {

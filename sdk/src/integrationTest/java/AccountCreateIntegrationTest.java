@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -94,7 +93,6 @@ class AccountCreateIntegrationTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("Can create account using aliasKey")
     void canCreateWithAliasKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
@@ -115,7 +113,7 @@ class AccountCreateIntegrationTest {
 
         assertEquals(key.getPublicKey(), info.aliasKey);
 
-        testEnv.close(aliasId, key);
+        testEnv.close(info.accountId, key);
     }
 
     @Test

@@ -2,7 +2,6 @@ package com.hedera.hashgraph.sdk;
 
 import io.grpc.ChannelCredentials;
 import io.grpc.TlsChannelCredentials;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
