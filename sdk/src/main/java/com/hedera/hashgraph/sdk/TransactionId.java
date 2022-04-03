@@ -8,8 +8,6 @@ import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
