@@ -132,16 +132,24 @@ public final class ContractFunctionParameters {
         bitWidth = Math.min(bitWidth, 64);
         ByteString.Output output = ByteString.newOutput(bitWidth / 8);
 
-        // write bytes in big-endian order
-        for (int i = bitWidth - 8; i >= 0; i -= 8) {
-            // widening conversion sign-extends so we don't have to do anything special when
-            // truncating a previously widened value
-            byte u8 = (byte) (val >> i);
-            output.write(u8);
-        }
+        try {
+            // write bytes in big-endian order
+            for (int i = bitWidth - 8; i >= 0; i -= 8) {
+                // widening conversion sign-extends so we don't have to do anything special when
+                // truncating a previously widened value
+                byte u8 = (byte) (val >> i);
+                output.write(u8);
+            }
 
-        // byte padding will sign-extend appropriately
-        return leftPad32(output.toByteString(), signed && val < 0);
+            // byte padding will sign-extend appropriately
+            return leftPad32(output.toByteString(), signed && val < 0);
+        } finally {
+            try {
+                output.close();
+            } catch (Throwable ignored) {
+                // do nothing
+            }
+        }
     }
 
     static ByteString int256(BigInteger bigInt) {
@@ -661,13 +669,21 @@ public final class ContractFunctionParameters {
         }
 
         var output = ByteString.newOutput(ADDRESS_LEN + SELECTOR_LEN);
-        output.write(address, 0, address.length);
-        output.write(selector, 0, selector.length);
+        try {
+            output.write(address, 0, address.length);
+            output.write(selector, 0, selector.length);
 
-        // function reference encodes as `bytes24`
-        args.add(new Argument("function", rightPad32(output.toByteString()), false));
+            // function reference encodes as `bytes24`
+            args.add(new Argument("function", rightPad32(output.toByteString()), false));
 
-        return this;
+            return this;
+        } finally {
+            try {
+                output.close();
+            } catch (Throwable ignored) {
+                // do nothing
+            }
+        }
     }
 
     /**

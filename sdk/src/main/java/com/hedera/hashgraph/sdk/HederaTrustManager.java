@@ -42,6 +42,7 @@ class HederaTrustManager implements X509TrustManager {
 
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) {
+        throw new UnsupportedOperationException("Attempted to use HederaTrustManager to verify a client, but this trust manager is for verifying server only");
     }
 
     @Override
