@@ -78,7 +78,7 @@ public class AccountAllowanceExample {
         Objects.requireNonNull(bobId);
 
         charlieId = new AccountCreateTransaction()
-            .setKey(bobKey)
+            .setKey(charlieKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
             .getReceipt(client)
