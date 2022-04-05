@@ -117,7 +117,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
         buildAllTransactions();
 

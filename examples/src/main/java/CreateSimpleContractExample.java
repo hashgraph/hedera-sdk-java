@@ -112,6 +112,7 @@ public final class CreateSimpleContractExample {
         // now delete the contract
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(newContractId)
+            .setTransferAccountId(OPERATOR_ID)
             .setMaxTransactionFee(new Hbar(1))
             .execute(client)
             .getReceipt(client);
