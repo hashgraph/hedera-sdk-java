@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AccountAllowanceIntegrationTest {
     @Test
-    @Disabled
     @DisplayName("Can spend hbar allowance")
     void canSpendHbarAllowance() throws Throwable {
         var testEnv = new IntegrationTestEnv(1);
@@ -39,22 +38,19 @@ public class AccountAllowanceIntegrationTest {
         Objects.requireNonNull(aliceId);
         Objects.requireNonNull(bobId);
 
-        var allowanceTx = new AccountAllowanceApproveTransaction()
+        new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(bobId, aliceId, new Hbar(10))
             .freezeWith(testEnv.client)
-            .sign(bobKey);
-        allowanceTx
+            .sign(bobKey)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var transferTx = new TransferTransaction()
+        var transferRecord = new TransferTransaction()
             .addHbarTransfer(testEnv.operatorId, new Hbar(5))
-            .addHbarTransfer(bobId, new Hbar(5).negated())
-            .setHbarTransferApproval(bobId, true)
+            .addApprovedHbarTransfer(bobId, new Hbar(5).negated())
             .setTransactionId(TransactionId.generate(aliceId))
             .freezeWith(testEnv.client)
-            .sign(aliceKey);
-        var transferRecord = transferTx
+            .sign(aliceKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 

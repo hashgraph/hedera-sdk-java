@@ -259,6 +259,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustNftAllowanceAllSerials(tokenId, true, ownerAccountId, spenderAccountId);
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowance(
         NftId nftId,
         AccountId ownerAccountId,
@@ -288,7 +292,7 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getAdjustAllowanceMethod();
+        return CryptoServiceGrpc.getAdjustAllowancesMethod();
     }
 
     CryptoAdjustAllowanceTransactionBody.Builder build() {
@@ -323,25 +327,13 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         for (var allowance : hbarAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : tokenAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : nftAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
     }
 }
