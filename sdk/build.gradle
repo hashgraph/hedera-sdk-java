@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.hedera.hashgraph"
-version = "2.10.1"
+version = "2.11.0"
 description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
@@ -46,9 +46,9 @@ dependencies {
 	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-core:1.44.1"
-	implementation "io.grpc:grpc-protobuf-lite:1.44.1"
-	implementation "io.grpc:grpc-stub:1.44.1"
+	implementation "io.grpc:grpc-core:1.45.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.45.0"
+	implementation "io.grpc:grpc-stub:1.45.0"
 
 	testCompile "org.assertj:assertj-core:3.22.0"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
@@ -68,11 +68,11 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
 	protoc {
-		artifact = "com.google.protobuf:protoc:3.19.4"
+		artifact = "com.google.protobuf:protoc:3.20.0"
 	}
 	plugins {
 		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.44.1"
+			artifact = "io.grpc:protoc-gen-grpc-java:1.45.0"
 		}
 	}
 	generateProtoTasks {

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -44,7 +45,7 @@ public class TokenFeeScheduleUpdateTransactionTest {
         return new TokenFeeScheduleUpdateTransaction()
             .setTokenId(new TokenId(8798))
             .setCustomFees(customFees)
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .freeze();
     }

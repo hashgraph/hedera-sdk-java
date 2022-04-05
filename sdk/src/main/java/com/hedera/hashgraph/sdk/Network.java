@@ -322,8 +322,4 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
             return (network.size() + 3 - 1) / 3;
         }
     }
-
-    Node getNode(AccountId nodeAccountId) {
-        return Collections.min(network.get(nodeAccountId));
-    }
 }

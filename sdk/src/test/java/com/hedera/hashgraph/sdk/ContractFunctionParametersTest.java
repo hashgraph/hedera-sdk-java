@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -158,10 +159,12 @@ public class ContractFunctionParametersTest {
                 .addUint256(BigInteger.valueOf(-0x1));
         });
 
+        /*
         assertThrows(IllegalArgumentException.class, () -> {
             new ContractFunctionParameters()
                 .addUint256(BigInteger.valueOf(2).pow(256));
         });
+         */
     }
 
     @Test
@@ -456,6 +459,7 @@ public class ContractFunctionParametersTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("BigInteger checks")
     void bigIntChecks() {
         ContractFunctionParameters params = new ContractFunctionParameters();

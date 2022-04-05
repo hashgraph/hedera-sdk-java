@@ -122,7 +122,7 @@ class ExecutableTest {
         tx.setNodesFromNodeAccountIds(client);
         tx.setMinBackoff(Duration.ofMillis(10));
         tx.setMaxBackoff(Duration.ofMillis(1000));
-        tx.nextNodeIndex = 1;
+        tx.nodeAccountIds.setIndex(1);
 
         var node = tx.getNodeForExecute(1);
         assertEquals(node4, node);
@@ -145,7 +145,7 @@ class ExecutableTest {
 
         var node = tx.getNodeForExecute(1);
         assertEquals(node3, node);
-        tx.nextNodeIndex++;
+        tx.nodeAccountIds.advance();
 
         node = tx.getNodeForExecute(2);
         assertEquals(node3, node);

@@ -1,9 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenPauseTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;

@@ -217,7 +217,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
             try {
-                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+                nodeAccountIds.setList(client.network.getNodeAccountIdsForExecute());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -248,7 +248,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
-            headerBuilder.setPayment(getPaymentTransaction(nextNodeIndex));
+            headerBuilder.setPayment(getPaymentTransaction(nodeAccountIds.getIndex()));
         }
 
         // Delegate to the derived class to apply the header because the common header struct is

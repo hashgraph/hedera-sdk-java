@@ -1,11 +1,7 @@
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCreateFlow;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +38,9 @@ public class ContractCreateFlowIntegrationTest {
         assertEquals(Status.SUCCESS, receipt.status);
 
         new ContractDeleteTransaction()
+            .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 

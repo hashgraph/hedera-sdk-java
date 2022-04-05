@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.mirror.MirrorNetworkService;
 import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
@@ -12,7 +10,6 @@ import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -20,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.time.Duration;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CompletableFuture;
 

@@ -6,17 +6,16 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.Objects;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Objects;
-
 public class AutomaticAssociationTest {
-    @Disabled
     @Test
     @DisplayName("Tokens automatically become associated")
     void autoAssociateTest() throws Exception {
@@ -86,7 +85,7 @@ public class AutomaticAssociationTest {
                 .getReceipt(testEnv.client);
         });
 
-        assertTrue(error.getMessage().contains("NO_REMAINING_AUTO_ASSOCIATIONS"));
+        assertTrue(error.getMessage().contains("NO_REMAINING_AUTOMATIC_ASSOCIATIONS"));
 
         new AccountUpdateTransaction()
             .setAccountId(accountId)
