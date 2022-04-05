@@ -1,6 +1,11 @@
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountInfoFlow;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.Transaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -102,6 +107,31 @@ class AccountInfoIntegrationTest {
         });
 
         assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("AccountInfoFlow.verify functions")
+    void accountInfoFlowVerifyFunctions() throws Throwable {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var newKey = PrivateKey.generateED25519();
+        var newPublicKey = newKey.getPublicKey();
+
+        Transaction<?> signedTx = new AccountCreateTransaction()
+            .setKey(newPublicKey)
+            .setInitialBalance(Hbar.fromTinybars(1000))
+            .freezeWith(testEnv.client)
+            .signWithOperator(testEnv.client);
+
+        Transaction<?> unsignedTx = new AccountCreateTransaction()
+            .setKey(newPublicKey)
+            .setInitialBalance(Hbar.fromTinybars(1000))
+            .freezeWith(testEnv.client);
+
+        assertTrue(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, signedTx));
+        assertFalse(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, unsignedTx));
 
         testEnv.close();
     }

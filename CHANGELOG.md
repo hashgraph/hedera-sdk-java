@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.11.0-beta.1
+
+### Added
+
+ * `AccountInfoFlow`
+ * `Client.[set|get]NodeMinReadmitPeriod()`
+ * Support for using any node from the entire network upon execution
+   if node account IDs have no been locked for the request.
+ * Support for `ContractFunctionParameters` integers with different bit widths.
+
+### Fixed
+
+ * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
+
 ## v2.10.1
 
 ### Added
@@ -47,6 +61,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AddressBookQuery`
  * Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
    regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+* `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+
+### Fixed
+
+* Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
+  regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
 
 ### Deprecated
 

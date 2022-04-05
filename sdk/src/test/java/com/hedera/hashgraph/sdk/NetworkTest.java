@@ -26,25 +26,25 @@ public class NetworkTest {
         Assertions.assertThat(network.toArray()).isEqualTo(new Node[]{node3, node4, node5, node6});
 
         node3.inUse();
-        node3.increaseDelay();
+        node3.increaseBackoff();
         Collections.sort(network);
         Assertions.assertThat(network.toArray()).isEqualTo(new Node[]{node4, node5, node6, node3});
 
         Thread.sleep(10);
         node5.inUse();
-        node5.increaseDelay();
+        node5.increaseBackoff();
         Collections.sort(network);
         Assertions.assertThat(network.toArray()).isEqualTo(new Node[]{node4, node6, node3, node5});
 
         Thread.sleep(10);
         node5.inUse();
-        node5.decreaseDelay();
+        node5.decreaseBackoff();
         Collections.sort(network);
         Assertions.assertThat(network.toArray()).isEqualTo(new Node[]{node4, node6, node3, node5});
 
         Thread.sleep(10);
         node4.inUse();
-        node4.decreaseDelay();
+        node4.decreaseBackoff();
         Collections.sort(network);
         Assertions.assertThat(network.toArray()).isEqualTo(new Node[]{node6, node4, node3, node5});
     }

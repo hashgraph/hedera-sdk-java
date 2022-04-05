@@ -39,9 +39,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Nullable
     protected Duration minBackoff = null;
 
-    protected int nextNodeIndex = 0;
-
-    protected List<AccountId> nodeAccountIds = Collections.emptyList();
+    protected LockableList<AccountId> nodeAccountIds = new LockableList<>();
     protected List<Node> nodes = new ArrayList<>();
 
     protected boolean attemptedAllNodes = false;
@@ -155,7 +153,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Nullable
     public final List<AccountId> getNodeAccountIds() {
         if (!nodeAccountIds.isEmpty()) {
-            return new ArrayList<>(nodeAccountIds);
+            return new ArrayList<>(nodeAccountIds.getList());
         }
 
         return null;
@@ -173,7 +171,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
      * @return {@code this}
      */
     public SdkRequestT setNodeAccountIds(List<AccountId> nodeAccountIds) {
-        this.nodeAccountIds = new ArrayList<>(nodeAccountIds);
+        this.nodeAccountIds.setList(nodeAccountIds).setLocked(true);
 
         // noinspection unchecked
         return (SdkRequestT) this;
@@ -235,7 +233,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 throw new TimeoutException();
             }
 
-            GrpcRequest grpcRequest = new GrpcRequest(attempt);
+            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
             Node node = grpcRequest.getNode();
             ResponseT response = null;
 
@@ -324,7 +322,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         long smallestDelay = Long.MAX_VALUE;
 
         for (int i = 0; i < nodes.size(); i++) {
-            node = nodes.get(nextNodeIndex);
+            node = nodes.get(nodeAccountIds.getIndex());
 
             if (!node.isHealthy()) {
                 // Keep track of the node with the smallest delay seen thus far. If we go through the entire list
@@ -347,7 +345,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
             // If we've tried all nodes, index will be +1 too far. Index increment happens outside
             // this method so try to be consistent with happy path.
-            nextNodeIndex = Math.max(0, nextNodeIndex - 1);
+            nodeAccountIds.setIndex(Math.max(0, nodeAccountIds.getIndex()));
         }
 
         // node won't be null at this point because execute() validates before this method is called.
@@ -374,7 +372,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             return CompletableFuture.<O>failedFuture(new MaxAttemptsExceededException(lastException));
         }
 
-        GrpcRequest grpcRequest = new GrpcRequest(attempt);
+        GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
 
         // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
         if (!grpcRequest.getNode().isHealthy()) {
@@ -418,17 +416,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     abstract ProtoRequestT makeRequest();
 
     GrpcRequest getGrpcRequest(int attempt) {
-        return new GrpcRequest(attempt);
+        return new GrpcRequest(null, attempt);
     }
 
     void advanceRequest() {
-        if (nextNodeIndex == nodes.size() - 1) {
+        if (nodeAccountIds.getIndex() + 1 == nodes.size() - 1) {
             attemptedAllNodes = true;
         }
 
-        // each time buildNext is called we move our cursor to the next transaction
-        // wrapping around to ensure we are cycling
-        nextNodeIndex = (nextNodeIndex + 1) % nodeAccountIds.size();
+        nodeAccountIds.advance();
     }
 
     /**
@@ -481,6 +477,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
     @VisibleForTesting
     class GrpcRequest {
+        @Nullable
+        private final Network network;
         private final Node node;
         private final int attempt;
         //private final ClientCall<ProtoRequestT, ResponseT> call;
@@ -492,7 +490,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         private double latency;
         private Status responseStatus;
 
-        GrpcRequest(int attempt) {
+        GrpcRequest(@Nullable Network network, int attempt) {
+            this.network = network;
             this.attempt = attempt;
             this.node = getNodeForExecute(attempt);
             this.request = getRequestForExecute();
@@ -530,7 +529,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         Throwable reactToConnectionFailure() {
-            node.increaseDelay();
+            Objects.requireNonNull(network).increaseBackoff(node);
             logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
                 node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
             verboseLog(node);
@@ -543,7 +542,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             var retry = Executable.this.shouldRetryExceptionally(e);
 
             if (retry) {
-                node.increaseDelay();
+                Objects.requireNonNull(network).increaseBackoff(node);
                 logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                     node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
                 verboseLog(node);
@@ -563,7 +562,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         ExecutionState getStatus(ResponseT response) {
-            node.decreaseDelay();
+            node.decreaseBackoff();
 
             this.response = response;
             this.responseStatus = Executable.this.mapResponseStatus(response);
