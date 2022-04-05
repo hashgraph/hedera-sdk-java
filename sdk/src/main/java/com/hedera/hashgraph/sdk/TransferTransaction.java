@@ -286,7 +286,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    public TransferTransaction doAddHbarTransfer(AccountId accountId, Hbar value, boolean isApproved) {
+    private TransferTransaction doAddHbarTransfer(AccountId accountId, Hbar value, boolean isApproved) {
         requireNotFrozen();
 
         for (var transfer : hbarTransfers) {

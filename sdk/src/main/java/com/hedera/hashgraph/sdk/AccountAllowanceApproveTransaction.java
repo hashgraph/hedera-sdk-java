@@ -22,6 +22,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     private final List<TokenAllowance> tokenAllowances =  new ArrayList<>();
     private final List<TokenNftAllowance> nftAllowances = new ArrayList<>();
     // key is "{ownerId}:{spenderId}".  OwnerId may be "FEE_PAYER"
+    // <ownerId:spenderId, <tokenId, index>>
     private final Map<String, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
     public AccountAllowanceApproveTransaction() {
@@ -181,7 +182,13 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         Map<TokenId, Integer> innerMap
     ) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, new ArrayList<>(), null);
+        TokenNftAllowance newAllowance = new TokenNftAllowance(
+            tokenId,
+            ownerAccountId,
+            spenderAccountId,
+            new ArrayList<>(),
+            null
+        );
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
@@ -295,25 +302,13 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         for (var allowance : hbarAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : tokenAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : nftAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
     }
 }

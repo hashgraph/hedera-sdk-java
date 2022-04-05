@@ -47,6 +47,12 @@ public final class ContractFunctionResult {
 
     public final List<ContractStateChange> stateChanges;
 
+    public final long gas;
+
+    public final Hbar hbarAmount;
+
+    public final byte[] contractFunctionParametersBytes;
+
     private final ByteString rawResult;
 
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
@@ -81,6 +87,12 @@ public final class ContractFunctionResult {
         for (var stateChangeProto : inner.getStateChangesList()) {
             stateChanges.add(ContractStateChange.fromProtobuf(stateChangeProto));
         }
+
+        gas = inner.getGas();
+
+        hbarAmount = Hbar.fromTinybars(inner.getAmount());
+
+        contractFunctionParametersBytes = inner.getFunctionParameters().toByteArray();
     }
 
     /**

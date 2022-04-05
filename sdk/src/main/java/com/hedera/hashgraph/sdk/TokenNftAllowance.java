@@ -5,10 +5,12 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
+import com.hedera.hashgraph.sdk.proto.NftRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,8 +64,18 @@ public class TokenNftAllowance {
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            Collections.emptyList(),
+            null
+        );
+    }
+
+    static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+            null,
             allowanceProto.getSerialNumbersList(),
-            allowanceProto.getApprovedForAll()
+            null
         );
     }
 
@@ -74,6 +86,18 @@ public class TokenNftAllowance {
     TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
         return ownerAccountId != null ?
             this : new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers, allSerials);
+    }
+
+    void validateChecksums(Client client) throws BadEntityIdException {
+        if (tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+        if (ownerAccountId != null) {
+            ownerAccountId.validateChecksum(client);
+        }
+        if (spenderAccountId != null) {
+            spenderAccountId.validateChecksum(client);
+        }
     }
 
     NftAllowance toProtobuf() {
@@ -102,10 +126,18 @@ public class TokenNftAllowance {
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
-        builder.addAllSerialNumbers(serialNumbers);
-        if (allSerials != null) {
-            builder.setApprovedForAll(allSerials);
+        return builder.build();
+    }
+
+    NftRemoveAllowance toRemoveProtobuf() {
+        var builder = NftRemoveAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
         }
+        if (ownerAccountId != null) {
+            builder.setOwner(ownerAccountId.toProtobuf());
+        }
+        builder.addAllSerialNumbers(serialNumbers);
         return builder.build();
     }
 

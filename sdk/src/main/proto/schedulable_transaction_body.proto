@@ -39,6 +39,7 @@ import "crypto_transfer.proto";
 import "crypto_update.proto";
 import "crypto_approve_allowance.proto";
 import "crypto_adjust_allowance.proto";
+import "crypto_delete_allowance.proto";
 
 import "file_append.proto";
 import "file_create.proto";
@@ -121,6 +122,11 @@ message SchedulableTransactionBody {
      * Adds one or more approved allowances for spenders to transfer the paying account's hbar or tokens.
      */
     CryptoApproveAllowanceTransactionBody cryptoApproveAllowance = 38;
+
+    /**
+     * Deletes one or more approved hbar or token allowances from an owner's account
+     */
+    CryptoDeleteAllowanceTransactionBody cryptoDeleteAllowance = 40;
 
     /**
      * Create a new cryptocurrency account

@@ -345,6 +345,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case CRYPTOADJUSTALLOWANCE:
                 return new AccountAllowanceAdjustTransaction(txs);
 
+            case CRYPTODELETEALLOWANCE:
+                return new AccountAllowanceDeleteTransaction(txs);
+
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
@@ -367,6 +370,15 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case CONTRACTDELETEINSTANCE:
                 return new ContractDeleteTransaction(body.setContractDeleteInstance(scheduled.getContractDeleteInstance()).build());
+
+            case CRYPTOADJUSTALLOWANCE:
+                return new AccountAllowanceAdjustTransaction(body.setCryptoAdjustAllowance(scheduled.getCryptoAdjustAllowance()).build());
+
+            case CRYPTOAPPROVEALLOWANCE:
+                return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());
+
+            case CRYPTODELETEALLOWANCE:
+                return new AccountAllowanceDeleteTransaction(body.setCryptoDeleteAllowance(scheduled.getCryptoDeleteAllowance()).build());
 
             case CRYPTOCREATEACCOUNT:
                 return new AccountCreateTransaction(body.setCryptoCreateAccount(scheduled.getCryptoCreateAccount()).build());
@@ -413,41 +425,44 @@ public abstract class Transaction<T extends Transaction<T>>
             case CONSENSUSSUBMITMESSAGE:
                 return new TopicMessageSubmitTransaction(body.setConsensusSubmitMessage(scheduled.getConsensusSubmitMessage()).build());
 
-            case TOKENASSOCIATE:
-                return new TokenAssociateTransaction(body.setTokenAssociate(scheduled.getTokenAssociate()).build());
-
-            case TOKENBURN:
-                return new TokenBurnTransaction(body.setTokenBurn(scheduled.getTokenBurn()).build());
-
             case TOKENCREATION:
                 return new TokenCreateTransaction(body.setTokenCreation(scheduled.getTokenCreation()).build());
-
-            case TOKENDELETION:
-                return new TokenDeleteTransaction(body.setTokenDeletion(scheduled.getTokenDeletion()).build());
-
-            case TOKENDISSOCIATE:
-                return new TokenDissociateTransaction(body.setTokenDissociate(scheduled.getTokenDissociate()).build());
 
             case TOKENFREEZE:
                 return new TokenFreezeTransaction(body.setTokenFreeze(scheduled.getTokenFreeze()).build());
 
+            case TOKENUNFREEZE:
+                return new TokenUnfreezeTransaction(body.setTokenUnfreeze(scheduled.getTokenUnfreeze()).build());
+
             case TOKENGRANTKYC:
                 return new TokenGrantKycTransaction(body.setTokenGrantKyc(scheduled.getTokenGrantKyc()).build());
-
-            case TOKENMINT:
-                return new TokenMintTransaction(body.setTokenMint(scheduled.getTokenMint()).build());
 
             case TOKENREVOKEKYC:
                 return new TokenRevokeKycTransaction(body.setTokenRevokeKyc(scheduled.getTokenRevokeKyc()).build());
 
-            case TOKENUNFREEZE:
-                return new TokenUnfreezeTransaction(body.setTokenUnfreeze(scheduled.getTokenUnfreeze()).build());
+            case TOKENDELETION:
+                return new TokenDeleteTransaction(body.setTokenDeletion(scheduled.getTokenDeletion()).build());
 
             case TOKENUPDATE:
                 return new TokenUpdateTransaction(body.setTokenUpdate(scheduled.getTokenUpdate()).build());
 
+            case TOKENMINT:
+                return new TokenMintTransaction(body.setTokenMint(scheduled.getTokenMint()).build());
+
+            case TOKENBURN:
+                return new TokenBurnTransaction(body.setTokenBurn(scheduled.getTokenBurn()).build());
+
             case TOKENWIPE:
                 return new TokenWipeTransaction(body.setTokenWipe(scheduled.getTokenWipe()).build());
+
+            case TOKENASSOCIATE:
+                return new TokenAssociateTransaction(body.setTokenAssociate(scheduled.getTokenAssociate()).build());
+
+            case TOKENDISSOCIATE:
+                return new TokenDissociateTransaction(body.setTokenDissociate(scheduled.getTokenDissociate()).build());
+
+            case TOKEN_FEE_SCHEDULE_UPDATE:
+                return new TokenFeeScheduleUpdateTransaction(body.setTokenFeeScheduleUpdate(scheduled.getTokenFeeScheduleUpdate()).build());
 
             case TOKEN_PAUSE:
                 return new TokenPauseTransaction(body.setTokenPause(scheduled.getTokenPause()).build());
@@ -457,12 +472,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case SCHEDULEDELETE:
                 return new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
-
-            case CRYPTOAPPROVEALLOWANCE:
-                return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());
-
-            case CRYPTOADJUSTALLOWANCE:
-                return new AccountAllowanceAdjustTransaction(body.setCryptoAdjustAllowance(scheduled.getCryptoAdjustAllowance()).build());
 
             default:
                 throw new IllegalStateException("schedulable transaction did not have a transaction set");
