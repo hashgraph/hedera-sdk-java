@@ -35,7 +35,7 @@ dependencies {
 	implementation 'org.slf4j:slf4j-api:1.7.36'
 
 	// Toggle which slf4j library to use to enable/disable logging
-	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
+	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha7'
 	integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
 	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
