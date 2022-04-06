@@ -29,12 +29,10 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
