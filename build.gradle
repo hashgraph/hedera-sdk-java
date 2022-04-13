@@ -33,7 +33,7 @@ allprojects {
 		errorprone "io.grpc:grpc-java-api-checker:1.1.0"
 
 		// https://github.com/eclipse-ee4j/common-annotations-api
-		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0"
+		implementation "jakarta.annotation:jakarta.annotation-api:2.1.0"
 	}
 
 	jacoco {
