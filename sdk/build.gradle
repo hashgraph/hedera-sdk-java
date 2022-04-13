@@ -49,8 +49,8 @@ dependencies {
 	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
 	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.44.1"
-	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.45.1"
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.45.1'
 
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
