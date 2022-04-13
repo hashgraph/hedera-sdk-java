@@ -42,7 +42,7 @@ dependencies {
 
 	implementation "io.grpc:grpc-core:1.45.1"
 	implementation "io.grpc:grpc-protobuf-lite:1.45.1"
-	implementation "io.grpc:grpc-stub:1.45.0"
+	implementation "io.grpc:grpc-stub:1.45.1"
 
 	testCompile "org.assertj:assertj-core:3.22.0"
 	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
