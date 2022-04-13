@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,7 +40,7 @@ public class ScheduleCreateTransactionTest {
             .addHbarTransfer(AccountId.fromString("0.0.555"), new Hbar(-10))
             .addHbarTransfer(AccountId.fromString("0.0.333"), new Hbar(10));
         return transferTransaction.schedule()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setAdminKey(unusedPrivateKey)
             .setPayerAccountId(AccountId.fromString("0.0.222"))

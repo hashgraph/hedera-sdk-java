@@ -40,6 +40,7 @@ public class ContractCreateFlowIntegrationTest {
         new ContractDeleteTransaction()
             .setTransferAccountId(testEnv.operatorId)
             .setContractId(contractId)
+            .setTransferAccountId(testEnv.operatorId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 

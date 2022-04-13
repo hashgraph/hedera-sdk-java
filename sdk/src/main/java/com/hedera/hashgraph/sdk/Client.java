@@ -657,6 +657,24 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    public Duration getMinNodeReadmitTime() {
+        return network.getMinNodeReadmitTime();
+    }
+
+    public Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+        network.setMinNodeReadmitTime(minNodeReadmitTime);
+        return this;
+    }
+
+    public Duration getMaxNodeReadmitTime() {
+        return network.getMaxNodeReadmitTime();
+    }
+
+    public Client setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
+        network.setMaxNodeReadmitTime(maxNodeReadmitTime);
+        return this;
+    }
+
     /**
      * Set the max amount of nodes that will be chosen per request. By default, the request will use 1/3rd the network
      * nodes per request.

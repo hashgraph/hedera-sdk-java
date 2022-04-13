@@ -89,7 +89,7 @@ public class MockingTest {
                     TransactionReceipt.newBuilder().setFileID(fileId.toProtobuf()).setStatus(ResponseCodeEnum.SUCCESS).build()
                 ).build()
             ).build()
-        )).enqueueResponse(TestResponse.successfulReceipt());
+        )).enqueueResponse(TestResponse.successfulReceipt()).enqueueResponse(TestResponse.successfulReceipt());
         fileService.buffer
             .enqueueResponse(TestResponse.transactionOk())
             .enqueueResponse(TestResponse.transactionOk())
@@ -114,7 +114,7 @@ public class MockingTest {
 
         Thread.sleep(1000);
 
-        Assertions.assertEquals(2, cryptoService.buffer.queryRequestsReceived.size());
+        Assertions.assertEquals(3, cryptoService.buffer.queryRequestsReceived.size());
         Assertions.assertEquals(3, fileService.buffer.transactionRequestsReceived.size());
         Assertions.assertEquals(1, contractService.buffer.transactionRequestsReceived.size());
         var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
