@@ -109,10 +109,13 @@ public final class AccountInfo {
     @Nullable
     public final PublicKey aliasKey;
 
+    @Deprecated
     public final List<HbarAllowance> hbarAllowances;
 
+    @Deprecated
     public final List<TokenAllowance> tokenAllowances;
 
+    @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
     private AccountInfo(
@@ -134,10 +137,7 @@ public final class AccountInfo {
         long ownedNfts,
         int maxAutomaticTokenAssociations,
         @Nullable PublicKey aliasKey,
-        LedgerId ledgerId,
-        List<HbarAllowance> hbarAllowances,
-        List<TokenAllowance> tokenAllowances,
-        List<TokenNftAllowance> tokenNftAllowances
+        LedgerId ledgerId
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -158,9 +158,9 @@ public final class AccountInfo {
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         this.aliasKey = aliasKey;
         this.ledgerId = ledgerId;
-        this.hbarAllowances = hbarAllowances;
-        this.tokenAllowances = tokenAllowances;
-        this.tokenNftAllowances = tokenNftAllowances;
+        this.hbarAllowances = Collections.emptyList();
+        this.tokenAllowances = Collections.emptyList();
+        this.tokenNftAllowances = Collections.emptyList();
     }
 
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
@@ -179,21 +179,6 @@ public final class AccountInfo {
         for (com.hedera.hashgraph.sdk.proto.TokenRelationship relationship : accountInfo.getTokenRelationshipsList()) {
             TokenId tokenId = TokenId.fromProtobuf(relationship.getTokenId());
             relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
-        }
-
-        List<HbarAllowance> hbarAllowances = new ArrayList<>(accountInfo.getGrantedCryptoAllowancesCount());
-        for (var allowanceProto : accountInfo.getGrantedCryptoAllowancesList()) {
-            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
-        }
-
-        List<TokenAllowance> tokenAllowances = new ArrayList<>(accountInfo.getGrantedTokenAllowancesCount());
-        for (var allowanceProto : accountInfo.getGrantedTokenAllowancesList()) {
-            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
-        }
-
-        List<TokenNftAllowance> nftAllowances = new ArrayList<>(accountInfo.getGrantedNftAllowancesCount());
-        for (var allowanceProto : accountInfo.getGrantedNftAllowancesList()) {
-            nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto).withOwner(accountId));
         }
 
         @Nullable
@@ -218,10 +203,7 @@ public final class AccountInfo {
             accountInfo.getOwnedNfts(),
             accountInfo.getMaxAutomaticTokenAssociations(),
             aliasKey,
-            LedgerId.fromByteString(accountInfo.getLedgerId()),
-            hbarAllowances,
-            tokenAllowances,
-            nftAllowances
+            LedgerId.fromByteString(accountInfo.getLedgerId())
         );
     }
 
@@ -263,18 +245,6 @@ public final class AccountInfo {
             accountInfoBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         }
 
-        for (var allowance : hbarAllowances) {
-            accountInfoBuilder.addGrantedCryptoAllowances(allowance.toGrantedProtobuf());
-        }
-
-        for (var allowance : tokenAllowances) {
-            accountInfoBuilder.addGrantedTokenAllowances(allowance.toGrantedProtobuf());
-        }
-
-        for (var allowance : tokenNftAllowances) {
-            accountInfoBuilder.addGrantedNftAllowances(allowance.toGrantedProtobuf());
-        }
-
         return accountInfoBuilder.build();
     }
 
@@ -300,9 +270,6 @@ public final class AccountInfo {
             .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
             .add("aliasKey", aliasKey)
             .add("ledgerId", ledgerId)
-            .add("hbarAllowances", hbarAllowances)
-            .add("tokenAllowances", tokenAllowances)
-            .add("tokenNftAllowances", tokenNftAllowances)
             .toString();
     }
 

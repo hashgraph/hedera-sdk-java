@@ -58,6 +58,7 @@ import "token_get_nft_infos.proto";
 
 import "schedule_get_info.proto";
 
+import "get_account_details.proto";
 
 /**
  * A single response, which is returned from the node to the client, after the client sent the node
@@ -184,5 +185,10 @@ message Response {
          * Execution times of "sufficiently recent" transactions
          */
         NetworkGetExecutionTimeResponse networkGetExecutionTime = 157;
+
+        /**
+         * Gets all information about an account including allowances granted by the account
+         */
+        GetAccountDetailsResponse accountDetails = 158;
     }
 }
