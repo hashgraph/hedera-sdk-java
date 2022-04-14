@@ -418,12 +418,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                 switch (grpcRequest.getStatus(response)) {
                     case ServerError:
                         executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                        break;
                     case Retry:
                         Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
                         });
+                        break;
                     case RequestError:
                         returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
+                        break;
                     case Success:
                     default:
                         returnFuture.complete(grpcRequest.mapResponse());
