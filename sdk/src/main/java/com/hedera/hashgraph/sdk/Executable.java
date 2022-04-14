@@ -286,7 +286,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        // TODO: seems like orTimeout is being called added always.  Is that expected?
         var retval = new CompletableFuture<O>().orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
 
         mergeFromClient(client);
