@@ -233,6 +233,8 @@ public class MockingTest {
                     .setMaxAttempts(2)
                     .executeAsync(server.client)
                     .handle((response, error) -> {
+                        System.out.println(error);
+                        System.out.println(error.getCause());
                         Assertions.assertNotNull(error);
                         Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
