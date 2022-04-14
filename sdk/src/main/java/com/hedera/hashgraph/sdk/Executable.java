@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -381,7 +382,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
         if (attempt > maxAttempts) {
             System.out.println("max attempts exceeded");
-            returnFuture.completeExceptionally(new MaxAttemptsExceededException(lastException));
+            returnFuture.completeExceptionally(new CompletionException(new MaxAttemptsExceededException(lastException)));
             return;
         }
 
@@ -410,7 +411,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
 
                 if (error != null) {
                     // not a network failure, some other weirdness going on; just fail fast
-                    returnFuture.completeExceptionally(error);
+                    returnFuture.completeExceptionally(new CompletionException(error));
                     return null;
                 }
 
@@ -422,7 +423,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
                         });
                     case RequestError:
-                        returnFuture.completeExceptionally(grpcRequest.mapStatusException());
+                        returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
                     case Success:
                     default:
                         returnFuture.complete(grpcRequest.mapResponse());
