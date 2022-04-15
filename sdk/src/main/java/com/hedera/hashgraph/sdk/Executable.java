@@ -295,6 +295,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
             setNodesFromNodeAccountIds(client);
 
             executeAsyncInternal(client, 1, null, retval);
+        }).exceptionally(error -> {
+            retval.completeExceptionally(error);
+            return null;
         });
         return retval;
     }
@@ -380,7 +383,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         if (attempt > maxAttempts) {
-            System.out.println("max attempts exceeded");
             returnFuture.completeExceptionally(new CompletionException(new MaxAttemptsExceededException(lastException)));
             return;
         }
@@ -431,7 +433,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
                         returnFuture.complete(grpcRequest.mapResponse());
                 }
                 return null;
+            }).exceptionally(error -> {
+                returnFuture.completeExceptionally(error);
+                return null;
             });
+        }).exceptionally(error -> {
+            returnFuture.completeExceptionally(error);
+            return null;
         });
     }
 
