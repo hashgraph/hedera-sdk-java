@@ -342,14 +342,15 @@ public enum RequestType {
     CRYPTO_APPROVE_ALLOWANCE(HederaFunctionality.CryptoApproveAllowance),
 
     /**
-     * Adjust allowances for a spender relative to the owner account
-     */
-    CRYPTO_ADJUST_ALLOWANCE(HederaFunctionality.CryptoAdjustAllowance),
-
-    /**
      * Deletes granted allowances on owner account
      */
-    CRYPTO_DELETE_ALLOWANCE(HederaFunctionality.CryptoDeleteAllowance);
+    CRYPTO_DELETE_ALLOWANCE(HederaFunctionality.CryptoDeleteAllowance),
+
+    /**
+     * Gets all the information about an account, including balance and allowances. This does not get the list of
+     * account records.
+     */
+    GET_ACCOUNT_DETAILS(HederaFunctionality.GetAccountDetails);
 
     final HederaFunctionality code;
 
@@ -495,10 +496,10 @@ public enum RequestType {
                 return TOKEN_UNPAUSE;
             case CryptoApproveAllowance:
                 return CRYPTO_APPROVE_ALLOWANCE;
-            case CryptoAdjustAllowance:
-                return CRYPTO_ADJUST_ALLOWANCE;
             case CryptoDeleteAllowance:
                 return CRYPTO_DELETE_ALLOWANCE;
+            case GetAccountDetails:
+                return GET_ACCOUNT_DETAILS;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -643,10 +644,10 @@ public enum RequestType {
                 return "TOKEN_UNPAUSE";
             case CRYPTO_APPROVE_ALLOWANCE:
                 return "CRYPTO_APPROVE_ALLOWANCE";
-            case CRYPTO_ADJUST_ALLOWANCE:
-                return "CRYPTO_ADJUST_ALLOWANCE";
             case CRYPTO_DELETE_ALLOWANCE:
                 return "CRYPTO_DELETE_ALLOWANCE";
+            case GET_ACCOUNT_DETAILS:
+                return "GET_ACCOUNT_DETAILS";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

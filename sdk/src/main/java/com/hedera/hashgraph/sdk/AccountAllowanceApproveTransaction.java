@@ -53,7 +53,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
                 nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
             } else {
                 getNftSerials(
-                    AccountId.fromProtobuf(allowanceProto.getOwner()),
+                    allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
                     AccountId.fromProtobuf(allowanceProto.getSpender()),
                     TokenId.fromProtobuf(allowanceProto.getTokenId())
                 ).addAll(allowanceProto.getSerialNumbersList());
@@ -61,7 +61,15 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
-    private AccountAllowanceApproveTransaction doApproveHbarAllowance(
+    /**
+     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
+     */
+    @Deprecated
+    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
+        return approveHbarAllowance(null, spenderAccountId, amount);
+    }
+
+    public AccountAllowanceApproveTransaction approveHbarAllowance(
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
         Hbar amount
@@ -76,22 +84,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
-     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
-     */
-    @Deprecated
-    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
-        return doApproveHbarAllowance(null, spenderAccountId, amount);
-    }
-
-    public AccountAllowanceApproveTransaction approveHbarAllowance(
-        AccountId ownerAccountId,
-        AccountId spenderAccountId,
-        Hbar amount
-    ) {
-        return doApproveHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
-    }
-
-    /**
      * @deprecated - Use {@link #getHbarApprovals()} instead
      */
     @Deprecated
@@ -103,7 +95,19 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return new ArrayList<>(hbarAllowances);
     }
 
-    private AccountAllowanceApproveTransaction doApproveTokenAllowance(
+    /**
+     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     */
+    @Deprecated
+    public AccountAllowanceApproveTransaction addTokenAllowance(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        return approveTokenAllowance(tokenId, null, spenderAccountId, amount);
+    }
+
+    public AccountAllowanceApproveTransaction approveTokenAllowance(
         TokenId tokenId,
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
@@ -120,27 +124,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
             amount
         ));
         return this;
-    }
-
-    /**
-     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
-     */
-    @Deprecated
-    public AccountAllowanceApproveTransaction addTokenAllowance(
-        TokenId tokenId,
-        AccountId spenderAccountId,
-        long amount
-    ) {
-        return doApproveTokenAllowance(tokenId, null, spenderAccountId, amount);
-    }
-
-    public AccountAllowanceApproveTransaction approveTokenAllowance(
-        TokenId tokenId,
-        AccountId ownerAccountId,
-        AccountId spenderAccountId,
-        long amount
-    ) {
-        return doApproveTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
     /**
@@ -220,13 +203,13 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     public AccountAllowanceApproveTransaction approveTokenNftAllowance(
         NftId nftId,
-        AccountId ownerAccountId,
+        @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
         requireNotFrozen();
         Objects.requireNonNull(nftId);
         getNftSerials(
-            Objects.requireNonNull(ownerAccountId),
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             nftId.tokenId
         ).add(nftId.serial);
@@ -235,13 +218,13 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     public AccountAllowanceApproveTransaction approveTokenNftAllowanceAllSerials(
         TokenId tokenId,
-        AccountId ownerAccountId,
+        @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
         requireNotFrozen();
         nftAllowances.add(new TokenNftAllowance(
             Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             Collections.emptyList(),
             true
@@ -273,18 +256,14 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();
 
-        @Nullable
-        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
-            transactionIds.get(0).accountId : null;
-
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addCryptoAllowances(allowance.toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addTokenAllowances(allowance.toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addNftAllowances(allowance.toProtobuf());
         }
         return builder;
     }

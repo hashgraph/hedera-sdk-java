@@ -99,10 +99,13 @@ public final class TransactionRecord {
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    @Deprecated
     public final List<HbarAllowance> hbarAllowanceAdjustments;
 
+    @Deprecated
     public final List<TokenAllowance> tokenAllowanceAdjustments;
 
+    @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
 
     private TransactionRecord(
@@ -123,10 +126,7 @@ public final class TransactionRecord {
         @Nullable PublicKey aliasKey,
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp,
-        List<HbarAllowance> hbarAllowanceAdjustments,
-        List<TokenAllowance> tokenAllowanceAdjustments,
-        List<TokenNftAllowance> tokenNftAllowanceAdjustments
+        @Nullable Instant parentConsensusTimestamp
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -146,9 +146,9 @@ public final class TransactionRecord {
         this.children = children;
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
-        this.hbarAllowanceAdjustments = hbarAllowanceAdjustments;
-        this.tokenAllowanceAdjustments = tokenAllowanceAdjustments;
-        this.tokenNftAllowanceAdjustments = tokenNftAllowanceAdjustments;
+        this.hbarAllowanceAdjustments = Collections.emptyList();
+        this.tokenAllowanceAdjustments = Collections.emptyList();
+        this.tokenNftAllowanceAdjustments = Collections.emptyList();
     }
 
     static TransactionRecord fromProtobuf(
@@ -198,16 +198,6 @@ public final class TransactionRecord {
 
         var aliasKey = PublicKey.fromAliasBytes(transactionRecord.getAlias());
 
-        var hbarAllowanceAdjustments = new ArrayList<HbarAllowance>(transactionRecord.getCryptoAdjustmentsCount());
-        for (var hbarAdjustmentProto : transactionRecord.getCryptoAdjustmentsList()) {
-            hbarAllowanceAdjustments.add(HbarAllowance.fromProtobuf(hbarAdjustmentProto));
-        }
-
-        var tokenAllowanceAdjustments = new ArrayList<TokenAllowance>(transactionRecord.getTokenAdjustmentsCount());
-        for (var tokenAdjustmentProto : transactionRecord.getTokenAdjustmentsList()) {
-            tokenAllowanceAdjustments.add(TokenAllowance.fromProtobuf(tokenAdjustmentProto));
-        }
-
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -227,10 +217,7 @@ public final class TransactionRecord {
             children,
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            hbarAllowanceAdjustments,
-            tokenAllowanceAdjustments,
-            Collections.emptyList()
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
         );
     }
 
