@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoAdjustAllowanceTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
@@ -37,6 +36,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * @deprecated with no replacement
+ */
+
+@Deprecated
 public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowanceAdjustTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances =  new ArrayList<>();
@@ -60,24 +64,7 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     }
 
     private void initFromTransactionBody() {
-        var body = sourceTransactionBody.getCryptoAdjustAllowance();
-        for (var allowanceProto : body.getCryptoAllowancesList()) {
-            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
-        }
-        for (var allowanceProto : body.getTokenAllowancesList()) {
-            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto));
-        }
-        for (var allowanceProto : body.getNftAllowancesList()) {
-            if (allowanceProto.hasApprovedForAll()) {
-                nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
-            } else {
-                getNftSerials(
-                    AccountId.fromProtobuf(allowanceProto.getOwner()),
-                    AccountId.fromProtobuf(allowanceProto.getSpender()),
-                    TokenId.fromProtobuf(allowanceProto.getTokenId())
-                ).addAll(allowanceProto.getSerialNumbersList());
-            }
-        }
+        throw new UnsupportedOperationException("Cannot construct AccountAllowanceAdjustTransaction from bytes");
     }
 
     private AccountAllowanceAdjustTransaction adjustHbarAllowance(
@@ -311,36 +298,17 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getAdjustAllowancesMethod();
-    }
-
-    CryptoAdjustAllowanceTransactionBody.Builder build() {
-        var builder = CryptoAdjustAllowanceTransactionBody.newBuilder();
-
-        @Nullable
-        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
-            transactionIds.get(0).accountId : null;
-
-        for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
-        }
-        for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
-        }
-        for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
-        }
-        return builder;
+        throw new UnsupportedOperationException("Cannot get method descriptor for AccountAllowanceAdjustTransaction");
     }
 
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoAdjustAllowance(build());
+        // do nothing
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoAdjustAllowance(build());
+        throw new UnsupportedOperationException("Cannot schedule AccountAllowanceAdjustTransaction");
     }
 
     @Override

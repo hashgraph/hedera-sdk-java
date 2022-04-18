@@ -122,10 +122,6 @@ public class AccountAllowanceExample {
             "Charlie's balance: " +
                 new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
         );
-        System.out.println(
-            "Hbar allowances where Alice is the owner: " +
-                new AccountInfoQuery().setAccountId(aliceId).execute(client).hbarAllowances
-        );
     }
 
     private void demonstrateAllowances() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
@@ -178,16 +174,14 @@ public class AccountAllowanceExample {
             System.out.println(error.getMessage());
         }
 
-        System.out.println("Adjusting Bob's allowance, increasing it by 2 Hbar.  After this, Bob's allowance should be 3 Hbar.");
+        System.out.println("Adjusting Bob's allowance to 3 Hbar.");
 
-        new AccountAllowanceAdjustTransaction()
-            .grantHbarAllowance(aliceId, bobId, Hbar.from(2))
+        new AccountAllowanceApproveTransaction()
+            .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
             .freezeWith(client)
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
-
-        printBalances();
 
         System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again.");
         System.out.println("This time it should succeed.");
@@ -205,16 +199,14 @@ public class AccountAllowanceExample {
 
         printBalances();
 
-        System.out.println("Deleting all Hbar allowances owned by Alice");
+        System.out.println("Deleting Bob's allowance");
 
-        new AccountAllowanceDeleteTransaction()
-            .deleteAllHbarAllowances(aliceId)
+        new AccountAllowanceApproveTransaction()
+            .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
             .freezeWith(client)
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
-
-        printBalances();
     }
 
     private void cleanUp() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {

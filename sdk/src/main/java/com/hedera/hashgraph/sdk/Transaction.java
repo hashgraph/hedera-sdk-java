@@ -358,9 +358,6 @@ public abstract class Transaction<T extends Transaction<T>>
             case CRYPTOAPPROVEALLOWANCE:
                 return new AccountAllowanceApproveTransaction(txs);
 
-            case CRYPTOADJUSTALLOWANCE:
-                return new AccountAllowanceAdjustTransaction(txs);
-
             case CRYPTODELETEALLOWANCE:
                 return new AccountAllowanceDeleteTransaction(txs);
 
@@ -386,9 +383,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case CONTRACTDELETEINSTANCE:
                 return new ContractDeleteTransaction(body.setContractDeleteInstance(scheduled.getContractDeleteInstance()).build());
-
-            case CRYPTOADJUSTALLOWANCE:
-                return new AccountAllowanceAdjustTransaction(body.setCryptoAdjustAllowance(scheduled.getCryptoAdjustAllowance()).build());
 
             case CRYPTOAPPROVEALLOWANCE:
                 return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());

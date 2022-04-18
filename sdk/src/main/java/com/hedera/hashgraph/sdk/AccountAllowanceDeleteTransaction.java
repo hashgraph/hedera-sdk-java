@@ -60,12 +60,6 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     private void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoDeleteAllowance();
-        for (var allowanceProto : body.getCryptoAllowancesList()) {
-            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
-        }
-        for (var allowanceProto : body.getTokenAllowancesList()) {
-            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto));
-        }
         for (var allowanceProto : body.getNftAllowancesList()) {
             getNftSerials(
                 AccountId.fromProtobuf(allowanceProto.getOwner()),
@@ -74,16 +68,28 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         }
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public AccountAllowanceDeleteTransaction deleteAllHbarAllowances(AccountId ownerAccountId) {
         requireNotFrozen();
         hbarAllowances.add(new HbarAllowance(Objects.requireNonNull(ownerAccountId), null, null));
         return this;
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public List<HbarAllowance> getHbarAllowanceDeletions() {
         return new ArrayList<>(hbarAllowances);
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public AccountAllowanceDeleteTransaction deleteAllTokenAllowances(TokenId tokenId, AccountId ownerAccountId) {
         requireNotFrozen();
         tokenAllowances.add(new TokenAllowance(
@@ -95,6 +101,10 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         return this;
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     public List<TokenAllowance> getTokenAllowanceDeletions() {
         return new ArrayList<>(tokenAllowances);
     }
@@ -154,12 +164,6 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     CryptoDeleteAllowanceTransactionBody.Builder build() {
         var builder = CryptoDeleteAllowanceTransactionBody.newBuilder();
-        for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.toWipeProtobuf());
-        }
-        for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.toWipeProtobuf());
-        }
         for (var allowance : nftAllowances) {
             builder.addNftAllowances(allowance.toRemoveProtobuf());
         }
@@ -178,12 +182,6 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
-        for (var allowance : hbarAllowances) {
-            allowance.validateChecksums(client);
-        }
-        for (var allowance : tokenAllowances) {
-            allowance.validateChecksums(client);
-        }
         for (var allowance : nftAllowances) {
             allowance.validateChecksums(client);
         }

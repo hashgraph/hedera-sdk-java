@@ -1327,13 +1327,13 @@ public enum Status {
     MAX_ALLOWANCES_EXCEEDED(ResponseCodeEnum.MAX_ALLOWANCES_EXCEEDED),
 
     /**
-     * No allowances have been specified in the approval/adjust transaction.
+     * No allowances have been specified in the approval transaction.
      */
     EMPTY_ALLOWANCES(ResponseCodeEnum.EMPTY_ALLOWANCES),
 
     /**
      * Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
-     * CryptoApproveAllowance or CryptoAdjustAllowance transaction.
+     * CryptoApproveAllowance transaction.
      */
     SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES(ResponseCodeEnum.SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES),
 
@@ -1381,7 +1381,27 @@ public enum Status {
      * The delegating Spender cannot grant allowance on a NFT serial for another spender as it doesnt not have approveForAll
      * granted on token-owner.
      */
-    DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL);
+    DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL),
+
+    /**
+     * The scheduled transaction could not be created because it's expiration_time was too far in the future.
+     */
+    SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE(ResponseCodeEnum.SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE),
+
+    /**
+     * The scheduled transaction could not be created because it's expiration_time was less than or equal to the consensus time.
+     */
+    SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME(ResponseCodeEnum.SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME),
+
+    /**
+     * The scheduled transaction could not be created because it would cause throttles to be violated on the specified expiration_time.
+     */
+    SCHEDULE_FUTURE_THROTTLE_EXCEEDED(ResponseCodeEnum.SCHEDULE_FUTURE_THROTTLE_EXCEEDED),
+
+    /**
+     * The scheduled transaction could not be created because it would cause the gas limit to be violated on the specified expiration_time.
+     */
+    SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED(ResponseCodeEnum.SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED);
 
     final ResponseCodeEnum code;
 
@@ -1919,6 +1939,14 @@ public enum Status {
                 return DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL;
             case DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL:
                 return DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL;
+            case SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE:
+                return SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE;
+            case SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME:
+                return SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME;
+            case SCHEDULE_FUTURE_THROTTLE_EXCEEDED:
+                return SCHEDULE_FUTURE_THROTTLE_EXCEEDED;
+            case SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED:
+                return SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
