@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -5,10 +24,12 @@ import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
+import com.hedera.hashgraph.sdk.proto.NftRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,8 +83,18 @@ public class TokenNftAllowance {
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            Collections.emptyList(),
+            null
+        );
+    }
+
+    static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+            null,
             allowanceProto.getSerialNumbersList(),
-            allowanceProto.getApprovedForAll()
+            null
         );
     }
 
@@ -71,9 +102,16 @@ public class TokenNftAllowance {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
-    TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return ownerAccountId != null ?
-            this : new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers, allSerials);
+    void validateChecksums(Client client) throws BadEntityIdException {
+        if (tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+        if (ownerAccountId != null) {
+            ownerAccountId.validateChecksum(client);
+        }
+        if (spenderAccountId != null) {
+            spenderAccountId.validateChecksum(client);
+        }
     }
 
     NftAllowance toProtobuf() {
@@ -102,10 +140,18 @@ public class TokenNftAllowance {
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
-        builder.addAllSerialNumbers(serialNumbers);
-        if (allSerials != null) {
-            builder.setApprovedForAll(allSerials);
+        return builder.build();
+    }
+
+    NftRemoveAllowance toRemoveProtobuf() {
+        var builder = NftRemoveAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
         }
+        if (ownerAccountId != null) {
+            builder.setOwner(ownerAccountId.toProtobuf());
+        }
+        builder.addAllSerialNumbers(serialNumbers);
         return builder.build();
     }
 

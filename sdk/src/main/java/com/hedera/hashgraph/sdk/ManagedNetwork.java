@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -483,15 +502,12 @@ abstract class ManagedNetwork<
 
         var returnNodes = new HashMap<KeyT, ManagedNodeT>(count);
 
-        for (var i = 0; i < count; i++) {
-            if (returnNodes.size() == count) {
-                break;
-            }
-
+        for (var i = 0; i < count; /* do not increment i here */ ) {
             var node = getNode(null);
 
             if (!returnNodes.containsKey(node.getKey())) {
                 returnNodes.put(node.getKey(), node);
+                i++;
             }
         }
 

@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -55,12 +74,12 @@ public class TokenId implements Comparable<TokenId> {
         Objects.requireNonNull(tokenId);
         return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
     }
-    
+
     //Construct a token ID from bytes
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenID.parseFrom(bytes).toBuilder().build());
     }
-    
+
     //Construct a token ID from a solidity address
     public static TokenId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, TokenId::new);
@@ -69,7 +88,7 @@ public class TokenId implements Comparable<TokenId> {
     public NftId nft(@Nonnegative long serial) {
         return new NftId(this, serial);
     }
-    
+
     //Construct a solidity address from a token ID
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);

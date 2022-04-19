@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -63,26 +82,26 @@ public final class FileId implements Comparable<FileId> {
         return EntityIdHelper.fromString(id, FileId::new);
     }
 
-    //Construct a file ID from bytes    
+    //Construct a file ID from bytes
     public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
-    
+
     static FileId fromProtobuf(FileID fileId) {
         Objects.requireNonNull(fileId);
         return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
-    
+
     //Construct a file ID from solidity
     public static FileId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, FileId::new);
     }
-    
+
     //Construct a solidity address from a file ID
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
-    
+
     FileID toProtobuf() {
         return FileID.newBuilder()
             .setShardNum(shard)

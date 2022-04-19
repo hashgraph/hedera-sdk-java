@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -12,6 +31,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,10 +118,13 @@ public final class TransactionRecord {
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    @Deprecated
     public final List<HbarAllowance> hbarAllowanceAdjustments;
 
+    @Deprecated
     public final List<TokenAllowance> tokenAllowanceAdjustments;
 
+    @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
 
     private TransactionRecord(
@@ -122,10 +145,7 @@ public final class TransactionRecord {
         @Nullable PublicKey aliasKey,
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp,
-        List<HbarAllowance> hbarAllowanceAdjustments,
-        List<TokenAllowance> tokenAllowanceAdjustments,
-        List<TokenNftAllowance> tokenNftAllowanceAdjustments
+        @Nullable Instant parentConsensusTimestamp
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -145,9 +165,9 @@ public final class TransactionRecord {
         this.children = children;
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
-        this.hbarAllowanceAdjustments = hbarAllowanceAdjustments;
-        this.tokenAllowanceAdjustments = tokenAllowanceAdjustments;
-        this.tokenNftAllowanceAdjustments = tokenNftAllowanceAdjustments;
+        this.hbarAllowanceAdjustments = Collections.emptyList();
+        this.tokenAllowanceAdjustments = Collections.emptyList();
+        this.tokenNftAllowanceAdjustments = Collections.emptyList();
     }
 
     static TransactionRecord fromProtobuf(
@@ -197,21 +217,6 @@ public final class TransactionRecord {
 
         var aliasKey = PublicKey.fromAliasBytes(transactionRecord.getAlias());
 
-        var hbarAllowanceAdjustments = new ArrayList<HbarAllowance>(transactionRecord.getCryptoAdjustmentsCount());
-        for (var hbarAdjustmentProto : transactionRecord.getCryptoAdjustmentsList()) {
-            hbarAllowanceAdjustments.add(HbarAllowance.fromProtobuf(hbarAdjustmentProto));
-        }
-
-        var tokenAllowanceAdjustments = new ArrayList<TokenAllowance>(transactionRecord.getTokenAdjustmentsCount());
-        for (var tokenAdjustmentProto : transactionRecord.getTokenAdjustmentsList()) {
-            tokenAllowanceAdjustments.add(TokenAllowance.fromProtobuf(tokenAdjustmentProto));
-        }
-
-        var tokenNftAllowanceAdjustments = new ArrayList<TokenNftAllowance>(transactionRecord.getNftAdjustmentsCount());
-        for (var nftAdjustmentProto : transactionRecord.getNftAdjustmentsList()) {
-            tokenNftAllowanceAdjustments.add(TokenNftAllowance.fromProtobuf(nftAdjustmentProto));
-        }
-
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -231,10 +236,7 @@ public final class TransactionRecord {
             children,
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            hbarAllowanceAdjustments,
-            tokenAllowanceAdjustments,
-            tokenNftAllowanceAdjustments
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
         );
     }
 
