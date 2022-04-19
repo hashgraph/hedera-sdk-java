@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -27,6 +46,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -34,6 +54,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 public class MockingTest {
@@ -431,6 +452,38 @@ public class MockingTest {
                 sigPairList.get(1).getEd25519().toString());
 
         server.close();
+    }
+
+    @Test
+    @DisplayName("Can cancel executeAsync()")
+    void canCancelExecuteAsync() throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("canCancelExecuteAsync", service);
+
+        server.client.setMaxBackoff(Duration.ofSeconds(8));
+        server.client.setMinBackoff(Duration.ofSeconds(1));
+
+        var noReceiptResponse = TestResponse.query(
+            Response.newBuilder()
+                .setTransactionGetReceipt(
+                    TransactionGetReceiptResponse.newBuilder()
+                        .setHeader(
+                            ResponseHeader.newBuilder()
+                                .setNodeTransactionPrecheckCode(com.hedera.hashgraph.sdk.Status.RECEIPT_NOT_FOUND.code)
+                        )
+                ).build()
+        );
+
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+
+        var future = new TransactionReceiptQuery().executeAsync(server.client);
+        Thread.sleep(1500);
+        future.cancel(true);
+        Thread.sleep(5000);
+
+        Assertions.assertEquals(2, service.buffer.queryRequestsReceived.size());
     }
 
     private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {

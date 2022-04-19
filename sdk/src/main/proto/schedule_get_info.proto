@@ -71,7 +71,11 @@ message ScheduleInfo {
   }
 
   /**
-   * The time at which the schedule will expire
+   * The time at which the schedule will be evaluated for execution and then expire.
+   *
+   * Note: Before Long Term Scheduled Transactions are enabled, Scheduled Transactions will _never_ execute at expiration - they
+   *       will _only_ execute during the initial ScheduleCreate transaction or via ScheduleSign transactions and will _always_
+   *       expire at expirationTime.
    */
   Timestamp expirationTime = 4;
 
@@ -115,6 +119,16 @@ message ScheduleInfo {
    * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
    */
   bytes ledger_id = 12;
+
+  /**
+   * When set to true, the transaction will be evaluated for execution at expiration_time instead
+   * of when all required signatures are received.
+   * When set to false, the transaction will execute immediately after sufficient signatures are received
+   * to sign the contained transaction. During the initial ScheduleCreate transaction or via ScheduleSign transactions.
+   *
+   * Note: this field is unused until Long Term Scheduled Transactions are enabled.
+   */
+  bool wait_for_expiry = 13;
 }  
 
 /**

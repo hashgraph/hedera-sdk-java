@@ -1,4 +1,23 @@
-;import com.hedera.hashgraph.sdk.AccountAllowanceAdjustTransaction;
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+import com.hedera.hashgraph.sdk.AccountAllowanceAdjustTransaction;
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
 import com.hedera.hashgraph.sdk.AccountAllowanceDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
@@ -10,12 +29,10 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -105,10 +122,6 @@ public class AccountAllowanceExample {
             "Charlie's balance: " +
                 new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
         );
-        System.out.println(
-            "Hbar allowances where Alice is the owner: " +
-                new AccountInfoQuery().setAccountId(aliceId).execute(client).hbarAllowances
-        );
     }
 
     private void demonstrateAllowances() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
@@ -161,16 +174,14 @@ public class AccountAllowanceExample {
             System.out.println(error.getMessage());
         }
 
-        System.out.println("Adjusting Bob's allowance, increasing it by 2 Hbar.  After this, Bob's allowance should be 3 Hbar.");
+        System.out.println("Adjusting Bob's allowance to 3 Hbar.");
 
-        new AccountAllowanceAdjustTransaction()
-            .grantHbarAllowance(aliceId, bobId, Hbar.from(2))
+        new AccountAllowanceApproveTransaction()
+            .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
             .freezeWith(client)
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
-
-        printBalances();
 
         System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again.");
         System.out.println("This time it should succeed.");
@@ -188,16 +199,14 @@ public class AccountAllowanceExample {
 
         printBalances();
 
-        System.out.println("Deleting all Hbar allowances owned by Alice");
+        System.out.println("Deleting Bob's allowance");
 
-        new AccountAllowanceDeleteTransaction()
-            .deleteAllHbarAllowances(aliceId)
+        new AccountAllowanceApproveTransaction()
+            .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
             .freezeWith(client)
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
-
-        printBalances();
     }
 
     private void cleanUp() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
