@@ -1,9 +1,27 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoAllowance;
-import com.hedera.hashgraph.sdk.proto.CryptoRemoveAllowance;
 import com.hedera.hashgraph.sdk.proto.GrantedCryptoAllowance;
 
 import javax.annotation.Nullable;
@@ -39,20 +57,8 @@ public class HbarAllowance {
         );
     }
 
-    static HbarAllowance fromProtobuf(CryptoRemoveAllowance allowanceProto) {
-        return new HbarAllowance(
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            null,
-            null
-        );
-    }
-
     public static HbarAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoAllowance.parseFrom(Objects.requireNonNull(bytes)));
-    }
-
-    HbarAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return ownerAccountId != null ? this : new HbarAllowance(newOwnerAccountId, spenderAccountId, amount);
     }
 
     void validateChecksums(Client client) throws BadEntityIdException {
@@ -81,14 +87,6 @@ public class HbarAllowance {
             .setAmount(amount.toTinybars());
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
-        }
-        return builder.build();
-    }
-
-    CryptoRemoveAllowance toWipeProtobuf() {
-        var builder = CryptoRemoveAllowance.newBuilder();
-        if (ownerAccountId != null) {
-            builder.setOwner(ownerAccountId.toProtobuf());
         }
         return builder.build();
     }

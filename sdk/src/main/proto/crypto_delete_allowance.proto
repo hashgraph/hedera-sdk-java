@@ -28,36 +28,16 @@ option java_multiple_files = true;
 import "basic_types.proto";
 
 /**
- * Deletes one or more hbar/token approved allowances from an owner's account. This operation
- * will remove the allowances granted to <b>all</b> spenders of an owner's hbar, a specific
- * fungible token and/or a specific non-fungible token serial number. Each owner account
- * listed as wiping an allowance must sign the transaction.
+ * Deletes one or more non-fungible approved allowances from an owner's account. This operation
+ * will remove the allowances granted to one or more specific non-fungible token serial numbers. Each owner account
+ * listed as wiping an allowance must sign the transaction. Hbar and fungible token allowances
+ * can be removed by setting the amount to zero in CryptoApproveAllowance.
  */
 message CryptoDeleteAllowanceTransactionBody {
-    /**
-     * List of hbar allowances to remove.
-     */
-    repeated CryptoRemoveAllowance cryptoAllowances = 1;
-
     /**
      * List of non-fungible token allowances to remove.
      */
     repeated NftRemoveAllowance nftAllowances = 2;
-
-    /**
-     * List of fungible token allowances to remove.
-     */
-    repeated TokenRemoveAllowance tokenAllowances = 3;
-}
-
-/**
- * Hbar allowances to be removed on an owner account
- */
-message CryptoRemoveAllowance {
-    /**
-     * The account ID of the hbar owner (ie. the grantor of the allowance).
-     */
-    AccountID owner = 1;
 }
 
 /**
@@ -78,19 +58,4 @@ message NftRemoveAllowance {
      * The list of serial numbers to remove allowances from.
      */
     repeated int64 serial_numbers = 3;
-}
-
-/**
- * Token allowances to be removed on an owner account
- */
-message TokenRemoveAllowance {
-    /**
-     * The token that the allowance pertains to.
-     */
-    TokenID token_id = 1;
-
-    /**
-     * The account ID of the token owner (ie. the grantor of the allowance).
-     */
-    AccountID owner = 2;
 }

@@ -1,9 +1,27 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.GrantedTokenAllowance;
-import com.hedera.hashgraph.sdk.proto.TokenRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -47,21 +65,8 @@ public class TokenAllowance {
         );
     }
 
-    static TokenAllowance fromProtobuf(TokenRemoveAllowance allowanceProto) {
-        return new TokenAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            null,
-            0
-        );
-    }
-
     public static TokenAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance.parseFrom(Objects.requireNonNull(bytes)));
-    }
-
-    TokenAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return ownerAccountId != null ? this : new TokenAllowance(tokenId, newOwnerAccountId, spenderAccountId, amount);
     }
 
     void validateChecksums(Client client) throws BadEntityIdException {
@@ -99,17 +104,6 @@ public class TokenAllowance {
         }
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
-        }
-        return builder.build();
-    }
-
-    TokenRemoveAllowance toWipeProtobuf() {
-        var builder = TokenRemoveAllowance.newBuilder();
-        if (tokenId != null) {
-            builder.setTokenId(tokenId.toProtobuf());
-        }
-        if (ownerAccountId != null) {
-            builder.setOwner(ownerAccountId.toProtobuf());
         }
         return builder.build();
     }

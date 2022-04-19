@@ -58,11 +58,6 @@ service CryptoService {
     rpc approveAllowances (Transaction) returns (TransactionResponse);
 
     /**
-     * Adjusts the approved allowances for a spender to transfer the paying account's hbar or tokens.
-     */
-    rpc adjustAllowances (Transaction) returns (TransactionResponse);
-
-    /**
      * Deletes the approved hbar or token allowances on an owner account.
      */
     rpc deleteAllowances (Transaction) returns (TransactionResponse);

@@ -26,26 +26,36 @@ option java_package = "com.hedera.hashgraph.sdk.proto";
 option java_multiple_files = true;
 
 import "basic_types.proto";
+import "timestamp.proto";
 import "schedulable_transaction_body.proto";
 
 /**
  * Create a new <i>schedule entity</i> (or simply, <i>schedule</i>) in the network's action queue.
  * Upon <tt>SUCCESS</tt>, the receipt contains the `ScheduleID` of the created schedule. A schedule
- * entity includes a <tt>scheduledTransactionBody</tt> to be executed when the schedule has
- * collected enough signing Ed25519 keys to satisfy the scheduled transaction's signing
- * requirements. Upon `SUCCESS`, the receipt also includes the <tt>scheduledTransactionID</tt> to
+ * entity includes a <tt>scheduledTransactionBody</tt> to be executed.
+ * When the schedule has collected enough signing Ed25519 keys to satisfy the schedule's signing
+ * requirements, the schedule can be executed.
+ *
+ * If Long Term Scheduled Transactions are enabled and <tt>wait_for_expiry</tt> is set to <tt>true</tt>, then the schedule
+ * will execute at it's <tt>expiration_time</tt>.
+ *
+ * Otherwise it will execute immediately after the transaction that provided enough Ed25519 keys, a <tt>ScheduleCreate</tt>
+ * or <tt>ScheduleSign</tt>.
+ *
+ * Upon `SUCCESS`, the receipt also includes the <tt>scheduledTransactionID</tt> to
  * use to query for the record of the scheduled transaction's execution (if it occurs). 
  * 
- * The expiration time of a schedule is always 30 minutes; it remains in state and can be queried
+ * The expiration time of a schedule is controlled by it's <tt>expiration_time</tt>. It remains in state and can be queried
  * using <tt>GetScheduleInfo</tt> until expiration, no matter if the scheduled transaction has
- * executed or marked deleted.
+ * executed or marked deleted. If Long Term Scheduled Transactions are disabled, the <tt>expiration_time</tt> is always
+ * 30 minutes in the future.
  * 
  * If the <tt>adminKey</tt> field is omitted, the resulting schedule is immutable. If the
  * <tt>adminKey</tt> is set, the <tt>ScheduleDelete</tt> transaction can be used to mark it as
  * deleted. The creator may also specify an optional <tt>memo</tt> whose UTF-8 encoding is at most
  * 100 bytes and does not include the zero byte is also supported.
  * 
- * When a scheduled transaction whose schedule has collected enough signing keys is executed, the
+ * When a <tt>scheduledTransactionBody</tt> is executed, the
  * network only charges its payer the service fee, and not the node and network fees. If the
  * optional <tt>payerAccountID</tt> is set, the network charges this account. Otherwise it charges
  * the payer of the originating <tt>ScheduleCreate</tt>.  
@@ -90,4 +100,33 @@ message ScheduleCreateTransactionBody {
    * given
    */
   AccountID payerAccountID = 4;
+
+  /**
+   * An optional timestamp for specifying when the transaction should be evaluated for execution and then expire.
+   * Defaults to 30 minutes after the transaction's consensus timestamp.
+   *
+   * Note: This field is unused and forced to be unset until Long Term Scheduled Transactions are enabled - Transactions will always
+   *       expire in 30 minutes if Long Term Scheduled Transactions are not enabled.
+   */
+  Timestamp expiration_time = 5;
+
+  /**
+   * When set to true, the transaction will be evaluated for execution at expiration_time instead
+   * of when all required signatures are received.
+   * When set to false, the transaction will execute immediately after sufficient signatures are received
+   * to sign the contained transaction. During the initial ScheduleCreate transaction or via ScheduleSign transactions.
+   *
+   * Defaults to false.
+   *
+   * Setting this to false does not necessarily mean that the transaction will never execute at expiration_time.
+   *  For Example - If the signature requirements for a Scheduled Transaction change via external means (e.g. CryptoUpdate)
+   *  such that the Scheduled Transaction would be allowed to execute, it will do so autonomously at expiration_time, unless a
+   *  ScheduleSign comes in to “poke” it and force it to go through immediately.
+   *
+   * Note: This field is unused and forced to be unset until Long Term Scheduled Transactions are enabled. Before Long Term
+   *       Scheduled Transactions are enabled, Scheduled Transactions will _never_ execute at expiration  - they will _only_
+   *       execute during the initial ScheduleCreate transaction or via ScheduleSign transactions and will _always_
+   *       expire at expiration_time.
+   */
+  bool wait_for_expiry = 13;
 }
