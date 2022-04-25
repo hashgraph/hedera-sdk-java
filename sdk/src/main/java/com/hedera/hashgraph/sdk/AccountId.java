@@ -38,15 +38,34 @@ public final class AccountId implements Comparable<AccountId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * Assign the num part of the account id.
+     *
+     * @param num                       the num part of the account id
+     */
     public AccountId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Assign all parts of the account id.
+     *
+     * @param shard                     the shard part of the account id
+     * @param realm                     the realm part of the account id
+     * @param num                       the num part of the account id
+     */
     @SuppressWarnings("InconsistentOverloads")
     public AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Assign all parts of the account id.
+     *
+     * @param shard                     the shard part of the account id
+     * @param realm                     the realm part of the account id
+     * @param num                       the num part of the account id
+     */
     @SuppressWarnings("InconsistentOverloads")
     AccountId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -56,6 +75,13 @@ public final class AccountId implements Comparable<AccountId> {
         this.aliasKey = null;
     }
 
+    /**
+     * Assign all parts of the account id.
+     *
+     * @param shard                     the shard part of the account id
+     * @param realm                     the realm part of the account id
+     * @param num                       the num part of the account id
+     */
     @SuppressWarnings("InconsistentOverloads")
     AccountId(
         @Nonnegative long shard,
@@ -71,6 +97,13 @@ public final class AccountId implements Comparable<AccountId> {
         this.aliasKey = aliasKey;
     }
 
+    /**
+     * Retrieve the account id from a string.
+     *
+     * @param id                        a string representing a valid account id
+     * @return                          the account id object
+     * @throws                          IllegalArgumentException
+     */
     public static AccountId fromString(String id) {
         try {
             return EntityIdHelper.fromString(id, AccountId::new);
@@ -92,10 +125,22 @@ public final class AccountId implements Comparable<AccountId> {
         }
     }
 
+    /**
+     * Retrieve the account id from a solidity address.
+     *
+     * @param address                   a string representing the address
+     * @return                          the account id object
+     */
     public static AccountId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
     }
 
+    /**
+     * Retrieve the account id from a protobuf.
+     *
+     * @param accountId                 the protobuf
+     * @return                          the account id object
+     */
     static AccountId fromProtobuf(AccountID accountId) {
         Objects.requireNonNull(accountId);
         return new AccountId(
@@ -107,14 +152,27 @@ public final class AccountId implements Comparable<AccountId> {
         );
     }
 
+    /**
+     * Retrieve the account id from a protobuf byte array.
+     *
+     * @param bytes                     a byte array representation of the protobuf
+     * @return                          the account id object
+     * @throws InvalidProtocolBufferException
+     */
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(AccountID.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the solidity address as a string
+     */
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
+    /**
+     * @return                          the account id builder
+     */
     AccountID toProtobuf() {
         var accountIdBuilder = AccountID.newBuilder()
             .setShardNum(shard)
@@ -137,21 +195,36 @@ public final class AccountId implements Comparable<AccountId> {
         validateChecksum(client);
     }
 
+    /**
+     * Verify that the client has a valid checksum.
+     *
+     * @param client                    the client to verify
+     * @throws                          BadEntityIdException
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         if (aliasKey == null) {
             EntityIdHelper.validate(shard, realm, num, client, checksum);
         }
     }
 
+    /**
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
     }
 
+    /**
+     * @return                          a byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
+    /**
+     * @return                          account id or alias key's account id
+     */
     @Override
     public String toString() {
         if (aliasKey != null) {
@@ -161,6 +234,10 @@ public final class AccountId implements Comparable<AccountId> {
         }
     }
 
+    /**
+     * @param client                    the client
+     * @return                          the account id with checksum
+     */
     public String toStringWithChecksum(Client client) {
         if (aliasKey != null) {
             throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey");

@@ -22,9 +22,15 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     @Nullable
     private AccountId accountId = null;
 
+    /**
+     * Constructor.
+     */
     public AccountStakersQuery() {
     }
 
+    /**
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;

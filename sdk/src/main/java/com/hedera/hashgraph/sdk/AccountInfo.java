@@ -118,6 +118,29 @@ public final class AccountInfo {
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
+    /**
+     * Constructor.
+     *
+     * @param accountId                 the account id
+     * @param contractAccountId         the contracts account id
+     * @param isDeleted                 is it deleted
+     * @param proxyAccountId            the proxy account's id
+     * @param proxyReceived             amount of proxy received
+     * @param key                       signing key
+     * @param balance                   account balance
+     * @param sendRecordThreshold       @depreciated no replacement
+     * @param receiveRecordThreshold    @depreciated no replacement
+     * @param receiverSignatureRequired is the receiver's signature required
+     * @param expirationTime            the expiration time
+     * @param autoRenewPeriod           the auto renew period
+     * @param liveHashes                the live hashes
+     * @param tokenRelationships        list of token id and token relationship records
+     * @param accountMemo               the account melo
+     * @param ownedNfts                 number of nft's
+     * @param maxAutomaticTokenAssociations     max number of token associations
+     * @param aliasKey                  public alias key
+     * @param ledgerId                  the ledger id
+     */
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -163,6 +186,12 @@ public final class AccountInfo {
         this.tokenNftAllowances = Collections.emptyList();
     }
 
+    /**
+     * Retrieve the account info from a protobuf.
+     *
+     * @param accountInfo               the account info protobuf
+     * @return                          the account info object
+     */
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
         var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
 
@@ -207,10 +236,22 @@ public final class AccountInfo {
         );
     }
 
+    /**
+     * Retrieve the account info from a protobuf byte array.
+     *
+     * @param bytes                     a byte array representing the protobuf
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Convert an account info object into a protobuf.
+     *
+     * @return                          the protobuf object
+     */
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var hashes = J8Arrays.stream(liveHashes.toArray())
             .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
@@ -248,6 +289,9 @@ public final class AccountInfo {
         return accountInfoBuilder.build();
     }
 
+    /**
+     * @return                          string representation
+     */
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -273,6 +317,9 @@ public final class AccountInfo {
             .toString();
     }
 
+    /**
+     * @return                          a byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

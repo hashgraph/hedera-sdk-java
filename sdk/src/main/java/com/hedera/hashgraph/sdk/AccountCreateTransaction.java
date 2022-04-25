@@ -27,19 +27,36 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
     private int maxAutomaticTokenAssociations = 0;
 
+    /**
+     * Constructor.
+     */
     public AccountCreateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException
+     */
     AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the creating account's key
+     */
     @Nullable
     public Key getKey() {
         return key;
@@ -61,6 +78,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * @return                          the initial balance for the new account
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -78,6 +98,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * @return                          is the receiver required to sign
+     */
     public boolean getReceiverSignatureRequired() {
         return receiverSigRequired;
     }
@@ -97,6 +120,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -115,6 +141,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * @return                          the duration for auto-renew
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -139,20 +168,37 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * @return                          the max automatic token associations
+     */
     public int getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }
 
+    /**
+     * Grant an amount of tokens.   // TODO: need to verify I think I'm wrong
+     * @param amount                    the amount of tokens
+     * @return                          {@code this}
+     */
     public AccountCreateTransaction setMaxAutomaticTokenAssociations(int amount) {
         requireNotFrozen();
         maxAutomaticTokenAssociations = amount;
         return this;
     }
 
+    /**
+     * @return                          the account memo
+     */
     public String getAccountMemo() {
         return accountMemo;
     }
 
+    /**
+     * Assign a memo to the account.
+     *
+     * @param memo                      the memo
+     * @return                          {@code this}
+     */
     public AccountCreateTransaction setAccountMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
@@ -160,6 +206,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}}
+     */
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder()
             .setInitialBalance(initialBalance.toTinybars())
@@ -186,6 +237,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoCreateAccount();
 

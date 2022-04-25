@@ -24,19 +24,36 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     @Nullable
     private AccountId transferAccountId = null;
 
+    /**
+     * Constructor.
+     */
     public ContractDeleteTransaction() {
     }
 
-    ContractDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */    ContractDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -55,6 +72,9 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return this;
     }
 
+    /**
+     * @return                          the account id that will receive the remaining hbars
+     */
     @Nullable
     public AccountId getTransferAccountId() {
         return transferAccountId;
@@ -75,6 +95,9 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return this;
     }
 
+    /**
+     * @return                          the contract id that will receive the remaining hbars
+     */
     @Nullable
     public ContractId getTransferContractId() {
         return transferContractId;
@@ -95,6 +118,12 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return this;
     }
 
+    /**
+     * Validates tha the contract id, transfer contract id and the transfer account id are valid.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException
+     */
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
@@ -116,6 +145,9 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         return SmartContractServiceGrpc.getDeleteContractMethod();
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractDeleteInstance();
         if (body.hasContractID()) {
@@ -129,6 +161,9 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         }
     }
 
+    /**
+     * @return {@code {@link ContractDeleteTransactionBody}}
+     */
     ContractDeleteTransactionBody.Builder build() {
         var builder = ContractDeleteTransactionBody.newBuilder();
         if (contractId != null) {

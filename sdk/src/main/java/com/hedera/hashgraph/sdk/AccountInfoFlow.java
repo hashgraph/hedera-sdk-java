@@ -3,6 +3,9 @@ package com.hedera.hashgraph.sdk;
 import java8.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Account Info Flow object.
+ */
 public class AccountInfoFlow {
 
     private static PublicKey getAccountPublicKey(
@@ -25,6 +28,17 @@ public class AccountInfoFlow {
         throw new UnsupportedOperationException("Account " + accountId + " has a KeyList key, which is not supported");
     }
 
+    /**
+     * Is the signature valid.
+     *
+     * @param client                    the client
+     * @param accountId                 the account id
+     * @param message                   the message
+     * @param signature                 the signature
+     * @return                          is the signature valid
+     * @throws PrecheckStatusException
+     * @throws TimeoutException
+     */
     public static boolean verifySignature(
         Client client,
         AccountId accountId,
@@ -34,6 +48,16 @@ public class AccountInfoFlow {
         return getAccountPublicKey(client, accountId).verify(message, signature);
     }
 
+    /**
+     * Is the transaction signature valid.
+     *
+     * @param client                    the client
+     * @param accountId                 the account id
+     * @param transaction               the signed transaction
+     * @return                          is the transaction signature valid
+     * @throws PrecheckStatusException
+     * @throws TimeoutException
+     */
     public static boolean verifyTransactionSignature(
         Client client,
         AccountId accountId,
@@ -42,6 +66,17 @@ public class AccountInfoFlow {
         return getAccountPublicKey(client, accountId).verifyTransaction(transaction);
     }
 
+    /**
+     * Asynchronously determine if the signature is valid.
+     *
+     * @param client                    the client
+     * @param accountId                 the account id
+     * @param message                   the message
+     * @param signature                 the signature
+     * @return                          is the signature valid
+     * @throws PrecheckStatusException
+     * @throws TimeoutException
+     */
     public static CompletableFuture<Boolean> verifySignatureAsync(
         Client client,
         AccountId accountId,
@@ -51,6 +86,16 @@ public class AccountInfoFlow {
         return getAccountPublicKeyAsync(client, accountId).thenApply(pubKey -> pubKey.verify(message, signature));
     }
 
+    /**
+     * Asynchronously determine if the signature is valid.
+     *
+     * @param client                    the client
+     * @param accountId                 the account id
+     * @param transaction               the signed transaction
+     * @return                          is the signature valid
+     * @throws PrecheckStatusException
+     * @throws TimeoutException
+     */
     public static CompletableFuture<Boolean> verifyTransactionSignatureAsync(
         Client client,
         AccountId accountId,

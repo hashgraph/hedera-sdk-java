@@ -59,6 +59,11 @@ public final class ContractFunctionParameters {
 
     private final ArrayList<Argument> args = new ArrayList<>();
 
+    /**
+     *
+     * @param string
+     * @return
+     */
     private static ByteString encodeString(String string) {
         ByteString strBytes = ByteString.copyFromUtf8(string);
         // prepend the size of the string in UTF-8 bytes

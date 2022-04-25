@@ -70,12 +70,23 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean defaultRegenerateTransactionId = true;
 
+    /**
+     * Constructor.
+     *
+     * @param executor                   the executor
+     * @param network                    the network
+     * @param mirrorNetwork              the mirror network
+     */
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
         this.mirrorNetwork = mirrorNetwork;
     }
 
+    /**
+     *
+     * @return
+     */
     static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
@@ -87,6 +98,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             threadFactory);
     }
 
+    /**
+     * Set the mirror network nodes.
+     *
+     * @param network                   list of network nodes
+     * @return                          {@code this}
+     * @throws InterruptedException
+     */
     public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
         try {
             this.mirrorNetwork.setNetwork(network);
@@ -97,6 +115,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * @return                          the list of mirror nodes
+     */
     public List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
@@ -122,6 +143,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return new Client(executor, network, mirrorNetwork);
     }
 
+    /**
+     * Set up the client for the selected network.
+     *
+     * @param name                      the selected network
+     * @return                          the configured client
+     */
     public static Client forName(String name) {
         switch (name) {
             case "mainnet":
@@ -164,6 +191,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return new Client(executor, network, mirrorNetwork);
     }
 
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet nodes</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
     public static Client forPreviewnet() {
         var executor = createExecutor();
         var network = Network.forPreviewnet(executor);
@@ -297,6 +330,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * @return                          the client's network
+     */
     public Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
@@ -318,6 +354,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * @return                          is tls enabled
+     */
     public boolean isTransportSecurity() {
         return network.isTransportSecurity();
     }
@@ -657,19 +696,37 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * @return                          the minimum node readmit time
+     */
     public Duration getMinNodeReadmitTime() {
         return network.getMinNodeReadmitTime();
     }
 
+    /**
+     * Assign the minimum node readmit time.
+     *
+     * @param minNodeReadmitTime        the requested duration
+     * @return  {@code this}
+     */
     public Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         network.setMinNodeReadmitTime(minNodeReadmitTime);
         return this;
     }
 
+    /**
+     * @return                          the maximum node readmit time
+     */
     public Duration getMaxNodeReadmitTime() {
         return network.getMaxNodeReadmitTime();
     }
 
+    /**
+     * Assign the maximum node readmit time.
+     *
+     * @param maxNodeReadmitTime        the maximum node readmit time
+     * @return {@code this}
+     */
     public Client setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
         network.setMaxNodeReadmitTime(maxNodeReadmitTime);
         return this;
@@ -776,6 +833,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxTransactionFee(maxTransactionFee);
     }
 
+    /**
+     * @return                          the default maximum query payment
+     */
     public synchronized Hbar getDefaultMaxQueryPayment() {
         return defaultMaxQueryPayment;
     }
@@ -816,10 +876,19 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
+    /**
+     * @return                          the default regenerate transaction id
+     */
     public synchronized boolean getDefaultRegenerateTransactionId() {
         return defaultRegenerateTransactionId;
     }
 
+    /**
+     * Assign the default regenerate transaction id.
+     *
+     * @param regenerateTransactionId   should there be a regenerated transaction id
+     * @return {@code this}
+     */
     public synchronized Client setDefaultRegenerateTransactionId(boolean regenerateTransactionId) {
         this.defaultRegenerateTransactionId = regenerateTransactionId;
         return this;
@@ -868,6 +937,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * @return                          the operator
+     */
     @Nullable
     Operator getOperator() {
         return this.operator;

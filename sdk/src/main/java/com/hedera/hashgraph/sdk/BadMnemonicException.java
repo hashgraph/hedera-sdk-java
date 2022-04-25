@@ -3,6 +3,9 @@ package com.hedera.hashgraph.sdk;
 import javax.annotation.Nullable;
 import java.util.List;
 
+/**
+ * Custom exception for when there are issues with the mnemonic.
+ */
 public class BadMnemonicException extends Exception {
     /**
      * The mnemonic that failed validation.
@@ -23,12 +26,21 @@ public class BadMnemonicException extends Exception {
     @Nullable
     public final List<Integer> unknownWordIndices;
 
+    /**
+     * @param mnemonic                  the mnemonic
+     * @param reason                    the reason
+     * @param unknownWordIndices        the indices
+     */
     BadMnemonicException(Mnemonic mnemonic, BadMnemonicReason reason, List<Integer> unknownWordIndices) {
         this.mnemonic = mnemonic;
         this.reason = reason;
         this.unknownWordIndices = unknownWordIndices;
     }
 
+    /**
+     * @param mnemonic                  the mnemonic
+     * @param reason                    the reason
+     */
     BadMnemonicException(Mnemonic mnemonic, BadMnemonicReason reason) {
         this.mnemonic = mnemonic;
         this.reason = reason;
