@@ -63,6 +63,8 @@ public class ContractCreateTransactionTest {
             .setGas(0)
             .setInitialBalance(Hbar.fromTinybars(1000))
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
+            .setMaxAutomaticTokenAssociations(101)
+            .setAutoRenewAccountId(AccountId.fromString("0.0.456"))
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))

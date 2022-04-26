@@ -87,6 +87,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private Key adminKey = null;
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
+    private int maxAutomaticTokenAssociations = 0;
+    private AccountId autoRenewAccountId = null;
     @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
@@ -210,6 +212,45 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    public int getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    /**
+     * Sets the new maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @param maxAutomaticTokenAssociations The maximum automatic token associations
+     * @return  {@code this}
+     */
+
+    public ContractCreateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        requireNotFrozen();
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        return this;
+    }
+
+    @Nullable
+    public AccountId getAutoRenewAccountId() {
+        return autoRenewAccountId;
+    }
+
+    /**
+     * Sets account to charge for auto-renewal of this contract. If not set, or set to an
+     * account with zero hbar balance, the contract's own hbar balance will be used to
+     * cover auto-renewal fees.
+     *
+     * @param accountId ID of account to charge fees to
+     * @return {@code this}
+     */
+
+    public ContractCreateTransaction setAutoRenewAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
+        requireNotFrozen();
+        autoRenewAccountId = accountId;
+        return this;
+    }
+
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -286,6 +327,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
+        builder.setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+        if (autoRenewAccountId != null) {
+            builder.setProxyAccountID(autoRenewAccountId.toProtobuf());
+        }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
@@ -306,6 +351,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
         }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validateChecksum(client);
+        }
     }
 
     void initFromTransactionBody() {
@@ -319,6 +368,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         }
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
+        if (body.hasAutoRenewAccountId()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccountId());
         }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
