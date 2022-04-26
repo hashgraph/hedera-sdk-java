@@ -40,7 +40,8 @@ import "basic_types.proto";
  * Upon <tt>SUCCESS</tt>, the receipt includes the <tt>scheduledTransactionID</tt> to use to query
  * for the record of the scheduled transaction's execution (if it occurs). 
  * 
- * Other notable response codes include <tt>INVALID_SCHEDULE_ID</tt>, <tt>SCHEDULE_WAS_DELETD</tt>,
+ * Other notable response codes include <tt>INVALID_SCHEDULE_ID</tt>, <tt>SCHEDULE_ALREADY_DELETED</tt>,
+ * <tt>SCHEDULE_PENDING_EXPIRATION</tt>, <tt>SCHEDULE_ALREADY_EXPIRED</tt>,
  * <tt>INVALID_ACCOUNT_ID</tt>, <tt>UNRESOLVABLE_REQUIRED_SIGNERS</tt>,
  * <tt>SOME_SIGNATURES_WERE_INVALID</tt>, and <tt>NO_NEW_VALID_SIGNATURES</tt>. For more information
  * please see the section of this documentation on the <tt>ResponseCode</tt> enum.

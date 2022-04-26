@@ -1,22 +1,3 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
@@ -114,7 +95,7 @@ public enum RequestType {
     CONTRACT_GET_INFO(HederaFunctionality.ContractGetInfo),
 
     /**
-     * Smart Contract, get the byte code
+     * Smart Contract, get the runtime code
      */
     CONTRACT_GET_BYTECODE(HederaFunctionality.ContractGetBytecode),
 
@@ -369,7 +350,12 @@ public enum RequestType {
      * Gets all the information about an account, including balance and allowances. This does not get the list of
      * account records.
      */
-    GET_ACCOUNT_DETAILS(HederaFunctionality.GetAccountDetails);
+    GET_ACCOUNT_DETAILS(HederaFunctionality.GetAccountDetails),
+
+    /**
+     * Ethereum Transaction
+     */
+    ETHEREUM_TRANSACTION(HederaFunctionality.EthereumTransaction);
 
     final HederaFunctionality code;
 
@@ -519,6 +505,8 @@ public enum RequestType {
                 return CRYPTO_DELETE_ALLOWANCE;
             case GetAccountDetails:
                 return GET_ACCOUNT_DETAILS;
+            case EthereumTransaction:
+                return ETHEREUM_TRANSACTION;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -667,6 +655,8 @@ public enum RequestType {
                 return "CRYPTO_DELETE_ALLOWANCE";
             case GET_ACCOUNT_DETAILS:
                 return "GET_ACCOUNT_DETAILS";
+            case ETHEREUM_TRANSACTION:
+                return "ETHEREUM_TRANSACTION";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

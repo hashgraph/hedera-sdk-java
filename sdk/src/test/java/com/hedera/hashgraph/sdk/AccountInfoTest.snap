@@ -207,6 +207,7 @@ com.hedera.hashgraph.sdk.AccountInfoTest.toProtobuf=[
       "validUtf8": true,
       "empty": false
     },
+    "ethereumNonce_": 0,
     "initialized": true
   }
 ]

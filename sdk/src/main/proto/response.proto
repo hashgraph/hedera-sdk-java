@@ -82,7 +82,7 @@ message Response {
         ContractCallLocalResponse contractCallLocal = 3;
 
         /**
-         * Get the bytecode for a smart contract instance
+         * Get the runtime code for a smart contract instance
          */
         ContractGetBytecodeResponse contractGetBytecodeResponse = 5;
 

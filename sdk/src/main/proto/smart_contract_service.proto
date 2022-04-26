@@ -58,7 +58,7 @@ service SmartContractService {
     rpc contractCallLocalMethod (Query) returns (Response);
 
     /**
-     * Retrieves the byte code of a contract
+     * Retrieves the runtime code of a contract
      */
     rpc ContractGetBytecode (Query) returns (Response);
 
@@ -89,4 +89,9 @@ service SmartContractService {
      * Undeletes a contract if the submitting account has network admin privileges
      */
     rpc systemUndelete (Transaction) returns (TransactionResponse);
+
+    /**
+     * Ethereum transaction
+     */
+    rpc callEthereum (Transaction) returns (TransactionResponse);
 }
