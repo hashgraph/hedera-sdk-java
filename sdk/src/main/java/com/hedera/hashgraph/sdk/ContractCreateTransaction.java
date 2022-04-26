@@ -82,6 +82,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     @Nullable
     private FileId bytecodeFileId = null;
     @Nullable
+    private byte[] bytecode = null;
+    @Nullable
     private AccountId proxyAccountId = null;
     @Nullable
     private Key adminKey = null;
@@ -128,7 +130,31 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setBytecodeFileId(FileId bytecodeFileId) {
         Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
+        this.bytecode = null;
         this.bytecodeFileId = bytecodeFileId;
+        return this;
+    }
+
+    @Nullable
+    public byte[] getBytecode() {
+        return bytecode;
+    }
+
+    /**
+     * Sets the smart contract byte code.
+     *
+     * The bytes of the smart contract initcode. This is only useful if the smart contract init
+     * is less than the hedera transaction limit. In those cases fileID must be used.
+     *
+     * @param bytecode The bytecode
+     * @return {@code this}
+     */
+
+    public ContractCreateTransaction setBytecode(byte[] bytecode) {
+        Objects.requireNonNull(bytecode);
+        requireNotFrozen();
+        this.bytecodeFileId = null;
+        this.bytecode = bytecode;
         return this;
     }
 
@@ -321,6 +347,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
+        if (bytecode != null) {
+            builder.setInitcode(ByteString.copyFrom(bytecode));
+        }
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
@@ -362,6 +391,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
         if (body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if (body.hasInitcode()) {
+            bytecode = body.getInitcode().toByteArray();
         }
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
