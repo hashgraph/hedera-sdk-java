@@ -77,7 +77,8 @@ public class ContractFunctionResultTest {
                                 BigInteger.valueOf(777)
                             )
                         )
-                    ).toProtobuf())
+                    ).toProtobuf()
+                ).setSenderId(AccountId.fromString("1.2.3").toProtobuf())
         );
 
         // interpretation varies based on width
@@ -98,6 +99,8 @@ public class ContractFunctionResultTest {
 
         assertEquals("Hello, world!", result.getString(4));
         assertEquals("Hello, world, again!", result.getString(5));
+
+        assertEquals(AccountId.fromString("1.2.3"), result.senderAccountId);
 
         assertEquals(ContractId.fromString("1.2.3"), result.contractId);
         assertEquals(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"), result.evmAddress);

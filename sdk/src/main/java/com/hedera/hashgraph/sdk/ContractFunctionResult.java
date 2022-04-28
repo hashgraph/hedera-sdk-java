@@ -75,6 +75,9 @@ public final class ContractFunctionResult {
 
     private final ByteString rawResult;
 
+    @Nullable
+    public final AccountId senderAccountId;
+
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
 
@@ -114,6 +117,8 @@ public final class ContractFunctionResult {
         hbarAmount = Hbar.fromTinybars(inner.getAmount());
 
         contractFunctionParametersBytes = inner.getFunctionParameters().toByteArray();
+
+        senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
     }
 
     /**
@@ -400,13 +405,17 @@ public final class ContractFunctionResult {
         return MoreObjects.toStringHelper(this)
             .add("contractId", contractId)
             .add("evmAddress", evmAddress)
-            .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
+            .add("errorMessage", errorMessage)
             .add("bloom", Hex.toHexString(bloom.toByteArray()))
             .add("gasUsed", gasUsed)
-            .add("errorMessage", errorMessage)
             .add("logs", logs)
             .add("createdContractIds", createdContractIds)
             .add("stateChanges", stateChanges)
+            .add("gas", gas)
+            .add("hbarAmount", hbarAmount)
+            .add("contractFunctionparametersBytes", Hex.toHexString(contractFunctionParametersBytes))
+            .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
+            .add("senderAccountId", senderAccountId)
             .toString();
     }
 }
