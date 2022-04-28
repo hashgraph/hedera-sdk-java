@@ -91,6 +91,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
+    @Nullable
+    private AccountId autoRenewAccountId = null;
 
     public ContractCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
@@ -272,6 +274,26 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         requireNotFrozen();
         Objects.requireNonNull(memo);
         contractMemo = memo;
+        return this;
+    }
+
+    /**
+     * @return {@code this}
+     */
+    public AccountId getAutoRenewAccountId() {
+        return this.autoRenewAccountId;
+    }
+
+    /**
+     * Assign the account id for auto renewal.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
+    public ContractCreateTransaction setAutoRenewAccountID(AccountId accountId) {
+        Objects.requireNonNull(accountId);
+        requireNotFrozen();
+        autoRenewAccountId = accountId;
         return this;
     }
 

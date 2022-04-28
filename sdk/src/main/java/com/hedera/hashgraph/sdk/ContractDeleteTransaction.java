@@ -42,6 +42,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     private ContractId transferContractId = null;
     @Nullable
     private AccountId transferAccountId = null;
+    private boolean permanentRemoval = false;
 
     public ContractDeleteTransaction() {
     }
@@ -111,6 +112,25 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
         Objects.requireNonNull(transferContractId);
         requireNotFrozen();
         this.transferContractId = transferContractId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}
+     */
+    public boolean getPermanentRemoval() {
+        return this.permanentRemoval;
+    }
+
+    /**
+     * Change the status of the permanent removal flag.
+     *
+     * @param permanentRemoval          true or false
+     * @return {@code this}
+     */
+    public ContractDeleteTransaction setPermanentRemoval(boolean permanentRemoval) {
+        requireNotFrozen();
+        this.permanentRemoval = permanentRemoval;
         return this;
     }
 

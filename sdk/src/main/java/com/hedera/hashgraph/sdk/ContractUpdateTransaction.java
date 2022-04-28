@@ -72,6 +72,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     private Duration autoRenewPeriod = null;
     @Nullable
     private String contractMemo = null;
+    @Nullable
+    private AccountId autoRenewAccountId = null;
 
     public ContractUpdateTransaction() {
     }
@@ -233,6 +235,26 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     public ContractUpdateTransaction clearMemo() {
         requireNotFrozen();
         contractMemo = "";
+        return this;
+    }
+
+    /**
+     * @return {@code this}
+     */
+    public AccountId getAutoRenewAccountId() {
+        return this.autoRenewAccountId;
+    }
+
+    /**
+     * Assign the account id for auto renewal.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction setAutoRenewAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
+        requireNotFrozen();
+        this.autoRenewAccountId = accountId;
         return this;
     }
 
