@@ -128,7 +128,7 @@ public final class AccountInfo {
      */
     public final LedgerId ledgerId;
 
-    public long ethereumNonce;
+    public final long ethereumNonce;
 
     @Deprecated
     public final List<HbarAllowance> hbarAllowances;
