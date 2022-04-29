@@ -13,10 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenNftInfoIntegrationTest {
 
@@ -55,10 +53,10 @@ class TokenNftInfoIntegrationTest {
             .setNftId(nftId)
             .execute(testEnv.client);
 
-        assertEquals(nftInfos.size(), 1);
-        assertEquals(nftInfos.get(0).nftId, nftId);
-        assertEquals(nftInfos.get(0).accountId, testEnv.operatorId);
-        assertEquals(nftInfos.get(0).metadata[0], 50);
+        assertThat(nftInfos.size()).isEqualTo(1);
+        assertThat(nftInfos.get(0).nftId).isEqualTo(nftId);
+        assertThat(nftInfos.get(0).accountId).isEqualTo(testEnv.operatorId);
+        assertThat(nftInfos.get(0).metadata[0]).isEqualTo(50);
 
         testEnv.close(tokenId);
     }
@@ -95,13 +93,11 @@ class TokenNftInfoIntegrationTest {
         var nftId = tokenId.nft(mintReceipt.serials.get(0));
         var invalidNftId = new NftId(nftId.tokenId, nftId.serial + 1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenNftInfoQuery()
                 .setNftId(invalidNftId)
                 .execute(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_NFT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_NFT_ID.toString());
 
         testEnv.close(tokenId);
     }
@@ -138,13 +134,11 @@ class TokenNftInfoIntegrationTest {
         var nftId = tokenId.nft(mintReceipt.serials.get(0));
         var invalidNftId = new NftId(nftId.tokenId, -1L);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenNftInfoQuery()
                 .byNftId(invalidNftId)
                 .execute(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_NFT_SERIAL_NUMBER.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_NFT_SERIAL_NUMBER.toString());
 
         testEnv.close(tokenId);
     }
@@ -184,14 +178,14 @@ class TokenNftInfoIntegrationTest {
             .setEnd(10)
             .execute(testEnv.client);
 
-        assertEquals(nftInfos.size(), 10);
+        assertThat(nftInfos.size()).isEqualTo(10);
 
         var serials = new ArrayList<Long>(mintReceipt.serials);
 
         for (var info : nftInfos) {
-            assertEquals(info.nftId.tokenId, tokenId);
-            assertTrue(serials.remove(info.nftId.serial));
-            assertEquals(info.accountId, testEnv.operatorId);
+            assertThat(info.nftId.tokenId).isEqualTo(tokenId);
+            assertThat(serials.remove(info.nftId.serial)).isTrue();
+            assertThat(info.accountId).isEqualTo(testEnv.operatorId);
         }
 
         testEnv.close(tokenId);
@@ -232,14 +226,14 @@ class TokenNftInfoIntegrationTest {
             .setEnd(10)
             .execute(testEnv.client);
 
-        assertEquals(nftInfos.size(), 10);
+        assertThat(nftInfos.size()).isEqualTo(10);
 
         var serials = new ArrayList<Long>(mintReceipt.serials);
 
         for (var info : nftInfos) {
-            assertEquals(info.nftId.tokenId, tokenId);
-            assertTrue(serials.remove(info.nftId.serial));
-            assertEquals(info.accountId, testEnv.operatorId);
+            assertThat(info.nftId.tokenId).isEqualTo(tokenId);
+            assertThat(serials.remove(info.nftId.serial)).isTrue();
+            assertThat(info.accountId).isEqualTo(testEnv.operatorId);
         }
 
         testEnv.close(tokenId);

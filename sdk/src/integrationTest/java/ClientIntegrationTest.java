@@ -14,11 +14,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ClientIntegrationTest {
     @Test
@@ -35,7 +33,7 @@ public class ClientIntegrationTest {
             .setRequestTimeout(Duration.ofMinutes(2))
             .setNetwork(network);
 
-        assertNotNull(testEnv.operatorId);
+        assertThat(testEnv.operatorId).isNotNull();
 
         // Execute two simple queries so we create a channel for each network node.
         new AccountBalanceQuery()
@@ -63,7 +61,7 @@ public class ClientIntegrationTest {
 
     @Test
     void transactionIdNetworkIsVerified() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             var client = Client.forPreviewnet();
             client.setAutoValidateChecksums(true);
 
@@ -85,8 +83,8 @@ public class ClientIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .freezeWith(testEnv.client);
 
-        assertNotNull(transaction.getNodeAccountIds());
-        assertEquals(1, transaction.getNodeAccountIds().size());
+        assertThat(transaction.getNodeAccountIds()).isNotNull();
+        assertThat(transaction.getNodeAccountIds().size()).isEqualTo(1);
 
         testEnv.close();
     }
@@ -97,7 +95,7 @@ public class ClientIntegrationTest {
         var network = testEnv.client.getNetwork();
         var nodes = new ArrayList<>(network.values());
 
-        assertFalse(nodes.isEmpty());
+        assertThat(nodes.isEmpty()).isFalse();
 
         var node = nodes.get(0);
 
@@ -116,7 +114,7 @@ public class ClientIntegrationTest {
         var network = testEnv.client.getNetwork();
         var nodes = new ArrayList<>(network.values());
 
-        assertFalse(nodes.isEmpty());
+        assertThat(nodes.isEmpty()).isFalse();
 
         var node = nodes.get(0);
 
@@ -137,7 +135,7 @@ public class ClientIntegrationTest {
         var network = testEnv.client.getNetwork();
 
         var entries = new ArrayList<>(network.entrySet());
-        assertTrue(entries.size() > 1);
+        assertThat(entries.size()).isGreaterThan(1);
 
         network.clear();
         network.put("in-process:name", entries.get(0).getValue());
@@ -148,7 +146,7 @@ public class ClientIntegrationTest {
         testEnv.client.pingAll();
 
         var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
-        assertFalse(nodes.isEmpty());
+        assertThat(nodes.isEmpty()).isFalse();
 
         var node = nodes.get(0);
 
@@ -156,7 +154,7 @@ public class ClientIntegrationTest {
             .setAccountId(node)
             .execute(testEnv.client);
 
-        assertEquals(1, testEnv.client.getNetwork().values().size());
+        assertThat(testEnv.client.getNetwork().values().size()).isEqualTo(1);
 
         testEnv.close();
     }

@@ -9,9 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicInfoIntegrationTest {
 
@@ -31,7 +30,7 @@ public class TopicInfoIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)
@@ -58,11 +57,11 @@ public class TopicInfoIntegrationTest {
 
         var cost = infoQuery.getCost(testEnv.client);
 
-        assertNotNull(cost);
+        assertThat(cost).isNotNull();
 
         var info = infoQuery.execute(testEnv.client);
 
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)
@@ -90,11 +89,11 @@ public class TopicInfoIntegrationTest {
 
         var cost = infoQuery.getCost(testEnv.client);
 
-        assertNotNull(cost);
+        assertThat(cost).isNotNull();
 
         var info = infoQuery.execute(testEnv.client);
 
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)
@@ -120,7 +119,7 @@ public class TopicInfoIntegrationTest {
             .setTopicId(topicId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        assertThrows(MaxQueryPaymentExceededException.class, () -> {
+        assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
             infoQuery.execute(testEnv.client);
         });
 
@@ -149,13 +148,11 @@ public class TopicInfoIntegrationTest {
 
         var cost = infoQuery.getCost(testEnv.client);
 
-        assertNotNull(cost);
+        assertThat(cost).isNotNull();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-        });
-
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)

@@ -29,11 +29,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ScheduleCreateIntegrationTest {
     @Test
@@ -60,7 +57,7 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info.executedAt);
+        assertThat(info.executedAt).isNotNull();
 
         testEnv.close();
     }
@@ -89,8 +86,8 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info.executedAt);
-        assertNotNull(info.getScheduledTransaction());
+        assertThat(info.executedAt).isNotNull();
+        assertThat(info.getScheduledTransaction()).isNotNull();
 
         testEnv.close();
     }
@@ -120,8 +117,8 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info.executedAt);
-        assertNotNull(info.getScheduledTransaction());
+        assertThat(info.executedAt).isNotNull();
+        assertThat(info.getScheduledTransaction()).isNotNull();
 
         testEnv.close();
     }
@@ -175,7 +172,7 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNull(info.executedAt);
+        assertThat(info.executedAt).isNull();
 
         // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
         // since all 3 signatures have been provided.
@@ -189,7 +186,7 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info.executedAt);
+        assertThat(info.executedAt).isNotNull();
 
         new AccountDeleteTransaction()
             .setAccountId(accountId)
@@ -255,7 +252,7 @@ public class ScheduleCreateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(balanceQuery1.tokens.get(tokenId), 0);
+        assertThat(balanceQuery1.tokens.get(tokenId)).isEqualTo(0);
 
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
@@ -268,7 +265,7 @@ public class ScheduleCreateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(balanceQuery2.tokens.get(tokenId), 10);
+        assertThat(balanceQuery2.tokens.get(tokenId)).isEqualTo(10);
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -299,22 +296,20 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId1)
             .execute(testEnv.client);
 
-        assertNotNull(info1.executedAt);
+        assertThat(info1.executedAt).isNotNull();
 
         var transferTxFromInfo = info1.getScheduledTransaction();
 
         var scheduleCreateTx1 = transferTx.schedule();
         var scheduleCreateTx2 = transferTxFromInfo.schedule();
 
-        assertEquals(scheduleCreateTx1.toString(), scheduleCreateTx2.toString());
+        assertThat(scheduleCreateTx2.toString()).isEqualTo(scheduleCreateTx1.toString());
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             transferTxFromInfo.schedule()
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.toString().contains("IDENTICAL_SCHEDULE_ALREADY_CREATED"));
+        }).withMessageContaining("IDENTICAL_SCHEDULE_ALREADY_CREATED");
 
         testEnv.close(accountId, key);
     }
@@ -343,7 +338,7 @@ public class ScheduleCreateIntegrationTest {
             .setKey(keyList)
             .execute(testEnv.client);
 
-        assertNotNull(response.getReceipt(testEnv.client).accountId);
+        assertThat(response.getReceipt(testEnv.client).accountId).isNotNull();
 
         var topicId = Objects.requireNonNull(new TopicCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
@@ -378,13 +373,13 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info);
-        assertEquals(info.scheduleId, scheduleId);
+        assertThat(info).isNotNull();
+        assertThat(info.scheduleId).isEqualTo(scheduleId);
 
         var infoTransaction = (TopicMessageSubmitTransaction) info.getScheduledTransaction();
 
-        assertEquals(transaction.getTopicId(), infoTransaction.getTopicId());
-        assertEquals(transaction.getNodeAccountIds(), infoTransaction.getNodeAccountIds());
+        assertThat(transaction.getTopicId()).isEqualTo(infoTransaction.getTopicId());
+        assertThat(transaction.getNodeAccountIds()).isEqualTo(infoTransaction.getNodeAccountIds());
 
         var scheduleSign = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
@@ -399,7 +394,7 @@ public class ScheduleCreateIntegrationTest {
             .setScheduleId(scheduleId)
             .execute(testEnv.client);
 
-        assertNotNull(info.executedAt);
+        assertThat(info.executedAt).isNotNull();
 
         testEnv.close();
     }

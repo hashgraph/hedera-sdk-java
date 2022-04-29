@@ -13,11 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenInfoIntegrationTest {
     @Test
@@ -53,27 +51,27 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 3);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNotNull(info.freezeKey);
-        assertNotNull(info.wipeKey);
-        assertNotNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertEquals(key1.getPublicKey().toString(), info.adminKey.toString());
-        assertEquals(key2.getPublicKey().toString(), info.freezeKey.toString());
-        assertEquals(key3.getPublicKey().toString(), info.wipeKey.toString());
-        assertEquals(key4.getPublicKey().toString(), info.kycKey.toString());
-        assertEquals(key5.getPublicKey().toString(), info.supplyKey.toString());
-        assertNotNull(info.defaultFreezeStatus);
-        assertFalse(info.defaultFreezeStatus);
-        assertNotNull(info.defaultKycStatus);
-        assertFalse(info.defaultKycStatus);
-        assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
-        assertEquals(info.supplyType, TokenSupplyType.INFINITE);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(3);
+        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNotNull();
+        assertThat(info.wipeKey).isNotNull();
+        assertThat(info.kycKey).isNotNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.adminKey.toString()).isEqualTo(key1.getPublicKey().toString());
+        assertThat(info.freezeKey.toString()).isEqualTo(key2.getPublicKey().toString());
+        assertThat(info.wipeKey.toString()).isEqualTo(key3.getPublicKey().toString());
+        assertThat(info.kycKey.toString()).isEqualTo(key4.getPublicKey().toString());
+        assertThat(info.supplyKey.toString()).isEqualTo(key5.getPublicKey().toString());
+        assertThat(info.defaultFreezeStatus).isNotNull();
+        assertThat(info.defaultFreezeStatus).isFalse();
+        assertThat(info.defaultKycStatus).isNotNull();
+        assertThat(info.defaultKycStatus).isFalse();
+        assertThat(info.tokenType).isEqualTo(TokenType.FUNGIBLE_COMMON);
+        assertThat(info.supplyType).isEqualTo(TokenSupplyType.INFINITE);
 
         new TokenDeleteTransaction()
             .setTokenId(tokenId)
@@ -102,21 +100,21 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 0);
-        assertEquals(info.totalSupply, 0);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNull(info.adminKey);
-        assertNull(info.freezeKey);
-        assertNull(info.wipeKey);
-        assertNull(info.kycKey);
-        assertNull(info.supplyKey);
-        assertNull(info.defaultFreezeStatus);
-        assertNull(info.defaultKycStatus);
-        assertEquals(info.tokenType, TokenType.FUNGIBLE_COMMON);
-        assertEquals(info.supplyType, TokenSupplyType.INFINITE);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(0);
+        assertThat(info.totalSupply).isEqualTo(0);
+        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.adminKey).isNull();
+        assertThat(info.freezeKey).isNull();
+        assertThat(info.wipeKey).isNull();
+        assertThat(info.kycKey).isNull();
+        assertThat(info.supplyKey).isNull();
+        assertThat(info.defaultFreezeStatus).isNull();
+        assertThat(info.defaultKycStatus).isNull();
+        assertThat(info.tokenType).isEqualTo(TokenType.FUNGIBLE_COMMON);
+        assertThat(info.supplyType).isEqualTo(TokenSupplyType.INFINITE);
 
         // we lose this IntegrationTestEnv throwaway account
         testEnv.client.close();
@@ -147,28 +145,28 @@ class TokenInfoIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertEquals(mintReceipt.serials.size(), 10);
+        assertThat(mintReceipt.serials.size()).isEqualTo(10);
 
         var info = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 0);
-        assertEquals(info.totalSupply, 10);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNull(info.freezeKey);
-        assertNull(info.wipeKey);
-        assertNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertNull(info.defaultFreezeStatus);
-        assertNull(info.defaultKycStatus);
-        assertEquals(info.tokenType, TokenType.NON_FUNGIBLE_UNIQUE);
-        assertEquals(info.supplyType, TokenSupplyType.FINITE);
-        assertEquals(info.maxSupply, 5000);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(0);
+        assertThat(info.totalSupply).isEqualTo(10);
+        assertThat(testEnv.operatorId).isEqualTo(info.treasuryAccountId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNull();
+        assertThat(info.wipeKey).isNull();
+        assertThat(info.kycKey).isNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.defaultFreezeStatus).isNull();
+        assertThat(info.defaultKycStatus).isNull();
+        assertThat(info.tokenType).isEqualTo(TokenType.NON_FUNGIBLE_UNIQUE);
+        assertThat(info.supplyType).isEqualTo(TokenSupplyType.FINITE);
+        assertThat(info.maxSupply).isEqualTo(5000);
 
         testEnv.close(tokenId);
     }
@@ -240,7 +238,7 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        assertThrows(MaxQueryPaymentExceededException.class, () -> {
+        assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
             infoQuery.execute(testEnv.client);
         });
 
@@ -265,11 +263,9 @@ class TokenInfoIntegrationTest {
             .setTokenId(tokenId)
             .setMaxQueryPayment(new Hbar(1000));
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-        });
-
-        assertEquals(error.status.toString(), "INSUFFICIENT_TX_FEE");
+        }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
         testEnv.close(tokenId);
     }

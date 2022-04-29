@@ -12,8 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenAssociateIntegrationTest {
     @Test
@@ -97,15 +96,13 @@ class TokenAssociateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close(accountId, key);
     }
@@ -142,15 +139,13 @@ class TokenAssociateIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

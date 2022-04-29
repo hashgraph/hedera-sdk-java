@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicUpdateIntegrationTest {
     @Test
@@ -36,8 +34,8 @@ public class TopicUpdateIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals("hello", topicInfo.topicMemo);
-        assertNull(topicInfo.autoRenewAccountId);
+        assertThat(topicInfo.topicMemo).isEqualTo("hello");
+        assertThat(topicInfo.autoRenewAccountId).isNull();
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)

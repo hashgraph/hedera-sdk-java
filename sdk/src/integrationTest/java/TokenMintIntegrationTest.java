@@ -13,9 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenMintIntegrationTest {
     @Test
@@ -47,7 +46,7 @@ class TokenMintIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertEquals(receipt.totalSupply, 1000000 + 10);
+        assertThat(receipt.totalSupply).isEqualTo(1000000 + 10);
 
         testEnv.close(tokenId);
     }
@@ -73,15 +72,13 @@ class TokenMintIntegrationTest {
         );
 
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setTokenId(tokenId)
                 .setAmount(6)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.TOKEN_MAX_SUPPLY_REACHED.toString()));
+        }).withMessageContaining(Status.TOKEN_MAX_SUPPLY_REACHED.toString());
 
         testEnv.close(tokenId);
     }
@@ -91,14 +88,12 @@ class TokenMintIntegrationTest {
     void cannotMintTokensWhenTokenIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
         testEnv.close();
     }
@@ -126,14 +121,12 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_MINT_AMOUNT.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_MINT_AMOUNT.toString());
 
         testEnv.close(tokenId);
     }
@@ -170,15 +163,13 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setTokenId(tokenId)
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -212,7 +203,7 @@ class TokenMintIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertEquals(receipt.serials.size(), 10);
+        assertThat(receipt.serials.size()).isEqualTo(10);
 
         testEnv.close(tokenId);
     }
@@ -240,15 +231,13 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setMetadata(NftMetadataGenerator.generateOneLarge())
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.METADATA_TOO_LONG.toString()));
+        }).withMessageContaining(Status.METADATA_TOO_LONG.toString());
 
         testEnv.close(tokenId);
     }

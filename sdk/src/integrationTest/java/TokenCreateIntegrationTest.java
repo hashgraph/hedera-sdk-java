@@ -18,8 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenCreateIntegrationTest {
     private static List<CustomFee> createFixedFeeList(int count, AccountId feeCollector) {
@@ -93,16 +92,14 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenNameIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-        });
-
-        assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_NAME.toString()));
+        }).withMessageContaining(Status.MISSING_TOKEN_NAME.toString());
 
         testEnv.close();
     }
@@ -112,16 +109,14 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenSymbolIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-        });
-
-        assertTrue(error.getMessage().contains(Status.MISSING_TOKEN_SYMBOL.toString()));
+        }).withMessageContaining(Status.MISSING_TOKEN_SYMBOL.toString());
 
         testEnv.close();
     }
@@ -131,16 +126,14 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString()));
+        }).withMessageContaining(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString());
 
         testEnv.close();
     }
@@ -150,7 +143,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -158,9 +151,7 @@ class TokenCreateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close();
     }
@@ -172,7 +163,7 @@ class TokenCreateIntegrationTest {
 
         var key = PrivateKey.generateED25519();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -180,10 +171,7 @@ class TokenCreateIntegrationTest {
                 .setAdminKey(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close();
     }
@@ -223,7 +211,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateMoreThanTenCustomFees() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -232,9 +220,7 @@ class TokenCreateIntegrationTest {
                 .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.CUSTOM_FEES_LIST_TOO_LONG.toString()));
+        }).withMessageContaining(Status.CUSTOM_FEES_LIST_TOO_LONG.toString());
 
         testEnv.close();
     }
@@ -282,7 +268,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateMinGreaterThanMax() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -296,9 +282,7 @@ class TokenCreateIntegrationTest {
                     .setFeeCollectorAccountId(testEnv.operatorId)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString()));
+        }).withMessageContaining(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString());
 
         testEnv.close();
     }
@@ -308,7 +292,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateInvalidFeeCollector() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -318,9 +302,7 @@ class TokenCreateIntegrationTest {
                     .setAmount(1)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString()));
+        }).withMessageContaining(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString());
 
         testEnv.close();
     }
@@ -330,7 +312,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateNegativeFee() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -341,9 +323,7 @@ class TokenCreateIntegrationTest {
                     .setFeeCollectorAccountId(testEnv.operatorId)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString()));
+        }).withMessageContaining(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString());
 
         testEnv.close();
     }
@@ -354,7 +334,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateZeroDenominator() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -368,9 +348,7 @@ class TokenCreateIntegrationTest {
                     .setFeeCollectorAccountId(testEnv.operatorId)))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.FRACTION_DIVIDES_BY_ZERO.toString()));
+        }).withMessageContaining(Status.FRACTION_DIVIDES_BY_ZERO.toString());
 
         testEnv.close();
     }
