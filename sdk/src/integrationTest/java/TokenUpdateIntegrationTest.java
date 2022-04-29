@@ -114,7 +114,6 @@ class TokenUpdateIntegrationTest {
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
 
-        // we lose this IntegrationTestEnv throwaway account
-        testEnv.client.close();
+        testEnv.close();
     }
 }

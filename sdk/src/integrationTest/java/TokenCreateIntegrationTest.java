@@ -83,8 +83,7 @@ class TokenCreateIntegrationTest {
             .getReceipt(testEnv.client)
             .tokenId;
 
-        // we lose this IntegrationTestEnv throwaway account
-        testEnv.client.close();
+        testEnv.close();
     }
 
     @Test

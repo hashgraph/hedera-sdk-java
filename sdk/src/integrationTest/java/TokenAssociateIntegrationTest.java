@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -59,6 +60,7 @@ class TokenAssociateIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();

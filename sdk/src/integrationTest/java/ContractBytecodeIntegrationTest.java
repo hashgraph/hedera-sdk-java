@@ -47,7 +47,7 @@ public class ContractBytecodeIntegrationTest {
             .setContractId(contractId)
             .execute(testEnv.client);
 
-        assertThat(bytecode.size()).isEqualTo(1);
+        assertThat(bytecode.size()).isEqualTo(798);
 
         new ContractDeleteTransaction()
             .setTransferAccountId(testEnv.operatorId)

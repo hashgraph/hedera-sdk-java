@@ -75,7 +75,7 @@ class AccountUpdateIntegrationTest {
             new AccountUpdateTransaction()
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
+        }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
 
         testEnv.close();
     }

@@ -56,7 +56,7 @@ class TokenNftInfoIntegrationTest {
         assertThat(nftInfos.size()).isEqualTo(1);
         assertThat(nftInfos.get(0).nftId).isEqualTo(nftId);
         assertThat(nftInfos.get(0).accountId).isEqualTo(testEnv.operatorId);
-        assertThat(nftInfos.get(0).metadata[0]).isEqualTo(50);
+        assertThat(nftInfos.get(0).metadata[0]).isEqualTo((byte) 50);
 
         testEnv.close(tokenId);
     }

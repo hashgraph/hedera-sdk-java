@@ -116,8 +116,7 @@ class TokenInfoIntegrationTest {
         assertThat(info.tokenType).isEqualTo(TokenType.FUNGIBLE_COMMON);
         assertThat(info.supplyType).isEqualTo(TokenSupplyType.INFINITE);
 
-        // we lose this IntegrationTestEnv throwaway account
-        testEnv.client.close();
+        testEnv.close();
     }
 
 

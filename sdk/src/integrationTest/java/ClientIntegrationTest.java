@@ -130,6 +130,7 @@ public class ClientIntegrationTest {
         var testEnv = new IntegrationTestEnv(3);
 
         testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.setMaxAttempts(1);
         testEnv.client.setMaxNodesPerTransaction(2);
 
         var network = testEnv.client.getNetwork();

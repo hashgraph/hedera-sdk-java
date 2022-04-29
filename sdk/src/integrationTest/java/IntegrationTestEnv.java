@@ -1,4 +1,5 @@
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -11,6 +12,7 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java8.util.function.Function;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -28,12 +30,13 @@ public class IntegrationTestEnv {
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
-    private AccountId originalOperatorId;
+    private Client originalClient;
 
     @SuppressWarnings("EmptyCatch")
     public IntegrationTestEnv(int numberOfNodes) throws Exception {
         client = createTestEnvClient()
             .setMaxNodesPerTransaction(numberOfNodes);
+        originalClient = client;
 
         try {
             var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
@@ -46,7 +49,6 @@ public class IntegrationTestEnv {
 
         operatorKey = client.getOperatorPublicKey();
         operatorId = client.getOperatorAccountId();
-        originalOperatorId = operatorId;
 
         assertNotNull(client.getOperatorAccountId());
         assertNotNull(client.getOperatorPublicKey());
@@ -82,7 +84,7 @@ public class IntegrationTestEnv {
         throw new IllegalStateException("Failed to construct client for IntegrationTestEnv");
     }
 
-    public IntegrationTestEnv useThrowawayAccount(Hbar initialBalance) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    public IntegrationTestEnv useThrowawayAccount(Hbar initialBalance) throws Exception {
         var key = PrivateKey.generateED25519();
         operatorKey = key.getPublicKey();
         operatorId = new AccountCreateTransaction()
@@ -91,11 +93,14 @@ public class IntegrationTestEnv {
             .execute(client)
             .getReceipt(client)
             .accountId;
+
+        client = Client.forNetwork(originalClient.getNetwork());
+        client.setMirrorNetwork(originalClient.getMirrorNetwork());
         client.setOperator(Objects.requireNonNull(operatorId), key);
         return this;
     }
 
-    public IntegrationTestEnv useThrowawayAccount() throws ReceiptStatusException, PrecheckStatusException, TimeoutException {
+    public IntegrationTestEnv useThrowawayAccount() throws Exception {
         return useThrowawayAccount(new Hbar(50));
     }
 
@@ -104,32 +109,38 @@ public class IntegrationTestEnv {
         @Nullable AccountId newAccountId,
         @Nullable PrivateKey newAccountKey
     ) throws Exception {
-        if (newTokenId != null) {
-            new TokenDeleteTransaction()
-                .setTokenId(newTokenId)
-                .execute(client)
-                .getReceipt(client);
-        }
-
         if (newAccountId != null) {
-            new AccountDeleteTransaction()
-                .setTransferAccountId(originalOperatorId)
-                .setAccountId(newAccountId)
-                .freezeWith(client)
-                .sign(Objects.requireNonNull(newAccountKey))
-                .execute(client)
-                .getReceipt(client);
+            wipeAccountHbars(newAccountId, newAccountKey);
         }
 
-        if (!operatorId.equals(originalOperatorId)) {
-            new AccountDeleteTransaction()
-                .setTransferAccountId(originalOperatorId)
+        if (!operatorId.equals(originalClient.getOperatorAccountId())) {
+            var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
-                .execute(client)
-                .getReceipt(client);
+                .execute(originalClient)
+                .hbars;
+            new TransferTransaction()
+                .addHbarTransfer(operatorId, hbarsBalance.negated())
+                .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
+                .freezeWith(originalClient)
+                .signWithOperator(client)
+                .execute(originalClient);
+            client.close();
         }
 
-        client.close();
+        originalClient.close();
+    }
+
+    public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
+        var hbarsBalance = new AccountBalanceQuery()
+            .setAccountId(newAccountId)
+            .execute(originalClient)
+            .hbars;
+        new TransferTransaction()
+            .addHbarTransfer(newAccountId, hbarsBalance.negated())
+            .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
+            .freezeWith(originalClient)
+            .sign(Objects.requireNonNull(newAccountKey))
+            .execute(originalClient);
     }
 
     public void close() throws Exception {
