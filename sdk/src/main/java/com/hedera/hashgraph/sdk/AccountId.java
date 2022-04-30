@@ -57,7 +57,7 @@ public final class AccountId implements Comparable<AccountId> {
     public final PublicKey aliasKey;
 
     @Nullable
-    public final byte[] aliasEvmAddress;
+    public final EvmAddress aliasEvmAddress;
 
     @Nullable
     private final String checksum;
@@ -88,7 +88,7 @@ public final class AccountId implements Comparable<AccountId> {
         @Nonnegative long num,
         @Nullable String checksum,
         @Nullable PublicKey aliasKey,
-        @Nullable byte[] aliasEvmAddress
+        @Nullable EvmAddress aliasEvmAddress
     ) {
         this.shard = shard;
         this.realm = realm;
@@ -116,7 +116,7 @@ public final class AccountId implements Comparable<AccountId> {
                     0,
                     null,
                     isEvmAddress ? null : PublicKey.fromBytesDER(aliasBytes),
-                    isEvmAddress ? aliasBytes : null
+                    isEvmAddress ? EvmAddress.fromBytes(aliasBytes) : null
                 );
             }
         }
@@ -135,7 +135,7 @@ public final class AccountId implements Comparable<AccountId> {
             accountId.getAccountNum(),
             null,
             aliasIsEvmAddress ? null : PublicKey.fromAliasBytes(accountId.getAlias()),
-            aliasIsEvmAddress ? accountId.getAlias().toByteArray() : null
+            aliasIsEvmAddress ? EvmAddress.fromAliasBytes(accountId.getAlias()) : null
         );
     }
 
@@ -154,7 +154,7 @@ public final class AccountId implements Comparable<AccountId> {
         if (aliasKey != null) {
             accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         } else if (aliasEvmAddress != null) {
-            accountIdBuilder.setAlias(ByteString.copyFrom(aliasEvmAddress));
+            accountIdBuilder.setAlias(aliasEvmAddress.toProtobufKey().toByteString());
         }else {
             accountIdBuilder.setAccountNum(num);
         }
@@ -191,7 +191,7 @@ public final class AccountId implements Comparable<AccountId> {
         if (aliasKey != null) {
             return "" + shard + "." + realm + "." + aliasKey.toStringDER();
         } else if (aliasEvmAddress != null) {
-            return "" + shard + "." + realm + "." + Hex.toHexString(aliasEvmAddress);
+            return "" + shard + "." + realm + "." + aliasEvmAddress.toString();
         } else {
             return EntityIdHelper.toString(shard, realm, num);
         }
@@ -245,6 +245,9 @@ public final class AccountId implements Comparable<AccountId> {
         }
         if ((aliasKey == null) != (o.aliasKey == null)) {
             return aliasKey != null ? 1 : -1;
+        }
+        if ((aliasEvmAddress == null) != (o.aliasEvmAddress == null)) {
+            return aliasEvmAddress != null ? 1 : -1;
         }
         if (aliasKey == null) {
             return 0;
