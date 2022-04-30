@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `ContractCallQuery.[get|set]SenderAccountId()`
  * `TransactionRecord.ethereumHash`
  * `EthereumTransaction`
+ * `AccountId.aliasEvmAddress`
 
 ## v2.12.0
 

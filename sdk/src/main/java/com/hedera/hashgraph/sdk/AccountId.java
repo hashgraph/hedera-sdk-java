@@ -19,8 +19,10 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
+import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -55,6 +57,9 @@ public final class AccountId implements Comparable<AccountId> {
     public final PublicKey aliasKey;
 
     @Nullable
+    public final EvmAddress aliasEvmAddress;
+
+    @Nullable
     private final String checksum;
 
     public AccountId(@Nonnegative long num) {
@@ -73,6 +78,7 @@ public final class AccountId implements Comparable<AccountId> {
         this.num = num;
         this.checksum = checksum;
         this.aliasKey = null;
+        this.aliasEvmAddress = null;
     }
 
     @SuppressWarnings("InconsistentOverloads")
@@ -81,13 +87,15 @@ public final class AccountId implements Comparable<AccountId> {
         @Nonnegative long realm,
         @Nonnegative long num,
         @Nullable String checksum,
-        @Nullable PublicKey aliasKey
+        @Nullable PublicKey aliasKey,
+        @Nullable EvmAddress aliasEvmAddress
     ) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
         this.checksum = checksum;
         this.aliasKey = aliasKey;
+        this.aliasEvmAddress = aliasEvmAddress;
     }
 
     public static AccountId fromString(String id) {
@@ -100,12 +108,15 @@ public final class AccountId implements Comparable<AccountId> {
                     "Invalid Account ID \"" + id + "\": format should look like 0.0.123 or 0.0.123-vfmkw or 0.0.1337BEEF (where 1337BEEF is a hex-encoded, DER-format public key)"
                 );
             } else {
+                byte[] aliasBytes = Hex.decode(match.group(3));
+                boolean isEvmAddress = aliasBytes.length == 20;
                 return new AccountId(
                     Long.parseLong(match.group(1)),
                     Long.parseLong(match.group(2)),
                     0,
                     null,
-                    PublicKey.fromStringDER(match.group(3))
+                    isEvmAddress ? null : PublicKey.fromBytesDER(aliasBytes),
+                    isEvmAddress ? EvmAddress.fromBytes(aliasBytes) : null
                 );
             }
         }
@@ -117,12 +128,14 @@ public final class AccountId implements Comparable<AccountId> {
 
     static AccountId fromProtobuf(AccountID accountId) {
         Objects.requireNonNull(accountId);
+        boolean aliasIsEvmAddress = accountId.getAlias().size() == 20;
         return new AccountId(
             accountId.getShardNum(),
             accountId.getRealmNum(),
             accountId.getAccountNum(),
             null,
-            PublicKey.fromAliasBytes(accountId.getAlias())
+            aliasIsEvmAddress ? null : PublicKey.fromAliasBytes(accountId.getAlias()),
+            aliasIsEvmAddress ? EvmAddress.fromAliasBytes(accountId.getAlias()) : null
         );
     }
 
@@ -140,7 +153,9 @@ public final class AccountId implements Comparable<AccountId> {
             .setRealmNum(realm);
         if (aliasKey != null) {
             accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
-        } else {
+        } else if (aliasEvmAddress != null) {
+            accountIdBuilder.setAlias(aliasEvmAddress.toProtobufKey().toByteString());
+        }else {
             accountIdBuilder.setAccountNum(num);
         }
         return accountIdBuilder.build();
@@ -175,6 +190,8 @@ public final class AccountId implements Comparable<AccountId> {
     public String toString() {
         if (aliasKey != null) {
             return "" + shard + "." + realm + "." + aliasKey.toStringDER();
+        } else if (aliasEvmAddress != null) {
+            return "" + shard + "." + realm + "." + aliasEvmAddress.toString();
         } else {
             return EntityIdHelper.toString(shard, realm, num);
         }
@@ -228,6 +245,9 @@ public final class AccountId implements Comparable<AccountId> {
         }
         if ((aliasKey == null) != (o.aliasKey == null)) {
             return aliasKey != null ? 1 : -1;
+        }
+        if ((aliasEvmAddress == null) != (o.aliasEvmAddress == null)) {
+            return aliasEvmAddress != null ? 1 : -1;
         }
         if (aliasKey == null) {
             return 0;
