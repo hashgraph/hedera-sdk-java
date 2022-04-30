@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomFeeListTest {
     @BeforeAll
@@ -65,7 +65,7 @@ public class CustomFeeListTest {
         var copyCustomFeeList = new ArrayList<CustomFee>();
         copyCustomFeeList.add(CustomFee.fromBytes(customFee0Bytes));
         copyCustomFeeList.add(CustomFee.fromBytes(customFee1Bytes));
-        assertTrue(originalCustomFeeList.toString().equals(copyCustomFeeList.toString()));
+        assertThat(originalCustomFeeList.toString().equals(copyCustomFeeList.toString())).isTrue();
         SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }
 
@@ -77,11 +77,11 @@ public class CustomFeeListTest {
             copyCustomFeeList.add(fee.deepClone());
         }
         var originalCustomFeeListString = originalCustomFeeList.toString();
-        assertTrue(originalCustomFeeListString.equals(copyCustomFeeList.toString()));
+        assertThat(originalCustomFeeListString.equals(copyCustomFeeList.toString())).isTrue();
 
         // modifying clone doesn't affect original
         ((CustomFixedFee) copyCustomFeeList.get(0)).setDenominatingTokenId(new TokenId(89803));
-        assertTrue(originalCustomFeeListString.equals(originalCustomFeeList.toString()));
+        assertThat(originalCustomFeeListString.equals(originalCustomFeeList.toString())).isTrue();
 
         SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }

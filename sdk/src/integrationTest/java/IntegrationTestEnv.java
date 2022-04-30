@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IntegrationTestEnv {
     public Client client;
@@ -50,8 +49,8 @@ public class IntegrationTestEnv {
         operatorKey = client.getOperatorPublicKey();
         operatorId = client.getOperatorAccountId();
 
-        assertNotNull(client.getOperatorAccountId());
-        assertNotNull(client.getOperatorPublicKey());
+        assertThat(client.getOperatorAccountId()).isNotNull();
+        assertThat(client.getOperatorPublicKey()).isNotNull();
 
         var nodeGetter = new TestEnvNodeGetter(client);
         var network = new HashMap<String, AccountId>();

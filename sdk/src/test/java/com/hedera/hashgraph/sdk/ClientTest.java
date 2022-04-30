@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ClientTest {
     @Test
@@ -54,7 +53,7 @@ class ClientTest {
     @DisplayName("Client.setMaxQueryPayment() negative")
     void setMaxQueryPaymentNegative() throws TimeoutException {
         var client = Client.forTestnet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxQueryPayment(Hbar.MIN);
         });
         client.close();
@@ -64,7 +63,7 @@ class ClientTest {
     @ParameterizedTest(name = "Invalid maxAttempts {0}")
     void setMaxAttempts(int maxAttempts) throws TimeoutException {
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxAttempts(maxAttempts);
         });
         client.close();
@@ -77,7 +76,7 @@ class ClientTest {
     void setMaxBackoffInvalid(@Nullable Long maxBackoffMillis) throws TimeoutException {
         @Nullable Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxBackoff(maxBackoff);
         });
         client.close();
@@ -96,7 +95,7 @@ class ClientTest {
     void setMinBackoffInvalid(@Nullable Long minBackoffMillis) throws TimeoutException {
         @Nullable Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMinBackoff(minBackoff);
         });
         client.close();
@@ -112,7 +111,7 @@ class ClientTest {
     @DisplayName("Client.setMaxTransactionFee() negative")
     void setMaxTransactionFeeNegative() throws TimeoutException {
         var client = Client.forTestnet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setDefaultMaxTransactionFee(Hbar.MIN);
         });
         client.close();
@@ -143,7 +142,7 @@ class ClientTest {
         InputStream clientConfig = ClientTest.class.getClassLoader()
                 .getResourceAsStream("client-config.json");
 
-        Assertions.assertNotNull(clientConfig);
+        assertThat(clientConfig).isNotNull();
 
         Client.fromConfig(new InputStreamReader(clientConfig, StandardCharsets.UTF_8)).close();
 
@@ -151,7 +150,7 @@ class ClientTest {
         InputStream clientConfigWithOperator = ClientTest.class.getClassLoader()
                 .getResourceAsStream("client-config-with-operator.json");
 
-        Assertions.assertNotNull(clientConfigWithOperator);
+        assertThat(clientConfigWithOperator).isNotNull();
     }
 
     @Test

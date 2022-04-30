@@ -19,8 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MaxQueryPaymentExceededExceptionTest {
     @Test
@@ -31,7 +32,8 @@ class MaxQueryPaymentExceededExceptionTest {
             new Hbar(15)
         );
 
-        Assertions.assertEquals("cost for AccountBalanceQuery, of 30 ℏ, without explicit payment is greater than the maximum allowed payment of 15 ℏ",
-            e.getMessage());
+        assertThat(e.getMessage()).isEqualTo(
+            "cost for AccountBalanceQuery, of 30 ℏ, without explicit payment is greater than the maximum allowed payment of 15 ℏ"
+        );
     }
 }

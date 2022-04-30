@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class PrivateKeyTest {

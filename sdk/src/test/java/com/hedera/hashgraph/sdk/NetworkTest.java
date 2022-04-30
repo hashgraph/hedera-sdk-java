@@ -19,8 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Test;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
