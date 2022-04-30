@@ -7,8 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicDeleteIntegrationTest {
     @Test
@@ -41,14 +40,12 @@ public class TopicDeleteIntegrationTest {
 
         var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
+        }).withMessageContaining(Status.UNAUTHORIZED.toString());
 
         testEnv.close();
     }

@@ -23,7 +23,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class StatusTest {
@@ -39,20 +40,15 @@ class StatusTest {
 
             Status status = Status.valueOf(code);
 
-            assertEquals(code.getNumber(), status.code.getNumber());
+            assertThat(code.getNumber()).isEqualTo(status.code.getNumber());
         }
     }
 
     @Test
     @DisplayName("Status throws on Unrecognized")
     void statusUnrecognized() {
-        assertEquals(
-            "network returned unrecognized response code; "
-                + "your SDK may be out of date",
-            assertThrows(
-                IllegalArgumentException.class,
-                () -> Status.valueOf(ResponseCodeEnum.UNRECOGNIZED))
-                .getMessage()
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+            () -> Status.valueOf(ResponseCodeEnum.UNRECOGNIZED)
+        ).withMessage("network returned unrecognized response code; your SDK may be out of date");
     }
 }

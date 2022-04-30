@@ -29,7 +29,7 @@ import org.threeten.bp.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenCreateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -91,7 +91,7 @@ public class TokenCreateTransactionTest {
     void shouldBytesFungible() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     private TokenCreateTransaction spawnTestTransaction() {
@@ -130,6 +130,6 @@ public class TokenCreateTransactionTest {
     void shouldBytesNft() throws Exception {
         var tx = spawnTestTransactionNft();
         var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }

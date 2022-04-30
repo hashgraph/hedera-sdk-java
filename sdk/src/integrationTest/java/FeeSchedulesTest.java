@@ -5,7 +5,7 @@ import com.hedera.hashgraph.sdk.FileId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeeSchedulesTest {
     @Test
@@ -22,7 +22,7 @@ public class FeeSchedulesTest {
         /*
          * Test whether the file 0.0.111 actually contains stuff
          */
-        assertNotNull(feeSchedules.getCurrent());
+        assertThat(feeSchedules.getCurrent()).isNotNull();
 
         testEnv.close();
     }

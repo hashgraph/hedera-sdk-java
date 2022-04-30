@@ -6,14 +6,14 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenAssociateIntegrationTest {
     @Test
@@ -60,6 +60,7 @@ class TokenAssociateIntegrationTest {
     }
 
     @Test
+    @Disabled
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
@@ -97,15 +98,13 @@ class TokenAssociateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close(accountId, key);
     }
@@ -142,15 +141,13 @@ class TokenAssociateIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

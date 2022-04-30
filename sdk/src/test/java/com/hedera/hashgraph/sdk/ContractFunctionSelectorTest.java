@@ -23,9 +23,9 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class ContractFunctionSelectorTest {
     @Test
@@ -60,7 +60,7 @@ public class ContractFunctionSelectorTest {
             .addStringArray()
             .finish();
 
-        assertEquals("4438e4ce", Hex.toHexString(signature));
+        assertThat(Hex.toHexString(signature)).isEqualTo("4438e4ce");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ContractFunctionSelectorTest {
             .addAddress();
         signature.finish();
 
-        assertThrows(IllegalStateException.class, signature::addStringArray);
-        assertDoesNotThrow(signature::finish);
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(signature::addStringArray);
+        assertThatNoException().isThrownBy(signature::finish);
     }
 }

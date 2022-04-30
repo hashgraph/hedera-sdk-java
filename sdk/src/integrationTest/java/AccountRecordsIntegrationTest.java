@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class AccountRecordsIntegrationTest {
     @Test
@@ -42,7 +42,7 @@ class AccountRecordsIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertFalse(records.isEmpty());
+        assertThat(records.isEmpty()).isFalse();
 
         testEnv.close(accountId, key);
     }

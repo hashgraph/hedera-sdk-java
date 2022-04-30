@@ -27,9 +27,8 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContractUpdateTransactionTest {
     private static final PrivateKey privateKey = PrivateKey.fromString(
@@ -73,6 +72,6 @@ public class ContractUpdateTransactionTest {
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = ContractUpdateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }

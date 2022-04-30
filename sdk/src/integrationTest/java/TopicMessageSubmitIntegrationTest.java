@@ -13,10 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class TopicMessageSubmitIntegrationTest {
     @Test
@@ -35,10 +34,10 @@ public class TopicMessageSubmitIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(info.topicId, topicId);
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-        assertEquals(info.sequenceNumber, 0);
-        assertEquals(info.adminKey, testEnv.operatorKey);
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
         new TopicMessageSubmitTransaction()
             .setTopicId(topicId)
@@ -50,10 +49,10 @@ public class TopicMessageSubmitIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(info.topicId, topicId);
-        assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-        assertEquals(info.sequenceNumber, 1);
-        assertEquals(info.adminKey, testEnv.operatorKey);
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(1);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)
@@ -69,7 +68,7 @@ public class TopicMessageSubmitIntegrationTest {
         // Skip if using PreviewNet
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
-        assertDoesNotThrow(() -> {
+        assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(2);
 
             var response = new TopicCreateTransaction()
@@ -85,10 +84,10 @@ public class TopicMessageSubmitIntegrationTest {
                 .setTopicId(topicId)
                 .execute(testEnv.client);
 
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 0);
-            assertEquals(info.adminKey, testEnv.operatorKey);
+            assertThat(info.topicId).isEqualTo(topicId);
+            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+            assertThat(info.sequenceNumber).isEqualTo(0);
+            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             var responses = new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
@@ -104,10 +103,10 @@ public class TopicMessageSubmitIntegrationTest {
                 .setTopicId(topicId)
                 .execute(testEnv.client);
 
-            assertEquals(info.topicId, topicId);
-            assertEquals(info.topicMemo, "[e2e::TopicCreateTransaction]");
-            assertEquals(info.sequenceNumber, 14);
-            assertEquals(info.adminKey, testEnv.operatorKey);
+            assertThat(info.topicId).isEqualTo(topicId);
+            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+            assertThat(info.sequenceNumber).isEqualTo(14);
+            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
@@ -124,7 +123,7 @@ public class TopicMessageSubmitIntegrationTest {
         // Skip if using PreviewNet
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
-        assertDoesNotThrow(() -> {
+        assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
@@ -134,20 +133,18 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
                 new TopicMessageSubmitTransaction()
                     .setMessage(Contents.BIG_CONTENTS)
                     .setMaxChunks(15)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-            });
+            }).withMessageContaining(Status.INVALID_TOPIC_ID.toString());
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-
-            assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_ID.toString()));
 
             testEnv.close();
         });
@@ -159,7 +156,7 @@ public class TopicMessageSubmitIntegrationTest {
         // Skip if using PreviewNet
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
-        assertDoesNotThrow(() -> {
+        assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(1);
 
             var response = new TopicCreateTransaction()
@@ -169,19 +166,17 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var error = assertThrows(ReceiptStatusException.class, () -> {
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
                 new TopicMessageSubmitTransaction()
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-            });
+            }).withMessageContaining(Status.INVALID_TOPIC_MESSAGE.toString());
 
             new TopicDeleteTransaction()
                 .setTopicId(topicId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-
-            assertTrue(error.getMessage().contains(Status.INVALID_TOPIC_MESSAGE.toString()));
 
             testEnv.close();
         });

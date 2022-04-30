@@ -18,10 +18,8 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenNftTransferIntegrationTest {
     @Test
@@ -37,7 +35,7 @@ class TokenNftTransferIntegrationTest {
             .execute(testEnv.client);
 
         var accountId = response.getReceipt(testEnv.client).accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         response = new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -53,7 +51,7 @@ class TokenNftTransferIntegrationTest {
             .execute(testEnv.client);
 
         var tokenId = response.getReceipt(testEnv.client).tokenId;
-        assertNotNull(tokenId);
+        assertThat(tokenId).isNotNull();
 
         var mintReceipt = new TokenMintTransaction()
             .setTokenId(tokenId)
@@ -106,7 +104,7 @@ class TokenNftTransferIntegrationTest {
             .execute(testEnv.client);
 
         var accountId = response.getReceipt(testEnv.client).accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         response = new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -121,7 +119,7 @@ class TokenNftTransferIntegrationTest {
             .execute(testEnv.client);
 
         var tokenId = response.getReceipt(testEnv.client).tokenId;
-        assertNotNull(tokenId);
+        assertThat(tokenId).isNotNull();
 
         var mintReceipt = new TokenMintTransaction()
             .setTokenId(tokenId)
@@ -146,11 +144,9 @@ class TokenNftTransferIntegrationTest {
         }
         transfer.freezeWith(testEnv.client).sign(key);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             transfer.execute(testEnv.client).getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO.toString()));
+        }).withMessageContaining(Status.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

@@ -14,13 +14,9 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenFeeScheduleUpdateIntegrationTest {
     @Test
@@ -49,27 +45,27 @@ class TokenFeeScheduleUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 3);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNotNull(info.freezeKey);
-        assertNotNull(info.wipeKey);
-        assertNotNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.feeScheduleKey.toString());
-        assertNotNull(info.defaultFreezeStatus);
-        assertFalse(info.defaultFreezeStatus);
-        assertNotNull(info.defaultKycStatus);
-        assertFalse(info.defaultKycStatus);
-        assertEquals(info.customFees.size(), 0);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(3);
+        assertThat(testEnv.operatorId).isEqualTo(info.treasuryAccountId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNotNull();
+        assertThat(info.wipeKey).isNotNull();
+        assertThat(info.kycKey).isNotNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.defaultFreezeStatus).isNotNull();
+        assertThat(info.defaultFreezeStatus).isFalse();
+        assertThat(info.defaultKycStatus).isNotNull();
+        assertThat(info.defaultKycStatus).isFalse();
+        assertThat(info.customFees.size()).isEqualTo(0);
 
         var customFees = new ArrayList<CustomFee>();
         customFees.add(new CustomFixedFee()
@@ -94,50 +90,50 @@ class TokenFeeScheduleUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals(info.name, "ffff");
-        assertEquals(info.symbol, "F");
-        assertEquals(info.decimals, 3);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNotNull(info.freezeKey);
-        assertNotNull(info.wipeKey);
-        assertNotNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.feeScheduleKey.toString());
-        assertNotNull(info.defaultFreezeStatus);
-        assertFalse(info.defaultFreezeStatus);
-        assertNotNull(info.defaultKycStatus);
-        assertFalse(info.defaultKycStatus);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(3);
+        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNotNull();
+        assertThat(info.wipeKey).isNotNull();
+        assertThat(info.kycKey).isNotNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.defaultFreezeStatus).isNotNull();
+        assertThat(info.defaultFreezeStatus).isFalse();
+        assertThat(info.defaultKycStatus).isNotNull();
+        assertThat(info.defaultKycStatus).isFalse();
 
         var fees = info.customFees;
-        assertEquals(fees.size(), 2);
+        assertThat(fees.size()).isEqualTo(2);
         @Var int fixedCount = 0;
         @Var int fractionalCount = 0;
         for (var fee : fees) {
             if (fee instanceof CustomFixedFee) {
                 fixedCount++;
                 var fixed = (CustomFixedFee) fee;
-                assertEquals(fixed.getAmount(), 10);
-                assertEquals(fixed.getFeeCollectorAccountId(), testEnv.operatorId);
-                assertNull(fixed.getDenominatingTokenId());
+                assertThat(fixed.getAmount()).isEqualTo(10);
+                assertThat(fixed.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
+                assertThat(fixed.getDenominatingTokenId()).isNull();
             } else if (fee instanceof CustomFractionalFee) {
                 fractionalCount++;
                 var fractional = (CustomFractionalFee) fee;
-                assertEquals(fractional.getNumerator(), 1);
-                assertEquals(fractional.getDenominator(), 20);
-                assertEquals(fractional.getMin(), 1);
-                assertEquals(fractional.getMax(), 10);
-                assertEquals(fractional.getFeeCollectorAccountId(), testEnv.operatorId);
+                assertThat(fractional.getNumerator()).isEqualTo(1);
+                assertThat(fractional.getDenominator()).isEqualTo(20);
+                assertThat(fractional.getMin()).isEqualTo(1);
+                assertThat(fractional.getMax()).isEqualTo(10);
+                assertThat(fractional.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
             }
         }
-        assertEquals(fixedCount, 1);
-        assertEquals(fractionalCount, 1);
+        assertThat(fixedCount).isEqualTo(1);
+        assertThat(fractionalCount).isEqualTo(1);
 
         testEnv.close(tokenId);
     }
@@ -171,15 +167,13 @@ class TokenFeeScheduleUpdateIntegrationTest {
             .setFeeCollectorAccountId(testEnv.operatorId)
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenFeeScheduleUpdateTransaction()
                 .setTokenId(tokenId)
                 .setCustomFees(customFees)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId);
     }
