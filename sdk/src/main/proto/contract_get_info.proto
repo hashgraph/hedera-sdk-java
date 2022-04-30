@@ -33,7 +33,7 @@ import "response_header.proto";
 
 /**
  * Get information about a smart contract instance. This includes the account that it uses, the file
- * containing its bytecode, and the time when it will expire.
+ * containing its initcode (if a file was used to initialize the contract), and the time when it will expire.
  */
 message ContractGetInfoQuery {
     /**
@@ -128,6 +128,12 @@ message ContractGetInfoResponse {
          * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
          */
         bytes ledger_id = 12;
+
+        /**
+         * ID of the an account to charge for auto-renewal of this contract. If not set, or set to an account with zero hbar
+         * balance, the contract's own hbar balance will be used to cover auto-renewal fees.
+         */
+        AccountID auto_renew_account_id = 13;
     }
 
     /**

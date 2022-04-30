@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]AutoRenewAccountId()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractUpdateTransaction.[get|set|clear]AutoRenewAccountId()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]AutoRenewAccountId()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
+
 ## v2.12.0
 
 ### Added

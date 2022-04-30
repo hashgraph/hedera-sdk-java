@@ -118,7 +118,7 @@ message SchedulableTransactionBody {
     CryptoApproveAllowanceTransactionBody cryptoApproveAllowance = 37;
 
     /**
-     * Deletes one or more approved hbar or token allowances from an owner's account
+     * Deletes one or more of the specific approved NFT serial numbers on an owner account.
      */
     CryptoDeleteAllowanceTransactionBody cryptoDeleteAllowance = 38;
 
