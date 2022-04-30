@@ -26,6 +26,7 @@ import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -40,6 +41,11 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     private Key adminKey = null;
     private String scheduleMemo = "";
 
+    @Nullable
+    private Instant expirationTime;
+
+    private boolean waitForExpiry;
+
     public ScheduleCreateTransaction() {
         defaultMaxTransactionFee = new Hbar(5);
     }
@@ -47,6 +53,25 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
+    }
+
+    @Nullable
+    public Instant getExpirationTime() {
+        return expirationTime;
+    }
+
+    public ScheduleCreateTransaction setExpirationTime(Instant expirationTime) {
+        this.expirationTime = expirationTime;
+        return this;
+    }
+
+    public boolean isWaitForExpiry() {
+        return waitForExpiry;
+    }
+
+    public ScheduleCreateTransaction setWaitForExpiry(boolean waitForExpiry) {
+        this.waitForExpiry = waitForExpiry;
+        return this;
     }
 
     @Nullable
@@ -110,7 +135,10 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        builder.setMemo(scheduleMemo);
+        if (expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+        builder.setMemo(scheduleMemo).setWaitForExpiry(waitForExpiry);
 
         return builder;
     }
