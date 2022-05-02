@@ -40,7 +40,7 @@ dependencies {
 	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-core:1.45.1"
+	implementation "io.grpc:grpc-core:1.46.0"
 	implementation "io.grpc:grpc-protobuf-lite:1.45.1"
 	implementation "io.grpc:grpc-stub:1.45.1"
 
