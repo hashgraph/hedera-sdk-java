@@ -502,7 +502,7 @@ abstract class ManagedNetwork<
 
         var returnNodes = new HashMap<KeyT, ManagedNodeT>(count);
 
-        var revisedCount = Math.min(count, nodes.size());
+        var revisedCount = Math.min(count, network.size());
 
         for (var i = 0; i < revisedCount; /* do not increment i here */ ) {
             var node = getNode(null);
