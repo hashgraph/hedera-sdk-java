@@ -62,8 +62,22 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
         return receipt;
     }
 
+    public TransactionReceipt forceGetReceipt(Client client) throws TimeoutException, PrecheckStatusException {
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
+    }
+
     @Override
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .executeAsync(client);
+    }
+
+    public CompletableFuture<TransactionReceipt> forceGetReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
             .setTransactionId(transactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
@@ -79,9 +93,26 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
             .execute(client);
     }
 
+    public TransactionRecord forceGetRecord(Client client) throws TimeoutException, PrecheckStatusException {
+        forceGetReceipt(client);
+
+        return new TransactionRecordQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
+    }
+
     @Override
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
         return getReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .executeAsync(client)
+        );
+    }
+
+    public CompletableFuture<TransactionRecord> forceGetRecordAsync(Client client) {
+        return forceGetReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
             .setTransactionId(transactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
             .executeAsync(client)
