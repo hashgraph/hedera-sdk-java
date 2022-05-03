@@ -77,13 +77,6 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
             .executeAsync(client);
     }
 
-    public CompletableFuture<TransactionReceipt> forceGetReceiptAsync(Client client) {
-        return new TransactionReceiptQuery()
-            .setTransactionId(transactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId))
-            .executeAsync(client);
-    }
-
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);
 
@@ -94,7 +87,6 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     }
 
     public TransactionRecord forceGetRecord(Client client) throws TimeoutException, PrecheckStatusException {
-        forceGetReceipt(client);
 
         return new TransactionRecordQuery()
             .setTransactionId(transactionId)
@@ -105,14 +97,6 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     @Override
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
         return getReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
-            .setTransactionId(transactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId))
-            .executeAsync(client)
-        );
-    }
-
-    public CompletableFuture<TransactionRecord> forceGetRecordAsync(Client client) {
-        return forceGetReceiptAsync(client).thenCompose((receipt) -> new TransactionRecordQuery()
             .setTransactionId(transactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
             .executeAsync(client)
