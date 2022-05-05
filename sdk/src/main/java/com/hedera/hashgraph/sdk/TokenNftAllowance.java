@@ -83,11 +83,6 @@ public class TokenNftAllowance {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
-    TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return ownerAccountId != null ?
-            this : new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers, allSerials);
-    }
-
     void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);

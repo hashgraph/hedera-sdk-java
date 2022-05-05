@@ -11,6 +11,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * This class represents the account balance object
+ */
 public class AccountBalance {
     @Nonnegative
     public final Hbar hbars;
@@ -33,6 +36,12 @@ public class AccountBalance {
         this.tokenDecimals = decimal;
     }
 
+    /**
+     * Convert the protobuf object to an account balance object.
+     *
+     * @param protobuf                  protobuf response object
+     * @return                          the converted account balance object
+     */
     static AccountBalance fromProtobuf(CryptoGetAccountBalanceResponse protobuf) {
         var balanceList = protobuf.getTokenBalancesList();
         Map<TokenId, Long> map = new HashMap<>();
@@ -45,10 +54,22 @@ public class AccountBalance {
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
     }
 
+    /**
+     * Convert a byte array to an account balance object.
+     *
+     * @param data                      the byte array
+     * @return                          the converted account balance object
+     * @throws InvalidProtocolBufferException
+     */
     public static AccountBalance fromBytes(byte[] data) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetAccountBalanceResponse.parseFrom(data));
     }
 
+    /**
+     * Convert an account balance object into a protobuf.
+     *
+     * @return                          the protobuf object
+     */
     CryptoGetAccountBalanceResponse toProtobuf() {
         var protobuf = CryptoGetAccountBalanceResponse.newBuilder()
             .setBalance(hbars.toTinybars());
@@ -64,6 +85,11 @@ public class AccountBalance {
         return protobuf.build();
     }
 
+    /**
+     * Convert the account balance object to a byte array.
+     *
+     * @return                          the converted account balance object
+     */
     public ByteString toBytes() {
         return toProtobuf().toByteString();
     }

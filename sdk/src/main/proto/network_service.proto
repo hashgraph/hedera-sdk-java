@@ -53,4 +53,10 @@ service NetworkService {
      * account.)
      */
     rpc uncheckedSubmit (Transaction) returns (TransactionResponse);
+
+    /**
+     * Get all the information about an account, including balance and allowances. This does not get the list of
+     * account records.
+     */
+    rpc getAccountDetails (Query) returns (Response);
 }

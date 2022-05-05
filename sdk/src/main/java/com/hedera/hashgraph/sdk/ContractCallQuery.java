@@ -32,9 +32,15 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     private byte[] functionParameters = {};
     private long maxResultSize = 0;
 
+    /**
+     * Constructor.
+     */
     public ContractCallQuery() {
     }
 
+    /**
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -52,6 +58,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    /**
+     * @return                          the gas
+     */
     public long getGas() {
         return gas;
     }
@@ -75,6 +84,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars((long) (cost.toTinybars() * 1.1)));
     }
 
+    /**
+     * @return                          the byte string representation
+     */
     public ByteString getFunctionParameters() {
         return ByteString.copyFrom(functionParameters);
     }

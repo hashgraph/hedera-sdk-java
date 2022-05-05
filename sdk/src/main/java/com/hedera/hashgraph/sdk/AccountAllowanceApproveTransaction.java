@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * This transaction type is for approving account allowance.
+ */
 public class AccountAllowanceApproveTransaction extends Transaction<AccountAllowanceApproveTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances =  new ArrayList<>();
@@ -25,9 +28,18 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     // <ownerId:spenderId, <tokenId, index>>
     private final Map<String, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
+    /**
+     * Constructor.
+     */
     public AccountAllowanceApproveTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException
+     */
     AccountAllowanceApproveTransaction(
         LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs
     ) throws InvalidProtocolBufferException {
@@ -35,6 +47,11 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountAllowanceApproveTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
@@ -53,7 +70,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
                 nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
             } else {
                 getNftSerials(
-                    AccountId.fromProtobuf(allowanceProto.getOwner()),
+                    allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
                     AccountId.fromProtobuf(allowanceProto.getSpender()),
                     TokenId.fromProtobuf(allowanceProto.getTokenId())
                 ).addAll(allowanceProto.getSerialNumbersList());
@@ -61,7 +78,23 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
-    private AccountAllowanceApproveTransaction doApproveHbarAllowance(
+    /**
+     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
+     */
+    @Deprecated
+    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
+        return approveHbarAllowance(null, spenderAccountId, amount);
+    }
+
+    /**
+     * Approves the Hbar allowance.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param amount                    amount of hbar add
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveHbarAllowance(
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
         Hbar amount
@@ -76,22 +109,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
-     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
-     */
-    @Deprecated
-    public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
-        return doApproveHbarAllowance(null, spenderAccountId, amount);
-    }
-
-    public AccountAllowanceApproveTransaction approveHbarAllowance(
-        AccountId ownerAccountId,
-        AccountId spenderAccountId,
-        Hbar amount
-    ) {
-        return doApproveHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
-    }
-
-    /**
      * @deprecated - Use {@link #getHbarApprovals()} instead
      */
     @Deprecated
@@ -99,11 +116,35 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return getHbarApprovals();
     }
 
+    /**
+     * @return                          array list of hbar allowances
+     */
     public List<HbarAllowance> getHbarApprovals() {
         return new ArrayList<>(hbarAllowances);
     }
 
-    private AccountAllowanceApproveTransaction doApproveTokenAllowance(
+    /**
+     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     */
+    @Deprecated
+    public AccountAllowanceApproveTransaction addTokenAllowance(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        return approveTokenAllowance(tokenId, null, spenderAccountId, amount);
+    }
+
+    /**
+     * Approves the Token allowance.
+     *
+     * @param tokenId                   the token's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param amount                    amount of tokens
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveTokenAllowance(
         TokenId tokenId,
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
@@ -123,27 +164,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
-     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
-     */
-    @Deprecated
-    public AccountAllowanceApproveTransaction addTokenAllowance(
-        TokenId tokenId,
-        AccountId spenderAccountId,
-        long amount
-    ) {
-        return doApproveTokenAllowance(tokenId, null, spenderAccountId, amount);
-    }
-
-    public AccountAllowanceApproveTransaction approveTokenAllowance(
-        TokenId tokenId,
-        AccountId ownerAccountId,
-        AccountId spenderAccountId,
-        long amount
-    ) {
-        return doApproveTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
-    }
-
-    /**
      * @deprecated - Use {@link #getTokenApprovals()} instead
      */
     @Deprecated
@@ -151,14 +171,30 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return getTokenApprovals();
     }
 
+    /**
+     * @return                          array list of token approvals.
+     */
     public List<TokenAllowance> getTokenApprovals() {
         return new ArrayList<>(tokenAllowances);
     }
 
+    /**
+     * @param ownerAccountId            owner's account id
+     * @return                          a string representation of the account id
+     *                                  or FEE_PAYER
+     */
     private static String ownerToString(@Nullable AccountId ownerAccountId) {
         return ownerAccountId != null ? ownerAccountId.toString() : "FEE_PAYER";
     }
 
+    /**
+     * Return a list of NFT serial numbers.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spenders account id
+     * @param tokenId                   the token's id
+     * @return list of NFT serial numbers
+     */
     private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, AccountId spenderAccountId, TokenId tokenId) {
         var key = ownerToString(ownerAccountId) + ":" + spenderAccountId;
         if (nftMap.containsKey(key)) {
@@ -175,6 +211,15 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
+    /**
+     * Add NFT serials.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param tokenId                   the token's id
+     * @param innerMap                  list of token id's and serial number records
+     * @return list of NFT serial numbers
+     */
     private List<Long> newNftSerials(
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
@@ -218,30 +263,46 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return this;
     }
 
+    /**
+     * Approve the NFT allowance.
+     *
+     * @param nftId                     nft's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @return {@code this}
+     */
     public AccountAllowanceApproveTransaction approveTokenNftAllowance(
         NftId nftId,
-        AccountId ownerAccountId,
+        @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
         requireNotFrozen();
         Objects.requireNonNull(nftId);
         getNftSerials(
-            Objects.requireNonNull(ownerAccountId),
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             nftId.tokenId
         ).add(nftId.serial);
         return this;
     }
 
+    /**
+     * Approve the token nft allowance on all serials.
+     *
+     * @param tokenId                   the token's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @return {@code this}
+     */
     public AccountAllowanceApproveTransaction approveTokenNftAllowanceAllSerials(
         TokenId tokenId,
-        AccountId ownerAccountId,
+        @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId
     ) {
         requireNotFrozen();
         nftAllowances.add(new TokenNftAllowance(
             Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             Collections.emptyList(),
             true
@@ -257,6 +318,11 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return getTokenNftApprovals();
     }
 
+    /**
+     * Returns the list of token nft allowances.
+     *
+     * @return  list of token nft allowances.
+     */
     public List<TokenNftAllowance> getTokenNftApprovals() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {
@@ -265,26 +331,30 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return retval;
     }
 
+    /**
+     * @return {@code {@link CryptoServiceGrpc}}
+     */
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getApproveAllowancesMethod();
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody builder }}
+     */
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();
 
-        @Nullable
-        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
-            transactionIds.get(0).accountId : null;
-
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addCryptoAllowances(allowance.toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addTokenAllowances(allowance.toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addNftAllowances(allowance.toProtobuf());
         }
         return builder;
     }

@@ -78,6 +78,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return setBytecode(bytecode.toByteArray());
     }
 
+    /**
+     * @return                          the admin key
+     */
     @Nullable
     public Key getAdminKey() {
         return adminKey;
@@ -99,6 +102,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the gas
+     */
     public long getGas() {
         return gas;
     }
@@ -114,6 +120,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the initial balance in hbar
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -131,6 +140,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -154,6 +166,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -171,6 +186,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the byte string representation
+     */
     public ByteString getConstructorParameters() {
         return ByteString.copyFrom(constructorParameters);
     }
@@ -200,6 +218,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return setConstructorParameters(constructorParameters.toBytes(null).toByteArray());
     }
 
+    /**
+     * @return                          the contract memo
+     */
     public String getContractMemo() {
         return contractMemo;
     }
@@ -216,6 +237,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    /**
+     * @return                          the list of node account id's
+     */
     @Nullable
     public List<AccountId> getNodeAccountIds() {
         return nodeAccountIds;
@@ -292,12 +316,24 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return contractCreateTx;
     }
 
+    /**
+     * @param response                  the transaction response
+     * @return                          the receipt query
+     */
     TransactionReceiptQuery createTransactionReceiptQuery(TransactionResponse response) {
         return new TransactionReceiptQuery()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setTransactionId(response.transactionId);
     }
 
+    /**
+     * Execute the transaction from the passed in client.
+     *
+     * @param client                    the client with the transaction to execute
+     * @return                          the response
+     * @throws PrecheckStatusException
+     * @throws TimeoutException
+     */
     @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
         try {

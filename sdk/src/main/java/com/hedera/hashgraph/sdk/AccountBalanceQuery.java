@@ -22,9 +22,17 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     @Nullable
     private ContractId contractId = null;
 
+    /**
+     * Constructor.
+     */
     public AccountBalanceQuery() {
     }
 
+    /**
+     * Return the account's id.
+     *
+     * @return {@code accountId}
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -44,6 +52,9 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
         return this;
     }
 
+    /**
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;

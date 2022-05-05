@@ -27,7 +27,7 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     /**
      * Sets the Token ID for which information is requested.
      *
-     * @param tokenId The TokenId to be set
+     * @param tokenId                           The TokenId to be set
      * @return {@code this}
      */
     public TokenInfoQuery setTokenId(TokenId tokenId) {

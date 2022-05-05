@@ -30,19 +30,37 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     private Hbar payableAmount = new Hbar(0);
     private byte[] functionParameters = {};
 
+    /**
+     * Constructor.
+     */
     public ContractExecuteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     ContractExecuteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractExecuteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -61,6 +79,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return this;
     }
 
+    /**
+     * @return                          the gas
+     */
     public long getGas() {
         return gas;
     }
@@ -77,6 +98,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return this;
     }
 
+    /**
+     * @return                          the payable amount in hbar
+     */
     public Hbar getPayableAmount() {
         return payableAmount;
     }
@@ -94,6 +118,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return this;
     }
 
+    /**
+     * @return                          the function parameters
+     */
     public ByteString getFunctionParameters() {
         return ByteString.copyFrom(functionParameters);
     }
@@ -139,6 +166,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         return setFunctionParameters(params.toBytes(name));
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractCall();
         if (body.hasContractID()) {
@@ -149,6 +179,9 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
         functionParameters = body.getFunctionParameters().toByteArray();
     }
 
+    /**
+     * @return {@code {@link ContractCallTransactionBody}}
+     */
     ContractCallTransactionBody.Builder build() {
         var builder = ContractCallTransactionBody.newBuilder();
         if (contractId != null) {

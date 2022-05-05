@@ -20,9 +20,15 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     @Nullable
     private AccountId accountId = null;
 
+    /**
+     * Constructor.
+     */
     public AccountInfoQuery() {
     }
 
+    /**
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
