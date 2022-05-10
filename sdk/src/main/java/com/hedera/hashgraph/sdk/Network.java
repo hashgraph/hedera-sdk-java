@@ -257,7 +257,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return verifyCertificates;
     }
 
-    Network setVerifyCertificates(boolean verifyCertificates) {
+    synchronized Network setVerifyCertificates(boolean verifyCertificates) {
         this.verifyCertificates = verifyCertificates;
 
         for (var node : nodes) {
@@ -299,7 +299,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         }
     }
 
-    Map<String, AccountId> getNetwork() {
+    synchronized Map<String, AccountId> getNetwork() {
         Map<String, AccountId> returnMap = new HashMap<>();
         for (var node : nodes) {
             returnMap.put(node.address.toString(), node.getAccountId());
@@ -308,7 +308,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     @Override
-    protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
+    synchronized protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
         return new Node(entry.getValue(), entry.getKey(), executor)
             .setVerifyCertificates(verifyCertificates);
     }

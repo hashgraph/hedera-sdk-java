@@ -154,7 +154,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @param minBackoff
      * @return
      */
-    N setMinBackoff(Duration minBackoff) {
+    synchronized N setMinBackoff(Duration minBackoff) {
         if (currentBackoff == this.minBackoff) {
             currentBackoff = minBackoff;
         }
@@ -178,7 +178,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @param maxBackoff
      * @return
      */
-    N setMaxBackoff(Duration maxBackoff) {
+    synchronized N setMaxBackoff(Duration maxBackoff) {
         this.maxBackoff = ManagedNode.this.maxBackoff;
 
         // noinspection unchecked
@@ -288,7 +288,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return channel;
     }
 
-    boolean channelFailedToConnect() {
+    synchronized boolean channelFailedToConnect() {
         if (hasConnected) {
             return false;
         }
@@ -304,7 +304,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return !hasConnected;
     }
 
-    private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
+    synchronized private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
         hasConnected = (state == ConnectivityState.READY);
         if (i >= GET_STATE_MAX_ATTEMPTS || hasConnected) {
             return CompletableFuture.completedFuture(!hasConnected);
@@ -342,7 +342,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * @return
      */
     @Override
-    public int compareTo(ManagedNode<N, KeyT> node) {
+    synchronized public int compareTo(ManagedNode<N, KeyT> node) {
         int backoffRemainingComparison = Long.compare(this.unhealthyBackoffRemaining(), node.unhealthyBackoffRemaining());
         if (backoffRemainingComparison != 0) {
             return backoffRemainingComparison;

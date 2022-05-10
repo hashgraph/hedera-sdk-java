@@ -197,7 +197,7 @@ abstract class ManagedNetwork<
         return minNodeReadmitTime;
     }
 
-    public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    public synchronized void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
         for (var node : nodes) {
@@ -209,7 +209,7 @@ abstract class ManagedNetwork<
         return maxNodeReadmitTime;
     }
 
-    public void setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
+    public synchronized void setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
         this.maxNodeReadmitTime = maxNodeReadmitTime;
     }
 
@@ -366,7 +366,7 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-    void increaseBackoff(ManagedNodeT node) {
+    synchronized void increaseBackoff(ManagedNodeT node) {
         node.increaseBackoff();
         healthyNodes.remove(node);
     }
@@ -428,7 +428,7 @@ abstract class ManagedNetwork<
      * a new value. This value is either the value of the node with the smallest readmission time from now,
      * or `minNodeReadmitTime` or `maxNodeReadmitTime`.
      */
-    synchronized void readmitNodes() {
+    void readmitNodes() {
         var now = Instant.now();
 
         if (now.toEpochMilli() > earliestReadmitTime.toEpochMilli()) {
@@ -522,7 +522,7 @@ abstract class ManagedNetwork<
      * @throws TimeoutException
      * @throws InterruptedException
      */
-    synchronized void close() throws TimeoutException, InterruptedException {
+    void close() throws TimeoutException, InterruptedException {
         close(closeTimeout);
     }
 

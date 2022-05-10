@@ -74,7 +74,7 @@ class Node extends ManagedNode<Node, AccountId> {
         return addressBook;
     }
 
-    Node setAddressBook(@Nullable NodeAddress addressBook) {
+    synchronized Node setAddressBook(@Nullable NodeAddress addressBook) {
         this.addressBook = addressBook;
         return this;
     }
@@ -89,7 +89,7 @@ class Node extends ManagedNode<Node, AccountId> {
     }
 
     @Override
-    ChannelCredentials getChannelCredentials() {
+    synchronized ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.newBuilder()
             .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash, verifyCertificates))
             .build();
