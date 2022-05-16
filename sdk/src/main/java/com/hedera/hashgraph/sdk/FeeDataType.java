@@ -48,7 +48,12 @@ public enum FeeDataType {
      * The resource prices are scoped to an operation on a non-fungible unique
      * token with a custom fee schedule
      */
-    TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES(SubType.TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES);
+    TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES(SubType.TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES),
+
+    /**
+     * The resource prices are scoped to a ScheduleCreate containing a ContractCall.
+     */
+    SCHEDULE_CREATE_CONTRACT_CALL(SubType.SCHEDULE_CREATE_CONTRACT_CALL);
 
 
     final SubType code;
@@ -69,6 +74,8 @@ public enum FeeDataType {
                 return TOKEN_FUNGIBLE_COMMON_WITH_CUSTOM_FEES;
             case TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES:
                 return TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES;
+            case SCHEDULE_CREATE_CONTRACT_CALL:
+                return SCHEDULE_CREATE_CONTRACT_CALL;
             default:
                 throw new IllegalStateException("(BUG) unhandled SubType (FeeDataType)");
         }
@@ -87,6 +94,8 @@ public enum FeeDataType {
                 return "TOKEN_FUNGIBLE_COMMON_WITH_CUSTOM_FEES";
             case TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES:
                 return "TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES";
+            case SCHEDULE_CREATE_CONTRACT_CALL:
+                return "SCHEDULE_CREATE_CONTRACT_CALL";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

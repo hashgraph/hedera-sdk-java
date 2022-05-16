@@ -91,6 +91,11 @@ public class CustomRoyaltyFee extends CustomFee {
         return this;
     }
 
+    @Nullable
+    public CustomFixedFee getFallbackFee() {
+        return this.fallbackFee;
+    }
+
     RoyaltyFee toRoyaltyFeeProtobuf() {
         var royaltyFeeBuilder = RoyaltyFee.newBuilder()
             .setExchangeValueFraction(

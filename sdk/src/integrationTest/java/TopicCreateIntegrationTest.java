@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicCreateIntegrationTest {
     @Test
@@ -35,7 +35,7 @@ public class TopicCreateIntegrationTest {
 
         var response = new TopicCreateTransaction()
             .execute(testEnv.client);
-        assertNotNull(response.getReceipt(testEnv.client).topicId);
+        assertThat(response.getReceipt(testEnv.client).topicId).isNotNull();
 
         testEnv.close();
     }

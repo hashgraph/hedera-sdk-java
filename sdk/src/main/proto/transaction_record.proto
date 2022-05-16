@@ -122,4 +122,10 @@ message TransactionRecord {
      * transaction with a (previously unused) alias, the new account's alias. 
      */
      bytes alias = 16;
+
+    /**
+     * The keccak256 hash of the ethereumData. This field will only be populated for 
+     * EthereumTransaction.
+     */
+    bytes ethereum_hash = 17;
 }

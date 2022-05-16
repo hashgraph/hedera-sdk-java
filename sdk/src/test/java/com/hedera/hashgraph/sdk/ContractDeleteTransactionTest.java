@@ -26,9 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContractDeleteTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -69,6 +68,6 @@ public class ContractDeleteTransactionTest {
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = ContractDeleteTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }

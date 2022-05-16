@@ -176,6 +176,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("Cannot schedule `ScheduleCreateTransaction`");
+        throw new UnsupportedOperationException("Cannot schedule ScheduleCreateTransaction");
     }
 }

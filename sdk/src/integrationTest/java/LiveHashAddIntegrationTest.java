@@ -11,8 +11,7 @@ import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class LiveHashAddIntegrationTest {
     private static final byte[] HASH = Hex.decode("100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002");
@@ -31,7 +30,7 @@ class LiveHashAddIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new LiveHashAddTransaction()
                 .setAccountId(accountId)
                 .setDuration(Duration.ofDays(30))
@@ -39,9 +38,7 @@ class LiveHashAddIntegrationTest {
                 .setKeys(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         testEnv.close(accountId, key);
     }
