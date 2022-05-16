@@ -108,6 +108,6 @@ public class ContractCreateTransactionTest {
     void shouldBytes2() throws Exception {
         var tx = spawnTestTransaction2();
         var tx2 = ContractCreateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx2.toString());
     }
 }
