@@ -54,6 +54,7 @@ public class AccountInfoTest {
         .setProxyAccountID(new AccountId(8).toProtobuf())
         .addLiveHashes(liveHash)
         .setLedgerId(LedgerId.PREVIEWNET.toByteString())
+        .setEthereumNonce(1001)
         .build();
 
     @BeforeAll

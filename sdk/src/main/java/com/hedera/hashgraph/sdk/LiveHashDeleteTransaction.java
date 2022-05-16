@@ -132,6 +132,6 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("Cannot schedule live hash transactions");
+        throw new UnsupportedOperationException("Cannot schedule LiveHashDeleteTransaction");
     }
 }

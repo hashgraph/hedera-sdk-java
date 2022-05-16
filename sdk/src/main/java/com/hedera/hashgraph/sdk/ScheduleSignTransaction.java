@@ -99,6 +99,6 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("cannot schedule `ScheduleSignTransaction`");
+        throw new UnsupportedOperationException("cannot schedule ScheduleSignTransaction");
     }
 }

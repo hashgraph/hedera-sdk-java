@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]AutoRenewAccountId()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractUpdateTransaction.[get|set|clear]AutoRenewAccountId()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]AutoRenewAccountId()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
  * `CustomRoyaltyFee.getFallbackFee()`
 
 ## v2.12.0
