@@ -12,10 +12,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountBalanceIntegrationTest {
     @Test
@@ -25,7 +23,7 @@ class AccountBalanceIntegrationTest {
             .setTransportSecurity(true);
 
         for (var entry : client.getNetwork().entrySet()) {
-            assertTrue(entry.getKey().endsWith(":50212"));
+            assertThat(entry.getKey().endsWith(":50212")).isTrue();
 
             new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
@@ -42,7 +40,7 @@ class AccountBalanceIntegrationTest {
             .setTransportSecurity(true);
 
         for (var entry : client.getNetwork().entrySet()) {
-            assertTrue(entry.getKey().endsWith(":50212"));
+            assertThat(entry.getKey().endsWith(":50212")).isTrue();
 
             new AccountBalanceQuery()
                 .setNodeAccountIds(Collections.singletonList(entry.getValue()))
@@ -148,7 +146,7 @@ class AccountBalanceIntegrationTest {
             .setTransportSecurity(true);
 
         for (var entry : client.getNetwork().entrySet()) {
-            assertTrue(entry.getKey().endsWith(":50212"));
+            assertThat(entry.getKey().endsWith(":50212")).isTrue();
 
             try {
                 new AccountBalanceQuery()
@@ -173,12 +171,12 @@ class AccountBalanceIntegrationTest {
             .setVerifyCertificates(true)
             .setNetworkName(null);
 
-        assertFalse(client.getNetwork().isEmpty());
+        assertThat(client.getNetwork().isEmpty()).isFalse();
 
         for (var entry : client.getNetwork().entrySet()) {
-            assertTrue(entry.getKey().endsWith(":50212"));
+            assertThat(entry.getKey().endsWith(":50212")).isTrue();
 
-            assertThrows(IllegalStateException.class, () -> {
+            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> {
                 new AccountBalanceQuery()
                     .setNodeAccountIds(Collections.singletonList(entry.getValue()))
                     .setAccountId(entry.getValue())
@@ -198,7 +196,7 @@ class AccountBalanceIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertTrue(balance.hbars.toTinybars() > 0);
+        assertThat(balance.hbars.toTinybars() > 0).isTrue();
 
         testEnv.close();
     }
@@ -216,8 +214,8 @@ class AccountBalanceIntegrationTest {
 
         var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertTrue(accBalance.hbars.toTinybars() > 0);
-        assertEquals(0, cost.toTinybars());
+        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
+        assertThat(cost.toTinybars()).isEqualTo(0);
 
         testEnv.close();
     }
@@ -235,7 +233,7 @@ class AccountBalanceIntegrationTest {
 
         var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertTrue(accBalance.hbars.toTinybars() > 0);
+        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
 
         testEnv.close();
     }
@@ -253,7 +251,7 @@ class AccountBalanceIntegrationTest {
 
         var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertTrue(accBalance.hbars.toTinybars() > 0);
+        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
 
         testEnv.close();
     }
@@ -263,13 +261,11 @@ class AccountBalanceIntegrationTest {
     void canNotFetchBalanceForInvalidAccountId() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new AccountBalanceQuery()
                 .setAccountId(AccountId.fromString("1.0.3"))
                 .execute(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close();
     }
@@ -296,8 +292,8 @@ class AccountBalanceIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertEquals(10000, balance.tokens.get(tokenId));
-        assertEquals(50, balance.tokenDecimals.get(tokenId));
+        assertThat(balance.tokens.get(tokenId)).isEqualTo(10000);
+        assertThat(balance.tokenDecimals.get(tokenId)).isEqualTo(50);
 
         testEnv.close(tokenId);
     }

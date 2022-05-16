@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AccountAllowanceIntegrationTest {
     @Test
@@ -61,7 +61,7 @@ public class AccountAllowanceIntegrationTest {
                 break;
             }
         }
-        assertTrue(transferFound);
+        assertThat(transferFound).isTrue();
 
         new AccountDeleteTransaction()
             .setAccountId(bobId)

@@ -10,9 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class FileContentsIntegrationTest {
 
@@ -32,7 +31,7 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]");
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -57,7 +56,7 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(0, contents.size());
+        assertThat(contents.size()).isEqualTo(0);
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -72,12 +71,10 @@ public class FileContentsIntegrationTest {
     void cannotQueryFileContentsWhenFileIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new FileContentsQuery()
                 .execute(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
+        }).withMessageContaining(Status.INVALID_FILE_ID.toString());
 
         testEnv.close();
     }
@@ -100,7 +97,7 @@ public class FileContentsIntegrationTest {
 
         var contents = contentsQuery.execute(testEnv.client);
 
-        assertEquals("[e2e::FileCreateTransaction]", contents.toStringUtf8());
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]");
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -126,7 +123,7 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        assertThrows(MaxQueryPaymentExceededException.class, () -> {
+        assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
             contentsQuery.execute(testEnv.client);
         });
 
@@ -154,11 +151,9 @@ public class FileContentsIntegrationTest {
             .setFileId(fileId)
             .setMaxQueryPayment(new Hbar(100));
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-        });
-
-        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
+        }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
         new FileDeleteTransaction()
             .setFileId(fileId)

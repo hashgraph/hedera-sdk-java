@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
-import com.hedera.hashgraph.sdk.proto.ContractID;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContractFunctionResultTest {
     private static final String CALL_RESULT_HEX = ""
@@ -82,36 +79,36 @@ public class ContractFunctionResultTest {
         );
 
         // interpretation varies based on width
-        assertTrue(result.getBool(0));
-        assertEquals(-1, result.getInt32(0));
-        assertEquals((1L << 32) - 1, result.getInt64(0));
-        assertEquals(BigInteger.ONE.shiftLeft(32).subtract(BigInteger.ONE), result.getInt256(0));
+        assertThat(result.getBool(0)).isTrue();
+        assertThat(result.getInt32(0)).isEqualTo(-1);
+        assertThat(result.getInt64(0)).isEqualTo((1L << 32) - 1);
+        assertThat(result.getInt256(0)).isEqualTo(BigInteger.ONE.shiftLeft(32).subtract(BigInteger.ONE));
 
-        assertEquals(BigInteger.ONE.shiftLeft(255).subtract(BigInteger.ONE), result.getInt256(1));
+        assertThat(result.getInt256(1)).isEqualTo(BigInteger.ONE.shiftLeft(255).subtract(BigInteger.ONE));
 
-        assertEquals("11223344556677889900aabbccddeeff00112233", result.getAddress(2));
+        assertThat(result.getAddress(2)).isEqualTo("11223344556677889900aabbccddeeff00112233");
 
         // unsigned integers (where applicable)
-        assertEquals(-1, result.getUint32(3));
-        assertEquals(-1L, result.getUint64(3));
+        assertThat(result.getUint32(3)).isEqualTo(-1);
+        assertThat(result.getUint64(3)).isEqualTo(-1L);
         // BigInteger can represent the full range and so should be 2^256 - 1
-        assertEquals(BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE), result.getUint256(3));
+        assertThat(result.getUint256(3)).isEqualTo(BigInteger.ONE.shiftLeft(256).subtract(BigInteger.ONE));
 
-        assertEquals("Hello, world!", result.getString(4));
-        assertEquals("Hello, world, again!", result.getString(5));
+        assertThat(result.getString(4)).isEqualTo("Hello, world!");
+        assertThat(result.getString(5)).isEqualTo("Hello, world, again!");
 
-        assertEquals(AccountId.fromString("1.2.3"), result.senderAccountId);
+        assertThat(result.senderAccountId).isEqualTo(AccountId.fromString("1.2.3"));
 
-        assertEquals(ContractId.fromString("1.2.3"), result.contractId);
-        assertEquals(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"), result.evmAddress);
-        assertEquals(1, result.stateChanges.size());
+        assertThat(result.contractId).isEqualTo(ContractId.fromString("1.2.3"));
+        assertThat(result.evmAddress).isEqualTo(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"));
+        assertThat(result.stateChanges.size()).isEqualTo(1);
         ContractStateChange resultStateChange = result.stateChanges.get(0);
-        assertEquals(ContractId.fromString("1.2.3"), resultStateChange.contractId);
-        assertEquals(1, resultStateChange.storageChanges.size());
+        assertThat(resultStateChange.contractId).isEqualTo(ContractId.fromString("1.2.3"));
+        assertThat(resultStateChange.storageChanges.size()).isEqualTo(1);
         StorageChange resultStorageChange = resultStateChange.storageChanges.get(0);
-        assertEquals(BigInteger.valueOf(555), resultStorageChange.slot);
-        assertEquals(BigInteger.valueOf(666), resultStorageChange.valueRead);
-        assertEquals(BigInteger.valueOf(777), resultStorageChange.valueWritten);
+        assertThat(resultStorageChange.slot).isEqualTo(BigInteger.valueOf(555));
+        assertThat(resultStorageChange.valueRead).isEqualTo(BigInteger.valueOf(666));
+        assertThat(resultStorageChange.valueWritten).isEqualTo(BigInteger.valueOf(777));
     }
 
     @Test
@@ -123,8 +120,8 @@ public class ContractFunctionResultTest {
         );
 
         var strings = result.getStringArray(0);
-        assertEquals(strings.get(0), "random bytes");
-        assertEquals(strings.get(1), "random bytes");
+        assertThat(strings.get(0)).isEqualTo("random bytes");
+        assertThat(strings.get(1)).isEqualTo("random bytes");
     }
 
     @Test

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class NftIdTest {
 
@@ -66,7 +66,7 @@ class NftIdTest {
     void toFromString() {
         var id1 = NftId.fromString("0.0.5005@1234");
         var id2 = NftId.fromString(id1.toString());
-        assertEquals(id1.toString(), id2.toString());
+        assertThat(id2.toString()).isEqualTo(id1.toString());
     }
 
     @Test

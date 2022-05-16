@@ -32,13 +32,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 class KeyTest {
     @Test
@@ -49,8 +45,8 @@ class KeyTest {
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
 
-        assertEquals(64, signature.length);
-        assertTrue(publicKey.verify(message, signature));
+        assertThat(signature.length).isEqualTo(64);
+        assertThat(publicKey.verify(message, signature)).isTrue();
     }
 
     @Test
@@ -60,11 +56,11 @@ class KeyTest {
         var privateKey = PrivateKey.generateECDSA();
         var publicKey = privateKey.getPublicKey();
         var signature = privateKey.sign(message);
-        assertEquals(64, signature.length);
-        assertTrue(publicKey.verify(message, signature));
+        assertThat(signature.length).isEqualTo(64);
+        assertThat(publicKey.verify(message, signature)).isTrue();
         // muck with the signature a little and make sure it breaks
         signature[5] += 1;
-        assertFalse(publicKey.verify(message, signature));
+        assertThat(publicKey.verify(message, signature)).isFalse();
     }
 
     @Test
@@ -75,8 +71,8 @@ class KeyTest {
 
         var cut = PublicKey.fromProtobufKey(protoKey);
 
-        assertEquals(PublicKeyED25519.class, cut.getClass());
-        assertArrayEquals(keyBytes, ((PublicKey) cut).toBytes());
+        assertThat(cut.getClass()).isEqualTo(PublicKeyED25519.class);
+        assertThat(((PublicKey) cut).toBytes()).containsExactly(keyBytes);
     }
 
     @Test
@@ -87,8 +83,8 @@ class KeyTest {
 
         var cut = PublicKey.fromProtobufKey(protoKey);
 
-        assertEquals(PublicKeyECDSA.class, cut.getClass());
-        assertArrayEquals(keyProtobufBytes, ((PublicKey) cut).toProtobufKey().toByteArray());
+        assertThat(cut.getClass()).isEqualTo(PublicKeyECDSA.class);
+        assertThat(((PublicKey) cut).toProtobufKey().toByteArray()).containsExactly(keyProtobufBytes);
     }
 
     @Test
@@ -112,14 +108,14 @@ class KeyTest {
         var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertEquals(com.hedera.hashgraph.sdk.KeyList.class, cut.getClass());
+        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
 
         var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
         var actual = keyList.toProtobufKey().getKeyList();
 
-        assertEquals(2, actual.getKeysCount());
-        assertArrayEquals(keyBytes[0], actual.getKeys(0).getEd25519().toByteArray());
-        assertArrayEquals(keyBytes[1], actual.getKeys(1).getEd25519().toByteArray());
+        assertThat(actual.getKeysCount()).isEqualTo(2);
+        assertThat(actual.getKeys(0).getEd25519().toByteArray()).containsExactly(keyBytes[0]);
+        assertThat(actual.getKeys(1).getEd25519().toByteArray()).containsExactly(keyBytes[1]);
     }
 
     @Test
@@ -144,15 +140,15 @@ class KeyTest {
         var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertEquals(com.hedera.hashgraph.sdk.KeyList.class, cut.getClass());
+        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
 
         var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
         var actual = thresholdKey.toProtobufKey().getThresholdKey();
 
-        assertEquals(1, actual.getThreshold());
-        assertEquals(2, actual.getKeys().getKeysCount());
-        assertArrayEquals(keyBytes[0], actual.getKeys().getKeys(0).getEd25519().toByteArray());
-        assertArrayEquals(keyBytes[1], actual.getKeys().getKeys(1).getEd25519().toByteArray());
+        assertThat(actual.getThreshold()).isEqualTo(1);
+        assertThat(actual.getKeys().getKeysCount()).isEqualTo(2);
+        assertThat(actual.getKeys().getKeys(0).getEd25519().toByteArray()).containsExactly(keyBytes[0]);
+        assertThat(actual.getKeys().getKeys(1).getEd25519().toByteArray()).containsExactly(keyBytes[1]);
     }
 
     @Test
@@ -160,7 +156,9 @@ class KeyTest {
     void throwsUnsupportedKey() {
         byte[] keyBytes = {0, 1, 2};
         var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
-        assertThrows(IllegalStateException.class, () -> com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            () -> com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey)
+        );
     }
 
     @Test
@@ -172,9 +170,9 @@ class KeyTest {
         var key2 = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
-        assertEquals(key1.toString(), key2.toString());
-        assertEquals(key1.getPublicKey(), key2.getPublicKey());
-        assertNotEquals(key1.getPublicKey(), "random string");
+        assertThat(key2.toString()).isEqualTo(key1.toString());
+        assertThat(key2.getPublicKey()).isEqualTo(key1.getPublicKey());
+        assertThat(key1.getPublicKey()).isNotEqualTo("random string");
     }
 
     @Test
@@ -183,7 +181,7 @@ class KeyTest {
         var key = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
-        assertDoesNotThrow(() -> key.hashCode());
+        assertThatNoException().isThrownBy(key::hashCode);
     }
 
     @Test
@@ -202,37 +200,37 @@ class KeyTest {
         keyList.add(key1);
         keyList.addAll(List.of(key2, key3));
 
-        assertFalse(keyList.isEmpty());
-        assertEquals(keyList.size(), 3);
-        assertTrue(keyList.contains(key1));
-        assertTrue(keyList.contains(key2));
-        assertTrue(keyList.contains(key3));
+        assertThat(keyList.isEmpty()).isFalse();
+        assertThat(keyList.size()).isEqualTo(3);
+        assertThat(keyList).contains(key1);
+        assertThat(keyList).contains(key2);
+        assertThat(keyList).contains(key3);
 
         @Var var arr = keyList.toArray();
-        assertEquals(arr[0], key1);
-        assertEquals(arr[1], key2);
-        assertEquals(arr[2], key3);
+        assertThat(arr[0]).isEqualTo(key1);
+        assertThat(arr[1]).isEqualTo(key2);
+        assertThat(arr[2]).isEqualTo(key3);
 
         arr = new com.hedera.hashgraph.sdk.Key[]{null, null, null};
         keyList.toArray(arr);
-        assertEquals(arr[0], key1);
-        assertEquals(arr[1], key2);
-        assertEquals(arr[2], key3);
+        assertThat(arr[0]).isEqualTo(key1);
+        assertThat(arr[1]).isEqualTo(key2);
+        assertThat(arr[2]).isEqualTo(key3);
 
         keyList.remove(key2);
-        assertEquals(keyList.size(), 2);
+        assertThat(keyList.size()).isEqualTo(2);
 
         keyList.clear();
 
         keyList.addAll(List.of(key1, key2, key3));
-        assertEquals(keyList.size(), 3);
+        assertThat(keyList.size()).isEqualTo(3);
 
         keyList.retainAll(List.of(key2, key3));
 
-        assertEquals(keyList.size(), 2);
-        assertTrue(keyList.containsAll(List.of(key2, key3)));
+        assertThat(keyList.size()).isEqualTo(2);
+        assertThat(keyList).containsAll(List.of(key2, key3));
 
         keyList.removeAll(List.of(key2, key3));
-        assertTrue(keyList.isEmpty());
+        assertThat(keyList).isEmpty();
     }
 }
