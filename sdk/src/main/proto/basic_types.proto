@@ -103,6 +103,7 @@ message AccountID {
          * in that account, without creating anything, and with no creation fee being charged.
          */
         bytes alias = 4;
+
     }
 }
 
@@ -440,6 +441,11 @@ enum SubType {
      * token with a custom fee schedule
      */
     TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES = 4;
+
+    /**
+     * The resource prices are scoped to a ScheduleCreate containing a ContractCall.
+     */
+    SCHEDULE_CREATE_CONTRACT_CALL = 5;
 }
 
 /**
@@ -868,7 +874,7 @@ enum HederaFunctionality {
     ContractGetInfo = 17;
 
     /**
-     * Smart Contract, get the byte code
+     * Smart Contract, get the runtime code
      */
     ContractGetBytecode = 18;
 
@@ -1123,6 +1129,11 @@ enum HederaFunctionality {
      * account records.
      */
     GetAccountDetails = 83;
+
+    /**
+     * Ethereum Transaction
+     */
+    EthereumTransaction = 84;
 }
 
 /**
