@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v.2.15.0-beta.1
 
+### Added
+
+ * `ScheduleCreateTransaction.[waitForExpiry|expirationTime]`
+
 ## v2.14.0
 
 ### Deprecated
