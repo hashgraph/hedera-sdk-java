@@ -43,8 +43,6 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private AccountId proxyAccountId = null;
     private int maxAutomaticTokenAssociations = 0;
     @Nullable
-    AccountId autoRenewAccountId = null;
-    @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     @Nullable
@@ -187,17 +185,6 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     @Nullable
-    public AccountId getAutoRenewAccountId() {
-        return autoRenewAccountId;
-    }
-
-    public ContractCreateFlow setAutoRenewAccountId(AccountId accountId) {
-        Objects.requireNonNull(accountId);
-        autoRenewAccountId = accountId;
-        return this;
-    }
-
-    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -323,9 +310,6 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         }
         if (proxyAccountId != null) {
             contractCreateTx.setProxyAccountId(proxyAccountId);
-        }
-        if (autoRenewAccountId != null) {
-            contractCreateTx.setAutoRenewAccountId(autoRenewAccountId);
         }
         if (autoRenewPeriod != null) {
             contractCreateTx.setAutoRenewPeriod(autoRenewPeriod);
