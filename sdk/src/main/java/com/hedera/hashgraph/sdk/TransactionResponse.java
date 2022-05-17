@@ -35,6 +35,7 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     public final TransactionId transactionId;
 
     @Nullable
+    @Deprecated
     public final TransactionId scheduledTransactionId;
 
     TransactionResponse(
