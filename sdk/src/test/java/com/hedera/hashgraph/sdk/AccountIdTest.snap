@@ -8,6 +8,11 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAlias=[
 ]
 
 
+com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAliasEvmAddress=[
+  "0.0.301e300506032b6570031500302a300506032b6570032100114e6abc371b82da"
+]
+
+
 com.hedera.hashgraph.sdk.AccountIdTest.fromSolidityAddress=[
   "0.0.5005"
 ]
@@ -20,6 +25,18 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromSolidityAddressWith0x=[
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromString=[
   "0.0.5005"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasEvmAddress=[
+  {
+    "shard": 0,
+    "realm": 0,
+    "num": 0,
+    "aliasEvmAddress": {
+      "bytes": "MCowBQYDK2VwAyEAEU5qvDcbgto="
+    }
+  }
 ]
 
 
@@ -59,6 +76,11 @@ com.hedera.hashgraph.sdk.AccountIdTest.toBytes=[
 
 com.hedera.hashgraph.sdk.AccountIdTest.toBytesAlias=[
   "22221220114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.toBytesAliasEvmAddress=[
+  "22161214302a300506032b6570032100114e6abc371b82da"
 ]
 
 

@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+ * `AccountId.aliasEvmAddress`
  * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
  * `ContractCreateTransaction.[get|set]AutoRenewAccountId()`
  * `ContractCreateTransaction.[get|set]Bytecode()`
