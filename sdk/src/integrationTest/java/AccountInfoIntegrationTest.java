@@ -10,11 +10,9 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountInfoIntegrationTest {
     @Test
@@ -26,12 +24,12 @@ class AccountInfoIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertEquals(testEnv.operatorId, info.accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(testEnv.operatorKey.toString(), info.key.toString());
-        assertTrue(info.balance.toTinybars() > 0);
-        assertNull(info.proxyAccountId);
-        assertEquals(Hbar.ZERO, info.proxyReceived);
+        assertThat(info.accountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.balance.toTinybars()).isGreaterThan(0);
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         testEnv.close();
     }
@@ -49,7 +47,7 @@ class AccountInfoIntegrationTest {
 
         var accInfo = info.setQueryPayment(cost).execute(testEnv.client);
 
-        assertEquals(testEnv.operatorId, accInfo.accountId);
+        assertThat(accInfo.accountId).isEqualTo(testEnv.operatorId);
 
         testEnv.close();
     }
@@ -67,7 +65,7 @@ class AccountInfoIntegrationTest {
 
         var accInfo = info.setQueryPayment(cost).execute(testEnv.client);
 
-        assertEquals(testEnv.operatorId, accInfo.accountId);
+        assertThat(accInfo.accountId).isEqualTo(testEnv.operatorId);
 
         testEnv.close();
     }
@@ -84,11 +82,9 @@ class AccountInfoIntegrationTest {
 
         var cost = info.getCost(testEnv.client);
 
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
             info.execute(testEnv.client);
-        });
-
-        assertEquals("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
+        }).withMessage("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         testEnv.close();
     }
@@ -102,11 +98,9 @@ class AccountInfoIntegrationTest {
             .setAccountId(testEnv.operatorId)
             .setMaxQueryPayment(Hbar.fromTinybars(10000));
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             info.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-        });
-
-        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
+        }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
         testEnv.close();
     }
@@ -130,8 +124,8 @@ class AccountInfoIntegrationTest {
             .setInitialBalance(Hbar.fromTinybars(1000))
             .freezeWith(testEnv.client);
 
-        assertTrue(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, signedTx));
-        assertFalse(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, unsignedTx));
+        assertThat(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, signedTx)).isTrue();
+        assertThat(AccountInfoFlow.verifyTransactionSignature(testEnv.client, testEnv.operatorId, unsignedTx)).isFalse();
 
         testEnv.close();
     }

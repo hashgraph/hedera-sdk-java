@@ -5,8 +5,7 @@ import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountStakersIntegrationTest {
     @Test
@@ -14,14 +13,12 @@ class AccountStakersIntegrationTest {
     void cannotQueryAccountStakersSinceItIsNotSupported() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new AccountStakersQuery()
                 .setAccountId(testEnv.operatorId)
                 .setMaxQueryPayment(new Hbar(1))
                 .execute(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.NOT_SUPPORTED.toString()));
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         testEnv.close();
     }

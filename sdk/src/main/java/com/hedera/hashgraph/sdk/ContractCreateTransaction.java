@@ -82,11 +82,14 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     @Nullable
     private FileId bytecodeFileId = null;
     @Nullable
+    private byte[] bytecode = null;
+    @Nullable
     private AccountId proxyAccountId = null;
     @Nullable
     private Key adminKey = null;
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
+    private int maxAutomaticTokenAssociations = 0;
     @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
@@ -126,7 +129,31 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setBytecodeFileId(FileId bytecodeFileId) {
         Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
+        this.bytecode = null;
         this.bytecodeFileId = bytecodeFileId;
+        return this;
+    }
+
+    @Nullable
+    public byte[] getBytecode() {
+        return bytecode;
+    }
+
+    /**
+     * Sets the smart contract byte code.
+     *
+     * The bytes of the smart contract initcode. This is only useful if the smart contract init
+     * is less than the hedera transaction limit. In those cases fileID must be used.
+     *
+     * @param bytecode The bytecode
+     * @return {@code this}
+     */
+
+    public ContractCreateTransaction setBytecode(byte[] bytecode) {
+        Objects.requireNonNull(bytecode);
+        requireNotFrozen();
+        this.bytecodeFileId = null;
+        this.bytecode = bytecode;
         return this;
     }
 
@@ -210,6 +237,24 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    public int getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    /**
+     * Sets the new maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @param maxAutomaticTokenAssociations The maximum automatic token associations
+     * @return  {@code this}
+     */
+
+    public ContractCreateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        requireNotFrozen();
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        return this;
+    }
+
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -280,12 +325,16 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
         }
+        if (bytecode != null) {
+            builder.setInitcode(ByteString.copyFrom(bytecode));
+        }
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
         }
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
+        builder.setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
@@ -314,12 +363,16 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());
         }
+        if (body.hasInitcode()) {
+            bytecode = body.getInitcode().toByteArray();
+        }
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
         }
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
+        maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }

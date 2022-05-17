@@ -7,10 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FileCreateIntegrationTest {
     @Test
@@ -29,12 +26,12 @@ public class FileCreateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(28, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -59,12 +56,12 @@ public class FileCreateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(0, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(0);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -88,10 +85,10 @@ public class FileCreateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(0, info.size);
-        assertFalse(info.isDeleted);
-        assertNull(info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(0);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNull();
 
         testEnv.close();
     }
