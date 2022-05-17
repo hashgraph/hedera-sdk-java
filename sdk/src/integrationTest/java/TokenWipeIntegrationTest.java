@@ -17,8 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenWipeIntegrationTest {
     @Test
@@ -207,16 +206,14 @@ class TokenWipeIntegrationTest {
         var serialsToTransfer = mintReceipt.serials.subList(0, 4);
         // don't transfer them
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setTokenId(tokenId)
                 .setAccountId(accountId)
                 .setSerials(serialsToTransfer)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.ACCOUNT_DOES_NOT_OWN_WIPED_NFT.toString()));
+        }).withMessageContaining(Status.ACCOUNT_DOES_NOT_OWN_WIPED_NFT.toString());
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -273,15 +270,13 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setTokenId(tokenId)
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -338,15 +333,13 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setAccountId(accountId)
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -403,15 +396,13 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setTokenId(tokenId)
                 .setAccountId(accountId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_WIPING_AMOUNT.toString()));
+        }).withMessageContaining(Status.INVALID_WIPING_AMOUNT.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

@@ -34,9 +34,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
@@ -305,15 +305,20 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
+        var retval = new CompletableFuture<O>().orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
+
         mergeFromClient(client);
 
-        return onExecuteAsync(client).thenCompose((v) -> {
+        onExecuteAsync(client).thenRun(() -> {
             checkNodeAccountIds();
             setNodesFromNodeAccountIds(client);
 
-            return executeAsync(client, 1, null);
-        })
-            .orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
+            executeAsyncInternal(client, 1, null, retval);
+        }).exceptionally(error -> {
+            retval.completeExceptionally(error);
+            return null;
+        });
+        return retval;
     }
 
     @VisibleForTesting
@@ -386,49 +391,74 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         return request;
     }
 
-    private CompletableFuture<O> executeAsync(Client client, int attempt, @Nullable Throwable lastException) {
+    private void executeAsyncInternal(
+        Client client,
+        int attempt,
+        @Nullable Throwable lastException,
+        CompletableFuture<O> returnFuture
+    ) {
+        if (returnFuture.isCancelled() || returnFuture.isCompletedExceptionally() || returnFuture.isDone()) {
+            return;
+        }
+
         if (attempt > maxAttempts) {
-            return CompletableFuture.<O>failedFuture(new MaxAttemptsExceededException(lastException));
+            returnFuture.completeExceptionally(new CompletionException(new MaxAttemptsExceededException(lastException)));
+            return;
         }
 
         GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
 
         // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
         if (!grpcRequest.getNode().isHealthy()) {
-            return Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor)
-                .thenCompose((v) -> executeAsync(client, attempt, lastException));
+            Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor)
+                .thenRun(() -> executeAsyncInternal(client, attempt, lastException, returnFuture));
+            return;
         }
 
-        return grpcRequest.getNode().channelFailedToConnectAsync().thenCompose(connectionFailed -> {
+        grpcRequest.getNode().channelFailedToConnectAsync().thenAccept(connectionFailed -> {
             if (connectionFailed) {
                 var connectionException = grpcRequest.reactToConnectionFailure();
-                return executeAsync(client, attempt + 1, connectionException);
+                executeAsyncInternal(client, attempt + 1, connectionException, returnFuture);
+                return;
             }
 
-            return toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
+            toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
                 if (grpcRequest.shouldRetryExceptionally(error)) {
                     // the transaction had a network failure reaching Hedera
-                    return executeAsync(client, attempt + 1, error);
+                    executeAsyncInternal(client, attempt + 1, error, returnFuture);
+                    return null;
                 }
 
                 if (error != null) {
                     // not a network failure, some other weirdness going on; just fail fast
-                    return CompletableFuture.<O>failedFuture(error);
+                    returnFuture.completeExceptionally(new CompletionException(error));
+                    return null;
                 }
 
                 switch (grpcRequest.getStatus(response)) {
                     case ServerError:
-                        return executeAsync(client, attempt + 1, grpcRequest.mapStatusException());
+                        executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                        break;
                     case Retry:
-                        return Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor)
-                            .thenCompose((v) -> executeAsync(client, attempt + 1, grpcRequest.mapStatusException()));
+                        Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
+                            executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                        });
+                        break;
                     case RequestError:
-                        return CompletableFuture.<O>failedFuture(grpcRequest.mapStatusException());
+                        returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
+                        break;
                     case Success:
                     default:
-                        return CompletableFuture.completedFuture(grpcRequest.mapResponse());
+                        returnFuture.complete(grpcRequest.mapResponse());
                 }
-            }).thenCompose(x -> x);
+                return null;
+            }).exceptionally(error -> {
+                returnFuture.completeExceptionally(error);
+                return null;
+            });
+        }).exceptionally(error -> {
+            returnFuture.completeExceptionally(error);
+            return null;
         });
     }
 

@@ -7,8 +7,8 @@ import com.hedera.hashgraph.sdk.TransactionRecordQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ReceiptQueryIntegrationTest {
     @Test
@@ -121,11 +121,9 @@ public class ReceiptQueryIntegrationTest {
 
         var cost = recordQuery.getCost(testEnv.client);
 
-        var error = assertThrows(RuntimeException.class, () -> {
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
             recordQuery.execute(testEnv.client);
-        });
-
-        assertEquals("cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ", error.getMessage());
+        }).withMessage("cost for TransactionRecordQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         testEnv.close(receipt.accountId, key);
     }
@@ -147,11 +145,9 @@ public class ReceiptQueryIntegrationTest {
         var recordQuery = new TransactionRecordQuery()
             .setTransactionId(response.transactionId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             recordQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-        });
-
-        assertEquals("INSUFFICIENT_TX_FEE", error.status.toString());
+        }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
         testEnv.close(receipt.accountId, key);
     }

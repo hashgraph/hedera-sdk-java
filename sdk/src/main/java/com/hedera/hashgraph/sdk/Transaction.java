@@ -250,6 +250,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case CONTRACTDELETEINSTANCE:
                 return new ContractDeleteTransaction(txs);
 
+            case ETHEREUMTRANSACTION:
+                return new EthereumTransaction(txs);
+
             case CRYPTOADDLIVEHASH:
                 return new LiveHashAddTransaction(txs);
 

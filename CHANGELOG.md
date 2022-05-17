@@ -9,10 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+ * `TransactionResponse.scheduledTransactionId` with no replacement.
+
+### Added
+
+ * `AccountId.aliasEvmAddress`
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]AutoRenewAccountId()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractUpdateTransaction.[get|set|clear]AutoRenewAccountId()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]AutoRenewAccountId()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
+ * `CustomRoyaltyFee.getFallbackFee()`
+
+## v2.12.0
+
+### Added
+
  * `AccountAllowanceAdjustTransaction` with no replacement.
- * `AccountAllowanceDeleteTransaction.deleteAll[Hbar|Token]Allowances` with no replacements.
+ * `AccountAllowanceDeleteTransaction`
+ * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
  * `TransactionRecord.[hbar|token|tokenNft]AllowanceAdjustments`.
  * `AccountInfo.[hbar|token|tokenNft]Allowances`.
+ * `AccountAllowanceExample`
+ * License Headers
 
 ## v2.12.0-beta.1
 

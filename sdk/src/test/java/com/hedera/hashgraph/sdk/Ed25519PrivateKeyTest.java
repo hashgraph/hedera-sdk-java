@@ -35,7 +35,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class Ed25519PrivateKeyTest {
     private static final String TEST_KEY_STR = "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10";
@@ -97,11 +99,11 @@ class Ed25519PrivateKeyTest {
     void keyGenerates() {
         PrivateKey key = PrivateKey.generateED25519();
 
-        assertNotNull(key);
-        assertNotNull(key.toBytes());
+        assertThat(key).isNotNull();
+        assertThat(key.toBytes()).isNotNull();
 
         // we generate the chain code at the same time
-        assertTrue(key.isDerivable(), "generated key must support generation");
+        assertThat(key.isDerivable()).isTrue();
     }
 
     @Test
@@ -112,7 +114,7 @@ class Ed25519PrivateKeyTest {
         PrivateKey key2 = PrivateKey.fromBytes(key1Bytes);
         byte[] key2Bytes = key2.toBytes();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -125,8 +127,8 @@ class Ed25519PrivateKeyTest {
         PrivateKey key3 = PrivateKey.fromBytes(key1Bytes);
         byte[] key3Bytes = key3.toBytesRaw();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
+        assertThat(key3Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -139,8 +141,8 @@ class Ed25519PrivateKeyTest {
         PrivateKey key3 = PrivateKey.fromBytes(key1Bytes);
         byte[] key3Bytes = key3.toBytesDER();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
+        assertThat(key3Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -151,7 +153,7 @@ class Ed25519PrivateKeyTest {
         PrivateKey key2 = PrivateKey.fromString(key1String);
         String key2String = key2.toString();
 
-        assertEquals(key1String, key2String);
+        assertThat(key2String).isEqualTo(key1String);
     }
 
     @Test
@@ -164,8 +166,8 @@ class Ed25519PrivateKeyTest {
         PrivateKey key3 = PrivateKey.fromString(key1String);
         String key3String = key3.toStringRaw();
 
-        assertEquals(key1String, key2String);
-        assertEquals(key1String, key3String);
+        assertThat(key2String).isEqualTo(key1String);
+        assertThat(key3String).isEqualTo(key1String);
     }
 
     @Test
@@ -178,8 +180,8 @@ class Ed25519PrivateKeyTest {
         PrivateKey key3 = PrivateKey.fromString(key1String);
         String key3String = key3.toStringDER();
 
-        assertEquals(key1String, key2String);
-        assertEquals(key1String, key3String);
+        assertThat(key2String).isEqualTo(key1String);
+        assertThat(key3String).isEqualTo(key1String);
     }
 
     @ParameterizedTest
@@ -194,14 +196,11 @@ class Ed25519PrivateKeyTest {
     })
     void externalKeyDeserialize(String keyStr) {
         PrivateKey key = PrivateKey.fromString(keyStr);
-        assertNotNull(key);
+        assertThat(key).isNotNull();
         // the above are all the same key
-        assertEquals(
-            TEST_KEY_STR,
-            key.toString()
-        );
-        assertEquals(TEST_KEY_STR, key.toStringDER());
-        assertEquals(TEST_KEY_STR_RAW, key.toStringRaw());
+        assertThat(key.toString()).isEqualTo(TEST_KEY_STR);
+        assertThat(key.toStringDER()).isEqualTo(TEST_KEY_STR);
+        assertThat(key.toStringRaw()).isEqualTo(TEST_KEY_STR_RAW);
     }
 
     @Test
@@ -209,8 +208,8 @@ class Ed25519PrivateKeyTest {
     void keyToString() {
         PrivateKey key = PrivateKey.fromString(TEST_KEY_STR);
 
-        assertNotNull(key);
-        assertEquals(TEST_KEY_STR, key.toString());
+        assertThat(key).isNotNull();
+        assertThat(key.toString()).isEqualTo(TEST_KEY_STR);
     }
 
     @Test
@@ -219,58 +218,58 @@ class Ed25519PrivateKeyTest {
         StringReader stringReader = new StringReader(TEST_KEY_PEM);
         PrivateKey privateKey = PrivateKey.readPem(stringReader);
 
-        assertEquals(privateKey.toString(), TEST_KEY_STR);
+        assertThat(privateKey.toString()).isEqualTo(TEST_KEY_STR);
     }
 
     @Test
     @DisplayName("private key can be recovered from a mnemonic")
-    void keyFromMnemonic() {
-        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_STRING));
+    void keyFromMnemonic() throws Exception {
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
         PrivateKey key = PrivateKey.fromMnemonic(mnemonic);
         PrivateKey key2 = PrivateKey.fromString(MNEMONIC_PRIVATE_KEY);
-        assertArrayEquals(key2.toBytes(), key.toBytes());
+        assertThat(key2.toBytes()).containsExactly(key.toBytes());
     }
 
     @Test
     @DisplayName("validate 12 word generated mnemonic")
-    void validateGenerated12() {
+    void validateGenerated12() throws Exception {
         Mnemonic mnemonic = Mnemonic.generate12();
-        assertDoesNotThrow(() -> Mnemonic.fromString(mnemonic.toString()));
+        Mnemonic.fromString(mnemonic.toString());
     }
 
     @Test
     @DisplayName("validate legacy mnemonic")
-    void validateLegacyMnemonic() {
-        Mnemonic mnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(MNEMONIC_LEGACY_STRING));
-        PrivateKey key = assertDoesNotThrow(mnemonic::toLegacyPrivateKey);
-        assertEquals(key.legacyDerive(-1).toString(), MNEMONIC_LEGACY_PRIVATE_KEY);
+    void validateLegacyMnemonic() throws Exception {
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_STRING);
+        PrivateKey key = mnemonic.toLegacyPrivateKey();
+        assertThat(key.legacyDerive(-1).toString()).isEqualTo(MNEMONIC_LEGACY_PRIVATE_KEY);
     }
 
     @Test
     @DisplayName("validate 24 word generated mnemonic")
-    void validateGenerated24() {
+    void validateGenerated24() throws Exception {
         Mnemonic mnemonic = Mnemonic.generate24();
-        assertDoesNotThrow(() -> Mnemonic.fromString(mnemonic.toString()));
+        Mnemonic.fromString(mnemonic.toString());
     }
 
     @Test
     @DisplayName("derived key matches that of the mobile wallets")
-    void deriveKeyIndex0() {
-        Mnemonic iosMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(IOS_MNEMONIC_STRING));
+    void deriveKeyIndex0() throws Exception {
+        Mnemonic iosMnemonic = Mnemonic.fromString(IOS_MNEMONIC_STRING);
         PrivateKey iosKey = PrivateKey.fromMnemonic(iosMnemonic);
 
         PrivateKey iosDerivedKey = iosKey.derive(0);
         PrivateKey iosExpectedKey = PrivateKey.fromString(IOS_DEFAULT_PRIVATE_KEY);
 
-        assertArrayEquals(iosDerivedKey.toBytes(), iosExpectedKey.toBytes());
+        assertThat(iosDerivedKey.toBytes()).containsExactly(iosExpectedKey.toBytes());
 
-        Mnemonic androidMnemonic = assertDoesNotThrow(() -> Mnemonic.fromString(ANDROID_MNEMONIC_STRING));
+        Mnemonic androidMnemonic = Mnemonic.fromString(ANDROID_MNEMONIC_STRING);
         PrivateKey androidKey = PrivateKey.fromMnemonic(androidMnemonic);
 
         PrivateKey androidDerivedKey = androidKey.derive(0);
         PrivateKey androidExpectedKey = PrivateKey.fromString(ANDROID_DEFAULT_PRIVATE_KEY);
 
-        assertArrayEquals(androidDerivedKey.toBytes(), androidExpectedKey.toBytes());
+        assertThat(androidDerivedKey.toBytes()).containsExactly(androidExpectedKey.toBytes());
     }
 
     @Test
@@ -283,7 +282,15 @@ class Ed25519PrivateKeyTest {
 
         byte[] signature = privateKey.sign(messageToSign);
 
-        assertTrue(Ed25519.verify(signature, 0, privateKey.getPublicKey().toBytes(), 0, messageToSign, 0, messageToSign.length));
+        assertThat(Ed25519.verify(
+            signature,
+            0,
+            privateKey.getPublicKey().toBytes(),
+            0,
+            messageToSign,
+            0,
+            messageToSign.length
+        )).isTrue();
     }
 
     @Test
@@ -296,22 +303,32 @@ class Ed25519PrivateKeyTest {
 
         byte[] signature = privateKey.sign(messageToSign);
 
-        assertTrue(Ed25519.verify(signature, 0, privateKey.getPublicKey().toBytes(), 0, messageToSign, 0, messageToSign.length));
+        assertThat(Ed25519.verify(
+            signature,
+            0,
+            privateKey.getPublicKey().toBytes(),
+            0,
+            messageToSign,
+            0,
+            messageToSign.length
+        )).isTrue();
     }
 
     @Test
     @DisplayName("fromPem() with passphrase produces same key")
     void keyFromEncryptedPem() throws IOException {
         PrivateKey privateKey = PrivateKey.fromPem(ENCRYPTED_PEM, PEM_PASSPHRASE);
-        assertEquals(privateKey.toString(), TEST_KEY_STR);
+        assertThat(privateKey.toString()).isEqualTo(TEST_KEY_STR);
     }
 
     @Test
     @DisplayName("fromPem() with encrypted key without a passphrase throws useful error")
     void errorKeyFromEncryptedPemNoPassphrase() {
-        assertEquals(
-            "PEM file contained an encrypted private key but no passphrase was given",
-            assertThrows(BadKeyException.class, () -> PrivateKey.fromPem(ENCRYPTED_PEM)).getMessage());
+        assertThatExceptionOfType(BadKeyException.class).isThrownBy(
+            () -> PrivateKey.fromPem(ENCRYPTED_PEM)
+        ).satisfies(error -> assertThat(error.getMessage()).isEqualTo(
+            "PEM file contained an encrypted private key but no passphrase was given"
+        ));
     }
 
     @ParameterizedTest
@@ -328,17 +345,14 @@ class Ed25519PrivateKeyTest {
         PrivateKey key = PrivateKey.fromString(keyStr);
         byte[] signature = key.sign(MESSAGE_BYTES);
 
-        assertEquals(
-            SIG_STR,
-            Hex.toHexString(signature)
-        );
+        assertThat(Hex.toHexString(signature)).isEqualTo(SIG_STR);
     }
     @Test
     @DisplayName("private key is is ECDSA")
     void keyIsECDSA() {
         PrivateKey key = PrivateKey.generateECDSA();
 
-        assertTrue(key.isECDSA());
+        assertThat(key.isECDSA()).isTrue();
     }
 
     @Test
@@ -346,6 +360,6 @@ class Ed25519PrivateKeyTest {
     void keyIsNotEd25519() {
         PrivateKey key = PrivateKey.generateECDSA();
 
-        assertFalse(key.isED25519());
+        assertThat(key.isED25519()).isFalse();
     }
 }

@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
@@ -36,7 +35,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
 import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 import java8.util.function.Function;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +45,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.threeten.bp.Duration;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -450,6 +447,38 @@ public class MockingTest {
                 sigPairList.get(1).getEd25519().toString());
 
         server.close();
+    }
+
+    @Test
+    @DisplayName("Can cancel executeAsync()")
+    void canCancelExecuteAsync() throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("canCancelExecuteAsync", service);
+
+        server.client.setMaxBackoff(Duration.ofSeconds(8));
+        server.client.setMinBackoff(Duration.ofSeconds(1));
+
+        var noReceiptResponse = TestResponse.query(
+            Response.newBuilder()
+                .setTransactionGetReceipt(
+                    TransactionGetReceiptResponse.newBuilder()
+                        .setHeader(
+                            ResponseHeader.newBuilder()
+                                .setNodeTransactionPrecheckCode(com.hedera.hashgraph.sdk.Status.RECEIPT_NOT_FOUND.code)
+                        )
+                ).build()
+        );
+
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+
+        var future = new TransactionReceiptQuery().executeAsync(server.client);
+        Thread.sleep(1500);
+        future.cancel(true);
+        Thread.sleep(5000);
+
+        Assertions.assertEquals(2, service.buffer.queryRequestsReceived.size());
     }
 
     private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {

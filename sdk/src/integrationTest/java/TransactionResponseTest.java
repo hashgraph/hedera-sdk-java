@@ -3,8 +3,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionResponseTest {
     @Test
@@ -20,10 +19,10 @@ public class TransactionResponseTest {
 
         var record = transaction.getRecord(testEnv.client);
 
-        assertArrayEquals(record.transactionHash.toByteArray(), transaction.transactionHash);
+        assertThat(record.transactionHash.toByteArray()).containsExactly(transaction.transactionHash);
 
         var accountId = record.receipt.accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         testEnv.close(accountId, key);
     }
