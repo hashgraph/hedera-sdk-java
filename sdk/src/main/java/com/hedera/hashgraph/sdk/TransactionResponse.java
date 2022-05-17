@@ -63,6 +63,13 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
         return receipt;
     }
 
+    public TransactionReceipt forceGetReceipt(Client client) throws TimeoutException, PrecheckStatusException {
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
+    }
+
     @Override
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
@@ -73,6 +80,14 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
 
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);
+
+        return new TransactionRecordQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId))
+            .execute(client);
+    }
+
+    public TransactionRecord forceGetRecord(Client client) throws TimeoutException, PrecheckStatusException {
 
         return new TransactionRecordQuery()
             .setTransactionId(transactionId)
