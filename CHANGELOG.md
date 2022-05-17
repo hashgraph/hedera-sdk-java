@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.14.0
+
+### Deprecated
+
+ * `TransactionResponse.scheduledTransactionId` with no replacement.
+
+### Added
+
+ * `AccountId.aliasEvmAddress`
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
+ * `CustomRoyaltyFee.getFallbackFee()`
+
+
+## v2.13.0 - Where did it go?!
+
 ## v2.12.0
 
 ### Added

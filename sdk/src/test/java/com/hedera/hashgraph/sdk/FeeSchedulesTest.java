@@ -25,7 +25,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeeSchedulesTest {
     @BeforeAll
@@ -73,7 +73,7 @@ public class FeeSchedulesTest {
         var originalFeeSchedules = spawnFeeSchedulesExample();
         byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
         var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-        assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
+        assertThat(originalFeeSchedules.toString().equals(copyFeeSchedules.toString())).isTrue();
         SnapshotMatcher.expect(originalFeeSchedules.toString()).toMatchSnapshot();
     }
 
@@ -82,6 +82,6 @@ public class FeeSchedulesTest {
         var originalFeeSchedules = new FeeSchedules();
         byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
         var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-        assertTrue(originalFeeSchedules.toString().equals(copyFeeSchedules.toString()));
+        assertThat(originalFeeSchedules.toString().equals(copyFeeSchedules.toString())).isTrue();
     }
 }

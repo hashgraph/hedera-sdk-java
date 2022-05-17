@@ -16,9 +16,8 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenBurnIntegrationTest {
     @Test
@@ -48,7 +47,7 @@ class TokenBurnIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertEquals(receipt.totalSupply, 1000000 - 10);
+        assertThat(receipt.totalSupply).isEqualTo(1000000 - 10);
 
         testEnv.close(tokenId);
     }
@@ -58,14 +57,12 @@ class TokenBurnIntegrationTest {
     void cannotBurnTokensWhenTokenIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenBurnTransaction()
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
         testEnv.close();
     }
@@ -91,14 +88,12 @@ class TokenBurnIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenBurnTransaction()
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_BURN_AMOUNT.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_BURN_AMOUNT.toString());
 
         testEnv.close(tokenId);
     }
@@ -124,15 +119,13 @@ class TokenBurnIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenBurnTransaction()
                 .setTokenId(tokenId)
                 .setAmount(10)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId);
     }
@@ -225,15 +218,13 @@ class TokenBurnIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenBurnTransaction()
                 .setSerials(serials)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.TREASURY_MUST_OWN_BURNED_NFT.toString()));
+        }).withMessageContaining(Status.TREASURY_MUST_OWN_BURNED_NFT.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,8 +26,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
@@ -44,7 +43,7 @@ class Ed25519PublicKeyTest {
         var key = PrivateKey.fromStringED25519("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
         key.signTransaction(transaction);
 
-        Assertions.assertTrue(key.getPublicKey().verifyTransaction(transaction));
+        assertThat(key.getPublicKey().verifyTransaction(transaction)).isTrue();
     }
 
     @Test
@@ -55,7 +54,7 @@ class Ed25519PublicKeyTest {
         PublicKey key2 = PublicKey.fromBytes(key1Bytes);
         byte[] key2Bytes = key2.toBytes();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -68,8 +67,8 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromBytes(key1Bytes);
         byte[] key3Bytes = key3.toBytesRaw();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
+        assertThat(key3Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -82,8 +81,8 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromBytes(key1Bytes);
         byte[] key3Bytes = key3.toBytesDER();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
+        assertThat(key3Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -96,9 +95,9 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toString();
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyED25519.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
     }
 
     @Test
@@ -111,9 +110,9 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toStringRaw();
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyED25519.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
     }
 
     @Test
@@ -126,9 +125,9 @@ class Ed25519PublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toStringDER();
 
-        assertEquals(PublicKeyED25519.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyED25519.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
     }
 
     @ParameterizedTest
@@ -141,11 +140,11 @@ class Ed25519PublicKeyTest {
     })
     void externalKeyDeserialize(String keyStr) {
         PublicKey key = PublicKey.fromString(keyStr);
-        assertNotNull(key);
+        assertThat(key).isNotNull();
         // the above are all the same key
-        assertEquals(TEST_KEY_STR, key.toString());
-        assertEquals(TEST_KEY_STR, key.toStringDER());
-        assertEquals(TEST_KEY_STR_RAW, key.toStringRaw());
+        assertThat(key.toString()).isEqualTo(TEST_KEY_STR);
+        assertThat(key.toStringDER()).isEqualTo(TEST_KEY_STR);
+        assertThat(key.toStringRaw()).isEqualTo(TEST_KEY_STR_RAW);
     }
 
     @Test
@@ -153,8 +152,8 @@ class Ed25519PublicKeyTest {
     void keyToString() {
         PublicKey key = PublicKey.fromString(TEST_KEY_STR);
 
-        assertNotNull(key);
-        assertEquals(TEST_KEY_STR, key.toString());
+        assertThat(key).isNotNull();
+        assertThat(key.toString()).isEqualTo(TEST_KEY_STR);
     }
 
     @Test
@@ -162,7 +161,7 @@ class Ed25519PublicKeyTest {
     void keyIsECDSA() {
         PublicKey key = PrivateKey.generateECDSA().getPublicKey();
 
-        assertTrue(key.isECDSA());
+        assertThat(key.isECDSA()).isTrue();
     }
 
     @Test
@@ -170,6 +169,6 @@ class Ed25519PublicKeyTest {
     void keyIsNotEd25519() {
         PublicKey key = PrivateKey.generateECDSA().getPublicKey();
 
-        assertFalse(key.isED25519());
+        assertThat(key.isED25519()).isFalse();
     }
 }

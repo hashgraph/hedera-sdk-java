@@ -193,6 +193,6 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("Cannot schedule live hash transactions");
+        throw new UnsupportedOperationException("Cannot schedule LiveHashAddTransaction");
     }
 }

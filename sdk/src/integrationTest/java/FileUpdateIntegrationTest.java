@@ -11,12 +11,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class FileUpdateIntegrationTest {
     @Test
@@ -35,12 +31,12 @@ public class FileUpdateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 28);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileUpdateTransaction()
             .setFileId(fileId)
@@ -52,12 +48,12 @@ public class FileUpdateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 28);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(info.keys, KeyList.of(testEnv.operatorKey));
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -82,20 +78,18 @@ public class FileUpdateIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(info.fileId, fileId);
-        assertEquals(info.size, 28);
-        assertFalse(info.isDeleted);
-        assertNull(info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNull();
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new FileUpdateTransaction()
                 .setFileId(fileId)
                 .setContents("[e2e::FileUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.UNAUTHORIZED.toString()));
+        }).withMessageContaining(Status.UNAUTHORIZED.toString());
 
         testEnv.close();
     }
@@ -105,14 +99,12 @@ public class FileUpdateIntegrationTest {
     void cannotUpdateFileWhenFileIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new FileUpdateTransaction()
                 .setContents("[e2e::FileUpdateTransaction]")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_FILE_ID.toString()));
+        }).withMessageContaining(Status.INVALID_FILE_ID.toString());
 
         testEnv.close();
     }

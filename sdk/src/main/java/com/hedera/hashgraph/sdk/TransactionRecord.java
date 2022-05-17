@@ -118,6 +118,8 @@ public final class TransactionRecord {
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    public final ByteString ethereumHash;
+
     @Deprecated
     public final List<HbarAllowance> hbarAllowanceAdjustments;
 
@@ -145,7 +147,8 @@ public final class TransactionRecord {
         @Nullable PublicKey aliasKey,
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp
+        @Nullable Instant parentConsensusTimestamp,
+        ByteString ethereumHash
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -165,6 +168,7 @@ public final class TransactionRecord {
         this.children = children;
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
+        this.ethereumHash = ethereumHash;
         this.hbarAllowanceAdjustments = Collections.emptyList();
         this.tokenAllowanceAdjustments = Collections.emptyList();
         this.tokenNftAllowanceAdjustments = Collections.emptyList();
@@ -236,7 +240,8 @@ public final class TransactionRecord {
             children,
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
+            transactionRecord.getTransactionHash()
         );
     }
 
@@ -261,7 +266,8 @@ public final class TransactionRecord {
             .setTransactionID(transactionId.toProtobuf())
             .setMemo(transactionMemo)
             .setTransactionFee(transactionFee.toTinybars())
-            .setTransferList(transferList);
+            .setTransferList(transferList)
+            .setEthereumHash(ethereumHash);
 
         for (var tokenEntry : tokenTransfers.entrySet()) {
             var tokenTransfersList = TokenTransferList.newBuilder()
@@ -336,9 +342,7 @@ public final class TransactionRecord {
             .add("children", children)
             .add("duplicates", duplicates)
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
-            .add("hbarAllowanceAdjustments", hbarAllowanceAdjustments)
-            .add("tokenAllowanceAdjustments", tokenAllowanceAdjustments)
-            .add("tokenNftAllowanceAdjustments", tokenNftAllowanceAdjustments)
+            .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
             .toString();
     }
 

@@ -19,7 +19,11 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import io.grpc.Server;
 import io.grpc.ServerMethodDefinition;

@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.Int32Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
@@ -69,6 +70,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     private Instant expirationTime = null;
     @Nullable
     private Key adminKey = null;
+    @Nullable
+    private Integer maxAutomaticTokenAssociations = null;
     @Nullable
     private Duration autoRenewPeriod = null;
     @Nullable
@@ -168,6 +171,25 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Nullable
+    public Integer getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    /**
+     * Sets the new maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @param maxAutomaticTokenAssociations The maximum automatic token associations
+     * @return  {@code this}
+     */
+
+    public ContractUpdateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        requireNotFrozen();
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        return this;
+    }
+
+    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -251,6 +273,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
+        if (body.hasMaxAutomaticTokenAssociations()) {
+            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+        }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
@@ -272,6 +297,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if (maxAutomaticTokenAssociations != null) {
+            builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
         }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));

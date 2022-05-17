@@ -26,9 +26,8 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SystemUndeleteTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -84,13 +83,13 @@ public class SystemUndeleteTransactionTest {
     void shouldBytesContract() throws Exception {
         var tx = spawnTestTransactionContract();
         var tx2 = ScheduleDeleteTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
     void shouldBytesFile() throws Exception {
         var tx = spawnTestTransactionFile();
         var tx2 = SystemUndeleteTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }
