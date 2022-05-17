@@ -332,7 +332,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param transportSecurity - enable or disable transport security
      * @return {@code this} for fluent API usage.
      */
-    public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
+    public synchronized Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
         return this;
     }
@@ -347,7 +347,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param verifyCertificates - enable or disable certificate verification
      * @return
      */
-    public Client setVerifyCertificates(boolean verifyCertificates) {
+    public synchronized Client setVerifyCertificates(boolean verifyCertificates) {
         network.setVerifyCertificates(verifyCertificates);
         return this;
     }
@@ -383,7 +383,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     @Override
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
-    public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
+    public CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
         return new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
@@ -475,7 +475,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Nullable
     @Deprecated
-    public synchronized NetworkName getNetworkName() {
+    public NetworkName getNetworkName() {
         var ledgerId = network.getLedgerId();
         return ledgerId == null ? null : ledgerId.toNetworkName();
     }
@@ -501,7 +501,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     @Nullable
-    public synchronized LedgerId getLedgerId() {
+    public LedgerId getLedgerId() {
         return network.getLedgerId();
     }
 
@@ -522,7 +522,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return
      */
-    public synchronized int getMaxAttempts() {
+    public int getMaxAttempts() {
         return maxAttempts;
     }
 
@@ -556,7 +556,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param maxBackoff The maximum amount of time to wait between retries
      * @return {@code this}
      */
-    public Client setMaxBackoff(Duration maxBackoff) {
+    public synchronized Client setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("maxBackoff must be a positive duration");
         } else if (maxBackoff.compareTo(minBackoff) < 0) {
@@ -582,7 +582,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param minBackoff The minimum amount of time to wait between retries
      * @return {@code this}
      */
-    public Client setMinBackoff(Duration minBackoff) {
+    public synchronized Client setMinBackoff(Duration minBackoff) {
         if (minBackoff == null || minBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("minBackoff must be a positive duration");
         } else if (minBackoff.compareTo(maxBackoff) > 0) {
@@ -597,7 +597,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return
      */
-    public synchronized int getMaxNodeAttempts() {
+    public int getMaxNodeAttempts() {
         return network.getMaxNodeAttempts();
     }
 
@@ -620,7 +620,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     @Deprecated
-    public synchronized Duration getNodeWaitTime() {
+    public Duration getNodeWaitTime() {
         return getNodeMinBackoff();
     }
 
@@ -641,7 +641,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return
      */
-    public synchronized Duration getNodeMinBackoff() {
+    public Duration getNodeMinBackoff() {
         return network.getMinNodeBackoff();
     }
 
@@ -661,7 +661,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return
      */
-    public synchronized Duration getNodeMaxBackoff() {
+    public Duration getNodeMaxBackoff() {
         return network.getMaxNodeBackoff();
     }
 
@@ -680,7 +680,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network.getMinNodeReadmitTime();
     }
 
-    public Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    public synchronized Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         network.setMinNodeReadmitTime(minNodeReadmitTime);
         return this;
     }
@@ -720,7 +720,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Is automatic entity ID checksum validation enabled.
      * @return
      */
-    public synchronized boolean isAutoValidateChecksumsEnabled() {
+    public boolean isAutoValidateChecksumsEnabled() {
         return autoValidateChecksums;
     }
 
@@ -730,12 +730,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {AccountId}
      */
     @Nullable
-    public synchronized AccountId getOperatorAccountId() {
-        if (operator == null) {
+    public AccountId getOperatorAccountId() {
+        var op = operator;
+        if (op == null) {
             return null;
         }
 
-        return operator.accountId;
+        return op.accountId;
     }
 
     /**
@@ -744,12 +745,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return {PublicKey}
      */
     @Nullable
-    public synchronized PublicKey getOperatorPublicKey() {
-        if (operator == null) {
+    public PublicKey getOperatorPublicKey() {
+        var op = operator;
+        if (op == null) {
             return null;
         }
 
-        return operator.publicKey;
+        return op.publicKey;
     }
 
     /**
@@ -757,7 +759,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     @Nullable
-    public synchronized Hbar getDefaultMaxTransactionFee() {
+    public Hbar getDefaultMaxTransactionFee() {
         return defaultMaxTransactionFee;
     }
 
@@ -795,7 +797,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxTransactionFee(maxTransactionFee);
     }
 
-    public synchronized Hbar getDefaultMaxQueryPayment() {
+    public Hbar getDefaultMaxQueryPayment() {
         return defaultMaxQueryPayment;
     }
 
@@ -835,7 +837,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
-    public synchronized boolean getDefaultRegenerateTransactionId() {
+    public boolean getDefaultRegenerateTransactionId() {
         return defaultRegenerateTransactionId;
     }
 
@@ -850,7 +852,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return
      */
     @Override
-    public synchronized Duration getRequestTimeout() {
+    public Duration getRequestTimeout() {
         return requestTimeout;
     }
 
@@ -880,7 +882,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param closeTimeout
      * @return
      */
-    public Client setCloseTimeout(Duration closeTimeout) {
+    public synchronized Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
         mirrorNetwork.setCloseTimeout(closeTimeout);

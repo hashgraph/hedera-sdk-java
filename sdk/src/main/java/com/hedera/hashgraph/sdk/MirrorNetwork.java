@@ -63,7 +63,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
         return super.setNetwork(map);
     }
 
-    List<String> getNetwork() {
+    synchronized List<String> getNetwork() {
         List<String> retval = new ArrayList<>(network.size());
         for (var address : network.keySet()) {
             retval.add(address.toString());
@@ -72,7 +72,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
     }
 
     @Override
-    protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, ManagedNodeAddress> entry) {
+    protected synchronized MirrorNode createNodeFromNetworkEntry(Map.Entry<String, ManagedNodeAddress> entry) {
         return new MirrorNode(entry.getKey(), executor);
     }
 
