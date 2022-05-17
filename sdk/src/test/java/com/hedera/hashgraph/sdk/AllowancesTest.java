@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.NftAllowance;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -30,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AllowancesTest {
     @BeforeAll
@@ -99,9 +98,9 @@ public class AllowancesTest {
         var token2 = TokenAllowance.fromBytes(token1.toBytes());
         var nft2 = TokenNftAllowance.fromBytes(nft1.toBytes());
         var allNft2 = TokenNftAllowance.fromBytes(allNft1.toBytes());
-        assertEquals(hbar1.toString(), hbar2.toString());
-        assertEquals(token1.toString(), token2.toString());
-        assertEquals(nft1.toString(), nft2.toString());
-        assertEquals(allNft1.toString(), allNft2.toString());
+        assertThat(hbar2.toString()).isEqualTo(hbar1.toString());
+        assertThat(token2.toString()).isEqualTo(token1.toString());
+        assertThat(nft2.toString()).isEqualTo(nft1.toString());
+        assertThat(allNft2.toString()).isEqualTo(allNft1.toString());
     }
 }

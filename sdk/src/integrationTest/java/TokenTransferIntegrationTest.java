@@ -17,9 +17,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenTransferIntegrationTest {
     @Test
@@ -35,7 +34,7 @@ class TokenTransferIntegrationTest {
             .execute(testEnv.client);
 
         var accountId = response.getReceipt(testEnv.client).accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         response = new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -52,7 +51,7 @@ class TokenTransferIntegrationTest {
             .execute(testEnv.client);
 
         var tokenId = response.getReceipt(testEnv.client).tokenId;
-        assertNotNull(tokenId);
+        assertThat(tokenId).isNotNull();
 
         new TokenAssociateTransaction()
             .setAccountId(accountId)
@@ -136,7 +135,7 @@ class TokenTransferIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addTokenTransfer(tokenId, accountId1, -1)
                 .addTokenTransfer(tokenId, accountId2, 1)
@@ -145,33 +144,13 @@ class TokenTransferIntegrationTest {
                 .sign(key2)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
+        }).satisfies(error -> assertThat(error.getMessage()).containsAnyOf(
+            Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString(),
+            Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()
+        ));
 
-        assertTrue(
-            error.getMessage().contains(Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString()) ||
-                error.getMessage().contains(Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString())
-        );
-
-        new TokenDeleteTransaction()
-            .setTokenId(tokenId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        new AccountDeleteTransaction()
-            .setAccountId(accountId1)
-            .setTransferAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client)
-            .sign(key1)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        new AccountDeleteTransaction()
-            .setAccountId(accountId2)
-            .setTransferAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client)
-            .sign(key2)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+        testEnv.wipeAccountHbars(accountId1, key1);
+        testEnv.wipeAccountHbars(accountId2, key2);
 
         testEnv.close();
     }

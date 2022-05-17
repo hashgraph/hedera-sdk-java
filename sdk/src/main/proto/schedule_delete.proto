@@ -32,8 +32,8 @@ import "basic_types.proto";
  * target schedule.  A deleted schedule cannot receive any additional signing keys, nor will it be
  * executed.
  *
- * Other notable response codes include, <tt>INVALID_SCHEDULE_ID</tt>,
- * <tt>SCHEDULE_WAS_DELETED</tt>, <tt>SCHEDULE_WAS_EXECUTED</tt>, <tt>SCHEDULE_IS_IMMUTABLE</tt>.
+ * Other notable response codes include, <tt>INVALID_SCHEDULE_ID</tt>, <tt>SCHEDULE_PENDING_EXPIRATION</tt>,
+ * <tt>SCHEDULE_ALREADY_DELETED</tt>, <tt>SCHEDULE_ALREADY_EXECUTED</tt>, <tt>SCHEDULE_IS_IMMUTABLE</tt>.
  * For more information please see the section of this documentation on the <tt>ResponseCode</tt>
  * enum. 
 */

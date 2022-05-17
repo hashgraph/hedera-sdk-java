@@ -25,10 +25,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class TransactionIntegrationTest {
     @Test
@@ -49,10 +47,10 @@ public class TransactionIntegrationTest {
 
         var record = response.getRecord(testEnv.client);
 
-        assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
+        assertThat(expectedHash.get(response.nodeId)).containsExactly(record.transactionHash.toByteArray());
 
         var accountId = record.receipt.accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         testEnv.close(accountId, key);
     }
@@ -75,10 +73,10 @@ public class TransactionIntegrationTest {
 
         var record = response.getRecord(testEnv.client);
 
-        assertArrayEquals(expectedHash.get(response.nodeId), record.transactionHash.toByteArray());
+        assertThat(expectedHash.get(response.nodeId)).containsExactly(record.transactionHash.toByteArray());
 
         var accountId = record.receipt.accountId;
-        assertNotNull(accountId);
+        assertThat(accountId).isNotNull();
 
         var deleteTransaction = new AccountDeleteTransaction()
             .setAccountId(accountId)
@@ -108,7 +106,7 @@ public class TransactionIntegrationTest {
     @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
     void transactionFromToBytes2() {
-        assertDoesNotThrow(() -> {
+        assertThatNoException().isThrownBy(() -> {
             var id = TransactionId.generate(new AccountId(542348));
 
             var transactionBodyBuilder = TransactionBody.newBuilder();
@@ -216,19 +214,19 @@ public class TransactionIntegrationTest {
 
             var testEnv = new IntegrationTestEnv(1);
 
-            assertEquals(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars(), -10);
-            assertEquals(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars(), 10);
+            assertThat(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars()).isEqualTo(-10);
+            assertThat(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars()).isEqualTo(10);
 
-            assertNotNull(tx.getNodeAccountIds());
-            assertEquals(tx.getNodeAccountIds().size(), 1);
-            assertEquals(new AccountId(3), tx.getNodeAccountIds().get(0));
+            assertThat(tx.getNodeAccountIds()).isNotNull();
+            assertThat(tx.getNodeAccountIds().size()).isEqualTo(1);
+            assertThat(tx.getNodeAccountIds().get(0)).isEqualTo(new AccountId(3));
 
             var signatures = tx.getSignatures();
-            assertEquals(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey1)), Arrays.toString(signature1));
-            assertEquals(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey2)), Arrays.toString(signature2));
-            assertEquals(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey3)), Arrays.toString(signature3));
-            assertEquals(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey4)), Arrays.toString(signature4));
-            assertEquals(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey5)), Arrays.toString(signature5));
+            assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey1))).isEqualTo(Arrays.toString(signature1));
+            assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey2))).isEqualTo(Arrays.toString(signature2));
+            assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey3))).isEqualTo(Arrays.toString(signature3));
+            assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey4))).isEqualTo(Arrays.toString(signature4));
+            assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey5))).isEqualTo(Arrays.toString(signature5));
 
             var resp = tx.execute(testEnv.client);
 

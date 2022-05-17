@@ -122,6 +122,6 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("TokenFeeScheduleUpdateTransaction cannot be scheduled");
+        throw new UnsupportedOperationException("Cannot schedule TokenFeeScheduleUpdateTransaction");
     }
 }

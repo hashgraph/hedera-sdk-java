@@ -12,11 +12,8 @@ import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountUpdateIntegrationTest {
     @Test
@@ -37,13 +34,13 @@ class AccountUpdateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(accountId, info.accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(key1.getPublicKey().toString(), info.key.toString());
-        assertEquals(new Hbar(0), info.balance);
-        assertEquals(Duration.ofDays(90), info.autoRenewPeriod);
-        assertNull(info.proxyAccountId);
-        assertEquals(Hbar.ZERO, info.proxyReceived);
+        assertThat(info.accountId).isEqualTo(accountId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(key1.getPublicKey().toString());
+        assertThat(info.balance).isEqualTo(new Hbar(0));
+        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         new AccountUpdateTransaction()
             .setAccountId(accountId)
@@ -58,13 +55,13 @@ class AccountUpdateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), key2.getPublicKey().toString());
-        assertEquals(info.balance, new Hbar(0));
-        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-        assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertThat(info.accountId).isEqualTo(accountId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(key2.getPublicKey().toString());
+        assertThat(info.balance).isEqualTo(new Hbar(0));
+        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         testEnv.close(accountId, key2);
     }
@@ -74,13 +71,11 @@ class AccountUpdateIntegrationTest {
     void cannotUpdateAccountWhenAccountIdIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new AccountUpdateTransaction()
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
 
         testEnv.close();
     }

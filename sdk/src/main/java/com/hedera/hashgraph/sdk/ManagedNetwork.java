@@ -502,12 +502,11 @@ abstract class ManagedNetwork<
 
         var returnNodes = new HashMap<KeyT, ManagedNodeT>(count);
 
-        for (var i = 0; i < count; /* do not increment i here */ ) {
+        for (var i = 0; i < count; i++ ) {
             var node = getNode(null);
 
             if (!returnNodes.containsKey(node.getKey())) {
                 returnNodes.put(node.getKey(), node);
-                i++;
             }
         }
 

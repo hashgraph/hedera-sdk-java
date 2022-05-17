@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenFreezeIntegrationTest {
     @Test
@@ -82,16 +81,14 @@ class TokenFreezeIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenFreezeTransaction()
                 .setAccountId(accountId)
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_TOKEN_ID.toString()));
+        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
         testEnv.close(accountId, key);
     }
@@ -119,16 +116,14 @@ class TokenFreezeIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenFreezeTransaction()
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close(tokenId);
     }
@@ -165,7 +160,7 @@ class TokenFreezeIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenFreezeTransaction()
                 .setAccountId(accountId)
                 .setTokenId(tokenId)
@@ -173,9 +168,7 @@ class TokenFreezeIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
+        }).withMessageContaining(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

@@ -20,8 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
@@ -30,11 +28,9 @@ import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class CryptoTransferTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -113,12 +109,12 @@ public class CryptoTransferTransactionTest {
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = TransferTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
     void decimalsMustBeConsistent() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.8"), 100, 2)
                 .addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.7"), -100, 3);
@@ -128,11 +124,11 @@ public class CryptoTransferTransactionTest {
     @Test
     void canGetDecimals() {
         var tx = new TransferTransaction();
-        assertNull(tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5")));
+        assertThat(tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5"))).isNull();
         tx.addTokenTransfer(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.8"), 100);
-        assertNull(tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5")));
+        assertThat(tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5"))).isNull();
         tx.addTokenTransferWithDecimals(TokenId.fromString("0.0.5"), AccountId.fromString("0.0.7"), -100, 5);
-        assertEquals(5, tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5")));
+        assertThat(tx.getTokenIdDecimals().get(TokenId.fromString("0.0.5"))).isEqualTo(5);
     }
 
     @Test
@@ -145,9 +141,8 @@ public class CryptoTransferTransactionTest {
             .addTransactionList(tx1)
             .addTransactionList(tx2);
         var brokenTxBytes = brokenTxList.build().toByteArray();
-        var error = assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             Transaction.fromBytes(brokenTxBytes);
         });
-        // System.out.println(error);
     }
 }

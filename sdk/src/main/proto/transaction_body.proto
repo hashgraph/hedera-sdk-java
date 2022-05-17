@@ -42,6 +42,8 @@ import "crypto_update.proto";
 import "crypto_approve_allowance.proto";
 import "crypto_delete_allowance.proto";
 
+import "ethereum_transaction.proto";
+
 import "file_append.proto";
 import "file_create.proto";
 import "file_delete.proto";
@@ -141,6 +143,11 @@ message TransactionBody {
     ContractDeleteTransactionBody contractDeleteInstance = 22;
 
     /**
+     * An Ethereum encoded transaction.
+     */
+    EthereumTransactionBody ethereumTransaction = 50;
+
+    /**
      * Attach a new livehash to an account
      */
     CryptoAddLiveHashTransactionBody cryptoAddLiveHash = 10;
@@ -151,7 +158,7 @@ message TransactionBody {
     CryptoApproveAllowanceTransactionBody cryptoApproveAllowance = 48;
 
     /**
-     * Deletes one or more approved hbar or token allowances from an owner's account
+     * Deletes one or more of the specific approved NFT serial numbers on an owner account.
      */
     CryptoDeleteAllowanceTransactionBody cryptoDeleteAllowance = 49;
 
