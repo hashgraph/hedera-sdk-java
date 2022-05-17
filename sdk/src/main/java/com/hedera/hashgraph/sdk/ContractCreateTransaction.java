@@ -90,6 +90,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
     private int maxAutomaticTokenAssociations = 0;
+    @Nullable
+    private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
