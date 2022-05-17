@@ -73,8 +73,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
     @Nullable
-    private AccountId autoRenewAccountId = null;
-    @Nullable
     private Duration autoRenewPeriod = null;
     @Nullable
     private String contractMemo = null;
@@ -192,33 +190,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     @Nullable
-    public AccountId getAutoRenewAccountId() {
-        return autoRenewAccountId;
-    }
-
-    /**
-     * Sets account to charge for auto-renewal of this contract. If not set, or set to an
-     * account with zero hbar balance, the contract's own hbar balance will be used to
-     * cover auto-renewal fees.
-     *
-     * @param accountId ID of account to charge fees to
-     * @return {@code this}
-     */
-
-    public ContractUpdateTransaction setAutoRenewAccountId(AccountId accountId) {
-        Objects.requireNonNull(accountId);
-        requireNotFrozen();
-        autoRenewAccountId = accountId;
-        return this;
-    }
-
-    public ContractUpdateTransaction clearAutoRenewAccountId() {
-        requireNotFrozen();
-        autoRenewAccountId = new AccountId(0, 0, 0);
-        return this;
-    }
-
-    @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -305,9 +276,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (body.hasMaxAutomaticTokenAssociations()) {
             maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
         }
-        if (body.hasAutoRenewAccountId()) {
-            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccountId());
-        }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
@@ -333,9 +301,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (maxAutomaticTokenAssociations != null) {
             builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
         }
-        if (autoRenewAccountId != null) {
-            builder.setAutoRenewAccountId(autoRenewAccountId.toProtobuf());
-        }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
@@ -353,10 +318,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
-        }
-
-        if (autoRenewAccountId != null) {
-            autoRenewAccountId.validateChecksum(client);
         }
     }
 
