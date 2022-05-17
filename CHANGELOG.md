@@ -24,7 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `TransactionRecord.ethereumHash`
  * `EthereumTransaction`
  * `CustomRoyaltyFee.getFallbackFee()`
-
+ * `TransactionResponse.get[Receipt|Record]Query()`
 
 ## v2.13.0 - Where did it go?!
 
