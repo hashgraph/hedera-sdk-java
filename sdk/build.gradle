@@ -67,6 +67,8 @@ dependencies {
 	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 
 	implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+        implementation "com.esaulpaugh:headlong:6.3.1"
 }
 
 // https://github.com/google/protobuf-gradle-plugin
