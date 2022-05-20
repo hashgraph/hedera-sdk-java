@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## v2.14.0-beta.3
+
+ * add missing javadoc to the sdk files
+
 ### Deprecated
 
  * `AccountAllowanceAdjustTransaction` with no replacement.
@@ -21,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `AccountAllowanceDeleteTransaction`
  * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
  * `AccountAllowanceExample`
+ * License Headers
 
 ### Deprecated
 
