@@ -24,10 +24,19 @@ public final class Transfer {
         this.amount = amount;
     }
 
+    /**
+     * Create a transfer from a protobuf.
+     *
+     * @param accountAmount             the protobuf
+     * @return                          the new transfer
+     */
     static Transfer fromProtobuf(AccountAmount accountAmount) {
         return new Transfer(AccountId.fromProtobuf(accountAmount.getAccountID()), Hbar.fromTinybars(accountAmount.getAmount()));
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     AccountAmount toProtobuf() {
         return AccountAmount.newBuilder()
             .setAccountID(accountId.toProtobuf())

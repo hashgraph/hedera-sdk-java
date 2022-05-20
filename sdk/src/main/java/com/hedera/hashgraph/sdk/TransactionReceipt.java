@@ -117,6 +117,14 @@ public final class TransactionReceipt {
         this.children = children;
     }
 
+    /**
+     * Create transaction receipt from protobuf.
+     *
+     * @param transactionReceipt        the protobuf
+     * @param duplicates                list of duplicates
+     * @param children                  list of children
+     * @return                          the new transaction receipt
+     */
     static TransactionReceipt fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt,
         List<TransactionReceipt> duplicates,
@@ -195,14 +203,30 @@ public final class TransactionReceipt {
         );
     }
 
+    /**
+     * Create a transaction receipt from a protobuf.
+     *
+     * @param transactionReceipt        the protobuf
+     * @return                          the new transaction receipt
+     */
     public static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
         return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>());
     }
 
+    /**
+     * Create a transaction receipt from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction receipt
+     * @throws InvalidProtocolBufferException
+     */
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.TransactionReceipt toProtobuf() {
         var transactionReceiptBuilder = com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder()
             .setStatus(status.code)
@@ -281,6 +305,9 @@ public final class TransactionReceipt {
             .toString();
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

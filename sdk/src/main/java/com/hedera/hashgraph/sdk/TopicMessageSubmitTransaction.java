@@ -90,20 +90,35 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
      * Assign the message from a byte string.
      *
      * @param message                   the byte string
-     * @return                          the
+     * @return                          the message
      */
     public TopicMessageSubmitTransaction setMessage(ByteString message) {
         return setData(message);
     }
 
+    /**
+     * Assign the message from a byte array.
+     *
+     * @param message                   the byte array
+     * @return                          the message
+     */
     public TopicMessageSubmitTransaction setMessage(byte[] message) {
         return setData(message);
     }
 
+    /**
+     * Assign the message from a string.
+     *
+     * @param message                   the string
+     * @return                          the message
+     */
     public TopicMessageSubmitTransaction setMessage(String message) {
         return setData(message);
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getConsensusSubmitMessage();
         if (body.hasTopicID()) {
@@ -122,6 +137,12 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody}}
+     */
     ConsensusSubmitMessageTransactionBody.Builder build() {
         var builder = ConsensusSubmitMessageTransactionBody.newBuilder();
         if (topicId != null) {

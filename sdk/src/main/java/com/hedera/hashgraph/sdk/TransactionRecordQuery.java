@@ -28,9 +28,15 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     private boolean includeChildren = false;
     private boolean includeDuplicates = false;
 
+    /**
+     * Constructor.
+     */
     public TransactionRecordQuery() {
     }
 
+    /**
+     * @return                          the transaction id
+     */
     @Nullable
     @Override
     public TransactionId getTransactionIdInternal() {
@@ -49,6 +55,9 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         return this;
     }
 
+    /**
+     * @return                          should duplicates be included
+     */
     public boolean getIncludeDuplicates() {
         return includeDuplicates;
     }
@@ -68,6 +77,9 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         return this;
     }
 
+    /**
+     * @return                          should children be included
+     */
     public boolean getIncludeChildren() {
         return includeChildren;
     }

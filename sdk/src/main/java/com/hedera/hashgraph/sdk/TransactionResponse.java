@@ -8,6 +8,15 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * When the client sends the node a transaction of any kind, the node
+ * replies with this, which simply says that the transaction passed
+ * the precheck (so the node will submit it to the network) or it failed
+ * (so it won't). To learn the consensus result, the client should later
+ * obtain a receipt (free), or can buy a more detailed record (not free).
+ *
+ * {@link https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse}
+ */
 public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
     public final AccountId nodeId;
 
@@ -18,6 +27,14 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     @Nullable
     public final TransactionId scheduledTransactionId;
 
+    /**
+     * Constructor.
+     *
+     * @param nodeId                    the node id
+     * @param transactionId             the transaction id
+     * @param transactionHash           the transaction hash
+     * @param scheduledTransactionId    the scheduled transaction id
+     */
     TransactionResponse(
         AccountId nodeId,
         TransactionId transactionId,
@@ -30,6 +47,15 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
         this.scheduledTransactionId = scheduledTransactionId;
     }
 
+    /**
+     * Create a transaction receipt from a configured client.
+     *
+     * @param client                    the configured client
+     * @return                          the new transaction receipt
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     * @throws ReceiptStatusException
+     */
     public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = new TransactionReceiptQuery()
                 .setTransactionId(transactionId)
@@ -51,6 +77,15 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
             .executeAsync(client);
     }
 
+    /**
+     * Create a new transaction record from a configured client.
+     *
+     * @param client                    the configured client
+     * @return                          the new transaction record
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     * @throws ReceiptStatusException
+     */
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);
 
