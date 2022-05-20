@@ -13,16 +13,28 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
+ * Get the contents of a file. The content field is empty (no bytes) if the
+ * file is empty.
+ *
+ * A query to get the contents of a file. Queries do not change the state of
+ * the file or require network consensus. The information is returned from a
+ * single node processing the query.
+ * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents}
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
 
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileContentsQuery() {
     }
 
+    /**
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;

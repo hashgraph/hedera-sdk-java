@@ -54,19 +54,35 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     @Nullable
     private String contractMemo = null;
 
+    /**
+     * Contract.
+     */
     public ContractUpdateTransaction() {
     }
 
+    /**
+     * Contract.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) record
+     * @throws InvalidProtocolBufferException
+     */
     ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
-
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -85,6 +101,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @return                          the contract expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -104,6 +123,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @return                          the administrator key
+     */
     @Nullable
     public Key getAdminKey() {
         return adminKey;
@@ -122,6 +144,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -147,6 +172,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -193,6 +221,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * @return                          the contents of the memo
+     */
     @Nullable
     public String getContractMemo() {
         return contractMemo;
@@ -211,12 +242,20 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Remove the memo contents.
+     *
+     * @return {@code this}
+     */
     public ContractUpdateTransaction clearMemo() {
         requireNotFrozen();
         contractMemo = "";
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractUpdateInstance();
         if (body.hasContractID()) {
@@ -239,6 +278,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody builder }}
+     */
     ContractUpdateTransactionBody.Builder build() {
         var builder = ContractUpdateTransactionBody.newBuilder();
         if (contractId != null) {

@@ -25,19 +25,37 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     @Nullable
     private ContractId contractId;
 
+    /**
+     * Constructor.
+     */
     public SystemUndeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     SystemUndeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     SystemUndeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the file id
+     */
     @Nullable
     public final FileId getFileId() {
         return fileId;
@@ -78,6 +96,9 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getSystemUndelete();
         if (body.hasFileID()) {
@@ -88,6 +109,11 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody}}
+     */
     SystemUndeleteTransactionBody.Builder build() {
         var builder = SystemUndeleteTransactionBody.newBuilder();
         if (fileId != null) {

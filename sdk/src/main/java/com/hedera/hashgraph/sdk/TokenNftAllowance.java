@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Class to encapsulate the nft methods for token allowance's.
+ */
 public class TokenNftAllowance {
     @Nullable
     public final TokenId tokenId;
@@ -25,6 +28,15 @@ public class TokenNftAllowance {
     @Nullable
     public final Boolean allSerials;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param ownerAccountId            the grantor's account id
+     * @param spenderAccountId          the spender's account id
+     * @param serialNumbers             the list of serial numbers
+     * @param allSerials                grant for all serial's
+     */
     TokenNftAllowance(
         @Nullable TokenId tokenId,
         @Nullable AccountId ownerAccountId,
@@ -39,6 +51,12 @@ public class TokenNftAllowance {
         this.allSerials = allSerials;
     }
 
+    /**
+     * Create a copy of a nft token allowance object.
+     *
+     * @param allowance                 the nft token allowance to copj
+     * @return                          a new copy
+     */
     static TokenNftAllowance copyFrom(TokenNftAllowance allowance) {
         return new TokenNftAllowance(
             allowance.tokenId,
@@ -49,6 +67,12 @@ public class TokenNftAllowance {
         );
     }
 
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
     static TokenNftAllowance fromProtobuf(NftAllowance allowanceProto) {
         return new TokenNftAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
@@ -59,6 +83,12 @@ public class TokenNftAllowance {
         );
     }
 
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
     static TokenNftAllowance fromProtobuf(GrantedNftAllowance allowanceProto) {
         return new TokenNftAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
@@ -69,6 +99,12 @@ public class TokenNftAllowance {
         );
     }
 
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
     static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
         return new TokenNftAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
@@ -79,10 +115,23 @@ public class TokenNftAllowance {
         );
     }
 
+    /**
+     * Create a nft token allowance from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the nft token allowance
+     * @throws InvalidProtocolBufferException
+     */
     public static TokenNftAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
+    /**
+     * Validate the configured client.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException
+     */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
@@ -95,6 +144,9 @@ public class TokenNftAllowance {
         }
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     NftAllowance toProtobuf() {
         var builder = NftAllowance.newBuilder();
         if (tokenId != null) {
@@ -113,6 +165,9 @@ public class TokenNftAllowance {
         return builder.build();
     }
 
+    /**
+     * @return                          the granted protobuf
+     */
     GrantedNftAllowance toGrantedProtobuf() {
         var builder = GrantedNftAllowance.newBuilder();
         if (tokenId != null) {
@@ -124,6 +179,9 @@ public class TokenNftAllowance {
         return builder.build();
     }
 
+    /**
+     * @return                          the remove protobuf
+     */
     NftRemoveAllowance toRemoveProtobuf() {
         var builder = NftRemoveAllowance.newBuilder();
         if (tokenId != null) {
@@ -136,6 +194,9 @@ public class TokenNftAllowance {
         return builder.build();
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

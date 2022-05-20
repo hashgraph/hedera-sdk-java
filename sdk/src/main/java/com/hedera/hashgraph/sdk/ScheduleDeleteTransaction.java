@@ -12,30 +12,59 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
+/**
+ * Schedule a delete` transaction.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction}
+ */
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
 
     @Nullable
     private ScheduleId scheduleId = null;
 
+    /**
+     * Constructor.
+     */
     public ScheduleDeleteTransaction() {
         defaultMaxTransactionFee = new Hbar(5);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ScheduleDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the schedule id
+     */
     @Nullable
     public ScheduleId getScheduleId() {
         return scheduleId;
     }
 
+    /**
+     * Assign the scheduled id.
+     *
+     * @param scheduleId                the schedule id
+     * @return {@cod this}
+     */
     public ScheduleDeleteTransaction setScheduleId(ScheduleId scheduleId) {
         Objects.requireNonNull(scheduleId);
         requireNotFrozen();
@@ -43,6 +72,9 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getScheduleDelete();
         if (body.hasScheduleID()) {
@@ -50,6 +82,11 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ScheduleDeleteTransactionBody builder }}
+     */
     ScheduleDeleteTransactionBody.Builder build() {
         var builder = ScheduleDeleteTransactionBody.newBuilder();
         if (scheduleId != null) {

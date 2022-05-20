@@ -25,6 +25,13 @@ import java.util.regex.Pattern;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
+/**
+ * Abstract base utility class.
+ * @param <SdkRequestT>
+ * @param <ProtoRequestT>
+ * @param <ResponseT>
+ * @param <O>
+ */
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);

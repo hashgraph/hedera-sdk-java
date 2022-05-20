@@ -14,10 +14,17 @@ import java.util.Objects;
 /**
  * A list of keys that are required to sign in unison, with an optional threshold controlling how many keys of
  * the list are required.
+ * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/key}
  */
 public final class KeyList extends Key implements Collection<Key> {
+    /**
+     * The list of keys.
+     */
     private final List<Key> keys = new ArrayList<>();
     @Nullable
+    /**
+     * The minimum number of keys that must sign.
+     */
     public Integer threshold;
 
     /**
@@ -27,10 +34,21 @@ public final class KeyList extends Key implements Collection<Key> {
         this.threshold = null;
     }
 
+    /**
+     * Number of keys that need to sign.
+     *
+     * @param threshold                 the minimum number of keys that must sign
+     */
     private KeyList(int threshold) {
         this.threshold = threshold;
     }
 
+    /**
+     * List of keys in the key.
+     *
+     * @param keys                      the key / key list
+     * @return                          a list of the keys
+     */
     public static KeyList of(Key... keys) {
         var list = new KeyList();
 
@@ -51,6 +69,13 @@ public final class KeyList extends Key implements Collection<Key> {
         return new KeyList(threshold);
     }
 
+    /**
+     * Create key list from protobuf.
+     *
+     * @param keyList                   the key list
+     * @param threshold                 the minimum number of keys that must sign
+     * @return
+     */
     static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
@@ -167,6 +192,11 @@ public final class KeyList extends Key implements Collection<Key> {
             .build();
     }
 
+    /**
+     * Convert into protobuf representation.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.KeyList toProtobuf() {
         var keyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder();
 

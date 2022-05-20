@@ -22,14 +22,27 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     private AccountId accountId = null;
     private byte[] hash = {};
 
+    /**
+     * Constructor.
+     */
     public LiveHashDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     LiveHashDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -48,6 +61,9 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         return this;
     }
 
+    /**
+     * @return                          the hash
+     */
     public ByteString getHash() {
         return ByteString.copyFrom(hash);
     }
@@ -76,6 +92,9 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         return setHash(hash.toByteArray());
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoDeleteLiveHash();
         if (body.hasAccountOfLiveHash()) {
@@ -84,6 +103,11 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
         hash = body.getLiveHashToDelete().toByteArray();
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}}
+     */
     CryptoDeleteLiveHashTransactionBody.Builder build() {
         var builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
         if (accountId != null) {

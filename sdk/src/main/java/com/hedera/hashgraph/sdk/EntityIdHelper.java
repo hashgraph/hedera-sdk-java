@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class used internally by the sdk.
+ */
 class EntityIdHelper {
     /**
      * The length of a Solidity address in bytes.
@@ -24,6 +27,9 @@ class EntityIdHelper {
 
     private static final Pattern ENTITY_ID_REGEX = Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
 
+    /**
+     * Constructor.
+     */
     private EntityIdHelper() {
     }
 

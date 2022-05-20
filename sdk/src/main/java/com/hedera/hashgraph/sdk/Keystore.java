@@ -19,6 +19,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Objects;
 
+/**
+ * Internal utility class to serialize / deserialize between java object / json representation.
+ */
 final class Keystore {
     private static final Gson gson = new Gson();
     private static final JsonParser jsonParser = new JsonParser();

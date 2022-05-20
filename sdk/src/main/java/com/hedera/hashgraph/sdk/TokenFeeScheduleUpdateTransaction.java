@@ -14,29 +14,63 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Update the custom fees for a given token. If the token does not have a
+ * fee schedule, the network response returned will be
+ * CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES. You will need to sign the transaction
+ * with the fee schedule key to update the fee schedule for the token. If you
+ * do not have a fee schedule key set for the token, you will not be able to
+ * update the fee schedule.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule}
+ */
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     @Nullable
     private TokenId tokenId = null;
     private List<CustomFee> customFees = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public TokenFeeScheduleUpdateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     TokenFeeScheduleUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenFeeScheduleUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenFeeScheduleUpdateTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -44,10 +78,19 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         return this;
     }
 
+    /**
+     * @return                          the list of custom fees
+     */
     public List<CustomFee> getCustomFees() {
         return CustomFee.deepCloneList(customFees);
     }
 
+    /**
+     * Assign the list of custom fees.
+     *
+      * @param customFees               the list of custom fees
+     * @return {@code this}
+     */
     public TokenFeeScheduleUpdateTransaction setCustomFees(List<CustomFee> customFees) {
         Objects.requireNonNull(customFees);
         requireNotFrozen();
@@ -55,6 +98,9 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenFeeScheduleUpdate();
         if (body.hasTokenId()) {
@@ -66,6 +112,12 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenFeeScheduleUpdateTransactionBody}}
+     */
     TokenFeeScheduleUpdateTransactionBody.Builder build() {
         var builder = TokenFeeScheduleUpdateTransactionBody.newBuilder();
         if (tokenId != null) {

@@ -85,6 +85,12 @@ public final class TopicInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Create a topic info object from a protobuf.
+     *
+     * @param topicInfoResponse         the protobuf
+     * @return                          the new topic info object
+     */
     static TopicInfo fromProtobuf(ConsensusGetTopicInfoResponse topicInfoResponse) {
         var topicInfo = topicInfoResponse.getTopicInfo();
 
@@ -114,10 +120,20 @@ public final class TopicInfo {
         );
     }
 
+    /**
+     * Create a topic info object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new topic info object
+     * @throws InvalidProtocolBufferException
+     */
     public static TopicInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     ConsensusGetTopicInfoResponse toProtobuf() {
         var topicInfoResponseBuilder = ConsensusGetTopicInfoResponse.newBuilder()
             .setTopicID(topicId.toProtobuf());
@@ -161,6 +177,9 @@ public final class TopicInfo {
             .toString();
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

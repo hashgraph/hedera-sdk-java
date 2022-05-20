@@ -23,6 +23,12 @@ public class PrecheckStatusException extends Exception {
     @Nullable
     public final TransactionId transactionId;
 
+    /**
+     * Constructor.
+     *
+     * @param status                    the status
+     * @param transactionId             the transaction id
+     */
     PrecheckStatusException(Status status, @Nullable TransactionId transactionId) {
         this.status = status;
         this.transactionId = transactionId;

@@ -39,6 +39,13 @@ public final class Hbar implements Comparable<Hbar> {
         this(amount, HbarUnit.HBAR);
     }
 
+    /**
+     * Constructs a new hbar of the specified value in the specified unit.
+     * {@link com.hedera.hashgraph.sdk.HbarUnit}
+     *
+     * @param amount                            the amount
+     * @param unit                              the unit for amount
+     */
     Hbar(long amount, HbarUnit unit) {
         valueInTinybar = amount * unit.tinybar;
     }
@@ -56,6 +63,13 @@ public final class Hbar implements Comparable<Hbar> {
         this(amount, HbarUnit.HBAR);
     }
 
+    /**
+     * Constructs a new hbar of the specified value in the specified unit.
+     * {@link com.hedera.hashgraph.sdk.HbarUnit}
+     *
+     * @param amount                            the amount
+     * @param unit                              the unit for amount
+     */
     Hbar(BigDecimal amount, HbarUnit unit) {
         var tinybars = amount.multiply(BigDecimal.valueOf(unit.tinybar));
 
@@ -199,6 +213,12 @@ public final class Hbar implements Comparable<Hbar> {
         return to(HbarUnit.HBAR).toString() + " " + HbarUnit.HBAR.getSymbol();
     }
 
+    /**
+     * Convert hbar to string representation in specified units.
+     *
+     * @param unit                      the desired unit
+     * @return                          the string representation
+     */
     public String toString(HbarUnit unit) {
         return to(unit).toString();
     }

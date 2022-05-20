@@ -85,6 +85,22 @@ public final class ContractInfo {
      */
     public final LedgerId ledgerId;
 
+    /**
+     *  Constructor.
+     *
+     * @param contractId                the contract id
+     * @param accountId                 the account id
+     * @param contractAccountId         the account id of the owner
+     * @param adminKey                  the key that can modify the contract
+     * @param expirationTime            the time that contract will expire
+     * @param autoRenewPeriod           seconds before contract is renewed (funds must be available)
+     * @param storage                   number of bytes used by this contract
+     * @param contractMemo              the memo field 100 bytes
+     * @param balance                   current balance
+     * @param isDeleted                 does it still exist
+     * @param tokenRelationships        list of compound token id and relationship records
+     * @param ledgerId                  the ledger id
+     */
     private ContractInfo(
         ContractId contractId,
         AccountId accountId,
@@ -113,6 +129,12 @@ public final class ContractInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Extract the contract from the protobuf.
+     *
+     * @param contractInfo              the protobuf
+     * @return                          the contract object
+     */
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
         var adminKey = contractInfo.hasAdminKey()
             ? Key.fromProtobufKey(contractInfo.getAdminKey())
@@ -143,10 +165,20 @@ public final class ContractInfo {
         );
     }
 
+    /**
+     * Extract the contract from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the extracted contract
+     * @throws InvalidProtocolBufferException
+     */
     public static ContractInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     ContractGetInfoResponse.ContractInfo toProtobuf() {
         var contractInfoBuilder = ContractGetInfoResponse.ContractInfo.newBuilder()
             .setContractID(contractId.toProtobuf())
@@ -184,6 +216,9 @@ public final class ContractInfo {
             .toString();
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

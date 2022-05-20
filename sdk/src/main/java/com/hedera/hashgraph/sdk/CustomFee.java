@@ -7,13 +7,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Base class for custom fees.
+ */
 abstract public class CustomFee {
     @Nullable
     protected AccountId feeCollectorAccountId = null;
 
+    /**
+     * Constructor.
+     */
     CustomFee() {
     }
 
+    /**
+     * Convert the protobuf object to a custom fee object.
+     *
+     * @param customFee                 protobuf response object
+     * @return                          the converted custom fee object
+     */
     static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         switch (customFee.getFeeCase()) {
             case FIXED_FEE:
@@ -30,10 +42,23 @@ abstract public class CustomFee {
         }
     }
 
+    /**
+     * Convert byte array to a custom fee object.
+     *
+     * @param bytes                     the byte array
+     * @return                          the converted custom fee object
+     * @throws InvalidProtocolBufferException
+     */
     public static CustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create a new copy of a custom fee list.
+     *
+     * @param customFees                existing custom fee list
+     * @return                          new custom fee list
+     */
     public static List<CustomFee> deepCloneList(List<CustomFee> customFees) {
         var returnCustomFees = new ArrayList<CustomFee>(customFees.size());
         for (var fee : customFees) {
@@ -42,15 +67,26 @@ abstract public class CustomFee {
         return returnCustomFees;
     }
 
+    /**
+     * @return                          the fee collector account id
+     */
     @Nullable
     public AccountId getFeeCollectorAccountId() {
         return feeCollectorAccountId;
     }
 
+    /**
+     * Assign the fee collector account id.
+     *
+     * @param feeCollectorAccountId     the fee collector account id
+     */
     protected void doSetFeeCollectorAccountId(AccountId feeCollectorAccountId) {
         this.feeCollectorAccountId = Objects.requireNonNull(feeCollectorAccountId);
     }
 
+    /**
+     * @return                          the correct cloned fee type
+     */
     CustomFee deepClone() {
         if (this instanceof CustomFixedFee) {
             return CustomFixedFee.clonedFrom((CustomFixedFee) this);
@@ -61,12 +97,24 @@ abstract public class CustomFee {
         }
     }
 
+    /**
+     * Verify the validity of the client object.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException
+     */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (feeCollectorAccountId != null) {
             feeCollectorAccountId.validateChecksum(client);
         }
     }
 
+    /**
+     * Finalize the builder into the protobuf.
+     *
+     * @param customFeeBuilder              the builder object
+     * @return                              the protobuf
+     */
     protected com.hedera.hashgraph.sdk.proto.CustomFee finishToProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee.Builder customFeeBuilder) {
         if (getFeeCollectorAccountId() != null) {
             customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProtobuf());
@@ -74,8 +122,14 @@ abstract public class CustomFee {
         return customFeeBuilder.build();
     }
 
+    /**
+     * @return                              the protobuf for the custom fee object
+     */
     abstract com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf();
 
+    /**
+     * @return                              the byte array representing the protobuf
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

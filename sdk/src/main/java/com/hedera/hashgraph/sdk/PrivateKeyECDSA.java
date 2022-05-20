@@ -17,15 +17,29 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigInteger;
 
+/**
+ * Encapsulate the ECDSA private key.
+ */
 public class PrivateKeyECDSA extends PrivateKey {
 
     private final BigInteger keyData;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the key data
+     * @param publicKey                 the public key
+     */
     PrivateKeyECDSA(BigInteger keyData, @Nullable PublicKey publicKey) {
         this.keyData = keyData;
         this.publicKey = publicKey;
     }
 
+    /**
+     * Create a new private ECDSA key.
+     *
+     * @return                          the new key
+     */
     static PrivateKeyECDSA generateInternal() {
         var generator = new ECKeyPairGenerator();
         var keygenParams = new ECKeyGenerationParameters(ECDSA_SECP256K1_DOMAIN, ThreadLocalSecureRandom.current());
@@ -36,6 +50,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         return new PrivateKeyECDSA(privParams.getD(), new PublicKeyECDSA(pubParams.getQ().getEncoded(true)));
     }
 
+    /**
+     * Create a new private key from a private key ino object.
+     *
+     * @param privateKeyInfo            the private key info object
+     * @return                          the new key
+     */
     static PrivateKeyECDSA fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
             var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
@@ -46,6 +66,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         }
     }
 
+    /**
+     * Create a private key from a byte array.
+     *
+     * @param privateKey                the byte array
+     * @return                          the new key
+     */
     public static PrivateKey fromBytesInternal(byte[] privateKey) {
         if (privateKey.length == 32) {
             return new PrivateKeyECDSA(new BigInteger(1, privateKey), null);
@@ -55,6 +81,13 @@ public class PrivateKeyECDSA extends PrivateKey {
         return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    /**
+     * Throws an exception when trying to derive a child key.
+     *
+     * @param entropy                   entropy byte array
+     * @param index                     the child key index
+     * @return                          the new key
+     */
     static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
         throw new IllegalStateException("ECDSA secp256k1 keys do not currently support derivation");
     }
@@ -105,6 +138,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         return toBytesDER();
     }
 
+    /**
+     * Create a big int byte array.
+     *
+     * @param n                         the big integer
+     * @return                          the 32 byte array
+     */
     private static byte[] bigIntTo32Bytes(BigInteger n) {
         byte[] bytes = n.toByteArray();
         byte[] bytes32 = new byte[32];

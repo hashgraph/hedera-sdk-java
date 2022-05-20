@@ -18,6 +18,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
+/**
+ * Internal class used by node.
+ */
 class HederaTrustManager implements X509TrustManager {
     private static final String CERTIFICATE = "CERTIFICATE";
     private static final String PEM_HEADER = "-----BEGIN CERTIFICATE-----\n";
@@ -27,6 +30,12 @@ class HederaTrustManager implements X509TrustManager {
     @Nullable
     private final String certHash;
 
+    /**
+     * Constructor.
+     *
+     * @param certHash                  a byte string of the certificate hash
+     * @param verifyCertificate         should be verified
+     */
     HederaTrustManager(@Nullable ByteString certHash, boolean verifyCertificate) {
         if (certHash == null || certHash.isEmpty()) {
             if (verifyCertificate) {

@@ -9,14 +9,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The fee schedule for a specific hedera functionality and the time period this fee schedule will expire.
+ * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule}
+ */
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
     @Nullable
     private Instant expirationTime;
 
+    /**
+     * Constructor.
+     */
     public FeeSchedule() {
     }
 
+    /**
+     * Create a fee schedule from a protobuf.
+     *
+     * @param feeSchedule               the protobuf
+     * @return                          the fee schedule
+     */
     static FeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeSchedule feeSchedule) {
         FeeSchedule returnFeeSchedule = new FeeSchedule()
             .setExpirationTime(feeSchedule.hasExpiryTime() ? InstantConverter.fromProtobuf(feeSchedule.getExpiryTime()) : null);
@@ -28,34 +41,70 @@ public class FeeSchedule {
         return returnFeeSchedule;
     }
 
+    /**
+     * Create a fee schedule from byte array.
+     *
+     * @param bytes                     the bye array
+     * @return                          the fee schedule
+     * @throws InvalidProtocolBufferException
+     */
     public static FeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeSchedule.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          list of transaction fee schedules
+     */
     public List<TransactionFeeSchedule> getTransactionFeeSchedules() {
         return transactionFeeSchedules;
     }
 
+    /**
+     * Assign the list of transaction fee schedules.
+     *
+     * @param transactionFeeSchedules   list of transaction fee schedules
+     * @return
+     */
     public FeeSchedule setTransactionFeeSchedules(List<TransactionFeeSchedule> transactionFeeSchedules) {
         this.transactionFeeSchedules = Objects.requireNonNull(transactionFeeSchedules);
         return this;
     }
 
+    /**
+     * Add a transaction fee schedule.
+     *
+     * @param transactionFeeSchedule    transaction fee schedule to add
+     * @return {@code this}
+     */
     public FeeSchedule addTransactionFeeSchedule(TransactionFeeSchedule transactionFeeSchedule) {
         transactionFeeSchedules.add(Objects.requireNonNull(transactionFeeSchedule));
         return this;
     }
 
+    /**
+     * @return                          the expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
     }
 
+    /**
+     * Assign the expiration time.
+     *
+     * @param expirationTime            the expiration time
+     * @return
+     */
     public FeeSchedule setExpirationTime(@Nullable Instant expirationTime) {
         this.expirationTime = expirationTime;
         return this;
     }
 
+    /**
+     * Convert to a protobuf.
+     *
+     * @return                          the protobuf
+     */
     com.hedera.hashgraph.sdk.proto.FeeSchedule toProtobuf() {
         var returnBuilder = com.hedera.hashgraph.sdk.proto.FeeSchedule.newBuilder();
         if (expirationTime != null) {
@@ -75,6 +124,9 @@ public class FeeSchedule {
             .toString();
     }
 
+    /**
+     * @return                          a byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

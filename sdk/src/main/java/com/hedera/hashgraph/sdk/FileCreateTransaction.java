@@ -18,6 +18,7 @@ import java.util.Objects;
 
 /**
  * Creates a file with the content by submitting the transaction.
+ * {@link https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera}
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 
@@ -28,21 +29,37 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     private byte[] contents = {};
     private String fileMemo = "";
 
+    /**
+     * Constructor.
+     */
     public FileCreateTransaction() {
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
         defaultMaxTransactionFee = new Hbar(5);
     }
 
-    FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */   FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
-    FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */   FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -67,6 +84,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * @return                          list of keys
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -94,6 +114,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * @return                          byte string representation
+     */
     public ByteString getContents() {
         return ByteString.copyFrom(contents);
     }
@@ -146,10 +169,19 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * @return                          the file's memo field
+     */
     public String getFileMemo() {
         return fileMemo;
     }
 
+    /**
+     * Assign a memo to the file (100 bytes max).
+     *
+     * @param memo                      memo string
+     * @return {@code this}
+     */
     public FileCreateTransaction setFileMemo(String memo) {
         requireNotFrozen();
         Objects.requireNonNull(memo);
@@ -167,6 +199,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         // do nothing
     }
 
+    /**
+     * Initialize from transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileCreate();
         if (body.hasExpirationTime()) {
@@ -179,6 +214,11 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         fileMemo = body.getMemo();
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody builder}}
+     */
     FileCreateTransactionBody.Builder build() {
         var builder = FileCreateTransactionBody.newBuilder();
 

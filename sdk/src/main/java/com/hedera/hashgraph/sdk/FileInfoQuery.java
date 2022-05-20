@@ -26,9 +26,15 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileInfoQuery() {
     }
 
+    /**
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;

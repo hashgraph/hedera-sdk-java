@@ -7,7 +7,13 @@ import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
+/**
+ * Information about the versions of protobuf and hedera.
+ */
 public class NetworkVersionInfoQuery extends Query<NetworkVersionInfo, NetworkVersionInfoQuery> {
+    /**
+     * Constructor.
+     */
     public NetworkVersionInfoQuery() {
     }
 

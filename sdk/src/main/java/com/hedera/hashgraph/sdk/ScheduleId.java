@@ -7,6 +7,11 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * The entity ID of a schedule transaction.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id}
+ */
 public final class ScheduleId implements Comparable<ScheduleId> {
     /**
      * The shard number
@@ -29,15 +34,35 @@ public final class ScheduleId implements Comparable<ScheduleId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * Constructor.
+     *
+     * @param num                       the num part
+     */
     public ScheduleId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     */
     @SuppressWarnings("InconsistentOverloads")
     public ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @param checksum                  the checksum
+     */
     @SuppressWarnings("InconsistentOverloads")
     ScheduleId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -46,19 +71,41 @@ public final class ScheduleId implements Comparable<ScheduleId> {
         this.checksum = checksum;
     }
 
+    /**
+     * Create a schedule id from a string.
+     *
+     * @param id                        the string representing the schedule id
+     * @return                          the new schedule id
+     */
     public static ScheduleId fromString(String id) {
         return EntityIdHelper.fromString(id, ScheduleId::new);
     }
 
+    /**
+     * Create a schedule id from a protobuf.
+     *
+     * @param scheduleId                the protobuf
+     * @return                          the new schedule id
+     */
     static ScheduleId fromProtobuf(ScheduleID scheduleId) {
         Objects.requireNonNull(scheduleId);
         return new ScheduleId(scheduleId.getShardNum(), scheduleId.getRealmNum(), scheduleId.getScheduleNum());
     }
 
+    /**
+     * Create a schedule id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new schedule id
+     * @throws InvalidProtocolBufferException
+     */
     public static ScheduleId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ScheduleID.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the protobuf representing the schedule id
+     */
     ScheduleID toProtobuf() {
         return ScheduleID.newBuilder()
             .setShardNum(shard)
@@ -77,15 +124,27 @@ public final class ScheduleId implements Comparable<ScheduleId> {
         validateChecksum(client);
     }
 
+    /**
+     * Validate the configured client.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
+    /**
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
     }
 
+    /**
+     * @return                          byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
@@ -95,6 +154,12 @@ public final class ScheduleId implements Comparable<ScheduleId> {
         return EntityIdHelper.toString(shard, realm, num);
     }
 
+    /**
+     * Convert the schedule id into a string with checksum.
+     *
+     * @param client                    the configured client
+     * @return                          the string representation
+     */
     public String toStringWithChecksum(Client client) {
         return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }

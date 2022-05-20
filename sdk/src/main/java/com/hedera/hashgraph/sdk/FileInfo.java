@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 /**
  * Current information for a file, including its size.
+ * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info}
  */
 public final class FileInfo {
     /**
@@ -63,6 +64,12 @@ public final class FileInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Create a file info object from a ptotobuf.
+     *
+     * @param fileInfo                  the protobuf
+     * @return                          the new file info object
+     */
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
         @Nullable KeyList keys = fileInfo.hasKeys() ?
             KeyList.fromProtobuf(fileInfo.getKeys(), null) :
@@ -79,10 +86,20 @@ public final class FileInfo {
         );
     }
 
+    /**
+     * Create a file info object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new file info object
+     * @throws InvalidProtocolBufferException
+     */
     public static FileInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * @return                          the protobuf representation
+     */
     FileGetInfoResponse.FileInfo toProtobuf() {
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
             .setFileID(fileId.toProtobuf())
@@ -118,6 +135,9 @@ public final class FileInfo {
             .toString();
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

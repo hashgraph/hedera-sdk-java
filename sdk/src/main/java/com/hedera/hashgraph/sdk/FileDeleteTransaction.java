@@ -27,20 +27,35 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileDeleteTransaction() {
     }
 
-    FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */    FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
-    FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */    FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
-    @Nullable
+    /**
+     * @return                          the file id
+     */    @Nullable
     public FileId getFileId() {
         return fileId;
     }
@@ -58,13 +73,20 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         return this;
     }
 
-    void initFromTransactionBody() {
+    /**
+     * Initialize from the transaction body.
+     */   void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileDelete();
         if (body.hasFileID()) {
             fileId = FileId.fromProtobuf(body.getFileID());
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody builder}
+     */
     FileDeleteTransactionBody.Builder build() {
         var builder = FileDeleteTransactionBody.newBuilder();
         if (fileId != null) {

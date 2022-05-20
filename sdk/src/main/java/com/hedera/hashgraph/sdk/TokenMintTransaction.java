@@ -17,30 +17,81 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Minting fungible token allows you to increase the total supply of the
+ * token. Minting a non-fungible token creates an NFT with its unique
+ * metadata for the class of NFTs defined by the token ID. The Supply
+ * Key must sign the transaction.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token}
+ */
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable
     private TokenId tokenId = null;
+    /**
+     * The metadata field is specific to NFTs.
+     *
+     * Once an NFT is minted, the metadata cannot be changed and is immutable.
+     *
+     * You can use the metadata field to add a URI that contains additional
+     * information about the token.
+     *
+     * The metadata field has a 100 byte limit.
+     */
     private List<byte[]> metadataList = new ArrayList<>();
+    /**
+     * amount provided must be in the lowest denomination possible.
+     *
+     * Example: Token A has 2 decimals.
+     *
+     * In order to mint 100 tokens, one must provide an amount of 10000.
+     *
+     * In order to mint 100.55 tokens, one must provide an amount of 10055.
+     */
     private long amount = 0;
 
+    /**
+     * Constructor.
+     */
     public TokenMintTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenMintTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenMintTransaction setTokenId(@Nullable TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -48,16 +99,31 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * @return                          the amount to mint
+     */
     public long getAmount() {
         return amount;
     }
 
+    /**
+     * Assign the amount to mint.
+     *
+     * @param amount                    the amount to mint
+     * @return {@code this}
+     */
     public TokenMintTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
     }
 
+    /**
+     * Add to the metadata list.
+     *
+     * @param metadata                  the metadata 100 bytes max
+     * @return {@code this}
+     */
     public TokenMintTransaction addMetadata(byte[] metadata) {
         requireNotFrozen();
         Objects.requireNonNull(metadata);
@@ -65,16 +131,28 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * @return                          the metadata list
+     */
     public List<byte[]> getMetadata() {
         return new ArrayList<>(metadataList);
     }
 
+    /**
+     * Assign the metadata list.
+     *
+     * @param metadataList              the metadata list
+     * @return {@code this}
+     */
     public TokenMintTransaction setMetadata(List<byte[]> metadataList) {
         requireNotFrozen();
         this.metadataList = new ArrayList<>(metadataList);
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenMint();
         if (body.hasToken()) {
@@ -86,6 +164,12 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody}}
+     */
     TokenMintTransactionBody.Builder build() {
         var builder = TokenMintTransactionBody.newBuilder();
         if (tokenId != null) {

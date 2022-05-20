@@ -12,28 +12,60 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
+/**
+ * A token unpause transaction is a transaction that unpauses the token
+ * that was previously disabled from participating in transactions. The
+ * token's pause key is required to sign the transaction. Once the unpause
+ * transaction is submitted the token pause status is updated to unpause.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/unpause-a-token}
+ */
 public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction>{
     @Nullable
     private TokenId tokenId = null;
 
+    /**
+     * Constructor
+     */
     public TokenUnpauseTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     TokenUnpauseTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenUnpauseTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenUnpauseTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -41,6 +73,9 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenUnpause();
         if (body.hasToken()) {
@@ -48,6 +83,12 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenUnpauseTransactionBody}}
+     */
     TokenUnpauseTransactionBody.Builder build() {
         var builder = TokenUnpauseTransactionBody.newBuilder();
         if (tokenId != null) {

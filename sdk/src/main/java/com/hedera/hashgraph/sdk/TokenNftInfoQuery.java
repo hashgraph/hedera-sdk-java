@@ -15,16 +15,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A query that returns information about a non-fungible token (NFT).
+ *
+ * You request the info for an NFT by specifying the NFT ID.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/get-nft-token-info#methods}
+ */
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
+    /**
+     * The ID of the non-fungible token in x.y.z format.
+     */
     @Nullable
     private NftId nftId = null;
     @Nullable
     private TokenId tokenId = null;
+    /**
+     * The account ID of the current owner of the NFT
+     */
     @Nullable
     private AccountId accountId = null;
     private long start = 0;
     private long end = 0;
 
+    /**
+     * Constructor.
+     */
     public TokenNftInfoQuery() {
     }
 
@@ -52,6 +68,9 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return this;
     }
 
+    /**
+     * @return                          the nft id
+     */
     @Nullable
     public NftId getNftId() {
         return nftId;

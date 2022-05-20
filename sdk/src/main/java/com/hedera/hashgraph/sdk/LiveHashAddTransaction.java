@@ -29,14 +29,27 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     @Nullable
     private Duration duration = null;
 
+    /**
+     * Constructor.
+     */
     public LiveHashAddTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -55,6 +68,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * @return                          the hash
+     */
     public ByteString getHash() {
         return ByteString.copyFrom(hash);
     }
@@ -83,6 +99,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return setHash(hash.toByteArray());
     }
 
+    /**
+     * @return                          the key / key list
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -103,6 +122,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * @return                          the duration
+     */
     @Nullable
     public Duration getDuration() {
         return duration;
@@ -121,6 +143,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoAddLiveHash();
         var hashBody = body.getLiveHash();
@@ -137,6 +162,11 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}}
+     */
     CryptoAddLiveHashTransactionBody.Builder build() {
         var builder = CryptoAddLiveHashTransactionBody.newBuilder();
         var hashBuilder = LiveHash.newBuilder();

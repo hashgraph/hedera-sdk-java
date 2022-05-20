@@ -16,17 +16,31 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+/**
+ * Encapsulate the ED25519 private key.
+ */
 class PrivateKeyED25519 extends PrivateKey {
     private final byte[] keyData;
 
     @Nullable
     private final KeyParameter chainCode;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the key data
+     * @param chainCode                 the chain code
+     */
     PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
         this.keyData = keyData;
         this.chainCode = chainCode;
     }
 
+    /**
+     * Create a new private ED25519 key.
+     *
+     * @return                          the new key
+     */
     static PrivateKeyED25519 generateInternal() {
         // extra 32 bytes for chain code
         byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
@@ -35,6 +49,12 @@ class PrivateKeyED25519 extends PrivateKey {
         return derivableKeyED25519(data);
     }
 
+    /**
+     * Create a new private key from a private key info object.
+     *
+     * @param privateKeyInfo            the private key info object
+     * @return                          the new key
+     */
     static PrivateKeyED25519 fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
             var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
@@ -45,6 +65,12 @@ class PrivateKeyED25519 extends PrivateKey {
         }
     }
 
+    /**
+     * Create a derived key.
+     *
+     * @param deriveData                data to derive the key
+     * @return                          the new key
+     */
     static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) {
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
@@ -52,6 +78,12 @@ class PrivateKeyED25519 extends PrivateKey {
         return new PrivateKeyED25519(keyData, chainCode);
     }
 
+    /**
+     * Create a private key from a byte array.
+     *
+     * @param privateKey                the byte array
+     * @return                          the new key
+     */
     public static PrivateKey fromBytesInternal(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
@@ -63,6 +95,13 @@ class PrivateKeyED25519 extends PrivateKey {
         return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    /**
+     * Derive a legacy child key.
+     *
+     * @param entropy                   entropy byte array
+     * @param index                     the child key index
+     * @return                          the new key
+     */
     static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
         byte[] seed = new byte[entropy.length + 8];
         Arrays.fill(seed, 0, seed.length, (byte) 0);

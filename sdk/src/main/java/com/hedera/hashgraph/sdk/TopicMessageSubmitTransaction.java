@@ -30,24 +30,48 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     @Nullable
     private TopicId topicId = null;
 
+    /**
+     * Constructor.
+     */
     public TopicMessageSubmitTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     TopicMessageSubmitTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TopicMessageSubmitTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the topic id
+     */
     @Nullable
     public TopicId getTopicId() {
         return topicId;
     }
 
+    /**
+     * Assign the topic id.
+     *
+     * @param topicId                   the topic id
+     * @return {@code this}
+     */
     public TopicMessageSubmitTransaction setTopicId(TopicId topicId) {
         Objects.requireNonNull(topicId);
         requireNotFrozen();
@@ -55,10 +79,19 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         return this;
     }
 
+    /**
+     * @return                          the message
+     */
     public ByteString getMessage() {
         return getData();
     }
 
+    /**
+     * Assign the message from a byte string.
+     *
+     * @param message                   the byte string
+     * @return                          the
+     */
     public TopicMessageSubmitTransaction setMessage(ByteString message) {
         return setData(message);
     }

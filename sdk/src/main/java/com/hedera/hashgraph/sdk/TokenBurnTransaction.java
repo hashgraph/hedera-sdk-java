@@ -16,30 +16,70 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Burns fungible and non-fungible tokens owned by the Treasury Account.
+ * If no Supply Key is defined, the transaction will resolve to
+ * TOKEN_HAS_NO_SUPPLY_KEY.
+ *
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token}
+ */
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
+    /**
+     * The ID of the token to burn supply
+     */
     @Nullable
     private TokenId tokenId = null;
+    /**
+     * The ID of the token to burn supply
+     */
     private long amount = 0;
+    /**
+     * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.The  list of NFT serial IDs to burn.
+     */
     private List<Long> serials = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public TokenBurnTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */
     TokenBurnTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenBurnTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenBurnTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -47,20 +87,46 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * @return                          the amount of tokens to burn
+     */
     public long getAmount() {
         return amount;
     }
 
+    /**
+     * Assign the amount of tokens to burn.
+     *
+     * The amount provided must be in the lowest denomination possible.
+     *
+     * Example: Token A has 2 decimals. In order to burn 100 tokens, one must
+     * provide an amount of 10000. In order to burn 100.55 tokens, one must
+     * provide an amount of 10055.
+     *
+     * {@link https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token}
+     *
+     * @param amount                    the amount of tokens to burn
+     * @return {@code this}
+     */
     public TokenBurnTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
     }
 
+    /**
+     * @return                          list of token serials
+     */
     public List<Long> getSerials() {
         return new ArrayList<>(serials);
     }
 
+    /**
+     * Assign the list of token serials.
+     *
+     * @param serials                   list of token serials
+     * @return {@code this}
+     */
     public TokenBurnTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         Objects.requireNonNull(serials);
@@ -68,12 +134,23 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * Add a serial number to the list of serials.
+     *
+     * @param serial                    the serial number to add
+     * @return {@code this}
+     */
     public TokenBurnTransaction addSerial(@Nonnegative long serial) {
         requireNotFrozen();
         serials.add(serial);
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody}}
+     */
     TokenBurnTransactionBody.Builder build() {
         var builder = TokenBurnTransactionBody.newBuilder();
         if (tokenId != null) {
@@ -88,6 +165,9 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return builder;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenBurn();
         if (body.hasToken()) {

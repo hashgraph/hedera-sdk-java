@@ -7,6 +7,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A token transfer record.
+ *
+ * Internal utility class.
+ */
 public class TokenTransfer {
     final TokenId tokenId;
     final AccountId accountId;
@@ -17,10 +22,27 @@ public class TokenTransfer {
 
     boolean isApproved;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param amount                    the amount
+     * @param isApproved                is it approved
+     */
     TokenTransfer(TokenId tokenId, AccountId accountId, long amount, boolean isApproved) {
         this(tokenId, accountId, amount, null, isApproved);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param amount                    the amount
+     * @param expectedDecimals          the expected decimals
+     * @param isApproved                is it approved
+     */
     TokenTransfer(TokenId tokenId, AccountId accountId, long amount, @Nullable Integer expectedDecimals, boolean isApproved) {
         this.tokenId = tokenId;
         this.accountId = accountId;
@@ -29,6 +51,12 @@ public class TokenTransfer {
         this.isApproved = isApproved;
     }
 
+    /**
+     * Create a list of token transfer records from a protobuf.
+     *
+     * @param tokenTransferLists        the protobuf
+     * @return                          the list of token transfer records
+     */
     static List<TokenTransfer> fromProtobuf(List<com.hedera.hashgraph.sdk.proto.TokenTransferList> tokenTransferLists) {
         var transfers = new ArrayList<TokenTransfer>();
 
@@ -49,6 +77,9 @@ public class TokenTransfer {
         return transfers;
     }
 
+    /**
+     * @return                          an account amount protobuf
+     */
     AccountAmount toProtobuf() {
         return AccountAmount.newBuilder()
             .setAccountID(accountId.toProtobuf())

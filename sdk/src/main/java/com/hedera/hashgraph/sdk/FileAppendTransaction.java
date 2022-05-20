@@ -25,6 +25,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileAppendTransaction() {
         super();
 
@@ -32,17 +35,30 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         setChunkSize(2048);
     }
 
-    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         initFromTransactionBody();
     }
 
-    FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */   FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
@@ -61,6 +77,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return this;
     }
 
+    /**
+     * @return                          the byte string representing the file
+     */
     @Nullable
     public ByteString getContents() {
         return getData();
@@ -118,6 +137,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return FileServiceGrpc.getAppendContentMethod();
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileAppend();
         if (body.hasFileID()) {
@@ -136,6 +158,11 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody builder}}
+     */
     FileAppendTransactionBody.Builder build() {
         var builder = FileAppendTransactionBody.newBuilder();
         if (fileId != null) {

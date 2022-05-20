@@ -4,18 +4,42 @@ import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
 import org.threeten.bp.Instant;
 
+/**
+ * Instance in time utilities.
+ */
 final class InstantConverter {
+    /**
+     * Constructor.
+     */
     private InstantConverter() {
     }
 
+    /**
+     * Create an instance from a timestamp protobuf.
+     *
+     * @param timestamp                 the protobuf
+     * @return                          the instance
+     */
     static Instant fromProtobuf(Timestamp timestamp) {
         return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
     }
 
+    /**
+     * Create an instance from a timestamp in seconds protobuf.
+     *
+     * @param timestampSeconds          the protobuf
+     * @return                          the instance
+     */
     static Instant fromProtobuf(TimestampSeconds timestampSeconds) {
         return Instant.ofEpochSecond(timestampSeconds.getSeconds());
     }
 
+    /**
+     * Convert an instance into a timestamp.
+     *
+     * @param instant                   the instance
+     * @return                          the timestamp
+     */
     static Timestamp toProtobuf(Instant instant) {
         return Timestamp.newBuilder()
             .setSeconds(instant.getEpochSecond())
@@ -23,6 +47,12 @@ final class InstantConverter {
             .build();
     }
 
+    /**
+     * Convert an instance into a timestamp in seconds.
+     *
+     * @param instant                   the instance
+     * @return                          the timestamp in seconds
+     */
     static TimestampSeconds toSecondsProtobuf(Instant instant) {
         return TimestampSeconds.newBuilder()
             .setSeconds(instant.getEpochSecond())

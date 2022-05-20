@@ -4,6 +4,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Internal utility class.
+ *
+ * @param <T>
+ */
 class LockableList<T> implements Iterable<T> {
     private ArrayList<T> list = new ArrayList<>();
     private int index = 0;

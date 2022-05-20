@@ -4,6 +4,9 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * Internal utility class.
+ */
 class ManagedNodeAddress {
     private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
     private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
@@ -20,12 +23,25 @@ class ManagedNodeAddress {
     private final String address;
     private final int port;
 
+    /**
+     * Constructor.
+     *
+     * @param name                      the name part
+     * @param address                   the address part
+     * @param port                      the port part
+     */
     public ManagedNodeAddress(@Nullable String name, @Nullable String address, int port) {
         this.name = name;
         this.address = address;
         this.port = port;
     }
 
+    /**
+     * Create a managed node address fom a string.
+     *
+     * @param string                    the string representation
+     * @return                          the new managed node address
+     */
     public static ManagedNodeAddress fromString(String string) {
         var hostAndPortMatcher = HOST_AND_PORT.matcher(string);
         var inProcessMatcher = IN_PROCESS.matcher(string);
@@ -42,26 +58,44 @@ class ManagedNodeAddress {
         }
     }
 
+    /**
+     * @return                          the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+      * @return                         the address
+     */
     public String getAddress() {
         return address;
     }
 
+    /**
+     * @return                          the port
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * @return                          are we in process
+     */
     public boolean isInProcess() {
         return name != null;
     }
 
+    /**
+     * @return                          are we secure
+     */
     public boolean isTransportSecurity() {
         return port == PORT_NODE_TLS || port == PORT_MIRROR_TLS;
     }
 
+    /**
+     * @return                          the insecure managed node address
+     */
     public ManagedNodeAddress toInsecure() {
         var port = this.port;
 
@@ -76,6 +110,9 @@ class ManagedNodeAddress {
         return new ManagedNodeAddress(name, address, port);
     }
 
+    /**
+     * @return                          the secure managed node address
+     */
     public ManagedNodeAddress toSecure() {
         var port = this.port;
 

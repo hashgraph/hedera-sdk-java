@@ -21,6 +21,9 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Utility class used internally by the sdk.
+ */
 final class Crypto {
     static final int IV_LEN = 16;
     static final int ITERATIONS = 262144;
@@ -33,6 +36,15 @@ final class Crypto {
     private Crypto() {
     }
 
+    /**
+     * Derive a sha 256 key.
+     *
+     * @param passphrase                the password will be converted into bytes
+     * @param salt                      the salt to be mixed in
+     * @param iterations                the iterations for mixing
+     * @param dkLenBytes                the key length in bytes
+     * @return                          the key parameter object
+     */
     static KeyParameter deriveKeySha256(String passphrase, byte[] salt, int iterations, int dkLenBytes) {
         PKCS5S2ParametersGenerator gen = new PKCS5S2ParametersGenerator(new SHA256Digest());
         gen.init(passphrase.getBytes(StandardCharsets.UTF_8), salt, iterations);

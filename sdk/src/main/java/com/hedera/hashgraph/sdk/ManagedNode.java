@@ -18,6 +18,12 @@ import javax.annotation.Nullable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Internal utility class.
+ *
+ * @param <N>
+ * @param <KeyT>
+ */
 abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
@@ -71,6 +77,12 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     @Nullable
     protected ManagedChannel channel = null;
 
+    /**
+     * Constructor.
+     *
+     * @param address                   the node address
+     * @param executor                  the client
+     */
     protected ManagedNode(ManagedNodeAddress address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
@@ -80,6 +92,12 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.readmitTime = Instant.now();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param node                      the node object
+     * @param address                   the address to assign
+     */
     protected ManagedNode(N node, ManagedNodeAddress address) {
         this.address = address;
 
@@ -93,6 +111,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.useCount = node.useCount;
     }
 
+    /**
+     * @return                          the authority address
+     */
     protected String getAuthority() {
         return "127.0.0.1";
     }
@@ -110,6 +131,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      */
     abstract N toSecure();
 
+    /**
+     * @return                          the key list
+     */
     abstract KeyT getKey();
 
     /**
@@ -174,6 +198,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return badGrpcStatusCount;
     }
 
+    /**
+     * @return                          the unhealthy backoff time remaining
+     */
     long unhealthyBackoffRemaining() {
         return Math.max(0, readmitTime.toEpochMilli() - System.currentTimeMillis());
     }
@@ -228,6 +255,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return TlsChannelCredentials.create();
     }
 
+    /**
+     * Update use counters and update last used time stamp.
+     */
     synchronized void inUse() {
         useCount++;
         lastUsed = System.currentTimeMillis();
@@ -269,6 +299,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return channel;
     }
 
+    /**
+     * @return                          did we fail to connect
+     */
     boolean channelFailedToConnect() {
         if (hasConnected) {
             return false;
@@ -295,6 +328,11 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         });
     }
 
+    /**
+     * Asynchronously determine if the channel failed to connect.
+     *
+     * @return                          did we fail to connect
+     */
     CompletableFuture<Boolean> channelFailedToConnectAsync() {
         if (hasConnected) {
             return CompletableFuture.completedFuture(false);
@@ -347,6 +385,9 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return Long.compare(this.lastUsed, node.lastUsed);
     }
 
+    /**
+     * @return                          the user agent string
+     */
     private String getUserAgent() {
         var thePackage = getClass().getPackage();
         var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;

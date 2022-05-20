@@ -19,9 +19,15 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     @Nullable
     TopicId topicId = null;
 
+    /**
+     * Constructor.
+     */
     public TopicInfoQuery() {
     }
 
+    /**
+     * @return                          the topic id
+     */
     @Nullable
     public TopicId getTopicId() {
         return topicId;

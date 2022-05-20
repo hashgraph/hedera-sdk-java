@@ -96,6 +96,9 @@ abstract class ManagedNetwork<
         earliestReadmitTime = Instant.now().plus(minNodeReadmitTime);
     }
 
+    /**
+     * @return                          the ledger id
+     */
     @Nullable
     LedgerId getLedgerId() {
         return ledgerId;
@@ -115,6 +118,9 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * @return                          maximum node attempts
+     */
     int getMaxNodeAttempts() {
         return maxNodeAttempts;
     }
@@ -132,6 +138,9 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * @return                          the minimum node backoff time
+     */
     Duration getMinNodeBackoff() {
         return minNodeBackoff;
     }
@@ -153,6 +162,9 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * @return                          the maximum node backoff time
+     */
     Duration getMaxNodeBackoff() {
         return maxNodeBackoff;
     }
@@ -174,10 +186,18 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * @return                          the minimum node readmit time
+     */
     public Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
+    /**
+     * Assign the minimum node readmit time.
+     *
+     * @param minNodeReadmitTime        the minimum node readmit time
+     */
     public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
@@ -186,14 +206,25 @@ abstract class ManagedNetwork<
         }
     }
 
+    /**
+     * @return                          the maximum node readmit time
+     */
     public Duration getMaxNodeReadmitTime() {
         return maxNodeReadmitTime;
     }
 
+    /**
+     * Assign the maximum node readmit time.
+     *
+     * @param maxNodeReadmitTime        the maximum node readmit time
+     */
     public void setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
         this.maxNodeReadmitTime = maxNodeReadmitTime;
     }
 
+    /**
+     * @return                          using transport security
+     */
     boolean isTransportSecurity() {
         return transportSecurity;
     }
@@ -226,11 +257,19 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-
+    /**
+     * @return                          the close timeout
+     */
     Duration getCloseTimeout() {
         return closeTimeout;
     }
 
+    /**
+     * Assign the close timeout.
+     *
+     * @param closeTimeout              the close timeout
+     * @return {@code this}
+     */
     synchronized ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = closeTimeout;
 

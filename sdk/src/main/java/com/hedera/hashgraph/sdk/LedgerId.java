@@ -6,6 +6,9 @@ import org.bouncycastle.util.encoders.Hex;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 
+/**
+ * Internal utility class for ledger id manipulation.
+ */
 public class LedgerId {
     final private byte[] idBytes;
 
@@ -13,10 +16,21 @@ public class LedgerId {
     public final static LedgerId TESTNET = new LedgerId(new byte[]{1});
     public final static LedgerId PREVIEWNET = new LedgerId(new byte[]{2});
 
+    /**
+     * Constructor.
+     *
+     * @param idBytes                   the id (0=mainnet, 1=testnet, 2=previewnet, ...)
+     */
     LedgerId(byte[] idBytes) {
         this.idBytes = idBytes;
     }
 
+    /**
+     * Assign the ledger id via a string name or Hex encoded String.
+     *
+     * @param string                    the string containing the ledger id
+     * @return                          the ledger id
+     */
     public static LedgerId fromString(String string) {
         switch (string) {
             case "mainnet":
@@ -30,10 +44,22 @@ public class LedgerId {
         }
     }
 
+    /**
+     * Create a ledger id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the ledger id
+     */
     public static LedgerId fromBytes(byte[] bytes) {
         return new LedgerId(bytes);
     }
 
+    /**
+     * Create a ledger id from a string.
+     *
+     * @param byteString                the string
+     * @return                          the ledger id
+     */
     static LedgerId fromByteString(ByteString byteString) {
         return fromBytes(byteString.toByteArray());
     }
@@ -52,22 +78,37 @@ public class LedgerId {
         }
     }
 
+    /**
+     * @return                          is it mainnet
+     */
     public boolean isMainnet() {
         return this.equals(MAINNET);
     }
 
+    /**
+     * @return                          is it testnet
+     */
     public boolean isTestnet() {
         return this.equals(TESTNET);
     }
 
+    /**
+     * @return                          is it previewnet
+     */
     public boolean isPreviewnet() {
         return this.equals(PREVIEWNET);
     }
 
+    /**
+     * @return                          is it one of the three standard networks
+     */
     boolean isKnownNetwork() {
         return isMainnet() || isTestnet() || isPreviewnet();
     }
 
+    /**
+     * @return                          the string representation
+     */
     public String toString() {
         if (isMainnet()) {
             return "mainnet";
@@ -80,10 +121,16 @@ public class LedgerId {
         }
     }
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return idBytes;
     }
 
+    /**
+     * @return                          the byte string representation
+     */
     ByteString toByteString() {
         return ByteString.copyFrom(idBytes);
     }

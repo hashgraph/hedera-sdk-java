@@ -8,6 +8,7 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 /**
  * A common base for the signing authority or key that entities in Hedera may have.
  *
+ * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/key}
  * @see KeyList
  * @see PublicKey
  */
@@ -24,6 +25,12 @@ public abstract class Key {
             ECDSA_SECP256K1_CURVE.getH()
         );
 
+    /**
+     * Create a specific key type from the protobuf.
+     *
+     * @param key                       the protobuf key of unknown type
+     * @return                          the differentiated key
+     */
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519:
@@ -54,6 +61,9 @@ public abstract class Key {
      */
     abstract com.hedera.hashgraph.sdk.proto.Key toProtobufKey();
 
+    /**
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobufKey().toByteArray();
     }

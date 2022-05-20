@@ -1,5 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
+/**
+ * Enum for the fee assessment method
+ */
 public enum FeeAssessmentMethod {
 
     INCLUSIVE(false),

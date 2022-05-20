@@ -8,7 +8,9 @@ import org.threeten.bp.Duration;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
-
+/**
+ * Utility class used internally by the sdk.
+ */
 final class Delayer {
     private static final Logger logger = LoggerFactory.getLogger(Delayer.class);
 

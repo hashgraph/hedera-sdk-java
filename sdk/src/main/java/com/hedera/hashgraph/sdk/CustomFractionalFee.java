@@ -6,6 +6,10 @@ import com.hedera.hashgraph.sdk.proto.FractionalFee;
 
 import java.util.Objects;
 
+/**
+ * Custom fractional fee utility class.
+ * {@link https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee}
+ */
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0;
     private long denominator = 1;
@@ -13,9 +17,18 @@ public class CustomFractionalFee extends CustomFee {
     private long max = 0;
     private FeeAssessmentMethod assessmentMethod = FeeAssessmentMethod.INCLUSIVE;
 
+    /**
+     * Constructor.
+     */
     public CustomFractionalFee() {
     }
 
+    /**
+     * Clone a custom fractional fee object.
+     *
+     * @param source                    the source fee object
+     * @return                          the new custom fractional fee object
+     */
     static CustomFractionalFee clonedFrom(CustomFractionalFee source) {
         var returnFee = new CustomFractionalFee();
         returnFee.numerator = source.numerator;
@@ -27,6 +40,12 @@ public class CustomFractionalFee extends CustomFee {
         return returnFee;
     }
 
+    /**
+     * Create a custom fractional fee from a fee protobuf.
+     *
+     * @param fractionalFee             the fractional fee protobuf
+     * @return                           the new custom fractional fee object
+     */
     static CustomFractionalFee fromProtobuf(FractionalFee fractionalFee) {
         var fraction = fractionalFee.getFractionalAmount();
         return new CustomFractionalFee()
@@ -37,6 +56,12 @@ public class CustomFractionalFee extends CustomFee {
             .setAssessmentMethod(FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers()));
     }
 
+    /**
+     * Create a custom fractional fee from a fixed fee protobuf.
+     *
+     * @param customFee                 the custom fee protobuf
+     * @return                          the new custom fractional fee object
+     */
     static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var returnFee = fromProtobuf(customFee.getFractionalFee());
         if (customFee.hasFeeCollectorAccountId()) {
@@ -45,51 +70,110 @@ public class CustomFractionalFee extends CustomFee {
         return returnFee;
     }
 
+    /**
+     * Assign the fee collector account id.
+     *
+     * @param feeCollectorAccountId     the account id of the fee collector
+     * @return {@code this}
+     */
     public CustomFractionalFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
         doSetFeeCollectorAccountId(feeCollectorAccountId);
         return this;
     }
 
+    /**
+     * @return                          the numerator
+     */
     public long getNumerator() {
         return numerator;
     }
 
+    /**
+     * Assign the numerator.
+     *
+     * @param numerator                 the numerator
+     * @return {@code this}
+     */
     public CustomFractionalFee setNumerator(long numerator) {
         this.numerator = numerator;
         return this;
     }
 
+    /**
+     * @return                          the denominator
+     */
     public long getDenominator() {
         return denominator;
     }
 
+    /**
+     * Assign the denominator can not be zero (0).
+     *
+     * @param denominator               the denominator
+     * @return {@code this}
+     */
     public CustomFractionalFee setDenominator(long denominator) {
         this.denominator = denominator;
         return this;
     }
 
+    /**
+     * @return                          the minimum fee amount
+     */
     public long getMin() {
         return min;
     }
 
+    /**
+     * Assign the minimum fee amount.
+     *
+     * @param min                       the fee amount
+     * @return {@code this}
+     */
     public CustomFractionalFee setMin(long min) {
         this.min = min;
         return this;
     }
 
+    /**
+     * @return                          the fee amount
+     */
     public long getMax() {
         return max;
     }
 
+    /**
+     * Assign the maximum fee amount.
+     *
+     * @param max                       the fee amount
+     * @return
+     */
     public CustomFractionalFee setMax(long max) {
         this.max = max;
         return this;
     }
 
+    /**
+     * @return                          the assessment method inclusive / exclusive
+     */
     public FeeAssessmentMethod getAssessmentMethod() {
         return assessmentMethod;
     }
 
+    /**
+     * Assign the assessment method inclusive / exclusive.
+     *
+     * If the assessment method field is set, the token's custom fee is charged
+     * to the sending account and the receiving account receives the full token
+     * transfer amount. If this field is set to false, the receiver pays for
+     * the token custom fees and gets the remaining token balance.
+     *     INCLUSIVE(false)
+     *     EXCLUSIVE(true)
+     * {@link https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee}
+     *
+     * @param assessmentMethod          inclusive / exclusive
+     * @return {@code this}
+     */
     public CustomFractionalFee setAssessmentMethod(FeeAssessmentMethod assessmentMethod) {
         Objects.requireNonNull(assessmentMethod);
         this.assessmentMethod = assessmentMethod;
@@ -108,6 +192,11 @@ public class CustomFractionalFee extends CustomFee {
             .toString();
     }
 
+    /**
+     * Convert the fractional fee object to a protobuf.
+     *
+     * @return                          the protobuf object
+     */
     FractionalFee toFractionalFeeProtobuf() {
         return FractionalFee.newBuilder()
             .setMinimumAmount(getMin())

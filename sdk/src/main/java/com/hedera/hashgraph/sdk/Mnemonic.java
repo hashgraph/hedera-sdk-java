@@ -298,6 +298,10 @@ public final class Mnemonic {
         return PrivateKey.fromMnemonic(this, passphrase);
     }
 
+    /**
+     * @return                          the private key
+     * @throws BadMnemonicException
+     */
     public PrivateKey toLegacyPrivateKey() throws BadMnemonicException {
         if (this.words.size() == 22) {
             return PrivateKey.fromBytes(this.wordsToLegacyEntropy());
@@ -364,6 +368,12 @@ public final class Mnemonic {
         return asString;
     }
 
+    /**
+     * Convert passphrase to a byte array.
+     *
+     * @param passphrase                the passphrase
+     * @return                          the byte array
+     */
     byte[] toSeed(String passphrase) {
         String salt = "mnemonic" + passphrase;
 

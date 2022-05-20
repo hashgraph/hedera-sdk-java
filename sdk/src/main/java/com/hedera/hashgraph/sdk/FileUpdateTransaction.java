@@ -19,6 +19,7 @@ import java.util.Objects;
 
 /**
  * Updates a file by submitting the transaction.
+ * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file}
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 
@@ -32,19 +33,35 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     @Nullable
     private String fileMemo = null;
 
+    /**
+     * Constructor.
+     */
     public FileUpdateTransaction() {
     }
 
-    FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException
+     */    FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
-    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
@@ -63,6 +80,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+      * @return                         the list of keys
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -82,6 +102,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * @return                          the expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -103,6 +126,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * @return                          the files contents as a byte string
+     */
     public ByteString getContents() {
         return ByteString.copyFrom(contents);
     }
@@ -163,11 +189,20 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * @return                          the file's memo up to 100 bytes
+     */
     @Nullable
     public String getFileMemo() {
         return fileMemo;
     }
 
+    /**
+     * Assign the file memo up to 100 bytes max.
+     *
+     * @param memo                      the file's memo
+     * @return {@code this}
+     */
     public FileUpdateTransaction setFileMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
@@ -175,12 +210,20 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * Remove the file memo.
+     *
+     * @return {@code this}
+     */
     public FileUpdateTransaction clearMemo() {
         requireNotFrozen();
         fileMemo = "";
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileUpdate();
         if (body.hasFileID()) {
@@ -198,6 +241,11 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         contents = body.getContents().toByteArray();
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody builder }}
+     */
     FileUpdateTransactionBody.Builder build() {
         var builder = FileUpdateTransactionBody.newBuilder();
         if (fileId != null) {
