@@ -241,7 +241,7 @@ public final class TransactionRecord {
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            transactionRecord.getTransactionHash()
+            transactionRecord.getEthereumHash()
         );
     }
 
