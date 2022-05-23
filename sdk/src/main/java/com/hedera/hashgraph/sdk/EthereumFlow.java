@@ -26,18 +26,8 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
         return ethereumData;
     }
 
-    public EthereumFlow setEthereumData(@Nullable EthereumTransactionData ethereumData) {
-        this.ethereumData = ethereumData;
-        return this;
-    }
-
-    @Nullable
-    public FileId getCallDataFileId() {
-        return callDataFileId;
-    }
-
-    public EthereumFlow setCallDataFileId(@Nullable FileId callDataFileId) {
-        this.callDataFileId = callDataFileId;
+    public EthereumFlow setEthereumData(byte[] ethereumData) {
+        this.ethereumData = EthereumTransactionData.fromBytes(ethereumData);
         return this;
     }
 
@@ -46,7 +36,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
         return maxGasAllowance;
     }
 
-    public EthereumFlow setMaxGasAllowance(@Nullable Hbar maxGasAllowance) {
+    public EthereumFlow setMaxGasAllowance(Hbar maxGasAllowance) {
         this.maxGasAllowance = maxGasAllowance;
         return this;
     }
@@ -107,7 +97,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
             ethereumTransaction.setEthereumData(ethereumDataBytes);
         } else {
             var callDataFileId = createFile(ethereumData.callData, client);
-            ethereumData.callData = null;
+            ethereumData.callData = new byte[]{};
             ethereumTransaction.setEthereumData(ethereumData.toBytes()).setCallDataFileId(callDataFileId);
         }
 
@@ -132,7 +122,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
         } else {
             return createFileAsync(ethereumData.callData, client)
                     .thenCompose((callDataFileId) -> {
-                        ethereumData.callData = null;
+                        ethereumData.callData = new byte[]{};
                         return ethereumTransaction
                                 .setEthereumData(ethereumData.toBytes())
                                 .setCallDataFileId(callDataFileId)
