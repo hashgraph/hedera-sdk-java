@@ -44,14 +44,14 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
     private static FileId createFile(byte[] callData, Client client) throws PrecheckStatusException, TimeoutException {
         try {
             var transaction = new FileCreateTransaction()
-                    .setContents(Arrays.copyOfRange(callData, 0, Math.min(4096, callData.length)))
+                    .setContents(Arrays.copyOfRange(callData, 0, Math.min(FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length)))
                     .execute(client);
             var fileId = transaction.getReceipt(client).fileId;
 
-            if (callData.length > 4096) {
+            if (callData.length > FileAppendTransaction.DEFAULT_CHUNK_SIZE) {
                 new FileAppendTransaction()
                         .setFileId(fileId)
-                        .setContents(Arrays.copyOfRange(callData, 4096, callData.length))
+                        .setContents(Arrays.copyOfRange(callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
                         .execute(client)
                         .getReceipt(client);
             }
@@ -65,14 +65,14 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
 
     private static CompletableFuture<FileId> createFileAsync(byte[] callData, Client client) {
         return new FileCreateTransaction()
-                .setContents(Arrays.copyOfRange(callData, 0, Math.min(4096, callData.length)))
+                .setContents(Arrays.copyOfRange(callData, 0, Math.min(FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length)))
                 .executeAsync(client)
                 .thenCompose((response) -> response.getReceiptAsync(client))
                 .thenCompose((receipt) -> {
-                    if (callData.length > 4096) {
+                    if (callData.length > FileAppendTransaction.DEFAULT_CHUNK_SIZE) {
                         return new FileAppendTransaction()
                                 .setFileId(receipt.fileId)
-                                .setContents(Arrays.copyOfRange(callData, 4096, callData.length))
+                                .setContents(Arrays.copyOfRange(callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
                                 .executeAsync(client)
                                 .thenApply((r) -> receipt.fileId);
                     } else {

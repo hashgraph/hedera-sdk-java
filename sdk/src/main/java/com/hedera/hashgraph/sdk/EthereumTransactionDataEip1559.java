@@ -60,7 +60,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
         // typed transaction?
         byte typeByte = rlpItem.asByte();
         if (typeByte != 2) {
-            throw new IllegalArgumentException("only EIP1559 is supported");
+            throw new IllegalArgumentException("rlp type byte " + typeByte + "is not supported");
         }
         rlpItem = decoder.next();
         if (!rlpItem.isList()) {
