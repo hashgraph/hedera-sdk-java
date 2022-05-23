@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a delete` transaction.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction”>Hedera Documentation</a>
  */
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
 

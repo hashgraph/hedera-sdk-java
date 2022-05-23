@@ -37,7 +37,8 @@ import java.util.Objects;
 
 /**
  * Creates a file with the content by submitting the transaction.
- * {@link https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera}
+ *
+ * See <a “https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera”>Hedera Documentation</a>
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 

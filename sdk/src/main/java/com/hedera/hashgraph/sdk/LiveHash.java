@@ -31,7 +31,7 @@ import org.threeten.bp.Duration;
  * this livehash to this account. At least one of them must reach its
  * threshold to delete this livehash from this account.
  *
- * {@link https://docs.hedera.com/guides/core-concepts/accounts#livehash}
+ * See <a “https://docs.hedera.com/guides/core-concepts/accounts#livehash”>Hedera Documentation</a>
  */
 public class LiveHash {
     public final AccountId accountId;

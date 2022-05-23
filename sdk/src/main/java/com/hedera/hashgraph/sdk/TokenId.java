@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Constructs a TokenId.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/token-id}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/token-id”>Hedera Documentation</a>
  */
 public class TokenId implements Comparable<TokenId> {
     /**

@@ -24,7 +24,7 @@ package com.hedera.hashgraph.sdk;
  *
  * Indicates how many tokens can have during its lifetime.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokensupplytype}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokensupplytype”>Hedera Documentation</a>
  */
 public enum TokenSupplyType {
     /**

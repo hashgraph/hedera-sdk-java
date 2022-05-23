@@ -39,7 +39,7 @@ import java.util.Objects;
  * token.  If the pause key was not set during the creation of a token, you
  * will not be able to update the token to add this key.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/pause-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/pause-a-token”>Hedera Documentation</a>
  */
 public class TokenPauseTransaction extends Transaction<TokenPauseTransaction>{
     @Nullable

@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * The storage changes to a smart contract's storage as a side effect of the function call.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#contractstatechange}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#contractstatechange”>Hedera Documentation</a>
  */
 public class ContractStateChange {
     public final ContractId contractId;

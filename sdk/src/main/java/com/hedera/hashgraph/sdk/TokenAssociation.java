@@ -30,7 +30,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * of NFTs (serial numbers) of that token type. The Hedera account that is
  * being associated with a token is required to sign the transaction.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/associate-tokens-to-an-account}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/associate-tokens-to-an-account”>Hedera Documentation</a>
  */
 public class TokenAssociation {
     public final TokenId tokenId;

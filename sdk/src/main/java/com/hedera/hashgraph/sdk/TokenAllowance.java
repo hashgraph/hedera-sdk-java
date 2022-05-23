@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * An approved allowance of token transfers for a spender.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance”>Hedera Documentation</a>
  */
 public class TokenAllowance {
     /**

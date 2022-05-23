@@ -42,7 +42,7 @@ import java.util.Objects;
  * metadata for the class of NFTs defined by the token ID. The Supply
  * Key must sign the transaction.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token”>Hedera Documentation</a>
  */
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable

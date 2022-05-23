@@ -39,7 +39,7 @@ import java.util.Objects;
  *
  * You request the info for an NFT by specifying the NFT ID.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/get-nft-token-info#methods}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/get-nft-token-info#methods”>Hedera Documentation</a>
  */
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
     /**

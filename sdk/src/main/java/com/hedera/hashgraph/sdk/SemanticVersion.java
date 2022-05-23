@@ -27,7 +27,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * NetworkService to return the deployed versions of both protobufs and
  * software on the node answering the query.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/semanticversion}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/semanticversion”>Hedera Documentation</a>
  */
 public class SemanticVersion {
     /**

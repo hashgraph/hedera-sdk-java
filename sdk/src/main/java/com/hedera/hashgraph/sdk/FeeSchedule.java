@@ -30,7 +30,8 @@ import java.util.Objects;
 
 /**
  * The fee schedule for a specific hedera functionality and the time period this fee schedule will expire.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule”>Hedera Documentation</a>
  */
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();

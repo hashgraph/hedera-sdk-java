@@ -38,7 +38,8 @@ import java.util.Objects;
  * A query to get the contents of a file. Queries do not change the state of
  * the file or require network consensus. The information is returned from a
  * single node processing the query.
- * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents”>Hedera Documentation</a>
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
 

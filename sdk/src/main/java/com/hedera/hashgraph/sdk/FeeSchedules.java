@@ -27,7 +27,8 @@ import javax.annotation.Nullable;
 
 /**
  * This contains two Fee Schedules with expiry timestamp.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule”>Hedera Documentation</a>
  */
 public class FeeSchedules {
     @Nullable

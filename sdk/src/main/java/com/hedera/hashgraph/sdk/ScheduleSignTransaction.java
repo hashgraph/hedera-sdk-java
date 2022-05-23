@@ -42,7 +42,7 @@ import java.util.Objects;
  * Once a schedule transaction receives the last required signature, the
  * schedule transaction executes.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/sign-a-schedule-transaction}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/sign-a-schedule-transaction”>Hedera Documentation</a>
  */
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
 

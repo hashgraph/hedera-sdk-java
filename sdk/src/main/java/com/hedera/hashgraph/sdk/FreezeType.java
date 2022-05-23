@@ -21,7 +21,8 @@ package com.hedera.hashgraph.sdk;
 
 /**
  * The type of network freeze or upgrade operation to be performed. This type dictates which fields are required.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/freezetype}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/freezetype”>Hedera Documentation</a>
  */
 public enum FreezeType {
     /**

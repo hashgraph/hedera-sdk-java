@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * The entity ID of a schedule transaction.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id”>Hedera Documentation</a>
  */
 public final class ScheduleId implements Comparable<ScheduleId> {
     /**

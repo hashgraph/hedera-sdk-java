@@ -40,8 +40,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Internal utility class.
  *
- * @param <N>
- * @param <KeyT>
+ * @param <N>                           the n type
+ * @param <KeyT>                        the key t type
  */
 abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
@@ -131,6 +131,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
+     * Return the local host ip address
+     *
      * @return                          the authority address
      */
     protected String getAuthority() {
@@ -146,11 +148,14 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
 
     /**
      * Create a secure version of this node
-     * @return
+     *
+     * @return                          he secure version of the node
      */
     abstract N toSecure();
 
     /**
+     * Extract the key list
+     *
      * @return                          the key list
      */
     abstract KeyT getKey();
@@ -158,25 +163,26 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Get the address of this node
      *
-     * @return
+     * @return                          the address for the node
      */
     ManagedNodeAddress getAddress() {
         return address;
     }
 
     /**
-     * Get the minimum backoff
-     * @return
+     * Get the minimum backoff time
+     *
+     * @return                          the minimum backoff time
      */
     Duration getMinBackoff() {
         return minBackoff;
     }
 
     /**
-     * Set the minimum backoff
+     * Set the minimum backoff tim
      *
-     * @param minBackoff
-     * @return
+     * @param minBackoff                the minimum backoff time
+     * @return {@code this}
      */
     N setMinBackoff(Duration minBackoff) {
         if (currentBackoff == this.minBackoff) {
@@ -189,18 +195,19 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
-     * Get the maximum backoff
-     * @return
+     * Get the maximum backoff time
+     *
+     * @return                          the maximum backoff time
      */
     Duration getMaxBackoff() {
         return maxBackoff;
     }
 
     /**
-     * Set the minimum backoff
+     * Set the maximum backoff time
      *
-     * @param maxBackoff
-     * @return
+     * @param maxBackoff                the max backoff time
+     * @return {@code this}
      */
     N setMaxBackoff(Duration maxBackoff) {
         this.maxBackoff = ManagedNode.this.maxBackoff;
@@ -211,7 +218,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
 
     /**
      * Get the number of times this node has received a bad gRPC status
-     * @return
+     *
+     * @return                          the count of bad grpc status
      */
     long getBadGrpcStatusCount() {
         return badGrpcStatusCount;
@@ -229,7 +237,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * Healthy means the node has either not received any bad gRPC statuses, or if it has received bad gRPC status then
      * the node backed off for a period of time.
      *
-     * @return
+     * @return                          is the node healthy
      */
     boolean isHealthy() {
         return readmitTime.toEpochMilli() < Instant.now().toEpochMilli();
@@ -259,7 +267,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Get the amount of time the node has to wait until it's healthy again
      *
-     * @return
+     * @return                          remaining back off time
      */
     long getRemainingTimeForBackoff() {
         return readmitTime.toEpochMilli() - System.currentTimeMillis();
@@ -268,7 +276,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Create TLS credentials when transport security is enabled
      *
-     * @return
+     * @return                          the channel credentials
      */
     ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.create();
@@ -285,7 +293,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Get the gRPC channel for this node
      *
-     * @return
+     * @return                          the channel
      */
     synchronized ManagedChannel getChannel() {
         inUse();
@@ -362,8 +370,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Close the current nodes channel
      *
-     * @param timeout
-     * @throws InterruptedException
+     * @param timeout                   the timeout value
+     * @throws InterruptedException     thrown when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized void close(Duration timeout) throws InterruptedException {
         if (channel != null) {
@@ -376,8 +384,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Compares one node to another.  If node a < node b, use of node a will be prioritized over node b.
      *
-     * @param node
-     * @return
+     * @param node                      node to compare
+     * @return                          which comparison to use
      */
     @Override
     public int compareTo(ManagedNode<N, KeyT> node) {

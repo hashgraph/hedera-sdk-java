@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * A list of nodes and their metadata.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook”>Hedera Documentation</a>
  */
 public class NodeAddressBook {
     List<NodeAddress> nodeAddresses = Collections.emptyList();

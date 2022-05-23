@@ -29,7 +29,7 @@ import java.math.BigInteger;
 /**
  * A storage slot change description.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange”>Hedera Documentation</a>
  */
 public class StorageChange {
     /**

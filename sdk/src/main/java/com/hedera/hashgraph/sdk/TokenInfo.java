@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Gets information about a fungible or non-fungible token instance.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/get-token-info}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/get-token-info”>Hedera Documentation</a>
  */
 public class TokenInfo {
     /**

@@ -45,7 +45,7 @@ import java.util.Objects;
  * only the expiry may be updated. Setting any other field, in that case,
  * will cause the transaction status to resolve to TOKEN_IS_IMMUTABlE.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token”>Hedera Documentation</a>
  */
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     /**

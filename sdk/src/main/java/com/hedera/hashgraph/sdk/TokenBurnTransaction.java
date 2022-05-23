@@ -40,7 +40,7 @@ import java.util.Objects;
  * If no Supply Key is defined, the transaction will resolve to
  * TOKEN_HAS_NO_SUPPLY_KEY.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
  */
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     /**
@@ -122,7 +122,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      * provide an amount of 10000. In order to burn 100.55 tokens, one must
      * provide an amount of 10055.
      *
-     * {@link https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token}
+     * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
      *
      * @param amount                    the amount of tokens to burn
      * @return {@code this}

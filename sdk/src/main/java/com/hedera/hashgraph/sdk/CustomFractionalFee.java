@@ -27,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Custom fractional fee utility class.
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee”>Hedera Documentation</a>
  */
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0;
@@ -188,7 +188,7 @@ public class CustomFractionalFee extends CustomFee {
      * the token custom fees and gets the remaining token balance.
      *     INCLUSIVE(false)
      *     EXCLUSIVE(true)
-     * {@link https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee}
+     * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee”>Hedera Documentation</a>
      *
      * @param assessmentMethod          inclusive / exclusive
      * @return {@code this}

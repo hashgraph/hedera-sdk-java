@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  *
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo”>Hedera Documentation</a>
  */
 public class TokenNftInfo {
     /**

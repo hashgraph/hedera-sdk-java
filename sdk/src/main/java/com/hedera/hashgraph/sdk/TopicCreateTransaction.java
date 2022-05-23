@@ -41,8 +41,8 @@ import java.util.Objects;
  * <p>
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service}
- * {@link https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service”>Hedera Documentation</a>
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic”>Hedera Documentation</a>
  */
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     /**

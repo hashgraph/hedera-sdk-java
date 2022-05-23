@@ -46,7 +46,7 @@ import java.util.Map;
  * of hbars between the sending accounts and receiving accounts must equal
  * zero.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency”>Hedera Documentation</a>
  */
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();

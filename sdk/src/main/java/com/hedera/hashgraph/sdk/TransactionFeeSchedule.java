@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * The fees for a specific transaction or query based on the fee data.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule”>Hedera Documentation</a>
  */
 public class TransactionFeeSchedule {
     private RequestType requestType;

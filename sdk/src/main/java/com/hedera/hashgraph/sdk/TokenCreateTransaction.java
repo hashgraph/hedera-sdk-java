@@ -47,7 +47,7 @@ import java.util.Objects;
  * For non-fungible tokens, the token ID represents a NFT class. Once the token
  * is created, you will have to mint each NFT using the token mint operation.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token”>Hedera Documentation</a>
  */
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private List<CustomFee> customFees = new ArrayList<>();

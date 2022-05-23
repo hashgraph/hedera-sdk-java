@@ -29,7 +29,8 @@ import java.util.Objects;
 
 /**
  * An approved allowance of hbar transfers for a spender.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance”>Hedera Documentation</a>
  */
 public class HbarAllowance {
     @Nullable

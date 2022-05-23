@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * This transaction must be signed by the token's KYC Key.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/enable-kyc-account-flag-1}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/enable-kyc-account-flag-1”>Hedera Documentation</a>
  */
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {
     @Nullable

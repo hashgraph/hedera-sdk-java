@@ -28,7 +28,8 @@ import javax.annotation.Nullable;
 
 /**
  * Current information for a file, including its size.
- * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info”>Hedera Documentation</a>
  */
 public final class FileInfo {
     /**

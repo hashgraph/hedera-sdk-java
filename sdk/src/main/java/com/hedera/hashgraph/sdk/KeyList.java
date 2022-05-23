@@ -33,7 +33,8 @@ import java.util.Objects;
 /**
  * A list of keys that are required to sign in unison, with an optional threshold controlling how many keys of
  * the list are required.
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/key}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/key”>Hedera Documentation</a>
  */
 public final class KeyList extends Key implements Collection<Key> {
     /**

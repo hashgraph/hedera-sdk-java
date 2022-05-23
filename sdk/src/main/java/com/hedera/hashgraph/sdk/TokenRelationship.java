@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 /**
  * Token's information related to the given Account.
  *
- * {@link https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenrelationship}
+ * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenrelationship”>Hedera Documentation</a>
  */
 public class TokenRelationship {
     /**

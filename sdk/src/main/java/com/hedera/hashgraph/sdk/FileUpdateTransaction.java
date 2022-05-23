@@ -38,7 +38,8 @@ import java.util.Objects;
 
 /**
  * Updates a file by submitting the transaction.
- * {@link https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file}
+ *
+ * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file”>Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 

@@ -37,7 +37,7 @@ import java.util.Objects;
  * token's pause key is required to sign the transaction. Once the unpause
  * transaction is submitted the token pause status is updated to unpause.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/unpause-a-token}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/unpause-a-token”>Hedera Documentation</a>
  */
 public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction>{
     @Nullable

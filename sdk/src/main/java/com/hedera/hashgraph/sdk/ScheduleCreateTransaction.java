@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a create transaction.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction”>Hedera Documentation</a>
  */
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     @Nullable

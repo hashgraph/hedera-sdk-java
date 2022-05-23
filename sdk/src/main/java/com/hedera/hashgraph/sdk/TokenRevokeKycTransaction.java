@@ -37,7 +37,7 @@ import java.util.Objects;
  * not set, you can submit a TokenUpdateTransaction to provide the token
  * with this key.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/disable-kyc-account-flag}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/disable-kyc-account-flag”>Hedera Documentation</a>
  */
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
     /**

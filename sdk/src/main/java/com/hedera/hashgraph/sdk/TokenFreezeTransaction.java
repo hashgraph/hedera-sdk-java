@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * The transaction must be signed by the token's Freeze Key.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account}
+ *  * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account”>Hedera Documentation</a>
  */
 public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenFreezeTransaction> {
     @Nullable

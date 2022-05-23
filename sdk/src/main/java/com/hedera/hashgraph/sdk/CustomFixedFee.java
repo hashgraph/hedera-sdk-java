@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * Custom fixed fee utility class.
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee”>Hedera Documentation</a>
  */
 public class CustomFixedFee extends CustomFee {
     private long amount = 0;

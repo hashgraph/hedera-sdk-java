@@ -41,7 +41,7 @@ import java.util.Objects;
  * do not have a fee schedule key set for the token, you will not be able to
  * update the fee schedule.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule”>Hedera Documentation</a>
  */
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     @Nullable

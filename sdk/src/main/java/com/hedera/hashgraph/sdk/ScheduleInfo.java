@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * A query that returns information about the current state of a schedule
  * transaction on a Hedera network.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
  */
 public final class ScheduleInfo {
     /**

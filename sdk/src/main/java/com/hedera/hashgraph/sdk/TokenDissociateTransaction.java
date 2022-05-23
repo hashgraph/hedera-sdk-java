@@ -40,7 +40,7 @@ import java.util.Objects;
  * account. AccountBalanceQuery and AccountInfoQuery will not return anything
  * related to the token that was disassociated.
  *
- * {@link https://docs.hedera.com/guides/docs/sdks/tokens/dissociate-tokens-from-an-account}
+ * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/dissociate-tokens-from-an-account”>Hedera Documentation</a>
  */
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     @Nullable
