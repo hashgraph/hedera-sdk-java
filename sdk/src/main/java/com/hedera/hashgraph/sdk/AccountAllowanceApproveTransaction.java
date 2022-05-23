@@ -57,7 +57,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
      * Constructor.
      *
      * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
-     * @throws InvalidProtocolBufferException
      */
     AccountAllowanceApproveTransaction(
         LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs
@@ -99,6 +98,10 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
+     *
+     * @param spenderAccountId          the spender account id
+     * @param amount                    the amount of hbar
+     * @return                          an account allowance approve transaction
      */
     @Deprecated
     public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
@@ -129,6 +132,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #getHbarApprovals()} instead
+     *
+     * @return                          list of hbar allowance records
      */
     @Deprecated
     public List<HbarAllowance> getHbarAllowances() {
@@ -144,6 +149,11 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     *
+     * @param tokenId                   the token id
+     * @param spenderAccountId          the spenders account id
+     * @param amount                    the hbar amount
+     * @return                          an account allowance approve transaction
      */
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenAllowance(
@@ -184,6 +194,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #getTokenApprovals()} instead
+     *
+     * @return                          a list of token allowances
      */
     @Deprecated
     public List<TokenAllowance> getTokenAllowances() {
@@ -259,6 +271,10 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #approveTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     *
+     * @param nftId                     the nft id
+     * @param spenderAccountId          the spender's account id
+     * @return {@code this}
      */
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
@@ -269,6 +285,10 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #approveTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} instead
+     *
+     * @param tokenId                   the token id
+     * @param spenderAccountId          the spender's account id
+     * @return {@code this}
      */
     @Deprecated
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
@@ -331,6 +351,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
 
     /**
      * @deprecated - Use {@link #getTokenNftApprovals()} instead
+     *
+     * @return {@code this}
      */
     @Deprecated
     public List<TokenNftAllowance> getTokenNftAllowances() {
