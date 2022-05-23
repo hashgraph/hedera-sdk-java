@@ -54,7 +54,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
      * Constructor.
      *
      * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

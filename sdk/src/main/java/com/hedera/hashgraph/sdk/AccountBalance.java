@@ -78,7 +78,7 @@ public class AccountBalance {
      *
      * @param data                      the byte array
      * @return                          the converted account balance object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AccountBalance fromBytes(byte[] data) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetAccountBalanceResponse.parseFrom(data));
