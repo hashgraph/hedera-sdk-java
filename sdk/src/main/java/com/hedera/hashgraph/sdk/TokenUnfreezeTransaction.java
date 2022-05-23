@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * The transaction must be signed by the token's Freeze Key.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/unfreeze-an-account”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/unfreeze-an-account”>Hedera Documentation</a>
  */
 public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeTransaction> {
     @Nullable
@@ -55,7 +55,7 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
@@ -73,6 +73,8 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id
      */
     @Nullable
@@ -94,6 +96,8 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -131,8 +135,8 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenUnfreezeAccountTransactionBody}}
+     * @return {@code @link
+     *         com.hedera.hashgraph.sdk.proto.TokenUnfreezeAccountTransactionBody}
      */
     TokenUnfreezeAccountTransactionBody.Builder build() {
         var builder = TokenUnfreezeAccountTransactionBody.newBuilder();

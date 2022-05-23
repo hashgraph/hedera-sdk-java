@@ -189,7 +189,7 @@ public final class ContractInfo {
      *
      * @param bytes                     the byte array
      * @return                          the extracted contract
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ContractInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder().build());

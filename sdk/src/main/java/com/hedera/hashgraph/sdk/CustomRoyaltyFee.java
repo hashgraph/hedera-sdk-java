@@ -27,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Custom royalty fee utility class.
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee”>Hedera Documentation</a>
  */
 public class CustomRoyaltyFee extends CustomFee {
     private long numerator = 0;

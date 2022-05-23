@@ -40,7 +40,7 @@ import java.util.Objects;
  * treasury account. This transaction must be signed by the token's Wipe Key.
  * Wiping an account's tokens burns the tokens and decreases the total supply.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/wipe-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/wipe-a-token”>Hedera Documentation</a>
  */
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
     /**
@@ -78,7 +78,7 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenWipeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

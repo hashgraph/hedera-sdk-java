@@ -41,7 +41,7 @@ import java.util.Objects;
  * do not have a fee schedule key set for the token, you will not be able to
  * update the fee schedule.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule”>Hedera Documentation</a>
  */
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     @Nullable
@@ -59,7 +59,7 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenFeeScheduleUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

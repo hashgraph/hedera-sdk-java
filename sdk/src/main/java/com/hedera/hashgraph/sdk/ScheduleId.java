@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * The entity ID of a schedule transaction.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id”>Hedera Documentation</a>
  */
 public final class ScheduleId implements Comparable<ScheduleId> {
     /**
@@ -116,7 +116,7 @@ public final class ScheduleId implements Comparable<ScheduleId> {
      *
      * @param bytes                     the byte array
      * @return                          the new schedule id
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ScheduleId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ScheduleID.parseFrom(bytes).toBuilder().build());

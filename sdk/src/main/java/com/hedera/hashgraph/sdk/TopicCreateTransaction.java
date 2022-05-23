@@ -41,8 +41,8 @@ import java.util.Objects;
  * <p>
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service”>Hedera Documentation</a>
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic”>Hedera Documentation</a>
  */
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     /**
@@ -105,7 +105,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TopicCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

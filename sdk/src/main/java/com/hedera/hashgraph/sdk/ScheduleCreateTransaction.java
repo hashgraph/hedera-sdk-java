@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a create transaction.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction”>Hedera Documentation</a>
  */
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     @Nullable
@@ -57,7 +57,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

@@ -129,7 +129,7 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var txCount = txs.keySet().size();
@@ -202,7 +202,7 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @param bytes                     the byte array
      * @return                          the new transaction
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         var txs = new LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
@@ -393,7 +393,7 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @param scheduled                 the scheduled transaction
      * @return                          the new transaction
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()

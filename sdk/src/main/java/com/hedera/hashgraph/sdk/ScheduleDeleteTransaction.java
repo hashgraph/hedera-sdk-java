@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a delete` transaction.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction”>Hedera Documentation</a>
  */
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
 
@@ -53,7 +53,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     ScheduleDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

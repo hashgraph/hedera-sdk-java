@@ -36,7 +36,7 @@ import java.util.Objects;
  *
  * The transaction must be signed by the token's Freeze Key.
  *
- *  * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account”>Hedera Documentation</a>
  */
 public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenFreezeTransaction> {
     @Nullable
@@ -55,7 +55,7 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenFreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

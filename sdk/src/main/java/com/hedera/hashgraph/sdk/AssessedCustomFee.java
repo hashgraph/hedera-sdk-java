@@ -73,7 +73,7 @@ public class AssessedCustomFee {
      *
      * @param bytes                     the byte array
      * @return                          the converted assessed custom fee object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AssessedCustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee.parseFrom(bytes).toBuilder().build());

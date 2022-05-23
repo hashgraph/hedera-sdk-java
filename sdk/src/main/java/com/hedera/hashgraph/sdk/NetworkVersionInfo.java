@@ -65,7 +65,7 @@ public class NetworkVersionInfo {
      *
      * @param bytes                     the byte array
      * @return                          the new network version object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static NetworkVersionInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NetworkGetVersionInfoResponse.parseFrom(bytes));

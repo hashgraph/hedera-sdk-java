@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * A list of nodes and their metadata.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook”>Hedera Documentation</a>
  */
 public class NodeAddressBook {
     List<NodeAddress> nodeAddresses = Collections.emptyList();
@@ -80,7 +80,7 @@ public class NodeAddressBook {
      *
      * @param bytes                     the byte string
      * @return                          the new node address book
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.NodeAddressBook.parseFrom(bytes));

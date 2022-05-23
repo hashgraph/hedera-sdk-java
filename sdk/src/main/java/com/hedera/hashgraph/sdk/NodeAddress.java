@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * The metadata for a Node – including IP Address, and the crypto account associated with the Node.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddress”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddress”>Hedera Documentation</a>
  */
 public class NodeAddress {
     /**

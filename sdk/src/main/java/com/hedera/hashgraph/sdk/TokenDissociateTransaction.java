@@ -40,7 +40,7 @@ import java.util.Objects;
  * account. AccountBalanceQuery and AccountInfoQuery will not return anything
  * related to the token that was disassociated.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/dissociate-tokens-from-an-account”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/dissociate-tokens-from-an-account”>Hedera Documentation</a>
  */
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     @Nullable
@@ -59,7 +59,7 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenDissociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

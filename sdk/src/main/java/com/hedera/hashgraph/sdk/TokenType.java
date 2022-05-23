@@ -27,7 +27,7 @@ package com.hedera.hashgraph.sdk;
  * important when considering how tokens can be traced and if they can have
  * isolated and unique properties.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokentype”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokentype”>Hedera Documentation</a>
  */
 public enum TokenType {
     /**

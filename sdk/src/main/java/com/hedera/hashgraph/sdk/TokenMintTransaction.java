@@ -42,7 +42,7 @@ import java.util.Objects;
  * metadata for the class of NFTs defined by the token ID. The Supply
  * Key must sign the transaction.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token”>Hedera Documentation</a>
  */
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable
@@ -80,7 +80,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenMintTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

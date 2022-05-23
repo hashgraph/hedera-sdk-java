@@ -78,6 +78,8 @@ class ManagedNodeAddress {
     }
 
     /**
+     * Extract the name.
+     *
      * @return                          the name
      */
     public String getName() {
@@ -85,13 +87,17 @@ class ManagedNodeAddress {
     }
 
     /**
-      * @return                         the address
+     * Extract the address.
+     *
+     * @return                          the address
      */
     public String getAddress() {
         return address;
     }
 
     /**
+     * Extract the port.
+     *
      * @return                          the port
      */
     public int getPort() {
@@ -99,6 +105,8 @@ class ManagedNodeAddress {
     }
 
     /**
+     * Are we in process?
+     *
      * @return                          are we in process
      */
     public boolean isInProcess() {
@@ -106,6 +114,8 @@ class ManagedNodeAddress {
     }
 
     /**
+     * Are we secure?
+     *
      * @return                          are we secure
      */
     public boolean isTransportSecurity() {
@@ -113,6 +123,8 @@ class ManagedNodeAddress {
     }
 
     /**
+     * Create a new insecure managed node.
+     *
      * @return                          the insecure managed node address
      */
     public ManagedNodeAddress toInsecure() {
@@ -130,6 +142,8 @@ class ManagedNodeAddress {
     }
 
     /**
+     * Create a new managed node.
+     *
      * @return                          the secure managed node address
      */
     public ManagedNodeAddress toSecure() {

@@ -144,7 +144,7 @@ public final class TopicInfo {
      *
      * @param bytes                     the byte array
      * @return                          the new topic info object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TopicInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());

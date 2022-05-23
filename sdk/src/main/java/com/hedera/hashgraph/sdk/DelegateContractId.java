@@ -97,7 +97,7 @@ public final class DelegateContractId extends ContractId {
      *
      * @param bytes                     the byte array
      * @return                          the delegate contract id object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static DelegateContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());

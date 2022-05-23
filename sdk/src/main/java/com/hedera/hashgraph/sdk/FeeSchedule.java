@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * The fee schedule for a specific hedera functionality and the time period this fee schedule will expire.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule”>Hedera Documentation</a>
  */
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
@@ -66,7 +66,7 @@ public class FeeSchedule {
      *
      * @param bytes                     the bye array
      * @return                          the fee schedule
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static FeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeSchedule.parseFrom(bytes).toBuilder().build());

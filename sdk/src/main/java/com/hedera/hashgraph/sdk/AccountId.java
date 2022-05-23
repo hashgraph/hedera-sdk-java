@@ -176,7 +176,7 @@ public final class AccountId implements Comparable<AccountId> {
      *
      * @param bytes                     a byte array representation of the protobuf
      * @return                          the account id object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AccountId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(AccountID.parseFrom(bytes).toBuilder().build());

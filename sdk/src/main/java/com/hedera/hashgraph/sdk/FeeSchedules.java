@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 /**
  * This contains two Fee Schedules with expiry timestamp.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule”>Hedera Documentation</a>
  */
 public class FeeSchedules {
     @Nullable
@@ -60,7 +60,7 @@ public class FeeSchedules {
      *
      * @param bytes                     the byte array
      * @return                          the fee schedules object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static FeeSchedules fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CurrentAndNextFeeSchedule.parseFrom(bytes).toBuilder().build());

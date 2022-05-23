@@ -139,7 +139,7 @@ public class TokenNftAllowance {
      *
      * @param bytes                     the byte array
      * @return                          the nft token allowance
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenNftAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));

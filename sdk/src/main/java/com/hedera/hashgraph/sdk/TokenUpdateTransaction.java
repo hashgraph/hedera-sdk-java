@@ -45,7 +45,7 @@ import java.util.Objects;
  * only the expiry may be updated. Setting any other field, in that case,
  * will cause the transaction status to resolve to TOKEN_IS_IMMUTABlE.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token”>Hedera Documentation</a>
  */
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     /**
@@ -158,7 +158,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

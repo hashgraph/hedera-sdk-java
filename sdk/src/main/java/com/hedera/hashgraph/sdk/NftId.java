@@ -84,7 +84,7 @@ public class NftId implements Comparable<NftId> {
      *
      * @param bytes                     the byte array
      * @return                          the new nft id
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftID.parseFrom(bytes).toBuilder().build());

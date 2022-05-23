@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Constructs a TokenId.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/token-id”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/token-id”>Hedera Documentation</a>
  */
 public class TokenId implements Comparable<TokenId> {
     /**
@@ -116,7 +116,7 @@ public class TokenId implements Comparable<TokenId> {
      *
      * @param bytes                     the byte array
      * @return                          the new token id
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenID.parseFrom(bytes).toBuilder().build());

@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
  * (so it won't). To learn the consensus result, the client should later
  * obtain a receipt (free), or can buy a more detailed record (not free).
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse”>Hedera Documentation</a>
  */
 public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
     public final AccountId nodeId;

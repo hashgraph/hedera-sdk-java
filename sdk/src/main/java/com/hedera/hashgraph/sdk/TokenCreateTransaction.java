@@ -47,7 +47,7 @@ import java.util.Objects;
  * For non-fungible tokens, the token ID represents a NFT class. Once the token
  * is created, you will have to mint each NFT using the token mint operation.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token”>Hedera Documentation</a>
  */
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private List<CustomFee> customFees = new ArrayList<>();
@@ -197,7 +197,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

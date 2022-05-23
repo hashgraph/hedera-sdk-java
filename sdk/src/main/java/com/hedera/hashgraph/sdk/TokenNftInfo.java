@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  *
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo”>Hedera Documentation</a>
  */
 public class TokenNftInfo {
     /**
@@ -102,7 +102,7 @@ public class TokenNftInfo {
      *
      * @param bytes                     the byte array
      * @return                          the new token nft info
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenNftInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenGetNftInfoResponse.parseFrom(bytes).toBuilder().build().getNft());

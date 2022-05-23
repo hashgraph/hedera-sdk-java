@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * The fees for a specific transaction or query based on the fee data.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule”>Hedera Documentation</a>
  */
 public class TransactionFeeSchedule {
     private RequestType requestType;
@@ -68,7 +68,7 @@ public class TransactionFeeSchedule {
      *
      * @param bytes                     the byte array
      * @return                          the new transaction fee schedule
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TransactionFeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.parseFrom(bytes).toBuilder().build());

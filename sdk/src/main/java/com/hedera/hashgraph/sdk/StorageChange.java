@@ -29,7 +29,7 @@ import java.math.BigInteger;
 /**
  * A storage slot change description.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange”>Hedera Documentation</a>
  */
 public class StorageChange {
     /**
@@ -87,7 +87,7 @@ public class StorageChange {
      *
      * @param bytes                     the byte array
      * @return                          the new storage charge object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static StorageChange fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.StorageChange.parseFrom(bytes));

@@ -59,8 +59,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
-     */    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
+    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         initFromTransactionBody();
@@ -70,7 +71,8 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      * Constructor.
      *
      * @param txBody protobuf TransactionBody
-     */   FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+     */
+    FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }

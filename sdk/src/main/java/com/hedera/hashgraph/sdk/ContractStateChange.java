@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * The storage changes to a smart contract's storage as a side effect of the function call.
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#contractstatechange”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#contractstatechange”>Hedera Documentation</a>
  */
 public class ContractStateChange {
     public final ContractId contractId;
@@ -62,7 +62,7 @@ public class ContractStateChange {
      *
      * @param bytes                     the byte array
      * @return                          the contract stage change object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ContractStateChange fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractStateChange.parseFrom(bytes));

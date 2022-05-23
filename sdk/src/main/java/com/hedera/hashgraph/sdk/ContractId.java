@@ -152,7 +152,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
      *
      * @param bytes                     the byte array
      * @return                          the converted contract id object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());

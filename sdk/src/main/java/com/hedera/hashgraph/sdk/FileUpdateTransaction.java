@@ -39,7 +39,7 @@ import java.util.Objects;
 /**
  * Updates a file by submitting the transaction.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file”>Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 
@@ -64,8 +64,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
-     */    FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
+    FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -74,7 +75,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * Constructor.
      *
      * @param txBody protobuf TransactionBody
-     */    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+     */
+    FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }

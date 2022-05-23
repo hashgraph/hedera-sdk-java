@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * Creates a file with the content by submitting the transaction.
  *
- * See <a “https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera”>Hedera Documentation</a>
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 
@@ -62,8 +62,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
-     */   FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
+    FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -72,7 +73,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * Constructor.
      *
      * @param txBody protobuf TransactionBody
-     */   FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+     */
+    FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }

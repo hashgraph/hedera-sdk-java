@@ -125,7 +125,7 @@ public final class TopicId implements Comparable<TopicId> {
      *
      * @param bytes                     the byte array
      * @return                          the new topic id
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());

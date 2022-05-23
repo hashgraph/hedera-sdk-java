@@ -39,7 +39,7 @@ import java.util.Objects;
  * the file or require network consensus. The information is returned from a
  * single node processing the query.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents”>Hedera Documentation</a>
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
 

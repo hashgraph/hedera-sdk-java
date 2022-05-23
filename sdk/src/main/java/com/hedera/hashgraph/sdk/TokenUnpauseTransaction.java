@@ -37,7 +37,7 @@ import java.util.Objects;
  * token's pause key is required to sign the transaction. Once the unpause
  * transaction is submitted the token pause status is updated to unpause.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/unpause-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/unpause-a-token”>Hedera Documentation</a>
  */
 public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction>{
     @Nullable
@@ -54,7 +54,7 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenUnpauseTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

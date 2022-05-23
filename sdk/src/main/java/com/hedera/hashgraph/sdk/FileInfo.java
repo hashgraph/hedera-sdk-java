@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 /**
  * Current information for a file, including its size.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info”>Hedera Documentation</a>
  */
 public final class FileInfo {
     /**
@@ -111,7 +111,7 @@ public final class FileInfo {
      *
      * @param bytes                     the byte array
      * @return                          the new file info object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException   when there is an issue with the protobuf
      */
     public static FileInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());

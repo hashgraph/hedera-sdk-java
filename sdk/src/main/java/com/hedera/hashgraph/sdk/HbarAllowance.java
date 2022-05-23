@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * An approved allowance of hbar transfers for a spender.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance”>Hedera Documentation</a>
  */
 public class HbarAllowance {
     @Nullable
@@ -85,7 +85,7 @@ public class HbarAllowance {
      *
      * @param bytes                     the byte array
      * @return                          the new hbar allowance
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static HbarAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoAllowance.parseFrom(Objects.requireNonNull(bytes)));

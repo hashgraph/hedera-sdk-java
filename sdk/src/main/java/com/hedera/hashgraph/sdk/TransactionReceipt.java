@@ -237,7 +237,7 @@ public final class TransactionReceipt {
      *
      * @param bytes                     the byte array
      * @return                          the new transaction receipt
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());

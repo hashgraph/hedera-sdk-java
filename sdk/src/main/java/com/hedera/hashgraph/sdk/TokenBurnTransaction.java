@@ -40,7 +40,7 @@ import java.util.Objects;
  * If no Supply Key is defined, the transaction will resolve to
  * TOKEN_HAS_NO_SUPPLY_KEY.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
  */
 public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenBurnTransaction> {
     /**
@@ -68,7 +68,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenBurnTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
@@ -122,7 +122,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      * provide an amount of 10000. In order to burn 100.55 tokens, one must
      * provide an amount of 10055.
      *
-     * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
+     * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token”>Hedera Documentation</a>
      *
      * @param amount                    the amount of tokens to burn
      * @return {@code this}

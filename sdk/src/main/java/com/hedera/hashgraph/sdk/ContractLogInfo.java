@@ -88,7 +88,7 @@ public final class ContractLogInfo {
      *
      * @param bytes                     the byte array
      * @return                          the contract log info object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractLoginfo.parseFrom(bytes));

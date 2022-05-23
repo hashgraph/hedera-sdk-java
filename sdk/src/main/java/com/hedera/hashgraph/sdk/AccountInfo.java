@@ -260,7 +260,7 @@ public final class AccountInfo {
      *
      * @param bytes                     a byte array representing the protobuf
      * @return
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());

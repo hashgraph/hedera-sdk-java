@@ -263,7 +263,7 @@ public final class TransactionRecord {
      *
      * @param bytes                     the byte array
      * @return                          the new transaction record
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());

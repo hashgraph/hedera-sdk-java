@@ -27,7 +27,7 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 /**
  * A common base for the signing authority or key that entities in Hedera may have.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/key”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key”>Hedera Documentation</a>
  * @see KeyList
  * @see PublicKey
  */

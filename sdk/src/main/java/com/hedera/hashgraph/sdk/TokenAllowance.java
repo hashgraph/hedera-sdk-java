@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * An approved allowance of token transfers for a spender.
  *
- * See <a “https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance”>Hedera Documentation</a>
  */
 public class TokenAllowance {
     /**
@@ -107,7 +107,7 @@ public class TokenAllowance {
      *
      * @param bytes                     the byte array
      * @return                          the new token allowance
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance.parseFrom(Objects.requireNonNull(bytes)));

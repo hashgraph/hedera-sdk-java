@@ -37,7 +37,7 @@ import java.util.Objects;
  * not set, you can submit a TokenUpdateTransaction to provide the token
  * with this key.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/disable-kyc-account-flag”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/disable-kyc-account-flag”>Hedera Documentation</a>
  */
 public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenRevokeKycTransaction> {
     /**
@@ -62,7 +62,7 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenRevokeKycTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

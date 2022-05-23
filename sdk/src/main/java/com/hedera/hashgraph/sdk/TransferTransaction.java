@@ -46,7 +46,7 @@ import java.util.Map;
  * of hbars between the sending accounts and receiving accounts must equal
  * zero.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency”>Hedera Documentation</a>
  */
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
@@ -141,7 +141,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

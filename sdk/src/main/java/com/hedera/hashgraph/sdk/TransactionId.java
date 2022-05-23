@@ -152,7 +152,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
      *
      * @param bytes                     the byte array
      * @return                          the new transaction id
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());

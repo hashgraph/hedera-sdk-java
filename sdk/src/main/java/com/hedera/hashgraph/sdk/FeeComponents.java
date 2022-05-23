@@ -103,7 +103,7 @@ public class FeeComponents {
      *
      * @param bytes                     the byte array
      * @return                          the fee component object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static FeeComponents fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.FeeComponents.parseFrom(bytes).toBuilder().build());

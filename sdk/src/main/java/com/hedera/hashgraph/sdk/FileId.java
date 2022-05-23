@@ -112,7 +112,7 @@ public final class FileId implements Comparable<FileId> {
      *
      * @param bytes                     the byte array representation of a file id
      * @return                          the file id object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());

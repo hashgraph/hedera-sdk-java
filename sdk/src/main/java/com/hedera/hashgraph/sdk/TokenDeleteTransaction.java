@@ -40,7 +40,7 @@ import java.util.Objects;
  * unfreeze, grant kyc, revoke kyc and token transfer transactions will
  * resolve to TOKEN_WAS_DELETED.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/tokens/delete-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/delete-a-token”>Hedera Documentation</a>
  */
 public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDeleteTransaction> {
     @Nullable
@@ -57,7 +57,7 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
      *
      * @param txs Compound list of transaction id's list of (AccountId, Transaction)
      *            records
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     TokenDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);

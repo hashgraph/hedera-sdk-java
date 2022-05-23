@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * A query that returns information about the current state of a schedule
  * transaction on a Hedera network.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
  */
 public final class ScheduleInfo {
     /**
@@ -169,7 +169,7 @@ public final class ScheduleInfo {
      *
      * @param bytes                     the byte array
      * @return                          the new schedule info object
-     * @throws InvalidProtocolBufferException
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ScheduleGetInfoResponse.parseFrom(bytes).toBuilder().build());

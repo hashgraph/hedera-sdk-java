@@ -35,7 +35,7 @@ import java.util.Objects;
  * A query that returns information about the current state of a schedule
  * transaction on a Hedera network.
  *
- * See <a “https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
  */
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     @Nullable
