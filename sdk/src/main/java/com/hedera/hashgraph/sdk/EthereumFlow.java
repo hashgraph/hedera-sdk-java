@@ -8,6 +8,11 @@ import java.util.concurrent.TimeoutException;
 import javax.annotation.Nullable;
 
 public class EthereumFlow implements WithExecute<TransactionResponse> {
+    /**
+     * 5KiB in Bytes
+     * Indicates when we should splice out the call data from an ethereum transaction data
+     */
+    static int MAX_ETHEREUM_DATA_SIZE = 5120;
     @Nullable
     private EthereumTransactionData ethereumData;
 
@@ -93,7 +98,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
             ethereumTransaction.setMaxGasAllowanceHbar(maxGasAllowance);
         }
 
-        if (ethereumDataBytes.length <= 5120) {
+        if (ethereumDataBytes.length <= MAX_ETHEREUM_DATA_SIZE) {
             ethereumTransaction.setEthereumData(ethereumDataBytes);
         } else {
             var callDataFileId = createFile(ethereumData.callData, client);
@@ -117,7 +122,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
             ethereumTransaction.setMaxGasAllowanceHbar(maxGasAllowance);
         }
 
-        if (ethereumDataBytes.length <= 5120) {
+        if (ethereumDataBytes.length <= MAX_ETHEREUM_DATA_SIZE) {
             return ethereumTransaction.setEthereumData(ethereumDataBytes).executeAsync(client);
         } else {
             return createFileAsync(ethereumData.callData, client)
