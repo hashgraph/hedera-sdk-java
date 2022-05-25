@@ -196,6 +196,8 @@ public final class ContractInfo {
     }
 
     /**
+     * Build the protobuf.
+     *
      * @return                          the protobuf representation
      */
     ContractGetInfoResponse.ContractInfo toProtobuf() {
@@ -236,6 +238,8 @@ public final class ContractInfo {
     }
 
     /**
+     * Create a byte array representation.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

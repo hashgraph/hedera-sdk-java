@@ -95,6 +95,8 @@ public final class ContractLogInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.ContractLoginfo toProtobuf() {
@@ -110,6 +112,8 @@ public final class ContractLogInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

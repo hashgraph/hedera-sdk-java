@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
  * A query that returns information about the current state of a schedule
  * transaction on a Hedera network.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info">Hedera Documentation</a>
  */
 public final class ScheduleInfo {
     /**
@@ -176,6 +176,8 @@ public final class ScheduleInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
@@ -213,6 +215,8 @@ public final class ScheduleInfo {
     }
 
     /**
+     * Extract the transaction.
+     *
      * @return                          the transaction
      */
     public Transaction<?> getScheduledTransaction() {
@@ -237,6 +241,8 @@ public final class ScheduleInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

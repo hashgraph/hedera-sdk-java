@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Constructs a TokenId.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/token-id”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/token-id">Hedera Documentation</a>
  */
 public class TokenId implements Comparable<TokenId> {
     /**
@@ -143,6 +143,8 @@ public class TokenId implements Comparable<TokenId> {
     }
 
     /**
+     * Extract the solidity address as a string.
+     *
       * @return                         the solidity address as a string
      */
     public String toSolidityAddress() {
@@ -150,6 +152,8 @@ public class TokenId implements Comparable<TokenId> {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          a protobuf representation
      */
     TokenID toProtobuf() {
@@ -174,13 +178,15 @@ public class TokenId implements Comparable<TokenId> {
      * Validate the configured client.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
     /**
+     * Extract the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable
@@ -189,6 +195,8 @@ public class TokenId implements Comparable<TokenId> {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

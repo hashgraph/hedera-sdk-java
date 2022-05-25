@@ -87,6 +87,8 @@ abstract public class CustomFee {
     }
 
     /**
+     * Extract the fee collector account id.
+     *
      * @return                          the fee collector account id
      */
     @Nullable
@@ -104,6 +106,8 @@ abstract public class CustomFee {
     }
 
     /**
+     * Create a deep clone.
+     *
      * @return                          the correct cloned fee type
      */
     CustomFee deepClone() {
@@ -120,7 +124,7 @@ abstract public class CustomFee {
      * Verify the validity of the client object.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (feeCollectorAccountId != null) {
@@ -142,11 +146,15 @@ abstract public class CustomFee {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                              the protobuf for the custom fee object
      */
     abstract com.hedera.hashgraph.sdk.proto.CustomFee toProtobuf();
 
     /**
+     * Create the byte array.
+     *
      * @return                              the byte array representing the protobuf
      */
     public byte[] toBytes() {

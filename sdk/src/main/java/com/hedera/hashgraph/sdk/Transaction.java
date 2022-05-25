@@ -647,6 +647,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the scheduled transaction.
+     *
      * @return                          the scheduled transaction
      */
     public ScheduleCreateTransaction schedule() {
@@ -683,6 +685,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the valid transaction duration.
+     *
      * @return                          the transaction valid duration
      */
     @Nullable
@@ -707,6 +711,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the maximum transaction fee.
+     *
      * @return                          the maximum transaction fee
      */
     @Nullable
@@ -729,6 +735,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the default maximum transaction fee.
+     *
      * @return                          the default maximum transaction fee
      */
     public final Hbar getDefaultMaxTransactionFee() {
@@ -736,6 +744,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the memo for the transaction.
+     *
      * @return                          the memo for the transaction
      */
     public final String getTransactionMemo() {
@@ -758,6 +768,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract a byte array representation.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {
@@ -777,6 +789,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract a byte array of the transaction hash.
+     *
      * @return                          the transaction hash
      */
     public byte[] getTransactionHash() {
@@ -795,6 +809,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the list of account id and hash records.
+     *
      * @return                          the list of account id and hash records
      */
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
@@ -819,6 +835,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract the transaction id.
+     *
      * @return                          the transaction id
      */
     public final TransactionId getTransactionId() {
@@ -852,6 +870,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Should the transaction id be regenerated.
+     *
      * @return                          should the transaction id be regenerated
      */
     public final Boolean getRegenerateTransactionId() {
@@ -989,6 +1009,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Extract list of account id and public keys.
+     *
      * @return                          the list of account id and public keys
      */
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
@@ -1002,6 +1024,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * Check if transaction is frozen.
+     *
      * @return                          is the transaction frozen
      */
     protected boolean isFrozen() {
@@ -1110,6 +1134,8 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     /**
+     * There must be at least one chunk.
+     *
      * @return                          there is 1 required chunk
      */
     int getRequiredChunks() {
@@ -1253,7 +1279,7 @@ public abstract class Transaction<T extends Transaction<T>>
     abstract void onFreeze(TransactionBody.Builder bodyBuilder);
 
     /**
-     * Called in {@link #schedule()} when convertin transaction into a scheduled version.
+     * Called in {@link #schedule()} when converting transaction into a scheduled version.
      */
     abstract void onScheduled(SchedulableTransactionBody.Builder scheduled);
 

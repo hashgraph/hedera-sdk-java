@@ -41,6 +41,8 @@ final class ThreadLocalSecureRandom {
     }
 
     /**
+     * Extract seme randomness.
+     *
      * @return                          some randomness
      */
     static SecureRandom current() {

@@ -259,7 +259,7 @@ public final class AccountInfo {
      * Retrieve the account info from a protobuf byte array.
      *
      * @param bytes                     a byte array representing the protobuf
-     * @return
+     * @return                          the account info object
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
@@ -308,9 +308,6 @@ public final class AccountInfo {
         return accountInfoBuilder.build();
     }
 
-    /**
-     * @return                          string representation
-     */
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -337,6 +334,8 @@ public final class AccountInfo {
     }
 
     /**
+     * Extract a byte array representation.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {

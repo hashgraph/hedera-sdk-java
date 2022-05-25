@@ -20,7 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 /**
- * Custom exception thrown by the entity helper validate method when the account id & checksum are invalid.
+ * Custom exception thrown by the entity helper validate method when the account id and checksum are invalid.
  */
 public class BadEntityIdException extends Exception {
     public final long shard;

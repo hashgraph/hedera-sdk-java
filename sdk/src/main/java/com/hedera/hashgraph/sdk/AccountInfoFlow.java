@@ -55,8 +55,8 @@ public class AccountInfoFlow {
      * @param message                   the message
      * @param signature                 the signature
      * @return                          is the signature valid
-     * @throws PrecheckStatusException
-     * @throws TimeoutException
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
      */
     public static boolean verifySignature(
         Client client,
@@ -74,8 +74,8 @@ public class AccountInfoFlow {
      * @param accountId                 the account id
      * @param transaction               the signed transaction
      * @return                          is the transaction signature valid
-     * @throws PrecheckStatusException
-     * @throws TimeoutException
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
      */
     public static boolean verifyTransactionSignature(
         Client client,
@@ -93,8 +93,8 @@ public class AccountInfoFlow {
      * @param message                   the message
      * @param signature                 the signature
      * @return                          is the signature valid
-     * @throws PrecheckStatusException
-     * @throws TimeoutException
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
      */
     public static CompletableFuture<Boolean> verifySignatureAsync(
         Client client,
@@ -112,8 +112,8 @@ public class AccountInfoFlow {
      * @param accountId                 the account id
      * @param transaction               the signed transaction
      * @return                          is the signature valid
-     * @throws PrecheckStatusException
-     * @throws TimeoutException
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
      */
     public static CompletableFuture<Boolean> verifyTransactionSignatureAsync(
         Client client,

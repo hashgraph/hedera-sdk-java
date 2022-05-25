@@ -45,6 +45,8 @@ public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     }
 
     /**
+     * Extract the topic id.
+     *
      * @return                          the topic id
      */
     @Nullable

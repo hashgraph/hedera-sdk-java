@@ -79,6 +79,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     /**
+     * Extract the data.
+     *
      * @return                          the data
      */
     ByteString getData() {
@@ -192,6 +194,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     /**
+     * Extract the list of transaction hashes.
+     *
      * @return                          the list of transaction hashes
      */
     public final List<Map<AccountId, byte[]>> getAllTransactionHashesPerNode() {
@@ -241,6 +245,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     /**
+     * Extract the list of all signers.
+     *
      * @return                          the list of all signatures
      */
     public List<Map<AccountId, Map<PublicKey, byte[]>>> getAllSignatures() {
@@ -431,6 +437,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     abstract void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);
 
     /**
+     * Should the receipt be retrieved?
+     *
      * @return                          by default do not get a receipt
      */
     boolean shouldGetReceipt() {

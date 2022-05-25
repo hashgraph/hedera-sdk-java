@@ -27,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Custom fractional fee utility class.
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee">Hedera Documentation</a>
  */
 public class CustomFractionalFee extends CustomFee {
     private long numerator = 0;
@@ -101,6 +101,8 @@ public class CustomFractionalFee extends CustomFee {
     }
 
     /**
+     * Extract the numerator.
+     *
      * @return                          the numerator
      */
     public long getNumerator() {
@@ -119,6 +121,8 @@ public class CustomFractionalFee extends CustomFee {
     }
 
     /**
+     * Extract the denominator.
+     *
      * @return                          the denominator
      */
     public long getDenominator() {
@@ -137,6 +141,8 @@ public class CustomFractionalFee extends CustomFee {
     }
 
     /**
+     * Extract the minimum fee amount.
+     *
      * @return                          the minimum fee amount
      */
     public long getMin() {
@@ -155,6 +161,8 @@ public class CustomFractionalFee extends CustomFee {
     }
 
     /**
+     * Extract the fee amount.
+     *
      * @return                          the fee amount
      */
     public long getMax() {
@@ -165,7 +173,7 @@ public class CustomFractionalFee extends CustomFee {
      * Assign the maximum fee amount.
      *
      * @param max                       the fee amount
-     * @return
+     * @return {@code this}
      */
     public CustomFractionalFee setMax(long max) {
         this.max = max;
@@ -173,6 +181,8 @@ public class CustomFractionalFee extends CustomFee {
     }
 
     /**
+     * Extract the assessment method inclusive / exclusive.
+     *
      * @return                          the assessment method inclusive / exclusive
      */
     public FeeAssessmentMethod getAssessmentMethod() {
@@ -188,7 +198,7 @@ public class CustomFractionalFee extends CustomFee {
      * the token custom fees and gets the remaining token balance.
      *     INCLUSIVE(false)
      *     EXCLUSIVE(true)
-     * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee”>Hedera Documentation</a>
+     * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee">Hedera Documentation</a>
      *
      * @param assessmentMethod          inclusive / exclusive
      * @return {@code this}

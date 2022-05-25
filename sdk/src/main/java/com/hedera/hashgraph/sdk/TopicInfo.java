@@ -151,6 +151,8 @@ public final class TopicInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     ConsensusGetTopicInfoResponse toProtobuf() {
@@ -197,6 +199,8 @@ public final class TopicInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

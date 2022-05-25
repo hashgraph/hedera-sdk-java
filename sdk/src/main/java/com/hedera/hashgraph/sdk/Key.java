@@ -27,7 +27,7 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 /**
  * A common base for the signing authority or key that entities in Hedera may have.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key">Hedera Documentation</a>
  * @see KeyList
  * @see PublicKey
  */
@@ -81,6 +81,8 @@ public abstract class Key {
     abstract com.hedera.hashgraph.sdk.proto.Key toProtobufKey();
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

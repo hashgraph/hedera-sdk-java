@@ -22,7 +22,7 @@ package com.hedera.hashgraph.sdk;
 /**
  * Common units of hbar; for the most part they follow SI prefix conventions.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/hbars#hbar-units”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/hbars#hbar-units">Hedera Documentation</a>
  */
 public enum HbarUnit {
     /**

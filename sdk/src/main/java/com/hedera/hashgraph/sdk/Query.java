@@ -144,8 +144,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      *
      * @param client                    the configured client
      * @return                          the cost in hbar
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public Hbar getCost(Client client) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
@@ -160,6 +160,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     /**
+     * Does this query require a payment?
+     *
      * @return                          does this query require a payment
      */
     boolean isPaymentRequired() {
@@ -184,6 +186,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     abstract QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request);
 
     /**
+     * Crate the new Query.
+     *
      * @return                          the new Query
      */
     private Query<Hbar, QueryCostQuery> getCostExecutable() {
@@ -337,6 +341,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     /**
+     * Extract the transaction id.
+     *
      * @return                          the transaction id
      */
     @Nullable

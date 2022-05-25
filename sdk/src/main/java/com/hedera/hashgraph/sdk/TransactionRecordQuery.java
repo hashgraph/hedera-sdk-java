@@ -54,6 +54,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     /**
+     * Extract the transaction id.
+     *
      * @return                          the transaction id
      */
     @Nullable
@@ -75,6 +77,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     /**
+     * Should duplicates be included?
+     *
      * @return                          should duplicates be included
      */
     public boolean getIncludeDuplicates() {
@@ -97,6 +101,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     /**
+     * Extract the children be included.
+     *
      * @return                          should children be included
      */
     public boolean getIncludeChildren() {

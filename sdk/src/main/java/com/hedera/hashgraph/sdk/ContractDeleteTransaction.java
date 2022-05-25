@@ -72,6 +72,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable
@@ -93,6 +95,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     /**
+     * Extract the transfer account id.
+     *
      * @return                          the account id that will receive the remaining hbars
      */
     @Nullable
@@ -116,6 +120,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     /**
+     * Extract the transfer contract id.
+     *
      * @return                          the contract id that will receive the remaining hbars
      */
     @Nullable
@@ -142,7 +148,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
      * Validates tha the contract id, transfer contract id and the transfer account id are valid.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
@@ -182,6 +188,8 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     }
 
     /**
+     * Build the transaction body.
+     *
      * @return {@code {@link ContractDeleteTransactionBody}}
      */
     ContractDeleteTransactionBody.Builder build() {

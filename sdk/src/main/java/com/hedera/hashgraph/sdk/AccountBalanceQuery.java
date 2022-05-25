@@ -72,6 +72,8 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable

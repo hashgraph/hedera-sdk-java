@@ -55,9 +55,10 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the hex-encoded bytecode of the contract.
+     *
      * @return the hex-encoded bytecode of the contract.
      */
-
     public String getBytecode() {
         return bytecode;
     }
@@ -65,7 +66,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     /**
      * Sets the bytecode of the contract in hex.
      *
-     * @param bytecode
+     * @param bytecode                  the string to assign
      * @return {@code this}
      */
     public ContractCreateFlow setBytecode(String bytecode) {
@@ -77,8 +78,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     /**
      * Sets the bytecode of the contract in raw bytes.
      *
-     * @param bytecode
-     * @return
+     * @param bytecode                  the byte array
+     * @return {@code this}
      */
     public ContractCreateFlow setBytecode(byte[] bytecode) {
         Objects.requireNonNull(bytecode);
@@ -89,8 +90,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     /**
      * Sets the bytecode of the contract in raw bytes.
      *
-     * @param bytecode
-     * @return
+     * @param bytecode                  the byte string
+     * @return                          the contract in raw bytes
      */
     public ContractCreateFlow setBytecode(ByteString bytecode) {
         Objects.requireNonNull(bytecode);
@@ -98,6 +99,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -122,6 +125,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the gas.
+     *
      * @return                          the gas
      */
     public long getGas() {
@@ -140,6 +145,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the initial balance in hbar.
+     *
      * @return                          the initial balance in hbar
      */
     public Hbar getInitialBalance() {
@@ -160,6 +167,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the proxy account id.
+     *
      * @return                          the proxy account id
      */
     @Nullable
@@ -186,6 +195,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -206,6 +217,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the byte string representation.
+     *
      * @return                          the byte string representation
      */
     public ByteString getConstructorParameters() {
@@ -238,6 +251,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the contract memo.
+     *
      * @return                          the contract memo
      */
     public String getContractMemo() {
@@ -257,6 +272,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Extract the list of node account id's.
+     *
      * @return                          the list of node account id's
      */
     @Nullable
@@ -336,6 +353,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * Create a new transaction receipt query.
+     *
      * @param response                  the transaction response
      * @return                          the receipt query
      */
@@ -350,8 +369,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      *
      * @param client                    the client with the transaction to execute
      * @return                          the response
-     * @throws PrecheckStatusException
-     * @throws TimeoutException
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
      */
     @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {

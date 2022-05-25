@@ -89,6 +89,8 @@ class Node extends ManagedNode<Node, AccountId> {
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     AccountId getAccountId() {
@@ -96,6 +98,8 @@ class Node extends ManagedNode<Node, AccountId> {
     }
 
     /**
+     * Extract the address book.
+     *
      * @return                          the address book
      */
     NodeAddress getAddressBook() {
@@ -114,6 +118,8 @@ class Node extends ManagedNode<Node, AccountId> {
     }
 
     /**
+     * Are the certificates being verified?
+     *
      * @return                          are the certificates being verified
      */
     boolean isVerifyCertificates() {

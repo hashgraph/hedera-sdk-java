@@ -65,7 +65,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      *
      * @param executor                  the executor service
      * @param network                   the network records
-     * @return
+     * @return                          the new network
      */
     static Network forNetwork(ExecutorService executor, Map<String, AccountId> network) {
         return new Network(executor, network);
@@ -282,6 +282,8 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     /**
+     * Are certificates being verified?
+     *
      * @return                          are certificates being verified
      */
     boolean isVerifyCertificates() {
@@ -343,6 +345,8 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     /**
+     * Extract the of network records.
+     *
      * @return                          list of network records
      */
     Map<String, AccountId> getNetwork() {
@@ -388,6 +392,8 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
     }
 
     /**
+     * Extract the number of nodes for each request.
+     *
      * @return                          the number of nodes for each request
      */
     int getNumberOfNodesForRequest() {

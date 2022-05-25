@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
  * (so it won't). To learn the consensus result, the client should later
  * obtain a receipt (free), or can buy a more detailed record (not free).
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse">Hedera Documentation</a>
  */
 public final class TransactionResponse implements WithGetReceipt, WithGetRecord {
     public final AccountId nodeId;
@@ -71,9 +71,9 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
      *
      * @param client                    the configured client
      * @return                          the new transaction receipt
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
-     * @throws ReceiptStatusException
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = new TransactionReceiptQuery()
@@ -101,9 +101,9 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
      *
      * @param client                    the configured client
      * @return                          the new transaction record
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
-     * @throws ReceiptStatusException
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);

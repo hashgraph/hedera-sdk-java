@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
 
 /**
  * Custom fixed fee utility class.
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee">Hedera Documentation</a>
  */
 public class CustomFixedFee extends CustomFee {
     private long amount = 0;
@@ -97,6 +97,8 @@ public class CustomFixedFee extends CustomFee {
     }
 
     /**
+     * Extract the amount.
+     *
      * @return                          the amount of the fee in tiny bar
      */
     public long getAmount() {
@@ -115,6 +117,8 @@ public class CustomFixedFee extends CustomFee {
     }
 
     /**
+     * Extract the fee amount.
+     *
      * @return                          the fee amount in hbar
      */
     public Hbar getHbarAmount() {
@@ -134,6 +138,8 @@ public class CustomFixedFee extends CustomFee {
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id object
      */
     @Nullable

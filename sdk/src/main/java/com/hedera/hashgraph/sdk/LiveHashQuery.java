@@ -45,6 +45,8 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -65,6 +67,8 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     }
 
     /**
+     * Extract the hash.
+     *
      * @return                          the hash
      */
     public ByteString getHash() {

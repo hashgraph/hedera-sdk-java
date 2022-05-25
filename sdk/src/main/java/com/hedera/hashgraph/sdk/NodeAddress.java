@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * The metadata for a Node – including IP Address, and the crypto account associated with the Node.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddress”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddress">Hedera Documentation</a>
  */
 public class NodeAddress {
     /**
@@ -112,6 +112,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the public key.
+     *
      * @return                          the public key
      */
     @Nullable
@@ -131,6 +133,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -150,6 +154,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the node id.
+     *
       * @return                         the node id
      */
     public long getNodeId() {
@@ -168,6 +174,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the certificate hash.
+     *
      * @return                          the certificate hash
      */
     @Nullable
@@ -187,6 +195,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the list of addresses.
+     *
      * @return                          the list of addresses
      */
     public List<Endpoint> getAddresses() {
@@ -205,6 +215,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the description.
+     *
      * @return                          the description
      */
     @Nullable
@@ -224,6 +236,8 @@ public class NodeAddress {
     }
 
     /**
+     * Extract the tiny stake.
+     *
      * @return                          the tiny stake
      */
     public long getStake() {
@@ -234,7 +248,7 @@ public class NodeAddress {
      * Assign the tiny bar stake.
      *
      * @param stake                     the tiny bar stake
-     * @return
+     * @return {@code this}
      */
     public NodeAddress setStake(long stake) {
         this.stake = stake;

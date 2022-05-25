@@ -82,6 +82,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable
@@ -105,6 +107,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable
@@ -128,6 +132,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable

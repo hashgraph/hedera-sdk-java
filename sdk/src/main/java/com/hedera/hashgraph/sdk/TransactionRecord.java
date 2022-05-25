@@ -270,6 +270,8 @@ public final class TransactionRecord {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TransactionRecord toProtobuf() {
@@ -367,6 +369,8 @@ public final class TransactionRecord {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

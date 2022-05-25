@@ -141,6 +141,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
+     * Extract the list of hbar allowances.
+     *
      * @return                          array list of hbar allowances
      */
     public List<HbarAllowance> getHbarApprovals() {
@@ -203,6 +205,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
+     * Extract a list of token allowance approvals.
+     *
      * @return                          array list of token approvals.
      */
     public List<TokenAllowance> getTokenApprovals() {
@@ -210,6 +214,8 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
+     * Extract the owner as a string.
+     *
      * @param ownerAccountId            owner's account id
      * @return                          a string representation of the account id
      *                                  or FEE_PAYER
@@ -372,9 +378,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return retval;
     }
 
-    /**
-     * @return {@code {@link CryptoServiceGrpc}}
-     */
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return CryptoServiceGrpc.getApproveAllowancesMethod();

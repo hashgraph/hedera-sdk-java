@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  *
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo">Hedera Documentation</a>
  */
 public class TokenNftInfo {
     /**
@@ -109,6 +109,8 @@ public class TokenNftInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     TokenGetNftInfoResponse toProtobuf() {
@@ -134,6 +136,8 @@ public class TokenNftInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

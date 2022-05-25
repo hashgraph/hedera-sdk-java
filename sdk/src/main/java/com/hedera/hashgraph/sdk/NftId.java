@@ -91,6 +91,8 @@ public class NftId implements Comparable<NftId> {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          a protobuf representation
      */
     NftID toProtobuf() {
@@ -101,6 +103,8 @@ public class NftId implements Comparable<NftId> {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {

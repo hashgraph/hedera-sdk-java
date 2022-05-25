@@ -100,6 +100,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -121,6 +123,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the key.
+     *
      * @return                          the key
      */
     @Nullable
@@ -167,6 +171,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the proxy account id.
+     *
      * @return                          the proxy account id
      */
     @Nullable
@@ -196,6 +202,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable
@@ -218,6 +226,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -242,6 +252,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Is the receiver required to sign?
+     *
      * @return                          is the receiver required to sign
      */
     @Nullable
@@ -263,6 +275,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the maximum automatic token associations.
+     *
      * @return                          the max automatic token associations
      */
     @Nullable
@@ -271,7 +285,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
-     * Grant an amount of tokens.   // TODO: need to verify I think I'm wrong
+     * Grant an amount of tokens.
+     *
      * @param amount                    the amount of tokens
      * @return                          {@code this}
      */
@@ -282,6 +297,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Extract the account memo.
+     *
      * @return                          the account memo
      */
     @Nullable
@@ -303,6 +320,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Erase the memo field.
+     *
      * @return {@code this}
      */
     public AccountUpdateTransaction clearMemo() {
@@ -320,6 +339,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
             proxyAccountId.validateChecksum(client);
         }
     }
+
     /**
      * Initialize from the transaction body.
      */
@@ -358,6 +378,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * Create the builder.
+     *
      * @return                          the transaction builder
      */
     CryptoUpdateTransactionBody.Builder build() {

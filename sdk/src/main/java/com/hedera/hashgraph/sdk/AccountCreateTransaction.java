@@ -74,6 +74,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the key.
+     *
      * @return                          the creating account's key
      */
     @Nullable
@@ -98,6 +100,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the amount in hbar.
+     *
      * @return                          the initial balance for the new account
      */
     public Hbar getInitialBalance() {
@@ -118,6 +122,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Is the receiver required to sign?
+     *
      * @return                          is the receiver required to sign
      */
     public boolean getReceiverSignatureRequired() {
@@ -140,6 +146,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the proxy account id.
+     *
      * @return                          the proxy account id
      */
     @Nullable
@@ -161,6 +169,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the duration for the auto renew period.
+     *
      * @return                          the duration for auto-renew
      */
     @Nullable
@@ -188,6 +198,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the maximum automatic token associations.
+     *
      * @return                          the max automatic token associations
      */
     public int getMaxAutomaticTokenAssociations() {
@@ -195,7 +207,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * Grant an amount of tokens.   // TODO: need to verify I think I'm wrong
+     * Grant an amount of tokens.
+     *
      * @param amount                    the amount of tokens
      * @return                          {@code this}
      */
@@ -206,6 +219,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * Extract the account memo.
+     *
      * @return                          the account memo
      */
     public String getAccountMemo() {

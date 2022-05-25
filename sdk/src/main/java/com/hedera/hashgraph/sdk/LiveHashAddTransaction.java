@@ -67,6 +67,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -88,6 +90,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     /**
+     * Extract the hash.
+     *
      * @return                          the hash
      */
     public ByteString getHash() {
@@ -119,6 +123,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     /**
+     * Extract the key / key list.
+     *
      * @return                          the key / key list
      */
     @Nullable
@@ -142,6 +148,8 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     }
 
     /**
+     * Extract the duration.
+     *
      * @return                          the duration
      */
     @Nullable

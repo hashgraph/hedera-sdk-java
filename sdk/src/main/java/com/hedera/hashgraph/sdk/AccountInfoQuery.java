@@ -46,6 +46,8 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable

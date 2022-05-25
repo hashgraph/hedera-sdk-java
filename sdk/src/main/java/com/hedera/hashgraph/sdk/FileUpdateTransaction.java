@@ -39,7 +39,7 @@ import java.util.Objects;
 /**
  * Updates a file by submitting the transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file">Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 
@@ -82,6 +82,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable
@@ -125,6 +127,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable
@@ -149,6 +153,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * Extract the files contents as a byte string.
+     *
      * @return                          the files contents as a byte string
      */
     public ByteString getContents() {
@@ -212,6 +218,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * Extract the file's memo up to 100 bytes.
+     *
      * @return                          the file's memo up to 100 bytes
      */
     @Nullable

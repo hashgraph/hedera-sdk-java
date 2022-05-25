@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 /**
  * Current information for a file, including its size.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info">Hedera Documentation</a>
  */
 public final class FileInfo {
     /**
@@ -118,6 +118,8 @@ public final class FileInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     FileGetInfoResponse.FileInfo toProtobuf() {
@@ -156,6 +158,8 @@ public final class FileInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

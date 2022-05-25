@@ -46,6 +46,8 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable

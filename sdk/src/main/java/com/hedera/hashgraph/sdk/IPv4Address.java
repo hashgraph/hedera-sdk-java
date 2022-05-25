@@ -64,6 +64,8 @@ public class IPv4Address {
     }
 
     /**
+     * Extract the network portion of the address.
+     *
      * @return                          the network portion of the address
      */
     @Nullable
@@ -83,6 +85,8 @@ public class IPv4Address {
     }
 
     /**
+     * Extract the host portion of the address.
+     *
      * @return                          the host portion of the address
      */
     @Nullable
@@ -102,6 +106,8 @@ public class IPv4Address {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     ByteString toProtobuf() {
@@ -109,6 +115,8 @@ public class IPv4Address {
     }
 
     /**
+     * Extract the string representation.
+     *
      * @return                          the string representation
      */
     @Override

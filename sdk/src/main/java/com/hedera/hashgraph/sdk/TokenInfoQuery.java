@@ -45,6 +45,8 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id
      */
     @Nullable

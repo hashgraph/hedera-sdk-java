@@ -140,6 +140,8 @@ public final class FileId implements Comparable<FileId> {
     }
 
     /**
+     * Extract the string representation of file id.
+     *
      * @return                          the string representation of file id
      */
     public String toSolidityAddress() {
@@ -171,13 +173,15 @@ public final class FileId implements Comparable<FileId> {
      * Validate that the client is configured correctly.
      *
      * @param client                    the client to validate
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
     /**
+     * Extract the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable
@@ -186,6 +190,8 @@ public final class FileId implements Comparable<FileId> {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          byte array representation
      */
     public byte[] toBytes() {

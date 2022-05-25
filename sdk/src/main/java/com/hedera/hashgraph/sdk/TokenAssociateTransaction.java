@@ -71,6 +71,8 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -92,6 +94,8 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     }
 
     /**
+     * Extract the list of token id's.
+     *
      * @return                          the list of token id's
      */
     public List<TokenId> getTokenIds() {

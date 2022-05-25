@@ -97,6 +97,8 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     NftTransfer toProtobuf() {

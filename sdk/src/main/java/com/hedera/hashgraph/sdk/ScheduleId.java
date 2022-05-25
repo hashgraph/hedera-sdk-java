@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * The entity ID of a schedule transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/schedule-id">Hedera Documentation</a>
  */
 public final class ScheduleId implements Comparable<ScheduleId> {
     /**
@@ -123,6 +123,8 @@ public final class ScheduleId implements Comparable<ScheduleId> {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representing the schedule id
      */
     ScheduleID toProtobuf() {
@@ -147,13 +149,15 @@ public final class ScheduleId implements Comparable<ScheduleId> {
      * Validate the configured client.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
     /**
+     * Extract the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable
@@ -162,6 +166,8 @@ public final class ScheduleId implements Comparable<ScheduleId> {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          byte array representation
      */
     public byte[] toBytes() {

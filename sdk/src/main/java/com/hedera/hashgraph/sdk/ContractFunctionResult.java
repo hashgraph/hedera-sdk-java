@@ -75,6 +75,11 @@ public final class ContractFunctionResult {
 
     private final ByteString rawResult;
 
+    /**
+     * Constructor.
+     *
+     * @param inner                     the protobuf
+     */
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
 
@@ -362,6 +367,11 @@ public final class ContractFunctionResult {
         return rawResult.substring(startIndex, endIndex);
     }
 
+    /**
+     * Create the protobuf representation.
+     *
+     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ContractFunctionResult}}
+     */
     com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProtobuf() {
         var contractFunctionResult = com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
             .setContractID(contractId.toProtobuf())

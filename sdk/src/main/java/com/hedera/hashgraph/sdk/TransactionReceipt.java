@@ -244,6 +244,8 @@ public final class TransactionReceipt {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TransactionReceipt toProtobuf() {
@@ -325,6 +327,8 @@ public final class TransactionReceipt {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

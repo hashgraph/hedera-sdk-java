@@ -46,7 +46,7 @@ import java.util.Map;
  * of hbars between the sending accounts and receiving accounts must equal
  * zero.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency">Hedera Documentation</a>
  */
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
@@ -159,6 +159,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     /**
+     * Extract the list of token id decimals.
+     *
      * @return                          the list of token id decimals
      */
     public Map<TokenId, Integer> getTokenIdDecimals() {
@@ -172,6 +174,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     /**
+     * Extract the list of token transfer records.
+     *
      * @return                          the list of token transfer records
      */
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
@@ -324,6 +328,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     /**
+     * Extract the of token nft transfers.
+     *
      * @return                          list of token nft transfers
      */
     public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
@@ -387,6 +393,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     /**
+     * Extract the of hbar transfers.
+     *
      * @return                          list of hbar transfers
      */
     public Map<AccountId, Hbar> getHbarTransfers() {

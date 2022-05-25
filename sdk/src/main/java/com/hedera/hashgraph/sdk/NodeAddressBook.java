@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * A list of nodes and their metadata.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook">Hedera Documentation</a>
  */
 public class NodeAddressBook {
     List<NodeAddress> nodeAddresses = Collections.emptyList();
@@ -42,6 +42,8 @@ public class NodeAddressBook {
     }
 
     /**
+     * Extract the of node addresses.
+     *
      * @return                          list of node addresses
      */
     public List<NodeAddress> getNodeAddresses() {
@@ -87,6 +89,8 @@ public class NodeAddressBook {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.NodeAddressBook toProtobuf() {
@@ -100,6 +104,8 @@ public class NodeAddressBook {
     }
 
     /**
+     * Create the byte string.
+     *
      * @return                          the byte string representation
      */
     public ByteString toBytes() {

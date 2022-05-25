@@ -26,7 +26,7 @@ import javax.annotation.Nullable;
  * all messages for the specified topic or within the defined start and end
  * time.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/consensus/get-topic-message”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/consensus/get-topic-message">Hedera Documentation</a>
  */
 public final class SubscriptionHandle {
     @Nullable

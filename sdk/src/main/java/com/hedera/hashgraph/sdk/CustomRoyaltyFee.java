@@ -27,7 +27,7 @@ import java.util.Objects;
 
 /**
  * Custom royalty fee utility class.
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee">Hedera Documentation</a>
  */
 public class CustomRoyaltyFee extends CustomFee {
     private long numerator = 0;
@@ -76,8 +76,8 @@ public class CustomRoyaltyFee extends CustomFee {
     /**
      * Create a royalty fee from a custom fee protobuf.
      *
-     * @param customFee                  the custom fee protobuf
-     * @return
+     * @param customFee                 the custom fee protobuf
+     * @return                          the custom fee
      */
     static CustomRoyaltyFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         var returnFee = fromProtobuf(customFee.getRoyaltyFee());
@@ -99,6 +99,8 @@ public class CustomRoyaltyFee extends CustomFee {
     }
 
     /**
+     * Extract the numerator.
+     *
      * @return                          the numerator
      */
     public long getNumerator() {
@@ -117,6 +119,8 @@ public class CustomRoyaltyFee extends CustomFee {
     }
 
     /**
+     * Extract the denominator.
+     *
      * @return                          the denominator
      */
     public long getDenominator() {

@@ -78,6 +78,8 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable
@@ -99,6 +101,8 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     /**
+     * Extract the byte string representing the file.
+     *
      * @return                          the byte string representing the file
      */
     @Nullable

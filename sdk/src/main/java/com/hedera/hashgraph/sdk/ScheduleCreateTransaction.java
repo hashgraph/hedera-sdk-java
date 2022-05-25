@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a create transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction">Hedera Documentation</a>
  */
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     @Nullable
@@ -65,6 +65,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     /**
+     * Extract the payer account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -115,6 +117,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -135,6 +139,8 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     }
 
     /**
+     * Extract the schedule's memo.
+     *
      * @return                          the schedule's memo
      */
     public String getScheduleMemo() {

@@ -75,7 +75,7 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
      *
      * @param accountId                 the account id
      * @param validStart                the valid start time
-     * @return
+     * @return                          the new transaction id
      */
     public static TransactionId withValidStart(AccountId accountId, Instant validStart) {
         return new TransactionId(accountId, validStart);
@@ -159,6 +159,8 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
+     * Extract the scheduled status.
+     *
      * @return                          the scheduled status
      */
     public boolean getScheduled() {
@@ -177,6 +179,8 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
+     * Extract the nonce.
+     *
      * @return                          the nonce value
      */
     @Nullable
@@ -200,9 +204,9 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
      *
      * @param client                    the configured client
      * @return                          the receipt
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
-     * @throws ReceiptStatusException
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = new TransactionReceiptQuery()
@@ -236,9 +240,9 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
      *
      * @param client                    the configured client
      * @return                          the new receipt
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
-     * @throws ReceiptStatusException
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);
@@ -258,6 +262,8 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
+     * Extract the transaction id protobuf.
+     *
      * @return                          the protobuf representation
      */
     TransactionID toProtobuf() {
@@ -276,9 +282,6 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         return id.build();
     }
 
-    /**
-     * @return                          the string representation in postfix notation
-     */
     private String toStringPostfix() {
         Objects.requireNonNull(validStart);
         return "@" + validStart.getEpochSecond() + "." + validStart.getNano() +
@@ -309,6 +312,8 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
+     * Extract the byte array representation.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

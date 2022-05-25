@@ -54,6 +54,8 @@ public final class TransactionReceiptQuery
     }
 
     /**
+     * Extract the transaction id.
+     *
      * @return                          the transaction id
      */
     @Override
@@ -75,6 +77,8 @@ public final class TransactionReceiptQuery
     }
 
     /**
+     * Should the children be included?
+     *
      * @return                          should children be included
      */
     public boolean getIncludeChildren() {
@@ -94,6 +98,8 @@ public final class TransactionReceiptQuery
     }
 
     /**
+     * Should duplicates be included?
+     *
      * @return                          should duplicates be included
      */
     public boolean getIncludeDuplicates() {

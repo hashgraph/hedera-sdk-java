@@ -34,7 +34,7 @@ import java.util.Objects;
  * A list of keys that are required to sign in unison, with an optional threshold controlling how many keys of
  * the list are required.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key">Hedera Documentation</a>
  */
 public final class KeyList extends Key implements Collection<Key> {
     /**
@@ -94,7 +94,7 @@ public final class KeyList extends Key implements Collection<Key> {
      *
      * @param keyList                   the key list
      * @param threshold                 the minimum number of keys that must sign
-     * @return
+     * @return                          the key list
      */
     static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
         var keys = (threshold != null ? new KeyList(threshold) : new KeyList());

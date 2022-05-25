@@ -52,6 +52,8 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable

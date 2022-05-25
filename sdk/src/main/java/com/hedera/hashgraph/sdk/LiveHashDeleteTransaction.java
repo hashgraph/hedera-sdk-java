@@ -60,6 +60,8 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -81,6 +83,8 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     }
 
     /**
+     * Extract the hash.
+     *
      * @return                          the hash
      */
     public ByteString getHash() {

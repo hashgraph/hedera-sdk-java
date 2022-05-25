@@ -73,6 +73,8 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable

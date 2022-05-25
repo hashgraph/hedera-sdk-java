@@ -47,7 +47,7 @@ import java.util.Objects;
  * For non-fungible tokens, the token ID represents a NFT class. Once the token
  * is created, you will have to mint each NFT using the token mint operation.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/define-a-token">Hedera Documentation</a>
  */
 public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> {
     private List<CustomFee> customFees = new ArrayList<>();
@@ -215,6 +215,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the token name.
+     *
      * @return                          the token name
      */
     @Nullable
@@ -236,6 +238,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the token symbol.
+     *
      * @return                          the token symbol
      */
     public String getTokenSymbol() {
@@ -256,6 +260,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the decimals.
+     *
      * @return                          the decimals
      */
     public int getDecimals() {
@@ -277,6 +283,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the initial supply of tokens.
+     *
      * @return                          the initial supply of tokens
      */
     public long getInitialSupply() {
@@ -296,6 +304,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the treasury account id.
+     *
      * @return                          the treasury account id
      */
     @Nullable
@@ -317,6 +327,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -338,6 +350,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the know your customer key.
+     *
      * @return                          the know your customer key
      */
     @Nullable
@@ -358,6 +372,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the freeze key.
+     *
      * @return                          the freeze key
      */
     @Nullable
@@ -379,6 +395,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the wipe key.
+     *
      * @return                          the wipe key
      */
     @Nullable
@@ -400,6 +418,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the supply key.
+     *
      * @return                          the supply key
      */
     @Nullable
@@ -421,6 +441,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the fee schedule key.
+     *
      * @return                          the fee schedule key
      */
     @Nullable
@@ -442,6 +464,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the pause key.
+     *
      * @return                          the pause key
      */
     @Nullable
@@ -453,7 +477,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * Assign the pause key.
      *
       * @param key                      the pause key
-     * @return
+     * @return {@code this}
      */
     public TokenCreateTransaction setPauseKey(Key key) {
         requireNotFrozen();
@@ -463,6 +487,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the freeze default.
+     *
      * @return                          the freeze default
      */
     public boolean getFreezeDefault() {
@@ -482,6 +508,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable
@@ -504,6 +532,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the auto renew account id.
+     *
      * @return                          the auto renew account id
      */
     @Nullable
@@ -525,6 +555,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -546,6 +578,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the token's memo 100 bytes max.
+     *
      * @return                          the token's memo 100 bytes max
      */
     public String getTokenMemo() {
@@ -566,6 +600,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the custom fees.
+     *
      * @return                          the custom fees
      */
     @Nullable
@@ -586,6 +622,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the token type.
+     *
      * @return                          the token type
      */
     public TokenType getTokenType() {
@@ -606,6 +644,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the supply type.
+     *
      * @return                          the supply type
      */
     public TokenSupplyType getSupplyType() {
@@ -626,6 +666,8 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the max supply of tokens.
+     *
      * @return                          the max supply of tokens
      */
     public long getMaxSupply() {

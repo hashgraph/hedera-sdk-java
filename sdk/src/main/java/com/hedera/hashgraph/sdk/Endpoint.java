@@ -59,6 +59,8 @@ public class Endpoint {
     }
 
     /**
+     * Extract the ipv4 address.
+     *
      * @return                          the ipv4 address
      */
     @Nullable
@@ -78,6 +80,8 @@ public class Endpoint {
     }
 
     /**
+     * Extract the port number.
+     *
      * @return                          the port number
      */
     public int getPort() {
@@ -96,6 +100,8 @@ public class Endpoint {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     ServiceEndpoint toProtobuf() {

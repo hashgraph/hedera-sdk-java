@@ -109,6 +109,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the topic id.
+     *
      * @return                          the topic id
      */
     @Nullable
@@ -130,6 +132,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the topic memo.
+     *
      * @return                          the topic memo
      */
     @Nullable
@@ -162,6 +166,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -194,6 +200,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the submit key.
+     *
      * @return                          the submit key
      */
     @Nullable
@@ -226,6 +234,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -247,6 +257,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Extract the auto renew account id.
+     *
      * @return                          the auto renew account id
      */
     @Nullable

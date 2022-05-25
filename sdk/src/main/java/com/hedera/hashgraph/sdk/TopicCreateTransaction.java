@@ -41,8 +41,8 @@ import java.util.Objects;
  * <p>
  * On success, the resulting TransactionReceipt contains the newly created TopicId.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service”>Hedera Documentation</a>
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensus-service">Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/consensus-service/consensuscreatetopic">Hedera Documentation</a>
  */
 public final class TopicCreateTransaction extends Transaction<TopicCreateTransaction> {
     /**
@@ -123,6 +123,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Extract the topic memo.
+     *
      * @return                          the topic memo
      */
     public String getTopicMemo() {
@@ -143,6 +145,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -170,6 +174,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Extract the submit key.
+     *
      * @return                          the submit key
      */
     @Nullable
@@ -194,6 +200,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -219,6 +227,8 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Extract the auto renew account id.
+     *
      * @return                          the auto renew account id
      */
     @Nullable

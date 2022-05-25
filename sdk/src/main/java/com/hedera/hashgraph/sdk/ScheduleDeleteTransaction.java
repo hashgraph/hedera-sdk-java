@@ -34,7 +34,7 @@ import java.util.Objects;
 /**
  * Schedule a delete` transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction">Hedera Documentation</a>
  */
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
 
@@ -71,6 +71,8 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     }
 
     /**
+     * Extract the schedule id.
+     *
      * @return                          the schedule id
      */
     @Nullable

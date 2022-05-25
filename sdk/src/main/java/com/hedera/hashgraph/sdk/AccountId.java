@@ -121,7 +121,7 @@ public final class AccountId implements Comparable<AccountId> {
      *
      * @param id                        a string representing a valid account id
      * @return                          the account id object
-     * @throws                          IllegalArgumentException
+     * @throws IllegalArgumentException when the account id and checksum are invalid
      */
     public static AccountId fromString(String id) {
         try {
@@ -183,6 +183,8 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Extract the solidity address.
+     *
      * @return                          the solidity address as a string
      */
     public String toSolidityAddress() {
@@ -190,6 +192,8 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Extract the account id protobuf.
+     *
      * @return                          the account id builder
      */
     AccountID toProtobuf() {
@@ -218,7 +222,7 @@ public final class AccountId implements Comparable<AccountId> {
      * Verify that the client has a valid checksum.
      *
      * @param client                    the client to verify
-     * @throws                          BadEntityIdException
+     * @throws BadEntityIdException     when the account id and checksum are invalid
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         if (aliasKey == null) {
@@ -227,6 +231,8 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Extract the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable
@@ -235,15 +241,14 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Extract a byte array representation.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
-    /**
-     * @return                          account id or alias key's account id
-     */
     @Override
     public String toString() {
         if (aliasKey != null) {
@@ -254,6 +259,8 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Extract a string representation with the checksum.
+     *
      * @param client                    the client
      * @return                          the account id with checksum
      */

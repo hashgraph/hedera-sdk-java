@@ -40,7 +40,7 @@ import java.util.Objects;
  * treasury account. This transaction must be signed by the token's Wipe Key.
  * Wiping an account's tokens burns the tokens and decreases the total supply.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/wipe-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/wipe-a-token">Hedera Documentation</a>
  */
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
     /**
@@ -96,6 +96,8 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id
      */
     @Nullable
@@ -117,6 +119,8 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -138,6 +142,8 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the amount.
+     *
      * @return                          the amount
      */
     public long getAmount() {
@@ -157,6 +163,8 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the list of serial numbers.
+     *
      * @return                          the list of serial numbers
      */
     public List<Long> getSerials() {

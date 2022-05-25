@@ -69,6 +69,8 @@ public class FeeData {
     }
 
     /**
+     * Extract the node data.
+     *
      * @return                          the node data fee components object
      */
     @Nullable
@@ -88,6 +90,8 @@ public class FeeData {
     }
 
     /**
+     * Extract the network data.
+     *
      * @return                          the network data fee component object
      */
     @Nullable
@@ -107,6 +111,8 @@ public class FeeData {
     }
 
     /**
+     * Extract the service data.
+     *
      * @return                          the service data fee component object
      */
     @Nullable
@@ -126,6 +132,8 @@ public class FeeData {
     }
 
     /**
+     * Extract the fee data type.
+     *
      * @return                          the fee data type
      */
     FeeDataType getType() {
@@ -174,6 +182,8 @@ public class FeeData {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {

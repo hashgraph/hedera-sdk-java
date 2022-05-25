@@ -72,6 +72,8 @@ public class NetworkVersionInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     protected NetworkGetVersionInfoResponse toProtobuf() {
@@ -82,6 +84,8 @@ public class NetworkVersionInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

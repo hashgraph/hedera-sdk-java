@@ -72,6 +72,8 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable
@@ -93,6 +95,8 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     }
 
     /**
+     * Extract the receiving account id.
+     *
      * @return                          the account id that receives the hbar
      */
     @Nullable

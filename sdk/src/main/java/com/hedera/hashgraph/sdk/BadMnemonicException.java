@@ -46,6 +46,8 @@ public class BadMnemonicException extends Exception {
     public final List<Integer> unknownWordIndices;
 
     /**
+     * Constructor.
+     *
      * @param mnemonic                  the mnemonic
      * @param reason                    the reason
      * @param unknownWordIndices        the indices
@@ -57,6 +59,8 @@ public class BadMnemonicException extends Exception {
     }
 
     /**
+     * Constructor.
+     *
      * @param mnemonic                  the mnemonic
      * @param reason                    the reason
      */

@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * An approved allowance of token transfers for a spender.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance">Hedera Documentation</a>
  */
 public class TokenAllowance {
     /**
@@ -117,7 +117,7 @@ public class TokenAllowance {
      * Validate the configured client.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
@@ -132,6 +132,8 @@ public class TokenAllowance {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TokenAllowance toProtobuf() {
@@ -150,6 +152,8 @@ public class TokenAllowance {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the protobuf representation
      */
     GrantedTokenAllowance toGrantedProtobuf() {
@@ -165,6 +169,8 @@ public class TokenAllowance {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

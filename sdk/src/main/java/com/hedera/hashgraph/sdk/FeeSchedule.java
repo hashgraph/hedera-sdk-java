@@ -31,7 +31,7 @@ import java.util.Objects;
 /**
  * The fee schedule for a specific hedera functionality and the time period this fee schedule will expire.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule">Hedera Documentation</a>
  */
 public class FeeSchedule {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
@@ -73,6 +73,8 @@ public class FeeSchedule {
     }
 
     /**
+     * Extract the of transaction fee schedules.
+     *
      * @return                          list of transaction fee schedules
      */
     public List<TransactionFeeSchedule> getTransactionFeeSchedules() {
@@ -83,7 +85,7 @@ public class FeeSchedule {
      * Assign the list of transaction fee schedules.
      *
      * @param transactionFeeSchedules   list of transaction fee schedules
-     * @return
+     * @return {@code this}
      */
     public FeeSchedule setTransactionFeeSchedules(List<TransactionFeeSchedule> transactionFeeSchedules) {
         this.transactionFeeSchedules = Objects.requireNonNull(transactionFeeSchedules);
@@ -102,6 +104,8 @@ public class FeeSchedule {
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable
@@ -113,7 +117,7 @@ public class FeeSchedule {
      * Assign the expiration time.
      *
      * @param expirationTime            the expiration time
-     * @return
+     * @return {@code this}
      */
     public FeeSchedule setExpirationTime(@Nullable Instant expirationTime) {
         this.expirationTime = expirationTime;
@@ -145,6 +149,8 @@ public class FeeSchedule {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {

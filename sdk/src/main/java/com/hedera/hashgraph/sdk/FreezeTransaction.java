@@ -78,6 +78,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     /**
+     * Extract the start time.
+     *
      * @return                          the start time
      */
     public Instant getStartTime() {
@@ -165,6 +167,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable
@@ -186,6 +190,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     /**
+     * Extract the file's hash.
+     *
      * @return                          the file's hash
      */
     public byte[] getFileHash() {
@@ -200,6 +206,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     /**
+     * Extract the freeze type.
+     *
      * @return                          the freeze type
      */
     public FreezeType getFreezeType() {

@@ -78,6 +78,8 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     /**
+     * Extract the topic id.
+     *
      * @return                          the topic id
      */
     @Nullable
@@ -99,6 +101,8 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     }
 
     /**
+     * Extract the message.
+     *
      * @return                          the message
      */
     public ByteString getMessage() {

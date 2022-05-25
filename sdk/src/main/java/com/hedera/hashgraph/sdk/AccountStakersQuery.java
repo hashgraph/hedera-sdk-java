@@ -48,6 +48,8 @@ public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountS
     }
 
     /**
+     * Extract the account id.
+     *
      * @return                          the account id
      */
     @Nullable

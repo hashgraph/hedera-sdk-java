@@ -57,6 +57,8 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * Extract the new ED25519 private key.
+     *
      * @return                          the new ED25519 private key
      */
     public static PrivateKey generateED25519() {
@@ -64,6 +66,8 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * Extract the new ECDSA private key.
+     *
      * @return                          the new ECDSA private key
      */
     public static PrivateKey generateECDSA() {
@@ -379,11 +383,15 @@ public abstract class PrivateKey extends Key {
     public abstract byte[] toBytes();
 
     /**
+     * Extract the byte array encoded as DER.
+     *
      * @return                          the byte array encoded as DER
      */
     public abstract byte[] toBytesDER();
 
     /**
+     * Extract the raw byte array.
+     *
      * @return                          the raw byte array
      */
     public abstract byte[] toBytesRaw();
@@ -394,6 +402,8 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * Extract the DER encoded hex string.
+     *
      * @return                          the DER encoded hex string
      */
     public String toStringDER() {
@@ -401,6 +411,8 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * Extract the raw hex string.
+     *
      * @return                          the raw hex string
      */
     public String toStringRaw() {
@@ -425,11 +437,15 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * Are we an ED25519 key?
+     *
      * @return                          are we an ED25519 key
      */
     public abstract boolean isED25519();
 
     /**
+     * Are we an ECDSA key?
+     *
      * @return                          are we an ECDSA key
      */
     public abstract boolean isECDSA();

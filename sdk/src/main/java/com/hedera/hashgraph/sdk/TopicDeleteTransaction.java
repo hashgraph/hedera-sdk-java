@@ -72,6 +72,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     }
 
     /**
+     * Extract the topic id.
+     *
      * @return                          the topic id
      */
     @Nullable

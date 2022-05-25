@@ -42,7 +42,7 @@ import java.util.Objects;
  * metadata for the class of NFTs defined by the token ID. The Supply
  * Key must sign the transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/mint-a-token">Hedera Documentation</a>
  */
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable
@@ -98,6 +98,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id
      */
     @Nullable
@@ -119,6 +121,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the amount.
+     *
      * @return                          the amount to mint
      */
     public long getAmount() {
@@ -151,6 +155,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     }
 
     /**
+     * Extract the list of metadata byte array records.
+     *
      * @return                          the metadata list
      */
     public List<byte[]> getMetadata() {

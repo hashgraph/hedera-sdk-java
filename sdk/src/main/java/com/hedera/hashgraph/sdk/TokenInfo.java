@@ -35,7 +35,7 @@ import java.util.List;
 /**
  * Gets information about a fungible or non-fungible token instance.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/get-token-info”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/get-token-info">Hedera Documentation</a>
  */
 public class TokenInfo {
     /**
@@ -367,6 +367,8 @@ public class TokenInfo {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     TokenGetInfoResponse toProtobuf() {
@@ -455,6 +457,8 @@ public class TokenInfo {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

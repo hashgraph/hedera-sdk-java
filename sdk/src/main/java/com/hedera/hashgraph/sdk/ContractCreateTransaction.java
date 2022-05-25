@@ -123,6 +123,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id as a byte code
      */
     @Nullable
@@ -149,6 +151,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -174,6 +178,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the gas.
+     *
      * @return                          the gas amount that was set
      */
     public long getGas() {
@@ -193,6 +199,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the initial balance.
+     *
      * @return                          the initial balance in hbar
      */
     public Hbar getInitialBalance() {
@@ -214,6 +222,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the proxy account id.
+     *
      * @return                          the proxy account id
      */
     @Nullable
@@ -241,6 +251,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -262,6 +274,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the constructor parameters.
+     *
      * @return                          the byte string representation
      */
     public ByteString getConstructorParameters() {
@@ -295,6 +309,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Extract the contract memo.
+     *
      * @return                          the contract's memo
      */
     public String getContractMemo() {
@@ -315,6 +331,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Build the transaction body.
+     *
      * @return {@code {@link ContractCreateTransactionBody}}
      */
     ContractCreateTransactionBody.Builder build() {

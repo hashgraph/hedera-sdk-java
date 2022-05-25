@@ -98,6 +98,8 @@ public class LedgerId {
     }
 
     /**
+     * Are we on Mionnet?
+     *
      * @return                          is it mainnet
      */
     public boolean isMainnet() {
@@ -105,6 +107,8 @@ public class LedgerId {
     }
 
     /**
+     * Are we on Testnet?
+     *
      * @return                          is it testnet
      */
     public boolean isTestnet() {
@@ -112,6 +116,8 @@ public class LedgerId {
     }
 
     /**
+     * Are we on Previewnet?
+     *
      * @return                          is it previewnet
      */
     public boolean isPreviewnet() {
@@ -119,6 +125,8 @@ public class LedgerId {
     }
 
     /**
+     * Are we one of the three standard networks?
+     *
      * @return                          is it one of the three standard networks
      */
     boolean isKnownNetwork() {
@@ -126,6 +134,8 @@ public class LedgerId {
     }
 
     /**
+     * Extract the string representation.
+     *
      * @return                          the string representation
      */
     public String toString() {
@@ -141,6 +151,8 @@ public class LedgerId {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {
@@ -148,6 +160,8 @@ public class LedgerId {
     }
 
     /**
+     * Extract the byte string representation.
+     *
      * @return                          the byte string representation
      */
     ByteString toByteString() {

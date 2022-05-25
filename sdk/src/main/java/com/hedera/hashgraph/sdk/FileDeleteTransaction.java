@@ -75,6 +75,8 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id
      */
     @Nullable

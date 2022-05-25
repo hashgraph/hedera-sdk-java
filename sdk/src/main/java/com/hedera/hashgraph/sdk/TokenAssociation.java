@@ -30,7 +30,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * of NFTs (serial numbers) of that token type. The Hedera account that is
  * being associated with a token is required to sign the transaction.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/associate-tokens-to-an-account”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/associate-tokens-to-an-account">Hedera Documentation</a>
  */
 public class TokenAssociation {
     public final TokenId tokenId;
@@ -72,6 +72,8 @@ public class TokenAssociation {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TokenAssociation toProtobuf() {
@@ -90,6 +92,8 @@ public class TokenAssociation {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

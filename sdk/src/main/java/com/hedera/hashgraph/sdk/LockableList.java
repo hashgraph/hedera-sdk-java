@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Internal utility class for a new lockable list type.
  *
- * @param <T>
+ * @param <T>                           the lockable list type
  */
 class LockableList<T> implements Iterable<T> {
     private ArrayList<T> list = new ArrayList<>();
@@ -82,6 +82,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Extract the lockable list.
+     *
      * @return                          the lockable list
      */
     ArrayList<T> getList() {
@@ -117,6 +119,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Extract the current list.
+     *
      * @return                          the current list item
      */
     T getCurrent() {
@@ -124,6 +128,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Extract the next item.
+     *
      * @return                          the next list item
      */
     T getNext() {
@@ -177,6 +183,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Advance to the next item wraps if needed.
+     *
      * @return                          the next index wrapped
      */
     int advance() {
@@ -186,6 +194,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Is the list empty?
+     *
      * @return                          is the list empty
      */
     boolean isEmpty() {
@@ -193,6 +203,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Is the list locked?
+     *
      * @return                          is the list locked
      */
     boolean isLocked() {
@@ -211,6 +223,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * How many items are in the list.
+     *
      * @return                          the size of the list
      */
     int size() {
@@ -229,6 +243,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * What is the current index.
+     *
      * @return                          the index of the current item
      */
     int getIndex() {
@@ -236,6 +252,8 @@ class LockableList<T> implements Iterable<T> {
     }
 
     /**
+     * Empty the list.
+     *
      * @return                          an empty list
      */
     LockableList<T> clear() {

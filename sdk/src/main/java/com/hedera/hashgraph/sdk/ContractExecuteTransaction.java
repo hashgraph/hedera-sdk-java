@@ -78,6 +78,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable
@@ -99,6 +101,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     /**
+     * Extract the gas.
+     *
      * @return                          the gas
      */
     public long getGas() {
@@ -118,6 +122,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     /**
+     * Extract the payable amount.
+     *
      * @return                          the payable amount in hbar
      */
     public Hbar getPayableAmount() {
@@ -138,6 +144,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     /**
+     * Extract the function parameters.
+     *
      * @return                          the function parameters
      */
     public ByteString getFunctionParameters() {
@@ -199,6 +207,8 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     }
 
     /**
+     * Build the transaction body.
+     *
      * @return {@code {@link ContractCallTransactionBody}}
      */
     ContractCallTransactionBody.Builder build() {

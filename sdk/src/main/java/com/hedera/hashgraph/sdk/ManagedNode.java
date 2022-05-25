@@ -142,14 +142,14 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Create an insecure version of this node
      *
-     * @return
+     * @return                          the insecure version of the node
      */
     abstract N toInsecure();
 
     /**
      * Create a secure version of this node
      *
-     * @return                          he secure version of the node
+     * @return                          the secure version of the node
      */
     abstract N toSecure();
 
@@ -226,6 +226,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
+     * Extract the unhealthy backoff time remaining.
+     *
      * @return                          the unhealthy backoff time remaining
      */
     long unhealthyBackoffRemaining() {
@@ -327,6 +329,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
+     * Did we fail to connect?
+     *
      * @return                          did we fail to connect
      */
     boolean channelFailedToConnect() {
@@ -413,6 +417,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
+     * Extract the user agent string.
+     *
      * @return                          the user agent string
      */
     private String getUserAgent() {

@@ -58,6 +58,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable
@@ -78,6 +80,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     /**
+     * Extract the gas.
+     *
      * @return                          the gas
      */
     public long getGas() {
@@ -104,6 +108,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     /**
+     * Extract the function parameters.
+     *
      * @return                          the byte string representation
      */
     public ByteString getFunctionParameters() {

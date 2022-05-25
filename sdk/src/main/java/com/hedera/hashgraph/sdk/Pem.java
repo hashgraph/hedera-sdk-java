@@ -110,7 +110,7 @@ final class Pem {
      * @param input                     reader object
      * @param passphrase                passphrase
      * @return                          private key info object
-     * @throws IOException
+     * @throws IOException              if IO operations fail
      */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
         PemReader pemReader = new PemReader(input);
@@ -148,7 +148,7 @@ final class Pem {
      * @param encodedStruct             the byte array
      * @param passphrase                passphrase
      * @return                          private key info object
-     * @throws IOException
+     * @throws IOException              if IO operations fail
      */
     private static PrivateKeyInfo decryptPrivateKey(byte[] encodedStruct, String passphrase) throws IOException {
         var encryptedPrivateKeyInfo = EncryptedPrivateKeyInfo.getInstance(ASN1Primitive.fromByteArray(encodedStruct));

@@ -88,8 +88,8 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
      *
      * @param network                   the desired network
      * @return                          the mirror network
-     * @throws TimeoutException
-     * @throws InterruptedException
+     * @throws TimeoutException         when the transaction times out
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized MirrorNetwork setNetwork(List<String> network) throws TimeoutException, InterruptedException {
         var map = new HashMap<String, ManagedNodeAddress>(network.size());
@@ -100,6 +100,8 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
     }
 
     /**
+     * Extract the network names.
+     *
      * @return                          the network names
      */
     List<String> getNetwork() {
@@ -116,8 +118,10 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
     }
 
     /**
+     * Extract the next healthy mirror node on the list.
+     *
      * @return                          the next healthy mirror node on the list
-     * @throws InterruptedException
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized MirrorNode getNextMirrorNode() throws InterruptedException {
         return getNumberOfMostHealthyNodes(1).get(0);

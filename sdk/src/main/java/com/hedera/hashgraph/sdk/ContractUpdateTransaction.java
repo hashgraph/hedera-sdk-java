@@ -100,6 +100,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable
@@ -121,6 +123,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the contract expiration time.
+     *
      * @return                          the contract expiration time
      */
     @Nullable
@@ -143,6 +147,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the administrator key.
+     *
      * @return                          the administrator key
      */
     @Nullable
@@ -164,6 +170,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the proxy account id.
+     *
      * @return                          the proxy account id
      */
     @Nullable
@@ -192,6 +200,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -241,6 +251,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Extract the contents of the memo.
+     *
      * @return                          the contents of the memo
      */
     @Nullable

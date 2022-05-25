@@ -30,7 +30,7 @@ import java.util.Objects;
 /**
  * An approved allowance of hbar transfers for a spender.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance">Hedera Documentation</a>
  */
 public class HbarAllowance {
     @Nullable
@@ -95,7 +95,7 @@ public class HbarAllowance {
      * Validate that the client is configured correctly.
      *
      * @param client                    the client to verify
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (ownerAccountId != null) {
@@ -138,6 +138,8 @@ public class HbarAllowance {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          a byte array representation
      */
     public byte[] toBytes() {

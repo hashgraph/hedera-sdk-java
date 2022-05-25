@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
 /**
  * This contains two Fee Schedules with expiry timestamp.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/currentandnextfeeschedule">Hedera Documentation</a>
  */
 public class FeeSchedules {
     @Nullable
@@ -67,6 +67,8 @@ public class FeeSchedules {
     }
 
     /**
+     * Extract the current fee schedule.
+     *
      * @return                          the current fee schedule
      */
     @Nullable
@@ -86,6 +88,8 @@ public class FeeSchedules {
     }
 
     /**
+     * Extract the next fee schedule.
+     *
      * @return                          the next fee schedule
      */
     @Nullable
@@ -105,6 +109,8 @@ public class FeeSchedules {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          protobuf representation
      */
     CurrentAndNextFeeSchedule toProtobuf() {
@@ -119,6 +125,8 @@ public class FeeSchedules {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          byte array representation
      */
     public byte[] toBytes() {

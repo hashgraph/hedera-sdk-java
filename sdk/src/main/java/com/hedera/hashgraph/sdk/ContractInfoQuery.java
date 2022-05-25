@@ -47,6 +47,8 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable

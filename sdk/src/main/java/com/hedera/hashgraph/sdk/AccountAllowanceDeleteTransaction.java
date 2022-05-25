@@ -218,6 +218,8 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
     }
 
     /**
+     * Build the transaction body.
+     *
      * @return {@code {@link CryptoDeleteAllowanceTransactionBody}}
      */
     CryptoDeleteAllowanceTransactionBody.Builder build() {

@@ -149,7 +149,7 @@ public class TokenNftAllowance {
      * Validate the configured client.
      *
      * @param client                    the configured client
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
@@ -164,6 +164,8 @@ public class TokenNftAllowance {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     NftAllowance toProtobuf() {
@@ -185,6 +187,8 @@ public class TokenNftAllowance {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the granted protobuf
      */
     GrantedNftAllowance toGrantedProtobuf() {
@@ -199,6 +203,8 @@ public class TokenNftAllowance {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the remove protobuf
      */
     NftRemoveAllowance toRemoveProtobuf() {
@@ -214,6 +220,8 @@ public class TokenNftAllowance {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

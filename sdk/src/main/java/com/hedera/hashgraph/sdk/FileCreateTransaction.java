@@ -38,7 +38,7 @@ import java.util.Objects;
 /**
  * Creates a file with the content by submitting the transaction.
  *
- * See <a href="https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera">Hedera Documentation</a>
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 
@@ -80,6 +80,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     /**
+     * Extract the time.
+     *
      * @return                          expiration time
      */
     @Nullable
@@ -107,6 +109,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     /**
+     * Extract the of keys.
+     *
      * @return                          list of keys
      */
     @Nullable
@@ -137,6 +141,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     /**
+     * Create the byte string.
+     *
      * @return                          byte string representation
      */
     public ByteString getContents() {
@@ -192,6 +198,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     }
 
     /**
+     * Extract the file's memo field.
+     *
      * @return                          the file's memo field
      */
     public String getFileMemo() {

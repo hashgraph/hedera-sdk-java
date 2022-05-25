@@ -44,6 +44,8 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     }
 
     /**
+     * Extract the contract id.
+     *
      * @return                          the contract id
      */
     @Nullable

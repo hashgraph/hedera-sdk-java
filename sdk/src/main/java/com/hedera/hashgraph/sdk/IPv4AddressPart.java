@@ -39,6 +39,8 @@ public class IPv4AddressPart {
     }
 
     /**
+     * Extract the first byte.
+     *
      * @return                          the first byte
      */
     public byte getLeft() {
@@ -57,6 +59,8 @@ public class IPv4AddressPart {
     }
 
     /**
+     * Extract the last byte.
+     *
      * @return                          the last byte
      */
     public byte getRight() {

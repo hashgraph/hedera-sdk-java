@@ -97,6 +97,8 @@ public class TokenTransfer {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          an account amount protobuf
      */
     AccountAmount toProtobuf() {

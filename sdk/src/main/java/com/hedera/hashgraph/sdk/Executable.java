@@ -46,10 +46,11 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 /**
  * Abstract base utility class.
- * @param <SdkRequestT>
- * @param <ProtoRequestT>
- * @param <ResponseT>
- * @param <O>
+ *
+ * @param <SdkRequestT>                 the sdk request
+ * @param <ProtoRequestT>               the proto request
+ * @param <ResponseT>                   the response
+ * @param <O>                           the O type
  */
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     static final Pattern RST_STREAM = Pattern

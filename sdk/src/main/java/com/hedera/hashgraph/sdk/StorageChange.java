@@ -29,7 +29,7 @@ import java.math.BigInteger;
 /**
  * A storage slot change description.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange">Hedera Documentation</a>
  */
 public class StorageChange {
     /**
@@ -94,6 +94,8 @@ public class StorageChange {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     com.hedera.hashgraph.sdk.proto.StorageChange toProtobuf() {
@@ -111,6 +113,8 @@ public class StorageChange {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

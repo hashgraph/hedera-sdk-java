@@ -218,11 +218,15 @@ public abstract class PublicKey extends Key {
     public abstract byte[] toBytes();
 
     /**
+     * Extract the DER represented as a byte array.
+     *
      * @return                          the DER represented as a byte array
      */
     public abstract byte[] toBytesDER();
 
     /**
+     * Extract the raw byte representation.
+     *
      * @return                          the raw byte representation
      */
     public abstract byte[] toBytesRaw();
@@ -233,6 +237,8 @@ public abstract class PublicKey extends Key {
     }
 
     /**
+     * Extract the DER encoded string.
+     *
      * @return                          the DER encoded string
      */
     public String toStringDER() {
@@ -240,6 +246,8 @@ public abstract class PublicKey extends Key {
     }
 
     /**
+     * Extract the raw string.
+     *
      * @return                          the raw string
      */
     public String toStringRaw() {
@@ -258,11 +266,15 @@ public abstract class PublicKey extends Key {
     }
 
     /**
+     * Is this an ED25519 key?
+     *
      * @return                          is this an ED25519 key
      */
     public abstract boolean isED25519();
 
     /**
+     * Is this an ECDSA key?
+     *
      * @return                          is this an ECDSA key
      */
     public abstract boolean isECDSA();

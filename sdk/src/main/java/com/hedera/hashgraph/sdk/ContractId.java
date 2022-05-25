@@ -159,6 +159,8 @@ public class ContractId extends Key implements Comparable<ContractId> {
     }
 
     /**
+     * Extract the representation of solidity address.
+     *
      * @return                          string representation of solidity address
      */
     public String toSolidityAddress() {
@@ -200,13 +202,15 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * Verify the checksum.
      *
      * @param client                    to validate against
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
     /**
+     * Extract the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable

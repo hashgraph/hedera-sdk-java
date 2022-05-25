@@ -45,7 +45,7 @@ import java.util.Objects;
  * only the expiry may be updated. Setting any other field, in that case,
  * will cause the transaction status to resolve to TOKEN_IS_IMMUTABlE.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/update-a-token">Hedera Documentation</a>
  */
 public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> {
     /**
@@ -176,6 +176,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the token id.
+     *
      * @return                          the token id
      */
     @Nullable
@@ -187,7 +189,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * Assign the token id.
      *
      * @param tokenId                   the token id
-     * @return
+     * @return {@code this}
      */
     public TokenUpdateTransaction setTokenId(TokenId tokenId) {
         requireNotFrozen();
@@ -197,6 +199,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the token name.
+     *
      * @return                          the token name
      */
     @Nullable
@@ -218,6 +222,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the token symbol.
+     *
      * @return                          the token symbol
      */
     public String getTokenSymbol() {
@@ -238,6 +244,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the treasury account id.
+     *
      * @return                          the treasury account id
      */
     @Nullable
@@ -259,6 +267,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the admin key.
+     *
      * @return                          the admin key
      */
     @Nullable
@@ -280,6 +290,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the kyc key.
+     *
      * @return                          the kyc key
      */
     @Nullable
@@ -300,6 +312,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the freeze key.
+     *
      * @return                          the freeze key
      */
     @Nullable
@@ -321,6 +335,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the wipe key.
+     *
      * @return                          the wipe key
      */
     @Nullable
@@ -342,6 +358,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the supply key.
+     *
      * @return                          the supply key
      */
     @Nullable
@@ -363,6 +381,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the fee schedule key.
+     *
      * @return                          the fee schedule key
      */
     @Nullable
@@ -384,6 +404,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the pause key.
+     *
      * @return                          the pause key
      */
     @Nullable
@@ -405,6 +427,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the expiration time.
+     *
      * @return                          the expiration time
      */
     @Nullable
@@ -427,6 +451,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the auto renew account id.
+     *
      * @return                          the auto renew account id
      */
     @Nullable
@@ -448,6 +474,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the auto renew period.
+     *
      * @return                          the auto renew period
      */
     @Nullable
@@ -469,6 +497,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the token memo.
+     *
      * @return                          the token memo
      */
     @Nullable

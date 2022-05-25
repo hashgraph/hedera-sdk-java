@@ -79,9 +79,6 @@ public class AssessedCustomFee {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee.parseFrom(bytes).toBuilder().build());
     }
 
-    /**
-     * @return                          string representation of assessed custom fee object
-     */
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -93,6 +90,8 @@ public class AssessedCustomFee {
     }
 
     /**
+     * Create the protobuf representation.
+     *
      * @return {@code {@link com.hedera.hashgraph.sdk.proto.AssessedCustomFee}}
      */
     com.hedera.hashgraph.sdk.proto.AssessedCustomFee toProtobuf() {
@@ -110,6 +109,8 @@ public class AssessedCustomFee {
     }
 
     /**
+     * Create a byte array representation.
+     *
      * @return                          the converted assessed custom fees
      */
     public byte[] toBytes() {

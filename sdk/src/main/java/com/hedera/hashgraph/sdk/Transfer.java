@@ -54,6 +54,8 @@ public final class Transfer {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     AccountAmount toProtobuf() {

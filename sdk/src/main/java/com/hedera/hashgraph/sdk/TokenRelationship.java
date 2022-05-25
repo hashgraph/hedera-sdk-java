@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 /**
  * Token's information related to the given Account.
  *
- * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenrelationship”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenrelationship">Hedera Documentation</a>
  */
 public class TokenRelationship {
     /**
@@ -156,6 +156,8 @@ public class TokenRelationship {
     }
 
     /**
+     * Create the protobuf.
+     *
      * @return                          the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TokenRelationship toProtobuf() {
@@ -182,6 +184,8 @@ public class TokenRelationship {
     }
 
     /**
+     * Create the byte array.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

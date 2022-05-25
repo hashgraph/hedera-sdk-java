@@ -43,7 +43,6 @@ final class FutureConverter {
      *
      * @param listenableFuture          the T object generator
      * @return                          the T type object
-     * @param <T>
      */
     static <T> CompletableFuture<T> toCompletableFuture(ListenableFuture<T> listenableFuture) {
         return Java8FutureUtils.createCompletableFuture(

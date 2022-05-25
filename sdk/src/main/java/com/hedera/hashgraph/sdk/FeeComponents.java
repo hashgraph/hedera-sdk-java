@@ -110,6 +110,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the minimum component.
+     *
      * @return                          the minimum component
      */
     public long getMin() {
@@ -128,6 +130,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the maximum component.
+     *
      * @return                          the maximum component
      */
     public long getMax() {
@@ -146,6 +150,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the constant component.
+     *
      * @return                          the constant component
      */
     public long getConstant() {
@@ -164,6 +170,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the transaction bandwidth bytes.
+     *
      * @return                          the transaction bandwidth bytes
      */
     public long getTransactionBandwidthByte() {
@@ -182,6 +190,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the transaction verification price per signature.
+     *
      * @return                          the transaction verification price per signature
      */
     public long getTransactionVerification() {
@@ -200,6 +210,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the of ram consumed in byte hours.
+     *
      * @return                          price of ram consumed in byte hours
      */
     public long getTransactionRamByteHour() {
@@ -210,7 +222,7 @@ public class FeeComponents {
      * Assign the price of ram consumed in byte hours.
      *
      * @param transactionRamByteHour    price of ram consumed in byte hours
-     * @return
+     * @return {@code this}
      */
     public FeeComponents setTransactionRamByteHour(long transactionRamByteHour) {
         this.transactionRamByteHour = transactionRamByteHour;
@@ -218,6 +230,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the of storage in byte hours.
+     *
      * @return                          price of storage in byte hours
      */
     public long getTransactionStorageByteHour() {
@@ -228,7 +242,7 @@ public class FeeComponents {
      * Assign the price of storage consumed in byte hours.
      *
      * @param transactionStorageByteHour    price of storage in byte hours
-     * @return
+     * @return {@code this}
      */
     public FeeComponents setTransactionStorageByteHour(long transactionStorageByteHour) {
         this.transactionStorageByteHour = transactionStorageByteHour;
@@ -236,6 +250,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the of gas for computation.
+     *
      * @return                          price of gas for computation
      */
     public long getContractTransactionGas() {
@@ -246,7 +262,7 @@ public class FeeComponents {
      * Assign the price of computation in gas.
      *
      * @param contractTransactionGas    price of gas for computation
-     * @return
+     * @return {@code this}
      */
     public FeeComponents setContractTransactionGas(long contractTransactionGas) {
         this.contractTransactionGas = contractTransactionGas;
@@ -254,6 +270,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the per hbar transferred.
+     *
      * @return                          price per hbar transferred
      */
     public long getTransferVolumeHbar() {
@@ -263,7 +281,7 @@ public class FeeComponents {
     /**
      * Assign the price per hbar transferred.
      *
-     * @param transferVolumeHbar
+     * @param transferVolumeHbar        price per hbar transferred
      * @return {@code this}
      */
     public FeeComponents setTransferVolumeHbar(long transferVolumeHbar) {
@@ -272,6 +290,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the for data retrieved.
+     *
      * @return                          price for data retrieved
      */
     public long getResponseMemoryByte() {
@@ -282,7 +302,7 @@ public class FeeComponents {
      * Assign the price for data retrieved in bytes.
      *
      * @param responseMemoryByte        price for data retrieved
-     * @return
+     * @return {@code this}
      */
     public FeeComponents setResponseMemoryByte(long responseMemoryByte) {
         this.responseMemoryByte = responseMemoryByte;
@@ -290,6 +310,8 @@ public class FeeComponents {
     }
 
     /**
+     * Extract the for data retrieved from disk.
+     *
      * @return                          price for data retrieved from disk
      */
     public long getResponseDiskByte() {

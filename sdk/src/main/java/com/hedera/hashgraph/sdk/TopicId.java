@@ -132,6 +132,8 @@ public final class TopicId implements Comparable<TopicId> {
     }
 
     /**
+     * Extract the solidity address representation.
+     *
      * @return                          the solidity address representation
      */
     public String toSolidityAddress() {
@@ -139,6 +141,8 @@ public final class TopicId implements Comparable<TopicId> {
     }
 
     /**
+     * Extracts a protobuf representing the token id.
+     *
      * @return                          the protobuf representation
      */
     TopicID toProtobuf() {
@@ -163,13 +167,15 @@ public final class TopicId implements Comparable<TopicId> {
      * Verify that the client has a valid checksum.
      *
      * @param client                    the client to verify
-     * @throws BadEntityIdException
+     * @throws BadEntityIdException     if entity ID is formatted poorly
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
     /**
+     * Extracts the checksum.
+     *
      * @return                          the checksum
      */
     @Nullable
@@ -178,6 +184,8 @@ public final class TopicId implements Comparable<TopicId> {
     }
 
     /**
+     * Extracts a byte array representation.
+     *
      * @return                          the byte array representation
      */
     public byte[] toBytes() {

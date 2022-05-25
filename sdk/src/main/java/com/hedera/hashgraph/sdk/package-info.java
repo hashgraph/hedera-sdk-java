@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks”>Hedera Documentation</a>
+ * See <a href="https://docs.hedera.com/guides/docs/sdks">Hedera Documentation</a>
  */
 @ParametersAreNonnullByDefault
 package com.hedera.hashgraph.sdk;

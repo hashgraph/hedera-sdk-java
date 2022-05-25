@@ -70,6 +70,8 @@ public class AddressBookQuery {
     }
 
     /**
+     * Extract the file id.
+     *
      * @return                          the file id that was assigned
      */
     @Nullable
@@ -89,6 +91,8 @@ public class AddressBookQuery {
     }
 
     /**
+     * Extract the limit number.
+     *
      * @return                          the limit number that was assigned
      */
     @Nullable
@@ -108,6 +112,8 @@ public class AddressBookQuery {
     }
 
     /**
+     * Extract the maximum number of attempts.
+     *
      * @return                          the maximum number of attempts
      */
     public int getMaxAttempts() {
