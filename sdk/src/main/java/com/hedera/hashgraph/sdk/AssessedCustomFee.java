@@ -92,7 +92,7 @@ public class AssessedCustomFee {
     /**
      * Create the protobuf representation.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.AssessedCustomFee}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.AssessedCustomFee}
      */
     com.hedera.hashgraph.sdk.proto.AssessedCustomFee toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.AssessedCustomFee.newBuilder().setAmount(amount);

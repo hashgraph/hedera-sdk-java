@@ -703,7 +703,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody}
      */
     TokenCreateTransactionBody.Builder build() {
         var builder = TokenCreateTransactionBody.newBuilder();

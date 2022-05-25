@@ -190,7 +190,7 @@ public final class ContractDeleteTransaction extends Transaction<ContractDeleteT
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link ContractDeleteTransactionBody}}
+     * @return {@link ContractDeleteTransactionBody}
      */
     ContractDeleteTransactionBody.Builder build() {
         var builder = ContractDeleteTransactionBody.newBuilder();

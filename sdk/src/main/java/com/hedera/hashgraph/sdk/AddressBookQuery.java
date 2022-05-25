@@ -239,7 +239,7 @@ public class AddressBookQuery {
     /**
      * Build the address book query.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery buildQuery }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery buildQuery }
      */
     com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery buildQuery() {
         var builder = com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder();

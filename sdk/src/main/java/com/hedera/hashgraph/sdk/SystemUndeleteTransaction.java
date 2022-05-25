@@ -133,7 +133,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody}
      */
     SystemUndeleteTransactionBody.Builder build() {
         var builder = SystemUndeleteTransactionBody.newBuilder();

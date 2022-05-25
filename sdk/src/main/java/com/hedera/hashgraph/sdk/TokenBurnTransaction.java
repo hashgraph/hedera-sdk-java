@@ -174,7 +174,7 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody}
      */
     TokenBurnTransactionBody.Builder build() {
         var builder = TokenBurnTransactionBody.newBuilder();

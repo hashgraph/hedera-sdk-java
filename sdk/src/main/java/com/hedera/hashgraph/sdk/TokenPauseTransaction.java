@@ -106,8 +106,8 @@ public class TokenPauseTransaction extends Transaction<TokenPauseTransaction>{
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenPauseTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenPauseTransactionBody}
      */
     TokenPauseTransactionBody.Builder build() {
         var builder = TokenPauseTransactionBody.newBuilder();

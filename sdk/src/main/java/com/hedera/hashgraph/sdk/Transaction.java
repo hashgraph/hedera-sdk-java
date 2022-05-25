@@ -393,7 +393,6 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @param scheduled                 the scheduled transaction
      * @return                          the new transaction
-     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()

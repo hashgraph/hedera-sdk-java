@@ -255,7 +255,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FreezeTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.FreezeTransactionBody builder }
      */
     FreezeTransactionBody.Builder build() {
         var builder = FreezeTransactionBody.newBuilder();

@@ -118,7 +118,7 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody}
      */
     TokenAssociateTransactionBody.Builder build() {
         var builder = TokenAssociateTransactionBody.newBuilder();

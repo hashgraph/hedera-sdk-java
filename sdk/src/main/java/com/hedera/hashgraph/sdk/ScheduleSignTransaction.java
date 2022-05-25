@@ -101,9 +101,9 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link
+     * @return {@link
      *         com.hedera.hashgraph.sdk.proto.ScheduleSignTransactionBody
-     *         builder }}
+     *         builder }
      */
     ScheduleSignTransactionBody.Builder build() {
         var builder = ScheduleSignTransactionBody.newBuilder();

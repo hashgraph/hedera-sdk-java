@@ -110,8 +110,8 @@ public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenDeleteTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenDeleteTransactionBody}
      */
     TokenDeleteTransactionBody.Builder build() {
         var builder = TokenDeleteTransactionBody.newBuilder();

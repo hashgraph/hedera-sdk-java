@@ -581,8 +581,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody}
      */
     TokenUpdateTransactionBody.Builder build() {
         var builder = TokenUpdateTransactionBody.newBuilder();

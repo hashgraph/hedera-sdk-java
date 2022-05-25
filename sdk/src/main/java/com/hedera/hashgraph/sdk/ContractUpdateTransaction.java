@@ -312,7 +312,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody builder }
      */
     ContractUpdateTransactionBody.Builder build() {
         var builder = ContractUpdateTransactionBody.newBuilder();

@@ -209,7 +209,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link ContractCallTransactionBody}}
+     * @return {@link ContractCallTransactionBody}
      */
     ContractCallTransactionBody.Builder build() {
         var builder = ContractCallTransactionBody.newBuilder();

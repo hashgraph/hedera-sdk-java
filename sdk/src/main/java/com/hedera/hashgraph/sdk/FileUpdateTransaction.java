@@ -274,7 +274,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody builder }
      */
     FileUpdateTransactionBody.Builder build() {
         var builder = FileUpdateTransactionBody.newBuilder();

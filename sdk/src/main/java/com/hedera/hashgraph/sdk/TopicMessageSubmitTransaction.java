@@ -163,8 +163,8 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody}
      */
     ConsensusSubmitMessageTransactionBody.Builder build() {
         var builder = ConsensusSubmitMessageTransactionBody.newBuilder();

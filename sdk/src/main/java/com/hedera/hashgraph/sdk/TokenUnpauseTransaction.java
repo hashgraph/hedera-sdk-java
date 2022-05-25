@@ -107,8 +107,8 @@ public class TokenUnpauseTransaction extends Transaction<TokenUnpauseTransaction
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenUnpauseTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenUnpauseTransactionBody}
      */
     TokenUnpauseTransactionBody.Builder build() {
         var builder = TokenUnpauseTransactionBody.newBuilder();

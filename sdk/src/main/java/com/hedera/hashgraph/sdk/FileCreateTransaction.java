@@ -247,7 +247,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody builder}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody builder}
      */
     FileCreateTransactionBody.Builder build() {
         var builder = FileCreateTransactionBody.newBuilder();

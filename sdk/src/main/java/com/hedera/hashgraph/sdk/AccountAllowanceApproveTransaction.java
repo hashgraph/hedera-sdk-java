@@ -386,7 +386,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody builder }
      */
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();

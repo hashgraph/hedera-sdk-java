@@ -331,8 +331,8 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody}
      */
     ConsensusUpdateTopicTransactionBody.Builder build() {
         var builder = ConsensusUpdateTopicTransactionBody.newBuilder();

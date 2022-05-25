@@ -370,7 +370,7 @@ public final class ContractFunctionResult {
     /**
      * Create the protobuf representation.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ContractFunctionResult}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.ContractFunctionResult}
      */
     com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProtobuf() {
         var contractFunctionResult = com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()

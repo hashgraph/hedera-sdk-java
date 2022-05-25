@@ -333,7 +333,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link ContractCreateTransactionBody}}
+     * @return {@link ContractCreateTransactionBody}
      */
     ContractCreateTransactionBody.Builder build() {
         var builder = ContractCreateTransactionBody.newBuilder();

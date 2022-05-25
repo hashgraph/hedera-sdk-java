@@ -136,7 +136,7 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link CryptoDeleteTransactionBody}}
+     * @return {@link CryptoDeleteTransactionBody}
      */
     CryptoDeleteTransactionBody.Builder build() {
         var builder = CryptoDeleteTransactionBody.newBuilder();

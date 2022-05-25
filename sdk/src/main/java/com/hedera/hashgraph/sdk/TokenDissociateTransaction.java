@@ -137,8 +137,8 @@ public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transac
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody}
      */
     TokenDissociateTransactionBody.Builder build() {
         var builder = TokenDissociateTransactionBody.newBuilder();

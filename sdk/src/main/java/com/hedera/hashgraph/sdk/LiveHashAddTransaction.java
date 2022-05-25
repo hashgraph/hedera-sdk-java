@@ -192,7 +192,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}
      */
     CryptoAddLiveHashTransactionBody.Builder build() {
         var builder = CryptoAddLiveHashTransactionBody.newBuilder();

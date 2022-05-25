@@ -135,8 +135,8 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenFreezeAccountTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenFreezeAccountTransactionBody}
      */
     TokenFreezeAccountTransactionBody.Builder build() {
         var builder = TokenFreezeAccountTransactionBody.newBuilder();

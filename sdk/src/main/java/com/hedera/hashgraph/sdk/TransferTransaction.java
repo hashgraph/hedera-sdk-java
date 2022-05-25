@@ -463,8 +463,8 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody}
      */
     CryptoTransferTransactionBody.Builder build() {
         var tokenTransfers = new ArrayList<TokenTransferList>();

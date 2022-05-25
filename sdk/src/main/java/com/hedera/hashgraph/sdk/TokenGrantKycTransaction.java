@@ -135,8 +135,8 @@ public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transacti
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenGrantKycTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenGrantKycTransactionBody}
      */
     TokenGrantKycTransactionBody.Builder build() {
         var builder = TokenGrantKycTransactionBody.newBuilder();

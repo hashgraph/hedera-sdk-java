@@ -160,7 +160,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody}
      */
     SystemDeleteTransactionBody.Builder build() {
         var builder = SystemDeleteTransactionBody.newBuilder();

@@ -139,8 +139,8 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenRevokeKycTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenRevokeKycTransactionBody}
      */
     TokenRevokeKycTransactionBody.Builder build() {
         var builder = TokenRevokeKycTransactionBody.newBuilder();

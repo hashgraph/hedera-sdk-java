@@ -186,7 +186,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody builder}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody builder}
      */
     FileAppendTransactionBody.Builder build() {
         var builder = FileAppendTransactionBody.newBuilder();

@@ -107,8 +107,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody}
      */
     ConsensusDeleteTopicTransactionBody.Builder build() {
         var builder = ConsensusDeleteTopicTransactionBody.newBuilder();

@@ -162,7 +162,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody builder }
      */
     ScheduleCreateTransactionBody.Builder build() {
         var builder = ScheduleCreateTransactionBody.newBuilder();

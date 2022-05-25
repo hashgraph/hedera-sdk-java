@@ -84,7 +84,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
      * Assign the scheduled id.
      *
      * @param scheduleId                the schedule id
-     * @return {@cod this}
+     * @return {@code this}
      */
     public ScheduleDeleteTransaction setScheduleId(ScheduleId scheduleId) {
         Objects.requireNonNull(scheduleId);
@@ -106,7 +106,7 @@ public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteT
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.ScheduleDeleteTransactionBody builder }}
+     * @return {@link com.hedera.hashgraph.sdk.proto.ScheduleDeleteTransactionBody builder }
      */
     ScheduleDeleteTransactionBody.Builder build() {
         var builder = ScheduleDeleteTransactionBody.newBuilder();

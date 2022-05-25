@@ -192,8 +192,8 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody}
      */
     TokenMintTransactionBody.Builder build() {
         var builder = TokenMintTransactionBody.newBuilder();

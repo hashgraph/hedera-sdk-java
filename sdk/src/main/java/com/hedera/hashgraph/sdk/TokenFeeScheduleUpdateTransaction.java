@@ -138,8 +138,8 @@ public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeSched
     /**
      * Build the transaction body.
      *
-     * @return {@code {@link
-     *         com.hedera.hashgraph.sdk.proto.TokenFeeScheduleUpdateTransactionBody}}
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenFeeScheduleUpdateTransactionBody}
      */
     TokenFeeScheduleUpdateTransactionBody.Builder build() {
         var builder = TokenFeeScheduleUpdateTransactionBody.newBuilder();

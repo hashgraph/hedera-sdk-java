@@ -129,7 +129,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     /**
      * Build the correct transaction body.
      *
-     * @return {@code {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}}
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}
      */
     CryptoDeleteLiveHashTransactionBody.Builder build() {
         var builder = CryptoDeleteLiveHashTransactionBody.newBuilder();
