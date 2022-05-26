@@ -27,18 +27,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The fees for a specific transaction or query based on the fee data.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule">Hedera Documentation</a>
+ */
 public class TransactionFeeSchedule {
     private RequestType requestType;
     @Nullable
     private FeeData feeData;
     private List<FeeData> fees;
 
+    /**
+     * Constructor.
+     */
     public TransactionFeeSchedule() {
         requestType = RequestType.NONE;
         feeData = null;
         fees = new ArrayList<>();
     }
 
+    /**
+     * Create a transaction fee schedule object from a protobuf.
+     *
+     * @param transactionFeeSchedule    the protobuf
+     * @return                          the new transaction fee schedule
+     */
     static TransactionFeeSchedule fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule transactionFeeSchedule) {
         var returnFeeSchedule = new TransactionFeeSchedule()
             .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
@@ -49,14 +63,32 @@ public class TransactionFeeSchedule {
         return returnFeeSchedule;
     }
 
+    /**
+     * Create a transaction fee schedule object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction fee schedule
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TransactionFeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Extract the request type.
+     *
+     * @return                          the request type
+     */
     public RequestType getRequestType() {
         return requestType;
     }
 
+    /**
+     * Assign the request type.
+     *
+     * @param requestType               the request type
+     * @return {@code this}
+     */
     public TransactionFeeSchedule setRequestType(RequestType requestType) {
         this.requestType = requestType;
         return this;
@@ -74,15 +106,32 @@ public class TransactionFeeSchedule {
         return this;
     }
 
+    /**
+     * Extract the list of fee's.
+     *
+     * @return                          the list of fee's
+     */
     public List<FeeData> getFees() {
         return fees;
     }
 
+    /**
+     * Add a fee to the schedule.
+     *
+     * @param fee                       the fee to add
+     * @return {@code this}
+     */
     public TransactionFeeSchedule addFee(FeeData fee) {
         fees.add(Objects.requireNonNull(fee));
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule}
+     */
     com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule toProtobuf() {
         var returnBuilder = com.hedera.hashgraph.sdk.proto.TransactionFeeSchedule.newBuilder()
             .setHederaFunctionality(getRequestType().code);
@@ -104,6 +153,11 @@ public class TransactionFeeSchedule {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

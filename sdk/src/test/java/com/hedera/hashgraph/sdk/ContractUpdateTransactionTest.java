@@ -60,7 +60,6 @@ public class ContractUpdateTransactionTest {
             .setContractId(ContractId.fromString("0.0.5007"))
             .setAdminKey(privateKey)
             .setMaxAutomaticTokenAssociations(101)
-            .setAutoRenewAccountId(AccountId.fromString("0.0.456"))
             .setAutoRenewPeriod(Duration.ofDays(1))
             .setContractMemo("3")
             .setExpirationTime(Instant.ofEpochMilli(4))

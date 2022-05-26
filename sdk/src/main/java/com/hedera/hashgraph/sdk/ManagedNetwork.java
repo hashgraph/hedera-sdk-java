@@ -115,6 +115,11 @@ abstract class ManagedNetwork<
         earliestReadmitTime = Instant.now().plus(minNodeReadmitTime);
     }
 
+    /**
+     * Extract the ledger id.
+     *
+     * @return                          the ledger id
+     */
     @Nullable
     LedgerId getLedgerId() {
         return ledgerId;
@@ -124,8 +129,8 @@ abstract class ManagedNetwork<
      * Set the new LedgerId for this network. LedgerIds are used for TLS certificate checking and entity ID
      * checksum validation.
      *
-     * @param ledgerId
-     * @return
+     * @param ledgerId                  the ledger id
+     * @return {@code this}
      */
     synchronized ManagedNetworkT setLedgerId(@Nullable LedgerId ledgerId) {
         this.ledgerId = ledgerId;
@@ -134,6 +139,11 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * Extract the node attempts.
+     *
+     * @return                          maximum node attempts
+     */
     int getMaxNodeAttempts() {
         return maxNodeAttempts;
     }
@@ -141,8 +151,8 @@ abstract class ManagedNetwork<
     /**
      * Set the max number of times a node can return a bad gRPC status before we remove it from the list.
      *
-     * @param maxNodeAttempts
-     * @return
+     * @param maxNodeAttempts           the max node attempts
+     * @return {@code this}
      */
     synchronized ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
         this.maxNodeAttempts = maxNodeAttempts;
@@ -151,6 +161,11 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * Extract the minimum node backoff time.
+     *
+     * @return                          the minimum node backoff time
+     */
     Duration getMinNodeBackoff() {
         return minNodeBackoff;
     }
@@ -158,8 +173,8 @@ abstract class ManagedNetwork<
     /**
      * Set the minimum backoff a node should use when receiving a bad gRPC status.
      *
-     * @param minNodeBackoff
-     * @return
+     * @param minNodeBackoff            the min node backoff
+     * @return {@code this}
      */
     synchronized ManagedNetworkT setMinNodeBackoff(Duration minNodeBackoff) {
         this.minNodeBackoff = minNodeBackoff;
@@ -172,6 +187,11 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * Extract the maximum node backoff time.
+     *
+     * @return                          the maximum node backoff time
+     */
     Duration getMaxNodeBackoff() {
         return maxNodeBackoff;
     }
@@ -179,8 +199,8 @@ abstract class ManagedNetwork<
     /**
      * Set the maximum backoff a node should use when receiving a bad gRPC status.
      *
-     * @param maxNodeBackoff
-     * @return
+     * @param maxNodeBackoff            the max node backoff
+     * @return {@code this}
      */
     synchronized ManagedNetworkT setMaxNodeBackoff(Duration maxNodeBackoff) {
         this.maxNodeBackoff = maxNodeBackoff;
@@ -193,10 +213,20 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
+    /**
+     * Extract the minimum node readmit time.
+     *
+     * @return                          the minimum node readmit time
+     */
     public Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
+    /**
+     * Assign the minimum node readmit time.
+     *
+     * @param minNodeReadmitTime        the minimum node readmit time
+     */
     public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
@@ -205,14 +235,29 @@ abstract class ManagedNetwork<
         }
     }
 
+    /**
+     * Extract the maximum node readmit time.
+     *
+     * @return                          the maximum node readmit time
+     */
     public Duration getMaxNodeReadmitTime() {
         return maxNodeReadmitTime;
     }
 
+    /**
+     * Assign the maximum node readmit time.
+     *
+     * @param maxNodeReadmitTime        the maximum node readmit time
+     */
     public void setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
         this.maxNodeReadmitTime = maxNodeReadmitTime;
     }
 
+    /**
+     * Is transport Security enabled?
+     *
+     * @return                          using transport security
+     */
     boolean isTransportSecurity() {
         return transportSecurity;
     }
@@ -220,9 +265,9 @@ abstract class ManagedNetwork<
     /**
      * Enable or disable transport security (TLS).
      *
-     * @param transportSecurity
-     * @return
-     * @throws InterruptedException
+     * @param transportSecurity         should transport security be enabled
+     * @return {@code this}
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         if (this.transportSecurity != transportSecurity) {
@@ -245,11 +290,21 @@ abstract class ManagedNetwork<
         return (ManagedNetworkT) this;
     }
 
-
+    /**
+     * Extract the close timeout.
+     *
+     * @return                          the close timeout
+     */
     Duration getCloseTimeout() {
         return closeTimeout;
     }
 
+    /**
+     * Assign the close timeout.
+     *
+     * @param closeTimeout              the close timeout
+     * @return {@code this}
+     */
     synchronized ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = closeTimeout;
 
@@ -465,8 +520,9 @@ abstract class ManagedNetwork<
 
     /**
      * Get a random node by key, or if null get a random healthy node.
-     * @param key
-     * @return
+     *
+     * @param key                       the desired key
+     * @return                          the node
      */
     synchronized ManagedNodeT getNode(@Nullable KeyT key) {
         // Attempt to readmit nodes each time a node is fetched.
@@ -492,9 +548,9 @@ abstract class ManagedNetwork<
      *
      * Returns a list of nodes where each node has a unique key.
      *
-     * @param count - number of nodes to return
-     * @return - List of nodes to use
-     * @throws InterruptedException
+     * @param count                     number of nodes to return
+     * @return                          List of nodes to use
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     protected synchronized List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
         readmitNodes();
@@ -516,8 +572,8 @@ abstract class ManagedNetwork<
     /**
      * Close the network with the {@link ManagedNetwork#closeTimeout} duration
      *
-     * @throws TimeoutException
-     * @throws InterruptedException
+     * @throws TimeoutException         when the transaction times out
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized void close() throws TimeoutException, InterruptedException {
         close(closeTimeout);
@@ -526,9 +582,9 @@ abstract class ManagedNetwork<
     /**
      * Close the network with a specific timeout duration
      *
-     * @param timeout
-     * @throws TimeoutException
-     * @throws InterruptedException
+     * @param timeout                   the timeout
+     * @throws TimeoutException         when the transaction times out
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized void close(Duration timeout) throws TimeoutException, InterruptedException {
         var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();

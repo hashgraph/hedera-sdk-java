@@ -41,6 +41,12 @@ public final class ExchangeRates {
         this.nextRate = nextRate;
     }
 
+    /**
+     * Create an Exchange Rates from a protobuf.
+     *
+     * @param pb                        the protobuf
+     * @return                          the new exchange rates
+     */
     static ExchangeRates fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRateSet pb) {
         return new ExchangeRates(
             ExchangeRate.fromProtobuf(pb.getCurrentRate()),
@@ -48,6 +54,13 @@ public final class ExchangeRates {
         );
     }
 
+    /**
+     * Create an Exchange Rates from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new exchange rates
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ExchangeRates fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRateSet.parseFrom(bytes).toBuilder().build());
     }

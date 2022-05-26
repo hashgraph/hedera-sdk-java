@@ -33,30 +33,59 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * The transaction that will associate accounts to a token id.
+ */
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
     @Nullable
     private AccountId accountId = null;
     private List<TokenId> tokenIds = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public TokenAssociateTransaction() {
         defaultMaxTransactionFee = new Hbar(5);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TokenAssociateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenAssociateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
 
+    /**
+     * Assign the account id.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
     public TokenAssociateTransaction setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         requireNotFrozen();
@@ -64,10 +93,21 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return this;
     }
 
+    /**
+     * Extract the list of token id's.
+     *
+     * @return                          the list of token id's
+     */
     public List<TokenId> getTokenIds() {
         return new ArrayList<>(tokenIds);
     }
 
+    /**
+     * Assign a new list of token id's.
+     *
+     * @param tokens                    the list of token id's
+     * @return {@code this}
+     */
     public TokenAssociateTransaction setTokenIds(List<TokenId> tokens) {
         Objects.requireNonNull(tokens);
         requireNotFrozen();
@@ -75,6 +115,11 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody}
+     */
     TokenAssociateTransactionBody.Builder build() {
         var builder = TokenAssociateTransactionBody.newBuilder();
         if (accountId != null) {
@@ -90,6 +135,9 @@ public class TokenAssociateTransaction extends Transaction<TokenAssociateTransac
         return builder;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenAssociate();
         if (body.hasAccount()) {

@@ -32,6 +32,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Gets information about a fungible or non-fungible token instance.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/get-token-info">Hedera Documentation</a>
+ */
 public class TokenInfo {
     /**
      * The ID of the token for which information is requested.
@@ -234,21 +239,45 @@ public class TokenInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Are we frozen?
+     *
+     * @param freezeStatus              the freeze status
+     * @return                          true / false / null
+     */
     @Nullable
     static Boolean freezeStatusFromProtobuf(TokenFreezeStatus freezeStatus) {
         return freezeStatus == TokenFreezeStatus.FreezeNotApplicable ? null : freezeStatus == TokenFreezeStatus.Frozen;
     }
 
+    /**
+     * Is kyc required?
+     *
+     * @param kycStatus                 the kyc status
+     * @return                          true / false / null
+     */
     @Nullable
     static Boolean kycStatusFromProtobuf(TokenKycStatus kycStatus) {
         return kycStatus == TokenKycStatus.KycNotApplicable ? null : kycStatus == TokenKycStatus.Granted;
     }
 
+    /**
+     * Are we paused?
+     *
+     * @param pauseStatus               the paused status
+     * @return                          true / false / null
+     */
     @Nullable
     static Boolean pauseStatusFromProtobuf(TokenPauseStatus pauseStatus) {
         return pauseStatus == TokenPauseStatus.PauseNotApplicable ? null : pauseStatus == TokenPauseStatus.Paused;
     }
 
+    /**
+     * Create a token info object from a protobuf.
+     *
+     * @param response                  the protobuf
+     * @return                          new token info object
+     */
     static TokenInfo fromProtobuf(TokenGetInfoResponse response) {
         var info = response.getTokenInfo();
 
@@ -282,10 +311,23 @@ public class TokenInfo {
         );
     }
 
+    /**
+     * Create a token info object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new token info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TokenInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create custom fee list from protobuf.
+     *
+     * @param info                      the protobuf
+     * @return                          the list of custom fee's
+     */
     private static List<CustomFee> customFeesFromProto(com.hedera.hashgraph.sdk.proto.TokenInfo info) {
         var returnCustomFees = new ArrayList<CustomFee>(info.getCustomFeesCount());
         for (var feeProto : info.getCustomFeesList()) {
@@ -294,18 +336,41 @@ public class TokenInfo {
         return returnCustomFees;
     }
 
+    /**
+     * Create a token freeze status protobuf.
+     *
+     * @param freezeStatus              the freeze status
+     * @return                          the protobuf
+     */
     static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
         return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
+    /**
+     * Create a kyc status protobuf.
+     *
+     * @param kycStatus                 the kyc status
+     * @return                          the protobuf
+     */
     static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
         return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
+    /**
+     * Create a pause status protobuf.
+     *
+     * @param pauseStatus               the pause status
+     * @return                          the protobuf
+     */
     static TokenPauseStatus pauseStatusToProtobuf(@Nullable Boolean pauseStatus) {
         return pauseStatus == null ? TokenPauseStatus.PauseNotApplicable : pauseStatus ? TokenPauseStatus.Paused : TokenPauseStatus.Unpaused;
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     TokenGetInfoResponse toProtobuf() {
         var tokenInfoBuilder = com.hedera.hashgraph.sdk.proto.TokenInfo.newBuilder()
             .setTokenId(tokenId.toProtobuf())
@@ -391,6 +456,11 @@ public class TokenInfo {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

@@ -40,6 +40,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A transaction that transfers hbars and tokens between Hedera accounts.
+ * You can enter multiple transfers in a single transaction. The net value
+ * of hbars between the sending accounts and receiving accounts must equal
+ * zero.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency">Hedera Documentation</a>
+ */
 public class TransferTransaction extends Transaction<TransferTransaction> {
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
     private final ArrayList<TokenNftTransfer> nftTransfers = new ArrayList<>();
@@ -121,20 +129,40 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         }
     }
 
+    /**
+     * Constructor.
+     */
     public TransferTransaction() {
         defaultMaxTransactionFee = new Hbar(1);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the list of token id decimals.
+     *
+     * @return                          the list of token id decimals
+     */
     public Map<TokenId, Integer> getTokenIdDecimals() {
         Map<TokenId, Integer> decimalsMap = new HashMap<>();
 
@@ -145,6 +173,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return decimalsMap;
     }
 
+    /**
+     * Extract the list of token transfer records.
+     *
+     * @return                          the list of token transfer records
+     */
     public Map<TokenId, Map<AccountId, Long>> getTokenTransfers() {
         Map<TokenId, Map<AccountId, Long>> transfers = new HashMap<>();
 
@@ -158,6 +191,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
+    /**
+     * Add a token transfer to the transaction.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @param isApproved                is it approved
+     * @return {@code this}
+     */
     private TransferTransaction doAddTokenTransfer(TokenId tokenId, AccountId accountId, long value, boolean isApproved) {
         requireNotFrozen();
 
@@ -172,10 +214,26 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Add a non approved token transfer to the transaction.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @return                          the updated transaction
+     */
     public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         return doAddTokenTransfer(tokenId, accountId, value, false);
     }
 
+    /**
+     * Add an approved token transfer to the transaction.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @return                          the updated transaction
+     */
     public TransferTransaction addApprovedTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         return doAddTokenTransfer(tokenId, accountId, value, true);
     }
@@ -216,6 +274,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Add a non approved token transfer with decimals.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @param decimals                  the deco
+     * @return                          the updated transaction
+     */
     public TransferTransaction addTokenTransferWithDecimals(
         TokenId tokenId,
         AccountId accountId,
@@ -225,6 +292,15 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return doAddTokenTransferWithDecimals(tokenId, accountId, value, decimals, false);
     }
 
+    /**
+     * Add an approved token transfer with decimals.
+     *
+     * @param tokenId                   the token id
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @param decimals                  the deco
+     * @return                          the updated transaction
+     */
     public TransferTransaction addApprovedTokenTransferWithDecimals(
         TokenId tokenId,
         AccountId accountId,
@@ -251,6 +327,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Extract the of token nft transfers.
+     *
+     * @return                          list of token nft transfers
+     */
     public Map<TokenId, List<TokenNftTransfer>> getTokenNftTransfers() {
         Map<TokenId, List<TokenNftTransfer>> transfers = new HashMap<>();
 
@@ -270,10 +351,26 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Add a non approved nft transfer.
+     *
+     * @param nftId                     the nft's id
+     * @param sender                    the sender account id
+     * @param receiver                  the receiver account id
+     * @return                          the updated transaction
+     */
     public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         return doAddNftTransfer(nftId, sender, receiver, false);
     }
 
+    /**
+     * Add an approved nft transfer.
+     *
+     * @param nftId                     the nft's id
+     * @param sender                    the sender account id
+     * @param receiver                  the receiver account id
+     * @return                          the updated transaction
+     */
     public TransferTransaction addApprovedNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         return doAddNftTransfer(nftId, sender, receiver, true);
     }
@@ -295,6 +392,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Extract the of hbar transfers.
+     *
+     * @return                          list of hbar transfers
+     */
     public Map<AccountId, Hbar> getHbarTransfers() {
         Map<AccountId, Hbar> transfers = new HashMap<>();
 
@@ -319,10 +421,24 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Add a non approved hbar transfer.
+     *
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @return                          the updated transaction
+     */
     public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
         return doAddHbarTransfer(accountId, value, false);
     }
 
+    /**
+     * Add an approved hbar transfer.
+     *
+     * @param accountId                 the account id
+     * @param value                     the value
+     * @return                          the updated transaction
+     */
     public TransferTransaction addApprovedHbarTransfer(AccountId accountId, Hbar value) {
         return doAddHbarTransfer(accountId, value, true);
     }
@@ -344,6 +460,12 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody}
+     */
     CryptoTransferTransactionBody.Builder build() {
         var tokenTransfers = new ArrayList<TokenTransferList>();
 
@@ -454,6 +576,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         scheduled.setCryptoTransfer(build());
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoTransfer();
 

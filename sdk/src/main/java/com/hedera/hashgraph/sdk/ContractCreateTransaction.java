@@ -90,27 +90,46 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
     private int maxAutomaticTokenAssociations = 0;
-    private AccountId autoRenewAccountId = null;
     @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
+    /**
+     * Constructor.
+     */
     public ContractCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         defaultMaxTransactionFee = new Hbar(20);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id as a byte code
+     */
     @Nullable
     public FileId getBytecodeFileId() {
         return bytecodeFileId;
@@ -135,6 +154,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the admin key.
+     *
+     * @return                          the admin key
+     */
     @Nullable
     public byte[] getBytecode() {
         return bytecode;
@@ -180,6 +204,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the gas.
+     *
+     * @return                          the gas amount that was set
+     */
     public long getGas() {
         return gas;
     }
@@ -196,6 +225,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the initial balance.
+     *
+     * @return                          the initial balance in hbar
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -214,6 +248,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -249,34 +288,17 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @param maxAutomaticTokenAssociations The maximum automatic token associations
      * @return  {@code this}
      */
-
     public ContractCreateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
         requireNotFrozen();
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
     }
 
-    @Nullable
-    public AccountId getAutoRenewAccountId() {
-        return autoRenewAccountId;
-    }
-
     /**
-     * Sets account to charge for auto-renewal of this contract. If not set, or set to an
-     * account with zero hbar balance, the contract's own hbar balance will be used to
-     * cover auto-renewal fees.
+     * Extract the auto renew period.
      *
-     * @param accountId ID of account to charge fees to
-     * @return {@code this}
+     * @return                          the auto renew period
      */
-
-    public ContractCreateTransaction setAutoRenewAccountId(AccountId accountId) {
-        Objects.requireNonNull(accountId);
-        requireNotFrozen();
-        autoRenewAccountId = accountId;
-        return this;
-    }
-
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -295,6 +317,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the constructor parameters.
+     *
+     * @return                          the byte string representation
+     */
     public ByteString getConstructorParameters() {
         return ByteString.copyFrom(constructorParameters);
     }
@@ -325,6 +352,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return setConstructorParameters(constructorParameters.toBytes(null).toByteArray());
     }
 
+    /**
+     * Extract the contract memo.
+     *
+     * @return                          the contract's memo
+     */
     public String getContractMemo() {
         return contractMemo;
     }
@@ -342,6 +374,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link ContractCreateTransactionBody}
+     */
     ContractCreateTransactionBody.Builder build() {
         var builder = ContractCreateTransactionBody.newBuilder();
         if (bytecodeFileId != null) {
@@ -357,9 +394,6 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
             builder.setAdminKey(adminKey.toProtobufKey());
         }
         builder.setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
-        if (autoRenewAccountId != null) {
-            builder.setProxyAccountID(autoRenewAccountId.toProtobuf());
-        }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
@@ -380,12 +414,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
         }
-
-        if (autoRenewAccountId != null) {
-            autoRenewAccountId.validateChecksum(client);
-        }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractCreateInstance();
 
@@ -402,9 +435,6 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
         maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
-        if (body.hasAutoRenewAccountId()) {
-            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccountId());
-        }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }

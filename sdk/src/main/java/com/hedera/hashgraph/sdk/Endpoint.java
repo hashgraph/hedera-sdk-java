@@ -25,15 +25,27 @@ import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * Utility class used internally by the sdk.
+ */
 public class Endpoint {
     @Nullable
     IPv4Address address = null;
 
     int port;
 
+    /**
+     * Constructor.
+     */
     Endpoint() {
     }
 
+    /**
+     * Create an endpoint object from a service endpoint protobuf.
+     *
+     * @param serviceEndpoint           the service endpoint protobuf
+     * @return                          the endpoint object
+     */
     static Endpoint fromProtobuf(ServiceEndpoint serviceEndpoint) {
         @Var var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
 
@@ -46,25 +58,52 @@ public class Endpoint {
             .setPort(port);
     }
 
+    /**
+     * Extract the ipv4 address.
+     *
+     * @return                          the ipv4 address
+     */
     @Nullable
     public IPv4Address getAddress() {
         return address;
     }
 
+    /**
+     * Assign the ipv4 address.
+     *
+     * @param address                   the desired ipv4 address
+     * @return {@code this}
+     */
     public Endpoint setAddress(IPv4Address address) {
         this.address = address;
         return this;
     }
 
+    /**
+     * Extract the port number.
+     *
+     * @return                          the port number
+     */
     public int getPort() {
         return port;
     }
 
+    /**
+     * Assign the desired port number.
+     *
+     * @param port                      the desired port number
+     * @return {@code this}
+     */
     public Endpoint setPort(int port) {
         this.port = port;
         return this;
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     ServiceEndpoint toProtobuf() {
         var builder = ServiceEndpoint.newBuilder();
 

@@ -53,9 +53,17 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     @Nullable
     private AccountId senderAccountId = null;
 
+    /**
+     * Constructor.
+     */
     public ContractCallQuery() {
     }
 
+    /**
+     * Extract the contract id.
+     *
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -73,6 +81,11 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    /**
+     * Extract the gas.
+     *
+     * @return                          the gas
+     */
     public long getGas() {
         return gas;
     }
@@ -96,6 +109,11 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars((long) (cost.toTinybars() * 1.1)));
     }
 
+    /**
+     * Extract the function parameters.
+     *
+     * @return                          the byte string representation
+     */
     public ByteString getFunctionParameters() {
         return ByteString.copyFrom(functionParameters);
     }

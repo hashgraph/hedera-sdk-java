@@ -30,6 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+/**
+ * Utility class used internally by the sdk.
+ */
 class EntityIdHelper {
     /**
      * The length of a Solidity address in bytes.
@@ -43,9 +46,20 @@ class EntityIdHelper {
 
     private static final Pattern ENTITY_ID_REGEX = Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
 
+    /**
+     * Constructor.
+     */
     private EntityIdHelper() {
     }
 
+    /**
+     * Generate an R object from a string.
+     *
+     * @param idString                  the id string
+     * @param constructObjectWithIdNums the R object generator
+     * @return                          the R type object
+     * @param <R>
+     */
     static <R> R fromString(String idString, WithIdNums<R> constructObjectWithIdNums) {
         var match = ENTITY_ID_REGEX.matcher(idString);
         if (!match.find()) {
@@ -60,6 +74,14 @@ class EntityIdHelper {
             match.group(4));
     }
 
+    /**
+     * Generate an R object from a solidity address.
+     *
+     * @param address                   the string representation
+     * @param withAddress               the R object generator
+     * @return                          the R type object
+     * @param <R>
+     */
     static <R> R fromSolidityAddress(String address, WithIdNums<R> withAddress) {
         return fromSolidityAddress(decodeSolidityAddress(address), withAddress);
     }
@@ -74,6 +96,12 @@ class EntityIdHelper {
         return withAddress.apply(buf.getInt(), buf.getLong(), buf.getLong(), null);
     }
 
+    /**
+     * Decode the solidity address from a string.
+     *
+     * @param address                   the string representation
+     * @return                          the decoded address
+     */
     private static byte[] decodeSolidityAddress(@Var String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
@@ -89,6 +117,14 @@ class EntityIdHelper {
         }
     }
 
+    /**
+     * Generate a solidity address.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @return                          the solidity address
+     */
     static String toSolidityAddress(long shard, long realm, long num) {
         if (Long.highestOneBit(shard) > 32) {
             throw new IllegalStateException("shard out of 32-bit range " + shard);
@@ -102,6 +138,13 @@ class EntityIdHelper {
                 .array());
     }
 
+    /**
+     * Generate a checksum.
+     *
+     * @param ledgerId                  the ledger id
+     * @param addr                      the address
+     * @return                          the checksum
+     */
     static String checksum(LedgerId ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
         List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
@@ -155,6 +198,16 @@ class EntityIdHelper {
         return answer.reverse().toString();
     }
 
+    /**
+     * Validate the configured client.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @param client                    the configured client
+     * @param checksum                  the checksum
+     * @throws BadEntityIdException
+     */
     static void validate(long shard, long realm, long num, Client client, @Nullable String checksum) throws BadEntityIdException {
         if (client.getNetworkName() == null) {
             throw new IllegalStateException("Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
@@ -170,10 +223,28 @@ class EntityIdHelper {
         }
     }
 
+    /**
+     * Generate a string representation.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @return                          the string representation
+     */
     static String toString(long shard, long realm, long num) {
         return "" + shard + "." + realm + "." + num;
     }
 
+    /**
+     * Generate a string representation with a checksum.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @param client                    the configured client
+     * @param checksum                  the checksum
+     * @return                          the string representation with checksum
+     */
     static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
         if (client.getLedgerId() != null) {
             return "" + shard + "." + realm + "." + num + "-" + checksum(client.getLedgerId(), EntityIdHelper.toString(shard, realm, num));

@@ -53,19 +53,39 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     @Nullable
     private Instant expirationTime = null;
 
+    /**
+     * Constructor.
+     */
     public SystemDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     SystemDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public final FileId getFileId() {
         return fileId;
@@ -86,6 +106,11 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         return this;
     }
 
+    /**
+     * Extract the contract id.
+     *
+     * @return                          the contract id
+     */
     @Nullable
     public final ContractId getContractId() {
         return contractId;
@@ -106,6 +131,11 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         return this;
     }
 
+    /**
+     * Extract the expiration time.
+     *
+     * @return                          the expiration time
+     */
     @Nullable
     public final Instant getExpirationTime() {
         return expirationTime;
@@ -127,6 +157,11 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody}
+     */
     SystemDeleteTransactionBody.Builder build() {
         var builder = SystemDeleteTransactionBody.newBuilder();
         if (fileId != null) {
@@ -142,6 +177,9 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         return builder;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getSystemDelete();
         if (body.hasFileID()) {
