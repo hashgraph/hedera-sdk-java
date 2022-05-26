@@ -67,9 +67,9 @@ message ContractUpdateTransactionBody {
     Key adminKey = 3;
 
     /**
-     * (NOT YET IMPLEMENTED) The new id of the account to which the contract is proxy staked
+     * [Deprecated] The new id of the account to which the contract is proxy staked
      */
-    AccountID proxyAccountID = 6;
+    AccountID proxyAccountID = 6 [deprecated = true];
 
     /**
      * (NOT YET IMPLEMENTED) The new interval at which the contract will pay to extend its expiry
@@ -109,4 +109,27 @@ message ContractUpdateTransactionBody {
      * account. Otherwise it updates the contract's auto-renew account to the referenced account.
      */
     AccountID auto_renew_account_id = 12;
+
+    /**
+     * ID of the new account or node to which this contract is staking.
+     */
+    oneof staked_id {
+
+        /**
+         * ID of the new account to which this contract is staking. If set to the sentinel <tt>0.0.0</tt> AccountID,
+         * this field removes the contract's staked account ID.
+         */
+        AccountID staked_account_id = 13;
+
+        /**
+         * ID of the new node this contract is staked to. If set to the sentinel <tt>-1</tt>, this field
+         * removes the contract's staked node ID.
+         */
+        int64 staked_node_id = 14;
+    }
+
+    /**
+     * If true, the contract declines receiving a staking reward.
+     */
+    google.protobuf.BoolValue decline_reward = 15;
 }

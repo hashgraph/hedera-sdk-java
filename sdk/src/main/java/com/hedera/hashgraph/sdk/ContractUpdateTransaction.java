@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.BoolValue;
 import com.google.protobuf.Int32Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
@@ -76,6 +77,15 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     private Duration autoRenewPeriod = null;
     @Nullable
     private String contractMemo = null;
+
+    @Nullable
+    private AccountId stakedNodeAccountId = null;
+
+    @Nullable
+    private Long stakedNodeId = null;
+
+    @Nullable
+    private Boolean declineStakingReward = null;
 
     /**
      * Contract.
@@ -308,6 +318,66 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * @return ID of the account to which this contract is staking.
+     */
+    @Nullable
+    public AccountId getStakedNodeAccountId() {
+        return stakedNodeAccountId;
+    }
+
+    /**
+     * @param stakedNodeAccountId ID of the account to which this contract is staking.
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction setStakedNodeAccountId(@Nullable AccountId stakedNodeAccountId) {
+        this.stakedNodeAccountId = stakedNodeAccountId;
+        return this;
+    }
+
+    /**
+     * @return ID of the node this contract is staked to.
+     */
+    @Nullable
+    public Long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * @param stakedNodeId ID of the node this contract is staked to.
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     */
+    public boolean getDeclineStakingReward() {
+        return declineStakingReward;
+    }
+
+    /**
+     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        this.declineStakingReward = declineStakingReward;
+        return this;
+    }
+
+    /**
+     * Clear the staking reward
+     *
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction clearDeclineStakingReward() {
+        this.declineStakingReward = null;
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -332,6 +402,18 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
         if (body.hasMemoWrapper()) {
             contractMemo = body.getMemoWrapper().getValue();
+        }
+
+        if (body.hasDeclineReward()) {
+            declineStakingReward = body.getDeclineReward().getValue();
+        }
+
+        if (body.hasStakedAccountId()) {
+            stakedNodeAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
+        }
+
+        if (body.hasStakedNodeId()) {
+            stakedNodeId = body.getStakedNodeId();
         }
     }
 
@@ -363,6 +445,19 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (contractMemo != null) {
             builder.setMemoWrapper(StringValue.of(contractMemo));
         }
+
+        if (stakedNodeAccountId != null) {
+            builder.setStakedAccountId(stakedNodeAccountId.toProtobuf());
+        }
+
+        if (stakedNodeId != null) {
+            builder.setStakedNodeId(stakedNodeId);
+        }
+
+        if (declineStakingReward != null) {
+            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+        }
+
         return builder;
     }
 
@@ -374,6 +469,10 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
+        }
+
+        if (stakedNodeAccountId != null) {
+            stakedNodeAccountId.validateChecksum(client);
         }
     }
 

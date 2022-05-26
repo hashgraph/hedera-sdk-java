@@ -134,6 +134,16 @@ message ContractGetInfoResponse {
          * balance, the contract's own hbar balance will be used to cover auto-renewal fees.
          */
         AccountID auto_renew_account_id = 13;
+
+        /**
+         * The maximum number of tokens that a contract can be implicitly associated with.
+         */
+        int32 max_automatic_token_associations = 14;
+
+        /**
+         * Staking metadata for this contract.
+         */
+        StakingInfo staking_info = 15;
     }
 
     /**
