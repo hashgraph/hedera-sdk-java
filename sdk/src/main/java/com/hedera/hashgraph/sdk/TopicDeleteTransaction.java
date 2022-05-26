@@ -43,19 +43,39 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     @Nullable
     private TopicId topicId = null;
 
+    /**
+     * Constructor.
+     */
     public TopicDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the topic id.
+     *
+     * @return                          the topic id
+     */
     @Nullable
     public TopicId getTopicId() {
         return topicId;
@@ -74,6 +94,9 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getConsensusDeleteTopic();
         if (body.hasTopicID()) {
@@ -81,6 +104,12 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody}
+     */
     ConsensusDeleteTopicTransactionBody.Builder build() {
         var builder = ConsensusDeleteTopicTransactionBody.newBuilder();
         if (topicId != null) {

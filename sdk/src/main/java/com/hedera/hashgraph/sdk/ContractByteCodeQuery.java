@@ -37,9 +37,17 @@ public final class ContractByteCodeQuery extends Query<ByteString, ContractByteC
     @Nullable
     private ContractId contractId = null;
 
+    /**
+     * Constructor.
+     */
     public ContractByteCodeQuery() {
     }
 
+    /**
+     * Extract the contract id.
+     *
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;

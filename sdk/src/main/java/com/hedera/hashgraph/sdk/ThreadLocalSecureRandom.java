@@ -21,6 +21,9 @@ package com.hedera.hashgraph.sdk;
 
 import java.security.SecureRandom;
 
+/**
+ * Internal utility class.
+ */
 final class ThreadLocalSecureRandom {
     @SuppressWarnings("AnonymousHasLambdaAlternative")
     private static final ThreadLocal<SecureRandom> secureRandom =
@@ -31,9 +34,17 @@ final class ThreadLocalSecureRandom {
             }
         };
 
+    /**
+     * Constructor.
+     */
     private ThreadLocalSecureRandom() {
     }
 
+    /**
+     * Extract seme randomness.
+     *
+     * @return                          some randomness
+     */
     static SecureRandom current() {
         return secureRandom.get();
     }

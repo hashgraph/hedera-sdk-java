@@ -31,13 +31,24 @@ import java8.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * Initializes the TokenInfoQuery object.
+ */
 public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, TokenInfoQuery> {
     @Nullable
     TokenId tokenId = null;
 
+    /**
+     * Constructor.
+     */
     public TokenInfoQuery() {
     }
 
+    /**
+     * Extract the token id.
+     *
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
@@ -46,7 +57,7 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
     /**
      * Sets the Token ID for which information is requested.
      *
-     * @param tokenId The TokenId to be set
+     * @param tokenId                           The TokenId to be set
      * @return {@code this}
      */
     public TokenInfoQuery setTokenId(TokenId tokenId) {

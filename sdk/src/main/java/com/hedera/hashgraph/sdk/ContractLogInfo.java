@@ -53,6 +53,14 @@ public final class ContractLogInfo {
      */
     public final ByteString data;
 
+    /**
+     * Constructor.
+     *
+     * @param contractId                the contract id
+     * @param bloom                     the bloom filter
+     * @param topics                    list of topics
+     * @param data                      the event data
+     */
     private ContractLogInfo(ContractId contractId, ByteString bloom, List<ByteString> topics, ByteString data) {
         this.contractId = contractId;
         this.bloom = bloom;
@@ -60,6 +68,12 @@ public final class ContractLogInfo {
         this.data = data;
     }
 
+    /**
+     * Convert to a protobuf.
+     *
+     * @param logInfo                   the log info object
+     * @return                          the protobuf
+     */
     static ContractLogInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractLoginfo logInfo) {
         return new ContractLogInfo(
             ContractId.fromProtobuf(logInfo.getContractID()),
@@ -69,10 +83,22 @@ public final class ContractLogInfo {
         );
     }
 
+    /**
+     * Create the contract log info from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the contract log info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractLoginfo.parseFrom(bytes));
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.ContractLoginfo toProtobuf() {
         var contractLogInfo = com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
             .setContractID(contractId.toProtobuf())
@@ -85,6 +111,11 @@ public final class ContractLogInfo {
         return contractLogInfo.build();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

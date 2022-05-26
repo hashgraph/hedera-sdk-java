@@ -38,9 +38,17 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     private AccountId accountId = null;
     private byte[] hash = {};
 
+    /**
+     * Constructor.
+     */
     public LiveHashQuery() {
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -58,6 +66,11 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
         return this;
     }
 
+    /**
+     * Extract the hash.
+     *
+     * @return                          the hash
+     */
     public ByteString getHash() {
         return ByteString.copyFrom(hash);
     }

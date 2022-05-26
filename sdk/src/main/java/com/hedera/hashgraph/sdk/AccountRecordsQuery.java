@@ -39,9 +39,17 @@ public final class AccountRecordsQuery extends Query<List<TransactionRecord>, Ac
     @Nullable
     private AccountId accountId = null;
 
+    /**
+     * Constructor.
+     */
     public AccountRecordsQuery() {
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;

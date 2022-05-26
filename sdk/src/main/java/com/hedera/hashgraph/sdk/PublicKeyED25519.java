@@ -29,13 +29,27 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 
+/**
+ * Encapsulate the ED25519 public key.
+ */
 class PublicKeyED25519 extends PublicKey {
     private final byte[] keyData;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the byte array representing the key
+     */
     PublicKeyED25519(byte[] keyData) {
         this.keyData = keyData;
     }
 
+    /**
+     * Create a key from a byte array representation.
+     *
+     * @param publicKey                 the byte array representing the key
+     * @return                          the new key
+     */
     static PublicKeyED25519 fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
             // If this is a 32 byte string, assume an Ed25519 public key
@@ -46,6 +60,12 @@ class PublicKeyED25519 extends PublicKey {
         return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 
+    /**
+     * Create a key from a subject public key info object.
+     *
+     * @param subjectPublicKeyInfo      the subject public key info object
+     * @return                          the new public key
+     */
     static PublicKeyED25519 fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
         return new PublicKeyED25519(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }

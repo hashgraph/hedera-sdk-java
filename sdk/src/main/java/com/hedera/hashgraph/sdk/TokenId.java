@@ -26,6 +26,11 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * Constructs a TokenId.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/token-id">Hedera Documentation</a>
+ */
 public class TokenId implements Comparable<TokenId> {
     /**
      * The shard number
@@ -48,15 +53,35 @@ public class TokenId implements Comparable<TokenId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * Constructor.
+     *
+     * @param num                       the num part
+     */
     public TokenId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     */
     @SuppressWarnings("InconsistentOverloads")
     public TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @param checksum                  the checksum
+     */
     @SuppressWarnings("InconsistentOverloads")
     TokenId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -65,35 +90,72 @@ public class TokenId implements Comparable<TokenId> {
         this.checksum = checksum;
     }
 
-    //Construct a token ID from string
+    /**
+     * Create a token id from a string.
+     *
+     * @param id                        the string representation
+     * @return                          the new token id
+     */
     public static TokenId fromString(String id) {
         return EntityIdHelper.fromString(id, TokenId::new);
     }
 
+    /**
+     * Create a token id from a protobuf.
+     *
+     * @param tokenId                   the protobuf
+     * @return                          the new token id
+     */
     static TokenId fromProtobuf(TokenID tokenId) {
         Objects.requireNonNull(tokenId);
         return new TokenId(tokenId.getShardNum(), tokenId.getRealmNum(), tokenId.getTokenNum());
     }
 
-    //Construct a token ID from bytes
+    /**
+     * Create a token id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new token id
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TokenId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenID.parseFrom(bytes).toBuilder().build());
     }
 
-    //Construct a token ID from a solidity address
+    /**
+     * Create a token id from a solidity address.
+     *
+     * @param address                   the solidity address as a string
+     * @return                          the new token id
+     */
     public static TokenId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, TokenId::new);
     }
 
+    /**
+     * Create an nft id.
+     *
+     * @param serial                    the serial number
+     * @return                          the new nft id
+     */
     public NftId nft(@Nonnegative long serial) {
         return new NftId(this, serial);
     }
 
-    //Construct a solidity address from a token ID
+    /**
+     * Extract the solidity address as a string.
+     *
+      * @return                         the solidity address as a string
+     */
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          a protobuf representation
+     */
     TokenID toProtobuf() {
         return TokenID.newBuilder()
             .setShardNum(shard)
@@ -112,15 +174,31 @@ public class TokenId implements Comparable<TokenId> {
         validateChecksum(client);
     }
 
+    /**
+     * Validate the configured client.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
+    /**
+     * Extract the checksum.
+     *
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
@@ -130,6 +208,12 @@ public class TokenId implements Comparable<TokenId> {
         return EntityIdHelper.toString(shard, realm, num);
     }
 
+    /**
+     * Create a string representation with checksum.
+     *
+     * @param client                    the configured client
+     * @return                          the string representation with checksum
+     */
     public String toStringWithChecksum(Client client) {
         return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }

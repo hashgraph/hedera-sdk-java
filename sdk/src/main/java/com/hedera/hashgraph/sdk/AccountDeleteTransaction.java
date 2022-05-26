@@ -44,20 +44,38 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
     @Nullable
     private AccountId transferAccountId = null;
 
-
+    /**
+     * Constructor.
+     */
     public AccountDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     AccountDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -76,6 +94,11 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         return this;
     }
 
+    /**
+     * Extract the receiving account id.
+     *
+     * @return                          the account id that receives the hbar
+     */
     @Nullable
     public AccountId getTransferAccountId() {
         return transferAccountId;
@@ -110,6 +133,11 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         return CryptoServiceGrpc.getCryptoDeleteMethod();
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link CryptoDeleteTransactionBody}
+     */
     CryptoDeleteTransactionBody.Builder build() {
         var builder = CryptoDeleteTransactionBody.newBuilder();
 
@@ -124,6 +152,9 @@ public final class AccountDeleteTransaction extends Transaction<AccountDeleteTra
         return builder;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoDelete();
         if (body.hasDeleteAccountID()) {

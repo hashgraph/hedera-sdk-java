@@ -47,9 +47,17 @@ public final class TransactionReceiptQuery
     private boolean includeChildren = false;
     private boolean includeDuplicates = false;
 
+    /**
+     * Constructor.
+     */
     public TransactionReceiptQuery() {
     }
 
+    /**
+     * Extract the transaction id.
+     *
+     * @return                          the transaction id
+     */
     @Override
     @Nullable
     public TransactionId getTransactionIdInternal() {
@@ -68,6 +76,11 @@ public final class TransactionReceiptQuery
         return this;
     }
 
+    /**
+     * Should the children be included?
+     *
+     * @return                          should children be included
+     */
     public boolean getIncludeChildren() {
         return includeChildren;
     }
@@ -84,6 +97,11 @@ public final class TransactionReceiptQuery
         return this;
     }
 
+    /**
+     * Should duplicates be included?
+     *
+     * @return                          should duplicates be included
+     */
     public boolean getIncludeDuplicates() {
         return includeDuplicates;
     }
@@ -142,6 +160,12 @@ public final class TransactionReceiptQuery
         return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children);
     }
 
+    /**
+     * Create a list of transaction receipts from a protobuf.
+     *
+     * @param protoReceiptList          the protobuf
+     * @return                          the list of transaction receipts
+     */
     private static List<TransactionReceipt> mapReceiptList(
         List<com.hedera.hashgraph.sdk.proto.TransactionReceipt> protoReceiptList
     ) {
