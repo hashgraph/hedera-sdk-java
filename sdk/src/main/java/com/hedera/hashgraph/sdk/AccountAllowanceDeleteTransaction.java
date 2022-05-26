@@ -36,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * This transaction type is for deleting an account allowance.
+ */
 public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction<AccountAllowanceDeleteTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances = new ArrayList<>();
@@ -43,9 +46,18 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
     // <ownerId, <tokenId, index>>
     private final Map<AccountId, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
+    /**
+     * Constructor.
+     */
     public AccountAllowanceDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException   when there is an issue with the protobuf
+     */
     AccountAllowanceDeleteTransaction(
         LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs
     ) throws InvalidProtocolBufferException {
@@ -53,6 +65,11 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountAllowanceDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
@@ -70,6 +87,9 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     /**
      * @deprecated with no replacement
+     *
+     * @param ownerAccountId            the owner's account id
+     * @return {@code this}
      */
     @Deprecated
     public AccountAllowanceDeleteTransaction deleteAllHbarAllowances(AccountId ownerAccountId) {
@@ -80,6 +100,8 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     /**
      * @deprecated with no replacement
+     *
+     * @return                          a list of hbar allowance records
      */
     @Deprecated
     public List<HbarAllowance> getHbarAllowanceDeletions() {
@@ -88,6 +110,10 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     /**
      * @deprecated with no replacement
+     *
+     * @param tokenId                   the token id
+     * @param ownerAccountId            the owner's account id
+     * @return {@code this}
      */
     @Deprecated
     public AccountAllowanceDeleteTransaction deleteAllTokenAllowances(TokenId tokenId, AccountId ownerAccountId) {
@@ -103,12 +129,21 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
 
     /**
      * @deprecated with no replacement
+     *
+     * @return                          a list of token allowance records
      */
     @Deprecated
     public List<TokenAllowance> getTokenAllowanceDeletions() {
         return new ArrayList<>(tokenAllowances);
     }
 
+    /**
+     * Remove all nft token allowances.
+     *
+     * @param nftId                     nft's id
+     * @param ownerAccountId            owner's account id
+     * @return                          {@code this}
+     */
     public AccountAllowanceDeleteTransaction deleteAllTokenNftAllowances(NftId nftId, AccountId ownerAccountId) {
         requireNotFrozen();
         Objects.requireNonNull(nftId);
@@ -116,6 +151,11 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         return this;
     }
 
+    /**
+     * Return list of nft tokens to be deleted.
+     *
+     * @return                          list of token nft allowances
+     */
     public List<TokenNftAllowance> getTokenNftAllowanceDeletions() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {
@@ -124,6 +164,13 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         return retval;
     }
 
+    /**
+     * Return list of nft serial numbers.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param tokenId                   the token's id
+     * @return                          list of nft serial numbers
+     */
     private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, TokenId tokenId) {
         var key = ownerAccountId;
         if (nftMap.containsKey(key)) {
@@ -140,6 +187,14 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         }
     }
 
+    /**
+     * Return serial numbers of new nft's.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param tokenId                   the token's id
+     * @param innerMap                  list of token id's and serial number records
+     * @return                          list of nft serial numbers
+     */
     private List<Long> newNftSerials(
         @Nullable AccountId ownerAccountId,
         TokenId tokenId,
@@ -162,6 +217,11 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
         return CryptoServiceGrpc.getDeleteAllowancesMethod();
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link CryptoDeleteAllowanceTransactionBody}
+     */
     CryptoDeleteAllowanceTransactionBody.Builder build() {
         var builder = CryptoDeleteAllowanceTransactionBody.newBuilder();
         for (var allowance : nftAllowances) {

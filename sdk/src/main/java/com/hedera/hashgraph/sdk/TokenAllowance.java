@@ -26,15 +26,40 @@ import com.hedera.hashgraph.sdk.proto.GrantedTokenAllowance;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * An approved allowance of token transfers for a spender.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenallowance">Hedera Documentation</a>
+ */
 public class TokenAllowance {
+    /**
+     * The token that the allowance pertains to
+     */
     @Nullable
     public final TokenId tokenId;
+    /**
+     * The account ID of the hbar owner (ie. the grantor of the allowance)
+     */
     @Nullable
     public final AccountId ownerAccountId;
+    /**
+     * The account ID of the spender of the hbar allowance
+     */
     @Nullable
     public final AccountId spenderAccountId;
+    /**
+     * The amount of the spender's token allowance
+     */
     public final long amount;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param ownerAccountId            the grantor account id
+     * @param spenderAccountId          the spender account id
+     * @param amount                    the token allowance
+     */
     TokenAllowance(
         @Nullable TokenId tokenId,
         @Nullable AccountId ownerAccountId,
@@ -47,6 +72,12 @@ public class TokenAllowance {
         this.amount = amount;
     }
 
+    /**
+     * Create a token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the new token allowance
+     */
     static TokenAllowance fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance allowanceProto) {
         return new TokenAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
@@ -56,6 +87,12 @@ public class TokenAllowance {
         );
     }
 
+    /**
+     * Create a token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the new token allowance
+     */
     static TokenAllowance fromProtobuf(GrantedTokenAllowance allowanceProto) {
         return new TokenAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
@@ -65,10 +102,23 @@ public class TokenAllowance {
         );
     }
 
+    /**
+     * Create a token allowance from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new token allowance
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TokenAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
+    /**
+     * Validate the configured client.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
     void validateChecksums(Client client) throws BadEntityIdException {
         if (tokenId != null) {
             tokenId.validateChecksum(client);
@@ -81,6 +131,11 @@ public class TokenAllowance {
         }
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.TokenAllowance toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.TokenAllowance.newBuilder()
             .setAmount(amount);
@@ -96,6 +151,11 @@ public class TokenAllowance {
         return builder.build();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the protobuf representation
+     */
     GrantedTokenAllowance toGrantedProtobuf() {
         var builder = GrantedTokenAllowance.newBuilder()
             .setAmount(amount);
@@ -108,6 +168,11 @@ public class TokenAllowance {
         return builder.build();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

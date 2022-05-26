@@ -38,6 +38,12 @@ final class FutureConverter {
     private FutureConverter() {
     }
 
+    /**
+     * Generate a T object from a listenable future.
+     *
+     * @param listenableFuture          the T object generator
+     * @return                          the T type object
+     */
     static <T> CompletableFuture<T> toCompletableFuture(ListenableFuture<T> listenableFuture) {
         return Java8FutureUtils.createCompletableFuture(
             GuavaFutureUtils.createValueSourceFuture(listenableFuture));

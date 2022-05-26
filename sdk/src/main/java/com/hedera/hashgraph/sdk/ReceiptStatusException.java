@@ -38,6 +38,12 @@ public class ReceiptStatusException extends Exception {
      */
     public final TransactionReceipt receipt;
 
+    /**
+     * Constructor.
+     *
+     * @param transactionId             the transaction id
+     * @param receipt                   the receipt
+     */
     ReceiptStatusException(TransactionId transactionId, TransactionReceipt receipt) {
         this.transactionId = transactionId;
         this.receipt = receipt;

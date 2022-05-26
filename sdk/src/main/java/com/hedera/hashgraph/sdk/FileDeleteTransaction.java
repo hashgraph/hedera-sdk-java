@@ -46,19 +46,39 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     FileDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
@@ -77,6 +97,9 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileDelete();
         if (body.hasFileID()) {
@@ -84,6 +107,11 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileDeleteTransactionBody builder}
+     */
     FileDeleteTransactionBody.Builder build() {
         var builder = FileDeleteTransactionBody.newBuilder();
         if (fileId != null) {

@@ -31,14 +31,28 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+/**
+ * Encapsulate the ECDSA public key.
+ */
 public class PublicKeyECDSA extends PublicKey {
     // Compressed 33 byte form
     private byte[] keyData;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the byte array representing the key
+     */
     PublicKeyECDSA(byte[] keyData) {
         this.keyData = keyData;
     }
 
+    /**
+     * Create a key from a byte array representation.
+     *
+     * @param publicKey                 the byte array representing the key
+     * @return                          the new key
+     */
     static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == 33) {
             // compressed 33 byte raw form
@@ -54,6 +68,12 @@ public class PublicKeyECDSA extends PublicKey {
         return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 
+    /**
+     * Create a key from a subject public key info object.
+     *
+     * @param subjectPublicKeyInfo      the subject public key info object
+     * @return                          the new public key
+     */
     static PublicKeyECDSA fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
         return new PublicKeyECDSA(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }

@@ -31,30 +31,63 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
+/**
+ * Freezes transfers of the specified token for the account.
+ *
+ * The transaction must be signed by the token's Freeze Key.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account">Hedera Documentation</a>
+ */
 public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenFreezeTransaction> {
     @Nullable
     private TokenId tokenId = null;
     @Nullable
     private AccountId accountId = null;
 
+    /**
+     * Constructor.
+     */
     public TokenFreezeTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TokenFreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenFreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the token id.
+     *
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenFreezeTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -62,11 +95,22 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
         return this;
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
 
+    /**
+     * Assign the account id.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
     public TokenFreezeTransaction setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         requireNotFrozen();
@@ -74,6 +118,9 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenFreeze();
         if (body.hasToken()) {
@@ -85,6 +132,12 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenFreezeAccountTransactionBody}
+     */
     TokenFreezeAccountTransactionBody.Builder build() {
         var builder = TokenFreezeAccountTransactionBody.newBuilder();
         if (tokenId != null) {

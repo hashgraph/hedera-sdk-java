@@ -33,11 +33,23 @@ public final class ProxyStaker {
      */
     public final Hbar amount;
 
+    /**
+     * Constructor.
+     *
+     * @param accountId                 the account id
+     * @param amount                    the amount
+     */
     private ProxyStaker(AccountId accountId, long amount) {
         this.accountId = accountId;
         this.amount = Hbar.fromTinybars(amount);
     }
 
+    /**
+     * Create a proxy staker object from a protobuf.
+     *
+     * @param proxyStaker               the protobuf
+     * @return                          the new proxy staker object
+     */
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {
         return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID()), proxyStaker.getAmount());
     }
