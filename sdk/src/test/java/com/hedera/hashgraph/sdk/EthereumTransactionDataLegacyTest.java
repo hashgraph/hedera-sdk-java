@@ -51,7 +51,7 @@ public class EthereumTransactionDataLegacyTest {
         assertThat(Hex.toHexString(data.value)).isEqualTo("0de0b6b3a7640000");
         assertThat(Hex.toHexString(data.callData)).isEqualTo("123456");
         assertThat(Hex.toHexString(data.accessList)).isEqualTo("");
-        assertThat(Hex.toHexString(data.recId)).isEqualTo("01");
+        assertThat(Hex.toHexString(data.recoveryId)).isEqualTo("01");
         assertThat(Hex.toHexString(data.r)).isEqualTo("df48f2efd10421811de2bfb125ab75b2d3c44139c4642837fb1fccce911fd479");
         assertThat(Hex.toHexString(data.s)).isEqualTo("1aaf7ae92bee896651dfc9d99ae422a296bf5d9f1ca49b2d96d82b79eb112d66");
     }

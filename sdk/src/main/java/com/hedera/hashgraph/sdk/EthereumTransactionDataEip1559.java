@@ -20,7 +20,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
     public byte[] to;
     public byte[] value;
     public byte[] accessList;
-    public byte[] recId;
+    public byte[] recoveryId;
     public byte[] r;
     public byte[] s;
 
@@ -34,7 +34,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
         byte[] value,
         byte[] callData,
         byte[] accessList,
-        byte[] recId,
+        byte[] recoveryId,
         byte[] r,
         byte[] s
     ) {
@@ -48,7 +48,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
         this.to = to;
         this.value = value;
         this.accessList = accessList;
-        this.recId = recId;
+        this.recoveryId = recoveryId;
         this.r = r;
         this.s = s;
     }
@@ -90,7 +90,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
     public byte[] toBytes() {
         return RLPEncoder.encodeSequentially(Integers.toBytes(0x02), Lists.of(
             chainId, nonce, maxPriorityGas, maxGas, gasLimit, to,
-            value, callData, new ArrayList<String>(), recId, r, s
+            value, callData, new ArrayList<String>(), recoveryId, r, s
         ));
     }
 
@@ -104,7 +104,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
             .add("to", Hex.toHexString(to))
             .add("value", Hex.toHexString(value))
             .add("accessList", Hex.toHexString(accessList))
-            .add("recId", Hex.toHexString(recId))
+            .add("recoveryId", Hex.toHexString(recoveryId))
             .add("r", Hex.toHexString(r))
             .add("s", Hex.toHexString(s))
             .toString();
