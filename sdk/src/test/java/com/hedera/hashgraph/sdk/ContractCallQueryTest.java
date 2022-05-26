@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -46,6 +47,7 @@ public class ContractCallQueryTest {
         SnapshotMatcher.expect(new ContractCallQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .setGas(1541)
+            .setSenderAccountId(AccountId.fromString("1.2.3"))
             .setFunction("foo",
                 new ContractFunctionParameters()
                     .addString("Hello")
@@ -59,6 +61,7 @@ public class ContractCallQueryTest {
         SnapshotMatcher.expect(new ContractCallQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .setGas(1541)
+            .setSenderAccountId(AccountId.fromString("1.2.3"))
             .setFunctionParameters(
                 new ContractFunctionParameters()
                     .addString("Hello")

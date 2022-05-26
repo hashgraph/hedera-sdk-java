@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## v2.14.0
 
 ## v2.14.0-beta.3
 
@@ -13,10 +13,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
+ * `TransactionResponse.scheduledTransactionId` with no replacement.
+
+### Added
+
+ * `AccountId.aliasEvmAddress`
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
+ * `CustomRoyaltyFee.getFallbackFee()`
+ * `TransactionResponse.get[Receipt|Record]Query()`
+
+## v2.13.0 - Where did it go?!
+
+## v2.12.0
+
+### Added
+
  * `AccountAllowanceAdjustTransaction` with no replacement.
- * `AccountAllowanceDeleteTransaction.deleteAll[Hbar|Token]Allowances` with no replacements.
+ * `AccountAllowanceDeleteTransaction`
+ * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
  * `TransactionRecord.[hbar|token|tokenNft]AllowanceAdjustments`.
  * `AccountInfo.[hbar|token|tokenNft]Allowances`.
+ * `AccountAllowanceExample`
+ * License Headers
 
 ## v2.12.0-beta.1
 

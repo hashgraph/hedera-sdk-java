@@ -44,6 +44,7 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
     public final TransactionId transactionId;
 
     @Nullable
+    @Deprecated
     public final TransactionId scheduledTransactionId;
 
     /**
@@ -88,6 +89,12 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
         return receipt;
     }
 
+    public TransactionReceiptQuery getReceiptQuery() {
+        return new TransactionReceiptQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId));
+    }
+
     @Override
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
         return new TransactionReceiptQuery()
@@ -112,6 +119,12 @@ public final class TransactionResponse implements WithGetReceipt, WithGetRecord 
             .setTransactionId(transactionId)
             .setNodeAccountIds(Collections.singletonList(nodeId))
             .execute(client);
+    }
+
+    public TransactionRecordQuery getRecordQuery() {
+        return new TransactionRecordQuery()
+            .setTransactionId(transactionId)
+            .setNodeAccountIds(Collections.singletonList(nodeId));
     }
 
     @Override

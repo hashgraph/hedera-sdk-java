@@ -117,7 +117,7 @@ public enum RequestType {
     CONTRACT_GET_INFO(HederaFunctionality.ContractGetInfo),
 
     /**
-     * Smart Contract, get the byte code
+     * Smart Contract, get the runtime code
      */
     CONTRACT_GET_BYTECODE(HederaFunctionality.ContractGetBytecode),
 
@@ -372,7 +372,12 @@ public enum RequestType {
      * Gets all the information about an account, including balance and allowances. This does not get the list of
      * account records.
      */
-    GET_ACCOUNT_DETAILS(HederaFunctionality.GetAccountDetails);
+    GET_ACCOUNT_DETAILS(HederaFunctionality.GetAccountDetails),
+
+    /**
+     * Ethereum Transaction
+     */
+    ETHEREUM_TRANSACTION(HederaFunctionality.EthereumTransaction);
 
     final HederaFunctionality code;
 
@@ -522,6 +527,8 @@ public enum RequestType {
                 return CRYPTO_DELETE_ALLOWANCE;
             case GetAccountDetails:
                 return GET_ACCOUNT_DETAILS;
+            case EthereumTransaction:
+                return ETHEREUM_TRANSACTION;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -670,6 +677,8 @@ public enum RequestType {
                 return "CRYPTO_DELETE_ALLOWANCE";
             case GET_ACCOUNT_DETAILS:
                 return "GET_ACCOUNT_DETAILS";
+            case ETHEREUM_TRANSACTION:
+                return "ETHEREUM_TRANSACTION";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

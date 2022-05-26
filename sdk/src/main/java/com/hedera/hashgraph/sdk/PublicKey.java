@@ -262,7 +262,7 @@ public abstract class PublicKey extends Key {
      * @return                          the new account id
      */
     public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
-        return new AccountId(shard, realm, 0, null, this);
+        return new AccountId(shard, realm, 0, null, this, null);
     }
 
     /**

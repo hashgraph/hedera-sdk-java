@@ -61,7 +61,8 @@ import "schedulable_transaction_body.proto";
  * the payer of the originating <tt>ScheduleCreate</tt>.  
  * 
  * Two <tt>ScheduleCreate</tt> transactions are <i>identical</i> if they are equal in all their
- * fields other than <tt>payerAccountID</tt>.  (Here "equal" should be understood in the sense of
+ * fields other than <tt>payerAccountID</tt>.  (For the <tt>scheduledTransactionBody</tt> field,
+ * "equal" should be understood in the sense of
  * gRPC object equality in the network software runtime. In particular, a gRPC object with <a
  * href="https://developers.google.com/protocol-buffers/docs/proto3#unknowns">unknown fields</a> is
  * not equal to a gRPC object without unknown fields, even if they agree on all known fields.) 

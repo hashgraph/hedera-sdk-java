@@ -13,8 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenDissociateIntegrationTest {
     @Test
@@ -106,15 +105,13 @@ class TokenDissociateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenDissociateTransaction()
                 .freezeWith(testEnv.client)
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_ACCOUNT_ID.toString()));
+        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
         testEnv.close(accountId, key);
     }
@@ -151,15 +148,13 @@ class TokenDissociateIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenDissociateTransaction()
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.INVALID_SIGNATURE.toString()));
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId, accountId, key);
     }
@@ -196,7 +191,7 @@ class TokenDissociateIntegrationTest {
                 .tokenId
         );
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenDissociateTransaction()
                 .setAccountId(accountId)
                 .setTokenIds(Collections.singletonList(tokenId))
@@ -204,9 +199,7 @@ class TokenDissociateIntegrationTest {
                 .sign(key)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString()));
+        }).withMessageContaining(Status.TOKEN_NOT_ASSOCIATED_TO_ACCOUNT.toString());
 
         testEnv.close(tokenId, accountId, key);
     }

@@ -415,7 +415,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 .setNodeAccountIds(Collections.singletonList(nodeAccountId))
                 .execute(this);
         } catch (Exception e) {
-            logger.debug("pining account {} failed with exception {}", nodeAccountId, e.getMessage());
+            logger.debug("pinging account {} failed with exception {}", nodeAccountId, e.getMessage());
         }
 
         return null;

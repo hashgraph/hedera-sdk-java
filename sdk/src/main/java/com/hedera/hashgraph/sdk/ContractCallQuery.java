@@ -50,6 +50,8 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     private long gas = 0;
     private byte[] functionParameters = {};
     private long maxResultSize = 0;
+    @Nullable
+    private AccountId senderAccountId = null;
 
     /**
      * Constructor.
@@ -179,6 +181,26 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    @Nullable
+    public AccountId getSenderAccountId() {
+        return senderAccountId;
+    }
+
+    /**
+     * Sets the account that is the "sender." If not present it is the accountId from the transactionId.
+     * Typically a different value than specified in the transactionId requires a valid signature
+     * over either the hedera transaction or foreign transaction data.
+     *
+     * @param senderAccountId the account that is the "sender"
+     * @return {@code this}
+     */
+
+    public ContractCallQuery setSenderAccountId(AccountId senderAccountId) {
+        Objects.requireNonNull(senderAccountId);
+        this.senderAccountId = senderAccountId;
+        return this;
+    }
+
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (contractId != null) {
@@ -194,6 +216,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         }
         builder.setGas(gas);
         builder.setFunctionParameters(ByteString.copyFrom(functionParameters));
+        if (senderAccountId != null) {
+            builder.setSenderId(senderAccountId.toProtobuf());
+        }
 
         queryBuilder.setContractCallLocal(builder.setHeader(header));
     }

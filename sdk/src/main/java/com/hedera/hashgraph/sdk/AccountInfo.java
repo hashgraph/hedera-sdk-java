@@ -120,13 +120,15 @@ public final class AccountInfo {
 
     public final int maxAutomaticTokenAssociations;
 
+    @Nullable
+    public final PublicKey aliasKey;
+
     /**
      * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
      */
     public final LedgerId ledgerId;
 
-    @Nullable
-    public final PublicKey aliasKey;
+    public final long ethereumNonce;
 
     @Deprecated
     public final List<HbarAllowance> hbarAllowances;
@@ -179,7 +181,8 @@ public final class AccountInfo {
         long ownedNfts,
         int maxAutomaticTokenAssociations,
         @Nullable PublicKey aliasKey,
-        LedgerId ledgerId
+        LedgerId ledgerId,
+        long ethereumNonce
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -200,6 +203,7 @@ public final class AccountInfo {
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         this.aliasKey = aliasKey;
         this.ledgerId = ledgerId;
+        this.ethereumNonce = ethereumNonce;
         this.hbarAllowances = Collections.emptyList();
         this.tokenAllowances = Collections.emptyList();
         this.tokenNftAllowances = Collections.emptyList();
@@ -251,7 +255,8 @@ public final class AccountInfo {
             accountInfo.getOwnedNfts(),
             accountInfo.getMaxAutomaticTokenAssociations(),
             aliasKey,
-            LedgerId.fromByteString(accountInfo.getLedgerId())
+            LedgerId.fromByteString(accountInfo.getLedgerId()),
+            accountInfo.getEthereumNonce()
         );
     }
 
@@ -291,7 +296,8 @@ public final class AccountInfo {
             .setMemo(accountMemo)
             .setOwnedNfts(ownedNfts)
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setLedgerId(ledgerId.toByteString());
+            .setLedgerId(ledgerId.toByteString())
+            .setEthereumNonce(ethereumNonce);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -330,6 +336,7 @@ public final class AccountInfo {
             .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
             .add("aliasKey", aliasKey)
             .add("ledgerId", ledgerId)
+            .add("ethereumNonce", ethereumNonce)
             .toString();
     }
 

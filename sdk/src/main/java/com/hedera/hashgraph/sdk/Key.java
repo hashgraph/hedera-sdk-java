@@ -56,7 +56,11 @@ public abstract class Key {
                 return new PublicKeyED25519(key.getEd25519().toByteArray());
 
             case ECDSA_SECP256K1:
-                return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                if (key.getECDSASecp256K1().size() == 20) {
+                    return new EvmAddress(key.getECDSASecp256K1().toByteArray());
+                } else {
+                    return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                }
 
             case KEYLIST:
                 return KeyList.fromProtobuf(key.getKeyList(), null);

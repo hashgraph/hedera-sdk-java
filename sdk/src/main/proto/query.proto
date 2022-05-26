@@ -87,7 +87,7 @@ message Query {
         ContractGetInfoQuery contractGetInfo = 4;
 
         /**
-         * Get bytecode used by a smart contract instance
+         * Get runtime code used by a smart contract instance
          */
         ContractGetBytecodeQuery contractGetBytecode = 5;
 

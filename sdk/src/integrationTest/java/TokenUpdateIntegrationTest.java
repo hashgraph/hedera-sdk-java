@@ -10,11 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenUpdateIntegrationTest {
     @Test
@@ -42,25 +39,23 @@ class TokenUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals("ffff", info.name);
-        assertEquals("F", info.symbol);
-        assertEquals(3, info.decimals);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNotNull(info.freezeKey);
-        assertNotNull(info.wipeKey);
-        assertNotNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
-        assertNotNull(info.defaultFreezeStatus);
-        assertFalse(info.defaultFreezeStatus);
-        assertNotNull(info.defaultKycStatus);
-        assertFalse(info.defaultKycStatus);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("ffff");
+        assertThat(info.symbol).isEqualTo("F");
+        assertThat(info.decimals).isEqualTo(3);
+        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNotNull();
+        assertThat(info.wipeKey).isNotNull();
+        assertThat(info.kycKey).isNotNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.defaultFreezeStatus).isNotNull().isFalse();
+        assertThat(info.defaultKycStatus).isNotNull().isFalse();
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -73,25 +68,25 @@ class TokenUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertEquals(tokenId, info.tokenId);
-        assertEquals("aaaa", info.name);
-        assertEquals("A", info.symbol);
-        assertEquals(3, info.decimals);
-        assertEquals(testEnv.operatorId, info.treasuryAccountId);
-        assertNotNull(info.adminKey);
-        assertNotNull(info.freezeKey);
-        assertNotNull(info.wipeKey);
-        assertNotNull(info.kycKey);
-        assertNotNull(info.supplyKey);
-        assertEquals(testEnv.operatorKey.toString(), info.adminKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.freezeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.wipeKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.kycKey.toString());
-        assertEquals(testEnv.operatorKey.toString(), info.supplyKey.toString());
-        assertNotNull(info.defaultFreezeStatus);
-        assertFalse(info.defaultFreezeStatus);
-        assertNotNull(info.defaultKycStatus);
-        assertFalse(info.defaultKycStatus);
+        assertThat(info.tokenId).isEqualTo(tokenId);
+        assertThat(info.name).isEqualTo("aaaa");
+        assertThat(info.symbol).isEqualTo("A");
+        assertThat(info.decimals).isEqualTo(3);
+        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+        assertThat(info.adminKey).isNotNull();
+        assertThat(info.freezeKey).isNotNull();
+        assertThat(info.wipeKey).isNotNull();
+        assertThat(info.kycKey).isNotNull();
+        assertThat(info.supplyKey).isNotNull();
+        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.defaultFreezeStatus).isNotNull();
+        assertThat(info.defaultFreezeStatus).isFalse();
+        assertThat(info.defaultKycStatus).isNotNull();
+        assertThat(info.defaultKycStatus).isFalse();
 
         testEnv.close(tokenId);
     }
@@ -110,18 +105,15 @@ class TokenUpdateIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var error = assertThrows(ReceiptStatusException.class, () -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
                 .setTokenName("aaaa")
                 .setTokenSymbol("A")
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
 
-        assertTrue(error.getMessage().contains(Status.TOKEN_IS_IMMUTABLE.toString()));
-
-        // we lose this IntegrationTestEnv throwaway account
-        testEnv.client.close();
+        testEnv.close();
     }
 }

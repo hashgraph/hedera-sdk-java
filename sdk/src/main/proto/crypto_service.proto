@@ -58,7 +58,7 @@ service CryptoService {
     rpc approveAllowances (Transaction) returns (TransactionResponse);
 
     /**
-     * Deletes the approved hbar or token allowances on an owner account.
+     * Deletes one or more of the specific approved NFT serial numbers on an owner account.
      */
     rpc deleteAllowances (Transaction) returns (TransactionResponse);
 

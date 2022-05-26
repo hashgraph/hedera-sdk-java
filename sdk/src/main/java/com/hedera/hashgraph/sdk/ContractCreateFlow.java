@@ -41,6 +41,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private Hbar initialBalance = Hbar.ZERO;
     @Nullable
     private AccountId proxyAccountId = null;
+    private int maxAutomaticTokenAssociations = 0;
     @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
@@ -194,6 +195,16 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         return this;
     }
 
+    public int getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    public ContractCreateFlow setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        Objects.requireNonNull(proxyAccountId);
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        return this;
+    }
+  
     /**
      * Extract the auto renew period.
      *
@@ -333,7 +344,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
             .setBytecodeFileId(fileId)
             .setConstructorParameters(constructorParameters)
             .setGas(gas)
-            .setInitialBalance(initialBalance);
+            .setInitialBalance(initialBalance)
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
         if (adminKey != null) {
             contractCreateTx.setAdminKey(adminKey);
         }

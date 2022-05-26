@@ -11,10 +11,8 @@ import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class FileAppendIntegrationTest {
     @Test
@@ -34,12 +32,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(28, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileAppendTransaction()
             .setFileId(fileId)
@@ -51,12 +49,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(56, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(56);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -85,12 +83,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(28, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileAppendTransaction()
             .setFileId(fileId)
@@ -102,18 +100,18 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS, contents.toStringUtf8());
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
         info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(13522, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(13522);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)
@@ -142,12 +140,12 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(28, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         var appendTx = new FileAppendTransaction()
             .setFileId(fileId)
@@ -160,18 +158,18 @@ public class FileAppendIntegrationTest {
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS, contents.toStringUtf8());
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
         info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 
-        assertEquals(fileId, info.fileId);
-        assertEquals(13522, info.size);
-        assertFalse(info.isDeleted);
-        assertNotNull(info.keys);
-        assertNull(info.keys.getThreshold());
-        assertEquals(KeyList.of(testEnv.operatorKey), info.keys);
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(13522);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         new FileDeleteTransaction()
             .setFileId(fileId)

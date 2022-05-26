@@ -151,6 +151,11 @@ public class CustomRoyaltyFee extends CustomFee {
         return this;
     }
 
+    @Nullable
+    public CustomFixedFee getFallbackFee() {
+        return this.fallbackFee;
+    }
+
     /**
      * Convert the royalty fee object to a protobuf.
      *
