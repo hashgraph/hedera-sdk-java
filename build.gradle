@@ -52,6 +52,10 @@ allprojects {
 
 	tasks.withType(JavaCompile).configureEach {
 		options.encoding = "UTF-8"
+
+                // Disable warnings because I'm tired of them :P
+		options.warnings = false
+
 		options.errorprone {
 			// https://github.com/uber/NullAway
 			warn("NullAway")
