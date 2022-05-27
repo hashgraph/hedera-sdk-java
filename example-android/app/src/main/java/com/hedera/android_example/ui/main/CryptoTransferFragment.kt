@@ -45,7 +45,6 @@ class CryptoTransferFragment : Fragment() {
         amountToSend.setText("0.1")
         button.setOnClickListener {
 
-
             lifecycleScope.executeAsyncTask(
                 onPreExecute = {
                     resultText.text = ""
