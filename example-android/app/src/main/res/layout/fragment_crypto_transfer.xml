@@ -54,23 +54,32 @@
         android:layout_marginBottom="32dp"
         android:ems="10"
         android:inputType="numberDecimal"
-        app:layout_constraintBottom_toTopOf="@+id/sendHbar"
+        app:layout_constraintBottom_toTopOf="@+id/button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amountToSendTitle" />
 
-    <Button
-        android:id="@+id/sendHbar"
-        android:layout_width="wrap_content"
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="48dp"
         android:layout_height="48dp"
-        android:layout_marginStart="156dp"
-        android:layout_marginEnd="156dp"
         app:layout_constraintBottom_toTopOf="@+id/transferResult"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/amountToSend"
-        android:text="@string/tab_3_send" />
+        android:text="@string/tab_3_send"
+        android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/tab_3_send"
+        app:layout_constraintBottom_toTopOf="@+id/transferResult"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/amountToSend" />
 
     <TextView
         android:id="@+id/transferResult"
@@ -83,5 +92,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/sendHbar" />
+        app:layout_constraintTop_toBottomOf="@+id/button"
+        android:textIsSelectable="true"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>
