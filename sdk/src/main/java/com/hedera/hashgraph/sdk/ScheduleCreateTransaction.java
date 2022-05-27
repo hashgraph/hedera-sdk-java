@@ -70,11 +70,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         initFromTransactionBody();
     }
 
-    /**
-     * Extract the payer account id.
-     *
-     * @return                          the account id
-     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
