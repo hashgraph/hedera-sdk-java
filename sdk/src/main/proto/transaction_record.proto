@@ -128,4 +128,9 @@ message TransactionRecord {
      * EthereumTransaction.
      */
     bytes ethereum_hash = 17;
+
+    /**
+     * List of accounts with the corresponding staking rewards paid as a result of a transaction.
+     */
+    repeated AccountAmount paid_staking_rewards = 18;
 }

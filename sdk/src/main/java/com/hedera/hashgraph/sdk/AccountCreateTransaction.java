@@ -46,6 +46,14 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
     private int maxAutomaticTokenAssociations = 0;
 
+    @Nullable
+    private AccountId stakedNodeAccountId = null;
+
+    @Nullable
+    private Long stakedNodeId = null;
+
+    private boolean declineStakingReward = false;
+
     /**
      * Constructor.
      */
@@ -241,6 +249,56 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * @return ID of the account to which this contract is staking.
+     */
+    @Nullable
+    public AccountId getStakedNodeAccountId() {
+        return stakedNodeAccountId;
+    }
+
+    /**
+     * @param stakedNodeAccountId ID of the account to which this contract is staking.
+     * @return {@code this}
+     */
+    public AccountCreateTransaction setStakedNodeAccountId(@Nullable AccountId stakedNodeAccountId) {
+        this.stakedNodeAccountId = stakedNodeAccountId;
+        return this;
+    }
+
+    /**
+     * @return ID of the node this contract is staked to.
+     */
+    @Nullable
+    public Long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * @param stakedNodeId ID of the node this contract is staked to.
+     * @return {@code this}
+     */
+    public AccountCreateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     */
+    public boolean getDeclineStakingReward() {
+        return declineStakingReward;
+    }
+
+    /**
+     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * @return {@code this}
+     */
+    public AccountCreateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        this.declineStakingReward = declineStakingReward;
+        return this;
+    }
+
+    /**
      * Build the transaction body.
      *
      * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}
@@ -251,7 +309,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             .setReceiverSigRequired(receiverSigRequired)
             .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
             .setMemo(accountMemo)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setDeclineReward(declineStakingReward);
 
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -261,6 +320,14 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             builder.setKey(key.toProtobufKey());
         }
 
+        if (stakedNodeAccountId != null) {
+            builder.setStakedAccountId(stakedNodeAccountId.toProtobuf());
+        }
+
+        if (stakedNodeId != null) {
+            builder.setStakedNodeId(stakedNodeId);
+        }
+
         return builder;
     }
 
@@ -268,6 +335,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     void validateChecksums(Client client) throws BadEntityIdException {
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
+        }
+
+        if (stakedNodeAccountId != null) {
+            stakedNodeAccountId.validateChecksum(client);
         }
     }
 
@@ -290,6 +361,15 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         accountMemo = body.getMemo();
         receiverSigRequired = body.getReceiverSigRequired();
         maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
+        declineStakingReward = body.getDeclineReward();
+
+        if (body.hasStakedAccountId()) {
+            stakedNodeAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
+        }
+
+        if (body.hasStakedNodeId()) {
+            stakedNodeId = body.getStakedNodeId();
+        }
     }
 
     @Override

@@ -1269,7 +1269,7 @@ public enum Status {
     UNEXPECTED_TOKEN_DECIMALS(ResponseCodeEnum.UNEXPECTED_TOKEN_DECIMALS),
 
     /**
-     * The proxy account id is invalid or does not exist.
+     * [Deprecated] The proxy account id is invalid or does not exist.
      */
     INVALID_PROXY_ACCOUNT_ID(ResponseCodeEnum.INVALID_PROXY_ACCOUNT_ID),
 
@@ -1453,7 +1453,22 @@ public enum Status {
     /**
      * A delete transaction submitted via HAPI set permanent_removal=true
      */
-    PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION(ResponseCodeEnum.PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION);
+    PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION(ResponseCodeEnum.PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION),
+
+    /**
+     * A CryptoCreate or ContractCreate used the deprecated proxyAccountID field.
+     */
+    PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED(ResponseCodeEnum.PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED),
+
+    /**
+     * An account set the staked_account_id to itself in CryptoUpdate or ContractUpdate transactions.
+     */
+    SELF_STAKING_IS_NOT_ALLOWED(ResponseCodeEnum.SELF_STAKING_IS_NOT_ALLOWED),
+
+    /**
+     * The staking account id or staking node id given is invalid or does not exist.
+     */
+    INVALID_STAKING_ID(ResponseCodeEnum.INVALID_STAKING_ID);
 
     final ResponseCodeEnum code;
 
@@ -2019,6 +2034,12 @@ public enum Status {
                 return CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT;
             case PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION:
                 return PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION;
+            case PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED:
+                return PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED;
+            case SELF_STAKING_IS_NOT_ALLOWED:
+                return SELF_STAKING_IS_NOT_ALLOWED;
+            case INVALID_STAKING_ID:
+                return INVALID_STAKING_ID;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
