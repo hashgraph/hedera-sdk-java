@@ -40,6 +40,7 @@ import java.util.Objects;
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
+    static int DEFAULT_CHUNK_SIZE = 4096;
 
     @Nullable
     private FileId fileId = null;
