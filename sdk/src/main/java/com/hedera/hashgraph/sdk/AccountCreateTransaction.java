@@ -47,7 +47,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private int maxAutomaticTokenAssociations = 0;
 
     @Nullable
-    private AccountId stakedNodeAccountId = null;
+    private AccountId stakedAccountId = null;
 
     @Nullable
     private Long stakedNodeId = null;
@@ -252,16 +252,16 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @return ID of the account to which this contract is staking.
      */
     @Nullable
-    public AccountId getStakedNodeAccountId() {
-        return stakedNodeAccountId;
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
     }
 
     /**
-     * @param stakedNodeAccountId ID of the account to which this contract is staking.
+     * @param stakedAccountId ID of the account to which this contract is staking.
      * @return {@code this}
      */
-    public AccountCreateTransaction setStakedNodeAccountId(@Nullable AccountId stakedNodeAccountId) {
-        this.stakedNodeAccountId = stakedNodeAccountId;
+    public AccountCreateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        this.stakedAccountId = stakedAccountId;
         return this;
     }
 
@@ -320,8 +320,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             builder.setKey(key.toProtobufKey());
         }
 
-        if (stakedNodeAccountId != null) {
-            builder.setStakedAccountId(stakedNodeAccountId.toProtobuf());
+        if (stakedAccountId != null) {
+            builder.setStakedAccountId(stakedAccountId.toProtobuf());
         }
 
         if (stakedNodeId != null) {
@@ -337,8 +337,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             proxyAccountId.validateChecksum(client);
         }
 
-        if (stakedNodeAccountId != null) {
-            stakedNodeAccountId.validateChecksum(client);
+        if (stakedAccountId != null) {
+            stakedAccountId.validateChecksum(client);
         }
     }
 
@@ -364,7 +364,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         declineStakingReward = body.getDeclineReward();
 
         if (body.hasStakedAccountId()) {
-            stakedNodeAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
+            stakedAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
         }
 
         if (body.hasStakedNodeId()) {
