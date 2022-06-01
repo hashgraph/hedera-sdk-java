@@ -37,3 +37,5 @@ update-proto:
 
 update: update-proto build
 
+publish: build
+    ./gradlew sdk:uploadArchieve
