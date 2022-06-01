@@ -29,11 +29,13 @@ update-snapshots TEST=".*":
     rm sdk/src/test/java/com/hedera/hashgraph/sdk/{{TEST}}.snap
     ./gradlew test --tests "{{TEST}}.*"
 
-publish: build
-    ./gradlew sdk:uploadArchieve
+publish: _hard-clean build
+    ./gradlew sdk:uploadArchive
 
 update-proto:
     ./scripts/update_protobufs.py master
 
 update: update-proto build
 
+_hard-clean:
+    git clean -ffdx
