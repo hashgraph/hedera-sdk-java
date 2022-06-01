@@ -37,5 +37,8 @@ update-proto:
 
 update: update-proto build
 
-publish: build
+_hard-clean:
+    git clean --ffdx
+
+publish: _hard-clean build
     ./gradlew sdk:uploadArchieve
