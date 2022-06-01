@@ -1,0 +1,21 @@
+apply from: "./common.gradle"
+
+dependencies {
+    implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+	// release = 8
+	compileJava {
+		options.compilerArgs += [
+			"--release",
+			"9" // Avoid using Java 12 APIs
+		]
+	}
+}
+
+tasks.withType(Jar.class) {
+	archiveBaseName = "sdk"
+	includeEmptyDirs = false
+}
