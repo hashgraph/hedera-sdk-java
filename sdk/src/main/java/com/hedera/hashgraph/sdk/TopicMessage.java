@@ -30,21 +30,48 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * Topic message records.
+ */
 public final class TopicMessage {
+    /**
+     * The consensus timestamp of the message in seconds.nanoseconds
+     */
     public final Instant consensusTimestamp;
-
+    /**
+     * The content of the message
+     */
     public final byte[] contents;
-
+    /**
+     * The new running hash of the topic that received the message
+     */
     public final byte[] runningHash;
-
+    /**
+     * The sequence number of the message relative to all other messages
+     * for the same topic
+     */
     public final long sequenceNumber;
-
+    /**
+     * Array of topic message chunks.
+     */
     @Nullable
     public final TopicMessageChunk[] chunks;
-
+    /**
+     * The transaction id
+     */
     @Nullable
     public final TransactionId transactionId;
 
+    /**
+     * Constructor.
+     *
+     * @param lastConsensusTimestamp    the last consensus time
+     * @param message                   the message
+     * @param lastRunningHash           the last running hash
+     * @param lastSequenceNumber        the last sequence number
+     * @param chunks                    the array of chunks
+     * @param transactionId             the transaction id
+     */
     TopicMessage(
         Instant lastConsensusTimestamp,
         byte[] message,
@@ -61,6 +88,12 @@ public final class TopicMessage {
         this.transactionId = transactionId;
     }
 
+    /**
+     * Create a new topic message from a response protobuf.
+     *
+     * @param response                  the protobuf response
+     * @return                          the new topic message
+     */
     static TopicMessage ofSingle(ConsensusTopicResponse response) {
         return new TopicMessage(
             InstantConverter.fromProtobuf(response.getConsensusTimestamp()),
@@ -74,6 +107,12 @@ public final class TopicMessage {
         );
     }
 
+    /**
+     * Create a new topic message from a list of response's protobuf.
+     *
+     * @param responses                 the protobuf response
+     * @return                          the new topic message
+     */
     static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
         var chunks = new TopicMessageChunk[responses.size()];

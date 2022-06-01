@@ -73,19 +73,38 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     @Nullable
     private Key aliasKey;
 
+    /**
+     * Constructor.
+     */
     public AccountUpdateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -104,6 +123,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the key.
+     *
+     * @return                          the key
+     */
     @Nullable
     public Key getKey() {
         return key;
@@ -147,6 +171,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -173,6 +202,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the expiration time.
+     *
+     * @return                          the expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -192,6 +226,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -213,6 +252,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Is the receiver required to sign?
+     *
+     * @return                          is the receiver required to sign
+     */
     @Nullable
     public Boolean getReceiverSignatureRequired() {
         return receiverSigRequired;
@@ -231,22 +275,44 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the maximum automatic token associations.
+     *
+     * @return                          the max automatic token associations
+     */
     @Nullable
     public Integer getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }
 
+    /**
+     * Grant an amount of tokens.
+     *
+     * @param amount                    the amount of tokens
+     * @return                          {@code this}
+     */
     public AccountUpdateTransaction setMaxAutomaticTokenAssociations(int amount) {
         requireNotFrozen();
         maxAutomaticTokenAssociations = amount;
         return this;
     }
 
+    /**
+     * Extract the account memo.
+     *
+     * @return                          the account memo
+     */
     @Nullable
     public String getAccountMemo() {
         return accountMemo;
     }
 
+    /**
+     * Assign a memo to the account.
+     *
+     * @param memo                      the memo
+     * @return                          {@code this}
+     */
     public AccountUpdateTransaction setAccountMemo(String memo) {
         requireNotFrozen();
         Objects.requireNonNull(memo);
@@ -254,6 +320,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Erase the memo field.
+     *
+     * @return {@code this}
+     */
     public AccountUpdateTransaction clearMemo() {
         requireNotFrozen();
         accountMemo = "";
@@ -270,6 +341,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoUpdateAccount();
 
@@ -304,6 +378,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 
+    /**
+     * Create the builder.
+     *
+     * @return                          the transaction builder
+     */
     CryptoUpdateTransactionBody.Builder build() {
         var builder = CryptoUpdateTransactionBody.newBuilder();
         if (accountId != null) {

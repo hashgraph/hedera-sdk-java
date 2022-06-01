@@ -19,6 +19,16 @@
  */
 package com.hedera.hashgraph.sdk;
 
+/**
+ * Possible Token Types (IWA Compatibility).
+ *
+ * Apart from fungible and non-fungible, Tokens can have either a common or
+ * unique representation. This distinction might seem subtle, but it is
+ * important when considering how tokens can be traced and if they can have
+ * isolated and unique properties.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokentype">Hedera Documentation</a>
+ */
 public enum TokenType {
     /**
      * Interchangeable value with one another, where any quantity of them has the same value as another equal quantity if they are in the same class.
@@ -33,10 +43,21 @@ public enum TokenType {
 
     final com.hedera.hashgraph.sdk.proto.TokenType code;
 
+    /**
+     * Constructor.
+     *
+     * @param code                      the token type
+     */
     TokenType(com.hedera.hashgraph.sdk.proto.TokenType code) {
         this.code = code;
     }
 
+    /**
+     * What type are we.
+     *
+     * @param code                      the token type in question
+     * @return                          the token type
+     */
     static TokenType valueOf(com.hedera.hashgraph.sdk.proto.TokenType code) {
         switch (code) {
             case FUNGIBLE_COMMON:

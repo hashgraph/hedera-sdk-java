@@ -64,11 +64,23 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @Nullable
     private Hbar chosenQueryPayment = null;
 
+    /**
+     * Constructor.
+     */
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
+    /**
+     * Create a payment transaction.
+     *
+     * @param paymentTransactionId      the transaction id
+     * @param nodeId                    the node id
+     * @param operator                  the operator
+     * @param paymentAmount             the amount
+     * @return                          the new payment transaction
+     */
     private static Transaction makePaymentTransaction(
         TransactionId paymentTransactionId,
         AccountId nodeId,
@@ -127,6 +139,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return (T) this;
     }
 
+    /**
+     * Calculate the expected cost.
+     *
+     * @param client                    the configured client
+     * @return                          the cost in hbar
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
+     */
     public Hbar getCost(Client client) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
         return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client);
@@ -139,6 +159,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client);
     }
 
+    /**
+     * Does this query require a payment?
+     *
+     * @return                          does this query require a payment
+     */
     boolean isPaymentRequired() {
         // nearly all queries require a payment
         return true;
@@ -155,14 +180,31 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      */
     abstract ResponseHeader mapResponseHeader(Response response);
 
+    /**
+     * The derived class should access its request header and return.
+     */
     abstract QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request);
 
+    /**
+     * Crate the new Query.
+     *
+     * @return                          the new Query
+     */
     private Query<Hbar, QueryCostQuery> getCostExecutable() {
         return new QueryCostQuery();
     }
 
+    /**
+     * Validate the checksums.
+     */
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
+    /**
+     * Retrieve the operator from the configured client.
+     *
+     * @param client                    the configured client
+     * @return                          the operator
+     */
     Client.Operator getOperatorFromClient(Client client) {
         var operator = client.getOperator();
 
@@ -243,6 +285,12 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         }
     }
 
+    /**
+     * Retrieve the transaction at the given index.
+     *
+     * @param index                     the index
+     * @return                          the transaction
+     */
     Transaction getPaymentTransaction(int index) {
         var paymentTx = Objects.requireNonNull(paymentTransactions).get(index);
         if (paymentTx != null) {
@@ -292,11 +340,22 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return paymentTransactionId;
     }
 
+    /**
+     * Extract the transaction id.
+     *
+     * @return                          the transaction id
+     */
     @Nullable
     public TransactionId getPaymentTransactionId() {
         return paymentTransactionId;
     }
 
+    /**
+     * Assign the transaction id.
+     *
+     * @param paymentTransactionId      the transaction id
+     * @return {@code this}
+     */
     @Nullable
     public T setPaymentTransactionId(TransactionId paymentTransactionId) {
         this.paymentTransactionId = paymentTransactionId;

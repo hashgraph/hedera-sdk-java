@@ -41,6 +41,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * A common base for file and topic message transactions.
+ */
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
     private int chunkSize = 1024;
     protected ByteString data = ByteString.EMPTY;
@@ -50,22 +53,47 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      */
     private int maxChunks = 20;
 
+    /**
+     * Constructor.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     ChunkedTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
     }
 
+    /**
+     * Constructor.
+     */
     ChunkedTransaction() {
         super();
     }
 
+    /**
+     * Extract the data.
+     *
+     * @return                          the data
+     */
     ByteString getData() {
         return data;
     }
 
+    /**
+     * Assign the data via a byte array.
+     *
+     * @param data                      the byte array
+     * @return {@code this}
+     */
     T setData(byte[] data) {
         requireNotFrozen();
         this.data = ByteString.copyFrom(data);
@@ -74,6 +102,12 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    /**
+     * Assign the data via a byte string.
+     *
+     * @param data                      the byte string
+     * @return {@code this}
+     */
     T setData(ByteString data) {
         requireNotFrozen();
         this.data = data;
@@ -82,6 +116,12 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    /**
+     * Assign the data via a string.
+     *
+     * @param text                      the byte array
+     * @return {@code this}
+     */
     T setData(String text) {
         requireNotFrozen();
         this.data = ByteString.copyFromUtf8(text);
@@ -90,10 +130,21 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    /**
+     * Retrieve the maximum number of chunks.
+     *
+     * @return                          the number of chunks
+     */
     public int getMaxChunks() {
         return maxChunks;
     }
 
+    /**
+     * Assign the max number of chunks.
+     *
+     * @param maxChunks                 the number of chunks
+     * @return {@code this}
+     */
     public T setMaxChunks(int maxChunks) {
         requireNotFrozen();
         this.maxChunks = maxChunks;
@@ -102,10 +153,21 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return (T) this;
     }
 
+    /**
+     * Retrieve the chunk size.
+     *
+     * @return                          the chunk size
+     */
     public int getChunkSize() {
         return chunkSize;
     }
 
+    /**
+     * Assign the chunk size.
+     *
+     * @param chunkSize                 the chunk size
+     * @return {@code this}
+     */
     public T setChunkSize(int chunkSize) {
         requireNotFrozen();
         this.chunkSize = chunkSize;
@@ -132,6 +194,11 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return super.getTransactionHashPerNode();
     }
 
+    /**
+     * Extract the list of transaction hashes.
+     *
+     * @return                          the list of transaction hashes
+     */
     public final List<Map<AccountId, byte[]>> getAllTransactionHashesPerNode() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
@@ -178,6 +245,11 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return super.getSignatures();
     }
 
+    /**
+     * Extract the list of all signers.
+     *
+     * @return                          the list of all signatures
+     */
     public List<Map<AccountId, Map<PublicKey, byte[]>>> getAllSignatures() {
         if (publicKeys.isEmpty()) {
             return new ArrayList<>();
@@ -360,8 +432,16 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         }
     }
 
+    /**
+     * A common base for file and topic message transactions.
+     */
     abstract void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);
 
+    /**
+     * Should the receipt be retrieved?
+     *
+     * @return                          by default do not get a receipt
+     */
     boolean shouldGetReceipt() {
         return false;
     }

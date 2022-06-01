@@ -96,21 +96,41 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
+    /**
+     * Constructor.
+     */
     public ContractCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         defaultMaxTransactionFee = new Hbar(20);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id as a byte code
+     */
     @Nullable
     public FileId getBytecodeFileId() {
         return bytecodeFileId;
@@ -135,6 +155,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the admin key.
+     *
+     * @return                          the admin key
+     */
     @Nullable
     public byte[] getBytecode() {
         return bytecode;
@@ -180,6 +205,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the gas.
+     *
+     * @return                          the gas amount that was set
+     */
     public long getGas() {
         return gas;
     }
@@ -196,6 +226,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the initial balance.
+     *
+     * @return                          the initial balance in hbar
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -214,6 +249,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -249,13 +289,17 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @param maxAutomaticTokenAssociations The maximum automatic token associations
      * @return  {@code this}
      */
-
     public ContractCreateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
         requireNotFrozen();
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
     }
 
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -274,6 +318,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the constructor parameters.
+     *
+     * @return                          the byte string representation
+     */
     public ByteString getConstructorParameters() {
         return ByteString.copyFrom(constructorParameters);
     }
@@ -304,6 +353,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return setConstructorParameters(constructorParameters.toBytes(null).toByteArray());
     }
 
+    /**
+     * Extract the contract memo.
+     *
+     * @return                          the contract's memo
+     */
     public String getContractMemo() {
         return contractMemo;
     }
@@ -321,6 +375,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link ContractCreateTransactionBody}
+     */
     ContractCreateTransactionBody.Builder build() {
         var builder = ContractCreateTransactionBody.newBuilder();
         if (bytecodeFileId != null) {
@@ -358,6 +417,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractCreateInstance();
 

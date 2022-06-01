@@ -34,32 +34,83 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Wipes the provided amount of fungible or non-fungible tokens from the
+ * specified Hedera account. This transaction does not delete tokens from the
+ * treasury account. This transaction must be signed by the token's Wipe Key.
+ * Wiping an account's tokens burns the tokens and decreases the total supply.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/wipe-a-token">Hedera Documentation</a>
+ */
 public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenWipeTransaction> {
+    /**
+     * The ID of the token to wipe from the account
+     */
     @Nullable
     private TokenId tokenId = null;
+    /**
+     * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.
+     * The account ID to wipe the NFT from.
+     */
     @Nullable
     private AccountId accountId = null;
+    /**
+     * Applicable to tokens of type  FUNGIBLE_COMMON.The amount of token
+     * to wipe from the specified account. The amount must be a positive
+     * non-zero number in the lowest denomination possible, not bigger
+     * than the token balance of the account.
+     */
     private long amount = 0;
+    /**
+     * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.
+     * The list of NFTs to wipe.
+     */
     private List<Long> serials = new ArrayList<>();
 
+    /**
+     * Constructor.
+     */
     public TokenWipeTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TokenWipeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenWipeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the token id.
+     *
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenWipeTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -67,11 +118,22 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
 
+    /**
+     * Assign the account id.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
     public TokenWipeTransaction setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         requireNotFrozen();
@@ -79,20 +141,42 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * Extract the amount.
+     *
+     * @return                          the amount
+     */
     public long getAmount() {
         return amount;
     }
 
+    /**
+     * Assign the amount.
+     *
+     * @param amount                    the amount
+     * @return {@code this}
+     */
     public TokenWipeTransaction setAmount(@Nonnegative long amount) {
         requireNotFrozen();
         this.amount = amount;
         return this;
     }
 
+    /**
+     * Extract the list of serial numbers.
+     *
+     * @return                          the list of serial numbers
+     */
     public List<Long> getSerials() {
         return new ArrayList<>(serials);
     }
 
+    /**
+     * Assign the list of serial numbers.
+     *
+     * @param serials                   the list of serial numbers
+     * @return {@code this}
+     */
     public TokenWipeTransaction setSerials(List<Long> serials) {
         requireNotFrozen();
         Objects.requireNonNull(serials);
@@ -100,12 +184,21 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         return this;
     }
 
+    /**
+     * Add a serial number to the list of serial numbers.
+     *
+     * @param serial                    the serial number to add
+     * @return {@code this}
+     */
     public TokenWipeTransaction addSerial(@Nonnegative long serial) {
         requireNotFrozen();
         serials.add(serial);
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenWipe();
         if (body.hasToken()) {
@@ -119,6 +212,12 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
         serials = body.getSerialNumbersList();
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.TokenWipeAccountTransactionBody}
+     */
     TokenWipeAccountTransactionBody.Builder build() {
         var builder = TokenWipeAccountTransactionBody.newBuilder();
         if (tokenId != null) {

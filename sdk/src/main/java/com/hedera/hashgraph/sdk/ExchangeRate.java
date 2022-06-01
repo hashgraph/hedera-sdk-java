@@ -54,6 +54,12 @@ public final class ExchangeRate {
         this.exchangeRateInCents = (double) cents / (double) hbars;
     }
 
+    /**
+     * Create an Exchange Rate from a protobuf.
+     *
+     * @param pb                        the protobuf
+     * @return                          the new exchange rate
+     */
     static ExchangeRate fromProtobuf(com.hedera.hashgraph.sdk.proto.ExchangeRate pb) {
         return new ExchangeRate(
             pb.getHbarEquiv(),

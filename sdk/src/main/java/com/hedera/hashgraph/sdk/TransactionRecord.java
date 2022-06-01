@@ -174,6 +174,14 @@ public final class TransactionRecord {
         this.tokenNftAllowanceAdjustments = Collections.emptyList();
     }
 
+    /**
+     * Create a transaction record from a protobuf.
+     *
+     * @param transactionRecord         the protobuf
+     * @param children                  the list of children
+     * @param duplicates                the list of duplicates
+     * @return                          the new transaction record
+     */
     static TransactionRecord fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
         List<TransactionRecord> children,
@@ -241,18 +249,36 @@ public final class TransactionRecord {
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            transactionRecord.getTransactionHash()
+            transactionRecord.getEthereumHash()
         );
     }
 
+    /**
+     * Create a transaction record from a protobuf.
+     *
+     * @param transactionRecord         the protobuf
+     * @return                          the new transaction record
+     */
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
         return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
     }
 
+    /**
+     * Create a transaction record from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction record
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.TransactionRecord toProtobuf() {
         var transferList = TransferList.newBuilder();
         for (Transfer transfer : transfers) {
@@ -346,6 +372,11 @@ public final class TransactionRecord {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

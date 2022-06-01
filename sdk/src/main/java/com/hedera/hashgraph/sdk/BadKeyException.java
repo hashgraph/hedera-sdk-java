@@ -26,10 +26,16 @@ package com.hedera.hashgraph.sdk;
  * on {@link PrivateKey} or {@link PublicKey}.
  */
 public final class BadKeyException extends IllegalArgumentException {
+    /**
+     * @param message                   the message
+     */
     BadKeyException(String message) {
         super(message);
     }
 
+    /**
+     * @param cause                     the cause
+     */
     BadKeyException(Throwable cause) {
         super(cause);
     }

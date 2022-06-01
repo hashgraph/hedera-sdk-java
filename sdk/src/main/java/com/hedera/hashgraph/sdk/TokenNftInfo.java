@@ -27,6 +27,11 @@ import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoResponse;
 import java.time.Instant;
 import java.util.Objects;
 
+/**
+ *
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/token-service/tokengetnftinfo#tokennftinfo">Hedera Documentation</a>
+ */
 public class TokenNftInfo {
     /**
      * The ID of the NFT
@@ -53,6 +58,15 @@ public class TokenNftInfo {
      */
     public final LedgerId ledgerId;
 
+    /**
+     * Constructor.
+     *
+     * @param nftId                     the id of the nft
+     * @param accountId                 the current owner of the nft
+     * @param creationTime              the effective consensus time
+     * @param metadata                  the unique metadata
+     * @param ledgerId                  the ledger id of the response
+     */
     private TokenNftInfo(
         NftId nftId,
         AccountId accountId,
@@ -67,6 +81,12 @@ public class TokenNftInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Create token nft info from a protobuf.
+     *
+     * @param info                      the protobuf
+     * @return                          the new token nft info
+     */
     static TokenNftInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo info) {
         return new TokenNftInfo(
             NftId.fromProtobuf(info.getNftID()),
@@ -77,10 +97,22 @@ public class TokenNftInfo {
         );
     }
 
+    /**
+     * Create token nft info from byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new token nft info
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TokenNftInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TokenGetNftInfoResponse.parseFrom(bytes).toBuilder().build().getNft());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     TokenGetNftInfoResponse toProtobuf() {
         return TokenGetNftInfoResponse.newBuilder().setNft(
             com.hedera.hashgraph.sdk.proto.TokenNftInfo.newBuilder()
@@ -103,6 +135,11 @@ public class TokenNftInfo {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

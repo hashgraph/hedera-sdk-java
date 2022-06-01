@@ -51,15 +51,35 @@ public final class TopicId implements Comparable<TopicId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * Constructor.
+     *
+     * @param num                       the num part
+     */
     public TopicId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     */
     @SuppressWarnings("InconsistentOverloads")
     public TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param shard                     the shard part
+     * @param realm                     the realm part
+     * @param num                       the num part
+     * @param checksum                  the checksum
+     */
     @SuppressWarnings("InconsistentOverloads")
     TopicId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -68,33 +88,63 @@ public final class TopicId implements Comparable<TopicId> {
         this.checksum = checksum;
     }
 
-    //Constructs a topic ID from string
+    /**
+     * Create a topic id from a string.
+     *
+     * @param id                        the string representation
+     * @return                          the new topic id
+     */
     public static TopicId fromString(String id) {
         return EntityIdHelper.fromString(id, TopicId::new);
     }
 
-    //Constructs a topic ID from a solidity address
+    /**
+     * Create a topic id from a solidity address.
+     *
+     * @param address                   the solidity address
+     * @return                          the new topic id
+     */
     public static TopicId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, TopicId::new);
     }
 
+    /**
+     * Create a topic id from a protobuf.
+     *
+     * @param topicId                   the protobuf
+     * @return                          the new topic id
+     */
     static TopicId fromProtobuf(TopicID topicId) {
         Objects.requireNonNull(topicId);
 
         return new TopicId(topicId.getShardNum(), topicId.getRealmNum(), topicId.getTopicNum());
     }
 
-    //Constructs a topic ID from bytes
+    /**
+     * Create a topic id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new topic id
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TopicId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TopicID.parseFrom(bytes).toBuilder().build());
     }
 
-    //Constructs a solidity address from topic ID
+    /**
+     * Extract the solidity address representation.
+     *
+     * @return                          the solidity address representation
+     */
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
 
-
+    /**
+     * Extracts a protobuf representing the token id.
+     *
+     * @return                          the protobuf representation
+     */
     TopicID toProtobuf() {
         return TopicID.newBuilder()
             .setShardNum(shard)
@@ -113,15 +163,31 @@ public final class TopicId implements Comparable<TopicId> {
         validateChecksum(client);
     }
 
+    /**
+     * Verify that the client has a valid checksum.
+     *
+     * @param client                    the client to verify
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
+    /**
+     * Extracts the checksum.
+     *
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
     }
 
+    /**
+     * Extracts a byte array representation.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
@@ -131,7 +197,13 @@ public final class TopicId implements Comparable<TopicId> {
         return EntityIdHelper.toString(shard, realm, num);
     }
 
-    public String toStringWithChecksum(Client client) {
+    /**
+     * Create a string representation that includes the checksum.
+     *
+     * @param client                    the client
+     * @return                          the string representation with the checksum
+     */
+    public String tostringwithchecksum(Client client) {
         return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }
 

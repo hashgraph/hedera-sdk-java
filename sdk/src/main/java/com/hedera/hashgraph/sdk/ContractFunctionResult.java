@@ -77,6 +77,11 @@ public final class ContractFunctionResult {
     @Nullable
     public final AccountId senderAccountId;
 
+    /**
+     * Constructor.
+     *
+     * @param inner                     the protobuf
+     */
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
 
@@ -365,6 +370,11 @@ public final class ContractFunctionResult {
         return rawResult.substring(startIndex, endIndex);
     }
 
+    /**
+     * Create the protobuf representation.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.ContractFunctionResult}
+     */
     com.hedera.hashgraph.sdk.proto.ContractFunctionResult toProtobuf() {
         var contractFunctionResult = com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
             .setContractID(contractId.toProtobuf())

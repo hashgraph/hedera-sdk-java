@@ -34,6 +34,13 @@ public final class MaxQueryPaymentExceededException extends RuntimeException {
      */
     public final Hbar maxQueryPayment;
 
+    /**
+     * Constructor.
+     *
+     * @param builder                   the query builder object
+     * @param cost                      the query cost
+     * @param maxQueryPayment           the maximum query payment
+     */
     MaxQueryPaymentExceededException(Query<?, ?> builder, Hbar cost, Hbar maxQueryPayment) {
         super(String.format(
             "cost for %s, of %s, without explicit payment is greater than "

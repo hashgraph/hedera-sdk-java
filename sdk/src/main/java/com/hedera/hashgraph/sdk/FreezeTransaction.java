@@ -50,24 +50,50 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     private byte[] fileHash = {};
     private FreezeType freezeType = FreezeType.UNKNOWN_FREEZE_TYPE;
 
+    /**
+     * Constructor.
+     */
     public FreezeTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     FreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     FreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the start time.
+     *
+     * @return                          the start time
+     */
     @SuppressWarnings("FromTemporalAccessor")
     public Instant getStartTime() {
         return startTime != null ? startTime : Instant.EPOCH;
     }
 
+    /**
+     * Assign the start time.
+     *
+     * @param startTime                 the start time
+     * @return {@code this}
+     */
     public FreezeTransaction setStartTime(Instant startTime) {
         requireNotFrozen();
         Objects.requireNonNull(startTime);
@@ -143,11 +169,22 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return setFileHash(updateFileHash);
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
     }
 
+    /**
+     * Assign the file id.
+     *
+      * @param fileId                    the file id
+     * @return {@code this}
+     */
     public FreezeTransaction setFileId(FileId fileId) {
         requireNotFrozen();
         Objects.requireNonNull(fileId);
@@ -155,6 +192,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return this;
     }
 
+    /**
+     * Extract the file's hash.
+     *
+     * @return                          the file's hash
+     */
     public byte[] getFileHash() {
         return fileHash;
     }
@@ -166,10 +208,22 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return this;
     }
 
+    /**
+     * Extract the freeze type.
+     *
+     * @return                          the freeze type
+     */
     public FreezeType getFreezeType() {
         return freezeType;
     }
 
+    /**
+     * Assign the freeze type.
+     * {@link com.hedera.hashgraph.sdk.FreezeTransaction}
+     *
+     * @param freezeType                the freeze type
+     * @return {@code this}
+     */
     public FreezeTransaction setFreezeType(FreezeType freezeType) {
         requireNotFrozen();
         Objects.requireNonNull(freezeType);
@@ -181,12 +235,14 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     void validateChecksums(Client client) {
     }
 
-
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FreezeServiceGrpc.getFreezeMethod();
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFreeze();
         freezeType = FreezeType.valueOf(body.getFreezeType());
@@ -199,6 +255,11 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FreezeTransactionBody builder }
+     */
     FreezeTransactionBody.Builder build() {
         var builder = FreezeTransactionBody.newBuilder();
         builder.setFreezeType(freezeType.code);

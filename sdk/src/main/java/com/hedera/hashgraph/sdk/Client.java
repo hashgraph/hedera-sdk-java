@@ -88,12 +88,24 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean defaultRegenerateTransactionId = true;
 
+    /**
+     * Constructor.
+     *
+     * @param executor                   the executor
+     * @param network                    the network
+     * @param mirrorNetwork              the mirror network
+     */
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
         this.mirrorNetwork = mirrorNetwork;
     }
 
+    /**
+     * Extract the executor.
+     *
+     * @return                          the executor service
+     */
     static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
             .setNameFormat("hedera-sdk-%d")
@@ -105,6 +117,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             threadFactory);
     }
 
+    /**
+     * Set the mirror network nodes.
+     *
+     * @param network                   list of network nodes
+     * @return                          {@code this}
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     */
     public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
         try {
             this.mirrorNetwork.setNetwork(network);
@@ -115,6 +134,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Extract the mirror network node list.
+     *
+     * @return                          the list of mirror nodes
+     */
     public List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
@@ -140,6 +164,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return new Client(executor, network, mirrorNetwork);
     }
 
+    /**
+     * Set up the client for the selected network.
+     *
+     * @param name                      the selected network
+     * @return                          the configured client
+     */
     public static Client forName(String name) {
         switch (name) {
             case "mainnet":
@@ -182,6 +212,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return new Client(executor, network, mirrorNetwork);
     }
 
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet nodes</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
     public static Client forPreviewnet() {
         var executor = createExecutor();
         var network = Network.forPreviewnet(executor);
@@ -315,6 +351,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Extract the network.
+     *
+     * @return                          the client's network
+     */
     public Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
@@ -336,6 +377,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Is tls enabled.
+     *
+     * @return                          is tls enabled
+     */
     public boolean isTransportSecurity() {
         return network.isTransportSecurity();
     }
@@ -344,7 +390,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Set if server certificates should be verified against an existing address book
      *
      * @param verifyCertificates - enable or disable certificate verification
-     * @return
+     * @return {@code this}
      */
     public Client setVerifyCertificates(boolean verifyCertificates) {
         network.setVerifyCertificates(verifyCertificates);
@@ -354,19 +400,13 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Is certificate verification enabled.
      *
-     * @return
+     * @return                          is certificate verification enabled
      */
     public boolean isVerifyCertificates() {
         return network.isVerifyCertificates();
     }
 
-    /**
-     * Ping a specific node from the network
-     *
-     * @param nodeAccountId
-     * @return
-     */
-    @Override
+   @Override
     public Void ping(AccountId nodeAccountId) {
         try {
             new AccountBalanceQuery()
@@ -393,10 +433,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             });
     }
 
-    /**
-     * Ping all network nodes.
-     * @return
-     */
     @Override
     public synchronized Void pingAll() {
         for (var nodeAccountId : network.getNetwork().values()) {
@@ -470,7 +506,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @deprecated use {@link #getLedgerId()} instead
      *
-     * @return
+     * @return                          the network name
      */
     @Nullable
     @Deprecated
@@ -485,8 +521,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @deprecated use {@link #setLedgerId(LedgerId)} instead
      *
-     * @param networkName
-     * @return
+     * @param networkName               the desired network
+     * @return {@code this}
      */
     @Deprecated
     public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
@@ -497,7 +533,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Current LedgerId of the network; corresponds to ledger ID in entity ID checksum calculations.
      *
-     * @return
+     * @return                          the ledger id
      */
     @Nullable
     public synchronized LedgerId getLedgerId() {
@@ -508,8 +544,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Set the LedgerId to a particular value. Useful when constructing a network which is a subset of an existing
      * known network.
      *
-     * @param ledgerId
-     * @return
+     * @param ledgerId                  the desired ledger id
+     * @return {@code this}
      */
     public synchronized Client setLedgerId(@Nullable LedgerId ledgerId) {
         this.network.setLedgerId(ledgerId);
@@ -519,7 +555,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Max number of attempts a request executed with this client will do.
      *
-     * @return
+     * @return                          the maximus attempts
      */
     public synchronized int getMaxAttempts() {
         return maxAttempts;
@@ -528,8 +564,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Set the max number of attempts a request executed with this client will do.
      *
-     * @param maxAttempts
-     * @return
+     * @param maxAttempts               the desired max attempts
+     * @return {@code this}
      */
     public synchronized Client setMaxAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
@@ -594,7 +630,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Max number of times any node in the network can receive a bad gRPC status before being removed from the network.
      *
-     * @return
+     * @return                          the maximum node attempts
      */
     public synchronized int getMaxNodeAttempts() {
         return network.getMaxNodeAttempts();
@@ -604,8 +640,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Set the max number of times any node in the network can receive a bad gRPC status before being removed from the
      * network.
      *
-     * @param maxNodeAttempts
-     * @return
+     * @param maxNodeAttempts           the desired minimum attempts
+     * @return {@code this}
      */
     public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
         this.network.setMaxNodeAttempts(maxNodeAttempts);
@@ -616,7 +652,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * The minimum backoff time for any node in the network.
      *
      * @deprecated - Use {@link Client#getNodeMaxBackoff()} instead
-     * @return
+     * @return                          the wait time
      */
     @Deprecated
     public synchronized Duration getNodeWaitTime() {
@@ -627,8 +663,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Set the minimum backoff time for any node in the network.
      *
      * @deprecated - Use {@link Client#setNodeMinBackoff(Duration)} ()} instead
-     * @param nodeWaitTime
-     * @return
+     * @param nodeWaitTime              the wait time
+     * @return                          the updated client
      */
     @Deprecated
     public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
@@ -638,7 +674,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * The minimum backoff time for any node in the network.
      *
-     * @return
+     * @return                          the minimum backoff time
      */
     public synchronized Duration getNodeMinBackoff() {
         return network.getMinNodeBackoff();
@@ -647,8 +683,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Set the minimum backoff time for any node in the network.
      *
-     * @param minBackoff
-     * @return
+     * @param minBackoff                the desired minimum backoff time
+     * @return {@code this}
      */
     public synchronized Client setNodeMinBackoff(Duration minBackoff) {
         network.setMinNodeBackoff(minBackoff);
@@ -658,7 +694,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * The maximum backoff time for any node in the network.
      *
-     * @return
+     * @return                          the maximum node backoff time
      */
     public synchronized Duration getNodeMaxBackoff() {
         return network.getMaxNodeBackoff();
@@ -667,27 +703,49 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Set the maximum backoff time for any node in the network.
      *
-     * @param maxBackoff
-     * @return
+     * @param maxBackoff                the desired max backoff time
+     * @return {@code this}
      */
     public synchronized Client setNodeMaxBackoff(Duration maxBackoff) {
         network.setMaxNodeBackoff(maxBackoff);
         return this;
     }
 
+    /**
+     * Extract the minimum node readmit time.
+     *
+     * @return                          the minimum node readmit time
+     */
     public Duration getMinNodeReadmitTime() {
         return network.getMinNodeReadmitTime();
     }
 
+    /**
+     * Assign the minimum node readmit time.
+     *
+     * @param minNodeReadmitTime        the requested duration
+     * @return  {@code this}
+     */
     public Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         network.setMinNodeReadmitTime(minNodeReadmitTime);
         return this;
     }
 
+    /**
+     * Extract the node readmit time.
+     *
+     * @return                          the maximum node readmit time
+     */
     public Duration getMaxNodeReadmitTime() {
         return network.getMaxNodeReadmitTime();
     }
 
+    /**
+     * Assign the maximum node readmit time.
+     *
+     * @param maxNodeReadmitTime        the maximum node readmit time
+     * @return {@code this}
+     */
     public Client setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
         network.setMaxNodeReadmitTime(maxNodeReadmitTime);
         return this;
@@ -697,8 +755,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * Set the max amount of nodes that will be chosen per request. By default, the request will use 1/3rd the network
      * nodes per request.
      *
-     * @param maxNodesPerTransaction
-     * @return
+     * @param maxNodesPerTransaction    the desired number of nodes
+     * @return {@code this}
      */
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
         this.network.setMaxNodesPerRequest(maxNodesPerTransaction);
@@ -707,8 +765,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     /**
      * Enable or disable automatic entity ID checksum validation.
-     * @param value
-     * @return
+     *
+     * @param value                     the desired value
+     * @return {@code this}
      */
     public synchronized Client setAutoValidateChecksums(boolean value) {
         autoValidateChecksums = value;
@@ -717,7 +776,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     /**
      * Is automatic entity ID checksum validation enabled.
-     * @return
+     *
+     * @return                          is validation enabled
      */
     public synchronized boolean isAutoValidateChecksumsEnabled() {
         return autoValidateChecksums;
@@ -752,8 +812,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * The default maximum fee used for transactions
-     * @return
+     * The default maximum fee used for transactions.
+     *
+     * @return                          the max transaction fee
      */
     @Nullable
     public synchronized Hbar getDefaultMaxTransactionFee() {
@@ -794,6 +855,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxTransactionFee(maxTransactionFee);
     }
 
+    /**
+     * Extract the maximum query payment.
+     *
+     * @return                          the default maximum query payment
+     */
     public synchronized Hbar getDefaultMaxQueryPayment() {
         return defaultMaxQueryPayment;
     }
@@ -834,10 +900,21 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return setDefaultMaxQueryPayment(maxQueryPayment);
     }
 
+    /**
+     * Should the transaction id be regenerated?
+     *
+     * @return                          the default regenerate transaction id
+     */
     public synchronized boolean getDefaultRegenerateTransactionId() {
         return defaultRegenerateTransactionId;
     }
 
+    /**
+     * Assign the default regenerate transaction id.
+     *
+     * @param regenerateTransactionId   should there be a regenerated transaction id
+     * @return {@code this}
+     */
     public synchronized Client setDefaultRegenerateTransactionId(boolean regenerateTransactionId) {
         this.defaultRegenerateTransactionId = regenerateTransactionId;
         return this;
@@ -846,7 +923,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Maximum amount of time a request can run
      *
-     * @return
+     * @return                          the timeout value
      */
     @Override
     public synchronized Duration getRequestTimeout() {
@@ -856,8 +933,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Set the maximum amount of time a request can run. Used only in async variants of methods.
      *
-     * @param requestTimeout
-     * @return
+     * @param requestTimeout            the timeout value
+     * @return {@code this}
      */
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = Objects.requireNonNull(requestTimeout);
@@ -867,7 +944,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Maximum amount of time closing a network can take.
      *
-     * @return
+     * @return                          the timeout value
      */
     public Duration getCloseTimeout() {
         return closeTimeout;
@@ -876,8 +953,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     /**
      * Set the maximum amount of time closing a network can take.
      *
-     * @param closeTimeout
-     * @return
+     * @param closeTimeout              the timeout value
+     * @return {@code this}
      */
     public Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
@@ -886,6 +963,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this;
     }
 
+    /**
+     * Extract the operator.
+     *
+     * @return                          the operator
+     */
     @Nullable
     Operator getOperator() {
         return this.operator;

@@ -39,6 +39,9 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Query the mirror node for the address book.
+ */
 public class AddressBookQuery {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBookQuery.class);
 
@@ -49,38 +52,80 @@ public class AddressBookQuery {
     private int maxAttempts = 10;
     private Duration maxBackoff = Duration.ofSeconds(8L);
 
+    /**
+     * Constructor.
+     */
     public AddressBookQuery() {
     }
 
+    /**
+     * Assign the file id of address book to retrieve.
+     *
+     * @param fileId                    the file id of the address book
+     * @return {@code this}
+     */
     public AddressBookQuery setFileId(FileId fileId) {
         this.fileId = fileId;
         return this;
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id that was assigned
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
     }
 
+    /**
+     * Assign the number of node addresses to retrieve or all nodes set to 0.
+     *
+     * @param limit                     number of node addresses to get
+     * @return {@code this}
+     */
     public AddressBookQuery setLimit(@Nullable @Nonnegative Integer limit) {
         this.limit = limit;
         return this;
     }
 
+    /**
+     * Extract the limit number.
+     *
+     * @return                          the limit number that was assigned
+     */
     @Nullable
     public Integer getLimit() {
         return limit;
     }
 
+    /**
+     * Assign the maximum number of attempts.
+     *
+     * @param maxAttempts               the maximum number of attempts
+     * @return {@code this}
+     */
     public AddressBookQuery setMaxAttempts(@Nonnegative int maxAttempts) {
         this.maxAttempts = maxAttempts;
         return this;
     }
 
+    /**
+     * Extract the maximum number of attempts.
+     *
+     * @return                          the maximum number of attempts
+     */
     public int getMaxAttempts() {
         return maxAttempts;
     }
 
+    /**
+     * Assign the maximum backoff duration.
+     *
+     * @param maxBackoff                the maximum backoff duration
+     * @return {@code this}
+     */
     public AddressBookQuery setMaxBackoff(Duration maxBackoff) {
         Objects.requireNonNull(maxBackoff);
         if (maxBackoff.toMillis() < 500L) {
@@ -90,10 +135,23 @@ public class AddressBookQuery {
         return this;
     }
 
+    /**
+     * Execute the query with preset timeout.
+     *
+     * @param client                    the client object
+     * @return                          the node address book
+     */
     public NodeAddressBook execute(Client client) {
         return execute(client, client.getRequestTimeout());
     }
 
+    /**
+     * Execute the query with user supplied timeout.
+     *
+     * @param client                    the client object
+     * @param timeout                   the user supplied timeout
+     * @return                          the node address book
+     */
     public NodeAddressBook execute(Client client, Duration timeout) {
         var deadline = Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS);
         for (int attempt = 1; true; attempt++) {
@@ -117,10 +175,23 @@ public class AddressBookQuery {
         }
     }
 
+    /**
+     * Execute the query with preset timeout asynchronously.
+     *
+     * @param client                    the client object
+     * @return                          the node address book
+     */
     public CompletableFuture<NodeAddressBook> executeAsync(Client client) {
         return executeAsync(client, client.getRequestTimeout());
     }
 
+    /**
+     * Execute the query with user supplied timeout.
+     *
+     * @param client                    the client object
+     * @param timeout                   the user supplied timeout
+     * @return                          the node address book
+     */
     public CompletableFuture<NodeAddressBook> executeAsync(Client client, Duration timeout) {
         var deadline = Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS);
         CompletableFuture<NodeAddressBook> returnFuture = new CompletableFuture<>();
@@ -128,6 +199,14 @@ public class AddressBookQuery {
         return returnFuture;
     }
 
+    /**
+     * Execute the query.
+     *
+     * @param client                    the client object
+     * @param deadline                  the user supplied timeout
+     * @param returnFuture              returned promise callback
+     * @param attempt                   maximum number of attempts
+     */
     void executeAsync(Client client, Deadline deadline, CompletableFuture<NodeAddressBook> returnFuture, int attempt) {
         List<NodeAddress> addresses = new ArrayList<>();
         ClientCalls.asyncServerStreamingCall(
@@ -157,6 +236,11 @@ public class AddressBookQuery {
             });
     }
 
+    /**
+     * Build the address book query.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery buildQuery }
+     */
     com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery buildQuery() {
         var builder = com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder();
         if (fileId != null) {

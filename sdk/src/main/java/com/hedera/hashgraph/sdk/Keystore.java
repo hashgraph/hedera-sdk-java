@@ -38,6 +38,9 @@ import java.security.MessageDigest;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Internal utility class to serialize / deserialize between java object / json representation.
+ */
 final class Keystore {
     private static final Gson gson = new Gson();
     private static final JsonParser jsonParser = new JsonParser();

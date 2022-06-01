@@ -27,28 +27,82 @@ import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse;
 import java.time.Instant;
 import javax.annotation.Nullable;
 
+/**
+ * A query that returns information about the current state of a schedule
+ * transaction on a Hedera network.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info">Hedera Documentation</a>
+ */
 public final class ScheduleInfo {
-
+    /**
+     * The ID of the schedule transaction
+     */
     public final ScheduleId scheduleId;
-
+    /**
+     * The Hedera account that created the schedule transaction in x.y.z format
+     */
     public final AccountId creatorAccountId;
-
+    /**
+     * The Hedera account paying for the execution of the schedule transaction
+     * in x.y.z format
+     */
     public final AccountId payerAccountId;
+    /**
+     * The signatories that have provided signatures so far for the schedule
+     * transaction
+     */
     public final KeyList signatories;
+    /**
+     * The Key which is able to delete the schedule transaction if set
+     */
     @Nullable
     public final Key adminKey;
     @Nullable
     public final TransactionId scheduledTransactionId;
+    /**
+     * Publicly visible information about the Schedule entity, up to
+     * 100 bytes. No guarantee of uniqueness.
+     */
     public final String memo;
+    /**
+     * The date and time the schedule transaction will expire
+     */
     @Nullable
     public final Instant expirationTime;
+    /**
+     * The time the schedule transaction was executed. If the schedule
+     * transaction has not executed this field will be left null.
+     */
     @Nullable
     public final Instant executedAt;
+    /**
+     * The consensus time the schedule transaction was deleted. If the
+     * schedule transaction was not deleted, this field will be left null.
+     */
     @Nullable
     public final Instant deletedAt;
+    /**
+     * The scheduled transaction (inner transaction).
+     */
     final SchedulableTransactionBody transactionBody;
     final LedgerId ledgerId;
 
+    /**
+     * Constructor.
+     *
+     * @param scheduleId                the schedule id
+     * @param creatorAccountId          the creator account id
+     * @param payerAccountId            the payer account id
+     * @param transactionBody           the transaction body
+     * @param signers                   the signers key list
+     * @param adminKey                  the admin key
+     * @param scheduledTransactionId    the transaction id
+     * @param memo                      the memo 100 bytes max
+     * @param expirationTime            the expiration time
+     * @param executed                  the time transaction was executed
+     * @param deleted                   the time it was deleted
+     * @param ledgerId                  the ledger id
+     */
     private ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
@@ -77,6 +131,12 @@ public final class ScheduleInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Create a schedule info object from a protobuf.
+     *
+     * @param scheduleInfo              the protobuf
+     * @return                          the new schedule info object
+     */
     static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo) {
         var info = scheduleInfo.getScheduleInfo();
 
@@ -104,10 +164,22 @@ public final class ScheduleInfo {
         );
     }
 
+    /**
+     * Create a schedule info object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new schedule info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ScheduleGetInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.ScheduleInfo toProtobuf() {
         var info = com.hedera.hashgraph.sdk.proto.ScheduleInfo.newBuilder();
 
@@ -142,6 +214,11 @@ public final class ScheduleInfo {
             .build();
     }
 
+    /**
+     * Extract the transaction.
+     *
+     * @return                          the transaction
+     */
     public Transaction<?> getScheduledTransaction() {
         return Transaction.fromScheduledTransaction(transactionBody);
     }
@@ -163,6 +240,11 @@ public final class ScheduleInfo {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

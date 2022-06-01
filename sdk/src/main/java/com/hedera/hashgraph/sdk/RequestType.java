@@ -21,6 +21,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
 
+/**
+ * Enum for the request type.
+ */
 public enum RequestType {
     /**
      * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and

@@ -49,6 +49,14 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+/**
+ * Abstract base utility class.
+ *
+ * @param <SdkRequestT>                 the sdk request
+ * @param <ProtoRequestT>               the proto request
+ * @param <ResponseT>                   the response
+ * @param <O>                           the O type
+ */
 abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
