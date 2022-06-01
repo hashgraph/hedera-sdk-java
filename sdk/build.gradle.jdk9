@@ -93,7 +93,7 @@ tasks.withType(JavaCompile).configureEach {
 	compileJava {
 		options.compilerArgs += [
 			"--release",
-			"8" // Avoid using Java 12 APIs
+			"9" // Avoid using Java 12 APIs
 		]
 	}
 }
