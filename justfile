@@ -30,7 +30,7 @@ update-snapshots TEST=".*":
     ./gradlew test --tests "{{TEST}}.*"
 
 publish: _hard-clean build
-    ./gradlew sdk:uploadArchieve
+    ./gradlew sdk:uploadArchive
 
 update-proto:
     ./scripts/update_protobufs.py master
