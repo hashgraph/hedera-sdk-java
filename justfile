@@ -31,9 +31,14 @@ update-snapshots TEST=".*":
 
 publish:
     #!/usr/bin/env bash
-    # git clean -ffdx
-    # ./gradlew sdk:uploadArchive
-    mv sdk/build.gradle.jdk9 sdk/build.gradle
+    git diff-index --quiet HEAD
+    if [ $? -ne 0 ]; then
+        echo "Aborting: uncommitted changes detected"
+        exit 1
+    fi
+    git clean -ffdx
+    ./gradlew sdk:uploadArchive
+    perl -p -i -e "s#jdk7#jdk9#g" sdk/build.gradle
     git clean -ffdx
     rm -f sdk/src/main/java/com/hedera/hashgraph/sdk/FutureConverter.java
     FILES="sdk/src/main/java/com/hedera/hashgraph/sdk/*.java executable-processor/src/main/java/com/hedera/hashgraph/sdk/*.java"
@@ -45,7 +50,8 @@ publish:
     perl -p -i -e "s#StreamSupport\.stream\((.*)\).map#\1.stream().map#g" $FILES
     perl -p -i -e "s#import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;#import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;\nimport net.javacrumbs.futureconverter.java8common.Java8FutureUtils;#g" $FILES
     perl -p -i -e "s#toCompletableFuture\((.*)\).handle#Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(\1)).handle#g" $FILES
-    ./gradlew sdk:assemble
+    ./gradlew sdk:uploadArchive
+    git restore sdk executable-processor
 
 
 update-proto:
