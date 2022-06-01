@@ -24,7 +24,7 @@ allprojects {
 	dependencies {
 		// https://github.com/google/error-prone
 		// https://errorprone.info/
-		errorprone "com.google.errorprone:error_prone_core:2.13.1"
+		errorprone "com.google.errorprone:error_prone_core:2.14.0"
 
 		// https://github.com/uber/NullAway
 		errorprone "com.uber.nullaway:nullaway:0.9.7"
