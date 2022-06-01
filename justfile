@@ -38,4 +38,4 @@ update-proto:
 update: update-proto build
 
 _hard-clean:
-    git clean --ffdx
+    git clean -ffdx
