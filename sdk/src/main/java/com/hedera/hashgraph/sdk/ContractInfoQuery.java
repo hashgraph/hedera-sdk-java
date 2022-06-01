@@ -40,9 +40,17 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
     @Nullable
     private ContractId contractId = null;
 
+    /**
+     * Constructor.
+     */
     public ContractInfoQuery() {
     }
 
+    /**
+     * Extract the contract id.
+     *
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;

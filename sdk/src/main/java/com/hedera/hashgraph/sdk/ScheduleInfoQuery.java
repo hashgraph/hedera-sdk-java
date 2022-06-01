@@ -31,18 +31,38 @@ import java8.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * A query that returns information about the current state of a schedule
+ * transaction on a Hedera network.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info">Hedera Documentation</a>
+ */
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     @Nullable
     private ScheduleId scheduleId = null;
 
+    /**
+     * Constructor.
+     */
     public ScheduleInfoQuery() {
     }
 
+    /**
+     * Extract the schedule id.
+     *
+     * @return                          the schedule id
+     */
     @Nullable
     public ScheduleId getScheduleId() {
         return scheduleId;
     }
 
+    /**
+     * Assign the schedule id.
+     *
+     * @param scheduleId                the schedule id
+     * @return {@code this}
+     */
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
         Objects.requireNonNull(scheduleId);
         this.scheduleId = scheduleId;

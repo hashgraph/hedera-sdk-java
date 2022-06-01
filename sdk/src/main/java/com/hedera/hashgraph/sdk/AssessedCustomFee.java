@@ -26,6 +26,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A custom transfer fee that was assessed during the handling of a CryptoTransfer.
+ */
 public class AssessedCustomFee {
     public final long amount;
     @Nullable
@@ -46,6 +49,12 @@ public class AssessedCustomFee {
         this.payerAccountIdList = payerAccountIdList;
     }
 
+    /**
+     * Convert the protobuf object to an assessed custom fee object.
+     *
+     * @param assessedCustomFee         protobuf response object
+     * @return                          the converted assessed custom fee object
+     */
     static AssessedCustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee assessedCustomFee) {
         var payerList = new ArrayList<AccountId>(assessedCustomFee.getEffectivePayerAccountIdCount());
         for (var payerId : assessedCustomFee.getEffectivePayerAccountIdList()) {
@@ -59,6 +68,13 @@ public class AssessedCustomFee {
         );
     }
 
+    /**
+     * Convert a byte array into an assessed custom fee object.
+     *
+     * @param bytes                     the byte array
+     * @return                          the converted assessed custom fee object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static AssessedCustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.AssessedCustomFee.parseFrom(bytes).toBuilder().build());
     }
@@ -73,6 +89,11 @@ public class AssessedCustomFee {
             .toString();
     }
 
+    /**
+     * Create the protobuf representation.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.AssessedCustomFee}
+     */
     com.hedera.hashgraph.sdk.proto.AssessedCustomFee toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.AssessedCustomFee.newBuilder().setAmount(amount);
         if (tokenId != null) {
@@ -87,6 +108,11 @@ public class AssessedCustomFee {
         return builder.build();
     }
 
+    /**
+     * Create a byte array representation.
+     *
+     * @return                          the converted assessed custom fees
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

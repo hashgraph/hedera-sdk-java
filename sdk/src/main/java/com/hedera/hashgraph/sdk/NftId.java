@@ -26,6 +26,9 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * The (non-fungible) token of which this NFT is an instance
+ */
 public class NftId implements Comparable<NftId> {
     /**
      * The (non-fungible) token of which this NFT is an instance
@@ -38,11 +41,23 @@ public class NftId implements Comparable<NftId> {
     @Nonnegative
     public final long serial;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param serial                    the serial number
+     */
     public NftId(TokenId tokenId, @Nonnegative long serial) {
         this.tokenId = Objects.requireNonNull(tokenId);
         this.serial = serial;
     }
 
+    /**
+     * Create a new nft id from a string.
+     *
+     * @param id                        the string representation
+     * @return                          the new nft id
+     */
     public static NftId fromString(String id) {
         @SuppressWarnings("StringSplitter")
         var parts = id.split("[/@]");
@@ -52,16 +67,34 @@ public class NftId implements Comparable<NftId> {
         return new NftId(TokenId.fromString(parts[0]), Long.parseLong(parts[1]));
     }
 
+    /**
+     * Create a new ntf id from a protobuf.
+     *
+     * @param nftId                     the protobuf representation
+     * @return                          the new nft id
+     */
     static NftId fromProtobuf(NftID nftId) {
         Objects.requireNonNull(nftId);
         var tokenId = nftId.getTokenID();
         return new NftId(TokenId.fromProtobuf(tokenId), nftId.getSerialNumber());
     }
 
+    /**
+     * Create a new nft id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new nft id
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static NftId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftID.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          a protobuf representation
+     */
     NftID toProtobuf() {
         return NftID.newBuilder()
             .setTokenID(tokenId.toProtobuf())
@@ -69,6 +102,11 @@ public class NftId implements Comparable<NftId> {
             .build();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          a byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
@@ -78,6 +116,12 @@ public class NftId implements Comparable<NftId> {
         return tokenId.toString() + "/" + serial;
     }
 
+    /**
+     * Generate a string representation with checksum.
+     *
+     * @param client                    the configured client
+     * @return                          the string representation with checksum
+     */
     public String toStringWithChecksum(Client client) {
         return tokenId.toStringWithChecksum(client) + "/" + serial;
     }

@@ -32,7 +32,6 @@ import io.grpc.ServiceDescriptor;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.ServerCalls;
-import java8.util.function.Function;
 import org.threeten.bp.Duration;
 
 import java.io.IOException;
@@ -87,7 +86,11 @@ public class Mocker implements AutoCloseable {
                             var r = response.get(responseIndex);
 
                             if (r instanceof Function<?, ?>){
-                                r = ((Function<Object, Object>) r).apply(request);
+                                try {
+                                    r = ((Function<Object, Object>) r).apply(request);
+                                } catch (Throwable e) {
+                                    r = Status.ABORTED.withDescription(e.getMessage()).asRuntimeException();
+                                }
                             }
 
                             if (r instanceof Throwable) {
