@@ -1,10 +1,10 @@
 com.hedera.hashgraph.sdk.ContractInfoTest.fromBytes=[
-  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet}"
+  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet, stakingInfo=null}"
 ]
 
 
 com.hedera.hashgraph.sdk.ContractInfoTest.fromProtobuf=[
-  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet}"
+  "ContractInfo{contractId=0.0.1, accountId=0.0.2, contractAccountId=3, adminKey=null, expirationTime=1970-01-01T00:00:00.004Z, autoRenewPeriod=PT120H, storage=6, contractMemo=7, balance=8 tℏ, isDeleted=false, tokenRelationships={}, ledgerId=testnet, stakingInfo=null}"
 ]
 
 
@@ -95,6 +95,7 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
       "validUtf8": true,
       "empty": false
     },
+    "maxAutomaticTokenAssociations_": 0,
     "initialized": true
   }
 ]

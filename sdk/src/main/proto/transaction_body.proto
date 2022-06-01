@@ -80,6 +80,8 @@ import "schedule_create.proto";
 import "schedule_delete.proto";
 import "schedule_sign.proto";
 
+import "node_stake_update.proto";
+
 /**
  * A single transaction. All transaction types are possible here.
  */
@@ -336,5 +338,10 @@ message TransactionBody {
      * Adds one or more Ed25519 keys to the affirmed signers of a scheduled transaction
      */
     ScheduleSignTransactionBody scheduleSign = 44;
+
+    /**
+     * Updates the staking info at the end of staking period to indicate new staking period has started.
+     */
+    NodeStakeUpdateTransactionBody node_stake_update = 51;
   }
 }

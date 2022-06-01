@@ -129,6 +129,8 @@ public final class TransactionRecord {
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
 
+    public final List<Transfer> paidStakingRewards;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -148,7 +150,8 @@ public final class TransactionRecord {
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
         @Nullable Instant parentConsensusTimestamp,
-        ByteString ethereumHash
+        ByteString ethereumHash,
+        List<Transfer> paidStakingRewards
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -172,6 +175,7 @@ public final class TransactionRecord {
         this.hbarAllowanceAdjustments = Collections.emptyList();
         this.tokenAllowanceAdjustments = Collections.emptyList();
         this.tokenNftAllowanceAdjustments = Collections.emptyList();
+        this.paidStakingRewards = paidStakingRewards;
     }
 
     /**
@@ -229,6 +233,11 @@ public final class TransactionRecord {
 
         var aliasKey = PublicKey.fromAliasBytes(transactionRecord.getAlias());
 
+        var paidStakingRewards = new ArrayList<Transfer>(transactionRecord.getPaidStakingRewardsCount());
+        for (var reward : transactionRecord.getPaidStakingRewardsList()) {
+            paidStakingRewards.add(Transfer.fromProtobuf(reward));
+        }
+
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
             transactionRecord.getTransactionHash(),
@@ -249,7 +258,8 @@ public final class TransactionRecord {
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            transactionRecord.getEthereumHash()
+            transactionRecord.getEthereumHash(),
+            paidStakingRewards
         );
     }
 
@@ -345,6 +355,10 @@ public final class TransactionRecord {
             transactionRecord.setParentConsensusTimestamp(InstantConverter.toProtobuf(parentConsensusTimestamp));
         }
 
+        for (Transfer reward : paidStakingRewards) {
+            transactionRecord.addPaidStakingRewards(reward.toProtobuf());
+        }
+
         return transactionRecord.build();
     }
 
@@ -369,6 +383,7 @@ public final class TransactionRecord {
             .add("duplicates", duplicates)
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
             .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
+            .add("paidStakingRewards", paidStakingRewards)
             .toString();
     }
 

@@ -104,6 +104,9 @@ public final class ContractInfo {
      */
     public final LedgerId ledgerId;
 
+    @Nullable
+    public final StakingInfo stakingInfo;
+
     /**
      *  Constructor.
      *
@@ -132,7 +135,8 @@ public final class ContractInfo {
         Hbar balance,
         boolean isDeleted,
         Map<TokenId, TokenRelationship> tokenRelationships,
-        LedgerId ledgerId
+        LedgerId ledgerId,
+        @Nullable StakingInfo stakingInfo
     ) {
         this.contractId = contractId;
         this.accountId = accountId;
@@ -146,6 +150,7 @@ public final class ContractInfo {
         this.isDeleted = isDeleted;
         this.tokenRelationships = tokenRelationships;
         this.ledgerId = ledgerId;
+        this.stakingInfo = stakingInfo;
     }
 
     /**
@@ -180,7 +185,8 @@ public final class ContractInfo {
             Hbar.fromTinybars(contractInfo.getBalance()),
             contractInfo.getDeleted(),
             tokenRelationships,
-            LedgerId.fromByteString(contractInfo.getLedgerId())
+            LedgerId.fromByteString(contractInfo.getLedgerId()),
+            contractInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(contractInfo.getStakingInfo()) : null
         );
     }
 
@@ -216,6 +222,10 @@ public final class ContractInfo {
             contractInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
 
+        if (stakingInfo != null) {
+            contractInfoBuilder.setStakingInfo(stakingInfo.toProtobuf());
+        }
+
         return contractInfoBuilder.build();
     }
 
@@ -234,6 +244,7 @@ public final class ContractInfo {
             .add("isDeleted", isDeleted)
             .add("tokenRelationships", tokenRelationships)
             .add("ledgerId", ledgerId)
+            .add("stakingInfo", stakingInfo)
             .toString();
     }
 
