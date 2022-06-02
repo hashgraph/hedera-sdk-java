@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -24,19 +43,39 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
     @Nullable
     private TopicId topicId = null;
 
+    /**
+     * Constructor.
+     */
     public TopicDeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TopicDeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the topic id.
+     *
+     * @return                          the topic id
+     */
     @Nullable
     public TopicId getTopicId() {
         return topicId;
@@ -55,6 +94,9 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getConsensusDeleteTopic();
         if (body.hasTopicID()) {
@@ -62,6 +104,12 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody}
+     */
     ConsensusDeleteTopicTransactionBody.Builder build() {
         var builder = ConsensusDeleteTopicTransactionBody.newBuilder();
         if (topicId != null) {

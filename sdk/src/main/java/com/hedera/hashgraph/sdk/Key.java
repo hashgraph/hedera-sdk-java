@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
@@ -8,6 +27,7 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 /**
  * A common base for the signing authority or key that entities in Hedera may have.
  *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/key">Hedera Documentation</a>
  * @see KeyList
  * @see PublicKey
  */
@@ -24,13 +44,23 @@ public abstract class Key {
             ECDSA_SECP256K1_CURVE.getH()
         );
 
+    /**
+     * Create a specific key type from the protobuf.
+     *
+     * @param key                       the protobuf key of unknown type
+     * @return                          the differentiated key
+     */
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519:
                 return new PublicKeyED25519(key.getEd25519().toByteArray());
 
             case ECDSA_SECP256K1:
-                return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                if (key.getECDSASecp256K1().size() == 20) {
+                    return new EvmAddress(key.getECDSASecp256K1().toByteArray());
+                } else {
+                    return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                }
 
             case KEYLIST:
                 return KeyList.fromProtobuf(key.getKeyList(), null);
@@ -54,6 +84,11 @@ public abstract class Key {
      */
     abstract com.hedera.hashgraph.sdk.proto.Key toProtobufKey();
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobufKey().toByteArray();
     }

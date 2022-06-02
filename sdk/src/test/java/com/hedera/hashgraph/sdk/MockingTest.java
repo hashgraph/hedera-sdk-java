@@ -1,27 +1,51 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.AccountID;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Query;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-import java8.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.threeten.bp.Duration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -50,6 +74,101 @@ public class MockingTest {
 
             Assertions.assertEquals(balance.hbars, Hbar.fromTinybars(100));
         }
+    }
+
+    String makeBigString(int size) {
+        char[] chars = new char[size];
+        Arrays.fill(chars, 'A');
+        return new String(chars);
+    }
+
+    @ParameterizedTest(name = "[{0}] ContractCreateFlow functions")
+    @CsvSource({
+        "sync",
+        "async"
+    })
+    void contractCreateFlowFunctions(String versionToTest) throws Throwable {
+        var BIG_BYTECODE = makeBigString(ContractCreateFlow.FILE_CREATE_MAX_BYTES + 1000);
+        var adminKey = PrivateKey.generateED25519().getPublicKey();
+
+        var cryptoService = new TestCryptoService();
+        var fileService = new TestFileService();
+        var contractService = new TestContractService();
+        var server = new TestServer("contractCreateFlow", cryptoService, fileService, contractService);
+
+        var fileId = FileId.fromString("1.2.3");
+
+        cryptoService.buffer.enqueueResponse(TestResponse.query(
+            Response.newBuilder().setTransactionGetReceipt(
+                TransactionGetReceiptResponse.newBuilder().setReceipt(
+                    TransactionReceipt.newBuilder().setFileID(fileId.toProtobuf()).setStatus(ResponseCodeEnum.SUCCESS).build()
+                ).build()
+            ).build()
+        )).enqueueResponse(TestResponse.successfulReceipt()).enqueueResponse(TestResponse.successfulReceipt());
+        fileService.buffer
+            .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk())
+            .enqueueResponse(TestResponse.transactionOk());
+
+        contractService.buffer.enqueueResponse(TestResponse.transactionOk());
+
+        var flow = new ContractCreateFlow()
+            .setBytecode(BIG_BYTECODE)
+            .setContractMemo("memo goes here")
+            .setConstructorParameters(new byte[]{1, 2, 3})
+            .setAutoRenewPeriod(Duration.ofMinutes(1))
+            .setAdminKey(adminKey)
+            .setGas(100)
+            .setInitialBalance(new Hbar(3));
+
+        if (versionToTest.equals("sync")) {
+            flow.execute(server.client);
+        } else {
+            flow.executeAsync(server.client).get();
+        }
+
+        Thread.sleep(1000);
+
+        Assertions.assertEquals(3, cryptoService.buffer.queryRequestsReceived.size());
+        Assertions.assertEquals(3, fileService.buffer.transactionRequestsReceived.size());
+        Assertions.assertEquals(1, contractService.buffer.transactionRequestsReceived.size());
+        var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
+        for (var request : fileService.buffer.transactionRequestsReceived) {
+            transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(request.toByteArray()));
+        }
+        transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(
+            contractService.buffer.transactionRequestsReceived.get(0).toByteArray()
+        ));
+
+        Assertions.assertInstanceOf(FileCreateTransaction.class, transactions.get(0));
+        Assertions.assertEquals(
+            ContractCreateFlow.FILE_CREATE_MAX_BYTES,
+            ((FileCreateTransaction)transactions.get(0)).getContents().size()
+        );
+
+        Assertions.assertTrue(cryptoService.buffer.queryRequestsReceived.get(0).hasTransactionGetReceipt());
+
+        Assertions.assertInstanceOf(FileAppendTransaction.class, transactions.get(1));
+        var fileAppendTx = (FileAppendTransaction) transactions.get(1);
+        Assertions.assertEquals(fileId, fileAppendTx.getFileId());
+        Assertions.assertEquals(
+            BIG_BYTECODE.length() - ContractCreateFlow.FILE_CREATE_MAX_BYTES,
+            fileAppendTx.getContents().size()
+        );
+
+        Assertions.assertInstanceOf(ContractCreateTransaction.class, transactions.get(3));
+        var contractCreateTx = (ContractCreateTransaction) transactions.get(3);
+        Assertions.assertEquals("memo goes here", contractCreateTx.getContractMemo());
+        Assertions.assertEquals(fileId, contractCreateTx.getBytecodeFileId());
+        Assertions.assertEquals(ByteString.copyFrom(new byte[]{1, 2, 3}), contractCreateTx.getConstructorParameters());
+        Assertions.assertEquals(Duration.ofMinutes(1), contractCreateTx.getAutoRenewPeriod());
+        Assertions.assertEquals(adminKey, contractCreateTx.getAdminKey());
+        Assertions.assertEquals(100, contractCreateTx.getGas());
+        Assertions.assertEquals(new Hbar(3), contractCreateTx.getInitialBalance());
+
+        Assertions.assertInstanceOf(FileDeleteTransaction.class, transactions.get(2));
+
+        server.close();
     }
 
     @Test
@@ -329,6 +448,38 @@ public class MockingTest {
         server.close();
     }
 
+    @Test
+    @DisplayName("Can cancel executeAsync()")
+    void canCancelExecuteAsync() throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("canCancelExecuteAsync", service);
+
+        server.client.setMaxBackoff(Duration.ofSeconds(8));
+        server.client.setMinBackoff(Duration.ofSeconds(1));
+
+        var noReceiptResponse = TestResponse.query(
+            Response.newBuilder()
+                .setTransactionGetReceipt(
+                    TransactionGetReceiptResponse.newBuilder()
+                        .setHeader(
+                            ResponseHeader.newBuilder()
+                                .setNodeTransactionPrecheckCode(com.hedera.hashgraph.sdk.Status.RECEIPT_NOT_FOUND.code)
+                        )
+                ).build()
+        );
+
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+        service.buffer.enqueueResponse(noReceiptResponse);
+
+        var future = new TransactionReceiptQuery().executeAsync(server.client);
+        Thread.sleep(1500);
+        future.cancel(true);
+        Thread.sleep(5000);
+
+        Assertions.assertEquals(2, service.buffer.queryRequestsReceived.size());
+    }
+
     private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {
         public Buffer buffer = new Buffer();
 
@@ -345,6 +496,49 @@ public class MockingTest {
         @Override
         public void cryptoGetBalance(Query request, StreamObserver<Response> responseObserver) {
             respondToQueryFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void getTransactionReceipts(Query request, StreamObserver<Response> responseObserver) {
+            respondToQueryFromQueue(request, responseObserver);
+        }
+    }
+
+    private static class TestFileService extends FileServiceGrpc.FileServiceImplBase implements TestService {
+        public Buffer buffer = new Buffer();
+
+        @Override
+        public Buffer getBuffer() {
+            return buffer;
+        }
+
+        @Override
+        public void createFile(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void appendContent(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void deleteFile(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+    }
+
+    private static class TestContractService extends SmartContractServiceGrpc.SmartContractServiceImplBase implements TestService {
+        public Buffer buffer = new Buffer();
+
+        @Override
+        public Buffer getBuffer() {
+            return buffer;
+        }
+
+        @Override
+        public void createContract(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
         }
     }
 }

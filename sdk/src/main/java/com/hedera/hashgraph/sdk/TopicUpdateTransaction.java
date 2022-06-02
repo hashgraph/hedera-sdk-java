@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -25,32 +44,75 @@ import java.util.Objects;
  * If a new autoRenewAccount is specified (not just being removed), that account must also sign the transaction.
  */
 public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransaction> {
+    /**
+     * Update the topic ID
+     */
     @Nullable
     private TopicId topicId = null;
+    /**
+     * Set a new auto-renew account ID for this topic (once autoRenew
+     * functionality is supported by HAPI).
+     */
     @Nullable
     private AccountId autoRenewAccountId = null;
+    /**
+     * Set a new short publicly visible memo on the new topic and is stored
+     * with the topic. (100 bytes)
+     */
     @Nullable
     private String topicMemo = null;
+    /**
+     * Set a new admin key that authorizes update topic and delete topic
+     * transactions.
+     */
     @Nullable
     private Key adminKey = null;
+    /**
+     * Set a new submit key for a topic that authorizes sending messages
+     * to this topic.
+     */
     @Nullable
     private Key submitKey = null;
+    /**
+     * Set a new auto -enew period for this topic (once autoRenew
+     * functionality is supported by HAPI).
+     */
     @Nullable
     private Duration autoRenewPeriod = null;
 
+    /**
+     * Constructor.
+     */
     public TopicUpdateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TopicUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the topic id.
+     *
+     * @return                          the topic id
+     */
     @Nullable
     public TopicId getTopicId() {
         return topicId;
@@ -69,6 +131,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Extract the topic memo.
+     *
+     * @return                          the topic memo
+     */
     @Nullable
     public String getTopicMemo() {
         return topicMemo;
@@ -98,6 +165,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Extract the admin key.
+     *
+     * @return                          the admin key
+     */
     @Nullable
     public Key getAdminKey() {
         return adminKey;
@@ -127,6 +199,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Extract the submit key.
+     *
+     * @return                          the submit key
+     */
     @Nullable
     public Key getSubmitKey() {
         return submitKey;
@@ -156,6 +233,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -174,6 +256,11 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Extract the auto renew account id.
+     *
+     * @return                          the auto renew account id
+     */
     @Nullable
     public AccountId getAutoRenewAccountId() {
         return autoRenewAccountId;
@@ -216,6 +303,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getConsensusUpdateTopic();
         if (body.hasTopicID()) {
@@ -238,6 +328,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link
+     *         com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody}
+     */
     ConsensusUpdateTopicTransactionBody.Builder build() {
         var builder = ConsensusUpdateTopicTransactionBody.newBuilder();
         if (topicId != null) {

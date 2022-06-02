@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
@@ -53,19 +72,38 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     @Nullable
     private Key aliasKey;
 
+    /**
+     * Constructor.
+     */
     public AccountUpdateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -84,6 +122,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the key.
+     *
+     * @return                          the key
+     */
     @Nullable
     public Key getKey() {
         return key;
@@ -102,17 +145,24 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * @deprecated with no replacement
+     */
+    @Deprecated
     @Nullable
     public Key getAliasKey() {
         return aliasKey;
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Sets the new key.
      *
      * @param aliasKey The Key to be set
      * @return {@code this}
      */
+    @Deprecated
     public AccountUpdateTransaction setAliasKey(Key aliasKey) {
         Objects.requireNonNull(aliasKey);
         requireNotFrozen();
@@ -120,6 +170,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -146,6 +201,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the expiration time.
+     *
+     * @return                          the expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -165,6 +225,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -186,6 +251,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Is the receiver required to sign?
+     *
+     * @return                          is the receiver required to sign
+     */
     @Nullable
     public Boolean getReceiverSignatureRequired() {
         return receiverSigRequired;
@@ -204,22 +274,44 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Extract the maximum automatic token associations.
+     *
+     * @return                          the max automatic token associations
+     */
     @Nullable
     public Integer getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }
 
+    /**
+     * Grant an amount of tokens.
+     *
+     * @param amount                    the amount of tokens
+     * @return                          {@code this}
+     */
     public AccountUpdateTransaction setMaxAutomaticTokenAssociations(int amount) {
         requireNotFrozen();
         maxAutomaticTokenAssociations = amount;
         return this;
     }
 
+    /**
+     * Extract the account memo.
+     *
+     * @return                          the account memo
+     */
     @Nullable
     public String getAccountMemo() {
         return accountMemo;
     }
 
+    /**
+     * Assign a memo to the account.
+     *
+     * @param memo                      the memo
+     * @return                          {@code this}
+     */
     public AccountUpdateTransaction setAccountMemo(String memo) {
         requireNotFrozen();
         Objects.requireNonNull(memo);
@@ -227,6 +319,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * Erase the memo field.
+     *
+     * @return {@code this}
+     */
     public AccountUpdateTransaction clearMemo() {
         requireNotFrozen();
         accountMemo = "";
@@ -243,6 +340,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoUpdateAccount();
 
@@ -270,17 +370,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasMaxAutomaticTokenAssociations()) {
             maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
         }
-        if (!body.getAlias().isEmpty()) {
-            try {
-                aliasKey = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(body.getAlias()));
-
-                if (!(aliasKey instanceof PublicKey)) {
-                    aliasKey = null;
-                }
-            } catch (InvalidProtocolBufferException e) {
-                throw new RuntimeException(e);
-            }
-        }
     }
 
     @Override
@@ -288,6 +377,11 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return CryptoServiceGrpc.getUpdateAccountMethod();
     }
 
+    /**
+     * Create the builder.
+     *
+     * @return                          the transaction builder
+     */
     CryptoUpdateTransactionBody.Builder build() {
         var builder = CryptoUpdateTransactionBody.newBuilder();
         if (accountId != null) {
@@ -313,9 +407,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
         if (maxAutomaticTokenAssociations != null) {
             builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
-        }
-        if (aliasKey != null) {
-            builder.setAlias(aliasKey.toProtobufKey().toByteString());
         }
         return builder;
     }

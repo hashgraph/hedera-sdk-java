@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -34,6 +53,14 @@ public final class ContractLogInfo {
      */
     public final ByteString data;
 
+    /**
+     * Constructor.
+     *
+     * @param contractId                the contract id
+     * @param bloom                     the bloom filter
+     * @param topics                    list of topics
+     * @param data                      the event data
+     */
     private ContractLogInfo(ContractId contractId, ByteString bloom, List<ByteString> topics, ByteString data) {
         this.contractId = contractId;
         this.bloom = bloom;
@@ -41,6 +68,12 @@ public final class ContractLogInfo {
         this.data = data;
     }
 
+    /**
+     * Convert to a protobuf.
+     *
+     * @param logInfo                   the log info object
+     * @return                          the protobuf
+     */
     static ContractLogInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ContractLoginfo logInfo) {
         return new ContractLogInfo(
             ContractId.fromProtobuf(logInfo.getContractID()),
@@ -50,10 +83,22 @@ public final class ContractLogInfo {
         );
     }
 
+    /**
+     * Create the contract log info from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the contract log info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ContractLogInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractLoginfo.parseFrom(bytes));
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.ContractLoginfo toProtobuf() {
         var contractLogInfo = com.hedera.hashgraph.sdk.proto.ContractLoginfo.newBuilder()
             .setContractID(contractId.toProtobuf())
@@ -66,6 +111,11 @@ public final class ContractLogInfo {
         return contractLogInfo.build();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

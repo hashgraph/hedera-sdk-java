@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -12,14 +31,28 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+/**
+ * Encapsulate the ECDSA public key.
+ */
 public class PublicKeyECDSA extends PublicKey {
     // Compressed 33 byte form
     private byte[] keyData;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the byte array representing the key
+     */
     PublicKeyECDSA(byte[] keyData) {
         this.keyData = keyData;
     }
 
+    /**
+     * Create a key from a byte array representation.
+     *
+     * @param publicKey                 the byte array representing the key
+     * @return                          the new key
+     */
     static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == 33) {
             // compressed 33 byte raw form
@@ -35,6 +68,12 @@ public class PublicKeyECDSA extends PublicKey {
         return fromSubjectKeyInfoInternal(SubjectPublicKeyInfo.getInstance(publicKey));
     }
 
+    /**
+     * Create a key from a subject public key info object.
+     *
+     * @param subjectPublicKeyInfo      the subject public key info object
+     * @return                          the new public key
+     */
     static PublicKeyECDSA fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
         return new PublicKeyECDSA(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }
@@ -114,5 +153,15 @@ public class PublicKeyECDSA extends PublicKey {
     @Override
     public int hashCode() {
         return Arrays.hashCode(keyData);
+    }
+
+    @Override
+    public boolean isED25519() {
+        return false;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return true;
     }
 }

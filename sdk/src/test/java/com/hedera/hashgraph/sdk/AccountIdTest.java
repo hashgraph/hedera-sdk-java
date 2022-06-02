@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -9,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountIdTest {
 
@@ -45,12 +64,12 @@ class AccountIdTest {
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-rmkyk").toStringWithChecksum(testnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-esxsf").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ntjly").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ogizo").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test
@@ -60,59 +79,59 @@ class AccountIdTest {
 
     @Test
     void goodChecksumOnTestnet() throws BadEntityIdException {
-        AccountId.fromString("0.0.123-rmkyk").validateChecksum(testnetClient);
+        AccountId.fromString("0.0.123-esxsf").validateChecksum(testnetClient);
     }
 
     @Test
     void goodChecksumOnPreviewnet() throws BadEntityIdException {
-        AccountId.fromString("0.0.123-ntjly").validateChecksum(previewnetClient);
+        AccountId.fromString("0.0.123-ogizo").validateChecksum(previewnetClient);
     }
 
     @Test
     void badChecksumOnPreviewnet() {
-        assertThrows(BadEntityIdException.class, () -> {
+        assertThatExceptionOfType(BadEntityIdException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.123-ntjli").validateChecksum(previewnetClient);
         });
     }
 
     @Test
     void malformedIdString() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.");
         });
     }
 
     @Test
     void malformedIdChecksum() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.123-ntjl");
         });
     }
 
     @Test
     void malformedIdChecksum2() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.123-ntjl1");
         });
     }
 
     @Test
     void malformedAliasKey() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777");
         });
     }
 
     @Test
     void malformedAliasKey2() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777g");
         });
     }
 
     @Test
     void malformedAliasKey3() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             AccountId.fromString("0.0.303a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
         });
     }
@@ -120,6 +139,11 @@ class AccountIdTest {
     @Test
     void fromStringWithAliasKey() {
         SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777")).toMatchSnapshot();
+    }
+
+    @Test
+    void fromStringWithAliasEvmAddress() {
+        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da")).toMatchSnapshot();
     }
 
     @Test
@@ -143,6 +167,11 @@ class AccountIdTest {
     }
 
     @Test
+    void toBytesAliasEvmAddress() {
+        SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes())).toMatchSnapshot();
+    }
+
+    @Test
     void fromBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(AccountId.fromBytes(new AccountId(5005).toBytes()).toString()).toMatchSnapshot();
     }
@@ -150,6 +179,11 @@ class AccountIdTest {
     @Test
     void fromBytesAlias() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toBytes()).toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromBytesAliasEvmAddress() throws InvalidProtocolBufferException {
+        SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes()).toString()).toMatchSnapshot();
     }
 
     @Test

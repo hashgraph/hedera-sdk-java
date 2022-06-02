@@ -5,18 +5,14 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountCreateIntegrationTest {
     @Test
@@ -37,13 +33,13 @@ class AccountCreateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), key.getPublicKey().toString());
-        assertEquals(info.balance, new Hbar(1));
-        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-        assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertThat(info.accountId).isEqualTo(accountId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+        assertThat(info.balance).isEqualTo(new Hbar(1));
+        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         testEnv.close(accountId, key);
     }
@@ -65,13 +61,13 @@ class AccountCreateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), key.getPublicKey().toString());
-        assertEquals(info.balance, new Hbar(0));
-        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-        assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertThat(info.accountId).isEqualTo(accountId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+        assertThat(info.balance).isEqualTo(new Hbar(0));
+        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         testEnv.close(accountId, key);
     }
@@ -81,20 +77,17 @@ class AccountCreateIntegrationTest {
     void canNotCreateAccountWithNoKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        var error = assertThrows(PrecheckStatusException.class, () -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new AccountCreateTransaction()
                 .setInitialBalance(new Hbar(1))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains(Status.KEY_REQUIRED.toString()));
+        }).withMessageContaining(Status.KEY_REQUIRED.toString());
 
         testEnv.close();
     }
 
     @Test
-    @Disabled
     @DisplayName("Can create account using aliasKey")
     void canCreateWithAliasKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
@@ -113,9 +106,9 @@ class AccountCreateIntegrationTest {
             .setAccountId(aliasId)
             .execute(testEnv.client);
 
-        assertEquals(key.getPublicKey(), info.aliasKey);
+        assertThat(key.getPublicKey()).isEqualTo(info.aliasKey);
 
-        testEnv.close(aliasId, key);
+        testEnv.close(info.accountId, key);
     }
 
     @Test
@@ -140,13 +133,13 @@ class AccountCreateIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
 
-        assertEquals(info.accountId, accountId);
-        assertFalse(info.isDeleted);
-        assertEquals(info.key.toString(), key.getPublicKey().toString());
-        assertEquals(info.balance, new Hbar(0));
-        assertEquals(info.autoRenewPeriod, Duration.ofDays(90));
-        assertNull(info.proxyAccountId);
-        assertEquals(info.proxyReceived, Hbar.ZERO);
+        assertThat(info.accountId).isEqualTo(accountId);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+        assertThat(info.balance).isEqualTo(new Hbar(0));
+        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+        assertThat(info.proxyAccountId).isNull();
+        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         testEnv.close(accountId, key);
     }

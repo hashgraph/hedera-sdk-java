@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -25,19 +44,39 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     @Nullable
     private ContractId contractId;
 
+    /**
+     * Constructor.
+     */
     public SystemUndeleteTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     SystemUndeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     SystemUndeleteTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public final FileId getFileId() {
         return fileId;
@@ -78,6 +117,9 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getSystemUndelete();
         if (body.hasFileID()) {
@@ -88,6 +130,11 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody}
+     */
     SystemUndeleteTransactionBody.Builder build() {
         var builder = SystemUndeleteTransactionBody.newBuilder();
         if (fileId != null) {

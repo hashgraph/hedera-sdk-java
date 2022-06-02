@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -26,6 +45,11 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * Subscribe to a topic ID's messages from a mirror node. You will receive
+ * all messages for the specified topic or within the defined start and end
+ * time.
+ */
 public final class TopicMessageQuery {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopicMessageQuery.class);
@@ -37,45 +61,90 @@ public final class TopicMessageQuery {
     private Duration maxBackoff = Duration.ofSeconds(8L);
     private Predicate<Throwable> retryHandler = this::shouldRetry;
 
+    /**
+     * Constructor.
+     */
     public TopicMessageQuery() {
         builder = ConsensusTopicQuery.newBuilder();
     }
 
+    /**
+     * Assign the topic id.
+     *
+     * @param topicId                   the topic id
+     * @return {@code this}
+     */
     public TopicMessageQuery setTopicId(TopicId topicId) {
         Objects.requireNonNull(topicId, "topicId must not be null");
         builder.setTopicID(topicId.toProtobuf());
         return this;
     }
 
+    /**
+     * Assign the start time.
+     *
+     * @param startTime                 the start time
+     * @return {@code this}
+     */
     public TopicMessageQuery setStartTime(Instant startTime) {
         Objects.requireNonNull(startTime, "startTime must not be null");
         builder.setConsensusStartTime(InstantConverter.toProtobuf(startTime));
         return this;
     }
 
+    /**
+     * Assign the end time.
+     *
+     * @param endTime                   the end time
+     * @return {@code this}
+     */
     public TopicMessageQuery setEndTime(Instant endTime) {
         Objects.requireNonNull(endTime, "endTime must not be null");
         builder.setConsensusEndTime(InstantConverter.toProtobuf(endTime));
         return this;
     }
 
+    /**
+     * Assign the number of messages to return.
+     *
+     * @param limit                     the number of messages to return
+     * @return {@code this}
+     */
     public TopicMessageQuery setLimit(long limit) {
         builder.setLimit(limit);
         return this;
     }
 
+    /**
+     * Assign the call back function.
+     *
+     * @param completionHandler         the call back function
+     * @return {@code this}
+     */
     public TopicMessageQuery setCompletionHandler(Runnable completionHandler) {
         Objects.requireNonNull(completionHandler, "completionHandler must not be null");
         this.completionHandler = completionHandler;
         return this;
     }
 
+    /**
+     * Assign the error handler does not return a value.
+     *
+     * @param errorHandler              the error handler
+     * @return {@code this}
+     */
     public TopicMessageQuery setErrorHandler(BiConsumer<Throwable, TopicMessage> errorHandler) {
         Objects.requireNonNull(errorHandler, "errorHandler must not be null");
         this.errorHandler = errorHandler;
         return this;
     }
 
+    /**
+     * Assign the maximum number of attempts.
+     *
+     * @param maxAttempts               the max attempts
+     * @return {@code this}
+     */
     public TopicMessageQuery setMaxAttempts(int maxAttempts) {
         if (maxAttempts < 0) {
             throw new IllegalArgumentException("maxAttempts must be positive");
@@ -84,6 +153,12 @@ public final class TopicMessageQuery {
         return this;
     }
 
+    /**
+     * The maximum backoff in milliseconds.
+     *
+     * @param maxBackoff                the maximum backoff
+     * @return {@code this}
+     */
     public TopicMessageQuery setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toMillis() < 500L) {
             throw new IllegalArgumentException("maxBackoff must be at least 500 ms");
@@ -92,6 +167,12 @@ public final class TopicMessageQuery {
         return this;
     }
 
+    /**
+     * Assign the retry handler.
+     *
+     * @param retryHandler              the retry handler
+     * @return {@code this}
+     */
     public TopicMessageQuery setRetryHandler(Predicate<Throwable> retryHandler) {
         Objects.requireNonNull(retryHandler, "retryHandler must not be null");
         this.retryHandler = retryHandler;
@@ -140,6 +221,13 @@ public final class TopicMessageQuery {
         return false;
     }
 
+    /**
+     * Subscribe to the topic.
+     *
+     * @param client                    the configured client
+     * @param onNext                    the consumer
+     * @return                          the subscription handle
+     */
     // TODO: Refactor into a base class when we add more mirror query types
     public SubscriptionHandle subscribe(Client client, Consumer<TopicMessage> onNext) {
         SubscriptionHandle subscriptionHandle = new SubscriptionHandle();

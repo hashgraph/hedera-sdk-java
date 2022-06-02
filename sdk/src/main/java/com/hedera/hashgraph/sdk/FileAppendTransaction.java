@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -21,10 +40,14 @@ import java.util.Objects;
  * (See {@link FileCreateTransaction#setKeys(Key...)} for more information.)
  */
 public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTransaction> {
+    static int DEFAULT_CHUNK_SIZE = 4096;
 
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileAppendTransaction() {
         super();
 
@@ -32,17 +55,34 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         setChunkSize(2048);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
 
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     FileAppendTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
@@ -61,6 +101,11 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return this;
     }
 
+    /**
+     * Extract the byte string representing the file.
+     *
+     * @return                          the byte string representing the file
+     */
     @Nullable
     public ByteString getContents() {
         return getData();
@@ -118,6 +163,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         return FileServiceGrpc.getAppendContentMethod();
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileAppend();
         if (body.hasFileID()) {
@@ -136,6 +184,11 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody builder}
+     */
     FileAppendTransactionBody.Builder build() {
         var builder = FileAppendTransactionBody.newBuilder();
         if (fileId != null) {

@@ -1,16 +1,30 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ECDSAPublicKeyTest {
     @Test
@@ -23,7 +37,7 @@ public class ECDSAPublicKeyTest {
         var key = PrivateKey.fromStringECDSA("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
         key.signTransaction(transaction);
 
-        Assertions.assertTrue(key.getPublicKey().verifyTransaction(transaction));
+        assertThat(key.getPublicKey().verifyTransaction(transaction)).isTrue();
     }
 
     @Test
@@ -34,7 +48,7 @@ public class ECDSAPublicKeyTest {
         PublicKey key2 = PublicKey.fromBytes(key1Bytes);
         byte[] key2Bytes = key2.toBytes();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -47,7 +61,7 @@ public class ECDSAPublicKeyTest {
         // cannot use PrivateKey.fromBytes() to parse raw ECDSA bytes
         // because they're indistinguishable from ED25519 raw bytes
 
-        assertArrayEquals(key1Bytes, key2Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
     }
 
     @Test
@@ -60,8 +74,8 @@ public class ECDSAPublicKeyTest {
         PublicKey key3 = PublicKey.fromBytes(key1Bytes);
         byte[] key3Bytes = key3.toBytesDER();
 
-        assertArrayEquals(key1Bytes, key2Bytes);
-        assertArrayEquals(key1Bytes, key3Bytes);
+        assertThat(key2Bytes).containsExactly(key1Bytes);
+        assertThat(key3Bytes).isEqualTo(key1Bytes);
     }
 
     @Test
@@ -74,9 +88,9 @@ public class ECDSAPublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toString();
 
-        assertEquals(PublicKeyECDSA.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyECDSA.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
     }
 
     @Test
@@ -91,9 +105,9 @@ public class ECDSAPublicKeyTest {
         // cannot use PublicKey.fromString() to parse raw ECDSA string
         // because it's indistinguishable from ED25519 raw bytes
 
-        assertEquals(PublicKeyECDSA.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyECDSA.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
     }
 
     @Test
@@ -106,8 +120,24 @@ public class ECDSAPublicKeyTest {
         PublicKey key3 = PublicKey.fromString(key1Str);
         String key3Str = key3.toStringDER();
 
-        assertEquals(PublicKeyECDSA.class, key3.getClass());
-        assertEquals(key1Str, key2Str);
-        assertEquals(key1Str, key3Str);
+        assertThat(key3.getClass()).isEqualTo(PublicKeyECDSA.class);
+        assertThat(key2Str).isEqualTo(key1Str);
+        assertThat(key3Str).isEqualTo(key1Str);
+    }
+
+    @Test
+    @DisplayName("public key is is ECDSA")
+    void keyIsECDSA() {
+        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+
+        assertThat(key.isECDSA()).isTrue();
+    }
+
+    @Test
+    @DisplayName("public key is is not Ed25519")
+    void keyIsNotEd25519() {
+        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+
+        assertThat(key.isED25519()).isFalse();
     }
 }

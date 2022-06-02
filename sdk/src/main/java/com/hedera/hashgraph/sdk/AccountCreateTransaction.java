@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -27,19 +46,38 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
     private int maxAutomaticTokenAssociations = 0;
 
+    /**
+     * Constructor.
+     */
     public AccountCreateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the key.
+     *
+     * @return                          the creating account's key
+     */
     @Nullable
     public Key getKey() {
         return key;
@@ -61,6 +99,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Extract the amount in hbar.
+     *
+     * @return                          the initial balance for the new account
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -78,6 +121,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Is the receiver required to sign?
+     *
+     * @return                          is the receiver required to sign
+     */
     public boolean getReceiverSignatureRequired() {
         return receiverSigRequired;
     }
@@ -97,6 +145,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -115,6 +168,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Extract the duration for the auto renew period.
+     *
+     * @return                          the duration for auto-renew
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -139,20 +197,42 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Extract the maximum automatic token associations.
+     *
+     * @return                          the max automatic token associations
+     */
     public int getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }
 
+    /**
+     * Grant an amount of tokens.
+     *
+     * @param amount                    the amount of tokens
+     * @return                          {@code this}
+     */
     public AccountCreateTransaction setMaxAutomaticTokenAssociations(int amount) {
         requireNotFrozen();
         maxAutomaticTokenAssociations = amount;
         return this;
     }
 
+    /**
+     * Extract the account memo.
+     *
+     * @return                          the account memo
+     */
     public String getAccountMemo() {
         return accountMemo;
     }
 
+    /**
+     * Assign a memo to the account.
+     *
+     * @param memo                      the memo
+     * @return                          {@code this}
+     */
     public AccountCreateTransaction setAccountMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
@@ -160,6 +240,11 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}
+     */
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder()
             .setInitialBalance(initialBalance.toTinybars())
@@ -186,6 +271,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoCreateAccount();
 

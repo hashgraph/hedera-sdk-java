@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import org.bouncycastle.asn1.ASN1OctetString;
@@ -16,17 +35,31 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
+/**
+ * Encapsulate the ED25519 private key.
+ */
 class PrivateKeyED25519 extends PrivateKey {
     private final byte[] keyData;
 
     @Nullable
     private final KeyParameter chainCode;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the key data
+     * @param chainCode                 the chain code
+     */
     PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
         this.keyData = keyData;
         this.chainCode = chainCode;
     }
 
+    /**
+     * Create a new private ED25519 key.
+     *
+     * @return                          the new key
+     */
     static PrivateKeyED25519 generateInternal() {
         // extra 32 bytes for chain code
         byte[] data = new byte[Ed25519.SECRET_KEY_SIZE + 32];
@@ -35,6 +68,12 @@ class PrivateKeyED25519 extends PrivateKey {
         return derivableKeyED25519(data);
     }
 
+    /**
+     * Create a new private key from a private key info object.
+     *
+     * @param privateKeyInfo            the private key info object
+     * @return                          the new key
+     */
     static PrivateKeyED25519 fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
             var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
@@ -45,6 +84,12 @@ class PrivateKeyED25519 extends PrivateKey {
         }
     }
 
+    /**
+     * Create a derived key.
+     *
+     * @param deriveData                data to derive the key
+     * @return                          the new key
+     */
     static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) {
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
@@ -52,6 +97,12 @@ class PrivateKeyED25519 extends PrivateKey {
         return new PrivateKeyED25519(keyData, chainCode);
     }
 
+    /**
+     * Create a private key from a byte array.
+     *
+     * @param privateKey                the byte array
+     * @return                          the new key
+     */
     public static PrivateKey fromBytesInternal(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
@@ -63,6 +114,13 @@ class PrivateKeyED25519 extends PrivateKey {
         return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    /**
+     * Derive a legacy child key.
+     *
+     * @param entropy                   entropy byte array
+     * @param index                     the child key index
+     * @return                          the new key
+     */
     static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
         byte[] seed = new byte[entropy.length + 8];
         Arrays.fill(seed, 0, seed.length, (byte) 0);
@@ -172,5 +230,15 @@ class PrivateKeyED25519 extends PrivateKey {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isED25519() {
+        return false;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return true;
     }
 }

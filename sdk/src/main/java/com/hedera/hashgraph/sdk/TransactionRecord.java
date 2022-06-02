@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -12,6 +31,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +118,17 @@ public final class TransactionRecord {
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    public final ByteString ethereumHash;
+
+    @Deprecated
+    public final List<HbarAllowance> hbarAllowanceAdjustments;
+
+    @Deprecated
+    public final List<TokenAllowance> tokenAllowanceAdjustments;
+
+    @Deprecated
+    public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -116,7 +147,8 @@ public final class TransactionRecord {
         @Nullable PublicKey aliasKey,
         List<TransactionRecord> children,
         List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp
+        @Nullable Instant parentConsensusTimestamp,
+        ByteString ethereumHash
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -136,8 +168,20 @@ public final class TransactionRecord {
         this.children = children;
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
+        this.ethereumHash = ethereumHash;
+        this.hbarAllowanceAdjustments = Collections.emptyList();
+        this.tokenAllowanceAdjustments = Collections.emptyList();
+        this.tokenNftAllowanceAdjustments = Collections.emptyList();
     }
 
+    /**
+     * Create a transaction record from a protobuf.
+     *
+     * @param transactionRecord         the protobuf
+     * @param children                  the list of children
+     * @param duplicates                the list of duplicates
+     * @return                          the new transaction record
+     */
     static TransactionRecord fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
         List<TransactionRecord> children,
@@ -204,18 +248,37 @@ public final class TransactionRecord {
             children,
             duplicates,
             transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null
+                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
+            transactionRecord.getEthereumHash()
         );
     }
 
+    /**
+     * Create a transaction record from a protobuf.
+     *
+     * @param transactionRecord         the protobuf
+     * @return                          the new transaction record
+     */
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
         return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
     }
 
+    /**
+     * Create a transaction record from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction record
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.TransactionRecord toProtobuf() {
         var transferList = TransferList.newBuilder();
         for (Transfer transfer : transfers) {
@@ -229,7 +292,8 @@ public final class TransactionRecord {
             .setTransactionID(transactionId.toProtobuf())
             .setMemo(transactionMemo)
             .setTransactionFee(transactionFee.toTinybars())
-            .setTransferList(transferList);
+            .setTransferList(transferList)
+            .setEthereumHash(ethereumHash);
 
         for (var tokenEntry : tokenTransfers.entrySet()) {
             var tokenTransfersList = TokenTransferList.newBuilder()
@@ -304,9 +368,15 @@ public final class TransactionRecord {
             .add("children", children)
             .add("duplicates", duplicates)
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
+            .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

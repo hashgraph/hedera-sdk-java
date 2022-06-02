@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -117,6 +136,14 @@ public final class TransactionReceipt {
         this.children = children;
     }
 
+    /**
+     * Create transaction receipt from protobuf.
+     *
+     * @param transactionReceipt        the protobuf
+     * @param duplicates                list of duplicates
+     * @param children                  list of children
+     * @return                          the new transaction receipt
+     */
     static TransactionReceipt fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt,
         List<TransactionReceipt> duplicates,
@@ -195,14 +222,32 @@ public final class TransactionReceipt {
         );
     }
 
+    /**
+     * Create a transaction receipt from a protobuf.
+     *
+     * @param transactionReceipt        the protobuf
+     * @return                          the new transaction receipt
+     */
     public static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
         return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>());
     }
 
+    /**
+     * Create a transaction receipt from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction receipt
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.TransactionReceipt toProtobuf() {
         var transactionReceiptBuilder = com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder()
             .setStatus(status.code)
@@ -281,6 +326,11 @@ public final class TransactionReceipt {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

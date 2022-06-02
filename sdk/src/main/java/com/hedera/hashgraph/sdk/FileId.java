@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -41,15 +60,35 @@ public final class FileId implements Comparable<FileId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * Assign the num portion of the file id.
+     *
+     * @param num                       the num portion not negative
+     */
     public FileId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Assign the file id.
+     *
+     * @param shard                     the shard portion
+     * @param realm                     the realm portion
+     * @param num                       the num portion
+     */
     @SuppressWarnings("InconsistentOverloads")
     public FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Assign the file id and optional checksum.
+     *
+     * @param shard                     the shard portion
+     * @param realm                     the realm portion
+     * @param num                       the num portion
+     * @param checksum                  the optional checksum
+     */
     @SuppressWarnings("InconsistentOverloads")
     FileId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -58,31 +97,60 @@ public final class FileId implements Comparable<FileId> {
         this.checksum = checksum;
     }
 
-    //Construct a file ID from string
+    /**
+     * Assign the file id from a string.
+     *
+     * @param id                        the string representation of a file id
+     * @return                          the file id object
+     */
     public static FileId fromString(String id) {
         return EntityIdHelper.fromString(id, FileId::new);
     }
 
-    //Construct a file ID from bytes    
+    /**
+     * Assign the file id from a byte array.
+     *
+     * @param bytes                     the byte array representation of a file id
+     * @return                          the file id object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static FileId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileID.parseFrom(bytes).toBuilder().build());
     }
-    
+
+    /**
+     * Create a file id object from a protobuf.
+     *
+     * @param fileId                    the protobuf
+     * @return                          the file id object
+     */
     static FileId fromProtobuf(FileID fileId) {
         Objects.requireNonNull(fileId);
         return new FileId(fileId.getShardNum(), fileId.getRealmNum(), fileId.getFileNum());
     }
-    
-    //Construct a file ID from solidity
+
+    /**
+     * Create a file id object from a solidity address.
+     *
+     * @param address                   the solidity address
+     * @return                          the file id object
+     */
     public static FileId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, FileId::new);
     }
-    
-    //Construct a solidity address from a file ID
+
+    /**
+     * Extract the string representation of file id.
+     *
+     * @return                          the string representation of file id
+     */
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
     }
-    
+
+    /**
+      * @return                         protobuf representing the file id
+     */
     FileID toProtobuf() {
         return FileID.newBuilder()
             .setShardNum(shard)
@@ -101,15 +169,31 @@ public final class FileId implements Comparable<FileId> {
         validateChecksum(client);
     }
 
+    /**
+     * Validate that the client is configured correctly.
+     *
+     * @param client                    the client to validate
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
+    /**
+     * Extract the checksum.
+     *
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
@@ -119,6 +203,12 @@ public final class FileId implements Comparable<FileId> {
         return EntityIdHelper.toString(shard, realm, num);
     }
 
+    /**
+     * Convert the client to a string representation with a checksum.
+     *
+     * @param client                    the client to stringify
+     * @return                          string representation with checksum
+     */
     public String toStringWithChecksum(Client client) {
         return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
     }

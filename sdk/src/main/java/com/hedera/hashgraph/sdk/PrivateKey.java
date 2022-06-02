@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -37,10 +56,20 @@ public abstract class PrivateKey extends Key {
         return generateED25519();
     }
 
+    /**
+     * Extract the new ED25519 private key.
+     *
+     * @return                          the new ED25519 private key
+     */
     public static PrivateKey generateED25519() {
         return PrivateKeyED25519.generateInternal();
     }
 
+    /**
+     * Extract the new ECDSA private key.
+     *
+     * @return                          the new ECDSA private key
+     */
     public static PrivateKey generateECDSA() {
         return PrivateKeyECDSA.generateInternal();
     }
@@ -94,22 +123,52 @@ public abstract class PrivateKey extends Key {
         return fromMnemonic(mnemonic, "");
     }
 
+    /**
+     * Retrieve a private key from a string.
+     *
+     * @param privateKey                string representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromString(String privateKey) {
         return fromBytes(Hex.decode(privateKey));
     }
 
+    /**
+     * Retrieve a private key from a DER encoded string.
+     *
+     * @param privateKey                DER encoded string representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromStringDER(String privateKey) {
         return fromBytesDER(Hex.decode(privateKey));
     }
 
+    /**
+     * Retrieve a private key from an ED25519 encoded string.
+     *
+     * @param privateKey                ED25519 encoded string representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromStringED25519(String privateKey) {
         return fromBytesED25519(Hex.decode(privateKey));
     }
 
+    /**
+     * Retrieve a private key from an ECDSA encoded string.
+     *
+     * @param privateKey                ECDSA encoded string representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromStringECDSA(String privateKey) {
         return fromBytesECDSA(Hex.decode(privateKey));
     }
 
+    /**
+     * Retrieve a private key from a byte array.
+     *
+     * @param privateKey                byte array representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
@@ -121,18 +180,42 @@ public abstract class PrivateKey extends Key {
         return fromBytesDER(privateKey);
     }
 
+    /**
+     * Retrieve a private key from an ED25519 encoded byte array.
+     *
+     * @param privateKey                ED25519 encoded byte array representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromBytesED25519(byte[] privateKey) {
         return PrivateKeyED25519.fromBytesInternal(privateKey);
     }
 
+    /**
+     * Retrieve a private key from an ECDSA encoded byte array.
+     *
+     * @param privateKey                ECDSA encoded byte array representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromBytesECDSA(byte[] privateKey) {
         return PrivateKeyECDSA.fromBytesInternal(privateKey);
     }
 
+    /**
+     * Retrieve a private key from a DER encoded byte array.
+     *
+     * @param privateKey                DER encoded byte array representing a private key
+     * @return                          the private key
+     */
     public static PrivateKey fromBytesDER(byte[] privateKey) {
         return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    /**
+     * Retrieve a private key from a private key info object.
+     *
+     * @param privateKeyInfo            private key info object
+     * @return                          the private key
+     */
     private static PrivateKey fromPrivateKeyInfo(PrivateKeyInfo privateKeyInfo) {
         if (privateKeyInfo.getPrivateKeyAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PrivateKeyED25519.fromPrivateKeyInfoInternal(privateKeyInfo);
@@ -218,10 +301,22 @@ public abstract class PrivateKey extends Key {
         return readPem(new StringReader(encodedPem), password);
     }
 
+    /**
+     * Derive a child key based on the index.
+     *
+     * @param index                     the index
+     * @return                          the derived child key
+     */
     public PrivateKey legacyDerive(int index) {
         return legacyDerive((long) index);
     }
 
+    /**
+     * Derive a child key based on the index.
+     *
+     * @param index                     the index
+     * @return                          the derived child key
+     */
     public abstract PrivateKey legacyDerive(long index);
 
     /**
@@ -263,6 +358,12 @@ public abstract class PrivateKey extends Key {
      */
     public abstract byte[] sign(byte[] message);
 
+    /**
+     * Sign a transaction.
+     *
+     * @param transaction               the transaction
+     * @return                          the signed transaction
+     */
     public byte[] signTransaction(Transaction<?> transaction) {
         transaction.requireOneNodeAccountId();
 
@@ -281,8 +382,18 @@ public abstract class PrivateKey extends Key {
     @Override
     public abstract byte[] toBytes();
 
+    /**
+     * Extract the byte array encoded as DER.
+     *
+     * @return                          the byte array encoded as DER
+     */
     public abstract byte[] toBytesDER();
 
+    /**
+     * Extract the raw byte array.
+     *
+     * @return                          the raw byte array
+     */
     public abstract byte[] toBytesRaw();
 
     @Override
@@ -290,14 +401,31 @@ public abstract class PrivateKey extends Key {
         return toStringDER();
     }
 
+    /**
+     * Extract the DER encoded hex string.
+     *
+     * @return                          the DER encoded hex string
+     */
     public String toStringDER() {
         return Hex.toHexString(toBytesDER());
     }
 
+    /**
+     * Extract the raw hex string.
+     *
+     * @return                          the raw hex string
+     */
     public String toStringRaw() {
         return Hex.toHexString(toBytesRaw());
     }
 
+    /**
+     * Retrieve the account id.
+     *
+     * @param shard                     the shard
+     * @param realm                     the realm
+     * @return                          the account id
+     */
     public AccountId toAccountId(@Nonnegative long shard, @Nonnegative long realm) {
         return getPublicKey().toAccountId(shard, realm);
     }
@@ -307,4 +435,18 @@ public abstract class PrivateKey extends Key {
         // Forward to the corresponding public key.
         return getPublicKey().toProtobufKey();
     }
+
+    /**
+     * Are we an ED25519 key?
+     *
+     * @return                          are we an ED25519 key
+     */
+    public abstract boolean isED25519();
+
+    /**
+     * Are we an ECDSA key?
+     *
+     * @return                          are we an ECDSA key
+     */
+    public abstract boolean isECDSA();
 }

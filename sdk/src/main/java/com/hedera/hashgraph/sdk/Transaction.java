@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -8,7 +27,6 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
@@ -16,13 +34,17 @@ import org.bouncycastle.crypto.digests.SHA384Digest;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.
@@ -54,7 +76,7 @@ public abstract class Transaction<T extends Transaction<T>>
     protected List<com.hedera.hashgraph.sdk.proto.Transaction> outerTransactions = Collections.emptyList();
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
     protected List<SignatureMap.Builder> sigPairLists = Collections.emptyList();
-    protected List<TransactionId> transactionIds = Collections.emptyList();
+    protected LockableList<TransactionId> transactionIds = new LockableList<>();
     // publicKeys and signers are parallel arrays.
     // If the signer associated with a public key is null, that means that the private key
     // associated with that public key has already contributed a signature to sigPairListBuilders, but
@@ -72,14 +94,15 @@ public abstract class Transaction<T extends Transaction<T>>
     //      { ID: 2, NodeAccountID: 3 }, // group = 1
     //      { ID: 2, NodeAccountID: 4 }  // group = 1
     // ]
-    int nextTransactionIndex = 0;
     private Duration transactionValidDuration;
     @Nullable
     private Hbar maxTransactionFee = null;
     private String memo = "";
-    protected boolean transactionIdsLocked = false;
     protected Boolean regenerateTransactionId = null;
 
+    /**
+     * Constructor.
+     */
     Transaction() {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
 
@@ -87,6 +110,11 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     // This constructor is used to construct from a scheduled transaction body
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     Transaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         setTransactionValidDuration(DEFAULT_TRANSACTION_VALID_DURATION);
         setMaxTransactionFee(Hbar.fromTinybars(txBody.getTransactionFee()));
@@ -96,17 +124,22 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     // This constructor is used to construct via fromBytes
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         var txCount = txs.keySet().size();
         var nodeCount = txs.values().iterator().next().size();
 
-        transactionIdsLocked = true;
-
-        nodeAccountIds = new ArrayList<>(nodeCount);
+        nodeAccountIds.ensureCapacity(nodeCount);
         sigPairLists = new ArrayList<>(nodeCount * txCount);
         outerTransactions = new ArrayList<>(nodeCount * txCount);
         innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
-        transactionIds = new ArrayList<>(txCount);
+        transactionIds.ensureCapacity(txCount);
 
         for (var transactionEntry : txs.entrySet()) {
             transactionIds.add(transactionEntry.getKey());
@@ -130,7 +163,27 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        nodeAccountIds.remove(new AccountId(0));
+        nodeAccountIds.remove(new AccountId(0)).setLocked(true);
+        transactionIds.setLocked(true);
+
+        // Verify that transaction bodies match
+        for (@Var int i = 0; i < txCount; i++) {
+            @Var TransactionBody firstTxBody = null;
+            for (@Var int j = 0; j < nodeCount; j++) {
+                int k = i*nodeCount + j;
+                var txBody = TransactionBody.parseFrom(innerSignedTransactions.get(k).getBodyBytes());
+                if (firstTxBody == null) {
+                    firstTxBody = txBody;
+                } else {
+                    requireProtoMatches(
+                        firstTxBody,
+                        txBody,
+                        new HashSet<>(Arrays.asList("NodeAccountID")),
+                        "TransactionBody"
+                    );
+                }
+            }
+        }
 
         sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
 
@@ -144,6 +197,13 @@ public abstract class Transaction<T extends Transaction<T>>
         frozenBodyBuilder = sourceTransactionBody.toBuilder();
     }
 
+    /**
+     * Create the correct transaction from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         var txs = new LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
         @Var TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
@@ -211,6 +271,9 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case CONTRACTDELETEINSTANCE:
                 return new ContractDeleteTransaction(txs);
+
+            case ETHEREUMTRANSACTION:
+                return new EthereumTransaction(txs);
 
             case CRYPTOADDLIVEHASH:
                 return new LiveHashAddTransaction(txs);
@@ -320,14 +383,20 @@ public abstract class Transaction<T extends Transaction<T>>
             case CRYPTOAPPROVEALLOWANCE:
                 return new AccountAllowanceApproveTransaction(txs);
 
-            case CRYPTOADJUSTALLOWANCE:
-                return new AccountAllowanceAdjustTransaction(txs);
+            case CRYPTODELETEALLOWANCE:
+                return new AccountAllowanceDeleteTransaction(txs);
 
             default:
                 throw new IllegalArgumentException("parsed transaction body has no data");
         }
     }
 
+    /**
+     * Create the correct transaction from a scheduled transaction.
+     *
+     * @param scheduled                 the scheduled transaction
+     * @return                          the new transaction
+     */
     public static Transaction<?> fromScheduledTransaction(com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()
             .setMemo(scheduled.getMemo())
@@ -345,6 +414,12 @@ public abstract class Transaction<T extends Transaction<T>>
 
             case CONTRACTDELETEINSTANCE:
                 return new ContractDeleteTransaction(body.setContractDeleteInstance(scheduled.getContractDeleteInstance()).build());
+
+            case CRYPTOAPPROVEALLOWANCE:
+                return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());
+
+            case CRYPTODELETEALLOWANCE:
+                return new AccountAllowanceDeleteTransaction(body.setCryptoDeleteAllowance(scheduled.getCryptoDeleteAllowance()).build());
 
             case CRYPTOCREATEACCOUNT:
                 return new AccountCreateTransaction(body.setCryptoCreateAccount(scheduled.getCryptoCreateAccount()).build());
@@ -391,41 +466,44 @@ public abstract class Transaction<T extends Transaction<T>>
             case CONSENSUSSUBMITMESSAGE:
                 return new TopicMessageSubmitTransaction(body.setConsensusSubmitMessage(scheduled.getConsensusSubmitMessage()).build());
 
-            case TOKENASSOCIATE:
-                return new TokenAssociateTransaction(body.setTokenAssociate(scheduled.getTokenAssociate()).build());
-
-            case TOKENBURN:
-                return new TokenBurnTransaction(body.setTokenBurn(scheduled.getTokenBurn()).build());
-
             case TOKENCREATION:
                 return new TokenCreateTransaction(body.setTokenCreation(scheduled.getTokenCreation()).build());
-
-            case TOKENDELETION:
-                return new TokenDeleteTransaction(body.setTokenDeletion(scheduled.getTokenDeletion()).build());
-
-            case TOKENDISSOCIATE:
-                return new TokenDissociateTransaction(body.setTokenDissociate(scheduled.getTokenDissociate()).build());
 
             case TOKENFREEZE:
                 return new TokenFreezeTransaction(body.setTokenFreeze(scheduled.getTokenFreeze()).build());
 
+            case TOKENUNFREEZE:
+                return new TokenUnfreezeTransaction(body.setTokenUnfreeze(scheduled.getTokenUnfreeze()).build());
+
             case TOKENGRANTKYC:
                 return new TokenGrantKycTransaction(body.setTokenGrantKyc(scheduled.getTokenGrantKyc()).build());
-
-            case TOKENMINT:
-                return new TokenMintTransaction(body.setTokenMint(scheduled.getTokenMint()).build());
 
             case TOKENREVOKEKYC:
                 return new TokenRevokeKycTransaction(body.setTokenRevokeKyc(scheduled.getTokenRevokeKyc()).build());
 
-            case TOKENUNFREEZE:
-                return new TokenUnfreezeTransaction(body.setTokenUnfreeze(scheduled.getTokenUnfreeze()).build());
+            case TOKENDELETION:
+                return new TokenDeleteTransaction(body.setTokenDeletion(scheduled.getTokenDeletion()).build());
 
             case TOKENUPDATE:
                 return new TokenUpdateTransaction(body.setTokenUpdate(scheduled.getTokenUpdate()).build());
 
+            case TOKENMINT:
+                return new TokenMintTransaction(body.setTokenMint(scheduled.getTokenMint()).build());
+
+            case TOKENBURN:
+                return new TokenBurnTransaction(body.setTokenBurn(scheduled.getTokenBurn()).build());
+
             case TOKENWIPE:
                 return new TokenWipeTransaction(body.setTokenWipe(scheduled.getTokenWipe()).build());
+
+            case TOKENASSOCIATE:
+                return new TokenAssociateTransaction(body.setTokenAssociate(scheduled.getTokenAssociate()).build());
+
+            case TOKENDISSOCIATE:
+                return new TokenDissociateTransaction(body.setTokenDissociate(scheduled.getTokenDissociate()).build());
+
+            case TOKEN_FEE_SCHEDULE_UPDATE:
+                return new TokenFeeScheduleUpdateTransaction(body.setTokenFeeScheduleUpdate(scheduled.getTokenFeeScheduleUpdate()).build());
 
             case TOKEN_PAUSE:
                 return new TokenPauseTransaction(body.setTokenPause(scheduled.getTokenPause()).build());
@@ -436,17 +514,113 @@ public abstract class Transaction<T extends Transaction<T>>
             case SCHEDULEDELETE:
                 return new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
 
-            case CRYPTOAPPROVEALLOWANCE:
-                return new AccountAllowanceApproveTransaction(body.setCryptoApproveAllowance(scheduled.getCryptoApproveAllowance()).build());
-
-            case CRYPTOADJUSTALLOWANCE:
-                return new AccountAllowanceAdjustTransaction(body.setCryptoAdjustAllowance(scheduled.getCryptoAdjustAllowance()).build());
-
             default:
                 throw new IllegalStateException("schedulable transaction did not have a transaction set");
         }
     }
 
+    private static void throwProtoMatchException(String fieldName, String aWas, String bWas) {
+        throw new IllegalArgumentException(
+            "fromBytes() failed because " + fieldName +
+                " fields in TransactionBody protobuf messages in the TransactionList did not match: A was " +
+                aWas + ", B was " + bWas
+        );
+    }
+
+    private static void requireProtoMatches(Object protoA, Object protoB, Set<String> ignoreSet, String thisFieldName) {
+        var aIsNull = protoA == null;
+        var bIsNull = protoB == null;
+        if (aIsNull != bIsNull) {
+            throwProtoMatchException(thisFieldName, aIsNull ? "null" : "not null", bIsNull ? "null" : "not null");
+        }
+        if (aIsNull) {
+            return;
+        }
+        var protoAClass = protoA.getClass();
+        var protoBClass = protoB.getClass();
+        if (!protoAClass.equals(protoBClass)) {
+            throwProtoMatchException(thisFieldName, "of class " + protoAClass, "of class " + protoBClass);
+        }
+        if (protoA instanceof Boolean ||
+            protoA instanceof Integer ||
+            protoA instanceof Long ||
+            protoA instanceof Float ||
+            protoA instanceof Double ||
+            protoA instanceof String ||
+            protoA instanceof ByteString
+        ) {
+            // System.out.println("values A = " + protoA.toString() + ", B = " + protoB.toString());
+            if (!protoA.equals(protoB)) {
+                throwProtoMatchException(thisFieldName, protoA.toString(), protoB.toString());
+            }
+        }
+        for (var method : protoAClass.getDeclaredMethods()) {
+            if (method.getParameterCount() != 0) {
+                continue;
+            }
+            int methodModifiers = method.getModifiers();
+            if ((!Modifier.isPublic(methodModifiers)) || Modifier.isStatic(methodModifiers)) {
+                continue;
+            }
+            var methodName = method.getName();
+            if (!methodName.startsWith("get")) {
+                continue;
+            }
+            var isList = methodName.endsWith("List") && List.class.isAssignableFrom(method.getReturnType());
+            var methodFieldName = methodName.substring(3, methodName.length() - (isList ? 4 : 0));
+            if (ignoreSet.contains(methodFieldName) || methodFieldName.equals("DefaultInstance")) {
+                continue;
+            }
+            if (!isList) {
+                try {
+                    var hasMethod = protoAClass.getMethod("has" + methodFieldName);
+                    var hasA = (Boolean) hasMethod.invoke(protoA);
+                    var hasB = (Boolean) hasMethod.invoke(protoB);
+                    if (!hasA.equals(hasB)) {
+                        throwProtoMatchException(methodFieldName, hasA ? "present" : "not present", hasB ? "present" : "not present");
+                    }
+                    if (!hasA) {
+                        continue;
+                    }
+                } catch (NoSuchMethodException ignored) {
+                    // pass if there is no has method
+                } catch (IllegalArgumentException error) {
+                    throw error;
+                } catch (Throwable error) {
+                    throw new IllegalArgumentException("fromBytes() failed due to error", error);
+                }
+            }
+            try {
+                var retvalA = method.invoke(protoA);
+                var retvalB = method.invoke(protoB);
+                if (isList) {
+                    var listA = (List<?>) retvalA;
+                    var listB = (List<?>) retvalB;
+                    if (listA.size() != listB.size()) {
+                        throwProtoMatchException(methodFieldName, "of size " + listA.size(), "of size " + listB.size());
+                    }
+                    for (@Var int i = 0; i < listA.size(); i++) {
+                        // System.out.println("comparing " + thisFieldName + "." + methodFieldName + "[" + i + "]");
+                        requireProtoMatches(listA.get(i), listB.get(i), ignoreSet, methodFieldName + "[" + i + "]");
+                    }
+                } else {
+                    // System.out.println("comparing " + thisFieldName + "." + methodFieldName);
+                    requireProtoMatches(retvalA, retvalB, ignoreSet, methodFieldName);
+                }
+            } catch (IllegalArgumentException error) {
+                throw error;
+            } catch (Throwable error) {
+                throw new IllegalArgumentException("fromBytes() failed due to error", error);
+            }
+        }
+    }
+
+    /**
+     * Generate a hash from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the hash
+     */
     static byte[] hash(byte[] bytes) {
         var digest = new SHA384Digest();
         var hash = new byte[digest.getDigestSize()];
@@ -474,6 +648,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return scheduled;
     }
 
+    /**
+     * Extract the scheduled transaction.
+     *
+     * @return                          the scheduled transaction
+     */
     public ScheduleCreateTransaction schedule() {
         requireNotFrozen();
         if (!nodeAccountIds.isEmpty()) {
@@ -507,6 +686,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return super.setNodeAccountIds(nodeAccountIds);
     }
 
+    /**
+     * Extract the valid transaction duration.
+     *
+     * @return                          the transaction valid duration
+     */
     @Nullable
     public final Duration getTransactionValidDuration() {
         return transactionValidDuration;
@@ -528,6 +712,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * Extract the maximum transaction fee.
+     *
+     * @return                          the maximum transaction fee
+     */
     @Nullable
     public final Hbar getMaxTransactionFee() {
         return maxTransactionFee;
@@ -547,10 +736,20 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * Extract the default maximum transaction fee.
+     *
+     * @return                          the default maximum transaction fee
+     */
     public final Hbar getDefaultMaxTransactionFee() {
         return defaultMaxTransactionFee;
     }
 
+    /**
+     * Extract the memo for the transaction.
+     *
+     * @return                          the memo for the transaction
+     */
     public final String getTransactionMemo() {
         return memo;
     }
@@ -570,6 +769,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * Extract a byte array representation.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before conversion to bytes will be stable, try calling `freeze`");
@@ -586,20 +790,31 @@ public abstract class Transaction<T extends Transaction<T>>
         return list.build().toByteArray();
     }
 
+    /**
+     * Extract a byte array of the transaction hash.
+     *
+     * @return                          the transaction hash
+     */
     public byte[] getTransactionHash() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
-        var index = nextTransactionIndex * nodeAccountIds.size() + nextNodeIndex;
+        var index = transactionIds.getIndex() * nodeAccountIds.size() + nodeAccountIds.getIndex();
 
         buildTransaction(index);
 
         return hash(outerTransactions.get(index).getSignedTransactionBytes().toByteArray());
     }
 
+    /**
+     * Extract the list of account id and hash records.
+     *
+     * @return                          the list of account id and hash records
+     */
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
         if (!this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
@@ -618,17 +833,20 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     final TransactionId getTransactionIdInternal() {
-        return transactionIds.get(nextTransactionIndex);
+        return transactionIds.getCurrent();
     }
 
+    /**
+     * Extract the transaction id.
+     *
+     * @return                          the transaction id
+     */
     public final TransactionId getTransactionId() {
         if (transactionIds.isEmpty() || !this.isFrozen()) {
             throw new IllegalStateException("transaction must have been frozen before getting the transaction ID, try calling `freeze`");
         }
 
-        transactionIdsLocked = true;
-
-        return transactionIds.get(nextTransactionIndex);
+        return transactionIds.setLocked(true).getCurrent();
     }
 
     /**
@@ -647,16 +865,27 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setTransactionId(TransactionId transactionId) {
         requireNotFrozen();
-        transactionIds = Collections.singletonList(transactionId);
+        transactionIds.setList(Collections.singletonList(transactionId)).setLocked(true);
 
         // noinspection unchecked
         return (T) this;
     }
 
+    /**
+     * Should the transaction id be regenerated.
+     *
+     * @return                          should the transaction id be regenerated
+     */
     public final Boolean getRegenerateTransactionId() {
         return regenerateTransactionId;
     }
 
+    /**
+     * Regenerate the transaction id.
+     *
+     * @param regenerateTransactionId   should the transaction id be regenerated
+     * @return {@code this}
+     */
     public final T setRegenerateTransactionId(boolean regenerateTransactionId) {
         this.regenerateTransactionId = regenerateTransactionId;
 
@@ -664,10 +893,23 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * Sign the transaction.
+     *
+     * @param privateKey                the private key
+     * @return                          the signed transaction
+     */
     public final T sign(PrivateKey privateKey) {
         return signWith(privateKey.getPublicKey(), privateKey::sign);
     }
 
+    /**
+     * Sign the transaction.
+     *
+     * @param publicKey                 the public key
+     * @param transactionSigner         the key list
+     * @return {@code this}
+     */
     public T signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         if (!isFrozen()) {
             throw new IllegalStateException("Signing requires transaction to be frozen");
@@ -688,6 +930,12 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * Sign the transaction with the configured client.
+     *
+     * @param client                    the configured client
+     * @return                          the signed transaction
+     */
     public T signWithOperator(Client client) {
         var operator = client.getOperator();
 
@@ -707,6 +955,13 @@ public abstract class Transaction<T extends Transaction<T>>
         return publicKeys.contains(key);
     }
 
+    /**
+     * Add a signature to the transaction.
+     *
+     * @param publicKey                 the public key
+     * @param signature                 the signature
+     * @return {@code this}
+     */
     public T addSignature(PublicKey publicKey, byte[] signature) {
         requireOneNodeAccountId();
         if (!isFrozen()) {
@@ -718,7 +973,8 @@ public abstract class Transaction<T extends Transaction<T>>
             return (T) this;
         }
 
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
         for (int i = 0; i < outerTransactions.size(); i++) {
             outerTransactions.set(i, null);
@@ -754,6 +1010,11 @@ public abstract class Transaction<T extends Transaction<T>>
         return map;
     }
 
+    /**
+     * Extract list of account id and public keys.
+     *
+     * @return                          the list of account id and public keys
+     */
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
         if (publicKeys.isEmpty()) {
             return Collections.emptyMap();
@@ -764,16 +1025,27 @@ public abstract class Transaction<T extends Transaction<T>>
         return getSignaturesAtOffset(0);
     }
 
+    /**
+     * Check if transaction is frozen.
+     *
+     * @return                          is the transaction frozen
+     */
     protected boolean isFrozen() {
         return frozenBodyBuilder != null;
     }
 
+    /**
+     * Throw an exception if the transaction is frozen.
+     */
     protected void requireNotFrozen() {
         if (isFrozen()) {
             throw new IllegalStateException("transaction is immutable; it has at least one signature or has been explicitly frozen");
         }
     }
 
+    /**
+     * Throw an exception if there is not exactly one node id set.
+     */
     protected void requireOneNodeAccountId() {
         if (nodeAccountIds.size() != 1) {
             throw new IllegalStateException("transaction did not have exactly one node ID set");
@@ -825,7 +1097,7 @@ public abstract class Transaction<T extends Transaction<T>>
                 if (operator != null) {
                     // Set a default transaction ID, generated from the operator account ID
 
-                    transactionIds = Collections.singletonList(TransactionId.generate(operator.accountId));
+                    transactionIds.setList(Collections.singletonList(TransactionId.generate(operator.accountId)));
                 } else {
                     // no client means there must be an explicitly set node ID and transaction ID
                     throw new IllegalStateException(
@@ -843,7 +1115,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
 
             try {
-                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+                nodeAccountIds.setList(client.network.getNodeAccountIdsForExecute());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -863,18 +1135,33 @@ public abstract class Transaction<T extends Transaction<T>>
         return (T) this;
     }
 
+    /**
+     * There must be at least one chunk.
+     *
+     * @return                          there is 1 required chunk
+     */
     int getRequiredChunks() {
         return 1;
     }
 
+    /**
+     * Generate transaction id's.
+     *
+     * @param initialTransactionId      the initial transaction id
+     * @param count                     the number of id's to generate.
+     */
     void generateTransactionIds(TransactionId initialTransactionId, int count) {
+        var locked = transactionIds.isLocked();
+        transactionIds.setLocked(false);
+
         if (count == 1) {
-            transactionIds = Collections.singletonList(initialTransactionId);
+            transactionIds.setList(Collections.singletonList(initialTransactionId));
             return;
         }
 
         var nextTransactionId = initialTransactionId.toProtobuf().toBuilder();
-        transactionIds = new ArrayList<TransactionId>(count);
+        transactionIds.ensureCapacity(count);
+        transactionIds.clear();
         for (int i = 0; i < count; i++) {
             transactionIds.add(TransactionId.fromProtobuf(nextTransactionId.build()));
 
@@ -884,8 +1171,15 @@ public abstract class Transaction<T extends Transaction<T>>
 
             nextTransactionId.setTransactionValidStart(nextValidStart);
         }
+
+        transactionIds.setLocked(locked);
     }
 
+    /**
+     * Wipe / reset the transaction list.
+     *
+     * @param requiredChunks            the number of required chunks
+     */
     void wipeTransactionLists(int requiredChunks) {
         Objects.requireNonNull(frozenBodyBuilder).setTransactionID(getTransactionIdInternal().toProtobuf());
 
@@ -905,8 +1199,12 @@ public abstract class Transaction<T extends Transaction<T>>
         }
     }
 
+    /**
+     * Build all the transactions.
+     */
     void buildAllTransactions() {
-        transactionIdsLocked = true;
+        transactionIds.setLocked(true);
+        nodeAccountIds.setLocked(true);
 
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
@@ -916,6 +1214,8 @@ public abstract class Transaction<T extends Transaction<T>>
     /**
      * Will build the specific transaction at {@code index}
      * This function is only ever called after the transaction is frozen.
+     *
+     * @param index                     the index of the transaction to be built
      */
     void buildTransaction(int index) {
         // Check if transaction is already built.
@@ -950,6 +1250,8 @@ public abstract class Transaction<T extends Transaction<T>>
     /**
      * Will sign the specific transaction at {@code index}
      * This function is only ever called after the transaction is frozen.
+     *
+     * @param index                     the index of the transaction to sign
      */
     void signTransaction(int index) {
         var bodyBytes = innerSignedTransactions.get(index).getBodyBytes().toByteArray();
@@ -979,13 +1281,13 @@ public abstract class Transaction<T extends Transaction<T>>
     abstract void onFreeze(TransactionBody.Builder bodyBuilder);
 
     /**
-     * Called in {@link #schedule()} when convertin transaction into a scheduled version.
+     * Called in {@link #schedule()} when converting transaction into a scheduled version.
      */
     abstract void onScheduled(SchedulableTransactionBody.Builder scheduled);
 
     @Override
     final com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
-        var index = nextNodeIndex + (nextTransactionIndex * nodeAccountIds.size());
+        var index = nodeAccountIds.getIndex() + (transactionIds.getIndex() * nodeAccountIds.size());
 
         buildTransaction(index);
 
@@ -1000,7 +1302,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ) {
         var transactionId = Objects.requireNonNull(getTransactionIdInternal());
         var hash = hash(request.getSignedTransactionBytes().toByteArray());
-        nextTransactionIndex = (nextTransactionIndex + 1) % transactionIds.size();
+        transactionIds.advance();
         return new TransactionResponse(nodeId, transactionId, hash, null);
     }
 
@@ -1011,6 +1313,11 @@ public abstract class Transaction<T extends Transaction<T>>
 
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
+    /**
+     * Prepare the transactions to be executed.
+     *
+     * @param client                    the configured client
+     */
     void onExecute(Client client) {
         if (!isFrozen()) {
             freezeWith(client);
@@ -1045,7 +1352,7 @@ public abstract class Transaction<T extends Transaction<T>>
     ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
-                if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIdsLocked) {
+                if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
                     return ExecutionState.RequestError;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));

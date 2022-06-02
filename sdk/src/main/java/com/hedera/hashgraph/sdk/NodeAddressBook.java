@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -8,21 +27,46 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-class NodeAddressBook {
+/**
+ * A list of nodes and their metadata.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddressbook">Hedera Documentation</a>
+ */
+public class NodeAddressBook {
     List<NodeAddress> nodeAddresses = Collections.emptyList();
 
+    /**
+     * Constructor.
+     */
     NodeAddressBook() {
     }
 
-    List<NodeAddress> getNodeAddresses() {
+    /**
+     * Extract the of node addresses.
+     *
+     * @return                          list of node addresses
+     */
+    public List<NodeAddress> getNodeAddresses() {
         return nodeAddresses;
     }
 
-    NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
+    /**
+     * Assign the list of node addresses.
+     *
+     * @param nodeAddresses             list of node addresses
+     * @return {@code this}
+     */
+    public NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
         this.nodeAddresses = nodeAddresses;
         return this;
     }
 
+    /**
+     * Create a node address book from a protobuf.
+     *
+     * @param book                      the protobuf
+     * @return                          the new node address book
+     */
     static NodeAddressBook fromProtobuf(com.hedera.hashgraph.sdk.proto.NodeAddressBook book) {
         var addresses = new ArrayList<NodeAddress>(book.getNodeAddressCount());
 
@@ -33,10 +77,22 @@ class NodeAddressBook {
         return new NodeAddressBook().setNodeAddresses(addresses);
     }
 
-    static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
+    /**
+     * Create a node address book from a byte string.
+     *
+     * @param bytes                     the byte string
+     * @return                          the new node address book
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
+    public static NodeAddressBook fromBytes(ByteString bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.NodeAddressBook.parseFrom(bytes));
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     com.hedera.hashgraph.sdk.proto.NodeAddressBook toProtobuf() {
         var builder = com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder();
 
@@ -47,7 +103,12 @@ class NodeAddressBook {
         return builder.build();
     }
 
-    ByteString toBytes() {
+    /**
+     * Create the byte string.
+     *
+     * @return                          the byte string representation
+     */
+    public ByteString toBytes() {
         return toProtobuf().toByteString();
     }
 

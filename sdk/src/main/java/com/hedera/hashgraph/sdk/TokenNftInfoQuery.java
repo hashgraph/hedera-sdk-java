@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Query;
@@ -15,16 +34,32 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * A query that returns information about a non-fungible token (NFT).
+ *
+ * You request the info for an NFT by specifying the NFT ID.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/get-nft-token-info#methods">Hedera Documentation</a>
+ */
 public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<TokenNftInfo>, TokenNftInfoQuery> {
+    /**
+     * The ID of the non-fungible token in x.y.z format.
+     */
     @Nullable
     private NftId nftId = null;
     @Nullable
     private TokenId tokenId = null;
+    /**
+     * The account ID of the current owner of the NFT
+     */
     @Nullable
     private AccountId accountId = null;
     private long start = 0;
     private long end = 0;
 
+    /**
+     * Constructor.
+     */
     public TokenNftInfoQuery() {
     }
 
@@ -52,6 +87,11 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return this;
     }
 
+    /**
+     * Extract the nft id.
+     *
+     * @return                          the nft id
+     */
     @Nullable
     public NftId getNftId() {
         return nftId;

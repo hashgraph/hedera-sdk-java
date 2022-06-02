@@ -11,7 +11,7 @@ import org.threeten.bp.Instant;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicMessageIntegrationTest {
     @Test
@@ -30,10 +30,12 @@ public class TopicMessageIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(topicId, info.topicId);
-        assertEquals("[e2e::TopicCreateTransaction]", info.topicMemo);
-        assertEquals(0, info.sequenceNumber);
-        assertEquals(testEnv.operatorKey, info.adminKey);
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        Thread.sleep(3000);
 
         var receivedMessage = new boolean[]{false};
         var start = Instant.now();
@@ -44,6 +46,8 @@ public class TopicMessageIntegrationTest {
             .subscribe(testEnv.client, (message) -> {
                 receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals("Hello, from HCS!");
             });
+
+        Thread.sleep(3000);
 
         new TopicMessageSubmitTransaction()
             .setTopicId(topicId)
@@ -87,10 +91,10 @@ public class TopicMessageIntegrationTest {
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertEquals(topicId, info.topicId);
-        assertEquals("[e2e::TopicCreateTransaction]", info.topicMemo);
-        assertEquals(0, info.sequenceNumber);
-        assertEquals(testEnv.operatorKey, info.adminKey);
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
         var receivedMessage = new boolean[]{false};
         var start = Instant.now();

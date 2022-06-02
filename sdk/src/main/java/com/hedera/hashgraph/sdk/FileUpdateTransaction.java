@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -19,6 +38,8 @@ import java.util.Objects;
 
 /**
  * Updates a file by submitting the transaction.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file">Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 
@@ -32,19 +53,39 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     @Nullable
     private String fileMemo = null;
 
+    /**
+     * Constructor.
+     */
     public FileUpdateTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     FileUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     FileUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;
@@ -63,6 +104,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+      * @return                         the list of keys
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -82,6 +126,11 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * Extract the expiration time.
+     *
+     * @return                          the expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -103,6 +152,11 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * Extract the files contents as a byte string.
+     *
+     * @return                          the files contents as a byte string
+     */
     public ByteString getContents() {
         return ByteString.copyFrom(contents);
     }
@@ -163,11 +217,22 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * Extract the file's memo up to 100 bytes.
+     *
+     * @return                          the file's memo up to 100 bytes
+     */
     @Nullable
     public String getFileMemo() {
         return fileMemo;
     }
 
+    /**
+     * Assign the file memo up to 100 bytes max.
+     *
+     * @param memo                      the file's memo
+     * @return {@code this}
+     */
     public FileUpdateTransaction setFileMemo(String memo) {
         Objects.requireNonNull(memo);
         requireNotFrozen();
@@ -175,12 +240,20 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         return this;
     }
 
+    /**
+     * Remove the file memo.
+     *
+     * @return {@code this}
+     */
     public FileUpdateTransaction clearMemo() {
         requireNotFrozen();
         fileMemo = "";
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileUpdate();
         if (body.hasFileID()) {
@@ -198,6 +271,11 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         contents = body.getContents().toByteArray();
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody builder }
+     */
     FileUpdateTransactionBody.Builder build() {
         var builder = FileUpdateTransactionBody.newBuilder();
         if (fileId != null) {

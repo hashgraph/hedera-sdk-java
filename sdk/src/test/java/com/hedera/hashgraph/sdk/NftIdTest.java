@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -9,7 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class NftIdTest {
 
@@ -47,7 +66,7 @@ class NftIdTest {
     void toFromString() {
         var id1 = NftId.fromString("0.0.5005@1234");
         var id2 = NftId.fromString(id1.toString());
-        assertEquals(id1.toString(), id2.toString());
+        assertThat(id2.toString()).isEqualTo(id1.toString());
     }
 
     @Test
@@ -57,12 +76,12 @@ class NftIdTest {
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-rmkyk@584903").toStringWithChecksum(testnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-esxsf@584903").toStringWithChecksum(testnetClient)).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(NftId.fromString("0.0.123-ntjly/487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(NftId.fromString("0.0.123-ogizo/487302").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
     }
 
     @Test

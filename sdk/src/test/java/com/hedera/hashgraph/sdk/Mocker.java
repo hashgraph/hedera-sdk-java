@@ -1,6 +1,29 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import io.grpc.Server;
 import io.grpc.ServerMethodDefinition;
@@ -9,7 +32,6 @@ import io.grpc.ServiceDescriptor;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.ServerCalls;
-import java8.util.function.Function;
 import org.threeten.bp.Duration;
 
 import java.io.IOException;
@@ -64,7 +86,11 @@ public class Mocker implements AutoCloseable {
                             var r = response.get(responseIndex);
 
                             if (r instanceof Function<?, ?>){
-                                r = ((Function<Object, Object>) r).apply(request);
+                                try {
+                                    r = ((Function<Object, Object>) r).apply(request);
+                                } catch (Throwable e) {
+                                    r = Status.ABORTED.withDescription(e.getMessage()).asRuntimeException();
+                                }
                             }
 
                             if (r instanceof Throwable) {
@@ -90,8 +116,12 @@ public class Mocker implements AutoCloseable {
 
         this.client = Client.forNetwork(network)
             .setOperator(new AccountId(1800), PRIVATE_KEY)
-            .setMinBackoff(Duration.ofMillis(10))
-            .setNodeMinBackoff(Duration.ofMillis(10));
+            .setMinBackoff(Duration.ofMillis(0))
+            .setMaxBackoff(Duration.ofMillis(0))
+            .setNodeMinBackoff(Duration.ofMillis(0))
+            .setNodeMaxBackoff(Duration.ofMillis(0))
+            .setMinNodeReadmitTime(Duration.ofMillis(0))
+            .setMaxNodeReadmitTime(Duration.ofMillis(0));
     }
 
     public static Mocker withResponses(List<List<Object>> responses) {

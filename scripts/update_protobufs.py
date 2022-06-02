@@ -4,7 +4,6 @@
 import os
 import subprocess
 import sys
-import time
 
 
 print(">>> Usage: `" + sys.argv[0] + " branch`")
@@ -171,7 +170,7 @@ def generate_FreezeType():
         finalize_FreezeType)
     output_java_file(FREEZE_TYPE_OUT_PATH, FreezeType_sections)
 
-    
+
 def generate_TokenPauseStatus():
     parse_enum_from_file(
         BASIC_TYPES_PATH,

@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -12,30 +31,63 @@ import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
+/**
+ * Unfreezes transfers of the specified token for the account.
+ *
+ * The transaction must be signed by the token's Freeze Key.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/unfreeze-an-account">Hedera Documentation</a>
+ */
 public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenUnfreezeTransaction> {
     @Nullable
     private TokenId tokenId = null;
     @Nullable
     private AccountId accountId = null;
 
+    /**
+     * Constructor.
+     */
     public TokenUnfreezeTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     TokenUnfreezeTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     TokenUnfreezeTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the token id.
+     *
+     * @return                          the token id
+     */
     @Nullable
     public TokenId getTokenId() {
         return tokenId;
     }
 
+    /**
+     * Assign the token id.
+     *
+     * @param tokenId                   the token id
+     * @return {@code this}
+     */
     public TokenUnfreezeTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
@@ -43,11 +95,22 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         return this;
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
     }
 
+    /**
+     * Assign the account id.
+     *
+     * @param accountId                 the account id
+     * @return {@code this}
+     */
     public TokenUnfreezeTransaction setAccountId(AccountId accountId) {
         Objects.requireNonNull(accountId);
         requireNotFrozen();
@@ -55,6 +118,9 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getTokenUnfreeze();
         if (body.hasToken()) {
@@ -66,6 +132,12 @@ public class TokenUnfreezeTransaction extends com.hedera.hashgraph.sdk.Transacti
         }
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@code @link
+     *         com.hedera.hashgraph.sdk.proto.TokenUnfreezeAccountTransactionBody}
+     */
     TokenUnfreezeAccountTransactionBody.Builder build() {
         var builder = TokenUnfreezeAccountTransactionBody.newBuilder();
         if (tokenId != null) {

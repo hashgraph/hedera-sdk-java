@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -9,6 +28,8 @@ import javax.annotation.Nullable;
 
 /**
  * Current information for a file, including its size.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info">Hedera Documentation</a>
  */
 public final class FileInfo {
     /**
@@ -63,6 +84,12 @@ public final class FileInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Create a file info object from a ptotobuf.
+     *
+     * @param fileInfo                  the protobuf
+     * @return                          the new file info object
+     */
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
         @Nullable KeyList keys = fileInfo.hasKeys() ?
             KeyList.fromProtobuf(fileInfo.getKeys(), null) :
@@ -79,10 +106,22 @@ public final class FileInfo {
         );
     }
 
+    /**
+     * Create a file info object from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new file info object
+     * @throws InvalidProtocolBufferException   when there is an issue with the protobuf
+     */
     public static FileInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     FileGetInfoResponse.FileInfo toProtobuf() {
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
             .setFileID(fileId.toProtobuf())
@@ -118,6 +157,11 @@ public final class FileInfo {
             .toString();
     }
 
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

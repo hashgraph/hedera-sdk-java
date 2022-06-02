@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -101,20 +120,48 @@ public final class AccountInfo {
 
     public final int maxAutomaticTokenAssociations;
 
+    @Nullable
+    public final PublicKey aliasKey;
+
     /**
      * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
      */
     public final LedgerId ledgerId;
 
-    @Nullable
-    public final PublicKey aliasKey;
+    public final long ethereumNonce;
 
+    @Deprecated
     public final List<HbarAllowance> hbarAllowances;
 
+    @Deprecated
     public final List<TokenAllowance> tokenAllowances;
 
+    @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
+    /**
+     * Constructor.
+     *
+     * @param accountId                 the account id
+     * @param contractAccountId         the contracts account id
+     * @param isDeleted                 is it deleted
+     * @param proxyAccountId            the proxy account's id
+     * @param proxyReceived             amount of proxy received
+     * @param key                       signing key
+     * @param balance                   account balance
+     * @param sendRecordThreshold       @depreciated no replacement
+     * @param receiveRecordThreshold    @depreciated no replacement
+     * @param receiverSignatureRequired is the receiver's signature required
+     * @param expirationTime            the expiration time
+     * @param autoRenewPeriod           the auto renew period
+     * @param liveHashes                the live hashes
+     * @param tokenRelationships        list of token id and token relationship records
+     * @param accountMemo               the account melo
+     * @param ownedNfts                 number of nft's
+     * @param maxAutomaticTokenAssociations     max number of token associations
+     * @param aliasKey                  public alias key
+     * @param ledgerId                  the ledger id
+     */
     private AccountInfo(
         AccountId accountId,
         String contractAccountId,
@@ -135,9 +182,7 @@ public final class AccountInfo {
         int maxAutomaticTokenAssociations,
         @Nullable PublicKey aliasKey,
         LedgerId ledgerId,
-        List<HbarAllowance> hbarAllowances,
-        List<TokenAllowance> tokenAllowances,
-        List<TokenNftAllowance> tokenNftAllowances
+        long ethereumNonce
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -158,11 +203,18 @@ public final class AccountInfo {
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         this.aliasKey = aliasKey;
         this.ledgerId = ledgerId;
-        this.hbarAllowances = hbarAllowances;
-        this.tokenAllowances = tokenAllowances;
-        this.tokenNftAllowances = tokenNftAllowances;
+        this.ethereumNonce = ethereumNonce;
+        this.hbarAllowances = Collections.emptyList();
+        this.tokenAllowances = Collections.emptyList();
+        this.tokenNftAllowances = Collections.emptyList();
     }
 
+    /**
+     * Retrieve the account info from a protobuf.
+     *
+     * @param accountInfo               the account info protobuf
+     * @return                          the account info object
+     */
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
         var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
 
@@ -179,21 +231,6 @@ public final class AccountInfo {
         for (com.hedera.hashgraph.sdk.proto.TokenRelationship relationship : accountInfo.getTokenRelationshipsList()) {
             TokenId tokenId = TokenId.fromProtobuf(relationship.getTokenId());
             relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
-        }
-
-        List<HbarAllowance> hbarAllowances = new ArrayList<>(accountInfo.getCryptoAllowancesCount());
-        for (var allowanceProto : accountInfo.getCryptoAllowancesList()) {
-            hbarAllowances.add(HbarAllowance.fromProtobuf(allowanceProto));
-        }
-
-        List<TokenAllowance> tokenAllowances = new ArrayList<>(accountInfo.getTokenAllowancesCount());
-        for (var allowanceProto : accountInfo.getTokenAllowancesList()) {
-            tokenAllowances.add(TokenAllowance.fromProtobuf(allowanceProto));
-        }
-
-        List<TokenNftAllowance> nftAllowances = new ArrayList<>(accountInfo.getNftAllowancesCount());
-        for (var allowanceProto : accountInfo.getNftAllowancesList()) {
-            nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
         }
 
         @Nullable
@@ -219,16 +256,26 @@ public final class AccountInfo {
             accountInfo.getMaxAutomaticTokenAssociations(),
             aliasKey,
             LedgerId.fromByteString(accountInfo.getLedgerId()),
-            hbarAllowances,
-            tokenAllowances,
-            nftAllowances
+            accountInfo.getEthereumNonce()
         );
     }
 
+    /**
+     * Retrieve the account info from a protobuf byte array.
+     *
+     * @param bytes                     a byte array representing the protobuf
+     * @return                          the account info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Convert an account info object into a protobuf.
+     *
+     * @return                          the protobuf object
+     */
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var hashes = J8Arrays.stream(liveHashes.toArray())
             .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
@@ -249,7 +296,8 @@ public final class AccountInfo {
             .setMemo(accountMemo)
             .setOwnedNfts(ownedNfts)
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setLedgerId(ledgerId.toByteString());
+            .setLedgerId(ledgerId.toByteString())
+            .setEthereumNonce(ethereumNonce);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -261,18 +309,6 @@ public final class AccountInfo {
 
         if (aliasKey != null) {
             accountInfoBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
-        }
-
-        for (var allowance : hbarAllowances) {
-            accountInfoBuilder.addCryptoAllowances(allowance.toProtobuf());
-        }
-
-        for (var allowance : tokenAllowances) {
-            accountInfoBuilder.addTokenAllowances(allowance.toProtobuf());
-        }
-
-        for (var allowance : tokenNftAllowances) {
-            accountInfoBuilder.addNftAllowances(allowance.toProtobuf());
         }
 
         return accountInfoBuilder.build();
@@ -300,12 +336,15 @@ public final class AccountInfo {
             .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
             .add("aliasKey", aliasKey)
             .add("ledgerId", ledgerId)
-            .add("hbarAllowances", hbarAllowances)
-            .add("tokenAllowances", tokenAllowances)
-            .add("tokenNftAllowances", tokenNftAllowances)
+            .add("ethereumNonce", ethereumNonce)
             .toString();
     }
 
+    /**
+     * Extract a byte array representation.
+     *
+     * @return                          a byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

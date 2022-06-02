@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
@@ -7,21 +26,20 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import java8.util.concurrent.CompletableFuture;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -50,11 +68,11 @@ class ExecutableTest {
         when(network.getNode(new AccountId(4))).thenReturn(node4);
         when(network.getNode(new AccountId(5))).thenReturn(node5);
 
-        nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
     }
 
     @Test
@@ -68,7 +86,7 @@ class ExecutableTest {
         tx.setMaxBackoff(Duration.ofMillis(1000));
 
         var node = tx.getNodeForExecute(1);
-        assertEquals(node3, node);
+        assertThat(node).isEqualTo(node3);
     }
 
 
@@ -86,8 +104,8 @@ class ExecutableTest {
         var grpcRequest = tx.getGrpcRequest(1);
 
         var timeRemaining = grpcRequest.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
-        Assertions.assertTrue(timeRemaining < 10000);
-        Assertions.assertTrue(timeRemaining > 9000);
+        assertThat(timeRemaining).isLessThan(10000);
+        assertThat(timeRemaining).isGreaterThan(9000);
     }
 
     @Test
@@ -104,7 +122,7 @@ class ExecutableTest {
         tx.setMaxBackoff(Duration.ofMillis(1000));
 
         var node = tx.getNodeForExecute(1);
-        assertEquals(node4, node);
+        assertThat(node).isEqualTo(node4);
     }
 
     @Test
@@ -122,10 +140,10 @@ class ExecutableTest {
         tx.setNodesFromNodeAccountIds(client);
         tx.setMinBackoff(Duration.ofMillis(10));
         tx.setMaxBackoff(Duration.ofMillis(1000));
-        tx.nextNodeIndex = 1;
+        tx.nodeAccountIds.setIndex(1);
 
         var node = tx.getNodeForExecute(1);
-        assertEquals(node4, node);
+        assertThat(node).isEqualTo(node4);
     }
 
     @Test
@@ -144,11 +162,11 @@ class ExecutableTest {
         tx.setMaxBackoff(Duration.ofMillis(1000));
 
         var node = tx.getNodeForExecute(1);
-        assertEquals(node3, node);
-        tx.nextNodeIndex++;
+        assertThat(node).isEqualTo(node3);
+        tx.nodeAccountIds.advance();
 
         node = tx.getNodeForExecute(2);
-        assertEquals(node3, node);
+        assertThat(node).isEqualTo(node3);
         verify(node4).getRemainingTimeForBackoff();
         verify(node5).getRemainingTimeForBackoff();
     }
@@ -176,15 +194,15 @@ class ExecutableTest {
         tx.setMaxBackoff(Duration.ofMillis(1000));
 
         var node = tx.getNodeForExecute(1);
-        assertEquals(node5, node);
+        assertThat(node).isEqualTo(node5);
         i.incrementAndGet();
 
         node = tx.getNodeForExecute(2);
-        assertEquals(node4, node);
+        assertThat(node).isEqualTo(node4);
         i.incrementAndGet();
 
         node = tx.getNodeForExecute(3);
-        assertEquals(node3, node);
+        assertThat(node).isEqualTo(node3);
     }
 
     @Test
@@ -202,11 +220,11 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
@@ -218,7 +236,7 @@ class ExecutableTest {
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
 
-        assertEquals(new AccountId(3), resp.nodeId);
+        assertThat(resp.nodeId).isEqualTo(new AccountId(3));
     }
 
     @Test
@@ -242,11 +260,11 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
@@ -260,7 +278,7 @@ class ExecutableTest {
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
-        assertEquals(new AccountId(4), resp.nodeId);
+        assertThat(resp.nodeId).isEqualTo(new AccountId(4));
     }
 
     @Test
@@ -296,11 +314,11 @@ class ExecutableTest {
             }
         };
 
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
@@ -315,7 +333,7 @@ class ExecutableTest {
         verify(node3, times(2)).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
         verify(node5).channelFailedToConnect();
-        assertEquals(new AccountId(3), resp.nodeId);
+        assertThat(resp.nodeId).isEqualTo(new AccountId(3));
     }
 
     @Test
@@ -331,13 +349,13 @@ class ExecutableTest {
         when(node5.channelFailedToConnect()).thenReturn(true);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
-        assertThrows(MaxAttemptsExceededException.class, () -> tx.execute(client));
+        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> tx.execute(client));
     }
 
     @Test
@@ -351,11 +369,11 @@ class ExecutableTest {
         when(node4.channelFailedToConnect()).thenReturn(false);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
@@ -371,7 +389,7 @@ class ExecutableTest {
                 throw new StatusRuntimeException(io.grpc.Status.ABORTED);
         };
 
-        assertThrows(RuntimeException.class, () -> tx.execute(client));
+        assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> tx.execute(client));
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
@@ -397,11 +415,11 @@ class ExecutableTest {
                 return i.getAndIncrement() == 0 ? ExecutionState.Retry : ExecutionState.Success;
             }
         };
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var receipt = com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder()
@@ -431,11 +449,11 @@ class ExecutableTest {
                 return Status.ACCOUNT_DELETED;
             }
         };
-        var nodeAccountIds = new ArrayList<AccountId>() {{
-            add(new AccountId(3));
-            add(new AccountId(4));
-            add(new AccountId(5));
-        }};
+        var nodeAccountIds = Arrays.asList(
+            new AccountId(3),
+            new AccountId(4),
+            new AccountId(5)
+        );
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
@@ -445,7 +463,7 @@ class ExecutableTest {
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        assertThrows(PrecheckStatusException.class, () -> tx.execute(client));
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> tx.execute(client));
 
         verify(node3).channelFailedToConnect();
     }
@@ -454,11 +472,11 @@ class ExecutableTest {
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 
-        assertEquals(ExecutionState.ServerError, tx.shouldRetry(Status.PLATFORM_TRANSACTION_NOT_CREATED, null));
-        assertEquals(ExecutionState.ServerError, tx.shouldRetry(Status.PLATFORM_NOT_ACTIVE, null));
-        assertEquals(ExecutionState.ServerError, tx.shouldRetry(Status.BUSY, null));
-        assertEquals(ExecutionState.Success, tx.shouldRetry(Status.OK, null));
-        assertEquals(ExecutionState.RequestError, tx.shouldRetry(Status.ACCOUNT_DELETED, null));
+        assertThat(tx.shouldRetry(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.shouldRetry(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.shouldRetry(Status.BUSY, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.shouldRetry(Status.OK, null)).isEqualTo(ExecutionState.Success);
+        assertThat(tx.shouldRetry(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.RequestError);
     }
 
     static class DummyTransaction<T extends Transaction<T>>

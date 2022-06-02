@@ -6,17 +6,16 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.as;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 public class AutomaticAssociationTest {
-    @Disabled
     @Test
     @DisplayName("Tokens automatically become associated")
     void autoAssociateTest() throws Exception {
@@ -35,8 +34,8 @@ public class AutomaticAssociationTest {
 
         var accountInfo1 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
-        assertEquals(1, accountInfo1.maxAutomaticTokenAssociations);
-        assertEquals(0, accountInfo1.tokenRelationships.size());
+        assertThat(accountInfo1.maxAutomaticTokenAssociations).isEqualTo(1);
+        assertThat(accountInfo1.tokenRelationships.size()).isEqualTo(0);
 
         var tokenId1 = new TokenCreateTransaction()
             .setTreasuryAccountId(testEnv.operatorId)
@@ -69,24 +68,22 @@ public class AutomaticAssociationTest {
         transferResponse1.getReceipt(testEnv.client);
         var transferRecord = transferResponse1.getRecord(testEnv.client);
 
-        assertEquals(1, transferRecord.automaticTokenAssociations.size());
-        assertEquals(accountId, transferRecord.automaticTokenAssociations.get(0).accountId);
-        assertEquals(tokenId1, transferRecord.automaticTokenAssociations.get(0).tokenId);
+        assertThat(transferRecord.automaticTokenAssociations.size()).isEqualTo(1);
+        assertThat(transferRecord.automaticTokenAssociations.get(0).accountId).isEqualTo(accountId);
+        assertThat(transferRecord.automaticTokenAssociations.get(0).tokenId).isEqualTo(tokenId1);
 
         var accountInfo2 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
-        assertEquals(1, accountInfo2.tokenRelationships.size());
-        assertTrue(accountInfo2.tokenRelationships.get(tokenId1).automaticAssociation);
+        assertThat(accountInfo2.tokenRelationships.size()).isEqualTo(1);
+        assertThat(accountInfo2.tokenRelationships.get(tokenId1).automaticAssociation).isTrue();
 
-        var error = assertThrows(Exception.class, () -> {
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addTokenTransfer(tokenId2, testEnv.operatorId, -1)
                 .addTokenTransfer(tokenId2, accountId, 1)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        });
-
-        assertTrue(error.getMessage().contains("NO_REMAINING_AUTO_ASSOCIATIONS"));
+        }).withMessageContaining("NO_REMAINING_AUTOMATIC_ASSOCIATIONS");
 
         new AccountUpdateTransaction()
             .setAccountId(accountId)
@@ -98,7 +95,7 @@ public class AutomaticAssociationTest {
 
         var accountInfo3 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
-        assertEquals(2, accountInfo3.maxAutomaticTokenAssociations);
+        assertThat(accountInfo3.maxAutomaticTokenAssociations).isEqualTo(2);
 
         new TokenDeleteTransaction()
             .setTokenId(tokenId1)

@@ -1,5 +1,25 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.Int32Value;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody;
@@ -8,6 +28,7 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
+import org.checkerframework.checker.units.qual.A;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -50,23 +71,43 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     @Nullable
     private Key adminKey = null;
     @Nullable
+    private Integer maxAutomaticTokenAssociations = null;
+    @Nullable
     private Duration autoRenewPeriod = null;
     @Nullable
     private String contractMemo = null;
 
+    /**
+     * Contract.
+     */
     public ContractUpdateTransaction() {
     }
 
+    /**
+     * Contract.
+     *
+     * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) record
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
-
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractUpdateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the contract id.
+     *
+     * @return                          the contract id
+     */
     @Nullable
     public ContractId getContractId() {
         return contractId;
@@ -85,6 +126,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Extract the contract expiration time.
+     *
+     * @return                          the contract expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -104,6 +150,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Extract the administrator key.
+     *
+     * @return                          the administrator key
+     */
     @Nullable
     public Key getAdminKey() {
         return adminKey;
@@ -122,6 +173,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -144,6 +200,30 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();
         this.proxyAccountId = proxyAccountId;
+        return this;
+    }
+
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
+    @Nullable
+    public Integer getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    /**
+     * Sets the new maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @param maxAutomaticTokenAssociations The maximum automatic token associations
+     * @return  {@code this}
+     */
+
+    public ContractUpdateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        requireNotFrozen();
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
     }
 
@@ -193,6 +273,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Extract the contents of the memo.
+     *
+     * @return                          the contents of the memo
+     */
     @Nullable
     public String getContractMemo() {
         return contractMemo;
@@ -211,12 +296,20 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Remove the memo contents.
+     *
+     * @return {@code this}
+     */
     public ContractUpdateTransaction clearMemo() {
         requireNotFrozen();
         contractMemo = "";
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractUpdateInstance();
         if (body.hasContractID()) {
@@ -231,6 +324,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
+        if (body.hasMaxAutomaticTokenAssociations()) {
+            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+        }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }
@@ -239,6 +335,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.ContractUpdateTransactionBody builder }
+     */
     ContractUpdateTransactionBody.Builder build() {
         var builder = ContractUpdateTransactionBody.newBuilder();
         if (contractId != null) {
@@ -252,6 +353,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
+        }
+        if (maxAutomaticTokenAssociations != null) {
+            builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
         }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));

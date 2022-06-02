@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -45,11 +64,23 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @Nullable
     private Hbar chosenQueryPayment = null;
 
+    /**
+     * Constructor.
+     */
     Query() {
         builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         headerBuilder = QueryHeader.newBuilder();
     }
 
+    /**
+     * Create a payment transaction.
+     *
+     * @param paymentTransactionId      the transaction id
+     * @param nodeId                    the node id
+     * @param operator                  the operator
+     * @param paymentAmount             the amount
+     * @return                          the new payment transaction
+     */
     private static Transaction makePaymentTransaction(
         TransactionId paymentTransactionId,
         AccountId nodeId,
@@ -108,6 +139,14 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return (T) this;
     }
 
+    /**
+     * Calculate the expected cost.
+     *
+     * @param client                    the configured client
+     * @return                          the cost in hbar
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
+     */
     public Hbar getCost(Client client) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
         return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client);
@@ -120,6 +159,11 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client);
     }
 
+    /**
+     * Does this query require a payment?
+     *
+     * @return                          does this query require a payment
+     */
     boolean isPaymentRequired() {
         // nearly all queries require a payment
         return true;
@@ -136,14 +180,31 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      */
     abstract ResponseHeader mapResponseHeader(Response response);
 
+    /**
+     * The derived class should access its request header and return.
+     */
     abstract QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request);
 
+    /**
+     * Crate the new Query.
+     *
+     * @return                          the new Query
+     */
     private Query<Hbar, QueryCostQuery> getCostExecutable() {
         return new QueryCostQuery();
     }
 
+    /**
+     * Validate the checksums.
+     */
     abstract void validateChecksums(Client client) throws BadEntityIdException;
 
+    /**
+     * Retrieve the operator from the configured client.
+     *
+     * @param client                    the configured client
+     * @return                          the operator
+     */
     Client.Operator getOperatorFromClient(Client client) {
         var operator = client.getOperator();
 
@@ -217,19 +278,28 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         if (nodeAccountIds.size() == 0) {
             // Get a list of node AccountId's if the user has not set them manually.
             try {
-                nodeAccountIds = client.network.getNodeAccountIdsForExecute();
+                nodeAccountIds.setList(client.network.getNodeAccountIdsForExecute());
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
+    /**
+     * Retrieve the transaction at the given index.
+     *
+     * @param index                     the index
+     * @return                          the transaction
+     */
     Transaction getPaymentTransaction(int index) {
         var paymentTx = Objects.requireNonNull(paymentTransactions).get(index);
         if (paymentTx != null) {
             return paymentTx;
         } else {
-            paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            if (paymentTransactionId == null) {
+                paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            }
+
             var newPaymentTx = makePaymentTransaction(
                 paymentTransactionId,
                 nodeAccountIds.get(index),
@@ -245,7 +315,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     final com.hedera.hashgraph.sdk.proto.Query makeRequest() {
         // If payment is required, set the next payment transaction on the query
         if (isPaymentRequired() && paymentTransactions != null) {
-            headerBuilder.setPayment(getPaymentTransaction(nextNodeIndex));
+            headerBuilder.setPayment(getPaymentTransaction(nodeAccountIds.getIndex()));
         }
 
         // Delegate to the derived class to apply the header because the common header struct is
@@ -268,6 +338,30 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         // this is only called on an error about either the payment transaction or missing a payment transaction
         // as we make sure the latter can't happen, this will never be null
         return paymentTransactionId;
+    }
+
+    /**
+     * Extract the transaction id.
+     *
+     * @return                          the transaction id
+     */
+    @Nullable
+    public TransactionId getPaymentTransactionId() {
+        return paymentTransactionId;
+    }
+
+    /**
+     * Assign the transaction id.
+     *
+     * @param paymentTransactionId      the transaction id
+     * @return {@code this}
+     */
+    @Nullable
+    public T setPaymentTransactionId(TransactionId paymentTransactionId) {
+        this.paymentTransactionId = paymentTransactionId;
+
+        // noinspection unchecked
+        return (T) this;
     }
 
     @Override

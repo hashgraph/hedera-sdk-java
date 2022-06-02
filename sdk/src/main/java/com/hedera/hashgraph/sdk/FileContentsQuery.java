@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -13,16 +32,31 @@ import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * Get the contents of a file. The content field is empty (no bytes) if the file is empty.
+ * Get the contents of a file. The content field is empty (no bytes) if the
+ * file is empty.
+ *
+ * A query to get the contents of a file. Queries do not change the state of
+ * the file or require network consensus. The information is returned from a
+ * single node processing the query.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-contents">Hedera Documentation</a>
  */
 public final class FileContentsQuery extends Query<ByteString, FileContentsQuery> {
 
     @Nullable
     private FileId fileId = null;
 
+    /**
+     * Constructor.
+     */
     public FileContentsQuery() {
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id
+     */
     @Nullable
     public FileId getFileId() {
         return fileId;

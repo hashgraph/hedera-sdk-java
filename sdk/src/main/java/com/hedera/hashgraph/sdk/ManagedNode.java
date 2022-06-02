@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -9,14 +28,21 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java8.util.Objects;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java8.util.concurrent.CompletableFuture;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Internal utility class.
+ *
+ * @param <N>                           the n type
+ * @param <KeyT>                        the key t type
+ */
 abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
@@ -45,7 +71,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Timestamp of when this node will be considered healthy again
      */
-    protected long backoffUntil;
+    protected Instant readmitTime;
 
     /**
      * The current backoff duration. Uses exponential backoff so think 1s, 2s, 4s, 8s, etc until maxBackoff is hit
@@ -70,27 +96,45 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     @Nullable
     protected ManagedChannel channel = null;
 
+    /**
+     * Constructor.
+     *
+     * @param address                   the node address
+     * @param executor                  the client
+     */
     protected ManagedNode(ManagedNodeAddress address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
         this.currentBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.minBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.maxBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
+        this.readmitTime = Instant.now();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param node                      the node object
+     * @param address                   the address to assign
+     */
     protected ManagedNode(N node, ManagedNodeAddress address) {
         this.address = address;
 
         this.executor = node.executor;
         this.minBackoff = node.minBackoff;
         this.maxBackoff = node.maxBackoff;
-        this.backoffUntil = node.backoffUntil;
+        this.readmitTime = node.readmitTime;
         this.currentBackoff = node.currentBackoff;
         this.badGrpcStatusCount = node.badGrpcStatusCount;
         this.lastUsed = node.lastUsed;
         this.useCount = node.useCount;
     }
 
+    /**
+     * Return the local host ip address
+     *
+     * @return                          the authority address
+     */
     protected String getAuthority() {
         return "127.0.0.1";
     }
@@ -98,40 +142,47 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Create an insecure version of this node
      *
-     * @return
+     * @return                          the insecure version of the node
      */
     abstract N toInsecure();
 
     /**
      * Create a secure version of this node
-     * @return
+     *
+     * @return                          the secure version of the node
      */
     abstract N toSecure();
 
+    /**
+     * Extract the key list
+     *
+     * @return                          the key list
+     */
     abstract KeyT getKey();
 
     /**
      * Get the address of this node
      *
-     * @return
+     * @return                          the address for the node
      */
     ManagedNodeAddress getAddress() {
         return address;
     }
 
     /**
-     * Get the minimum backoff
-     * @return
+     * Get the minimum backoff time
+     *
+     * @return                          the minimum backoff time
      */
     Duration getMinBackoff() {
         return minBackoff;
     }
 
     /**
-     * Set the minimum backoff
+     * Set the minimum backoff tim
      *
-     * @param minBackoff
-     * @return
+     * @param minBackoff                the minimum backoff time
+     * @return {@code this}
      */
     N setMinBackoff(Duration minBackoff) {
         if (currentBackoff == this.minBackoff) {
@@ -144,18 +195,19 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
-     * Get the maximum backoff
-     * @return
+     * Get the maximum backoff time
+     *
+     * @return                          the maximum backoff time
      */
     Duration getMaxBackoff() {
         return maxBackoff;
     }
 
     /**
-     * Set the minimum backoff
+     * Set the maximum backoff time
      *
-     * @param maxBackoff
-     * @return
+     * @param maxBackoff                the max backoff time
+     * @return {@code this}
      */
     N setMaxBackoff(Duration maxBackoff) {
         this.maxBackoff = ManagedNode.this.maxBackoff;
@@ -166,14 +218,20 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
 
     /**
      * Get the number of times this node has received a bad gRPC status
-     * @return
+     *
+     * @return                          the count of bad grpc status
      */
     long getBadGrpcStatusCount() {
         return badGrpcStatusCount;
     }
 
+    /**
+     * Extract the unhealthy backoff time remaining.
+     *
+     * @return                          the unhealthy backoff time remaining
+     */
     long unhealthyBackoffRemaining() {
-        return Math.max(0, backoffUntil - System.currentTimeMillis());
+        return Math.max(0, readmitTime.toEpochMilli() - System.currentTimeMillis());
     }
 
     /**
@@ -181,19 +239,20 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * Healthy means the node has either not received any bad gRPC statuses, or if it has received bad gRPC status then
      * the node backed off for a period of time.
      *
-     * @return
+     * @return                          is the node healthy
      */
     boolean isHealthy() {
-        return backoffUntil < System.currentTimeMillis();
+        return readmitTime.toEpochMilli() < Instant.now().toEpochMilli();
     }
 
     /**
      * Used when a node has received a bad gRPC status
      */
-    synchronized void increaseDelay() {
+    synchronized void increaseBackoff() {
         this.badGrpcStatusCount++;
-        this.backoffUntil = System.currentTimeMillis() + this.currentBackoff.toMillis();
-        this.currentBackoff = Duration.ofMillis(Math.min(this.currentBackoff.toMillis() * 2, this.maxBackoff.toMillis()));
+        this.readmitTime = Instant.now().plus(this.currentBackoff);
+        this.currentBackoff = currentBackoff.multipliedBy(2);
+        this.currentBackoff = currentBackoff.compareTo(maxBackoff) < 0 ? currentBackoff : maxBackoff;
     }
 
     /**
@@ -202,28 +261,32 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * this is to allow a node which has been performing poorly (receiving several bad gRPC status) to become used again
      * once it stops receiving bad gRPC statuses.
      */
-    synchronized void decreaseDelay() {
-        this.currentBackoff = Duration.ofMillis(Math.max(this.currentBackoff.toMillis() / 2, minBackoff.toMillis()));
+    synchronized void decreaseBackoff() {
+        this.currentBackoff = currentBackoff.dividedBy(2);
+        this.currentBackoff = currentBackoff.compareTo(minBackoff) > 0 ? currentBackoff : minBackoff;
     }
 
     /**
      * Get the amount of time the node has to wait until it's healthy again
      *
-     * @return
+     * @return                          remaining back off time
      */
     long getRemainingTimeForBackoff() {
-        return backoffUntil - System.currentTimeMillis();
+        return readmitTime.toEpochMilli() - System.currentTimeMillis();
     }
 
     /**
      * Create TLS credentials when transport security is enabled
      *
-     * @return
+     * @return                          the channel credentials
      */
     ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.create();
     }
 
+    /**
+     * Update use counters and update last used time stamp.
+     */
     synchronized void inUse() {
         useCount++;
         lastUsed = System.currentTimeMillis();
@@ -232,7 +295,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Get the gRPC channel for this node
      *
-     * @return
+     * @return                          the channel
      */
     synchronized ManagedChannel getChannel() {
         inUse();
@@ -265,6 +328,11 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return channel;
     }
 
+    /**
+     * Did we fail to connect?
+     *
+     * @return                          did we fail to connect
+     */
     boolean channelFailedToConnect() {
         if (hasConnected) {
             return false;
@@ -291,6 +359,11 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         });
     }
 
+    /**
+     * Asynchronously determine if the channel failed to connect.
+     *
+     * @return                          did we fail to connect
+     */
     CompletableFuture<Boolean> channelFailedToConnectAsync() {
         if (hasConnected) {
             return CompletableFuture.completedFuture(false);
@@ -301,8 +374,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Close the current nodes channel
      *
-     * @param timeout
-     * @throws InterruptedException
+     * @param timeout                   the timeout value
+     * @throws InterruptedException     thrown when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized void close(Duration timeout) throws InterruptedException {
         if (channel != null) {
@@ -315,8 +388,8 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     /**
      * Compares one node to another.  If node a < node b, use of node a will be prioritized over node b.
      *
-     * @param node
-     * @return
+     * @param node                      node to compare
+     * @return                          which comparison to use
      */
     @Override
     public int compareTo(ManagedNode<N, KeyT> node) {
@@ -343,6 +416,11 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         return Long.compare(this.lastUsed, node.lastUsed);
     }
 
+    /**
+     * Extract the user agent string.
+     *
+     * @return                          the user agent string
+     */
     private String getUserAgent() {
         var thePackage = getClass().getPackage();
         var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;

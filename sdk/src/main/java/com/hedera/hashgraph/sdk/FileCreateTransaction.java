@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -18,6 +37,8 @@ import java.util.Objects;
 
 /**
  * Creates a file with the content by submitting the transaction.
+ *
+ * See <a href="https://docs.hedera.com/guides/getting-started/try-examples/deploy-a-contract-using-the-hedera-token-service#2.-store-the-smart-contract-bytecode-on-hedera">Hedera Documentation</a>
  */
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 
@@ -28,21 +49,41 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     private byte[] contents = {};
     private String fileMemo = "";
 
+    /**
+     * Constructor.
+     */
     public FileCreateTransaction() {
         setExpirationTime(Instant.now().plus(DEFAULT_AUTO_RENEW_PERIOD));
         defaultMaxTransactionFee = new Hbar(5);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     FileCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the time.
+     *
+     * @return                          expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
@@ -67,6 +108,11 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * Extract the of keys.
+     *
+     * @return                          list of keys
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -94,6 +140,11 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * Create the byte string.
+     *
+     * @return                          byte string representation
+     */
     public ByteString getContents() {
         return ByteString.copyFrom(contents);
     }
@@ -146,10 +197,21 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * Extract the file's memo field.
+     *
+     * @return                          the file's memo field
+     */
     public String getFileMemo() {
         return fileMemo;
     }
 
+    /**
+     * Assign a memo to the file (100 bytes max).
+     *
+     * @param memo                      memo string
+     * @return {@code this}
+     */
     public FileCreateTransaction setFileMemo(String memo) {
         requireNotFrozen();
         Objects.requireNonNull(memo);
@@ -167,6 +229,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         // do nothing
     }
 
+    /**
+     * Initialize from transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getFileCreate();
         if (body.hasExpirationTime()) {
@@ -179,6 +244,11 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         fileMemo = body.getMemo();
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.FileCreateTransactionBody builder}
+     */
     FileCreateTransactionBody.Builder build() {
         var builder = FileCreateTransactionBody.newBuilder();
 

@@ -29,16 +29,13 @@ allprojects {
 	dependencies {
 		// https://github.com/google/error-prone
 		// https://errorprone.info/
-		errorprone "com.google.errorprone:error_prone_core:2.9.0"
+		errorprone "com.google.errorprone:error_prone_core:2.14.0"
 
 		// https://github.com/uber/NullAway
-		errorprone "com.uber.nullaway:nullaway:0.9.5"
+		errorprone "com.uber.nullaway:nullaway:0.9.7"
 
 		// https://github.com/grpc/grpc-java-api-checker
 		errorprone "io.grpc:grpc-java-api-checker:1.1.0"
-
-		// https://github.com/eclipse-ee4j/common-annotations-api
-		implementation "jakarta.annotation:jakarta.annotation-api:2.0.0"
 	}
 
 	jacoco {
@@ -60,6 +57,10 @@ allprojects {
 
 	tasks.withType(JavaCompile).configureEach {
 		options.encoding = "UTF-8"
+
+                // Disable warnings because I'm tired of them :P
+		options.warnings = false
+
 		options.errorprone {
 			// https://github.com/uber/NullAway
 			warn("NullAway")

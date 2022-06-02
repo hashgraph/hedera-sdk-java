@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -12,6 +31,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Internal utility class.
+ */
 public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     public final TokenId tokenId;
     public final AccountId sender;
@@ -19,6 +41,15 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     public final long serial;
     public boolean isApproved;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param sender                    the sender account id
+     * @param receiver                  the receiver account id
+     * @param serial                    the serial number
+     * @param isApproved                is it approved
+     */
     TokenNftTransfer(TokenId tokenId, AccountId sender, AccountId receiver, long serial, boolean isApproved) {
         this.tokenId = tokenId;
         this.sender = sender;
@@ -27,6 +58,12 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
         this.isApproved = isApproved;
     }
 
+    /**
+     * Create a list of token nft transfer records from a protobuf.
+     *
+     * @param tokenTransferList         the protobuf
+     * @return                          the new list
+     */
     static ArrayList<TokenNftTransfer> fromProtobuf(List<TokenTransferList> tokenTransferList) {
         var transfers = new ArrayList<TokenNftTransfer>();
 
@@ -59,6 +96,11 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
         ).get(0);
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     NftTransfer toProtobuf() {
         return NftTransfer.newBuilder()
             .setSenderAccountID(sender.toProtobuf())

@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.io.ByteStreams;
@@ -14,6 +33,9 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Internal utility class.
+ */
 class Network extends ManagedNetwork<Network, AccountId, Node> {
     @Nullable
     private Integer maxNodesPerRequest;
@@ -38,10 +60,23 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         }
     }
 
+    /**
+     * Create a network.
+     *
+     * @param executor                  the executor service
+     * @param network                   the network records
+     * @return                          the new network
+     */
     static Network forNetwork(ExecutorService executor, Map<String, AccountId> network) {
         return new Network(executor, network);
     }
 
+    /**
+     * Create a mainnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new mainnet network
+     */
     static Network forMainnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("35.237.200.180:50211", new AccountId(3));
@@ -153,6 +188,12 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return new Network(executor, network).setLedgerId(LedgerId.MAINNET);
     }
 
+    /**
+     * Create a testnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new testnet network
+     */
     static Network forTestnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
 
@@ -194,6 +235,12 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return new Network(executor, network).setLedgerId(LedgerId.TESTNET);
     }
 
+    /**
+     * Create a previewnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new previewnet network
+     */
     static Network forPreviewnet(ExecutorService executor) {
         var network = new HashMap<String, AccountId>();
         network.put("0.previewnet.hedera.com:50211", new AccountId(3));
@@ -234,10 +281,21 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return new Network(executor, network).setLedgerId(LedgerId.PREVIEWNET);
     }
 
+    /**
+     * Are certificates being verified?
+     *
+     * @return                          are certificates being verified
+     */
     boolean isVerifyCertificates() {
         return verifyCertificates;
     }
 
+    /**
+     * Assign the desired verify certificate status.
+     *
+     * @param verifyCertificates        the desired status
+     * @return {@code this}
+     */
     Network setVerifyCertificates(boolean verifyCertificates) {
         this.verifyCertificates = verifyCertificates;
 
@@ -260,6 +318,12 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return this;
     }
 
+    /**
+     * Import an address book.
+     *
+     * @param fileName                  the file name
+     * @return                          the list of address book records
+     */
     static Map<AccountId, NodeAddress> readAddressBookResource(String fileName) {
         try (var inputStream = Resources.getResource(fileName).openStream()) {
             var contents = ByteStreams.toByteArray(inputStream);
@@ -280,6 +344,11 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         }
     }
 
+    /**
+     * Extract the of network records.
+     *
+     * @return                          list of network records
+     */
     Map<String, AccountId> getNetwork() {
         Map<String, AccountId> returnMap = new HashMap<>();
         for (var node : nodes) {
@@ -311,20 +380,27 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return nodeAccountIds;
     }
 
+    /**
+     * Assign the maximum nodes to be returned for each request.
+     *
+     * @param maxNodesPerRequest        the desired number of nodes
+     * @return {@code this}
+     */
     Network setMaxNodesPerRequest(int maxNodesPerRequest) {
         this.maxNodesPerRequest = maxNodesPerRequest;
         return this;
     }
 
+    /**
+     * Extract the number of nodes for each request.
+     *
+     * @return                          the number of nodes for each request
+     */
     int getNumberOfNodesForRequest() {
         if (maxNodesPerRequest != null) {
             return Math.min(maxNodesPerRequest, network.size());
         } else {
             return (network.size() + 3 - 1) / 3;
         }
-    }
-
-    Node getNode(AccountId nodeAccountId) {
-        return Collections.min(network.get(nodeAccountId));
     }
 }

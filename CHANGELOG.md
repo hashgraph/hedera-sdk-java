@@ -5,6 +5,190 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.15.0
+
+### Added
+
+ * `EthereumFlow`
+ * `EthereumTransactionData`
+ * `EthereumTransactionDataLegacy`
+ * `EthereumTransactionDataEip1559`
+
+## v2.14.0
+
+## v2.14.0-beta.3
+
+ * add missing javadoc to the sdk files
+
+### Deprecated
+
+ * `TransactionResponse.scheduledTransactionId` with no replacement.
+
+### Added
+
+ * `AccountId.aliasEvmAddress`
+ * `ContractCreateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateTransaction.[get|set]Bytecode()`
+ * `ContractUpdateTransaction.[get|set]MaxAutomaticTokenAssociations()`
+ * `ContractCreateFlow.[get|set]MaxAutomaticTokenAssociations()`
+ * `AccountInfo.ethereumNonce`
+ * `ContractCallResult.senderAccountId`
+ * `ContractCallQuery.[get|set]SenderAccountId()`
+ * `TransactionRecord.ethereumHash`
+ * `EthereumTransaction`
+ * `CustomRoyaltyFee.getFallbackFee()`
+ * `TransactionResponse.get[Receipt|Record]Query()`
+
+## v2.13.0 - Where did it go?!
+
+## v2.12.0
+
+### Added
+
+ * `AccountAllowanceAdjustTransaction` with no replacement.
+ * `AccountAllowanceDeleteTransaction`
+ * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
+ * `TransactionRecord.[hbar|token|tokenNft]AllowanceAdjustments`.
+ * `AccountInfo.[hbar|token|tokenNft]Allowances`.
+ * `AccountAllowanceExample`
+ * License Headers
+
+## v2.12.0-beta.1
+
+### Added
+
+ * `AccountAllowanceDeleteTransaction`
+ * `ContractFunctionResult.[gas|hbarAmount|contractFunctionParametersBytes]`
+ * `AccountAllowanceExample`
+ * License Headers
+
+### Deprecated
+
+ * `AccountAllowanceAdjustTransaction.revokeTokenNftAllowance()` with no replacement.
+
+## v2.11.0
+
+### Added
+
+ * `AccountInfoFlow`
+ * `Client.[set|get]NodeMinReadmitPeriod()`
+ * Support for using any node from the entire network upon execution
+   if node account IDs have no been locked for the request.
+ * Support for `ContractFunctionParameters` integers with different bit widths.
+
+### Fixed
+
+ * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
+
+## v2.11.0-beta.1
+
+### Added
+
+ * `AccountInfoFlow`
+ * `Client.[set|get]NodeMinReadmitPeriod()`
+ * Support for using any node from the entire network upon execution
+   if node account IDs have no been locked for the request.
+ * Support for `ContractFunctionParameters` integers with different bit widths.
+ * `CreateTopicExample`
+ * `GetAccountInfoExample`
+ * `MultiSigOfflineExample`
+ * `ScheduledTransactionMultiSigThresholdExample`
+ * `ScheduleIdenticalTransactionExample`
+ * `SignTransactionExample`
+
+### Fixed
+
+ * `Transaction.fromBytes()` now verifies that transaction bodies in transaction list match.
+ * `ConstructClientExample`
+ * `CreateSimpleContractExample`
+ * `CreateStatefulContractExample`
+ * `DeleteAccountExample`
+
+## v2.10.1
+
+### Added
+
+ * `AccountAllowanceApproveTransaction.approve[Hbar|Token|TokenNft]Allowance()`
+ * `AccountAllowanceApproveTransaction.get[Hbar|Token|TokenNft]Approvals()`
+ * `AccountAllowanceAdjustTransaction.[grant|revoke][Hbar|Token|TokenNft]Allowance()`
+ * `AccountAllowanceAdjustTransaction.[grant|revoke]TokenNftAllowanceAllSerials()`
+ * `TransactionRecord.[hbar|token|tokenNft]AllowanceAdjustments`
+ * `TransferTransaction.addApproved[Hbar|Token|Nft]Transfer()`
+
+### Deprecated
+
+ * `AccountAllowanceApproveTransaction.get[Hbar|Token|TokenNft]Allowances()`, use `get*Approvals()` instead.
+ * `AccountAllowanceApproveTransaction.add[Hbar|Token|TokenNft]Allowance[WithOwner]()`, use `approve*Allowance()` instead.
+ * `AccountAllowanceAdjustTransaction.add[Hbar|Token|TokenNft]Allowance[WithOwner]()`, use `[grant|revoke]*Allowance()` instead.
+ * `TransferTransaction.set[Hbar|Token|Nft]TransferApproval()`, use `addApproved*Transfer()` instead.
+
+## v2.10.0
+
+### Added
+
+ * `ContractCreateFlow` to simplify contract creation.
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PrivateKeyED25519.isED25519()`
+ * `PrivateKeyED25519.isECDSA()`
+ * `PrivateKeyECDSA.isED25519()`
+ * `PrivateKeyECDSA.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+ * `PublicKeyED25519.isED25519()`
+ * `PublicKeyED25519.isECDSA()`
+ * `PublicKeyECDSA.isED25519()`
+ * `PublicKeyECDSA.isECDSA()`
+
+## Fixed
+
+ * Regenerated AccountIDTest.snap
+ * `AddressBookQuery`
+ * Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
+   regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+* `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+
+### Fixed
+
+* Checksums.  As a consequence, all previously generated checksums for `testnet` or `previewnet` will now be
+  regarded as incorrect.  Please generate new checksums for testnet and previewnet where necessary.
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+
+## v2.10.0-beta.1
+
+### Added
+
+ * `ContractCreateFlow` to simplify contract creation.
+ * `PrivateKey.isED25519()`
+ * `PrivateKey.isECDSA()`
+ * `PrivateKeyED25519.isED25519()`
+ * `PrivateKeyED25519.isECDSA()`
+ * `PrivateKeyECDSA.isED25519()`
+ * `PrivateKeyECDSA.isECDSA()`
+ * `PublicKey.isED25519()`
+ * `PublicKey.isECDSA()`
+ * `PublicKeyED25519.isED25519()`
+ * `PublicKeyED25519.isECDSA()`
+ * `PublicKeyECDSA.isED25519()`
+ * `PublicKeyECDSA.isECDSA()`
+
+## Fixed
+
+ * Regenerated AccountIDTest.snap
+ * `AccountAllowance[Adjust|Approve]Transaction.add*AllowanceWithOwner()`
+ * `AddressBookQuery`
+
+### Deprecated
+
+* `AccountUpdateTransaction.[set|get]AliasKey()` with no replacement.
+
 ## v2.9.0
 
 ### Added
@@ -88,7 +272,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  * Support for regenerating transaction IDs on demand if a request
-   responds with `TRANSACITON_EXPIRED`
+   responds with `TRANSACTION_EXPIRED`
 
 ## v2.6.0
 

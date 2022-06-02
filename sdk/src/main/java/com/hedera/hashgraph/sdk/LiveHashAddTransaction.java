@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -29,14 +48,29 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     @Nullable
     private Duration duration = null;
 
+    /**
+     * Constructor.
+     */
     public LiveHashAddTransaction() {
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the account id.
+     *
+     * @return                          the account id
+     */
     @Nullable
     public AccountId getAccountId() {
         return accountId;
@@ -55,6 +89,11 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * Extract the hash.
+     *
+     * @return                          the hash
+     */
     public ByteString getHash() {
         return ByteString.copyFrom(hash);
     }
@@ -83,6 +122,11 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return setHash(hash.toByteArray());
     }
 
+    /**
+     * Extract the key / key list.
+     *
+     * @return                          the key / key list
+     */
     @Nullable
     public Collection<Key> getKeys() {
         return keys;
@@ -103,6 +147,11 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * Extract the duration.
+     *
+     * @return                          the duration
+     */
     @Nullable
     public Duration getDuration() {
         return duration;
@@ -121,6 +170,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         return this;
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getCryptoAddLiveHash();
         var hashBody = body.getLiveHash();
@@ -137,6 +189,11 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
         }
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoAddLiveHashTransactionBody}
+     */
     CryptoAddLiveHashTransactionBody.Builder build() {
         var builder = CryptoAddLiveHashTransactionBody.newBuilder();
         var hashBuilder = LiveHash.newBuilder();
@@ -173,6 +230,6 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        throw new IllegalStateException("Cannot schedule live hash transactions");
+        throw new UnsupportedOperationException("Cannot schedule LiveHashAddTransaction");
     }
 }

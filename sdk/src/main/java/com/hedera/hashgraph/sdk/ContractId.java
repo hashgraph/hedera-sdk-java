@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -66,6 +85,12 @@ public class ContractId extends Key implements Comparable<ContractId> {
         this.checksum = null;
     }
 
+    /**
+     * Parse contract id from a string.
+     *
+     * @param id                        the string containing a contract id
+     * @return                          the contract id object
+     */
     public static ContractId fromString(String id) {
         var match = EVM_ADDRESS_REGEX.matcher(id);
         if (match.find()) {
@@ -79,11 +104,22 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
+    /**
+     * @deprecated with no replacement
+     */
     @Deprecated
     public static ContractId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }
 
+    /**
+     * Parse contract id from an ethereum address.
+     *
+     * @param shard                     the desired shard
+     * @param realm                     the desired realm
+     * @param evmAddress                the evm address
+     * @return                          the contract id object
+     */
     public static ContractId fromEvmAddress(@Nonnegative long shard, @Nonnegative long realm, String evmAddress) {
         return new ContractId(
             shard,
@@ -92,6 +128,12 @@ public class ContractId extends Key implements Comparable<ContractId> {
         );
     }
 
+    /**
+     * Extract a contract id from a protobuf.
+     *
+     * @param contractId                the protobuf containing a contract id
+     * @return                          the contract id object
+     */
     static ContractId fromProtobuf(ContractID contractId) {
         Objects.requireNonNull(contractId);
         if (contractId.hasEvmAddress()) {
@@ -105,10 +147,22 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
+    /**
+     * Convert a byte array to an account balance object.
+     *
+     * @param bytes                     the byte array
+     * @return                          the converted contract id object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ContractId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractID.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Extract the representation of solidity address.
+     *
+     * @return                          string representation of solidity address
+     */
     public String toSolidityAddress() {
         if (evmAddress != null) {
             return Hex.toHexString(evmAddress);
@@ -117,6 +171,11 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
+    /**
+     * Convert contract id to protobuf.
+     *
+     * @return                          the protobuf object
+     */
     ContractID toProtobuf() {
         var builder = ContractID.newBuilder()
             .setShardNum(shard)
@@ -139,10 +198,21 @@ public class ContractId extends Key implements Comparable<ContractId> {
         validateChecksum(client);
     }
 
+    /**
+     * Verify the checksum.
+     *
+     * @param client                    to validate against
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
     public void validateChecksum(Client client) throws BadEntityIdException {
         EntityIdHelper.validate(shard, realm, num, client, checksum);
     }
 
+    /**
+     * Extract the checksum.
+     *
+     * @return                          the checksum
+     */
     @Nullable
     public String getChecksum() {
         return checksum;
@@ -169,6 +239,12 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
+    /**
+     * Create a string representation that includes the checksum.
+     *
+     * @param client                    the client
+     * @return                          the string representation with the checksum
+     */
     public String toStringWithChecksum(Client client) {
         if (evmAddress != null) {
             throw new IllegalStateException("toStringWithChecksum cannot be applied to ContractId with evmAddress");

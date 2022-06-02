@@ -39,13 +39,15 @@ import "google/protobuf/wrappers.proto";
  * MODIFYING_IMMUTABLE_CONTRACT.
  * 
  * --- Signing Requirements ---
- * 1. Whether or not a contract has an admin Key, its expiry can be extended with only the
+ * 1. Whether or not a contract has an admin key, its expiry can be extended with only the
  *    transaction payer's signature.
  * 2. Updating any other field of a mutable contract requires the admin key's signature.
  * 3. If the update transaction includes a new admin key, this new key must also sign <b>unless</b>
  *    it is exactly an empty <tt>KeyList</tt>. This special sentinel key removes the existing admin
  *    key and causes the contract to become immutable. (Other <tt>Key</tt> structures without a
  *    constituent <tt>Ed25519</tt> key will be rejected with <tt>INVALID_ADMIN_KEY</tt>.)
+ * 4. If the update transaction sets the AccountID auto_renew_account_id wrapper field to anything
+ *    other than the sentinel <tt>0.0.0</tt> value, then the key of the referenced account must sign.
  */
 message ContractUpdateTransactionBody {
     /**
@@ -76,8 +78,7 @@ message ContractUpdateTransactionBody {
     Duration autoRenewPeriod = 7;
 
     /**
-     * The new id of the file asserted to contain the bytecode of the Solidity transaction that
-     * created this contract
+     * This field is unused and will have no impact on the specified smart contract.
      */
     FileID fileID = 8 [deprecated = true];
 
@@ -96,5 +97,16 @@ message ContractUpdateTransactionBody {
        */
       google.protobuf.StringValue memoWrapper = 10;
     }
-}
 
+    /**
+     * If set, the new maximum number of tokens that this contract can be 
+     * automatically associated with (i.e., receive air-drops from).
+     */
+    google.protobuf.Int32Value max_automatic_token_associations = 11;
+
+    /**
+     * If set to the sentinel <tt>0.0.0</tt> AccountID, this field removes the contract's auto-renew 
+     * account. Otherwise it updates the contract's auto-renew account to the referenced account.
+     */
+    AccountID auto_renew_account_id = 12;
+}

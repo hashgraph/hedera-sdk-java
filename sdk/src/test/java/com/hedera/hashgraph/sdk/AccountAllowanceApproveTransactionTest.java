@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
@@ -6,9 +25,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
-import java.util.Collections;
+import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class AccountAllowanceApproveTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -27,8 +46,9 @@ public class AccountAllowanceApproveTransactionTest {
     }
 
     AccountAllowanceApproveTransaction spawnTestTransaction() {
+        var ownerId = AccountId.fromString("5.6.7");
         return new AccountAllowanceApproveTransaction()
-            .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .addHbarAllowance(AccountId.fromString("1.1.1"), new Hbar(3))
             .addTokenAllowance(TokenId.fromString("2.2.2"), AccountId.fromString("3.3.3"), 6)
@@ -37,6 +57,13 @@ public class AccountAllowanceApproveTransactionTest {
             .addTokenNftAllowance(TokenId.fromString("8.8.8").nft(456), AccountId.fromString("5.5.5"))
             .addTokenNftAllowance(TokenId.fromString("4.4.4").nft(789), AccountId.fromString("9.9.9"))
             .addAllTokenNftAllowance(TokenId.fromString("6.6.6"), AccountId.fromString("7.7.7"))
+            .approveHbarAllowance(ownerId, AccountId.fromString("1.1.1"), new Hbar(3))
+            .approveTokenAllowance(TokenId.fromString("2.2.2"), ownerId, AccountId.fromString("3.3.3"), 6)
+            .approveTokenNftAllowance(TokenId.fromString("4.4.4").nft(123), ownerId, AccountId.fromString("5.5.5"))
+            .approveTokenNftAllowance(TokenId.fromString("4.4.4").nft(456), ownerId, AccountId.fromString("5.5.5"))
+            .approveTokenNftAllowance(TokenId.fromString("8.8.8").nft(456), ownerId, AccountId.fromString("5.5.5"))
+            .approveTokenNftAllowance(TokenId.fromString("4.4.4").nft(789), ownerId, AccountId.fromString("9.9.9"))
+            .approveTokenNftAllowanceAllSerials(TokenId.fromString("6.6.6"), ownerId, AccountId.fromString("7.7.7"))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
             .sign(unusedPrivateKey);
@@ -51,6 +78,6 @@ public class AccountAllowanceApproveTransactionTest {
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }

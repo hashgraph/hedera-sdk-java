@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
@@ -1287,7 +1306,7 @@ public enum Status {
     NEGATIVE_ALLOWANCE_AMOUNT(ResponseCodeEnum.NEGATIVE_ALLOWANCE_AMOUNT),
 
     /**
-     * The approveForAll flag cannot be set for a fungible token.
+     * [Deprecated] The approveForAll flag cannot be set for a fungible token.
      */
     CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON(ResponseCodeEnum.CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON),
 
@@ -1308,18 +1327,18 @@ public enum Status {
     MAX_ALLOWANCES_EXCEEDED(ResponseCodeEnum.MAX_ALLOWANCES_EXCEEDED),
 
     /**
-     * No allowances have been specified in the approval/adjust transaction.
+     * No allowances have been specified in the approval transaction.
      */
     EMPTY_ALLOWANCES(ResponseCodeEnum.EMPTY_ALLOWANCES),
 
     /**
-     * Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
-     * CryptoApproveAllowance or CryptoAdjustAllowance transaction.
+     * [Deprecated] Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
+     * CryptoApproveAllowance transaction.
      */
     SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES(ResponseCodeEnum.SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES),
 
     /**
-     * Serial numbers are repeated in nft allowance for a single spender account
+     * [Deprecated] Serial numbers are repeated in nft allowance for a single spender account
      */
     REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES(ResponseCodeEnum.REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES),
 
@@ -1334,10 +1353,107 @@ public enum Status {
     NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES(ResponseCodeEnum.NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES),
 
     /**
-     * An approval/adjustment transaction was submitted where the payer and owner account are
-     * not the same. Currently only the owner is permitted to perform these operations.
+     * The account id specified as the owner is invalid or does not exist.
      */
-    PAYER_AND_OWNER_NOT_EQUAL(ResponseCodeEnum.PAYER_AND_OWNER_NOT_EQUAL);
+    INVALID_ALLOWANCE_OWNER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_OWNER_ID),
+
+    /**
+     * The account id specified as the spender is invalid or does not exist.
+     */
+    INVALID_ALLOWANCE_SPENDER_ID(ResponseCodeEnum.INVALID_ALLOWANCE_SPENDER_ID),
+
+    /**
+     * [Deprecated] If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
+     */
+    REPEATED_ALLOWANCES_TO_DELETE(ResponseCodeEnum.REPEATED_ALLOWANCES_TO_DELETE),
+
+    /**
+     * If the account Id specified as the delegating spender is invalid or does not exist.
+     */
+    INVALID_DELEGATING_SPENDER(ResponseCodeEnum.INVALID_DELEGATING_SPENDER),
+
+    /**
+     * The delegating Spender cannot grant approveForAll allowance on a NFT token type for another spender.
+     */
+    DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL),
+
+    /**
+     * The delegating Spender cannot grant allowance on a NFT serial for another spender as it doesnt not have approveForAll
+     * granted on token-owner.
+     */
+    DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL(ResponseCodeEnum.DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL),
+
+    /**
+     * The scheduled transaction could not be created because it's expiration_time was too far in the future.
+     */
+    SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE(ResponseCodeEnum.SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE),
+
+    /**
+     * The scheduled transaction could not be created because it's expiration_time was less than or equal to the consensus time.
+     */
+    SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME(ResponseCodeEnum.SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME),
+
+    /**
+     * The scheduled transaction could not be created because it would cause throttles to be violated on the specified expiration_time.
+     */
+    SCHEDULE_FUTURE_THROTTLE_EXCEEDED(ResponseCodeEnum.SCHEDULE_FUTURE_THROTTLE_EXCEEDED),
+
+    /**
+     * The scheduled transaction could not be created because it would cause the gas limit to be violated on the specified expiration_time.
+     */
+    SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED(ResponseCodeEnum.SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED),
+
+    /**
+     * The ethereum transaction either failed parsing or failed signature validation, or some other EthereumTransaction error not covered by another response code.
+     */
+    INVALID_ETHEREUM_TRANSACTION(ResponseCodeEnum.INVALID_ETHEREUM_TRANSACTION),
+
+    /**
+     * EthereumTransaction was signed against a chainId that this network does not support.
+     */
+    WRONG_CHAIN_ID(ResponseCodeEnum.WRONG_CHAIN_ID),
+
+    /**
+     * This transaction specified an ethereumNonce that is not the current ethereumNonce of the account.
+     */
+    WRONG_NONCE(ResponseCodeEnum.WRONG_NONCE),
+
+    /**
+     * The ethereum transaction specified an access list, which the network does not support.
+     */
+    ACCESS_LIST_UNSUPPORTED(ResponseCodeEnum.ACCESS_LIST_UNSUPPORTED),
+
+    /**
+     * A schedule being signed or deleted has passed it's expiration date and is pending execution if needed and then expiration.
+     */
+    SCHEDULE_PENDING_EXPIRATION(ResponseCodeEnum.SCHEDULE_PENDING_EXPIRATION),
+
+    /**
+     * A selfdestruct or ContractDelete targeted a contract that is a token treasury.
+     */
+    CONTRACT_IS_TOKEN_TREASURY(ResponseCodeEnum.CONTRACT_IS_TOKEN_TREASURY),
+
+    /**
+     * A selfdestruct or ContractDelete targeted a contract with non-zero token balances.
+     */
+    CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES(ResponseCodeEnum.CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES),
+
+    /**
+     * A contract referenced by a transaction is "detached"; that is, expired and lacking any
+     * hbar funds for auto-renewal payment---but still within its post-expiry grace period.
+     */
+    CONTRACT_EXPIRED_AND_PENDING_REMOVAL(ResponseCodeEnum.CONTRACT_EXPIRED_AND_PENDING_REMOVAL),
+
+    /**
+     * A ContractUpdate requested removal of a contract's auto-renew account, but that contract has
+     * no auto-renew account.
+     */
+    CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT(ResponseCodeEnum.CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT),
+
+    /**
+     * A delete transaction submitted via HAPI set permanent_removal=true
+     */
+    PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION(ResponseCodeEnum.PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION);
 
     final ResponseCodeEnum code;
 
@@ -1863,8 +1979,46 @@ public enum Status {
                 return FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
             case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES:
                 return NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
-            case PAYER_AND_OWNER_NOT_EQUAL:
-                return PAYER_AND_OWNER_NOT_EQUAL;
+            case INVALID_ALLOWANCE_OWNER_ID:
+                return INVALID_ALLOWANCE_OWNER_ID;
+            case INVALID_ALLOWANCE_SPENDER_ID:
+                return INVALID_ALLOWANCE_SPENDER_ID;
+            case REPEATED_ALLOWANCES_TO_DELETE:
+                return REPEATED_ALLOWANCES_TO_DELETE;
+            case INVALID_DELEGATING_SPENDER:
+                return INVALID_DELEGATING_SPENDER;
+            case DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL:
+                return DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL;
+            case DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL:
+                return DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL;
+            case SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE:
+                return SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE;
+            case SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME:
+                return SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME;
+            case SCHEDULE_FUTURE_THROTTLE_EXCEEDED:
+                return SCHEDULE_FUTURE_THROTTLE_EXCEEDED;
+            case SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED:
+                return SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED;
+            case INVALID_ETHEREUM_TRANSACTION:
+                return INVALID_ETHEREUM_TRANSACTION;
+            case WRONG_CHAIN_ID:
+                return WRONG_CHAIN_ID;
+            case WRONG_NONCE:
+                return WRONG_NONCE;
+            case ACCESS_LIST_UNSUPPORTED:
+                return ACCESS_LIST_UNSUPPORTED;
+            case SCHEDULE_PENDING_EXPIRATION:
+                return SCHEDULE_PENDING_EXPIRATION;
+            case CONTRACT_IS_TOKEN_TREASURY:
+                return CONTRACT_IS_TOKEN_TREASURY;
+            case CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES:
+                return CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES;
+            case CONTRACT_EXPIRED_AND_PENDING_REMOVAL:
+                return CONTRACT_EXPIRED_AND_PENDING_REMOVAL;
+            case CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT:
+                return CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT;
+            case PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION:
+                return PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

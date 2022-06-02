@@ -1,19 +1,41 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.GrantedNftAllowance;
 import com.hedera.hashgraph.sdk.proto.NftAllowance;
+import com.hedera.hashgraph.sdk.proto.NftRemoveAllowance;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
+/**
+ * Class to encapsulate the nft methods for token allowance's.
+ */
 public class TokenNftAllowance {
     @Nullable
     public final TokenId tokenId;
@@ -21,48 +43,131 @@ public class TokenNftAllowance {
     public final AccountId ownerAccountId;
     @Nullable
     public final AccountId spenderAccountId;
-    @Nullable
     public final List<Long> serialNumbers;
+    @Nullable
+    public final Boolean allSerials;
 
+    /**
+     * Constructor.
+     *
+     * @param tokenId                   the token id
+     * @param ownerAccountId            the grantor's account id
+     * @param spenderAccountId          the spender's account id
+     * @param serialNumbers             the list of serial numbers
+     * @param allSerials                grant for all serial's
+     */
     TokenNftAllowance(
         @Nullable TokenId tokenId,
         @Nullable AccountId ownerAccountId,
         @Nullable AccountId spenderAccountId,
-        @Nullable Collection<Long> serialNumbers
+        Collection<Long> serialNumbers,
+        @Nullable Boolean allSerials
     ) {
         this.tokenId = tokenId;
         this.ownerAccountId = ownerAccountId;
         this.spenderAccountId = spenderAccountId;
-        this.serialNumbers = serialNumbers != null ? new ArrayList<>(serialNumbers) : null;
+        this.serialNumbers = new ArrayList<>(serialNumbers);
+        this.allSerials = allSerials;
     }
 
+    /**
+     * Create a copy of a nft token allowance object.
+     *
+     * @param allowance                 the nft token allowance to copj
+     * @return                          a new copy
+     */
     static TokenNftAllowance copyFrom(TokenNftAllowance allowance) {
         return new TokenNftAllowance(
             allowance.tokenId,
             allowance.ownerAccountId,
             allowance.spenderAccountId,
-            allowance.serialNumbers
+            allowance.serialNumbers,
+            allowance.allSerials
         );
     }
 
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
     static TokenNftAllowance fromProtobuf(NftAllowance allowanceProto) {
         return new TokenNftAllowance(
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            (allowanceProto.hasApprovedForAll() && allowanceProto.getApprovedForAll().getValue()) ?
-                null : allowanceProto.getSerialNumbersList()
+            allowanceProto.getSerialNumbersList(),
+            allowanceProto.hasApprovedForAll() ? allowanceProto.getApprovedForAll().getValue() : null
         );
     }
 
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
+    static TokenNftAllowance fromProtobuf(GrantedNftAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            null,
+            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            Collections.emptyList(),
+            null
+        );
+    }
+
+    /**
+     * Create a nft token allowance from a protobuf.
+     *
+     * @param allowanceProto            the protobuf
+     * @return                          the nft token allowance
+     */
+    static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
+        return new TokenNftAllowance(
+            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+            null,
+            allowanceProto.getSerialNumbersList(),
+            null
+        );
+    }
+
+    /**
+     * Create a nft token allowance from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the nft token allowance
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TokenNftAllowance fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(NftAllowance.parseFrom(Objects.requireNonNull(bytes)));
     }
 
-    TokenNftAllowance withOwner(@Nullable AccountId newOwnerAccountId) {
-        return new TokenNftAllowance(tokenId, newOwnerAccountId, spenderAccountId, serialNumbers);
+    /**
+     * Validate the configured client.
+     *
+     * @param client                    the configured client
+     * @throws BadEntityIdException     if entity ID is formatted poorly
+     */
+    void validateChecksums(Client client) throws BadEntityIdException {
+        if (tokenId != null) {
+            tokenId.validateChecksum(client);
+        }
+        if (ownerAccountId != null) {
+            ownerAccountId.validateChecksum(client);
+        }
+        if (spenderAccountId != null) {
+            spenderAccountId.validateChecksum(client);
+        }
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     NftAllowance toProtobuf() {
         var builder = NftAllowance.newBuilder();
         if (tokenId != null) {
@@ -74,25 +179,66 @@ public class TokenNftAllowance {
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
-        if (serialNumbers != null) {
-            builder.addAllSerialNumbers(serialNumbers);
-        } else {
-            builder.setApprovedForAll(BoolValue.newBuilder().setValue(true).build());
+        builder.addAllSerialNumbers(serialNumbers);
+        if (allSerials != null) {
+            builder.setApprovedForAll(BoolValue.newBuilder().setValue(allSerials).build());
         }
         return builder.build();
     }
 
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the granted protobuf
+     */
+    GrantedNftAllowance toGrantedProtobuf() {
+        var builder = GrantedNftAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
+        }
+        if (spenderAccountId != null) {
+            builder.setSpender(spenderAccountId.toProtobuf());
+        }
+        return builder.build();
+    }
+
+    /**
+     * Create the protobuf.
+     *
+     * @return                          the remove protobuf
+     */
+    NftRemoveAllowance toRemoveProtobuf() {
+        var builder = NftRemoveAllowance.newBuilder();
+        if (tokenId != null) {
+            builder.setTokenId(tokenId.toProtobuf());
+        }
+        if (ownerAccountId != null) {
+            builder.setOwner(ownerAccountId.toProtobuf());
+        }
+        builder.addAllSerialNumbers(serialNumbers);
+        return builder.build();
+    }
+
+    /**
+     * Create the byte array.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        var stringHelper = MoreObjects.toStringHelper(this)
             .add("tokenId", tokenId)
             .add("ownerAccountId", ownerAccountId)
-            .add("spenderAccountId", spenderAccountId)
-            .add("serials", serialNumbers)
-            .toString();
+            .add("spenderAccountId", spenderAccountId);
+        if (allSerials != null) {
+            stringHelper.add("allSerials", allSerials);
+        } else {
+            stringHelper.add("serials", serialNumbers);
+        }
+        return stringHelper.toString();
     }
 }

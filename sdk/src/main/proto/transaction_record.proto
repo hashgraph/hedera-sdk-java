@@ -124,20 +124,8 @@ message TransactionRecord {
      bytes alias = 16;
 
     /**
-     * The current balances of any adjusted crypto allowances as a result of this
-     * transaction. This field will only be populated for CryptoAdjustAllowanceTransaction.
+     * The keccak256 hash of the ethereumData. This field will only be populated for 
+     * EthereumTransaction.
      */
-    repeated CryptoAllowance crypto_adjustments = 17;
-
-    /**
-     * The current balances of any adjusted non-fungible token allowances as a result of this
-     * transaction. This field will only be populated for CryptoAdjustAllowanceTransaction.
-     */
-    repeated NftAllowance nft_adjustments = 18;
-
-    /**
-     * The current balances of any adjusted fungible token allowances as a result of this
-     * transaction. This field will only be populated for CryptoAdjustAllowanceTransaction.
-     */
-    repeated TokenAllowance token_adjustments = 19;
+    bytes ethereum_hash = 17;
 }

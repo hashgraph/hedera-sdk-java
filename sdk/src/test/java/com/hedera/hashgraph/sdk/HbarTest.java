@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import java8.util.stream.RefStreams;
@@ -9,10 +28,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.math.BigDecimal;
 import java.util.Iterator;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class HbarTest {
     private static final long fiftyGTinybar = 5_000_000_000L;
@@ -35,45 +52,45 @@ public class HbarTest {
 
     @Test
     void shouldConstruct() {
-        assertEquals(fiftyHbar.toTinybars(), fiftyGTinybar);
-        assertEquals(fiftyHbar.to(HbarUnit.HBAR), new BigDecimal(50));
-        assertEquals(new Hbar(50).toTinybars(), fiftyGTinybar);
-        assertEquals(Hbar.fromTinybars(fiftyGTinybar).toTinybars(), fiftyGTinybar);
+        assertThat(fiftyHbar.toTinybars()).isEqualTo(fiftyGTinybar);
+        assertThat(fiftyHbar.to(HbarUnit.HBAR)).isEqualTo(new BigDecimal(50));
+        assertThat(new Hbar(50).toTinybars()).isEqualTo(fiftyGTinybar);
+        assertThat(Hbar.fromTinybars(fiftyGTinybar).toTinybars()).isEqualTo(fiftyGTinybar);
     }
 
     @Test
     void shouldNotConstruct() {
-        assertThrows(Exception.class, () -> new Hbar(new BigDecimal("0.1"), HbarUnit.TINYBAR));
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> new Hbar(new BigDecimal("0.1"), HbarUnit.TINYBAR));
     }
 
     @Test
     void shouldDisplay() {
-        assertEquals("50 ℏ", fiftyHbar.toString());
-        assertEquals("-50 ℏ", negativeFiftyHbar.toString());
-        assertEquals("1 tℏ", Hbar.fromTinybars(1).toString());
-        assertEquals("-1 tℏ", Hbar.fromTinybars(1).negated().toString());
-        assertEquals("1000 tℏ", Hbar.fromTinybars(1000).toString());
-        assertEquals("-1000 tℏ", Hbar.fromTinybars(1000).negated().toString());
+        assertThat(fiftyHbar.toString()).isEqualTo("50 ℏ");
+        assertThat(negativeFiftyHbar.toString()).isEqualTo("-50 ℏ");
+        assertThat(Hbar.fromTinybars(1).toString()).isEqualTo("1 tℏ");
+        assertThat(Hbar.fromTinybars(1).negated().toString()).isEqualTo("-1 tℏ");
+        assertThat(Hbar.fromTinybars(1000).toString()).isEqualTo("1000 tℏ");
+        assertThat(Hbar.fromTinybars(1000).negated().toString()).isEqualTo("-1000 tℏ");
     }
 
     @ParameterizedTest
     @MethodSource("getValueConversions")
     void shouldConvert(BigDecimal value, HbarUnit unit) {
-        assertEquals(Hbar.from(value, unit), fiftyHbar);
-        assertEquals(fiftyHbar.to(unit), value);
+        assertThat(Hbar.from(value, unit)).isEqualTo(fiftyHbar);
+        assertThat(fiftyHbar.to(unit)).isEqualTo(value);
     }
 
     @Test
     void shouldCompare() {
-        assertEquals(fiftyHbar, fiftyHbar);
-        assertNotEquals(fiftyHbar, hundredHbar);
+        assertThat(fiftyHbar).isEqualTo(fiftyHbar);
+        assertThat(fiftyHbar).isNotEqualTo(hundredHbar);
 
-        assertEquals(fiftyHbar.compareTo(new Hbar(50)), 0);
+        assertThat(fiftyHbar.compareTo(new Hbar(50))).isEqualTo(0);
 
-        assertTrue(fiftyHbar.compareTo(hundredHbar) < 0);
-        assertTrue(hundredHbar.compareTo(fiftyHbar) > 0);
+        assertThat(fiftyHbar.compareTo(hundredHbar)).isLessThan(0);
+        assertThat(hundredHbar.compareTo(fiftyHbar)).isGreaterThan(0);
 
-        assertTrue(fiftyHbar.compareTo(negativeFiftyHbar) > 0);
+        assertThat(fiftyHbar.compareTo(negativeFiftyHbar)).isGreaterThan(0);
     }
 
     @Test
@@ -83,43 +100,43 @@ public class HbarTest {
 
     @Test
     void fromString() {
-        assertEquals(Hbar.fromString("1").toTinybars(), 100_000_000);
-        assertEquals(Hbar.fromString("1 ℏ").toTinybars(), 100_000_000);
-        assertEquals(Hbar.fromString("1.5 mℏ").toTinybars(), 150_000);
-        assertEquals(Hbar.fromString("+1.5 mℏ").toTinybars(), 150_000);
-        assertEquals(Hbar.fromString("-1.5 mℏ").toTinybars(), -150_000);
-        assertEquals(Hbar.fromString("+3").toTinybars(), 300_000_000);
-        assertEquals(Hbar.fromString("-3").toTinybars(), -300_000_000);
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThat(Hbar.fromString("1").toTinybars()).isEqualTo(100_000_000);
+        assertThat(Hbar.fromString("1 ℏ").toTinybars()).isEqualTo(100_000_000);
+        assertThat(Hbar.fromString("1.5 mℏ").toTinybars()).isEqualTo(150_000);
+        assertThat(Hbar.fromString("+1.5 mℏ").toTinybars()).isEqualTo(150_000);
+        assertThat(Hbar.fromString("-1.5 mℏ").toTinybars()).isEqualTo(-150_000);
+        assertThat(Hbar.fromString("+3").toTinybars()).isEqualTo(300_000_000);
+        assertThat(Hbar.fromString("-3").toTinybars()).isEqualTo(-300_000_000);
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             Hbar.fromString("1 h");
         });
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             Hbar.fromString("1ℏ");
         });
     }
 
     @Test
     void fromStringUnit() {
-        assertEquals(Hbar.fromString("1", HbarUnit.TINYBAR).toTinybars(), 1);
+        assertThat(Hbar.fromString("1", HbarUnit.TINYBAR).toTinybars()).isEqualTo(1);
     }
 
     @Test
     void from() {
-        assertEquals(Hbar.from(1).toTinybars(), 100000000);
+        assertThat(Hbar.from(1).toTinybars()).isEqualTo(100000000);
     }
 
     @Test
     void fromUnit() {
-        assertEquals(Hbar.from(1, HbarUnit.TINYBAR).toTinybars(), 1);
+        assertThat(Hbar.from(1, HbarUnit.TINYBAR).toTinybars()).isEqualTo(1);
     }
 
     @Test
     void getValue() {
-        assertEquals(new Hbar(1).getValue(), BigDecimal.valueOf(1));
+        assertThat(new Hbar(1).getValue()).isEqualTo(BigDecimal.valueOf(1));
     }
 
     @Test
     void hasHashCode() {
-        assertEquals(new Hbar(1).hashCode(), 100000031);
+        assertThat(new Hbar(1).hashCode()).isEqualTo(100000031);
     }
 }

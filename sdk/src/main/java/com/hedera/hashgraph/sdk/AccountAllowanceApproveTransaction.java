@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -10,26 +29,47 @@ import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * This transaction type is for approving account allowance.
+ */
 public class AccountAllowanceApproveTransaction extends Transaction<AccountAllowanceApproveTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances =  new ArrayList<>();
     private final List<TokenNftAllowance> nftAllowances = new ArrayList<>();
-    private final Map<AccountId, Map<TokenId, Integer>> nftMap = new HashMap<>();
+    // key is "{ownerId}:{spenderId}".  OwnerId may be "FEE_PAYER"
+    // <ownerId:spenderId, <tokenId, index>>
+    private final Map<String, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
+    /**
+     * Constructor.
+     */
     public AccountAllowanceApproveTransaction() {
     }
 
-    AccountAllowanceApproveTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    /**
+     * Constructor.
+     *
+     * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
+     */
+    AccountAllowanceApproveTransaction(
+        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs
+    ) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody                    protobuf TransactionBody
+     */
     AccountAllowanceApproveTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
@@ -48,6 +88,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
                 nftAllowances.add(TokenNftAllowance.fromProtobuf(allowanceProto));
             } else {
                 getNftSerials(
+                    allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
                     AccountId.fromProtobuf(allowanceProto.getSpender()),
                     TokenId.fromProtobuf(allowanceProto.getTokenId())
                 ).addAll(allowanceProto.getSerialNumbersList());
@@ -55,66 +96,281 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         }
     }
 
+    /**
+     * @deprecated - Use {@link #approveHbarAllowance(AccountId, AccountId, Hbar)} instead
+     *
+     * @param spenderAccountId          the spender account id
+     * @param amount                    the amount of hbar
+     * @return                          an account allowance approve transaction
+     */
+    @Deprecated
     public AccountAllowanceApproveTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
-        hbarAllowances.add(new HbarAllowance(
-            null,
-            Objects.requireNonNull(spenderAccountId),
-            Objects.requireNonNull(amount)
-        ));
+        return approveHbarAllowance(null, spenderAccountId, amount);
+    }
+
+    /**
+     * Approves the Hbar allowance.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param amount                    amount of hbar add
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveHbarAllowance(
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        Hbar amount
+    ) {
+        requireNotFrozen();
+        Objects.requireNonNull(amount);
+        if (amount.compareTo(Hbar.ZERO) < 0) {
+            throw new IllegalArgumentException("amount passed to approveHbarAllowance must be positive");
+        }
+        hbarAllowances.add(new HbarAllowance(ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #getHbarApprovals()} instead
+     *
+     * @return                          list of hbar allowance records
+     */
+    @Deprecated
     public List<HbarAllowance> getHbarAllowances() {
+        return getHbarApprovals();
+    }
+
+    /**
+     * Extract the list of hbar allowances.
+     *
+     * @return                          array list of hbar allowances
+     */
+    public List<HbarAllowance> getHbarApprovals() {
         return new ArrayList<>(hbarAllowances);
     }
 
-    public AccountAllowanceApproveTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
+    /**
+     * @deprecated - Use {@link #approveTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     *
+     * @param tokenId                   the token id
+     * @param spenderAccountId          the spenders account id
+     * @param amount                    the hbar amount
+     * @return                          an account allowance approve transaction
+     */
+    @Deprecated
+    public AccountAllowanceApproveTransaction addTokenAllowance(
+        TokenId tokenId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        return approveTokenAllowance(tokenId, null, spenderAccountId, amount);
+    }
+
+    /**
+     * Approves the Token allowance.
+     *
+     * @param tokenId                   the token's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param amount                    amount of tokens
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveTokenAllowance(
+        TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        long amount
+    ) {
+        requireNotFrozen();
+        if (amount < 0) {
+            throw new IllegalArgumentException("amount given to approveTokenAllowance must be positive");
+        }
         tokenAllowances.add(new TokenAllowance(
             Objects.requireNonNull(tokenId),
-            null,
+            ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
             amount
         ));
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #getTokenApprovals()} instead
+     *
+     * @return                          a list of token allowances
+     */
+    @Deprecated
     public List<TokenAllowance> getTokenAllowances() {
+        return getTokenApprovals();
+    }
+
+    /**
+     * Extract a list of token allowance approvals.
+     *
+     * @return                          array list of token approvals.
+     */
+    public List<TokenAllowance> getTokenApprovals() {
         return new ArrayList<>(tokenAllowances);
     }
 
-    private List<Long> getNftSerials(AccountId spenderAccountId, TokenId tokenId) {
-        if (nftMap.containsKey(spenderAccountId)) {
-            var innerMap = nftMap.get(spenderAccountId);
+    /**
+     * Extract the owner as a string.
+     *
+     * @param ownerAccountId            owner's account id
+     * @return                          a string representation of the account id
+     *                                  or FEE_PAYER
+     */
+    private static String ownerToString(@Nullable AccountId ownerAccountId) {
+        return ownerAccountId != null ? ownerAccountId.toString() : "FEE_PAYER";
+    }
+
+    /**
+     * Return a list of NFT serial numbers.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spenders account id
+     * @param tokenId                   the token's id
+     * @return list of NFT serial numbers
+     */
+    private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, AccountId spenderAccountId, TokenId tokenId) {
+        var key = ownerToString(ownerAccountId) + ":" + spenderAccountId;
+        if (nftMap.containsKey(key)) {
+            var innerMap = nftMap.get(key);
             if (innerMap.containsKey(tokenId)) {
                 return Objects.requireNonNull(nftAllowances.get(innerMap.get(tokenId)).serialNumbers);
             } else {
-                return newNftSerials(spenderAccountId, tokenId, innerMap);
+                return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
             }
         } else {
             Map<TokenId, Integer> innerMap = new HashMap<>();
-            nftMap.put(spenderAccountId, innerMap);
-            return newNftSerials(spenderAccountId, tokenId, innerMap);
+            nftMap.put(key, innerMap);
+            return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
         }
     }
 
-    private List<Long> newNftSerials(AccountId spenderAccountId, TokenId tokenId, Map<TokenId, Integer> innerMap) {
+    /**
+     * Add NFT serials.
+     *
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param tokenId                   the token's id
+     * @param innerMap                  list of token id's and serial number records
+     * @return list of NFT serial numbers
+     */
+    private List<Long> newNftSerials(
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        TokenId tokenId,
+        Map<TokenId, Integer> innerMap
+    ) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, null,spenderAccountId, new ArrayList<>());
+        TokenNftAllowance newAllowance = new TokenNftAllowance(
+            tokenId,
+            ownerAccountId,
+            spenderAccountId,
+            new ArrayList<>(),
+            null
+        );
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
 
+    /**
+     * @deprecated - Use {@link #approveTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     *
+     * @param nftId                     the nft id
+     * @param spenderAccountId          the spender's account id
+     * @return {@code this}
+     */
+    @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
-        getNftSerials(spenderAccountId, nftId.tokenId).add(nftId.serial);
+        requireNotFrozen();
+        getNftSerials(null, spenderAccountId, nftId.tokenId).add(nftId.serial);
         return this;
     }
 
+    /**
+     * @deprecated - Use {@link #approveTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} instead
+     *
+     * @param tokenId                   the token id
+     * @param spenderAccountId          the spender's account id
+     * @return {@code this}
+     */
+    @Deprecated
     public AccountAllowanceApproveTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
-        nftAllowances.add(new TokenNftAllowance(tokenId, null, spenderAccountId, null));
+        requireNotFrozen();
+        nftAllowances.add(new TokenNftAllowance(
+            tokenId,
+            null, spenderAccountId,
+            Collections.emptyList(),
+            true
+        ));
         return this;
     }
 
+    /**
+     * Approve the NFT allowance.
+     *
+     * @param nftId                     nft's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveTokenNftAllowance(
+        NftId nftId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId
+    ) {
+        requireNotFrozen();
+        Objects.requireNonNull(nftId);
+        getNftSerials(
+            ownerAccountId,
+            Objects.requireNonNull(spenderAccountId),
+            nftId.tokenId
+        ).add(nftId.serial);
+        return this;
+    }
+
+    /**
+     * Approve the token nft allowance on all serials.
+     *
+     * @param tokenId                   the token's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveTokenNftAllowanceAllSerials(
+        TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId
+    ) {
+        requireNotFrozen();
+        nftAllowances.add(new TokenNftAllowance(
+            Objects.requireNonNull(tokenId),
+            ownerAccountId,
+            Objects.requireNonNull(spenderAccountId),
+            Collections.emptyList(),
+            true
+        ));
+        return this;
+    }
+
+    /**
+     * @deprecated - Use {@link #getTokenNftApprovals()} instead
+     *
+     * @return {@code this}
+     */
+    @Deprecated
     public List<TokenNftAllowance> getTokenNftAllowances() {
+        return getTokenNftApprovals();
+    }
+
+    /**
+     * Returns the list of token nft allowances.
+     *
+     * @return  list of token nft allowances.
+     */
+    public List<TokenNftAllowance> getTokenNftApprovals() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {
             retval.add(TokenNftAllowance.copyFrom(allowance));
@@ -127,21 +383,22 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         return CryptoServiceGrpc.getApproveAllowancesMethod();
     }
 
+    /**
+     * Build the correct transaction body.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody builder }
+     */
     CryptoApproveAllowanceTransactionBody.Builder build() {
         var builder = CryptoApproveAllowanceTransactionBody.newBuilder();
 
-        @Nullable
-        AccountId ownerAccountId = (transactionIds.size() > 0 && transactionIds.get(0) != null) ?
-            transactionIds.get(0).accountId : null;
-
         for (var allowance : hbarAllowances) {
-            builder.addCryptoAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addCryptoAllowances(allowance.toProtobuf());
         }
         for (var allowance : tokenAllowances) {
-            builder.addTokenAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addTokenAllowances(allowance.toProtobuf());
         }
         for (var allowance : nftAllowances) {
-            builder.addNftAllowances(allowance.withOwner(ownerAccountId).toProtobuf());
+            builder.addNftAllowances(allowance.toProtobuf());
         }
         return builder;
     }
@@ -159,25 +416,13 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         for (var allowance : hbarAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : tokenAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
         for (var allowance : nftAllowances) {
-            if (allowance.spenderAccountId != null) {
-                allowance.spenderAccountId.validateChecksum(client);
-            }
-            if (allowance.tokenId != null) {
-                allowance.tokenId.validateChecksum(client);
-            }
+            allowance.validateChecksums(client);
         }
     }
 }

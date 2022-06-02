@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -26,14 +45,24 @@ import java.io.Writer;
 import java.security.AlgorithmParameters;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Internal utility class for handling PEM objects.
+ *
+ * Privacy-Enhanced Mail (PEM) is a de facto file format for storing and
+ * sending cryptographic keys, certificates, and other data, based on a set of
+ * 1993 IETF standards defining "privacy-enhanced mail."
+ */
 final class Pem {
     private static final String TYPE_PRIVATE_KEY = "PRIVATE KEY";
     private static final String TYPE_ENCRYPTED_PRIVATE_KEY = "ENCRYPTED PRIVATE KEY";
 
+    /**
+     * Constructor.
+     */
     private Pem() {
     }
 
-    /*
+    /**
      * For some reason, this generates PEM encodings that we ourselves can import, but OpenSSL
      * doesn't like. We decided to punt on generating encrypted PEMs for now but saving
      * the code for when we get back to it and/or any demand arises.
@@ -75,6 +104,14 @@ final class Pem {
         writer.flush();
     }
 
+    /**
+     * Create a private key info object from a reader.
+     *
+     * @param input                     reader object
+     * @param passphrase                passphrase
+     * @return                          private key info object
+     * @throws IOException              if IO operations fail
+     */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
         PemReader pemReader = new PemReader(input);
 
@@ -105,6 +142,14 @@ final class Pem {
         throw new BadKeyException("PEM file did not contain a private key");
     }
 
+    /**
+     * Create a private key info object from a byte array.
+     *
+     * @param encodedStruct             the byte array
+     * @param passphrase                passphrase
+     * @return                          private key info object
+     * @throws IOException              if IO operations fail
+     */
     private static PrivateKeyInfo decryptPrivateKey(byte[] encodedStruct, String passphrase) throws IOException {
         var encryptedPrivateKeyInfo = EncryptedPrivateKeyInfo.getInstance(ASN1Primitive.fromByteArray(encodedStruct));
 

@@ -58,6 +58,8 @@ import "token_get_account_nft_infos.proto";
 import "token_get_nft_info.proto";
 import "token_get_nft_infos.proto";
 
+import "get_account_details.proto";
+
 /**
  * A single query, which is sent from the client to a node. This includes all possible queries. Each
  * Query should not have more than 50 levels.
@@ -85,7 +87,7 @@ message Query {
         ContractGetInfoQuery contractGetInfo = 4;
 
         /**
-         * Get bytecode used by a smart contract instance
+         * Get runtime code used by a smart contract instance
          */
         ContractGetBytecodeQuery contractGetBytecode = 5;
 
@@ -189,5 +191,10 @@ message Query {
          * Gets <tt>handleTransaction</tt> times for one or more "sufficiently recent" TransactionIDs
          */
         NetworkGetExecutionTimeQuery networkGetExecutionTime = 57;
+
+        /**
+         * Gets all information about an account including allowances granted by the account
+         */
+        GetAccountDetailsQuery accountDetails = 58;
     }
 }

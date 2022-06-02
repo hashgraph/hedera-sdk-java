@@ -1,6 +1,24 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,7 +39,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class ClientTest {
     @Test
@@ -35,7 +53,7 @@ class ClientTest {
     @DisplayName("Client.setMaxQueryPayment() negative")
     void setMaxQueryPaymentNegative() throws TimeoutException {
         var client = Client.forTestnet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxQueryPayment(Hbar.MIN);
         });
         client.close();
@@ -45,7 +63,7 @@ class ClientTest {
     @ParameterizedTest(name = "Invalid maxAttempts {0}")
     void setMaxAttempts(int maxAttempts) throws TimeoutException {
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxAttempts(maxAttempts);
         });
         client.close();
@@ -58,7 +76,7 @@ class ClientTest {
     void setMaxBackoffInvalid(@Nullable Long maxBackoffMillis) throws TimeoutException {
         @Nullable Duration maxBackoff = maxBackoffMillis != null ? Duration.ofMillis(maxBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMaxBackoff(maxBackoff);
         });
         client.close();
@@ -77,7 +95,7 @@ class ClientTest {
     void setMinBackoffInvalid(@Nullable Long minBackoffMillis) throws TimeoutException {
         @Nullable Duration minBackoff = minBackoffMillis != null ? Duration.ofMillis(minBackoffMillis) : null;
         var client = Client.forNetwork(Map.of());
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setMinBackoff(minBackoff);
         });
         client.close();
@@ -93,7 +111,7 @@ class ClientTest {
     @DisplayName("Client.setMaxTransactionFee() negative")
     void setMaxTransactionFeeNegative() throws TimeoutException {
         var client = Client.forTestnet();
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             client.setDefaultMaxTransactionFee(Hbar.MIN);
         });
         client.close();
@@ -113,34 +131,34 @@ class ClientTest {
     void testFromJson() throws Exception {
         // Copied content of `client-config-with-operator.json`
         Client.fromConfig("{\n" +
-            "    \"network\":\"mainnet\",\n" +
-            "    \"operator\": {\n" +
-            "        \"accountId\": \"0.0.36\",\n" +
-            "        \"privateKey\": \"302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10\"\n" +
-            "    }\n" +
-            "}\n");
+                "    \"network\":\"mainnet\",\n" +
+                "    \"operator\": {\n" +
+                "        \"accountId\": \"0.0.36\",\n" +
+                "        \"privateKey\": \"302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10\"\n" +
+                "    }\n" +
+                "}\n");
 
         // put it in a file for nicer formatting
         InputStream clientConfig = ClientTest.class.getClassLoader()
-            .getResourceAsStream("client-config.json");
+                .getResourceAsStream("client-config.json");
 
-        Assertions.assertNotNull(clientConfig);
+        assertThat(clientConfig).isNotNull();
 
         Client.fromConfig(new InputStreamReader(clientConfig, StandardCharsets.UTF_8)).close();
 
         // put it in a file for nicer formatting
         InputStream clientConfigWithOperator = ClientTest.class.getClassLoader()
-            .getResourceAsStream("client-config-with-operator.json");
+                .getResourceAsStream("client-config-with-operator.json");
 
-        Assertions.assertNotNull(clientConfigWithOperator);
+        assertThat(clientConfigWithOperator).isNotNull();
     }
 
     @Test
     @DisplayName("setNetwork() functions correctly")
     void setNetworkWorks() throws Exception {
         var defaultNetwork = Map.of(
-            "0.testnet.hedera.com:50211", new AccountId(3),
-            "1.testnet.hedera.com:50211", new AccountId(4)
+                "0.testnet.hedera.com:50211", new AccountId(3),
+                "1.testnet.hedera.com:50211", new AccountId(4)
         );
 
         Client client = Client.forNetwork(defaultNetwork);
@@ -150,38 +168,38 @@ class ClientTest {
         assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(defaultNetwork);
 
         var defaultNetworkWithExtraNode = Map.of(
-            "0.testnet.hedera.com:50211", new AccountId(3),
-            "1.testnet.hedera.com:50211", new AccountId(4),
-            "2.testnet.hedera.com:50211", new AccountId(5)
+                "0.testnet.hedera.com:50211", new AccountId(3),
+                "1.testnet.hedera.com:50211", new AccountId(4),
+                "2.testnet.hedera.com:50211", new AccountId(5)
         );
 
         client.setNetwork(defaultNetworkWithExtraNode);
         assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(defaultNetworkWithExtraNode);
 
         var singleNodeNetwork = Map.of(
-            "2.testnet.hedera.com:50211", new AccountId(5)
+                "2.testnet.hedera.com:50211", new AccountId(5)
         );
 
         client.setNetwork(singleNodeNetwork);
         assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(singleNodeNetwork);
 
         var singleNodeNetworkWithDifferentAccountId = Map.of(
-            "2.testnet.hedera.com:50211", new AccountId(6)
+                "2.testnet.hedera.com:50211", new AccountId(6)
         );
 
         client.setNetwork(singleNodeNetworkWithDifferentAccountId);
         assertThat(client.getNetwork()).containsExactlyInAnyOrderEntriesOf(singleNodeNetworkWithDifferentAccountId);
 
         var multiAddressNetwork = Map.of(
-            "0.testnet.hedera.com:50211", new AccountId(3),
-            "34.94.106.61:50211", new AccountId(3),
-            "50.18.132.211:50211", new AccountId(3),
-            "138.91.142.219:50211", new AccountId(3),
+                "0.testnet.hedera.com:50211", new AccountId(3),
+                "34.94.106.61:50211", new AccountId(3),
+                "50.18.132.211:50211", new AccountId(3),
+                "138.91.142.219:50211", new AccountId(3),
 
-            "1.testnet.hedera.com:50211", new AccountId(4),
-            "35.237.119.55:50211", new AccountId(4),
-            "3.212.6.13:50211", new AccountId(4),
-            "52.168.76.241:50211", new AccountId(4)
+                "1.testnet.hedera.com:50211", new AccountId(4),
+                "35.237.119.55:50211", new AccountId(4),
+                "3.212.6.13:50211", new AccountId(4),
+                "52.168.76.241:50211", new AccountId(4)
         );
 
         client.setNetwork(multiAddressNetwork);
@@ -202,8 +220,8 @@ class ClientTest {
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
 
         var defaultNetworkWithExtraNode = List.of(
-            "hcs.testnet.mirrornode.hedera.com:5600",
-            "hcs.testnet1.mirrornode.hedera.com:5600"
+                "hcs.testnet.mirrornode.hedera.com:5600",
+                "hcs.testnet1.mirrornode.hedera.com:5600"
         );
 
         client.setMirrorNetwork(defaultNetworkWithExtraNode);
@@ -228,10 +246,14 @@ class ClientTest {
         Duration timeout = Duration.ofSeconds(5);
 
         Client client = Client.forNetwork(Map.of("127.0.0.1:50211", accountId))
-            .setRequestTimeout(timeout);
+            .setRequestTimeout(timeout)
+            .setNodeMinBackoff(Duration.ofMillis(0))
+            .setNodeMaxBackoff(Duration.ofMillis(0))
+            .setMinNodeReadmitTime(Duration.ofMillis(0))
+            .setMaxNodeReadmitTime(Duration.ofMillis(0));
         AccountBalanceQuery query = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .setMaxAttempts(3);
+                .setAccountId(accountId)
+                .setMaxAttempts(3);
         Instant start = Instant.now();
 
         try {
@@ -242,7 +264,7 @@ class ClientTest {
         long secondsTaken = java.time.Duration.between(start, Instant.now()).toSeconds();
 
         // 20 seconds would indicate we tried 2 times to connect
-        assertThat(secondsTaken).isLessThan(6);
+        assertThat(secondsTaken).isLessThan(7);
     }
 
     @Test
@@ -258,10 +280,10 @@ class ClientTest {
         Duration timeout = Duration.ofSeconds(5);
 
         Client client = Client.forNetwork(Map.of("127.0.0.1:50211", accountId))
-            .setRequestTimeout(timeout);
+                .setRequestTimeout(timeout);
         AccountBalanceQuery query = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .setMaxAttempts(3);
+                .setAccountId(accountId)
+                .setMaxAttempts(3);
         Instant start = Instant.now();
 
         try {

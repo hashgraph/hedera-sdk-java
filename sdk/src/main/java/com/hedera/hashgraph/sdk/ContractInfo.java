@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -85,6 +104,22 @@ public final class ContractInfo {
      */
     public final LedgerId ledgerId;
 
+    /**
+     *  Constructor.
+     *
+     * @param contractId                the contract id
+     * @param accountId                 the account id
+     * @param contractAccountId         the account id of the owner
+     * @param adminKey                  the key that can modify the contract
+     * @param expirationTime            the time that contract will expire
+     * @param autoRenewPeriod           seconds before contract is renewed (funds must be available)
+     * @param storage                   number of bytes used by this contract
+     * @param contractMemo              the memo field 100 bytes
+     * @param balance                   current balance
+     * @param isDeleted                 does it still exist
+     * @param tokenRelationships        list of compound token id and relationship records
+     * @param ledgerId                  the ledger id
+     */
     private ContractInfo(
         ContractId contractId,
         AccountId accountId,
@@ -113,6 +148,12 @@ public final class ContractInfo {
         this.ledgerId = ledgerId;
     }
 
+    /**
+     * Extract the contract from the protobuf.
+     *
+     * @param contractInfo              the protobuf
+     * @return                          the contract object
+     */
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
         var adminKey = contractInfo.hasAdminKey()
             ? Key.fromProtobufKey(contractInfo.getAdminKey())
@@ -143,10 +184,22 @@ public final class ContractInfo {
         );
     }
 
+    /**
+     * Extract the contract from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the extracted contract
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static ContractInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Build the protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     ContractGetInfoResponse.ContractInfo toProtobuf() {
         var contractInfoBuilder = ContractGetInfoResponse.ContractInfo.newBuilder()
             .setContractID(contractId.toProtobuf())
@@ -184,6 +237,11 @@ public final class ContractInfo {
             .toString();
     }
 
+    /**
+     * Create a byte array representation.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

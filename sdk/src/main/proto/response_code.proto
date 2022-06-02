@@ -1155,9 +1155,9 @@ enum ResponseCodeEnum {
   NEGATIVE_ALLOWANCE_AMOUNT = 290;
 
   /**
-   * The approveForAll flag cannot be set for a fungible token.
+   * [Deprecated] The approveForAll flag cannot be set for a fungible token.
    */
-  CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON = 291;
+  CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON = 291 [deprecated = true];
 
   /**
    * The spender does not have an existing approved allowance with the hbar/token owner.
@@ -1176,20 +1176,20 @@ enum ResponseCodeEnum {
   MAX_ALLOWANCES_EXCEEDED = 294;
 
   /**
-   * No allowances have been specified in the approval/adjust transaction.
+   * No allowances have been specified in the approval transaction.
    */
   EMPTY_ALLOWANCES = 295;
 
   /**
-   * Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
-   * CryptoApproveAllowance or CryptoAdjustAllowance transaction.
+   * [Deprecated] Spender is repeated more than once in Crypto or Token or NFT allowance lists in a single
+   * CryptoApproveAllowance transaction.
    */
-  SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES = 296;
+  SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES = 296 [deprecated = true];
 
   /**
-   * Serial numbers are repeated in nft allowance for a single spender account
+   * [Deprecated] Serial numbers are repeated in nft allowance for a single spender account
    */
-  REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES = 297;
+  REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES = 297 [deprecated = true];
 
   /**
    * Fungible common token used in NFT allowances
@@ -1202,8 +1202,105 @@ enum ResponseCodeEnum {
   NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES = 299;
 
   /**
-   * An approval/adjustment transaction was submitted where the payer and owner account are
-   * not the same. Currently only the owner is permitted to perform these operations.
+   * The account id specified as the owner is invalid or does not exist.
    */
-  PAYER_AND_OWNER_NOT_EQUAL = 300;
+  INVALID_ALLOWANCE_OWNER_ID = 300;
+
+  /**
+   * The account id specified as the spender is invalid or does not exist.
+   */
+  INVALID_ALLOWANCE_SPENDER_ID = 301;
+
+  /**
+   * [Deprecated] If the CryptoDeleteAllowance transaction has repeated crypto or token or Nft allowances to delete.
+   */
+  REPEATED_ALLOWANCES_TO_DELETE = 302 [deprecated = true];
+
+  /**
+   * If the account Id specified as the delegating spender is invalid or does not exist.
+   */
+  INVALID_DELEGATING_SPENDER = 303;
+
+  /**
+   * The delegating Spender cannot grant approveForAll allowance on a NFT token type for another spender.
+   */
+  DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL = 304;
+
+  /**
+   * The delegating Spender cannot grant allowance on a NFT serial for another spender as it doesnt not have approveForAll
+   * granted on token-owner.
+   */
+  DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL = 305;
+
+  /**
+   * The scheduled transaction could not be created because it's expiration_time was too far in the future.
+   */
+  SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE = 306;
+
+  /**
+   * The scheduled transaction could not be created because it's expiration_time was less than or equal to the consensus time.
+   */
+  SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME = 307;
+
+  /**
+   * The scheduled transaction could not be created because it would cause throttles to be violated on the specified expiration_time.
+   */
+  SCHEDULE_FUTURE_THROTTLE_EXCEEDED = 308;
+
+  /**
+   * The scheduled transaction could not be created because it would cause the gas limit to be violated on the specified expiration_time.
+   */
+  SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED = 309;
+
+  /**
+   * The ethereum transaction either failed parsing or failed signature validation, or some other EthereumTransaction error not covered by another response code.
+   */
+  INVALID_ETHEREUM_TRANSACTION = 310;
+
+  /**
+   * EthereumTransaction was signed against a chainId that this network does not support.
+   */
+  WRONG_CHAIN_ID = 311;
+  
+  /**
+   * This transaction specified an ethereumNonce that is not the current ethereumNonce of the account.
+   */
+  WRONG_NONCE = 312;
+  
+  /**
+   * The ethereum transaction specified an access list, which the network does not support.
+   */
+  ACCESS_LIST_UNSUPPORTED = 313;
+
+  /**
+   * A schedule being signed or deleted has passed it's expiration date and is pending execution if needed and then expiration.
+   */
+  SCHEDULE_PENDING_EXPIRATION = 314;
+
+  /**
+   * A selfdestruct or ContractDelete targeted a contract that is a token treasury.
+   */
+  CONTRACT_IS_TOKEN_TREASURY = 315;
+
+  /**
+   * A selfdestruct or ContractDelete targeted a contract with non-zero token balances.
+   */
+  CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES = 316;  
+
+  /**
+   * A contract referenced by a transaction is "detached"; that is, expired and lacking any
+   * hbar funds for auto-renewal payment---but still within its post-expiry grace period.
+   */
+  CONTRACT_EXPIRED_AND_PENDING_REMOVAL = 317;
+
+  /**
+   * A ContractUpdate requested removal of a contract's auto-renew account, but that contract has  
+   * no auto-renew account.
+   */
+  CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT = 318;
+
+  /**
+   * A delete transaction submitted via HAPI set permanent_removal=true 
+   */
+  PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION = 319;
 }

@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Query;
@@ -12,18 +31,38 @@ import java8.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
+/**
+ * A query that returns information about the current state of a schedule
+ * transaction on a Hedera network.
+ *
+ * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info">Hedera Documentation</a>
+ */
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     @Nullable
     private ScheduleId scheduleId = null;
 
+    /**
+     * Constructor.
+     */
     public ScheduleInfoQuery() {
     }
 
+    /**
+     * Extract the schedule id.
+     *
+     * @return                          the schedule id
+     */
     @Nullable
     public ScheduleId getScheduleId() {
         return scheduleId;
     }
 
+    /**
+     * Assign the schedule id.
+     *
+     * @param scheduleId                the schedule id
+     * @return {@code this}
+     */
     public ScheduleInfoQuery setScheduleId(ScheduleId scheduleId) {
         Objects.requireNonNull(scheduleId);
         this.scheduleId = scheduleId;

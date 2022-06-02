@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
@@ -284,8 +303,8 @@ public final class Mnemonic {
      *
      * @param passphrase the passphrase used to protect the mnemonic (not used in the
      *                   mobile wallets, use {@link #toPrivateKey()} instead.)
-     * @return the recovered key; use {@link PrivateKey#derive(int)} to get a key for an
-     * account index (0 for default account)
+     * @return           the recovered key; use {@link PrivateKey#derive(int)} to get a
+     *                   key for an account index (0 for default account)
      * @see PrivateKey#fromMnemonic(Mnemonic, String)
      */
     public PrivateKey toPrivateKey(String passphrase) throws BadMnemonicException {
@@ -298,6 +317,12 @@ public final class Mnemonic {
         return PrivateKey.fromMnemonic(this, passphrase);
     }
 
+    /**
+     * Extract the private key.
+     *
+     * @return                          the private key
+     * @throws BadMnemonicException     when there are issues with the mnemonic
+     */
     public PrivateKey toLegacyPrivateKey() throws BadMnemonicException {
         if (this.words.size() == 22) {
             return PrivateKey.fromBytes(this.wordsToLegacyEntropy());
@@ -309,8 +334,10 @@ public final class Mnemonic {
     /**
      * Recover a private key from this mnemonic phrase.
      *
-     * @return the recovered key; use {@link PrivateKey#derive(int)} to get a key for an
-     * account index (0 for default account)
+     * @return                          the recovered key; use
+     *                                  {@link PrivateKey#derive(int)} to get
+     *                                  a key for an account index (0 for
+     *                                  default account)
      * @see PrivateKey#fromMnemonic(Mnemonic)
      */
     public PrivateKey toPrivateKey() throws BadMnemonicException {
@@ -364,6 +391,12 @@ public final class Mnemonic {
         return asString;
     }
 
+    /**
+     * Convert passphrase to a byte array.
+     *
+     * @param passphrase                the passphrase
+     * @return                          the byte array
+     */
     byte[] toSeed(String passphrase) {
         String salt = "mnemonic" + passphrase;
 

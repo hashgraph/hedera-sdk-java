@@ -1,10 +1,28 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
@@ -18,15 +36,29 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigInteger;
 
+/**
+ * Encapsulate the ECDSA private key.
+ */
 public class PrivateKeyECDSA extends PrivateKey {
 
     private final BigInteger keyData;
 
+    /**
+     * Constructor.
+     *
+     * @param keyData                   the key data
+     * @param publicKey                 the public key
+     */
     PrivateKeyECDSA(BigInteger keyData, @Nullable PublicKey publicKey) {
         this.keyData = keyData;
         this.publicKey = publicKey;
     }
 
+    /**
+     * Create a new private ECDSA key.
+     *
+     * @return                          the new key
+     */
     static PrivateKeyECDSA generateInternal() {
         var generator = new ECKeyPairGenerator();
         var keygenParams = new ECKeyGenerationParameters(ECDSA_SECP256K1_DOMAIN, ThreadLocalSecureRandom.current());
@@ -37,6 +69,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         return new PrivateKeyECDSA(privParams.getD(), new PublicKeyECDSA(pubParams.getQ().getEncoded(true)));
     }
 
+    /**
+     * Create a new private key from a private key ino object.
+     *
+     * @param privateKeyInfo            the private key info object
+     * @return                          the new key
+     */
     static PrivateKeyECDSA fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
             var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
@@ -47,6 +85,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         }
     }
 
+    /**
+     * Create a private key from a byte array.
+     *
+     * @param privateKey                the byte array
+     * @return                          the new key
+     */
     public static PrivateKey fromBytesInternal(byte[] privateKey) {
         if (privateKey.length == 32) {
             return new PrivateKeyECDSA(new BigInteger(1, privateKey), null);
@@ -56,6 +100,13 @@ public class PrivateKeyECDSA extends PrivateKey {
         return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
     }
 
+    /**
+     * Throws an exception when trying to derive a child key.
+     *
+     * @param entropy                   entropy byte array
+     * @param index                     the child key index
+     * @return                          the new key
+     */
     static byte[] legacyDeriveChildKey(byte[] entropy, long index) {
         throw new IllegalStateException("ECDSA secp256k1 keys do not currently support derivation");
     }
@@ -106,6 +157,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         return toBytesDER();
     }
 
+    /**
+     * Create a big int byte array.
+     *
+     * @param n                         the big integer
+     * @return                          the 32 byte array
+     */
     private static byte[] bigIntTo32Bytes(BigInteger n) {
         byte[] bytes = n.toByteArray();
         byte[] bytes32 = new byte[32];
@@ -132,5 +189,15 @@ public class PrivateKeyECDSA extends PrivateKey {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean isED25519() {
+        return false;
+    }
+
+    @Override
+    public boolean isECDSA() {
+        return true;
     }
 }

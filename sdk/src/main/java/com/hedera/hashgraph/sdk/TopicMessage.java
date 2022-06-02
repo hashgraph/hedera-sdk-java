@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -11,21 +30,48 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+/**
+ * Topic message records.
+ */
 public final class TopicMessage {
+    /**
+     * The consensus timestamp of the message in seconds.nanoseconds
+     */
     public final Instant consensusTimestamp;
-
+    /**
+     * The content of the message
+     */
     public final byte[] contents;
-
+    /**
+     * The new running hash of the topic that received the message
+     */
     public final byte[] runningHash;
-
+    /**
+     * The sequence number of the message relative to all other messages
+     * for the same topic
+     */
     public final long sequenceNumber;
-
+    /**
+     * Array of topic message chunks.
+     */
     @Nullable
     public final TopicMessageChunk[] chunks;
-
+    /**
+     * The transaction id
+     */
     @Nullable
     public final TransactionId transactionId;
 
+    /**
+     * Constructor.
+     *
+     * @param lastConsensusTimestamp    the last consensus time
+     * @param message                   the message
+     * @param lastRunningHash           the last running hash
+     * @param lastSequenceNumber        the last sequence number
+     * @param chunks                    the array of chunks
+     * @param transactionId             the transaction id
+     */
     TopicMessage(
         Instant lastConsensusTimestamp,
         byte[] message,
@@ -42,6 +88,12 @@ public final class TopicMessage {
         this.transactionId = transactionId;
     }
 
+    /**
+     * Create a new topic message from a response protobuf.
+     *
+     * @param response                  the protobuf response
+     * @return                          the new topic message
+     */
     static TopicMessage ofSingle(ConsensusTopicResponse response) {
         return new TopicMessage(
             InstantConverter.fromProtobuf(response.getConsensusTimestamp()),
@@ -55,6 +107,12 @@ public final class TopicMessage {
         );
     }
 
+    /**
+     * Create a new topic message from a list of response's protobuf.
+     *
+     * @param responses                 the protobuf response
+     * @return                          the new topic message
+     */
     static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
         var chunks = new TopicMessageChunk[responses.size()];

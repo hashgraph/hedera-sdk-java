@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -63,31 +82,54 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     @Nullable
     private FileId bytecodeFileId = null;
     @Nullable
+    private byte[] bytecode = null;
+    @Nullable
     private AccountId proxyAccountId = null;
     @Nullable
     private Key adminKey = null;
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
+    private int maxAutomaticTokenAssociations = 0;
     @Nullable
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
+    /**
+     * Constructor.
+     */
     public ContractCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
         defaultMaxTransactionFee = new Hbar(20);
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txs Compound list of transaction id's list of (AccountId, Transaction)
+     *            records
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
 
+    /**
+     * Constructor.
+     *
+     * @param txBody protobuf TransactionBody
+     */
     ContractCreateTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
 
+    /**
+     * Extract the file id.
+     *
+     * @return                          the file id as a byte code
+     */
     @Nullable
     public FileId getBytecodeFileId() {
         return bytecodeFileId;
@@ -107,7 +149,36 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     public ContractCreateTransaction setBytecodeFileId(FileId bytecodeFileId) {
         Objects.requireNonNull(bytecodeFileId);
         requireNotFrozen();
+        this.bytecode = null;
         this.bytecodeFileId = bytecodeFileId;
+        return this;
+    }
+
+    /**
+     * Extract the admin key.
+     *
+     * @return                          the admin key
+     */
+    @Nullable
+    public byte[] getBytecode() {
+        return bytecode;
+    }
+
+    /**
+     * Sets the smart contract byte code.
+     *
+     * The bytes of the smart contract initcode. This is only useful if the smart contract init
+     * is less than the hedera transaction limit. In those cases fileID must be used.
+     *
+     * @param bytecode The bytecode
+     * @return {@code this}
+     */
+
+    public ContractCreateTransaction setBytecode(byte[] bytecode) {
+        Objects.requireNonNull(bytecode);
+        requireNotFrozen();
+        this.bytecodeFileId = null;
+        this.bytecode = bytecode;
         return this;
     }
 
@@ -133,6 +204,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the gas.
+     *
+     * @return                          the gas amount that was set
+     */
     public long getGas() {
         return gas;
     }
@@ -149,6 +225,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the initial balance.
+     *
+     * @return                          the initial balance in hbar
+     */
     public Hbar getInitialBalance() {
         return initialBalance;
     }
@@ -167,6 +248,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the proxy account id.
+     *
+     * @return                          the proxy account id
+     */
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -191,6 +277,28 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    public int getMaxAutomaticTokenAssociations() {
+        return maxAutomaticTokenAssociations;
+    }
+
+    /**
+     * Sets the new maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @param maxAutomaticTokenAssociations The maximum automatic token associations
+     * @return  {@code this}
+     */
+    public ContractCreateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
+        requireNotFrozen();
+        this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
+        return this;
+    }
+
+    /**
+     * Extract the auto renew period.
+     *
+     * @return                          the auto renew period
+     */
     @Nullable
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
@@ -209,6 +317,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Extract the constructor parameters.
+     *
+     * @return                          the byte string representation
+     */
     public ByteString getConstructorParameters() {
         return ByteString.copyFrom(constructorParameters);
     }
@@ -239,6 +352,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return setConstructorParameters(constructorParameters.toBytes(null).toByteArray());
     }
 
+    /**
+     * Extract the contract memo.
+     *
+     * @return                          the contract's memo
+     */
     public String getContractMemo() {
         return contractMemo;
     }
@@ -256,10 +374,18 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Build the transaction body.
+     *
+     * @return {@link ContractCreateTransactionBody}
+     */
     ContractCreateTransactionBody.Builder build() {
         var builder = ContractCreateTransactionBody.newBuilder();
         if (bytecodeFileId != null) {
             builder.setFileID(bytecodeFileId.toProtobuf());
+        }
+        if (bytecode != null) {
+            builder.setInitcode(ByteString.copyFrom(bytecode));
         }
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());
@@ -267,6 +393,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
+        builder.setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
@@ -289,11 +416,17 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         }
     }
 
+    /**
+     * Initialize from the transaction body.
+     */
     void initFromTransactionBody() {
         var body = sourceTransactionBody.getContractCreateInstance();
 
         if (body.hasFileID()) {
             bytecodeFileId = FileId.fromProtobuf(body.getFileID());
+        }
+        if (body.hasInitcode()) {
+            bytecode = body.getInitcode().toByteArray();
         }
         if (body.hasProxyAccountID()) {
             proxyAccountId = AccountId.fromProtobuf(body.getProxyAccountID());
@@ -301,6 +434,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
+        maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations();
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
         }

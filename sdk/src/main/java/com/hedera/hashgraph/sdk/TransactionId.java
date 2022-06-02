@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
@@ -8,8 +27,6 @@ import org.threeten.bp.Clock;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -53,6 +70,13 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         this.scheduled = false;
     }
 
+    /**
+     * Create a transaction id.
+     *
+     * @param accountId                 the account id
+     * @param validStart                the valid start time
+     * @return                          the new transaction id
+     */
     public static TransactionId withValidStart(AccountId accountId, Instant validStart) {
         return new TransactionId(accountId, validStart);
     }
@@ -71,6 +95,12 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         return new TransactionId(accountId, instant);
     }
 
+    /**
+     * Create a transaction id from a protobuf.
+     *
+     * @param transactionID             the protobuf
+     * @return                          the new transaction id
+     */
     static TransactionId fromProtobuf(TransactionID transactionID) {
         var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
         var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
@@ -80,6 +110,12 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
             .setNonce((transactionID.getNonce() != 0) ? transactionID.getNonce() : null);
     }
 
+    /**
+     * Create a new transaction id from a string.
+     *
+     * @param s                         the string representing the transaction id
+     * @return                          the new transaction id
+     */
     public static TransactionId fromString(String s) {
         @Var
         var parts = s.split("/", 2);
@@ -111,29 +147,67 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         return new TransactionId(accountId, validStart).setScheduled(scheduled).setNonce(nonce);
     }
 
+    /**
+     * Create a new transaction id from a byte array.
+     *
+     * @param bytes                     the byte array
+     * @return                          the new transaction id
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static TransactionId fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(TransactionID.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Extract the scheduled status.
+     *
+     * @return                          the scheduled status
+     */
     public boolean getScheduled() {
         return scheduled;
     }
 
+    /**
+     * Assign the scheduled status.
+     *
+     * @param scheduled                 the scheduled status
+     * @return {@code this}
+     */
     public TransactionId setScheduled(boolean scheduled) {
         this.scheduled = scheduled;
         return this;
     }
 
+    /**
+     * Extract the nonce.
+     *
+     * @return                          the nonce value
+     */
     @Nullable
     public Integer getNonce() {
         return nonce;
     }
 
+    /**
+     * Assign the nonce value.
+     *
+     * @param nonce                     the nonce value
+     * @return {@code this}
+     */
     public TransactionId setNonce(@Nullable Integer nonce) {
         this.nonce = nonce;
         return this;
     }
 
+    /**
+     * Return the receipt for the transaction.
+     *
+     * @param client                    the configured client
+     * @return                          the receipt
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
+     */
     public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = new TransactionReceiptQuery()
             .setTransactionId(this)
@@ -161,6 +235,15 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
             });
     }
 
+    /**
+     * Create a new transaction record.
+     *
+     * @param client                    the configured client
+     * @return                          the new receipt
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
+     */
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client);
 
@@ -178,6 +261,11 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
             .executeAsync(client));
     }
 
+    /**
+     * Extract the transaction id protobuf.
+     *
+     * @return                          the protobuf representation
+     */
     TransactionID toProtobuf() {
         var id = TransactionID.newBuilder()
             .setScheduled(scheduled)
@@ -209,6 +297,12 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         }
     }
 
+    /**
+     * Convert to a string representation with checksum.
+     *
+     * @param client                    the configured client
+     * @return                          the string representation with checksum
+     */
     public String toStringWithChecksum(Client client) {
         if (accountId != null && validStart != null) {
             return "" + accountId.toStringWithChecksum(client) + toStringPostfix();
@@ -217,6 +311,11 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         }
     }
 
+    /**
+     * Extract the byte array representation.
+     *
+     * @return                          the byte array representation
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

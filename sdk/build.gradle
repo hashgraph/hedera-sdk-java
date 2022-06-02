@@ -6,9 +6,6 @@ plugins {
     id "com.google.protobuf" version "0.8.18"
 }
 
-group = "com.hedera.hashgraph"
-version = "2.9.0"
-
 configurations {
     integrationTestImplementation.extendsFrom testImplementation
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
@@ -26,30 +23,30 @@ dependencies {
     // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
     implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
-    // Protobuf Lite is used to maintain easy compatibility with Android
-    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-    api "com.google.protobuf:protobuf-javalite:3.19.4"
+	// Protobuf Lite is used to maintain easy compatibility with Android
+	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+	api "com.google.protobuf:protobuf-javalite:3.21.1"
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:1.7.36'
 
-    // Toggle which slf4j library to use to enable/disable logging
-    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
-    integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
-    // testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
-    // integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+	// Toggle which slf4j library to use to enable/disable logging
+	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha7'
+	integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
+	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-    implementation "io.grpc:grpc-core:1.44.1"
-    implementation "io.grpc:grpc-protobuf-lite:1.44.1"
-    implementation "io.grpc:grpc-stub:1.44.1"
+	implementation "io.grpc:grpc-core:1.46.0"
+	implementation "io.grpc:grpc-protobuf-lite:1.46.0"
+	implementation "io.grpc:grpc-stub:1.46.0"
 
     testImplementation "org.assertj:assertj-core:3.22.0"
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
-    testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
-    testRuntimeOnly "io.grpc:grpc-netty-shaded:1.44.1"
-    integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
+	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
+	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.46.0"
+	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.45.1'
 
     // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
     //       use CompletableFuture directly.
@@ -58,41 +55,43 @@ dependencies {
     api "net.sourceforge.streamsupport:streamsupport:1.7.4"
     api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
 
-    // NOTE: This is to support Android API < 26.
-    api "org.threeten:threetenbp:1.5.2"
+	// NOTE: This is to support Android API < 26.
+	api "org.threeten:threetenbp:1.6.0"
 
     implementation "com.google.code.gson:gson:2.9.0"
 
     testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 
-    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+	implementation 'javax.annotation:javax.annotation-api:1.3.2'
+
+	implementation "com.esaulpaugh:headlong:6.3.2"
 }
 
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:3.19.4"
-    }
-    plugins {
-        grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.44.1"
-        }
-    }
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option "lite"
-                }
-            }
+	protoc {
+		artifact = "com.google.protobuf:protoc:3.21.1"
+	}
+	plugins {
+		grpc {
+			artifact = "io.grpc:protoc-gen-grpc-java:1.46.0"
+		}
+	}
+	generateProtoTasks {
+		all().each { task ->
+			task.builtins {
+				java {
+					option "lite"
+				}
+			}
 
-            task.plugins {
-                grpc {
-                    option "lite"
-                }
-            }
-        }
-    }
+			task.plugins {
+				grpc {
+					option "lite"
+				}
+			}
+		}
+	}
 }
 
 tasks.withType(JavaCompile).configureEach {
