@@ -1,237 +1,250 @@
 plugins {
-	id "java-library"
-	id "idea"
-	// id "maven-publish"
-	// id "com.bmuschko.nexus" version "2.3.1"
-	id "com.google.protobuf" version "0.8.18"
+    id "java-library"
+    id "idea"
+	id "signing"
+    id "maven-publish"
+    id "com.google.protobuf" version "0.8.18"
 }
 
 group = "com.hedera.hashgraph"
 version = "2.9.0"
-description = "Hedera™ Hashgraph SDK for Java"
 
 configurations {
-	integrationTestImplementation.extendsFrom testImplementation
-	integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 dependencies {
-	// https://github.com/bsideup/jabel
-	annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
+    // https://github.com/bsideup/jabel
+    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
 
-	// custom annotation processor to help generate methods around executables
-	annotationProcessor project(":executable-processor")
-	compileOnly project(":executable-annotation")
+    // custom annotation processor to help generate methods around executables
+    annotationProcessor project(":executable-processor")
+    compileOnly project(":executable-annotation")
 
-	// NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
-	// <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
-	implementation "org.bouncycastle:bcprov-jdk15on:1.70"
+    // NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
+    // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
+    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
-	// Protobuf Lite is used to maintain easy compatibility with Android
-	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-	api "com.google.protobuf:protobuf-javalite:3.19.4"
+    // Protobuf Lite is used to maintain easy compatibility with Android
+    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+    api "com.google.protobuf:protobuf-javalite:3.19.4"
 
-	// https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-	implementation 'org.slf4j:slf4j-api:1.7.36'
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    implementation 'org.slf4j:slf4j-api:1.7.36'
 
-	// Toggle which slf4j library to use to enable/disable logging
-	testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
-	integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
-	// testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
-	// integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+    // Toggle which slf4j library to use to enable/disable logging
+    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
+    integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-alpha6'
+    // testRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+    // integrationTestRuntimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 
-	implementation "io.grpc:grpc-core:1.44.1"
-	implementation "io.grpc:grpc-protobuf-lite:1.44.1"
-	implementation "io.grpc:grpc-stub:1.44.1"
+    implementation "io.grpc:grpc-core:1.44.1"
+    implementation "io.grpc:grpc-protobuf-lite:1.44.1"
+    implementation "io.grpc:grpc-stub:1.44.1"
 
-	testImplementation "org.assertj:assertj-core:3.22.0"
-	testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
+    testImplementation "org.assertj:assertj-core:3.22.0"
+    testImplementation "org.junit.jupiter:junit-jupiter-engine:5.8.2"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:5.8.2"
 
-	testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
-	testRuntimeOnly "io.grpc:grpc-netty-shaded:1.44.1"
-	integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
+    testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
+    testRuntimeOnly "io.grpc:grpc-netty-shaded:1.44.1"
+    integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.44.0'
 
-	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
-	//       use CompletableFuture directly.
-	// https://github.com/stefan-zobel/streamsupport
-	// https://developer.android.com/about/dashboards/index.html
-	api "net.sourceforge.streamsupport:streamsupport:1.7.4"
-	api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
+    // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
+    //       use CompletableFuture directly.
+    // https://github.com/stefan-zobel/streamsupport
+    // https://developer.android.com/about/dashboards/index.html
+    api "net.sourceforge.streamsupport:streamsupport:1.7.4"
+    api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
 
-	// NOTE: This is to support Android API < 26.
-	api "org.threeten:threetenbp:1.5.2"
+    // NOTE: This is to support Android API < 26.
+    api "org.threeten:threetenbp:1.5.2"
 
-	implementation "com.google.code.gson:gson:2.9.0"
+    implementation "com.google.code.gson:gson:2.9.0"
 
-	testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
+    testImplementation "io.github.json-snapshot:json-snapshot:1.0.17"
 
-	implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
 }
 
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
-	protoc {
-		artifact = "com.google.protobuf:protoc:3.19.4"
-	}
-	plugins {
-		grpc {
-			artifact = "io.grpc:protoc-gen-grpc-java:1.44.1"
-		}
-	}
-	generateProtoTasks {
-		all().each { task ->
-			task.builtins {
-				java {
-					option "lite"
-				}
-			}
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.19.4"
+    }
+    plugins {
+        grpc {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.44.1"
+        }
+    }
+    generateProtoTasks {
+        all().each { task ->
+            task.builtins {
+                java {
+                    option "lite"
+                }
+            }
 
-			task.plugins {
-				grpc {
-					option "lite"
-				}
-			}
-		}
-	}
+            task.plugins {
+                grpc {
+                    option "lite"
+                }
+            }
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	// https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
-	// release = 8
-	compileJava {
-		options.compilerArgs += [
-			"--release",
-			"8" // Avoid using Java 12 APIs
-		]
-	}
+    // https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+    // release = 8
+    compileJava {
+        options.compilerArgs += [
+            "--release",
+            "8" // Avoid using Java 12 APIs
+        ]
+    }
 }
 
 sourceSets {
-	main {
-		java {
-			srcDirs 'src/main/java'
-			srcDirs 'build/generated/source/proto/main/java'
-			srcDirs 'build/generated/source/proto/main/grpc'
-		}
-	}
-	integrationTest {
-		java.srcDir "$projectDir/src/integrationTest/java"
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'build/generated/source/proto/main/java'
+            srcDirs 'build/generated/source/proto/main/grpc'
+        }
+    }
+    integrationTest {
+        java.srcDir "$projectDir/src/integrationTest/java"
 
-		compileClasspath += sourceSets.main.output
-		runtimeClasspath += sourceSets.main.output
-	}
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
 }
 
 idea {
-	module {
-		sourceDirs -= file("src/integrationTest/java")
-		testSourceDirs += file("src/integrationTest/java")
-	}
+    module {
+        sourceDirs -= file("src/integrationTest/java")
+        testSourceDirs += file("src/integrationTest/java")
+    }
 }
 
 jacocoTestReport {
-	// make sure to use any/all test coverage data for the report
-	executionData fileTree(dir: buildDir, include: "jacoco/*.exec")
+    // make sure to use any/all test coverage data for the report
+    executionData fileTree(dir: buildDir, include: "jacoco/*.exec")
 
-	// remove generated proto files from report
-	afterEvaluate {
-		classDirectories.setFrom(files(classDirectories.files.collect {
-			fileTree(dir: it, exclude: '**/proto/**')
-		}))
-	}
+    // remove generated proto files from report
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: '**/proto/**')
+        }))
+    }
 
-	// configure it so only xml is generated for the report
-	reports {
-		xml.enabled true
-		html.enabled true
-		csv.enabled false
-	}
+    // configure it so only xml is generated for the report
+    reports {
+        xml.enabled true
+        html.enabled true
+        csv.enabled false
+    }
 
-	// make sure we run all tests before this report is made
-	dependsOn tasks.withType(Test)
+    // make sure we run all tests before this report is made
+    dependsOn tasks.withType(Test)
 }
 
 task integrationTest(type: Test) {
-	testClassesDirs = sourceSets.integrationTest.output.classesDirs
-	classpath = sourceSets.integrationTest.runtimeClasspath
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
 
-	onlyIf {
-		System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null || System.getenv('CONFIG_FILE') != null
-	}
+    onlyIf {
+        System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null || System.getenv('CONFIG_FILE') != null
+    }
 }
 
 tasks.withType(Javadoc) {
-	source = sourceSets.main.allJava + file("$buildDir/generated/sources/annotationProcessor/java/main")
+    source = sourceSets.main.allJava + file("$buildDir/generated/sources/annotationProcessor/java/main")
 }
 
 tasks.withType(Test) {
-	useJUnitPlatform()
+    useJUnitPlatform()
 
-	// NOTE: Uncomment to enable trace logs in the SDK during tests
-	// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+    // NOTE: Uncomment to enable trace logs in the SDK during tests
+    // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
 
-	// this task will fail on the first failed test
-	failFast = true
+    // this task will fail on the first failed test
+    failFast = true
 
-	// emit logs per passed or failed test
-	testLogging {
-		exceptionFormat = 'full'
-		events "passed", "skipped", "failed", "standardOut", "standardError"
-	}
+    // emit logs per passed or failed test
+    testLogging {
+        exceptionFormat = 'full'
+        events "passed", "skipped", "failed", "standardOut", "standardError"
+    }
 
-	// propagate system environment to test runner
-	systemProperty "OPERATOR_ID", findProperty("OPERATOR_ID")
-	systemProperty "OPERATOR_KEY", findProperty("OPERATOR_KEY")
-	systemProperty "CONFIG_FILE", findProperty("CONFIG_FILE")
-	systemProperty "HEDERA_NETWORK", findProperty("HEDERA_NETWORK")
+    // propagate system environment to test runner
+    systemProperty "OPERATOR_ID", findProperty("OPERATOR_ID")
+    systemProperty "OPERATOR_KEY", findProperty("OPERATOR_KEY")
+    systemProperty "CONFIG_FILE", findProperty("CONFIG_FILE")
+    systemProperty "HEDERA_NETWORK", findProperty("HEDERA_NETWORK")
 }
 
 jar {
-	exclude "**/*.proto"
-	archiveBaseName = "sdk-corda"
-	includeEmptyDirs = false
+    exclude "**/*.proto"
+    archiveBaseName = "sdk-corda"
+    includeEmptyDirs = false
 }
 
-// modifyPom {
-// 	project {
-// 		description 'Hedera™ Hashgraph SDK for Java'
-// 		name 'sdk'
-// 		url 'https://github.com/hashgraph/hedera-sdk-java'
-// 		organization {
-// 			name 'Hedera Hashgraph'
-// 			url 'https://www.hedera.com'
-// 		}
-// 		issueManagement {
-// 			system 'GitHub'
-// 			url 'https://github.com/hashgraph/hedera-sdk-java/issues'
-// 		}
-// 		licenses {
-// 			license {
-// 				name 'Apache License, Version 2.0'
-// 				url 'https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE'
-// 				distribution 'repo'
-// 			}
-// 		}
-// 		scm {
-// 			url 'https://github.com/hashgraph/hedera-sdk-java'
-// 			connection 'scm:git:https://github.com/hashgraph/hedera-sdk-java.git'
-// 			developerConnection 'scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git'
-// 		}
-// 		developers {
-// 			developer {
-// 				name 'Ryan Leckey'
-// 			}
-// 		}
-// 	}
-// }
+//stagingId = 890139c7fb9c81
 
-// extraArchive {
-// 	sources = true
-// 	tests = false
-// }
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "sdk"
 
-// nexus {
-// 	sign = true
-// 	repositoryUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
-// }
+            pom {
+                name = "Hedera SDK"
+                description = "Hedera™ Hashgraph SDK for Java"
+                url = 'https://github.com/hashgraph/hedera-sdk-java'
+
+                organization {
+					name = "Hedera Hashgraph"
+                    url = "https://www.hedera.com"
+                }
+
+                issueManagement {
+                    system = "GitHub"
+                    url = "https://github.com/hashgraph/hedera-sdk-java/issues"
+                }
+
+                licenses {
+                    license {
+                        name = "Apache License, Version 2.0"
+                        url = "https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE"
+                        distribution = "repo"
+                    }
+                }
+
+                scm {
+                    url = "https://github.com/hashgraph/hedera-sdk-java"
+                    connection = "scm:git:https://github.com/hashgraph/hedera-sdk-java.git"
+                    developerConnection = "scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git"
+                }
+
+                developers {
+                    developer {
+						name = "Ryan Leckey"
+                    }
+
+                    developer {
+						name = "Daniel Akhterov"
+                    }
+                }
+            }
+
+            from(components.java)
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+

@@ -7,7 +7,12 @@ plugins {
 
 	id "jacoco"
 	id "org.sonarqube" version "3.3"
+
+	id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
+
+group = "com.hedera.hashgraph"
+version = "2.9.0"
 
 allprojects {
 	apply plugin: "java"
@@ -87,5 +92,11 @@ allprojects {
 			disableWarningsInGeneratedCode = true
 			excludedPaths = ".*generated.*"
 		}
+	}
+}
+
+nexusPublishing {
+	repositories {
+		sonatype()
 	}
 }
