@@ -1,103 +1,104 @@
 plugins {
-	id "net.ltgt.errorprone" version "2.0.2" apply false
+    id "net.ltgt.errorprone" version "2.0.2" apply false
 
-	// Gradle plugin to discover dependency updates
-	// <https://github.com/ben-manes/gradle-versions-plugin>
-	id "com.github.ben-manes.versions" version "0.42.0"
+    // Gradle plugin to discover dependency updates
+    // <https://github.com/ben-manes/gradle-versions-plugin>
+    id "com.github.ben-manes.versions" version "0.42.0"
 
-	id "jacoco"
-	id "org.sonarqube" version "3.3"
+    id "jacoco"
+    id "org.sonarqube" version "3.3"
 
-	id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
+    id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
 }
 
-group = "com.hedera.hashgraph"
-version = "2.9.0"
+apply from: "./version.gradle"
 
 allprojects {
-	apply plugin: "java"
-	apply plugin: "net.ltgt.errorprone"
+    apply plugin: "java"
+    apply plugin: "net.ltgt.errorprone"
 
-	sourceCompatibility = 14
-	targetCompatibility = 14
+    sourceCompatibility = 14
+    targetCompatibility = 14
 
-	repositories {
-		mavenCentral()
-		maven { url 'https://jitpack.io' }
-	}
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
 
-	dependencies {
-		// https://github.com/google/error-prone
-		// https://errorprone.info/
-		errorprone "com.google.errorprone:error_prone_core:2.14.0"
+    dependencies {
+        // https://github.com/google/error-prone
+        // https://errorprone.info/
+        errorprone "com.google.errorprone:error_prone_core:2.14.0"
 
-		// https://github.com/uber/NullAway
-		errorprone "com.uber.nullaway:nullaway:0.9.7"
+        // https://github.com/uber/NullAway
+        errorprone "com.uber.nullaway:nullaway:0.9.7"
 
-		// https://github.com/grpc/grpc-java-api-checker
-		errorprone "io.grpc:grpc-java-api-checker:1.1.0"
-	}
+        // https://github.com/grpc/grpc-java-api-checker
+        errorprone "io.grpc:grpc-java-api-checker:1.1.0"
+    }
 
-	jacoco {
-		reportsDir = file("$buildDir/jacoco")
-		toolVersion = "0.8.7"
-	}
+    jacoco {
+        reportsDir = file("$buildDir/jacoco")
+        toolVersion = "0.8.7"
+    }
 
-	sonarqube {
-		properties {
-			property "sonar.projectKey", "hashgraph_hedera-sdk-java"
-			property "sonar.organization", "hashgraph"
-			property "sonar.host.url", "https://sonarcloud.io"
-		}
-	}
+    sonarqube {
+        properties {
+            property "sonar.projectKey", "hashgraph_hedera-sdk-java"
+            property "sonar.organization", "hashgraph"
+            property "sonar.host.url", "https://sonarcloud.io"
+        }
+    }
 
-	tasks.withType(Test) {
-		apply plugin: "jacoco"
-	}
+    tasks.withType(Test) {
+        apply plugin: "jacoco"
+    }
 
-	tasks.withType(JavaCompile).configureEach {
-		options.encoding = "UTF-8"
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
 
-		// Disable warnings because I'm tired of them :P
-		options.warnings = false
+        // Disable warnings because I'm tired of them :P
+        options.warnings = false
 
-		options.errorprone {
-			// https://github.com/uber/NullAway
-			warn("NullAway")
-			option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
-			option("NullAway:TreatGeneratedAsUnannotated", "true")
+        options.errorprone {
+            // https://github.com/uber/NullAway
+            warn("NullAway")
+            option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
+            option("NullAway:TreatGeneratedAsUnannotated", "true")
 
-			// https://github.com/grpc/grpc-java-api-checker
-			disable("GrpcExperimentalApi")
-			warn("GrpcInternal")
+            // https://github.com/grpc/grpc-java-api-checker
+            disable("GrpcExperimentalApi")
+            warn("GrpcInternal")
 
-			// Enable _all_ error prone checks then selectively disble
-			// Checks that are default-disabled are enabled as warnings
-			allDisabledChecksAsWarnings = true
-			disable("TryFailRefactoring")
-			disable("ThrowSpecificExceptions")
-			disable("FutureReturnValueIgnored")
-			disable("FieldCanBeFinal")
-			disable("Finally")
-			disable("BooleanParameter")
-			disable("ThreadJoinLoop")
-			disable("UnnecessaryDefaultInEnumSwitch")
-			disable("UngroupedOverloads")
-			disable("InlineMeSuggester")
+            // Enable _all_ error prone checks then selectively disble
+            // Checks that are default-disabled are enabled as warnings
+            allDisabledChecksAsWarnings = true
+            disable("TryFailRefactoring")
+            disable("ThrowSpecificExceptions")
+            disable("FutureReturnValueIgnored")
+            disable("FieldCanBeFinal")
+            disable("Finally")
+            disable("BooleanParameter")
+            disable("ThreadJoinLoop")
+            disable("UnnecessaryDefaultInEnumSwitch")
+            disable("UngroupedOverloads")
+            disable("InlineMeSuggester")
 
-			// Uncomment do disable Android + JDK7 checks
-			// disable("Java7ApiChecker")
-			// disable("AndroidJdkLibsChecker")
+            // Uncomment do disable Android + JDK7 checks
+            // disable("Java7ApiChecker")
+            // disable("AndroidJdkLibsChecker")
 
-			// Ignore generated and protobuf code
-			disableWarningsInGeneratedCode = true
-			excludedPaths = ".*generated.*"
-		}
-	}
+            // Ignore generated and protobuf code
+            disableWarningsInGeneratedCode = true
+            excludedPaths = ".*generated.*"
+        }
+    }
 }
 
 nexusPublishing {
-	repositories {
-		sonatype()
-	}
+    repositories {
+        sonatype {
+            stagingProfileId = "890139c7fb9c81"
+        }
+    }
 }
