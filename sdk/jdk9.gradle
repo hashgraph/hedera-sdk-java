@@ -1,5 +1,3 @@
-apply from: "./common.gradle"
-
 dependencies {
     implementation "net.javacrumbs.future-converter:future-converter-java8-guava:1.2.0"
 }
@@ -13,4 +11,12 @@ tasks.withType(JavaCompile).configureEach {
 			"9" // Avoid using Java 12 APIs
 		]
 	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = "sdk"
+                }
+        }
 }

@@ -1,5 +1,5 @@
 // For some reason we need to delcare these variables in global scope in both `build.gradle`
-// and `sdk/common.gradle` so I extracted them into another file and made both aforementioned
+// and `sdk/build.gradle` so I extracted them into another file and made both aforementioned
 // files import this one.
 group = "com.hedera.hashgraph"
 version = "2.15.0"

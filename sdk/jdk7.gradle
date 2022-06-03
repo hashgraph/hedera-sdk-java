@@ -1,5 +1,3 @@
-apply from: "./common.gradle"
-
 dependencies {
 	// NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
 	//       use CompletableFuture directly.
@@ -21,4 +19,12 @@ tasks.withType(JavaCompile).configureEach {
 			"8" // Avoid using Java 12 APIs
 		]
 	}
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			artifactId = "sdk-jdk7"
+                }
+        }
 }
