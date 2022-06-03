@@ -14,8 +14,3 @@ tasks.withType(JavaCompile).configureEach {
 		]
 	}
 }
-
-tasks.withType(Jar.class) {
-	archiveBaseName = "sdk"
-	includeEmptyDirs = false
-}
