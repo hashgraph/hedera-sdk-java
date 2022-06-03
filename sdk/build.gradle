@@ -1,8 +1,8 @@
 plugins {
 	id "java-library"
 	id "idea"
-	id "maven"
-	id "com.bmuschko.nexus" version "2.3.1"
+	id "signing"
+	id "maven-publish"
 	id "com.google.protobuf" version "0.8.18"
 }
 

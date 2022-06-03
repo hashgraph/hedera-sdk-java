@@ -37,7 +37,7 @@ publish:
         exit 1
     fi
     git clean -ffdx
-    ./gradlew sdk:uploadArchive
+    ./gradlew publishToSonatype
     perl -p -i -e "s#jdk7#jdk9#g" sdk/build.gradle
     git clean -ffdx
     rm -f sdk/src/main/java/com/hedera/hashgraph/sdk/FutureConverter.java
@@ -50,7 +50,7 @@ publish:
     perl -p -i -e "s#StreamSupport\.stream\((.*)\).map#\1.stream().map#g" $FILES
     perl -p -i -e "s#import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;#import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;\nimport net.javacrumbs.futureconverter.java8common.Java8FutureUtils;#g" $FILES
     perl -p -i -e "s#toCompletableFuture\((.*)\).handle#Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(\1)).handle#g" $FILES
-    ./gradlew sdk:uploadArchive
+    ./gradlew publishToSonatype
     git restore sdk executable-processor
 
 
