@@ -104,13 +104,14 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      */
     @Deprecated
     public FreezeTransaction setStartTime(int hour, int minute) {
-        return setStartTime(Instant.from(OffsetTime.of(hour, minute, 0, 0, ZoneOffset.UTC)));
+        return setStartTime(Instant.ofEpochMilli(((long)hour * 60 * 60 + (long)minute * 60) * 1000));
     }
 
     /**
      * @deprecated with no replacement
      */
     @Deprecated
+    @SuppressWarnings("FromTemporalAccessor")
     public Instant getEndTime() {
         return Instant.from(OffsetTime.of(endHour, endMinute, 0, 0, ZoneOffset.UTC));
     }

@@ -36,7 +36,6 @@ import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import java8.util.function.Function;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -479,6 +478,8 @@ public class MockingTest {
         Thread.sleep(5000);
 
         Assertions.assertEquals(2, service.buffer.queryRequestsReceived.size());
+
+        server.close();
     }
 
     private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {
