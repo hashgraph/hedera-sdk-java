@@ -13,7 +13,7 @@ tasks:
 
     build:
         cmds:
-            - ./gradlew compileJava
+            - ./gradlew compileJava {{.CLI_ARGS}}
     clean:
         cmds:
             - ./gradlew clean
