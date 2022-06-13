@@ -37,6 +37,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/tab_2_button"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/accountId" />
+
     <Button
         android:id="@+id/button"
         android:layout_width="wrap_content"
