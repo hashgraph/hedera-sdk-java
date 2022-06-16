@@ -1,0 +1,15 @@
+dependencies {
+    implementation "io.grpc:grpc-protobuf:1.46.0"
+
+    // Protobuf Lite is used to maintain easy compatibility with Android
+    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
+    api "com.google.protobuf:protobuf-java:3.21.1"
+}
+
+protobuf {
+    generateProtoTasks {
+        all()*.plugins {
+            grpc {}
+        }
+    }
+}

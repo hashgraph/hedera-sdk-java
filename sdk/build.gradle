@@ -7,7 +7,7 @@ plugins {
 }
 
 apply from: "../version.gradle"
-apply from: "./jdk7.gradle"
+apply from: "./sdk-jdk7.gradle"
 
 configurations {
     integrationTestImplementation.extendsFrom testImplementation

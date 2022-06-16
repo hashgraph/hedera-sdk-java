@@ -1,10 +1,4 @@
 dependencies {
-    implementation "io.grpc:grpc-protobuf-lite:1.46.0"
-
-    // Protobuf Lite is used to maintain easy compatibility with Android
-    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-    api "com.google.protobuf:protobuf-javalite:3.21.1"
-
     // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
     //       use CompletableFuture directly.
     // https://github.com/stefan-zobel/streamsupport
@@ -16,23 +10,7 @@ dependencies {
     api "org.threeten:threetenbp:1.6.0"
 }
 
-protobuf {
-    generateProtoTasks {
-        all().each { task ->
-            task.builtins {
-                java {
-                    option "lite"
-                }
-            }
-
-            task.plugins {
-                grpc {
-                    option "lite"
-                }
-            }
-        }
-    }
-}
+apply from: "./protobuf-lite.gradle"
 
 tasks.withType(JavaCompile).configureEach {
     // https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
@@ -42,13 +20,5 @@ tasks.withType(JavaCompile).configureEach {
                 "--release",
                 "8" // Avoid using Java 12 APIs
         ]
-    }
-}
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "sdk-jdk7"
-        }
     }
 }

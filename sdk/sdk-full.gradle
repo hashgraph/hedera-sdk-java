@@ -1,0 +1,10 @@
+apply from: "./jdk9.gradle"
+apply from: "./protobuf.gradle"
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "sdk-full"
+        }
+    }
+}
