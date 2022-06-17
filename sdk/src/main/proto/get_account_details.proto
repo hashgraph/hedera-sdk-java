@@ -79,13 +79,13 @@ message GetAccountDetailsResponse {
         bool deleted = 3;
 
         /**
-         * The Account ID of the account to which this is proxy staked. If proxyAccountID is null,
+         * [Deprecated] The Account ID of the account to which this is proxy staked. If proxyAccountID is null,
          * or is an invalid account, or is an account that isn't a node, then this account is
          * automatically proxy staked to a node chosen by the network, but without earning payments.
          * If the proxyAccountID account refuses to accept proxy staking , or if it is not currently
          * running a node, then it will behave as if proxyAccountID was null.
          */
-        AccountID proxy_account_id = 4;
+        AccountID proxy_account_id = 4 [deprecated = true];
 
         /**
          * The total number of tinybars proxy staked to this account

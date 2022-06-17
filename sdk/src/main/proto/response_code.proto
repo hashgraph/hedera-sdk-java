@@ -1118,9 +1118,9 @@ enum ResponseCodeEnum {
   UNEXPECTED_TOKEN_DECIMALS = 283;
 
   /**
-   * The proxy account id is invalid or does not exist.
+   * [Deprecated] The proxy account id is invalid or does not exist.
    */
-  INVALID_PROXY_ACCOUNT_ID = 284;
+  INVALID_PROXY_ACCOUNT_ID = 284 [deprecated = true];
 
   /**
    * The transfer account id in CryptoDelete transaction is invalid or does not exist.
@@ -1303,4 +1303,19 @@ enum ResponseCodeEnum {
    * A delete transaction submitted via HAPI set permanent_removal=true 
    */
   PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION = 319;
+
+  /*
+   * A CryptoCreate or ContractCreate used the deprecated proxyAccountID field.
+   */
+  PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED = 320;
+
+  /**
+   * An account set the staked_account_id to itself in CryptoUpdate or ContractUpdate transactions.
+   */
+  SELF_STAKING_IS_NOT_ALLOWED = 321;
+
+  /**
+   * The staking account id or staking node id given is invalid or does not exist.
+   */
+  INVALID_STAKING_ID = 322;
 }

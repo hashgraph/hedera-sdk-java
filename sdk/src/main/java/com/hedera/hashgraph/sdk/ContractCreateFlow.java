@@ -52,6 +52,14 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private String createBytecode = "";
     private String appendBytecode = "";
 
+    @Nullable
+    private AccountId stakedAccountId = null;
+
+    @Nullable
+    private Long stakedNodeId = null;
+
+    private boolean declineStakingReward = false;
+
     public ContractCreateFlow() {
     }
 
@@ -204,7 +212,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
     }
-  
+
     /**
      * Extract the auto renew period.
      *
@@ -283,6 +291,56 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * @return ID of the account to which this contract is staking.
+     */
+    @Nullable
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
+    }
+
+    /**
+     * @param stakedAccountId ID of the account to which this contract is staking.
+     * @return {@code this}
+     */
+    public ContractCreateFlow setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        this.stakedAccountId = stakedAccountId;
+        return this;
+    }
+
+    /**
+     * @return ID of the node this contract is staked to.
+     */
+    @Nullable
+    public Long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * @param stakedNodeId ID of the node this contract is staked to.
+     * @return {@code this}
+     */
+    public ContractCreateFlow setStakedNodeId(@Nullable Long stakedNodeId) {
+        this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     */
+    public boolean getDeclineStakingReward() {
+        return declineStakingReward;
+    }
+
+    /**
+     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * @return {@code this}
+     */
+    public ContractCreateFlow setDeclineStakingReward(boolean declineStakingReward) {
+        this.declineStakingReward = declineStakingReward;
+        return this;
+    }
+
+    /**
      * Extract the list of node account id's.
      *
      * @return                          the list of node account id's
@@ -345,7 +403,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
             .setConstructorParameters(constructorParameters)
             .setGas(gas)
             .setInitialBalance(initialBalance)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations);
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setDeclineStakingReward(declineStakingReward);
         if (adminKey != null) {
             contractCreateTx.setAdminKey(adminKey);
         }
@@ -360,6 +419,12 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         }
         if (nodeAccountIds != null) {
             contractCreateTx.setNodeAccountIds(nodeAccountIds);
+        }
+        if (stakedAccountId != null) {
+            contractCreateTx.setStakedAccountId(stakedAccountId);
+        }
+        if (stakedNodeId != null) {
+            contractCreateTx.setStakedNodeId(stakedNodeId);
         }
         return contractCreateTx;
     }
