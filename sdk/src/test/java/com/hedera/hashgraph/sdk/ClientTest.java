@@ -295,5 +295,7 @@ class ClientTest {
 
         // 20 seconds would indicate we tried 2 times to connect
         assertThat(secondsTaken).isLessThan(20);
+
+        client.close();
     }
 }

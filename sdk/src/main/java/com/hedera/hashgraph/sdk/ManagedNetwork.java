@@ -566,7 +566,9 @@ abstract class ManagedNetwork<
             }
         }
 
-        return Lists.copyOf(returnNodes.values());
+        var returnList = new ArrayList<ManagedNodeT>();
+        returnList.addAll(returnNodes.values());
+        return returnList;
     }
 
     /**

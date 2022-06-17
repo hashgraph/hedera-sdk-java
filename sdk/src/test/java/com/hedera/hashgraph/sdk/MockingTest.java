@@ -478,6 +478,8 @@ public class MockingTest {
         Thread.sleep(5000);
 
         Assertions.assertEquals(2, service.buffer.queryRequestsReceived.size());
+
+        server.close();
     }
 
     private static class TestCryptoService extends CryptoServiceGrpc.CryptoServiceImplBase implements TestService {

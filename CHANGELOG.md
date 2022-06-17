@@ -26,6 +26,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  * `ScheduleCreateTransaction.expirationTime`
  * `ScheduleCreateTransaction.waitForExpiry`
 
+## v2.15.0
+
+### Added
+
+ * `EthereumFlow`
+ * `EthereumTransactionData`
+ * `EthereumTransactionDataLegacy`
+ * `EthereumTransactionDataEip1559`
+
 ## v2.14.0
 
 ## v2.14.0-beta.3
