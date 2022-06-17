@@ -71,6 +71,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     private Integer maxAutomaticTokenAssociations = null;
     @Nullable
     private Key aliasKey;
+    @Nullable
+    private AccountId stakedAccountId = null;
+    private long stakedNodeId = -1;
 
     /**
      * Constructor.
@@ -327,6 +330,49 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     public AccountUpdateTransaction clearMemo() {
         requireNotFrozen();
         accountMemo = "";
+        return this;
+    }
+
+    /**
+     * Extract the staked account id.
+     *
+     * @return                          the staked account id
+     */
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
+    }
+
+    /**
+     * Assign the staked node id.
+     *
+     * @param accountId                 the account id to stake to
+     * @return                          {@code this}
+     */
+    public AccountUpdateTransaction setStakedAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
+        requireNotFrozen();
+        stakedAccountId = accountId;
+        return this;
+    }
+
+    /**
+     * Extract the staked node id.
+     *
+     * @return                          the staked node id
+     */
+    public long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * Assign the staked node id.
+     *
+     * @param nodeId                    the node id to stake to
+     * @return                          {@code this}
+     */
+    public AccountUpdateTransaction setStakedNodeId(long nodeId) {
+        requireNotFrozen();
+        stakedNodeId = nodeId;
         return this;
     }
 

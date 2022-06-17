@@ -45,6 +45,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private boolean receiverSigRequired = false;
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
     private int maxAutomaticTokenAssociations = 0;
+    @Nullable
+    private AccountId stakedAccountId = null;
+    private long stakedNodeId = -1;
 
     /**
      * Constructor.
@@ -237,6 +240,49 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         Objects.requireNonNull(memo);
         requireNotFrozen();
         accountMemo = memo;
+        return this;
+    }
+
+    /**
+     * Extract the staked account id.
+     *
+     * @return                          the staked account id
+     */
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
+    }
+
+    /**
+     * Assign the staked node id.
+     *
+     * @param accountId                 the account id to stake to
+     * @return                          {@code this}
+     */
+    public AccountCreateTransaction setStakedAccountId(AccountId accountId) {
+        Objects.requireNonNull(accountId);
+        requireNotFrozen();
+        stakedAccountId = accountId;
+        return this;
+    }
+
+    /**
+     * Extract the staked node id.
+     *
+     * @return                          the staked node id
+     */
+    public long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * Assign the staked node id.
+     *
+     * @param nodeId                    the node id to stake to
+     * @return                          {@code this}
+     */
+    public AccountCreateTransaction setStakedNodeId(long nodeId) {
+        requireNotFrozen();
+        stakedNodeId = nodeId;
         return this;
     }
 
