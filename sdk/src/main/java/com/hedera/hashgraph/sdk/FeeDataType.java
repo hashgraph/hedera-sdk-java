@@ -21,9 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.SubType;
 
-/**
- * Enum for the fee data types.
- */
+
 public enum FeeDataType {
     /**
      * The resource prices have no special scope

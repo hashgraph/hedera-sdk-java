@@ -139,6 +139,9 @@ public final class AccountInfo {
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
+    @Nullable
+    public final StakingInfo stakingInfo;
+
     /**
      * Constructor.
      *
@@ -182,7 +185,8 @@ public final class AccountInfo {
         int maxAutomaticTokenAssociations,
         @Nullable PublicKey aliasKey,
         LedgerId ledgerId,
-        long ethereumNonce
+        long ethereumNonce,
+        @Nullable StakingInfo stakingInfo
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -207,6 +211,7 @@ public final class AccountInfo {
         this.hbarAllowances = Collections.emptyList();
         this.tokenAllowances = Collections.emptyList();
         this.tokenNftAllowances = Collections.emptyList();
+        this.stakingInfo = stakingInfo;
     }
 
     /**
@@ -256,7 +261,8 @@ public final class AccountInfo {
             accountInfo.getMaxAutomaticTokenAssociations(),
             aliasKey,
             LedgerId.fromByteString(accountInfo.getLedgerId()),
-            accountInfo.getEthereumNonce()
+            accountInfo.getEthereumNonce(),
+            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null
         );
     }
 
@@ -311,6 +317,10 @@ public final class AccountInfo {
             accountInfoBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         }
 
+        if (stakingInfo != null) {
+            accountInfoBuilder.setStakingInfo(stakingInfo.toProtobuf());
+        }
+
         return accountInfoBuilder.build();
     }
 
@@ -337,6 +347,7 @@ public final class AccountInfo {
             .add("aliasKey", aliasKey)
             .add("ledgerId", ledgerId)
             .add("ethereumNonce", ethereumNonce)
+            .add("stakingInfo", stakingInfo)
             .toString();
     }
 
