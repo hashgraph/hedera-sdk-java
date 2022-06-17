@@ -1134,6 +1134,11 @@ enum HederaFunctionality {
      * Ethereum Transaction
      */
     EthereumTransaction = 84;
+
+    /**
+     * Updates the staking info at the end of staking period to indicate new staking period has started.
+     */
+    NodeStakeUpdate = 85;
 }
 
 /**
@@ -1362,9 +1367,9 @@ message NodeAddress {
     string description = 9;
 
     /**
-     * The amount of tinybars staked to the node
+     * [Deprecated] The amount of tinybars staked to the node
      */
-    int64 stake = 10;
+    int64 stake = 10 [deprecated = true];
 }
 
 /**
@@ -1531,4 +1536,48 @@ message TokenBalances {
 message TokenAssociation {
     TokenID token_id = 1;  // The token involved in the association
     AccountID account_id = 2; // The account involved in the association
+}
+
+/**
+ * Staking metadata for an account or a contract returned in CryptoGetInfo or ContractGetInfo queries
+ */
+message StakingInfo {
+
+    /**
+     * If true, this account or contract declined to receive a staking reward.
+     */
+    bool decline_reward = 1;
+
+    /**
+     * The staking period during which either the staking settings for this account or contract changed (such as starting
+     * staking or changing staked_node_id) or the most recent reward was earned, whichever is later. If this account or contract
+     * is not currently staked to a node, then this field is not set.
+     */
+    Timestamp stake_period_start = 2;
+
+    /**
+     * The amount in tinybars that will be received in the next reward situation.
+     */
+    int64 pending_reward = 3;
+
+    /**
+     * The total of balance of all accounts staked to this account or contract.
+     */
+    int64 staked_to_me = 4;
+
+    /**
+     * ID of the account or node to which this account or contract is staking.
+     */
+    oneof staked_id {
+
+        /**
+         * The account to which this account or contract is staking.
+         */
+        AccountID staked_account_id = 5;
+
+        /**
+         * The ID of the node this account or contract is staked to.
+         */
+        int64 staked_node_id = 6;
+    }
 }

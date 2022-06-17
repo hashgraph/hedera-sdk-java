@@ -21,9 +21,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
 
-/**
- * Enum for the request type.
- */
 public enum RequestType {
     /**
      * UNSPECIFIED - Need to keep first value as unspecified because first element is ignored and
@@ -377,7 +374,12 @@ public enum RequestType {
     /**
      * Ethereum Transaction
      */
-    ETHEREUM_TRANSACTION(HederaFunctionality.EthereumTransaction);
+    ETHEREUM_TRANSACTION(HederaFunctionality.EthereumTransaction),
+
+    /**
+     * Updates the staking info at the end of staking period to indicate new staking period has started.
+     */
+    NODE_STAKE_UPDATE(HederaFunctionality.NodeStakeUpdate);
 
     final HederaFunctionality code;
 
@@ -529,6 +531,8 @@ public enum RequestType {
                 return GET_ACCOUNT_DETAILS;
             case EthereumTransaction:
                 return ETHEREUM_TRANSACTION;
+            case NodeStakeUpdate:
+                return NODE_STAKE_UPDATE;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -679,6 +683,8 @@ public enum RequestType {
                 return "GET_ACCOUNT_DETAILS";
             case ETHEREUM_TRANSACTION:
                 return "ETHEREUM_TRANSACTION";
+            case NODE_STAKE_UPDATE:
+                return "NODE_STAKE_UPDATE";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

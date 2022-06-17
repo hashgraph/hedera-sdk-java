@@ -83,8 +83,14 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private FileId bytecodeFileId = null;
     @Nullable
     private byte[] bytecode = null;
+
+    /**
+     * @deprecated with no replacement
+     */
     @Nullable
+    @Deprecated
     private AccountId proxyAccountId = null;
+
     @Nullable
     private Key adminKey = null;
     private long gas = 0;
@@ -94,6 +100,14 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     private Duration autoRenewPeriod = null;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
+
+    @Nullable
+    private AccountId stakedAccountId = null;
+
+    @Nullable
+    private Long stakedNodeId = null;
+
+    private boolean declineStakingReward = false;
 
     /**
      * Constructor.
@@ -249,6 +263,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Extract the proxy account id.
      *
      * @return                          the proxy account id
@@ -259,6 +275,8 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Sets the ID of the account to which this account is proxy staked.
      * <p>
      * If proxyAccountID is null, or is an invalid account, or is an account that isn't a node,
@@ -375,6 +393,56 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * @return ID of the account to which this contract is staking.
+     */
+    @Nullable
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
+    }
+
+    /**
+     * @param stakedAccountId ID of the account to which this contract is staking.
+     * @return {@code this}
+     */
+    public ContractCreateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        this.stakedAccountId = stakedAccountId;
+        return this;
+    }
+
+    /**
+     * @return ID of the node this contract is staked to.
+     */
+    @Nullable
+    public Long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * @param stakedNodeId ID of the node this contract is staked to.
+     * @return {@code this}
+     */
+    public ContractCreateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     */
+    public boolean getDeclineStakingReward() {
+        return declineStakingReward;
+    }
+
+    /**
+     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * @return {@code this}
+     */
+    public ContractCreateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        this.declineStakingReward = declineStakingReward;
+        return this;
+    }
+
+    /**
      * Build the transaction body.
      *
      * @return {@link ContractCreateTransactionBody}
@@ -401,6 +469,15 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         builder.setInitialBalance(initialBalance.toTinybars());
         builder.setConstructorParameters(ByteString.copyFrom(constructorParameters));
         builder.setMemo(contractMemo);
+        builder.setDeclineReward(declineStakingReward);
+
+        if (stakedAccountId != null) {
+            builder.setStakedAccountId(stakedAccountId.toProtobuf());
+        }
+
+        if (stakedNodeId != null) {
+            builder.setStakedNodeId(stakedNodeId);
+        }
 
         return builder;
     }
@@ -413,6 +490,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
+        }
+
+        if (stakedAccountId != null) {
+            stakedAccountId.validateChecksum(client);
         }
     }
 
@@ -442,6 +523,15 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         initialBalance = Hbar.fromTinybars(body.getInitialBalance());
         constructorParameters = body.getConstructorParameters().toByteArray();
         contractMemo = body.getMemo();
+        declineStakingReward = body.getDeclineReward();
+
+        if (body.hasStakedAccountId()) {
+            stakedAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
+        }
+
+        if (body.hasStakedNodeId()) {
+            stakedNodeId = body.getStakedNodeId();
+        }
     }
 
     @Override
