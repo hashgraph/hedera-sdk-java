@@ -25,7 +25,6 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
-import java8.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
