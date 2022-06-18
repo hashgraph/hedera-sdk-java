@@ -357,6 +357,14 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction clearStakedAccountId() {
+        this.stakedAccountId = new AccountId(0);
+        return this;
+    }
+
+    /**
      * @return ID of the node this contract is staked to.
      */
     @Nullable
@@ -370,6 +378,14 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      */
     public AccountUpdateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
         this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction clearStakedNodeId() {
+        this.stakedNodeId = Long.valueOf(-1);
         return this;
     }
 

@@ -22,6 +22,7 @@ import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AccountInfo;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
+import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
@@ -32,7 +33,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class StakingExample {
+public class StakingWithUpdateExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -41,7 +42,7 @@ public class StakingExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private StakingExample() {
+    private StakingWithUpdateExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
@@ -85,6 +86,24 @@ public class StakingExample {
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
         AccountInfo info = new AccountInfoQuery()
+            .setAccountId(newAccountId)
+            .execute(client);
+
+        System.out.println("staking info: " + info.stakingInfo);
+
+        // Use the `AccountUpdateTransaction` to unstake the account's hbars
+        //
+        // If this succeeds then we should no longer have a staked account ID
+        new AccountUpdateTransaction()
+            .setAccountId(newAccountId)
+            .clearStakedAccountId()
+            .freezeWith(client)
+            .sign(newKey)
+            .execute(client);
+
+        // Query the account info, it should show the staked account ID
+        // to be 0.0.3 just like what we set it to
+        info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
