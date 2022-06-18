@@ -72,6 +72,15 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     @Nullable
     private Key aliasKey;
 
+    @Nullable
+    private AccountId stakedAccountId = null;
+
+    @Nullable
+    private Long stakedNodeId = null;
+
+    @Nullable
+    private Boolean declineStakingReward = null;
+
     /**
      * Constructor.
      */
@@ -330,6 +339,66 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * @return ID of the account to which this contract is staking.
+     */
+    @Nullable
+    public AccountId getStakedAccountId() {
+        return stakedAccountId;
+    }
+
+    /**
+     * @param stakedAccountId ID of the account to which this contract is staking.
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        this.stakedAccountId = stakedAccountId;
+        return this;
+    }
+
+    /**
+     * @return ID of the node this contract is staked to.
+     */
+    @Nullable
+    public Long getStakedNodeId() {
+        return stakedNodeId;
+    }
+
+    /**
+     * @param stakedNodeId ID of the node this contract is staked to.
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        this.stakedNodeId = stakedNodeId;
+        return this;
+    }
+
+    /**
+     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     */
+    public boolean getDeclineStakingReward() {
+        return declineStakingReward;
+    }
+
+    /**
+     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        this.declineStakingReward = declineStakingReward;
+        return this;
+    }
+
+    /**
+     * Clear the staking reward
+     *
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction clearDeclineStakingReward() {
+        this.declineStakingReward = null;
+        return this;
+    }
+
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
@@ -337,6 +406,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
         if (proxyAccountId != null) {
             proxyAccountId.validateChecksum(client);
+        }
+
+        if (stakedAccountId != null) {
+            stakedAccountId.validateChecksum(client);
         }
     }
 
@@ -369,6 +442,18 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
         if (body.hasMaxAutomaticTokenAssociations()) {
             maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+        }
+
+        if (body.hasDeclineReward()) {
+            declineStakingReward = body.getDeclineReward().getValue();
+        }
+
+        if (body.hasStakedAccountId()) {
+            stakedAccountId = AccountId.fromProtobuf(body.getStakedAccountId());
+        }
+
+        if (body.hasStakedNodeId()) {
+            stakedNodeId = body.getStakedNodeId();
         }
     }
 
@@ -408,6 +493,19 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (maxAutomaticTokenAssociations != null) {
             builder.setMaxAutomaticTokenAssociations(Int32Value.of(maxAutomaticTokenAssociations));
         }
+
+        if (stakedAccountId != null) {
+            builder.setStakedAccountId(stakedAccountId.toProtobuf());
+        }
+
+        if (stakedNodeId != null) {
+            builder.setStakedNodeId(stakedNodeId);
+        }
+
+        if (declineStakingReward != null) {
+            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+        }
+
         return builder;
     }
 

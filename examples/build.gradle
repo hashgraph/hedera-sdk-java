@@ -1,35 +1,35 @@
 dependencies {
-	// implementation "com.hedera.hashgraph:sdk:2.0.3"
-	implementation project(":sdk")
+    // implementation "com.hedera.hashgraph:sdk:2.0.3"
+    implementation project(":sdk")
 
-	implementation "com.google.code.gson:gson:2.9.0"
-	implementation "org.slf4j:slf4j-simple:1.7.36"
-	implementation "io.grpc:grpc-netty-shaded:1.46.0"
-	implementation "io.github.cdimascio:java-dotenv:5.3.1"
-	implementation "com.google.errorprone:error_prone_core:2.14.0"
+    implementation "com.google.code.gson:gson:2.9.0"
+    implementation "org.slf4j:slf4j-simple:1.7.36"
+    implementation "io.grpc:grpc-netty-shaded:1.47.0"
+    implementation "io.github.cdimascio:java-dotenv:5.3.1"
+    implementation "com.google.errorprone:error_prone_core:2.14.0"
 }
 
 java {
-	sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
-	targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
 }
 
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
-	if (taskName.startsWith("run")) {
-		task(taskName, type: JavaExec) {
-			classpath = sourceSets.main.runtimeClasspath
-			main = (taskName - "run") + "Example"
-			standardInput(System.in)
+    if (taskName.startsWith("run")) {
+        task(taskName, type: JavaExec) {
+            classpath = sourceSets.main.runtimeClasspath
+            main = (taskName - "run") + "Example"
+            standardInput(System.in)
 
-			// NOTE: Uncomment to enable trace logs in the SDK during the examples
-			// jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
-		}
-	}
+            // NOTE: Uncomment to enable trace logs in the SDK during the examples
+            // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+        }
+    }
 }
 
 tasks.withType(JavaCompile).configureEach {
-	options.errorprone {
-		disable("DefaultPackage")
-		disable("SystemOut")
-	}
+    options.errorprone {
+        disable("DefaultPackage")
+        disable("SystemOut")
+    }
 }
