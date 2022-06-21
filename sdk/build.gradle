@@ -14,6 +14,18 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
+task sourcesJar(type: Jar) {
+    dependsOn("assemble")
+    duplicatesStrategy "exclude"
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
+
 dependencies {
     // https://github.com/bsideup/jabel
     annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
@@ -191,6 +203,8 @@ publishing {
             }
 
             from(components.java)
+            artifact sourcesJar
+            artifact javadocJar
         }
     }
 }
