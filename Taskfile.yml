@@ -31,7 +31,7 @@ tasks:
 
     "test:unit":
         cmds:
-            - ./gradlew test "{{.CLI_ARGS}}"
+            - ./gradlew test {{.CLI_ARGS}}
             
     "test:integration":
         cmds:
