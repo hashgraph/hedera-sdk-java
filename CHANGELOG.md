@@ -5,21 +5,44 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.16.0
+
+### Added
+
+ * `StakingInfo`
+ * `AccountCreateTransaction.stakedAccountId`
+ * `AccountCreateTransaction.stakedNodeId`
+ * `AccountCreateTransaction.declineStakingReward`
+ * `ContractCreateTransaction.stakedAccountId`
+ * `ContractCreateTransaction.stakedNodeId`
+ * `ContractCreateTransaction.declineStakingReward`
+ * `AccountUpdateTransaction.stakedAccountId`
+ * `AccountUpdateTransaction.stakedNodeId`
+ * `AccountUpdateTransaction.declineStakingReward`
+ * `ContractUpdateTransaction.stakedAccountId`
+ * `ContractUpdateTransaction.stakedNodeId`
+ * `ContractUpdateTransaction.declineStakingReward`
+ * `TransactionRecord.paidStakingRewards`
+ * `ScheduleCreateTransaction.expirationTime`
+ * `ScheduleCreateTransaction.waitForExpiry`
+ * Protobuf requests and responses will be logged in hex
+ * There should be three artifacts now, `sdk-jdk7`, `sdk`, and `sdk-full`
+
 ## v2.16.0-beta.1
 
 ### Added
 
  * `StakingInfo`
- * `AccountCreateTransaction.stakedNodeAccountId`
+ * `AccountCreateTransaction.stakedAccountId`
  * `AccountCreateTransaction.stakedNodeId`
  * `AccountCreateTransaction.declineStakingReward`
- * `ContractCreateTransaction.stakedNodeContractId`
+ * `ContractCreateTransaction.stakedAccountId`
  * `ContractCreateTransaction.stakedNodeId`
  * `ContractCreateTransaction.declineStakingReward`
- * `AccountUpdateTransaction.stakedNodeAccountId`
+ * `AccountUpdateTransaction.stakedAccountId`
  * `AccountUpdateTransaction.stakedNodeId`
  * `AccountUpdateTransaction.declineStakingReward`
- * `ContractUpdateTransaction.stakedNodeContractId`
+ * `ContractUpdateTransaction.stakedAccountId`
  * `ContractUpdateTransaction.stakedNodeId`
  * `ContractUpdateTransaction.declineStakingReward`
  * `TransactionRecord.paidStakingRewards`
