@@ -85,7 +85,9 @@ public final class ScheduleInfo {
      * The scheduled transaction (inner transaction).
      */
     final SchedulableTransactionBody transactionBody;
-    final LedgerId ledgerId;
+
+    @Nullable
+    public final LedgerId ledgerId;
 
     /**
      * When set to true, the transaction will be evaluated for execution at expiration_time instead
@@ -95,7 +97,7 @@ public final class ScheduleInfo {
      *
      * Note: this field is unused until Long Term Scheduled Transactions are enabled.
      */
-    final boolean waitForExpiry;
+    public final boolean waitForExpiry;
 
     /**
      * Constructor.
