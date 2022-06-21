@@ -88,6 +88,16 @@ public final class ScheduleInfo {
     final LedgerId ledgerId;
 
     /**
+     * When set to true, the transaction will be evaluated for execution at expiration_time instead
+     * of when all required signatures are received.
+     * When set to false, the transaction will execute immediately after sufficient signatures are received
+     * to sign the contained transaction. During the initial ScheduleCreate transaction or via ScheduleSign transactions.
+     *
+     * Note: this field is unused until Long Term Scheduled Transactions are enabled.
+     */
+    final boolean waitForExpiry;
+
+    /**
      * Constructor.
      *
      * @param scheduleId                the schedule id
@@ -102,6 +112,7 @@ public final class ScheduleInfo {
      * @param executed                  the time transaction was executed
      * @param deleted                   the time it was deleted
      * @param ledgerId                  the ledger id
+     * @param waitForExpiry             the wait for expiry field
      */
     private ScheduleInfo(
         ScheduleId scheduleId,
@@ -115,7 +126,8 @@ public final class ScheduleInfo {
         @Nullable Instant expirationTime,
         @Nullable Instant executed,
         @Nullable Instant deleted,
-        LedgerId ledgerId
+        LedgerId ledgerId,
+        boolean waitForExpiry
     ) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
@@ -129,6 +141,7 @@ public final class ScheduleInfo {
         this.executedAt = executed;
         this.deletedAt = deleted;
         this.ledgerId = ledgerId;
+        this.waitForExpiry = waitForExpiry;
     }
 
     /**
@@ -160,7 +173,8 @@ public final class ScheduleInfo {
             info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null,
             info.hasExecutionTime() ? InstantConverter.fromProtobuf(info.getExecutionTime()) : null,
             info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null,
-            LedgerId.fromByteString(info.getLedgerId())
+            LedgerId.fromByteString(info.getLedgerId()),
+            info.getWaitForExpiry()
         );
     }
 
@@ -211,6 +225,7 @@ public final class ScheduleInfo {
             .setSigners(signatories.toProtobuf())
             .setMemo(memo)
             .setLedgerId(ledgerId.toByteString())
+            .setWaitForExpiry(waitForExpiry)
             .build();
     }
 
@@ -237,6 +252,7 @@ public final class ScheduleInfo {
             .add("executedAt", executedAt)
             .add("deletedAt", deletedAt)
             .add("ledgerId", ledgerId)
+            .add("waitForExpiry", waitForExpiry)
             .toString();
     }
 
