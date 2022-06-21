@@ -20,6 +20,8 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.protobuf.ByteString;
+import com.google.protobuf.MessageLite;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.MethodDescriptor;
@@ -27,6 +29,7 @@ import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
+import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
@@ -52,7 +55,7 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
  * @param <ResponseT>                   the response
  * @param <O>                           the O type
  */
-abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements WithExecute<O> {
+abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, ResponseT extends MessageLite, O> implements WithExecute<O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -614,6 +617,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT, ResponseT, O> implements W
         }
 
         O mapResponse() {
+            if (request != null && response != null) {
+                logger.trace("Sent protobuf {} and received protobuf {}", Hex.toHexString(request.toByteArray()), Hex.toHexString(response.toByteArray()));
+            }
             // successful response from Hedera
             return Executable.this.mapResponse(response, node.getAccountId(), request);
         }
