@@ -34,7 +34,7 @@ public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<R
 
     /**
      * If provided and is positive, returns a 32-bit pseudorandom number from the given range in the transaction record.
-     * If not set or set to zero, will return a 384-bit pseudorandom number in the record.
+     * If not set or set to zero, will return a 384-bit pseudorandom data in the record.
      */
     @Nullable
     public Integer range = null;
