@@ -73,7 +73,7 @@ public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<R
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-
+        throw new UnsupportedOperationException("cannot schedule RngTransaction");
     }
 
     @Override
