@@ -83,7 +83,7 @@ public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<R
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return null;
+        return UtilService.getRandomGenerateMethod();
     }
 
 
