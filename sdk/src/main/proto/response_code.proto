@@ -1318,4 +1318,19 @@ enum ResponseCodeEnum {
    * The staking account id or staking node id given is invalid or does not exist.
    */
   INVALID_STAKING_ID = 322;
+
+  /**
+   * Native staking, while implemented, has not yet enabled by the council.
+   */
+  STAKING_NOT_ENABLED = 323;
+
+  /**
+   * The range provided in RandomGenerate transaction is negative.
+   */
+  INVALID_RANDOM_GENERATE_RANGE = 324;
+
+  /**
+   * The maximum number of entities allowed in the current price regime have been created.
+   */
+  MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED = 325;
 }

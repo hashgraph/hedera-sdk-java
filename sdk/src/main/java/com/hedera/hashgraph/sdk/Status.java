@@ -1468,7 +1468,22 @@ public enum Status {
     /**
      * The staking account id or staking node id given is invalid or does not exist.
      */
-    INVALID_STAKING_ID(ResponseCodeEnum.INVALID_STAKING_ID);
+    INVALID_STAKING_ID(ResponseCodeEnum.INVALID_STAKING_ID),
+
+    /**
+     * Native staking, while implemented, has not yet enabled by the council.
+     */
+    STAKING_NOT_ENABLED(ResponseCodeEnum.STAKING_NOT_ENABLED),
+
+    /**
+     * The range provided in RandomGenerate transaction is negative.
+     */
+    INVALID_RANDOM_GENERATE_RANGE(ResponseCodeEnum.INVALID_RANDOM_GENERATE_RANGE),
+
+    /**
+     * The maximum number of entities allowed in the current price regime have been created.
+     */
+    MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED(ResponseCodeEnum.MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED);
 
     final ResponseCodeEnum code;
 
@@ -2040,6 +2055,12 @@ public enum Status {
                 return SELF_STAKING_IS_NOT_ALLOWED;
             case INVALID_STAKING_ID:
                 return INVALID_STAKING_ID;
+            case STAKING_NOT_ENABLED:
+                return STAKING_NOT_ENABLED;
+            case INVALID_RANDOM_GENERATE_RANGE:
+                return INVALID_RANDOM_GENERATE_RANGE;
+            case MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED:
+                return MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

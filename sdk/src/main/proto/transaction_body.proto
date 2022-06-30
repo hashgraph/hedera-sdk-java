@@ -81,6 +81,7 @@ import "schedule_delete.proto";
 import "schedule_sign.proto";
 
 import "node_stake_update.proto";
+import "random_generate.proto";
 
 /**
  * A single transaction. All transaction types are possible here.
@@ -343,5 +344,10 @@ message TransactionBody {
      * Updates the staking info at the end of staking period to indicate new staking period has started.
      */
     NodeStakeUpdateTransactionBody node_stake_update = 51;
+
+    /**
+     * Generates a pseudorandom number.
+     */
+    RandomGenerateTransactionBody random_generate = 52;
   }
 }

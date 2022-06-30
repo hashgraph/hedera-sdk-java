@@ -21,9 +21,9 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.RandomGenerateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hedera.hashgraph.sdk.proto.UtilServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
@@ -76,11 +76,9 @@ public class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<RngTran
         return builder;
     }
 
-    // TODO: Need to implement the following methods
-
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-//        bodyBuilder.setRandomGenerate(build());
+        bodyBuilder.setRandomGenerate(build());
     }
 
     @Override
@@ -94,11 +92,6 @@ public class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<RngTran
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-//        return TokenServiceGrpc.getr  .getRandomGenerateMethod();
-//        return UtilService.getRandomGenerateMethod();
-        return null;
+        return UtilServiceGrpc.getRandomGenerateMethod();
     }
-
-
-
 }

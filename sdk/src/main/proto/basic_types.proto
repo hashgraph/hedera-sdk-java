@@ -6,7 +6,7 @@ package proto;
  * ‌
  * Hedera Network Services Protobuf
  * ​
- * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
+ * Copyright (C) 2018 - 2022 Hedera Hashgraph, LLC
  * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1139,6 +1139,11 @@ enum HederaFunctionality {
      * Updates the staking info at the end of staking period to indicate new staking period has started.
      */
     NodeStakeUpdate = 85;
+
+    /**
+     * Generates a pseudorandom number.
+     */
+    RandomGenerate = 86;
 }
 
 /**
