@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.RandomGenerateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -30,27 +31,19 @@ import javax.annotation.Nullable;
 /**
  * Random Number Generator Transaction.
  */
-public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<RngTransaction> {
+public class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<RngTransaction> {
 
     /**
      * If provided and is positive, returns a 32-bit pseudorandom number from the given range in the transaction record.
      * If not set or set to zero, will return a 384-bit pseudorandom data in the record.
      */
     @Nullable
-    public Integer range = null;
+    private Integer range = null;
 
     /**
      * Constructor.
      */
     public RngTransaction() {
-    }
-    /**
-     * Assign the range.
-     *
-     * @param range                     if > 0 32 bit else 384 bit
-     */
-    public RngTransaction(Integer range) {
-        this.range = range;
     }
 
     /**
@@ -64,11 +57,30 @@ public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<R
         return this;
     }
 
+    /**
+     * Retrieve the range.
+     *
+     * @return                          the range
+     */
+    public Integer getRange() {
+        return range;
+    }
+
+    RandomGenerateTransactionBody.Builder build() {
+        var builder = RandomGenerateTransactionBody.newBuilder();
+
+        if (range != null) {
+            builder.setRange(range);
+        }
+
+        return builder;
+    }
+
     // TODO: Need to implement the following methods
 
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-
+//        bodyBuilder.setRandomGenerate(build());
     }
 
     @Override
@@ -78,12 +90,13 @@ public final class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<R
 
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
-        // validateChecksums(client);
     }
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return UtilService.getRandomGenerateMethod();
+//        return TokenServiceGrpc.getr  .getRandomGenerateMethod();
+//        return UtilService.getRandomGenerateMethod();
+        return null;
     }
 
 

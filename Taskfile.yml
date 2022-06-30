@@ -32,7 +32,7 @@ tasks:
     "test:unit":
         cmds:
             - ./gradlew test {{.CLI_ARGS}}
-            
+
     "test:integration":
         cmds:
             - ./gradlew -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID -PCONFIG_FILE=$CONFIG_FILE integrationTest "{{.CLI_ARGS}}"
@@ -40,11 +40,11 @@ tasks:
     "update:snapshots":
         cmds:
             - rm sdk/src/test/java/com/hedera/hashgraph/sdk/*.snap
-            - ./gradlew test 
+            - ./gradlew test
 
     "update:proto":
         cmds:
-            - ./scripts/update_protobufs.py master
+            - ./scripts/update_protobufs.py main
 
     update:
         deps:
