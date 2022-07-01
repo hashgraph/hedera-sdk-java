@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 /**
  * Random Number Generator Transaction.
  */
-public class RngTransaction extends com.hedera.hashgraph.sdk.Transaction<RngTransaction> {
+public class RngTransaction extends Transaction<RngTransaction> {
 
     /**
      * If provided and is positive, returns a 32-bit pseudorandom number from the given range in the transaction record.
