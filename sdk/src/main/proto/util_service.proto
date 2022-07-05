@@ -34,5 +34,5 @@ service UtilService {
   /**
    * Generates a pseudorandom number.
    */
-  rpc randomGenerate (Transaction) returns (TransactionResponse);
+  rpc prng (Transaction) returns (TransactionResponse);
 }

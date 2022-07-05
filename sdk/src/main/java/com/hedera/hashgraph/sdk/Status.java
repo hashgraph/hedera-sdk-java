@@ -1476,14 +1476,19 @@ public enum Status {
     STAKING_NOT_ENABLED(ResponseCodeEnum.STAKING_NOT_ENABLED),
 
     /**
-     * The range provided in RandomGenerate transaction is negative.
+     * The range provided in PRNG transaction is negative.
      */
-    INVALID_RANDOM_GENERATE_RANGE(ResponseCodeEnum.INVALID_RANDOM_GENERATE_RANGE),
+    INVALID_PRNG_RANGE(ResponseCodeEnum.INVALID_PRNG_RANGE),
 
     /**
      * The maximum number of entities allowed in the current price regime have been created.
      */
-    MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED(ResponseCodeEnum.MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED);
+    MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED(ResponseCodeEnum.MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED),
+
+    /**
+     * The full prefix signature for precompile is not valid
+     */
+    INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE(ResponseCodeEnum.INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE);
 
     final ResponseCodeEnum code;
 
@@ -2057,10 +2062,12 @@ public enum Status {
                 return INVALID_STAKING_ID;
             case STAKING_NOT_ENABLED:
                 return STAKING_NOT_ENABLED;
-            case INVALID_RANDOM_GENERATE_RANGE:
-                return INVALID_RANDOM_GENERATE_RANGE;
+            case INVALID_PRNG_RANGE:
+                return INVALID_PRNG_RANGE;
             case MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED:
                 return MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED;
+            case INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE:
+                return INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RngTransactionTest {
+public class PrngTransactionTest {
 
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
@@ -46,8 +46,8 @@ public class RngTransactionTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    private RngTransaction spawnTestTransaction() {
-        return new RngTransaction()
+    private PrngTransaction spawnTestTransaction() {
+        return new PrngTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
@@ -55,8 +55,8 @@ public class RngTransactionTest {
             .sign(unusedPrivateKey);
     }
 
-    private RngTransaction spawnTestTransaction2() {
-        return new RngTransaction()
+    private PrngTransaction spawnTestTransaction2() {
+        return new PrngTransaction()
             .setRange(100)
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))

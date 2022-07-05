@@ -28,7 +28,7 @@ option java_multiple_files = true;
 /**
  * Generates a pseudorandom number
  */
-message RandomGenerateTransactionBody {
+message PrngTransactionBody {
   /**
    * If provided and is positive, returns a 32-bit pseudorandom number from the given range in the transaction record.
    * If not set or set to zero, will return a 384-bit pseudorandom number in the record.

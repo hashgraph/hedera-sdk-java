@@ -19,11 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.RandomGenerateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.UtilServiceGrpc;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
@@ -31,7 +28,7 @@ import javax.annotation.Nullable;
 /**
  * Random Number Generator Transaction.
  */
-public class RngTransaction extends Transaction<RngTransaction> {
+public class PrngTransaction extends Transaction<PrngTransaction> {
 
     /**
      * If provided and is positive, returns a 32-bit pseudorandom number from the given range in the transaction record.
@@ -43,7 +40,7 @@ public class RngTransaction extends Transaction<RngTransaction> {
     /**
      * Constructor.
      */
-    public RngTransaction() {
+    public PrngTransaction() {
     }
 
     /**
@@ -52,7 +49,7 @@ public class RngTransaction extends Transaction<RngTransaction> {
      * @param range                     if > 0 32 bit else 384 bit
      * @return {@code this}
      */
-    public RngTransaction setRange(Integer range) {
+    public PrngTransaction setRange(Integer range) {
         this.range = range;
         return this;
     }
@@ -66,8 +63,8 @@ public class RngTransaction extends Transaction<RngTransaction> {
         return range;
     }
 
-    RandomGenerateTransactionBody.Builder build() {
-        var builder = RandomGenerateTransactionBody.newBuilder();
+    PrngTransactionBody.Builder build() {
+        var builder = PrngTransactionBody.newBuilder();
 
         if (range != null) {
             builder.setRange(range);
@@ -78,7 +75,7 @@ public class RngTransaction extends Transaction<RngTransaction> {
 
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setRandomGenerate(build());
+        bodyBuilder.setPrng(build());
     }
 
     @Override
@@ -92,6 +89,6 @@ public class RngTransaction extends Transaction<RngTransaction> {
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return UtilServiceGrpc.getRandomGenerateMethod();
+        return UtilServiceGrpc.getPrngMethod();
     }
 }

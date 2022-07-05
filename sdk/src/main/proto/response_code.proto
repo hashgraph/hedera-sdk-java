@@ -1325,12 +1325,17 @@ enum ResponseCodeEnum {
   STAKING_NOT_ENABLED = 323;
 
   /**
-   * The range provided in RandomGenerate transaction is negative.
+   * The range provided in PRNG transaction is negative.
    */
-  INVALID_RANDOM_GENERATE_RANGE = 324;
+  INVALID_PRNG_RANGE = 324;
 
   /**
    * The maximum number of entities allowed in the current price regime have been created.
    */
   MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED = 325;
+
+  /**
+ * The full prefix signature for precompile is not valid
+ */
+  INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE = 326;
 }

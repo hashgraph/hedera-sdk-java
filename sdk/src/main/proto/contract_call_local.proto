@@ -96,48 +96,45 @@ message ContractFunctionResult {
 
     /**
      * [DEPRECATED] the list of smart contracts that were created by the function call.
-     *
-     * The created ids will now _also_ be externalized through internal transaction
-     * records, where each record has its alias field populated with the new contract's
-     * EVM address. (This is needed for contracts created with CREATE2, since
-     * there is no longer a simple relationship between the new contract's 0.0.X id
+     * 
+     * The created ids will now _also_ be externalized through internal transaction 
+     * records, where each record has its alias field populated with the new contract's 
+     * EVM address. (This is needed for contracts created with CREATE2, since 
+     * there is no longer a simple relationship between the new contract's 0.0.X id 
      * and its Solidity address.)
      */
     repeated ContractID createdContractIDs = 7 [deprecated=true];
 
-    /**
-     * the list of state reads and changes caused by this function call
-     */
-    repeated ContractStateChange state_changes = 8;
+    reserved 8;
 
     /**
-     * The new contract's 20-byte EVM address. Only populated after release 0.23,
-     * where each created contract will have its own record. (This is an important
-     * point--the field is not <tt>repeated</tt> because there will be a separate
+     * The new contract's 20-byte EVM address. Only populated after release 0.23, 
+     * where each created contract will have its own record. (This is an important 
+     * point--the field is not <tt>repeated</tt> because there will be a separate 
      * child record for each created contract.)
-     *
+     * 
      * Every contract has an EVM address determined by its <tt>shard.realm.num</tt> id.
      * This address is as follows:
      *   <ol>
      *     <li>The first 4 bytes are the big-endian representation of the shard.</li>
      *     <li>The next 8 bytes are the big-endian representation of the realm.</li>
      *     <li>The final 8 bytes are the big-endian representation of the number.</li>
-     *   </ol>
-     *
-     * Contracts created via CREATE2 have an <b>additional, primary address</b> that is
-     * derived from the <a href="https://eips.ethereum.org/EIPS/eip-1014">EIP-1014</a>
-     * specification, and does not have a simple relation to a <tt>shard.realm.num</tt> id.
-     *
-     * (Please do note that CREATE2 contracts can also be referenced by the three-part
+     *   </ol>  
+     * 
+     * Contracts created via CREATE2 have an <b>additional, primary address</b> that is 
+     * derived from the <a href="https://eips.ethereum.org/EIPS/eip-1014">EIP-1014</a> 
+     * specification, and does not have a simple relation to a <tt>shard.realm.num</tt> id. 
+     * 
+     * (Please do note that CREATE2 contracts can also be referenced by the three-part 
      * EVM address described above.)
      */
     google.protobuf.BytesValue evm_address = 9;
 
     /**
-     * The amount of gas available for the call, aka the gasLimit.
+     * The amount of gas available for the call, aka the gasLimit. 
      *
      * This field should only be populated when the paired TransactionBody in the record stream is not a
-     * ContractCreateTransactionBody or a ContractCallTransactionBody.
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     int64 gas = 10;
 
@@ -145,7 +142,7 @@ message ContractFunctionResult {
      * Number of tinybars sent (the function must be payable if this is nonzero).
      *
      * This field should only be populated when the paired TransactionBody in the record stream is not a
-     * ContractCreateTransactionBody or a ContractCallTransactionBody.
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     int64 amount = 11;
 
@@ -153,7 +150,7 @@ message ContractFunctionResult {
      * The parameters passed into the contract call.
      *
      * This field should only be populated when the paired TransactionBody in the record stream is not a
-     * ContractCreateTransactionBody or a ContractCallTransactionBody.
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     bytes functionParameters = 12;
 
@@ -161,7 +158,7 @@ message ContractFunctionResult {
      * The account that is the "sender." If not present it is the accountId from the transactionId.
      *
      * This field should only be populated when the paired TransactionBody in the record stream is not a
-     * ContractCreateTransactionBody or a ContractCallTransactionBody.
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     AccountID sender_id = 13;
 }
@@ -173,7 +170,7 @@ message ContractFunctionResult {
  * It will not have a consensus timestamp. It cannot generate a record or a receipt. The response will contain the output
  * returned by the function call.  This is useful for calling getter functions, which purely read the state and don't change it.
  * It is faster and cheaper than a normal call, because it is purely local to a single  node.
- *
+ * 
  * Unlike a ContractCall transaction, the node will consume the entire amount of provided gas in determining
  * the fee for this query.
  */
@@ -206,7 +203,7 @@ message ContractCallLocalQuery {
 
     /**
      * The account that is the "sender." If not present it is the accountId from the transactionId.
-     * Typically a different value than specified in the transactionId requires a valid signature
+     * Typically a different value than specified in the transactionId requires a valid signature 
      * over either the hedera transaction or foreign transaction data.
      */
     AccountID sender_id = 6;
@@ -225,46 +222,4 @@ message ContractCallLocalResponse {
      * the value returned by the function (if it completed and didn't fail)
      */
     ContractFunctionResult functionResult = 2;
-}
-
-/**
- * The storage changes to a smart contract's storage as a side effect of the function call.
- */
-message ContractStateChange {
-
-    /**
-     * The contract to which the storage changes apply to
-     */
-    ContractID contractID = 1;
-
-    /**
-     * The list of storage changes.
-     */
-    repeated StorageChange storageChanges = 2;
-}
-
-/**
- * A storage slot change description.
- */
-message StorageChange {
-    /**
-     * The storage slot changed.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     */
-    bytes slot = 1;
-
-    /**
-     * The value read from the storage slot.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     *
-     * Because of the way SSTORE operations are charged the slot is always read before being written to.
-     */
-    bytes valueRead = 2;
-
-    /**
-     * The new value written to the slot.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     *
-     * If a value of zero is written the valueWritten will be present but the inner value will be absent.
-     *
-     * If a value was read and not written this value will not be present.
-     */
-    google.protobuf.BytesValue valueWritten = 3;
 }

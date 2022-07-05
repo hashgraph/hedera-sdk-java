@@ -1143,7 +1143,7 @@ enum HederaFunctionality {
     /**
      * Generates a pseudorandom number.
      */
-    RandomGenerate = 86;
+    PRNG = 86;
 }
 
 /**
