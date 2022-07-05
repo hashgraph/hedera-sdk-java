@@ -91,7 +91,7 @@ public class TransactionRecordTest {
                             .setBloom(ByteString.copyFrom("hola otra vez", StandardCharsets.UTF_8))
                             .setGasUsed(100_000)
                             .setErrorMessage("hello x3")
-                        )
+                        ).setPrngNumber(12)
                     )
             )
             .build();

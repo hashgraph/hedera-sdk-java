@@ -64,18 +64,18 @@ public class ContractFunctionResultTest {
                 .setContractID(ContractId.fromString("1.2.3").toProtobuf())
                 .setContractCallResult(ByteString.copyFrom(callResult))
                 .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())
-                .addStateChanges(
-                    new ContractStateChange(
-                        ContractId.fromString("1.2.3"),
-                        Collections.singletonList(
-                            new StorageChange(
-                                BigInteger.valueOf(555),
-                                BigInteger.valueOf(666),
-                                BigInteger.valueOf(777)
-                            )
-                        )
-                    ).toProtobuf()
-                ).setSenderId(AccountId.fromString("1.2.3").toProtobuf())
+                // .addStateChanges(
+                //     new ContractStateChange(
+                //         ContractId.fromString("1.2.3"),
+                //         Collections.singletonList(
+                //             new StorageChange(
+                //                 BigInteger.valueOf(555),
+                //                 BigInteger.valueOf(666),
+                //                 BigInteger.valueOf(777)
+                //             )
+                //         )
+                //     ).toProtobuf())
+                .setSenderId(AccountId.fromString("1.2.3").toProtobuf())
         );
 
         // interpretation varies based on width
@@ -101,14 +101,14 @@ public class ContractFunctionResultTest {
 
         assertThat(result.contractId).isEqualTo(ContractId.fromString("1.2.3"));
         assertThat(result.evmAddress).isEqualTo(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"));
-        assertThat(result.stateChanges.size()).isEqualTo(1);
-        ContractStateChange resultStateChange = result.stateChanges.get(0);
-        assertThat(resultStateChange.contractId).isEqualTo(ContractId.fromString("1.2.3"));
-        assertThat(resultStateChange.storageChanges.size()).isEqualTo(1);
-        StorageChange resultStorageChange = resultStateChange.storageChanges.get(0);
-        assertThat(resultStorageChange.slot).isEqualTo(BigInteger.valueOf(555));
-        assertThat(resultStorageChange.valueRead).isEqualTo(BigInteger.valueOf(666));
-        assertThat(resultStorageChange.valueWritten).isEqualTo(BigInteger.valueOf(777));
+        // assertThat(result.stateChanges.size()).isEqualTo(1);
+        // ContractStateChange resultStateChange = result.stateChanges.get(0);
+        // assertThat(resultStateChange.contractId).isEqualTo(ContractId.fromString("1.2.3"));
+        // assertThat(resultStateChange.storageChanges.size()).isEqualTo(1);
+        // StorageChange resultStorageChange = resultStateChange.storageChanges.get(0);
+        // assertThat(resultStorageChange.slot).isEqualTo(BigInteger.valueOf(555));
+        // assertThat(resultStorageChange.valueRead).isEqualTo(BigInteger.valueOf(666));
+        // assertThat(resultStorageChange.valueWritten).isEqualTo(BigInteger.valueOf(777));
     }
 
     @Test
