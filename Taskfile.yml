@@ -35,7 +35,7 @@ tasks:
             
     "test:integration":
         cmds:
-            - ./gradlew -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID -PCONFIG_FILE=$CONFIG_FILE integrationTest "{{.CLI_ARGS}}"
+            - ./gradlew -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID -PCONFIG_FILE=$CONFIG_FILE integrationTest {{.CLI_ARGS}}
 
     "update:snapshots":
         cmds:

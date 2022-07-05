@@ -130,7 +130,7 @@ public abstract class PrivateKey extends Key {
      * @return                          the private key
      */
     public static PrivateKey fromString(String privateKey) {
-        return fromBytes(Hex.decode(privateKey));
+        return fromBytes(Hex.decode(privateKey.startsWith("0x") ? privateKey.substring(2) : privateKey));
     }
 
     /**
