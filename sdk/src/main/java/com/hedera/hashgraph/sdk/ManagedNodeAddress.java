@@ -174,9 +174,7 @@ class ManagedNodeAddress {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ManagedNodeAddress that = (ManagedNodeAddress) o;
-        // ports are deliberately not compared.  The secure and non-secure version of the same address should evaluate to equal.
-        // This is especially important for setNetwork() in ManagedNetwork
-        return Objects.equals(getName(), that.getName()) && Objects.equals(getAddress(), that.getAddress());
+        return Objects.equals(getName(), that.getName()) && Objects.equals(getAddress(), that.getAddress()) && port == that.port;
     }
 
     @Override
