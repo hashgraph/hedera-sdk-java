@@ -79,7 +79,7 @@ public enum HbarUnit {
      * <p>
      * E.g. {@link #TINYBAR}.getSymbol() returns "tℏ".
      */
-    String getSymbol() {
+    public String getSymbol() {
         return symbol;
     }
 

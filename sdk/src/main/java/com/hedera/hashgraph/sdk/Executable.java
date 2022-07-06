@@ -29,6 +29,7 @@ import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,8 +82,18 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     @Nullable
     protected Duration grpcDeadline;
+    private java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
+    private java8.util.function.Function<ResponseT, ResponseT> responseListener;
 
     Executable() {
+        requestListener = request -> {
+            logger.trace("Sent protobuf {}", Hex.toHexString(request.toByteArray()));
+            return request;
+        };
+        responseListener = response -> {
+            logger.trace("Received protobuf {}", Hex.toHexString(response.toByteArray()));
+            return response;
+        };
     }
 
     @Nullable
@@ -204,6 +215,16 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         this.nodeAccountIds.setList(nodeAccountIds).setLocked(true);
 
         // noinspection unchecked
+        return (SdkRequestT) this;
+    }
+
+    public final SdkRequestT setRequestListener(java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener) {
+        this.requestListener = Objects.requireNonNull(requestListener);
+        return (SdkRequestT) this;
+    }
+
+    public final SdkRequestT setResponseListener(java8.util.function.Function<ResponseT, ResponseT> responseListener) {
+        this.responseListener = Objects.requireNonNull(responseListener);
         return (SdkRequestT) this;
     }
 
@@ -581,7 +602,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
 
         public ProtoRequestT getRequest() {
-            return request;
+            return Executable.this.requestListener.apply(request);
         }
 
         public long getDelay() {
@@ -617,9 +638,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
 
         O mapResponse() {
-            if (request != null && response != null) {
-                logger.trace("Sent protobuf {} and received protobuf {}", Hex.toHexString(request.toByteArray()), Hex.toHexString(response.toByteArray()));
-            }
             // successful response from Hedera
             return Executable.this.mapResponse(response, node.getAccountId(), request);
         }
@@ -627,7 +645,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         ExecutionState getStatus(ResponseT response) {
             node.decreaseBackoff();
 
-            this.response = response;
+            this.response = Executable.this.responseListener.apply(response);
             this.responseStatus = Executable.this.mapResponseStatus(response);
 
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",

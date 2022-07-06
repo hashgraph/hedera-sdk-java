@@ -37,11 +37,11 @@ public class ClientIntegrationTest {
 
         // Execute two simple queries so we create a channel for each network node.
         new AccountBalanceQuery()
-            .setAccountId(testEnv.operatorId)
+            .setAccountId(new AccountId(3))
             .execute(testEnv.client);
 
         new AccountBalanceQuery()
-            .setAccountId(testEnv.operatorId)
+            .setAccountId(new AccountId(3))
             .execute(testEnv.client);
 
         network = new HashMap<>();
