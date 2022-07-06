@@ -102,4 +102,9 @@ public class SemanticVersion {
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
+
+    @Override
+    public String toString() {
+        return String.format("%d.%d.%d", major, minor, patch);
+    }
 }
