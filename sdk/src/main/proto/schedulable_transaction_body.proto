@@ -69,6 +69,7 @@ import "token_pause.proto";
 import "token_unpause.proto";
 
 import "schedule_delete.proto";
+import "prng.proto";
 
 /**
  * A schedulable transaction. Note that the global/dynamic system property
@@ -276,5 +277,10 @@ message SchedulableTransactionBody {
      * Marks a schedule in the network's action queue as deleted, preventing it from executing
      */
     ScheduleDeleteTransactionBody scheduleDelete = 34;
+
+    /**
+     * Generates a pseudorandom number.
+     */
+    PrngTransactionBody prng = 40;
   }
 }
