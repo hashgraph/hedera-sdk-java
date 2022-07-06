@@ -87,6 +87,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     @Nullable
     private Boolean declineStakingReward = null;
 
+    @Nullable
+    private AccountId autoRenewAccountId = null;
+
     /**
      * Contract.
      */
@@ -378,6 +381,41 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
+     * Get the auto renew accountId.
+     *
+     * @return                          the auto renew accountId
+     */
+    @Nullable
+    public AccountId getAutoRenewAccountId() {
+        return autoRenewAccountId;
+    }
+
+    /**
+     * An account to charge for auto-renewal of this contract. If not set, or set to an
+     * account with zero hbar balance, the contract's own hbar balance will be used to
+     * cover auto-renewal fees.
+     *
+     * @param autoRenewAccountId The AccountId to be set for auto renewal
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        Objects.requireNonNull(autoRenewAccountId);
+        requireNotFrozen();
+        this.autoRenewAccountId = autoRenewAccountId;
+        return this;
+    }
+
+    /**
+     * Clears the auto-renew account ID
+     *
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction clearAutoRenewAccountId() {
+        this.autoRenewAccountId = new AccountId(0);
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -414,6 +452,10 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
         if (body.hasStakedNodeId()) {
             stakedNodeId = body.getStakedNodeId();
+        }
+
+        if (body.hasAutoRenewAccountId()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccountId());
         }
     }
 
@@ -458,6 +500,10 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
             builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
         }
 
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccountId(autoRenewAccountId.toProtobuf());
+        }
+
         return builder;
     }
 
@@ -473,6 +519,10 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
         if (stakedAccountId != null) {
             stakedAccountId.validateChecksum(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 

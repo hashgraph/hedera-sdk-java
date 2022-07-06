@@ -109,6 +109,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     private boolean declineStakingReward = false;
 
+    @Nullable
+    private AccountId autoRenewAccountId = null;
+
     /**
      * Constructor.
      */
@@ -443,6 +446,31 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * Get the auto renew accountId.
+     *
+     * @return                          the auto renew accountId
+     */
+    @Nullable
+    public AccountId getAutoRenewAccountId() {
+        return autoRenewAccountId;
+    }
+
+    /**
+     * An account to charge for auto-renewal of this contract. If not set, or set to an
+     * account with zero hbar balance, the contract's own hbar balance will be used to
+     * cover auto-renewal fees.
+     *
+     * @param autoRenewAccountId The AccountId to be set for auto renewal
+     * @return {@code this}
+     */
+    public ContractCreateTransaction setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        Objects.requireNonNull(autoRenewAccountId);
+        requireNotFrozen();
+        this.autoRenewAccountId = autoRenewAccountId;
+        return this;
+    }
+
+    /**
      * Build the transaction body.
      *
      * @return {@link ContractCreateTransactionBody}
@@ -479,6 +507,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
             builder.setStakedNodeId(stakedNodeId);
         }
 
+        if (autoRenewAccountId != null) {
+            builder.setAutoRenewAccountId(autoRenewAccountId.toProtobuf());
+        }
+
         return builder;
     }
 
@@ -494,6 +526,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
         if (stakedAccountId != null) {
             stakedAccountId.validateChecksum(client);
+        }
+
+        if (autoRenewAccountId != null) {
+            autoRenewAccountId.validateChecksum(client);
         }
     }
 
@@ -531,6 +567,10 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
         if (body.hasStakedNodeId()) {
             stakedNodeId = body.getStakedNodeId();
+        }
+
+        if (body.hasAutoRenewAccountId()) {
+            autoRenewAccountId = AccountId.fromProtobuf(body.getAutoRenewAccountId());
         }
     }
 

@@ -74,6 +74,7 @@ public class ContractCreateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setAutoRenewAccountId(new AccountId(30))
             .freeze()
             .sign(unusedPrivateKey);
     }
@@ -91,6 +92,7 @@ public class ContractCreateTransactionTest {
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setConstructorParameters(new byte[]{10, 11, 12, 13, 25})
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setAutoRenewAccountId(new AccountId(30))
             .freeze()
             .sign(unusedPrivateKey);
     }
