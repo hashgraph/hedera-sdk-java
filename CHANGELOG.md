@@ -5,13 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.16.2
+
+### Added
+
+ * `HbarUnit.getSymbol()`
+ * `SemanticVersion.toString()`
+ * `Executable.setRequestListener()`
+ * `Executable.setResponseListener()`
+
+### Fixed
+
+ * `PrivateKey.fromString()` should support `0x` prefix
+ * `ManagedNodeAddress.equals()` should compare ports
+
 ## v2.16.1
 
 ### Added
 
  * `ScheduleInfo.waitForExpiry`
  * `ScheduleInfo.ledgerId`
-
+"
 ## v2.16.0
 
 ### Added
