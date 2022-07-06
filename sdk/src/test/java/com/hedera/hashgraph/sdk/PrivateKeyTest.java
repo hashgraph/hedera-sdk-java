@@ -59,4 +59,9 @@ public class PrivateKeyTest {
 
         Assertions.assertEquals(Hex.toHexString(signature), "f3a13a555f1f8cd6532716b8f388bd4e9d8ed0b252743e923114c0c6cbfe414cf791c8e859afd3c12009ecf2cb20dacf01636d80823bcdbd9ec1ce59afe008f0");
     }
+
+    @Test
+    void supports0xPrefix() {
+        PrivateKey.fromString("0x8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
+    }
 }

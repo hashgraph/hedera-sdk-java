@@ -245,10 +245,11 @@ public class MockingTest {
             });
         } else {
             new AccountCreateTransaction()
-                    .setMaxAttempts(2)
+                    .setMaxAttempts(maxAttempts)
                     .executeAsync(server.client)
                     .handle((response, error) -> {
                         Assertions.assertNotNull(error);
+                        System.out.println(error);
                         Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
                         return null;
