@@ -74,6 +74,14 @@ public final class ContractInfo {
     public final Duration autoRenewPeriod;
 
     /**
+     * ID of the an account to charge for auto-renewal of this contract. If not set, or set to 
+     * an account with zero hbar balance, the contract's own hbar balance will be used to cover 
+     * auto-renewal fees.
+     */
+    @Nullable
+    public final AccountId autoRenewAccountId;
+
+    /**
      * Number of bytes of storage being used by this instance (which affects the cost to
      * extend the expiration time).
      */
@@ -116,6 +124,7 @@ public final class ContractInfo {
      * @param adminKey                  the key that can modify the contract
      * @param expirationTime            the time that contract will expire
      * @param autoRenewPeriod           seconds before contract is renewed (funds must be available)
+     * @param autoRenewAccountId        account ID which will be charged for renewing this account
      * @param storage                   number of bytes used by this contract
      * @param contractMemo              the memo field 100 bytes
      * @param balance                   current balance
@@ -130,6 +139,7 @@ public final class ContractInfo {
         @Nullable Key adminKey,
         Instant expirationTime,
         Duration autoRenewPeriod,
+        @Nullable AccountId autoRenewAccountId,
         long storage,
         String contractMemo,
         Hbar balance,
@@ -144,6 +154,7 @@ public final class ContractInfo {
         this.adminKey = adminKey;
         this.expirationTime = expirationTime;
         this.autoRenewPeriod = autoRenewPeriod;
+        this.autoRenewAccountId = autoRenewAccountId;
         this.storage = storage;
         this.contractMemo = contractMemo;
         this.balance = balance;
@@ -180,6 +191,7 @@ public final class ContractInfo {
             adminKey,
             InstantConverter.fromProtobuf(contractInfo.getExpirationTime()),
             DurationConverter.fromProtobuf(contractInfo.getAutoRenewPeriod()),
+            contractInfo.hasAutoRenewAccountId() ? AccountId.fromProtobuf(contractInfo.getAutoRenewAccountId()) : null,
             contractInfo.getStorage(),
             contractInfo.getMemo(),
             Hbar.fromTinybars(contractInfo.getBalance()),
@@ -226,6 +238,10 @@ public final class ContractInfo {
             contractInfoBuilder.setStakingInfo(stakingInfo.toProtobuf());
         }
 
+        if (autoRenewAccountId != null) {
+            contractInfoBuilder.setAutoRenewAccountId(autoRenewAccountId.toProtobuf());
+        }
+
         return contractInfoBuilder.build();
     }
 
@@ -238,6 +254,7 @@ public final class ContractInfo {
             .add("adminKey", adminKey)
             .add("expirationTime", expirationTime)
             .add("autoRenewPeriod", autoRenewPeriod)
+            .add("autoRenewAccountId", autoRenewAccountId)
             .add("storage", storage)
             .add("contractMemo", contractMemo)
             .add("balance", balance)
