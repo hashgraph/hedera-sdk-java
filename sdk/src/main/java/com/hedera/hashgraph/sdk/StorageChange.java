@@ -27,10 +27,12 @@ import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
- * A storage slot change description.
+ * @deprecated - User mirror nodes for contract traceability instead
  *
+ * A storage slot change description.
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange">Hedera Documentation</a>
  */
+@Deprecated
 public class StorageChange {
     /**
      * The storage slot changed. Up to 32 bytes, big-endian, zero bytes left trimmed
