@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.17.0
 
+### Added
+
+ * `PrngThansaction`
+ * `TransactionRecord.prngBytes`
+ * `TransactionRecord.prngNumber`
+
 ### Deprecated
 
  - `ContractFunctionResult.stateChanges` - Use mirror node for contract traceability instead

@@ -379,7 +379,12 @@ public enum RequestType {
     /**
      * Updates the staking info at the end of staking period to indicate new staking period has started.
      */
-    NODE_STAKE_UPDATE(HederaFunctionality.NodeStakeUpdate);
+    NODE_STAKE_UPDATE(HederaFunctionality.NodeStakeUpdate),
+
+    /**
+     * Generates a pseudorandom number.
+     */
+    PRNG(HederaFunctionality.PRNG);
 
     final HederaFunctionality code;
 
@@ -533,6 +538,8 @@ public enum RequestType {
                 return ETHEREUM_TRANSACTION;
             case NodeStakeUpdate:
                 return NODE_STAKE_UPDATE;
+            case PRNG:
+                return PRNG;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -685,6 +692,8 @@ public enum RequestType {
                 return "ETHEREUM_TRANSACTION";
             case NODE_STAKE_UPDATE:
                 return "NODE_STAKE_UPDATE";
+            case PRNG:
+                return "PRNG";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

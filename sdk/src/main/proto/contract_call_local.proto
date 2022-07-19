@@ -6,7 +6,7 @@ package proto;
  * ‌
  * Hedera Network Services Protobuf
  * ​
- * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
+ * Copyright (C) 2018 - 2022 Hedera Hashgraph, LLC
  * ​
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,10 +105,7 @@ message ContractFunctionResult {
      */
     repeated ContractID createdContractIDs = 7 [deprecated=true];
 
-    /**
-     * the list of state reads and changes caused by this function call
-     */
-    repeated ContractStateChange state_changes = 8;
+    reserved 8;
 
     /**
      * The new contract's 20-byte EVM address. Only populated after release 0.23, 
@@ -225,46 +222,4 @@ message ContractCallLocalResponse {
      * the value returned by the function (if it completed and didn't fail)
      */
     ContractFunctionResult functionResult = 2;
-}
-
-/**
- * The storage changes to a smart contract's storage as a side effect of the function call.
- */
-message ContractStateChange {
-
-    /**
-     * The contract to which the storage changes apply to
-     */
-    ContractID contractID = 1;
-
-    /**
-     * The list of storage changes.
-     */
-    repeated StorageChange storageChanges = 2;
-}
-
-/**
- * A storage slot change description.
- */
-message StorageChange {
-    /**
-     * The storage slot changed.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     */
-    bytes slot = 1;
-
-    /**
-     * The value read from the storage slot.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     *
-     * Because of the way SSTORE operations are charged the slot is always read before being written to.
-     */
-    bytes valueRead = 2;
-
-    /**
-     * The new value written to the slot.  Up to 32 bytes, big-endian, zero bytes left trimmed.
-     *
-     * If a value of zero is written the valueWritten will be present but the inner value will be absent.
-     *
-     * If a value was read and not written this value will not be present.
-     */
-    google.protobuf.BytesValue valueWritten = 3;
 }
