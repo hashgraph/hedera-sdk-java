@@ -65,6 +65,10 @@ public final class ContractFunctionResult {
     @Deprecated
     public final List<ContractId> createdContractIds;
 
+    /**
+     * @deprecated - Use mirror node for contract traceability instead
+     */
+    @Deprecated
     public final List<ContractStateChange> stateChanges;
 
     public final long gas;
