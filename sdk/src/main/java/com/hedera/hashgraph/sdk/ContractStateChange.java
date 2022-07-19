@@ -25,9 +25,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * @deprecated - User mirror nodes for contract traceability instead
+ *
  * The storage changes to a smart contract's storage as a side effect of the function call.
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#contractstatechange">Hedera Documentation</a>
  */
+@Deprecated
 public class ContractStateChange {
     public final ContractId contractId;
     public final List<StorageChange> storageChanges;
