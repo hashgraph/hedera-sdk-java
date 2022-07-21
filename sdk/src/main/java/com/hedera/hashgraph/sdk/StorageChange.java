@@ -27,10 +27,12 @@ import javax.annotation.Nullable;
 import java.math.BigInteger;
 
 /**
- * A storage slot change description.
+ * @deprecated - User mirror nodes for contract traceability instead
  *
+ * A storage slot change description.
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/smart-contracts/contractcalllocal#storagechange">Hedera Documentation</a>
  */
+@Deprecated
 public class StorageChange {
     /**
      * The storage slot changed. Up to 32 bytes, big-endian, zero bytes left trimmed
@@ -64,60 +66,60 @@ public class StorageChange {
         this.valueWritten = valueWritten;
     }
 
-    /**
-     * Create a storage charge from a protobuf.
-     *
-     * @param storageChangeProto        the protobuf
-     * @return                          the new storage charge object
-     */
-    static StorageChange fromProtobuf(com.hedera.hashgraph.sdk.proto.StorageChange storageChangeProto) {
-        return new StorageChange(
-            new BigInteger(storageChangeProto.getSlot().toByteArray()),
-            new BigInteger(storageChangeProto.getValueRead().toByteArray()),
-            storageChangeProto.hasValueWritten() ? (
-                storageChangeProto.getValueWritten().getValue().size() == 0 ?
-                    BigInteger.ZERO :
-                    new BigInteger(storageChangeProto.getValueWritten().getValue().toByteArray())
-            ) : null
-        );
-    }
-
-    /**
-     * Create a storage charge from a byte array.
-     *
-     * @param bytes                     the byte array
-     * @return                          the new storage charge object
-     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
-     */
-    public static StorageChange fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hedera.hashgraph.sdk.proto.StorageChange.parseFrom(bytes));
-    }
-
-    /**
-     * Create the byte array.
-     *
-     * @return                          the byte array representation
-     */
-    com.hedera.hashgraph.sdk.proto.StorageChange toProtobuf() {
-        var builder = com.hedera.hashgraph.sdk.proto.StorageChange.newBuilder()
-            .setSlot(ByteString.copyFrom(slot.toByteArray()))
-            .setValueRead(ByteString.copyFrom(valueRead.toByteArray()));
-        if (valueWritten != null) {
-            if (valueWritten.equals(BigInteger.ZERO)) {
-                builder.setValueWritten(BytesValue.newBuilder().setValue(ByteString.EMPTY).build());
-            } else {
-                builder.setValueWritten(BytesValue.newBuilder().setValue(ByteString.copyFrom(valueWritten.toByteArray())).build());
-            }
-        }
-        return builder.build();
-    }
-
-    /**
-     * Create the byte array.
-     *
-     * @return                          the byte array representation
-     */
-    public byte[] toBytes() {
-        return toProtobuf().toByteArray();
-    }
+    // /**
+    //  * Create a storage charge from a protobuf.
+    //  *
+    //  * @param storageChangeProto        the protobuf
+    //  * @return                          the new storage charge object
+    //  */
+    // static StorageChange fromProtobuf(com.hedera.hashgraph.sdk.proto.StorageChange storageChangeProto) {
+    //     return new StorageChange(
+    //         new BigInteger(storageChangeProto.getSlot().toByteArray()),
+    //         new BigInteger(storageChangeProto.getValueRead().toByteArray()),
+    //         storageChangeProto.hasValueWritten() ? (
+    //             storageChangeProto.getValueWritten().getValue().size() == 0 ?
+    //                 BigInteger.ZERO :
+    //                 new BigInteger(storageChangeProto.getValueWritten().getValue().toByteArray())
+    //         ) : null
+    //     );
+    // }
+    //
+    // /**
+    //  * Create a storage charge from a byte array.
+    //  *
+    //  * @param bytes                     the byte array
+    //  * @return                          the new storage charge object
+    //  * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+    //  */
+    // public static StorageChange fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    //     return fromProtobuf(com.hedera.hashgraph.sdk.proto.StorageChange.parseFrom(bytes));
+    // }
+    //
+    // /**
+    //  * Create the byte array.
+    //  *
+    //  * @return                          the byte array representation
+    //  */
+    // com.hedera.hashgraph.sdk.proto.StorageChange toProtobuf() {
+    //     var builder = com.hedera.hashgraph.sdk.proto.StorageChange.newBuilder()
+    //         .setSlot(ByteString.copyFrom(slot.toByteArray()))
+    //         .setValueRead(ByteString.copyFrom(valueRead.toByteArray()));
+    //     if (valueWritten != null) {
+    //         if (valueWritten.equals(BigInteger.ZERO)) {
+    //             builder.setValueWritten(BytesValue.newBuilder().setValue(ByteString.EMPTY).build());
+    //         } else {
+    //             builder.setValueWritten(BytesValue.newBuilder().setValue(ByteString.copyFrom(valueWritten.toByteArray())).build());
+    //         }
+    //     }
+    //     return builder.build();
+    // }
+    //
+    // /**
+    //  * Create the byte array.
+    //  *
+    //  * @return                          the byte array representation
+    //  */
+    // public byte[] toBytes() {
+    //     return toProtobuf().toByteArray();
+    // }
 }

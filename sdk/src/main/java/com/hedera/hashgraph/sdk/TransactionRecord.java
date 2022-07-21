@@ -131,6 +131,10 @@ public final class TransactionRecord {
 
     public final List<Transfer> paidStakingRewards;
 
+    public final ByteString prngBytes;
+
+    public final Integer prngNumber;
+
     private TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -151,7 +155,9 @@ public final class TransactionRecord {
         List<TransactionRecord> duplicates,
         @Nullable Instant parentConsensusTimestamp,
         ByteString ethereumHash,
-        List<Transfer> paidStakingRewards
+        List<Transfer> paidStakingRewards,
+        ByteString prngBytes,
+        Integer prngNumber
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -176,6 +182,8 @@ public final class TransactionRecord {
         this.tokenAllowanceAdjustments = Collections.emptyList();
         this.tokenNftAllowanceAdjustments = Collections.emptyList();
         this.paidStakingRewards = paidStakingRewards;
+        this.prngBytes = prngBytes;
+        this.prngNumber = prngNumber;
     }
 
     /**
@@ -259,7 +267,9 @@ public final class TransactionRecord {
             transactionRecord.hasParentConsensusTimestamp() ?
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
             transactionRecord.getEthereumHash(),
-            paidStakingRewards
+            paidStakingRewards,
+            transactionRecord.getPrngBytes(),
+            transactionRecord.getPrngNumber()
         );
     }
 
@@ -359,6 +369,14 @@ public final class TransactionRecord {
             transactionRecord.addPaidStakingRewards(reward.toProtobuf());
         }
 
+        if (prngBytes != null) {
+            transactionRecord.setPrngBytes(prngBytes);
+        }
+
+        if (prngNumber != null) {
+            transactionRecord.setPrngNumber(prngNumber);
+        }
+
         return transactionRecord.build();
     }
 
@@ -384,6 +402,8 @@ public final class TransactionRecord {
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
             .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
             .add("paidStakingRewards", paidStakingRewards)
+            .add("prngBytes", Hex.toHexString(prngBytes.toByteArray()))
+            .add("prngNumber", prngNumber)
             .toString();
     }
 

@@ -65,6 +65,10 @@ public final class ContractFunctionResult {
     @Deprecated
     public final List<ContractId> createdContractIds;
 
+    /**
+     * @deprecated - Use mirror node for contract traceability instead
+     */
+    @Deprecated
     public final List<ContractStateChange> stateChanges;
 
     public final long gas;
@@ -112,10 +116,10 @@ public final class ContractFunctionResult {
 
         createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
 
-        stateChanges = new ArrayList<>(inner.getStateChangesCount());
-        for (var stateChangeProto : inner.getStateChangesList()) {
-            stateChanges.add(ContractStateChange.fromProtobuf(stateChangeProto));
-        }
+        stateChanges = new ArrayList<ContractStateChange>();
+        // for (var stateChangeProto : inner.getStateChangesList()) {
+        //     stateChanges.add(ContractStateChange.fromProtobuf(stateChangeProto));
+        // }
 
         gas = inner.getGas();
 
@@ -403,9 +407,9 @@ public final class ContractFunctionResult {
             contractFunctionResult.addCreatedContractIDs(contractId.toProtobuf());
         }
 
-        for (var stateChange : stateChanges) {
-            contractFunctionResult.addStateChanges(stateChange.toProtobuf());
-        }
+        // for (var stateChange : stateChanges) {
+        //     contractFunctionResult.addStateChanges(stateChange.toProtobuf());
+        // }
 
         return contractFunctionResult.build();
     }
