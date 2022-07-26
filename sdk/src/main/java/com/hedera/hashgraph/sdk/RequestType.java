@@ -384,7 +384,7 @@ public enum RequestType {
     /**
      * Generates a pseudorandom number.
      */
-    PRNG(HederaFunctionality.PRNG);
+    UTIL_PRNG(HederaFunctionality.UtilPrng);
 
     final HederaFunctionality code;
 
@@ -538,8 +538,8 @@ public enum RequestType {
                 return ETHEREUM_TRANSACTION;
             case NodeStakeUpdate:
                 return NODE_STAKE_UPDATE;
-            case PRNG:
-                return PRNG;
+            case UtilPrng:
+                return UTIL_PRNG;
             default:
                 throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         }
@@ -692,8 +692,8 @@ public enum RequestType {
                 return "ETHEREUM_TRANSACTION";
             case NODE_STAKE_UPDATE:
                 return "NODE_STAKE_UPDATE";
-            case PRNG:
-                return "PRNG";
+            case UTIL_PRNG:
+                return "UTIL_PRNG";
             default:
                 return "<UNRECOGNIZED VALUE>";
         }

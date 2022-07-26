@@ -136,7 +136,7 @@ message TransactionRecord {
 
     oneof entropy {
         /**
-         * In the record of a PRNG transaction with no output range, a pseudorandom 384-bit string.
+         * In the record of a UtilPrng transaction with no output range, a pseudorandom 384-bit string.
          */
         bytes prng_bytes = 19;
 
