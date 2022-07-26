@@ -94,7 +94,7 @@ class TokenUpdateIntegrationTest {
     @Test
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount(new Hbar(10));
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var response = new TokenCreateTransaction()
             .setTokenName("ffff")
