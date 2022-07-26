@@ -7,11 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+ - `TokenNftInfo.allowanceSpenderAccountId`
+
 ### Deprecated
 
  - `AccountBalance.[tokens|tokenDecimals]` use a mirror node query instead
  - `AccountInfo.tokenRelationships` use a mirror node query instead
  - `ContractInfo.tokenRelationships` use a mirror node query instead
+
+### Fixed
+
+ - `TokenNftInfo.[to|from]Bytes()`
 
 ## v2.17.0
 
