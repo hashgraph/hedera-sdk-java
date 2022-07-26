@@ -112,6 +112,10 @@ public final class AccountInfo {
 
     public final List<LiveHash> liveHashes;
 
+    /**
+     * @deprecated use a mirror node query instead
+     */
+    @Deprecated
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
     public final String accountMemo;
