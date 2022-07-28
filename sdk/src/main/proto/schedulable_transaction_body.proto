@@ -69,7 +69,7 @@ import "token_pause.proto";
 import "token_unpause.proto";
 
 import "schedule_delete.proto";
-import "prng.proto";
+import "util_prng.proto";
 
 /**
  * A schedulable transaction. Note that the global/dynamic system property
@@ -281,6 +281,6 @@ message SchedulableTransactionBody {
     /**
      * Generates a pseudorandom number.
      */
-    PrngTransactionBody prng = 40;
+    UtilPrngTransactionBody util_prng = 40;
   }
 }

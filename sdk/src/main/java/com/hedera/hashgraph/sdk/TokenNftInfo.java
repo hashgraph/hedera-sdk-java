@@ -25,6 +25,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoResponse;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
@@ -59,6 +60,12 @@ public class TokenNftInfo {
     public final LedgerId ledgerId;
 
     /**
+     * If an allowance is granted for the NFT, its corresponding spender account
+     */
+    @Nullable
+    public final AccountId allowanceSpenderAccountId;
+
+    /**
      * Constructor.
      *
      * @param nftId                     the id of the nft
@@ -66,19 +73,22 @@ public class TokenNftInfo {
      * @param creationTime              the effective consensus time
      * @param metadata                  the unique metadata
      * @param ledgerId                  the ledger id of the response
+     * @param allowanceSpenderAccountId the spender of the allowance (null if not an allowance)
      */
-    private TokenNftInfo(
+    TokenNftInfo(
         NftId nftId,
         AccountId accountId,
         Instant creationTime,
         byte[] metadata,
-        LedgerId ledgerId
+        LedgerId ledgerId,
+        @Nullable AccountId allowanceSpenderAccountId
     ) {
         this.nftId = nftId;
         this.accountId = accountId;
         this.creationTime = Objects.requireNonNull(creationTime);
         this.metadata = metadata;
         this.ledgerId = ledgerId;
+        this.allowanceSpenderAccountId = allowanceSpenderAccountId;
     }
 
     /**
@@ -93,7 +103,8 @@ public class TokenNftInfo {
             AccountId.fromProtobuf(info.getAccountID()),
             InstantConverter.fromProtobuf(info.getCreationTime()),
             info.getMetadata().toByteArray(),
-            LedgerId.fromByteString(info.getLedgerId())
+            LedgerId.fromByteString(info.getLedgerId()),
+            info.hasSpenderId() ? AccountId.fromProtobuf(info.getSpenderId()) : null
         );
     }
 
@@ -105,7 +116,7 @@ public class TokenNftInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenNftInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(TokenGetNftInfoResponse.parseFrom(bytes).toBuilder().build().getNft());
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.TokenNftInfo.parseFrom(bytes));
     }
 
     /**
@@ -113,15 +124,17 @@ public class TokenNftInfo {
      *
      * @return                          the protobuf representation
      */
-    TokenGetNftInfoResponse toProtobuf() {
-        return TokenGetNftInfoResponse.newBuilder().setNft(
-            com.hedera.hashgraph.sdk.proto.TokenNftInfo.newBuilder()
-                .setNftID(nftId.toProtobuf())
-                .setAccountID(accountId.toProtobuf())
-                .setCreationTime(InstantConverter.toProtobuf(creationTime))
-                .setMetadata(ByteString.copyFrom(metadata))
-                .setLedgerId(ledgerId.toByteString())
-        ).build();
+    com.hedera.hashgraph.sdk.proto.TokenNftInfo toProtobuf() {
+        var builder = com.hedera.hashgraph.sdk.proto.TokenNftInfo.newBuilder()
+            .setNftID(nftId.toProtobuf())
+            .setAccountID(accountId.toProtobuf())
+            .setCreationTime(InstantConverter.toProtobuf(creationTime))
+            .setMetadata(ByteString.copyFrom(metadata))
+            .setLedgerId(ledgerId.toByteString());
+        if (allowanceSpenderAccountId != null) {
+            builder.setSpenderId(allowanceSpenderAccountId.toProtobuf());
+        }
+        return builder.build();
     }
 
     @Override
@@ -132,6 +145,7 @@ public class TokenNftInfo {
             .add("creationTime", creationTime)
             .add("metadata", metadata)
             .add("ledgerId", ledgerId)
+            .add("allowanceSpenderAccountId", allowanceSpenderAccountId)
             .toString();
     }
 
