@@ -41,6 +41,44 @@ message NodeStakeUpdateTransactionBody {
    * Staking info of each node at the beginning of the new staking period
    */
   repeated NodeStake node_stake = 2;
+
+  /**
+   * The maximum reward rate, in tinybars per whole hbar, that any account can receive in a day.
+   */
+  int64 max_staking_reward_rate_per_hbar = 3;
+
+  /**
+   * The fraction of the network and service fees paid to the node reward account 0.0.801.
+   */
+  Fraction node_reward_fee_fraction = 4;
+
+  /**
+   * The maximum number of trailing periods for which a user can collect rewards. For example, if this
+   * is 365 with a UTC calendar day period, then users must collect rewards at least once per calendar
+   * year to avoid missing any value.
+   */
+  int64 staking_periods_stored = 5;
+
+  /**
+   * The number of minutes in a staking period. Note for the special case of 1440 minutes, periods are 
+   * treated as UTC calendar days, rather than repeating 1440 minute periods left-aligned at the epoch.
+   */
+  int64 staking_period = 6;
+
+  /**
+   * The fraction of the network and service fees paid to the staking reward account 0.0.800.
+   */
+  Fraction staking_reward_fee_fraction = 7;
+
+  /**
+   * The minimum balance of staking reward account 0.0.800 required to active rewards.
+   */
+  int64 staking_start_threshold = 8;
+
+  /**
+   * The total number of tinybars to be distributed as staking rewards each period.
+   */
+  int64 staking_reward_rate = 9;
 }
 
 /**

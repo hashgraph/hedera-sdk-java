@@ -63,8 +63,8 @@ public class PrngTransaction extends Transaction<PrngTransaction> {
         return range;
     }
 
-    PrngTransactionBody.Builder build() {
-        var builder = PrngTransactionBody.newBuilder();
+    UtilPrngTransactionBody.Builder build() {
+        var builder = UtilPrngTransactionBody.newBuilder();
 
         if (range != null) {
             builder.setRange(range);
@@ -75,7 +75,7 @@ public class PrngTransaction extends Transaction<PrngTransaction> {
 
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setPrng(build());
+        bodyBuilder.setUtilPrng(build());
     }
 
     @Override

@@ -44,8 +44,16 @@ public class AccountBalance {
     @Nonnegative
     public final Map<TokenId, Long> token = new HashMap<>();
 
+    /**
+     * @deprecated - use a mirror node query
+     */
+    @Deprecated
     public final Map<TokenId, Long> tokens;
 
+    /**
+     * @deprecated - use a mirror node query
+     */
+    @Deprecated
     @Nonnegative
     public final Map<TokenId, Integer> tokenDecimals;
 
