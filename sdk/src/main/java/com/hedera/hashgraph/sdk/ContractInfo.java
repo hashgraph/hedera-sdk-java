@@ -74,8 +74,8 @@ public final class ContractInfo {
     public final Duration autoRenewPeriod;
 
     /**
-     * ID of the an account to charge for auto-renewal of this contract. If not set, or set to 
-     * an account with zero hbar balance, the contract's own hbar balance will be used to cover 
+     * ID of the an account to charge for auto-renewal of this contract. If not set, or set to
+     * an account with zero hbar balance, the contract's own hbar balance will be used to cover
      * auto-renewal fees.
      */
     @Nullable
@@ -104,7 +104,10 @@ public final class ContractInfo {
 
     /**
      * The tokens associated to the contract
+     *
+     * @deprecated use a mirror node query instead
      */
+    @Deprecated
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
     /**

@@ -81,7 +81,7 @@ import "schedule_delete.proto";
 import "schedule_sign.proto";
 
 import "node_stake_update.proto";
-import "prng.proto";
+import "util_prng.proto";
 
 /**
  * A single transaction. All transaction types are possible here.
@@ -348,6 +348,6 @@ message TransactionBody {
     /**
      * Generates a pseudorandom number.
      */
-    PrngTransactionBody prng = 52;
+    UtilPrngTransactionBody util_prng = 52;
   }
 }
