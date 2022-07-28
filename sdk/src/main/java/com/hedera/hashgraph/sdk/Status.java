@@ -1476,7 +1476,7 @@ public enum Status {
     STAKING_NOT_ENABLED(ResponseCodeEnum.STAKING_NOT_ENABLED),
 
     /**
-     * The range provided in PRNG transaction is negative.
+     * The range provided in UtilPrng transaction is negative.
      */
     INVALID_PRNG_RANGE(ResponseCodeEnum.INVALID_PRNG_RANGE),
 
