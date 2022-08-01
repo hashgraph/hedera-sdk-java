@@ -98,6 +98,16 @@ public final class CustomFeesExample {
             .getReceipt(client)
             .accountId;
 
+        PrivateKey deanKey = PrivateKey.generateED25519();
+        AccountId deanId = new AccountCreateTransaction()
+            .setInitialBalance(new Hbar(10))
+            .setKey(deanKey)
+            .freezeWith(client)
+            .sign(deanKey)
+            .execute(client)
+            .getReceipt(client)
+            .accountId;
+
         System.out.println("Alice: " + aliceId);
         System.out.println("Bob: " + bobId);
         System.out.println("Charlie: " + charlieId);
@@ -110,7 +120,7 @@ public final class CustomFeesExample {
 
         CustomFixedFee customHbarFee = new CustomFixedFee()
             .setHbarAmount(new Hbar(1))
-            .setFeeCollectorAccountId(aliceId);
+            .setFeeCollectorAccountId(deanId);
         List<CustomFee> hbarFeeList = Collections.singletonList(customHbarFee);
 
         // In this example the fee is in Hbar, but you can charge a fixed fee in a token if you'd like.
@@ -175,10 +185,10 @@ public final class CustomFeesExample {
             .getReceipt(client);
 
         Hbar aliceHbar1 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+            .setAccountId(deanId)
             .execute(client)
             .hbars;
-        System.out.println("Alice's Hbar balance before Bob transfers 20 tokens to Charlie: " + aliceHbar1);
+        System.out.println("Dean's Hbar balance before Bob transfers 20 tokens to Charlie: " + aliceHbar1);
 
         TransactionRecord record1 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
@@ -189,10 +199,10 @@ public final class CustomFeesExample {
             .getRecord(client);
 
         Hbar aliceHbar2 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+            .setAccountId(deanId)
             .execute(client)
             .hbars;
-        System.out.println("Alices's Hbar balance after Bob transfers 20 tokens to Charlie: " + aliceHbar2);
+        System.out.println("Dean's Hbar balance after Bob transfers 20 tokens to Charlie: " + aliceHbar2);
 
         System.out.println("Assessed fees according to transaction record:");
         System.out.println(record1.assessedCustomFees);
@@ -214,8 +224,16 @@ public final class CustomFeesExample {
             .setMin(1)
             .setMax(10)
             // .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
-            .setFeeCollectorAccountId(aliceId);
+            .setFeeCollectorAccountId(deanId);
         List<CustomFee> fractionalFeeList = Collections.singletonList(customFractionalFee);
+
+        new TokenAssociateTransaction()
+            .setAccountId(deanId)
+            .setTokenIds(Collections.singletonList(tokenId))
+            .freezeWith(client)
+            .sign(deanKey)
+            .execute(client)
+            .getReceipt(client);
 
         new TokenFeeScheduleUpdateTransaction()
             .setTokenId(tokenId)
@@ -233,10 +251,10 @@ public final class CustomFeesExample {
         System.out.println(tokenInfo2.customFees);
 
         Map<TokenId, Long> aliceTokens3 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+            .setAccountId(deanId)
             .execute(client)
             .tokens;
-        System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3);
+        System.out.println("Dean's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3);
 
         TransactionRecord record2 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
@@ -247,7 +265,7 @@ public final class CustomFeesExample {
             .getRecord(client);
 
         Map<TokenId, Long> aliceTokens4 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+            .setAccountId(deanId)
             .execute(client)
             .tokens;
         System.out.println("Alices's token balance after Bob transfers 20 tokens to Charlie: " + aliceTokens4);
@@ -259,6 +277,7 @@ public final class CustomFeesExample {
 
         // clean up
 
+        /*
         new TokenDeleteTransaction()
             .setTokenId(tokenId)
             .freezeWith(client)
@@ -289,6 +308,15 @@ public final class CustomFeesExample {
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(deanId)
+            .setTransferAccountId(client.getOperatorAccountId())
+            .freezeWith(client)
+            .sign(deanKey)
+            .execute(client)
+            .getReceipt(client);
+         */
 
         client.close();
     }
