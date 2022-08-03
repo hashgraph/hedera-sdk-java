@@ -56,6 +56,11 @@ PROTO_DO_NOT_REMOVE = (
 )
 
 
+ENUM_OVERRIDE = {
+    "UTIL_PRNG": "PRNG"
+}
+
+
 
 
 
@@ -395,7 +400,7 @@ def parse_enum_line(s, i, equal_i, sl_comment_i, line_end_i, comment_lines, add_
         parse_sl_comment(s, sl_comment_i, line_end_i, comment_lines)
     original_name = s[i:equal_i].strip()
     cap_snake_name = ensure_cap_snake_name(original_name)
-    add_to_output(original_name, cap_snake_name, comment_lines)
+    add_to_output(original_name, ENUM_OVERRIDE.get(cap_snake_name, cap_snake_name), comment_lines)
     comment_lines.clear()
 
 
@@ -449,8 +454,6 @@ def ensure_cap_snake_name(name):
                 out += c.upper()
                 i += 1
         return out
-
-
 
 
 
