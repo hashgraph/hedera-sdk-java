@@ -152,7 +152,7 @@ The methods that are meant to be overridden by the subclasses are:
 * `getMethodDescriptor()` returns a `grpc.MethodDescriptor`, which is an object that describes the rpc to be called.  `MethodDescriptor`s are fetched from the grpc-generated `"*Service*.java"` classes.
 * `getTransactionIdInternal()` is the unique ID for this transaction.
 
-The `Executable` class implements `execute()` and `executeAsync()`, and then the `FunctionalExecutableProcessor` generates several variants of the `execute()` and `executeAsync()` methods during the build process.  The `@FunctionalExecutable` annotation triggers this code generation.  This pattern also appears in `ChunkedTransaction`, `Transaction`, and `Query`.
+The `Executable` class implements `execute()` and `executeAsync()`, and then the `FunctionalExecutableProcessor` generates several variants of the `executeAsync()` method during the build process.  The `@FunctionalExecutable` annotation triggers this code generation.  This pattern also appears in `ChunkedTransaction`, `Transaction`, and `Query`.
 
 `Executable` has a public `executeAsync()` method that calls `onExecuteAsync()` and then chains onto that future a call to the private `executeAsync()` method, which sets up and makes the rpc with `grpc.ClientCalls.futureUnaryCall()`, and then chains to _that_ future a handler which handles the result of the rpc.  Depending on the result of the rpc, the handler may complete the future that was returned by `executeAsync()`, _or_ it may chain onto that future _another_, recursive call to the internal `executeAsync()` method, and this is how `executeAsync()` loops through multiple attempts to execute with different nodes, up to `maxAttempts`.
 
@@ -337,13 +337,11 @@ In addition to the `onNext()` handler, there are several optional handlers which
 
 ### `FunctionalExecutable` and `FunctionalExecutableProcessor`
 
-TODO: revamp this
-
 These classes aren't themselves components of the SDK, they are components in the SDK's build process.  `FunctionalExecutable` is a custom annotation defined in the `executable-annotation` directory, and we use this annotation is in the SDK source code to mark methods that require additional processing during the build process.  This additional processing is performed by the `FunctionalExecutableProcessor`, which is defined in the `executable-processor` directory.
 
-The `FunctionalExecutableProcessor` uses the JavaPoet library to generate variations of the marked method.  It presumes that the marked method is named `"*Async"`, that it has a `Client` parameter, and that it returns a `CompletableFuture<O>` (you may specify a type other than `O`, as shown in the example below), and the `FunctionalExecutableProcessor` adds to the class several variations of that method which build on that original `*Async()` method.
+The `FunctionalExecutableProcessor` uses the JavaPoet library to generate variations of each method marked with the `@FunctionalExecutable` annotation.  It presumes that the marked method is named `"*Async"`, that it has a `Client` parameter (or you may specify `onClient=true` if the method is _on_ `Client`, and you may specify an additional input type with `inputType=T`), and that it returns a `CompletableFuture<O>` (you may specify a type other than `O`, as shown in the example below), and the `FunctionalExecutableProcessor` adds to the class several variations of that method which build on that original `*Async()` method.
 
-For example, if in class `Bar` you create the method `CompletableFuture<Integer> fooAsync(Client client)` and mark it with `@FunctionalExecutable(type=int.class)` (`type` here is the return type of the marked method), the `FunctionalExecutableProcessor` will add the following methods to `Bar`:
+For example, if in class `Bar` you create the method `CompletableFuture<Integer> fooAsync(Client client)` and mark it with `@FunctionalExecutable(type=Integer.class)` (`type` here is the return type of the marked method), the `FunctionalExecutableProcessor` will add the following methods to `Bar`:
 
 - `void fooAsync(Client client, BiConsumer<Integer, Throwable> callback)`
 - `void fooAsync(Client client, Duration timeout, BiConsumer<Integer, Throwable> callback)`
@@ -352,9 +350,11 @@ For example, if in class `Bar` you create the method `CompletableFuture<Integer>
 - `Integer foo(Client client)`
 - `Integer foo(Client client, Duration timeout)`
 
-Note that the last two are synchronous versions.
+Note that the last two are synchronous versions, and in `Executable`, the synchronous variants generated from `executeAsync()` are overridden with manually programmed `execute()` methods.
 
 The `FunctionalAnnotationProcessor` can't add these methods to `Bar` directly.  Instead, it will generate a new interface called `WithFoo`.  The `WithFoo` interface will have an abstract `CompletableFuture<Integer> fooAsync(Client client)` method, and it will have all of the variations of the `fooAsync()` and `foo()` methods which are listed above, which will use and build on the abstract `fooAsync()` method.  You are expected to declare `Bar` as an implementation of this generated `WithFoo` interface.  You should use the `@Override` annotation on your `fooAsync()` method in `Bar` to make sure that it overrides the abstract `fooAsync()` method from `WithFoo`.
+
+If you want to get a better grasp on what the `FunctionalExecutableProcessor` actually does, I suggest that after building the SDK, you should look at the files in `sdk/build/generated/sources/annotationProcessor/java/main/com/hedera/hashgraph/sdk/`.  These are the `With*.java` files that are generated by the `FunctionalExecutableProcessor` during the build process.  For example, the `WithExecute.java` file was generated because of the `@FunctionalExecutable` annotation on the `Executable.executeAsync()` method, and if you look at `WithExecute.java` side-by-side with the `FunctionalExecutableProcessor.process()` method body, you should be able to see how each of the default methods in the `WithExecute` interface were generated by the processor
 
 
 
