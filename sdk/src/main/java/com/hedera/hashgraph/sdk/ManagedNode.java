@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
  * @param <N>                           the n type
  * @param <KeyT>                        the key t type
  */
-abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comparable<ManagedNode<N, KeyT>> {
+abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
     private static final int GET_STATE_MAX_ATTEMPTS = GET_STATE_TIMEOUT_MILLIS / GET_STATE_INTERVAL_MILLIS;
@@ -55,18 +55,6 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
      * Address of this node
      */
     protected final ManagedNodeAddress address;
-
-    /**
-     * Timestamp of when the last time this node was used in milliseconds.
-     * This field is used for healthy-ness calculation.
-     */
-    protected long lastUsed = 0;
-
-    /**
-     * Amount of times this node has been used. "Used" means the channel was used to submit a request.
-     * This field is used for healthy-ness calculation
-     */
-    protected long useCount = 0;
 
     /**
      * Timestamp of when this node will be considered healthy again
@@ -126,8 +114,6 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
         this.readmitTime = node.readmitTime;
         this.currentBackoff = node.currentBackoff;
         this.badGrpcStatusCount = node.badGrpcStatusCount;
-        this.lastUsed = node.lastUsed;
-        this.useCount = node.useCount;
     }
 
     /**
@@ -285,21 +271,11 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
     }
 
     /**
-     * Update use counters and update last used time stamp.
-     */
-    synchronized void inUse() {
-        useCount++;
-        lastUsed = System.currentTimeMillis();
-    }
-
-    /**
      * Get the gRPC channel for this node
      *
      * @return                          the channel
      */
     synchronized ManagedChannel getChannel() {
-        inUse();
-
         if (channel != null) {
             return channel;
         }
@@ -383,37 +359,6 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> implements Comp
             channel.awaitTermination(timeout.getSeconds(), TimeUnit.SECONDS);
             channel = null;
         }
-    }
-
-    /**
-     * Compares one node to another.  If node a < node b, use of node a will be prioritized over node b.
-     *
-     * @param node                      node to compare
-     * @return                          which comparison to use
-     */
-    @Override
-    public int compareTo(ManagedNode<N, KeyT> node) {
-        int backoffRemainingComparison = Long.compare(this.unhealthyBackoffRemaining(), node.unhealthyBackoffRemaining());
-        if (backoffRemainingComparison != 0) {
-            return backoffRemainingComparison;
-        }
-
-        int currentBackoffComparison = this.currentBackoff.compareTo(node.currentBackoff);
-        if (currentBackoffComparison != 0) {
-            return currentBackoffComparison;
-        }
-
-        int badGrpcComparison = Long.compare(this.badGrpcStatusCount, node.badGrpcStatusCount);
-        if (badGrpcComparison != 0) {
-            return badGrpcComparison;
-        }
-
-        int useCountComparison = Long.compare(this.useCount, node.useCount);
-        if (useCountComparison != 0) {
-            return useCountComparison;
-        }
-
-        return Long.compare(this.lastUsed, node.lastUsed);
     }
 
     /**
