@@ -47,9 +47,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
     private String scheduleMemo = "";
 
     @Nullable
-    private Instant expirationTime;
+    private Instant expirationTime = null;
 
-    private boolean waitForExpiry;
+    private boolean waitForExpiry = false;
 
     /**
      * Constructor.
@@ -195,11 +195,7 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
-        if (expirationTime != null) {
-            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
-        }
         builder.setMemo(scheduleMemo).setWaitForExpiry(waitForExpiry);
-
         return builder;
     }
 

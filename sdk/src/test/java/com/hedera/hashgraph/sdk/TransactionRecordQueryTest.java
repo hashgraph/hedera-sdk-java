@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,9 +44,15 @@ public class TransactionRecordQueryTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new TransactionRecordQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        spawnQuery().onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+    }
+
+    private TransactionRecordQuery spawnQuery() {
+        return new TransactionRecordQuery()
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5005"), validStart))
-            .toString()
-        ).toMatchSnapshot();
+            .setIncludeChildren(true)
+            .setIncludeDuplicates(true);
     }
 }

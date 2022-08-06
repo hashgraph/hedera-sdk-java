@@ -62,6 +62,7 @@ public class TopicCreateTransactionTest {
             .setAutoRenewAccountId(AccountId.fromString("0.0.5007"))
             .setAutoRenewPeriod(Duration.ofHours(24))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setTopicMemo("hello memo")
             .freeze()
             .sign(unusedPrivateKey);
     }
