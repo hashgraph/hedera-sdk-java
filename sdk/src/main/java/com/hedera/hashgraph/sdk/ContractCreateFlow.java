@@ -176,16 +176,21 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Extract the proxy account id.
      *
      * @return                          the proxy account id
      */
     @Nullable
+    @Deprecated
     public AccountId getProxyAccountId() {
         return proxyAccountId;
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Sets the ID of the account to which this account is proxy staked.
      * <p>
      * If proxyAccountID is null, or is an invalid account, or is an account that isn't a node,
@@ -197,6 +202,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @param proxyAccountId The AccountId to be set
      * @return {@code this}
      */
+    @Deprecated
     public ContractCreateFlow setProxyAccountId(AccountId proxyAccountId) {
         Objects.requireNonNull(proxyAccountId);
         this.proxyAccountId = proxyAccountId;
@@ -208,7 +214,6 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     public ContractCreateFlow setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
-        Objects.requireNonNull(proxyAccountId);
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
     }

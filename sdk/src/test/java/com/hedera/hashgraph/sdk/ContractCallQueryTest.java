@@ -55,7 +55,7 @@ public class ContractCallQueryTest {
                     .addString("Hello")
                     .addString("world!"))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
     @Test
@@ -72,6 +72,6 @@ public class ContractCallQueryTest {
                     .toBytes(null)
                     .toByteArray())
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

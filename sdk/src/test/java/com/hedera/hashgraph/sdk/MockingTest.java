@@ -82,12 +82,14 @@ public class MockingTest {
         return new String(chars);
     }
 
-    @ParameterizedTest(name = "[{0}] ContractCreateFlow functions")
+    @ParameterizedTest(name = "[{0}, {1}] ContractCreateFlow functions")
     @CsvSource({
-        "sync",
-        "async"
+        "sync, stakedNode",
+        "sync, stakedAccount",
+        "async, stakedNode",
+        "async, stakedAccount",
     })
-    void contractCreateFlowFunctions(String versionToTest) throws Throwable {
+    void contractCreateFlowFunctions(String versionToTest, String stakeType) throws Throwable {
         var BIG_BYTECODE = makeBigString(ContractCreateFlow.FILE_CREATE_MAX_BYTES + 1000);
         var adminKey = PrivateKey.generateED25519().getPublicKey();
 
@@ -97,6 +99,11 @@ public class MockingTest {
         var server = new TestServer("contractCreateFlow", cryptoService, fileService, contractService);
 
         var fileId = FileId.fromString("1.2.3");
+        var maxAutomaticTokenAssociations = 101;
+        var stakedAccountId = AccountId.fromString("4.3.2");
+        var stakedNode = 13L;
+        var declineStakingReward = true;
+
 
         cryptoService.buffer.enqueueResponse(TestResponse.query(
             Response.newBuilder().setTransactionGetReceipt(
@@ -119,7 +126,15 @@ public class MockingTest {
             .setAutoRenewPeriod(Duration.ofMinutes(1))
             .setAdminKey(adminKey)
             .setGas(100)
-            .setInitialBalance(new Hbar(3));
+            .setInitialBalance(new Hbar(3))
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setDeclineStakingReward(declineStakingReward);
+
+        if (stakeType.equals("stakedAccount")) {
+            flow.setStakedAccountId(stakedAccountId);
+        } else {
+            flow.setStakedNodeId(stakedNode);
+        }
 
         if (versionToTest.equals("sync")) {
             flow.execute(server.client);
@@ -165,6 +180,14 @@ public class MockingTest {
         Assertions.assertEquals(adminKey, contractCreateTx.getAdminKey());
         Assertions.assertEquals(100, contractCreateTx.getGas());
         Assertions.assertEquals(new Hbar(3), contractCreateTx.getInitialBalance());
+        Assertions.assertEquals(maxAutomaticTokenAssociations, contractCreateTx.getMaxAutomaticTokenAssociations());
+        Assertions.assertEquals(declineStakingReward, contractCreateTx.getDeclineStakingReward());
+
+        if (stakeType.equals("stakedAccount")) {
+            Assertions.assertEquals(stakedAccountId, contractCreateTx.getStakedAccountId());
+        } else {
+            Assertions.assertEquals(stakedNode, contractCreateTx.getStakedNodeId());
+        }
 
         Assertions.assertInstanceOf(FileDeleteTransaction.class, transactions.get(2));
 

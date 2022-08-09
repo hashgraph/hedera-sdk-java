@@ -16,8 +16,11 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -55,8 +58,12 @@ public class EthereumFlowMockTest {
         }
     }
 
-    @Test
-    public void extractsCallData() throws PrecheckStatusException, TimeoutException, InterruptedException, ReceiptStatusException {
+    @ParameterizedTest(name = "[{0}] ContractCreateFlow functions")
+    @CsvSource({
+        "sync",
+        "async"
+    })
+    public void extractsCallData(String versionToTest) throws PrecheckStatusException, TimeoutException, InterruptedException, ReceiptStatusException, ExecutionException {
         List<Object> responses1 = List.of(
                 (Function<Object, Object>) o -> {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
@@ -88,10 +95,6 @@ public class EthereumFlowMockTest {
                         .setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
                                 .setReceipt(TransactionReceipt.newBuilder().setStatusValue(ResponseCodeEnum.SUCCESS_VALUE))
                         ).build(),
-                Response.newBuilder()
-                        .setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
-                                .setReceipt(TransactionReceipt.newBuilder().setStatusValue(ResponseCodeEnum.SUCCESS_VALUE))
-                        ).build(),
                 (Function<Object, Object>) o -> {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
                     var transactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
@@ -113,10 +116,18 @@ public class EthereumFlowMockTest {
             var ethereumData = EthereumTransactionData.fromBytes(ETHEREUM_DATA.toByteArray());
             ethereumData.callData = LONG_CALL_DATA.toByteArray();
 
-            new EthereumFlow()
+            if (versionToTest.equals("sync")) {
+                new EthereumFlow()
                     .setEthereumData(ethereumData.toBytes())
                     .execute(mocker.client)
                     .getReceipt(mocker.client);
+            } else {
+                new EthereumFlow()
+                    .setEthereumData(ethereumData.toBytes())
+                    .executeAsync(mocker.client)
+                    .thenCompose(response -> response.getReceiptAsync(mocker.client))
+                    .get();
+            }
         }
     }
 }

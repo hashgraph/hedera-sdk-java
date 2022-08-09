@@ -42,7 +42,7 @@ public class AccountBalanceQueryTest {
         new AccountBalanceQuery()
             .setAccountId(AccountId.fromString("0.0.5005"))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
     @Test
@@ -51,6 +51,6 @@ public class AccountBalanceQueryTest {
         new AccountBalanceQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

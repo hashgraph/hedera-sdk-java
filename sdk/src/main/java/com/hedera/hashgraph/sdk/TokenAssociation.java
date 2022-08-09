@@ -42,7 +42,7 @@ public class TokenAssociation {
      * @param tokenId                   the token id
      * @param accountId                 the account id
      */
-    private TokenAssociation(TokenId tokenId, AccountId accountId) {
+    TokenAssociation(TokenId tokenId, AccountId accountId) {
         this.tokenId = tokenId;
         this.accountId = accountId;
     }

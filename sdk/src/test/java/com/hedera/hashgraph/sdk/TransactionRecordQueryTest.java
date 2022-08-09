@@ -46,7 +46,7 @@ public class TransactionRecordQueryTest {
     void shouldSerialize() {
         var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         spawnQuery().onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
     private TransactionRecordQuery spawnQuery() {

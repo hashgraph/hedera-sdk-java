@@ -57,8 +57,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
                 new FileAppendTransaction()
                         .setFileId(fileId)
                         .setContents(Arrays.copyOfRange(callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
-                        .execute(client)
-                        .getReceipt(client);
+                        .execute(client);
             }
 
             return fileId;

@@ -42,6 +42,6 @@ public class FileContentsQueryTest {
         new FileContentsQuery()
             .setFileId(FileId.fromString("0.0.5005"))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

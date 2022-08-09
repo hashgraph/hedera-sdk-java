@@ -48,6 +48,6 @@ public class TransactionReceiptQueryTest {
         new TransactionReceiptQuery()
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5005"), validStart))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }
