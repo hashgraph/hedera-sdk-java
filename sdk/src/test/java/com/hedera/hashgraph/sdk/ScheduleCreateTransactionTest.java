@@ -64,6 +64,7 @@ public class ScheduleCreateTransactionTest {
             .setPayerAccountId(AccountId.fromString("0.0.222"))
             .setScheduleMemo("hi")
             .setMaxTransactionFee(new Hbar(1))
+            .setExpirationTime(validStart)
             .freeze()
             .sign(unusedPrivateKey);
     }

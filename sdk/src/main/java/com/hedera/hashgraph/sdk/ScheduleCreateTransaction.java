@@ -195,6 +195,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         if (adminKey != null) {
             builder.setAdminKey(adminKey.toProtobufKey());
         }
+        if (expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
         builder.setMemo(scheduleMemo).setWaitForExpiry(waitForExpiry);
         return builder;
     }
@@ -212,6 +215,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         }
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());
+        }
+        if (body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
         scheduleMemo = body.getMemo();
     }
