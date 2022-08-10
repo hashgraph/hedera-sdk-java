@@ -37,8 +37,7 @@ public class EthereumFlowMockTest {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
                     var transactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
                     assertThat(transactionBody.getDataCase()).isEqualByComparingTo(TransactionBody.DataCase.ETHEREUMTRANSACTION);
-                    assertThat(transactionBody.getEthereumTransaction()).isNotNull();
-                    assertThat(transactionBody.getEthereumTransaction().getEthereumData()).isNotNull();
+                    assertThat(transactionBody.hasEthereumTransaction()).isTrue();
                     assertThat(transactionBody.getEthereumTransaction().getEthereumData()).isEqualTo(ETHEREUM_DATA);
                     return TransactionResponse.newBuilder().setNodeTransactionPrecheckCodeValue(0).build();
                 },
@@ -69,8 +68,7 @@ public class EthereumFlowMockTest {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
                     var transactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
                     assertThat(transactionBody.getDataCase()).isEqualByComparingTo(TransactionBody.DataCase.FILECREATE);
-                    assertThat(transactionBody.getFileCreate()).isNotNull();
-                    assertThat(transactionBody.getFileCreate().getContents()).isNotNull();
+                    assertThat(transactionBody.hasFileCreate()).isTrue();
                     assertThat(transactionBody.getFileCreate().getContents().size()).isEqualTo(4096);
                     return TransactionResponse.newBuilder().setNodeTransactionPrecheckCodeValue(0).build();
                 },
@@ -84,10 +82,9 @@ public class EthereumFlowMockTest {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
                     var transactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
                     assertThat(transactionBody.getDataCase()).isEqualByComparingTo(TransactionBody.DataCase.FILEAPPEND);
-                    assertThat(transactionBody.getFileAppend()).isNotNull();
-                    assertThat(transactionBody.getFileAppend().getFileID()).isNotNull();
+                    assertThat(transactionBody.hasFileAppend()).isTrue();
+                    assertThat(transactionBody.getFileAppend().hasFileID()).isTrue();
                     assertThat(transactionBody.getFileAppend().getFileID().getFileNum()).isEqualTo(1);
-                    assertThat(transactionBody.getFileAppend().getContents()).isNotNull();
                     assertThat(transactionBody.getFileAppend().getContents()).isEqualTo(LONG_CALL_DATA.substring(4096));
                     return TransactionResponse.newBuilder().setNodeTransactionPrecheckCodeValue(0).build();
                 },
@@ -99,8 +96,7 @@ public class EthereumFlowMockTest {
                     var signedTransaction = SignedTransaction.parseFrom(((Transaction) o).getSignedTransactionBytes());
                     var transactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
                     assertThat(transactionBody.getDataCase()).isEqualByComparingTo(TransactionBody.DataCase.ETHEREUMTRANSACTION);
-                    assertThat(transactionBody.getEthereumTransaction()).isNotNull();
-                    assertThat(transactionBody.getEthereumTransaction().getEthereumData()).isNotNull();
+                    assertThat(transactionBody.hasEthereumTransaction()).isTrue();
                     assertThat(EthereumTransactionData.fromBytes(transactionBody.getEthereumTransaction().getEthereumData().toByteArray()).callData).isEmpty();
                     return TransactionResponse.newBuilder().setNodeTransactionPrecheckCodeValue(0).build();
                 },
