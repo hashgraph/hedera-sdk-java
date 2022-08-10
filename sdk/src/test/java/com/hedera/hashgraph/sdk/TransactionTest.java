@@ -23,7 +23,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 public class TransactionTest {
     @Test
@@ -32,7 +33,7 @@ public class TransactionTest {
 
         var transaction = (TransferTransaction) Transaction.fromBytes(bytes);
 
-        assertEquals(transaction.getHbarTransfers().get(new AccountId(476260)), new Hbar(1).negated());
-        assertEquals(transaction.getHbarTransfers().get(new AccountId(476267)), new Hbar(1));
+        assertThat(transaction.getHbarTransfers().get(new AccountId(476260))).isEqualTo(new Hbar(1).negated());
+        assertThat(transaction.getHbarTransfers().get(new AccountId(476267))).isEqualTo(new Hbar(1));
     }
 }

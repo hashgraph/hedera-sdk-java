@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 // TODO: update this, test deepClone()
 
@@ -89,7 +89,7 @@ public class TokenInfoTest {
         var originalTokenInfo = spawnTokenInfoExample();
         byte[] tokenInfoBytes = originalTokenInfo.toBytes();
         var copyTokenInfo = TokenInfo.fromBytes(tokenInfoBytes);
-        assertTrue(originalTokenInfo.toString().equals(copyTokenInfo.toString()));
+        assertThat(copyTokenInfo.toString()).isEqualTo(originalTokenInfo.toString());
         SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
     }
 }

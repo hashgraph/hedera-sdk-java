@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Deprecated
 
  - `[Contract|Account]CreateTransaction.[set|get]ProxyAccountId()` with no replacement
+ - `ContractCreateFlow.[set|get]ProxyAccountId()` with no replacement
 
 ## v2.17.1
 

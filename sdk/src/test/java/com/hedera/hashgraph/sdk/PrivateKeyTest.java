@@ -21,12 +21,13 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PrivateKeyTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -57,7 +58,7 @@ public class PrivateKeyTest {
         var key = PrivateKey.fromStringECDSA("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048");
         var signature = key.sign(message);
 
-        Assertions.assertEquals(Hex.toHexString(signature), "f3a13a555f1f8cd6532716b8f388bd4e9d8ed0b252743e923114c0c6cbfe414cf791c8e859afd3c12009ecf2cb20dacf01636d80823bcdbd9ec1ce59afe008f0");
+        assertThat(Hex.toHexString(signature)).isEqualTo("f3a13a555f1f8cd6532716b8f388bd4e9d8ed0b252743e923114c0c6cbfe414cf791c8e859afd3c12009ecf2cb20dacf01636d80823bcdbd9ec1ce59afe008f0");
     }
 
     @Test
