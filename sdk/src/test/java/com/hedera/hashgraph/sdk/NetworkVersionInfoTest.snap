@@ -1,0 +1,3 @@
+com.hedera.hashgraph.sdk.NetworkVersionInfoTest.shouldSerialize=[
+  "com.hedera.hashgraph.sdk.NetworkVersionInfo"
+]

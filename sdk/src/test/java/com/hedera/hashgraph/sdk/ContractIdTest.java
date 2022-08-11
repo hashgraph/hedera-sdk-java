@@ -26,7 +26,8 @@ import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 class ContractIdTest {
     @BeforeAll
@@ -72,9 +73,9 @@ class ContractIdTest {
     @Test
     void toFromBytes() throws InvalidProtocolBufferException {
         ContractId a = ContractId.fromString("1.2.3");
-        assertEquals(a, ContractId.fromBytes(a.toBytes()));
+        assertThat(ContractId.fromBytes(a.toBytes())).isEqualTo(a);
         ContractId b = ContractId.fromEvmAddress(1, 2, "0x98329e006610472e6B372C080833f6D79ED833cf");
-        assertEquals(b, ContractId.fromBytes(b.toBytes()));
+        assertThat(ContractId.fromBytes(b.toBytes())).isEqualTo(b);
     }
 
     @Test

@@ -98,7 +98,7 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
 
     @Override
     ScheduleInfo mapResponse(Response response, AccountId nodeId, Query request) {
-        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo());
+        return ScheduleInfo.fromProtobuf(response.getScheduleGetInfo().getScheduleInfo());
     }
 
     @Override

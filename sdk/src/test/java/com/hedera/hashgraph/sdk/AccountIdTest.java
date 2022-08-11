@@ -138,12 +138,12 @@ class AccountIdTest {
 
     @Test
     void fromStringWithAliasKey() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777")).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toString()).toMatchSnapshot();
     }
 
     @Test
     void fromStringWithAliasEvmAddress() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da")).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toString()).toMatchSnapshot();
     }
 
     @Test

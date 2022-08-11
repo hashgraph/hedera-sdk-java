@@ -29,28 +29,12 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromString=[
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasEvmAddress=[
-  {
-    "shard": 0,
-    "realm": 0,
-    "num": 0,
-    "aliasEvmAddress": {
-      "bytes": "MCowBQYDK2VwAyEAEU5qvDcbgto="
-    }
-  }
+  "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasKey=[
-  {
-    "shard": 0,
-    "realm": 0,
-    "num": 0,
-    "aliasKey": {
-      "keyData": "EU5qvDcbgtq1wV6hSfAtNKASCHsWNRbdcPRKyvq/d3c=",
-      "ecdsa": false,
-      "ed25519": true
-    }
-  }
+  "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
 ]
 
 

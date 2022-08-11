@@ -131,11 +131,13 @@ public final class TransactionRecord {
 
     public final List<Transfer> paidStakingRewards;
 
+    @Nullable
     public final ByteString prngBytes;
 
+    @Nullable
     public final Integer prngNumber;
 
-    private TransactionRecord(
+    TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
         Instant consensusTimestamp,
@@ -156,8 +158,8 @@ public final class TransactionRecord {
         @Nullable Instant parentConsensusTimestamp,
         ByteString ethereumHash,
         List<Transfer> paidStakingRewards,
-        ByteString prngBytes,
-        Integer prngNumber
+        @Nullable ByteString prngBytes,
+        @Nullable Integer prngNumber
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -189,10 +191,10 @@ public final class TransactionRecord {
     /**
      * Create a transaction record from a protobuf.
      *
-     * @param transactionRecord         the protobuf
-     * @param children                  the list of children
-     * @param duplicates                the list of duplicates
-     * @return                          the new transaction record
+     * @param transactionRecord the protobuf
+     * @param children          the list of children
+     * @param duplicates        the list of duplicates
+     * @return the new transaction record
      */
     static TransactionRecord fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
@@ -268,16 +270,16 @@ public final class TransactionRecord {
                 InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
             transactionRecord.getEthereumHash(),
             paidStakingRewards,
-            transactionRecord.getPrngBytes(),
-            transactionRecord.getPrngNumber()
+            transactionRecord.hasPrngBytes() ? transactionRecord.getPrngBytes() : null,
+            transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null
         );
     }
 
     /**
      * Create a transaction record from a protobuf.
      *
-     * @param transactionRecord         the protobuf
-     * @return                          the new transaction record
+     * @param transactionRecord the protobuf
+     * @return the new transaction record
      */
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
         return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
@@ -286,9 +288,9 @@ public final class TransactionRecord {
     /**
      * Create a transaction record from a byte array.
      *
-     * @param bytes                     the byte array
-     * @return                          the new transaction record
-     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     * @param bytes the byte array
+     * @return the new transaction record
+     * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
@@ -297,7 +299,7 @@ public final class TransactionRecord {
     /**
      * Create the protobuf.
      *
-     * @return                          the protobuf representation
+     * @return the protobuf representation
      */
     com.hedera.hashgraph.sdk.proto.TransactionRecord toProtobuf() {
         var transferList = TransferList.newBuilder();
@@ -332,10 +334,14 @@ public final class TransactionRecord {
             var nftTransferList = TokenTransferList.newBuilder()
                 .setToken(nftEntry.getKey().toProtobuf());
             for (var aaEntry : nftEntry.getValue()) {
-                nftTransferList.addNftTransfers(NftTransfer.newBuilder()
-                    .setSenderAccountID(aaEntry.sender.toProtobuf())
-                    .setReceiverAccountID(aaEntry.receiver.toProtobuf())
-                    .setSerialNumber(aaEntry.serial).build());
+                nftTransferList.addNftTransfers(
+                    NftTransfer.newBuilder()
+                        .setSenderAccountID(aaEntry.sender.toProtobuf())
+                        .setReceiverAccountID(aaEntry.receiver.toProtobuf())
+                        .setSerialNumber(aaEntry.serial)
+                        .setIsApproval(aaEntry.isApproved)
+                        .build()
+                );
             }
 
             transactionRecord.addTokenTransferLists(nftTransferList);
@@ -402,7 +408,7 @@ public final class TransactionRecord {
             .add("parentConsensusTimestamp", parentConsensusTimestamp)
             .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
             .add("paidStakingRewards", paidStakingRewards)
-            .add("prngBytes", Hex.toHexString(prngBytes.toByteArray()))
+            .add("prngBytes", prngBytes != null ? Hex.toHexString(prngBytes.toByteArray()) : null)
             .add("prngNumber", prngNumber)
             .toString();
     }
@@ -410,7 +416,7 @@ public final class TransactionRecord {
     /**
      * Create the byte array.
      *
-     * @return                          the byte array representation
+     * @return the byte array representation
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();

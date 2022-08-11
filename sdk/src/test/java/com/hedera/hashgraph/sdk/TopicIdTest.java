@@ -51,4 +51,14 @@ class TopicIdTest {
     void fromBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(TopicId.fromBytes(new TopicId(5005).toBytes()).toString()).toMatchSnapshot();
     }
+
+    @Test
+    void fromSolidityAddress() {
+        SnapshotMatcher.expect(TokenId.fromSolidityAddress("000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void toSolidityAddress() {
+        SnapshotMatcher.expect(new TokenId(5005).toSolidityAddress()).toMatchSnapshot();
+    }
 }

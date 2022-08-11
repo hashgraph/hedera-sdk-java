@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,17 +38,19 @@ public class AccountBalanceQueryTest {
 
     @Test
     void shouldSerializeWithAccountId() {
-        SnapshotMatcher.expect(new AccountBalanceQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        new AccountBalanceQuery()
             .setAccountId(AccountId.fromString("0.0.5005"))
-            .toString()
-        ).toMatchSnapshot();
+            .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
     @Test
     void shouldSerializeWithContractId() {
-        SnapshotMatcher.expect(new AccountBalanceQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        new AccountBalanceQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
-            .toString()
-        ).toMatchSnapshot();
+            .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

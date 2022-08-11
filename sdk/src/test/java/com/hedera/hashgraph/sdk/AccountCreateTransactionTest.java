@@ -23,6 +23,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import java.util.Arrays;
@@ -54,7 +55,25 @@ public class AccountCreateTransactionTest {
             .setProxyAccountId(AccountId.fromString("0.0.1001"))
             .setAccountMemo("some dumb memo")
             .setReceiverSignatureRequired(true)
-            //.setAutoRenewPeriod(Duration.ofHours(10))
+            .setAutoRenewPeriod(Duration.ofHours(10))
+            .setStakedAccountId(AccountId.fromString("0.0.3"))
+            .setMaxAutomaticTokenAssociations(100)
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .freeze()
+            .sign(unusedPrivateKey);
+    }
+
+    AccountCreateTransaction spawnTestTransaction2() {
+        return new AccountCreateTransaction()
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setKey(unusedPrivateKey)
+            .setInitialBalance(Hbar.fromTinybars(450))
+            .setProxyAccountId(AccountId.fromString("0.0.1001"))
+            .setAccountMemo("some dumb memo")
+            .setReceiverSignatureRequired(true)
+            .setAutoRenewPeriod(Duration.ofHours(10))
+            .setStakedNodeId(4L)
             .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
@@ -69,6 +88,18 @@ public class AccountCreateTransactionTest {
     @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
+        var tx2 = AccountCreateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void shouldSerialize2() {
+        SnapshotMatcher.expect(spawnTestTransaction2().toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes2() throws Exception {
+        var tx = spawnTestTransaction2();
         var tx2 = AccountCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }

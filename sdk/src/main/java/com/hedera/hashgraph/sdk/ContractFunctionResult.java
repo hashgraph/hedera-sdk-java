@@ -407,6 +407,10 @@ public final class ContractFunctionResult {
             contractFunctionResult.addCreatedContractIDs(contractId.toProtobuf());
         }
 
+        if (senderAccountId != null) {
+            contractFunctionResult.setSenderId(senderAccountId.toProtobuf());
+        }
+
         // for (var stateChange : stateChanges) {
         //     contractFunctionResult.addStateChanges(stateChange.toProtobuf());
         // }

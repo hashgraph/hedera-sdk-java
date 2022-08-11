@@ -38,7 +38,7 @@ public final class Transfer {
      */
     public final Hbar amount;
 
-    private Transfer(AccountId accountId, Hbar amount) {
+    Transfer(AccountId accountId, Hbar amount) {
         this.accountId = accountId;
         this.amount = amount;
     }

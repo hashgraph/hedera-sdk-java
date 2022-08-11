@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -28,8 +29,7 @@ import org.threeten.bp.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenFeeScheduleUpdateTransactionTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -69,13 +69,11 @@ public class TokenFeeScheduleUpdateTransactionTest {
     }
 
     @Test
-    void shouldSerialize() {
-        assertDoesNotThrow(() -> {
-            var originalUpdate = spawnTestTransaction();
-            byte[] updateBytes = originalUpdate.toBytes();
-            var copyUpdate = TokenFeeScheduleUpdateTransaction.fromBytes(updateBytes);
-            assertTrue(originalUpdate.toString().equals(copyUpdate.toString()));
-            SnapshotMatcher.expect(originalUpdate.toString()).toMatchSnapshot();
-        });
+    void shouldSerialize() throws InvalidProtocolBufferException {
+        var originalUpdate = spawnTestTransaction();
+        byte[] updateBytes = originalUpdate.toBytes();
+        var copyUpdate = TokenFeeScheduleUpdateTransaction.fromBytes(updateBytes);
+        assertThat(copyUpdate.toString()).isEqualTo(originalUpdate.toString());
+        SnapshotMatcher.expect(originalUpdate.toString()).toMatchSnapshot();
     }
 }

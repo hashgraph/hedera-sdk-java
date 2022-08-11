@@ -60,6 +60,7 @@ public class FileCreateTransactionTest {
             .setExpirationTime(Instant.ofEpochSecond(1554158728))
             .setKeys(unusedPrivateKey)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setFileMemo("Hello memo")
             .freeze()
             .sign(unusedPrivateKey);
     }

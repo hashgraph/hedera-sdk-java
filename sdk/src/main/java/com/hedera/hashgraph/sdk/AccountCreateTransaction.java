@@ -154,21 +154,27 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Extract the proxy account id.
      *
      * @return                          the proxy account id
      */
     @Nullable
+    @Deprecated
     public AccountId getProxyAccountId() {
         return proxyAccountId;
     }
 
     /**
+     * @deprecated with no replacement
+     *
      * Set the ID of the account to which this account is proxy staked.
      *
      * @param proxyAccountId the proxy account ID.
      * @return {@code this}
      */
+    @Deprecated
     public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         requireNotFrozen();
         Objects.requireNonNull(proxyAccountId);

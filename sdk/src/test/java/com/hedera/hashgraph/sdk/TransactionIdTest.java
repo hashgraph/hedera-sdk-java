@@ -26,10 +26,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 class TransactionIdTest {
     @BeforeAll
@@ -56,14 +53,14 @@ class TransactionIdTest {
     void shouldToBytes() {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325");
         var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
-        assertEquals(originalId.toString(), copyId.toString());
+        assertThat(copyId.toString()).isEqualTo(originalId.toString());
     }
 
     @Test
     void shouldToBytes2() {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled/2");
         var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
-        assertEquals(originalId.toString(), copyId.toString());
+        assertThat(copyId.toString()).isEqualTo(originalId.toString());
     }
 
     @Test
@@ -71,10 +68,10 @@ class TransactionIdTest {
         var transactionId = TransactionId.fromString("0.0.23847@1588539964.632521325");
         var accountId = Objects.requireNonNull(transactionId.accountId);
         var validStart = Objects.requireNonNull(transactionId.validStart);
-        assertEquals(0, accountId.shard);
-        assertEquals(23847, accountId.num);
-        assertEquals(1588539964, validStart.getEpochSecond());
-        assertEquals(632521325, validStart.getNano());
+        assertThat(accountId.shard).isEqualTo(0);
+        assertThat(accountId.num).isEqualTo(23847);
+        assertThat(validStart.getEpochSecond()).isEqualTo(1588539964);
+        assertThat(validStart.getNano()).isEqualTo(632521325);
     }
 
     @Test
@@ -82,14 +79,14 @@ class TransactionIdTest {
         var transactionId = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled");
         var accountId = Objects.requireNonNull(transactionId.accountId);
         var validStart = Objects.requireNonNull(transactionId.validStart);
-        assertEquals(0, accountId.shard);
-        assertEquals(23847, accountId.num);
-        assertEquals(1588539964, validStart.getEpochSecond());
-        assertEquals(632521325, validStart.getNano());
-        assertTrue(transactionId.getScheduled());
-        assertNull(transactionId.getNonce());
+        assertThat(accountId.shard).isEqualTo(0);
+        assertThat(accountId.num).isEqualTo(23847);
+        assertThat(validStart.getEpochSecond()).isEqualTo(1588539964);
+        assertThat(validStart.getNano()).isEqualTo(632521325);
+        assertThat(transactionId.getScheduled()).isTrue();
+        assertThat(transactionId.getNonce()).isNull();
 
-        assertEquals(transactionId.toString(), "0.0.23847@1588539964.632521325?scheduled");
+        assertThat(transactionId.toString()).isEqualTo("0.0.23847@1588539964.632521325?scheduled");
     }
 
     @Test
@@ -97,13 +94,13 @@ class TransactionIdTest {
         var transactionId = TransactionId.fromString("0.0.23847@1588539964.632521325/4");
         var accountId = Objects.requireNonNull(transactionId.accountId);
         var validStart = Objects.requireNonNull(transactionId.validStart);
-        assertEquals(0, accountId.shard);
-        assertEquals(23847, accountId.num);
-        assertEquals(1588539964, validStart.getEpochSecond());
-        assertEquals(632521325, validStart.getNano());
-        assertFalse(transactionId.getScheduled());
-        assertEquals(4, transactionId.getNonce());
+        assertThat(accountId.shard).isEqualTo(0);
+        assertThat(accountId.num).isEqualTo(23847);
+        assertThat(validStart.getEpochSecond()).isEqualTo(1588539964);
+        assertThat(validStart.getNano()).isEqualTo(632521325);
+        assertThat(transactionId.getScheduled()).isFalse();
+        assertThat(transactionId.getNonce()).isEqualTo(4);
 
-        assertEquals(transactionId.toString(), "0.0.23847@1588539964.632521325/4");
+        assertThat(transactionId.toString()).isEqualTo("0.0.23847@1588539964.632521325/4");
     }
 }
