@@ -183,7 +183,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @return                          the proxy account id
      */
     @Nullable
-    @Deprecated(since = "2.17.2")
+    @Deprecated
     public AccountId getProxyAccountId() {
         return proxyAccountId;
     }
@@ -202,7 +202,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @param proxyAccountId The AccountId to be set
      * @return {@code this}
      */
-    @Deprecated(since = "2.17.2")
+    @Deprecated
     public ContractCreateFlow setProxyAccountId(AccountId proxyAccountId) {
         Objects.requireNonNull(proxyAccountId);
         this.proxyAccountId = proxyAccountId;

@@ -161,7 +161,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @return                          the proxy account id
      */
     @Nullable
-    @Deprecated(since = "2.17.2")
+    @Deprecated
     public AccountId getProxyAccountId() {
         return proxyAccountId;
     }
@@ -174,7 +174,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param proxyAccountId the proxy account ID.
      * @return {@code this}
      */
-    @Deprecated(since = "2.17.2")
+    @Deprecated
     public AccountCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         requireNotFrozen();
         Objects.requireNonNull(proxyAccountId);
