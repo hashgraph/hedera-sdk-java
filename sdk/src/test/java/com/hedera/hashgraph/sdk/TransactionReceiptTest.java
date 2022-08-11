@@ -2,13 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
-
-import javax.annotation.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

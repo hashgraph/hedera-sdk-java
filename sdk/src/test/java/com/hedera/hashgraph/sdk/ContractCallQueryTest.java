@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

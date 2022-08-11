@@ -33,7 +33,9 @@ public class TransactionTest {
 
         var transaction = (TransferTransaction) Transaction.fromBytes(bytes);
 
-        assertThat(transaction.getHbarTransfers().get(new AccountId(476260))).isEqualTo(new Hbar(1).negated());
-        assertThat(transaction.getHbarTransfers().get(new AccountId(476267))).isEqualTo(new Hbar(1));
+        assertThat(transaction.getHbarTransfers())
+            .containsEntry(new AccountId(476260), new Hbar(1).negated());
+        assertThat(transaction.getHbarTransfers())
+            .containsEntry(new AccountId(476267), new Hbar(1));
     }
 }

@@ -26,7 +26,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Collections;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class Ed25519PublicKeyTest {

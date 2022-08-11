@@ -3,16 +3,12 @@ package com.hedera.hashgraph.sdk;
 import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.Server;
 import io.grpc.Status;
-import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.threeten.bp.Duration;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -22,7 +18,7 @@ import java.util.Queue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 
-public class AddressBookQueryMockTest {
+class AddressBookQueryMockTest {
 
     private Client client;
     final private AddressBookQueryStub addressBookServiceStub = new AddressBookQueryStub();
@@ -74,7 +70,7 @@ public class AddressBookQueryMockTest {
         var nodes = executeVersion.equals("sync") ?
             addressBookQuery.execute(client) :
             addressBookQuery.executeAsync(client).get();
-        assertThat(nodes.nodeAddresses.size()).isEqualTo(1);
+        assertThat(nodes.nodeAddresses).hasSize(1);
         assertThat(nodes.nodeAddresses.get(0).accountId).isEqualTo(AccountId.fromString("0.0.3"));
     }
 
@@ -110,7 +106,7 @@ public class AddressBookQueryMockTest {
         var nodes = executeVersion.equals("sync") ?
             addressBookQuery.execute(client) :
             addressBookQuery.executeAsync(client).get();
-        assertThat(nodes.nodeAddresses.size()).isEqualTo(1);
+        assertThat(nodes.nodeAddresses).hasSize(1);
         assertThat(nodes.nodeAddresses.get(0).accountId).isEqualTo(AccountId.fromString("0.0.3"));
     }
 

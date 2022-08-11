@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
-
 import org.threeten.bp.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
