@@ -178,10 +178,21 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return setMaxAttempts(count);
     }
 
+    /**
+     * Get the maximum times execution will be attempted.
+     *
+     * @return Number of errors before execution will fail.
+     */
     public final int getMaxAttempts() {
         return maxAttempts != null ? maxAttempts : Client.DEFAULT_MAX_ATTEMPTS;
     }
 
+    /**
+     * Set the maximum times execution will be attempted.
+     *
+     * @param maxAttempts Execution will fail after this many errors.
+     * @return {@code this}
+     */
     public final SdkRequestT setMaxAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
             throw new IllegalArgumentException("maxAttempts must be greater than zero");
@@ -191,6 +202,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return (SdkRequestT) this;
     }
 
+    /**
+     * Get the list of account IDs for nodes with which execution will be attempted.
+     * @return
+     */
     @Nullable
     public final List<AccountId> getNodeAccountIds() {
         if (!nodeAccountIds.isEmpty()) {
@@ -260,10 +275,27 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
     }
 
+    /**
+     * Execute this transaction or query
+     *
+     * @param client The client with which this will be executed.
+     * @return Result of execution
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
     public O execute(Client client) throws TimeoutException, PrecheckStatusException {
         return execute(client, client.getRequestTimeout());
     }
 
+    /**
+     * Execute this transaction or query with a timeout
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return Result of execution
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
     @Override
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
@@ -334,6 +366,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
     }
 
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @return Future result of execution
+     */
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
