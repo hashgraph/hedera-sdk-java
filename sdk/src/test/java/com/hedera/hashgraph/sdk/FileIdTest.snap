@@ -3,6 +3,11 @@ com.hedera.hashgraph.sdk.FileIdTest.fromBytes=[
 ]
 
 
+com.hedera.hashgraph.sdk.FileIdTest.fromSolidityAddress=[
+  "0.0.5005"
+]
+
+
 com.hedera.hashgraph.sdk.FileIdTest.shouldSerializeFromString=[
   "0.0.5005"
 ]
@@ -10,4 +15,9 @@ com.hedera.hashgraph.sdk.FileIdTest.shouldSerializeFromString=[
 
 com.hedera.hashgraph.sdk.FileIdTest.toBytes=[
   "188d27"
+]
+
+
+com.hedera.hashgraph.sdk.FileIdTest.toSolidityAddress=[
+  "000000000000000000000000000000000000138d"
 ]

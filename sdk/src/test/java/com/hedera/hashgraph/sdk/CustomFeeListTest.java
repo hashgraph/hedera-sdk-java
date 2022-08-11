@@ -54,6 +54,14 @@ public class CustomFeeListTest {
             .setMin(3)
             .setMax(100)
         );
+        returnList.add(new CustomRoyaltyFee()
+            .setFeeCollectorAccountId(new AccountId(23423))
+            .setNumerator(5)
+            .setDenominator(8)
+            .setFallbackFee(new CustomFixedFee()
+                .setDenominatingTokenId(new TokenId(483902))
+                .setAmount(10))
+        );
         return returnList;
     }
 
@@ -62,10 +70,12 @@ public class CustomFeeListTest {
         var originalCustomFeeList = spawnCustomFeeListExample();
         byte[] customFee0Bytes = originalCustomFeeList.get(0).toBytes();
         byte[] customFee1Bytes = originalCustomFeeList.get(1).toBytes();
+        byte[] customFee2Bytes = originalCustomFeeList.get(2).toBytes();
         var copyCustomFeeList = new ArrayList<CustomFee>();
         copyCustomFeeList.add(CustomFee.fromBytes(customFee0Bytes));
         copyCustomFeeList.add(CustomFee.fromBytes(customFee1Bytes));
-        assertThat(originalCustomFeeList.toString().equals(copyCustomFeeList.toString())).isTrue();
+        copyCustomFeeList.add(CustomFee.fromBytes(customFee2Bytes));
+        assertThat(originalCustomFeeList.toString()).isEqualTo(copyCustomFeeList.toString());
         SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }
 
@@ -77,11 +87,11 @@ public class CustomFeeListTest {
             copyCustomFeeList.add(fee.deepClone());
         }
         var originalCustomFeeListString = originalCustomFeeList.toString();
-        assertThat(originalCustomFeeListString.equals(copyCustomFeeList.toString())).isTrue();
+        assertThat(originalCustomFeeListString).isEqualTo(copyCustomFeeList.toString());
 
         // modifying clone doesn't affect original
         ((CustomFixedFee) copyCustomFeeList.get(0)).setDenominatingTokenId(new TokenId(89803));
-        assertThat(originalCustomFeeListString.equals(originalCustomFeeList.toString())).isTrue();
+        assertThat(originalCustomFeeListString).isEqualTo(originalCustomFeeList.toString());
 
         SnapshotMatcher.expect(originalCustomFeeList.toString()).toMatchSnapshot();
     }

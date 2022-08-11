@@ -22,10 +22,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
-
 import org.threeten.bp.Instant;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ExchangeRatesTest {
     private static final String exchangeRateSetHex = "0a1008b0ea0110b6b4231a0608f0bade9006121008b0ea01108cef231a060880d7de9006";
@@ -36,16 +35,16 @@ public class ExchangeRatesTest {
 
         ExchangeRates exchangeRates = ExchangeRates.fromBytes(exchangeRatesBytes);
 
-        assertEquals(580150, exchangeRates.currentRate.cents);
-        assertEquals(30000, exchangeRates.currentRate.hbars);
+        assertThat(exchangeRates.currentRate.cents).isEqualTo(580150);
+        assertThat(exchangeRates.currentRate.hbars).isEqualTo(30000);
         Instant currentExpirationTime = Instant.ofEpochSecond(1645714800);
-        assertEquals(currentExpirationTime, exchangeRates.currentRate.expirationTime);
-        assertEquals(19.338333333333335, exchangeRates.currentRate.exchangeRateInCents);
+        assertThat(exchangeRates.currentRate.expirationTime).isEqualTo(currentExpirationTime);
+        assertThat(exchangeRates.currentRate.exchangeRateInCents).isEqualTo(19.338333333333335);
 
-        assertEquals(587660, exchangeRates.nextRate.cents);
-        assertEquals(30000, exchangeRates.nextRate.hbars);
+        assertThat(exchangeRates.nextRate.cents).isEqualTo(587660);
+        assertThat(exchangeRates.nextRate.hbars).isEqualTo(30000);
         Instant nextExpirationTime = Instant.ofEpochSecond(1645718400);
-        assertEquals(nextExpirationTime, exchangeRates.nextRate.expirationTime);
-        assertEquals(19.588666666666665, exchangeRates.nextRate.exchangeRateInCents);
+        assertThat(exchangeRates.nextRate.expirationTime).isEqualTo(nextExpirationTime);
+        assertThat(exchangeRates.nextRate.exchangeRateInCents).isEqualTo(19.588666666666665);
     }
 }

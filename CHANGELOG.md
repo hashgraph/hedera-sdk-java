@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Deprecated
+
+ - `[Contract|Account]CreateTransaction.[set|get]ProxyAccountId()` with no replacement
+ - `ContractCreateFlow.[set|get]ProxyAccountId()` with no replacement
+
+### Fixed
+
+ - `ContractCreateFlow.setMaxAutomaticTokenAssociations()`
+ - `ContractFunctionResult.senderAccountId` now serializes correctly
+ - `CustomRoyaltyFee` now clones and `toString()`s correctly
+ - `ScheduleCreateTransaction.expirationTime` now deserializes correctly
+ - `ScheduleInfo` now deserializes correctly
+ - Made `StakingInfo.[to|from]Bytes()` public
+ - `TransactionReceipt.topicRunningHash` now `toString()`s correctly
+ - `TransactionRecord.[prngBytes|prngNumber|tokenNftTransfers]` now serializes/deserializes correctly
+
 ## v2.17.1
 
 ### Added

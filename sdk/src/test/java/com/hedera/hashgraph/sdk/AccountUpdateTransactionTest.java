@@ -59,6 +59,25 @@ public class AccountUpdateTransactionTest {
             .setMaxAutomaticTokenAssociations(100)
             .setAccountMemo("Some memo")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setStakedAccountId(AccountId.fromString("0.0.3"))
+            .freeze()
+            .sign(unusedPrivateKey);
+    }
+
+    AccountUpdateTransaction spawnTestTransaction2() {
+        return new AccountUpdateTransaction()
+            .setKey(unusedPrivateKey)
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setAccountId(AccountId.fromString("0.0.2002"))
+            .setProxyAccountId(AccountId.fromString("0.0.1001"))
+            .setAutoRenewPeriod(Duration.ofHours(10))
+            .setExpirationTime(Instant.ofEpochSecond(1554158543))
+            .setReceiverSignatureRequired(false)
+            .setMaxAutomaticTokenAssociations(100)
+            .setAccountMemo("Some memo")
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setStakedNodeId(4L)
             .freeze()
             .sign(unusedPrivateKey);
     }
@@ -71,6 +90,18 @@ public class AccountUpdateTransactionTest {
     @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
+        var tx2 = AccountUpdateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void shouldSerialize2() {
+        SnapshotMatcher.expect(spawnTestTransaction2().toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes2() throws Exception {
+        var tx = spawnTestTransaction2();
         var tx2 = AccountUpdateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }

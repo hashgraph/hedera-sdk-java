@@ -69,7 +69,7 @@ public class TokenRelationship {
      */
     public final boolean automaticAssociation;
 
-    private TokenRelationship(
+    TokenRelationship(
         TokenId tokenId,
         String symbol,
         long balance,

@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -37,9 +38,10 @@ public class ContractInfoQueryTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new ContractInfoQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        new ContractInfoQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
-            .toString()
-        ).toMatchSnapshot();
+            .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

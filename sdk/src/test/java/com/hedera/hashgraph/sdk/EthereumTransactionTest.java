@@ -9,7 +9,7 @@ import org.threeten.bp.Instant;
 
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class EthereumTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -50,6 +50,6 @@ public class EthereumTransactionTest {
     void shouldBytesNft() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
-        assertEquals(tx.toString(), tx2.toString());
+        assertThat(tx2.toString()).isEqualTo(tx2.toString());
     }
 }

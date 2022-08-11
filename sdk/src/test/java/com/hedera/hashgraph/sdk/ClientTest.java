@@ -130,7 +130,7 @@ class ClientTest {
     @DisplayName("fromJson() functions correctly")
     void testFromJson() throws Exception {
         // Copied content of `client-config-with-operator.json`
-        Client.fromConfig("{\n" +
+        var client = Client.fromConfig("{\n" +
                 "    \"network\":\"mainnet\",\n" +
                 "    \"operator\": {\n" +
                 "        \"accountId\": \"0.0.36\",\n" +
@@ -151,6 +151,8 @@ class ClientTest {
                 .getResourceAsStream("client-config-with-operator.json");
 
         assertThat(clientConfigWithOperator).isNotNull();
+
+        client.close();
     }
 
     @Test
@@ -265,6 +267,8 @@ class ClientTest {
 
         // 20 seconds would indicate we tried 2 times to connect
         assertThat(secondsTaken).isLessThan(7);
+
+        client.close();
     }
 
     @Test

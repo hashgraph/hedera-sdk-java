@@ -26,12 +26,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContractFunctionResultTest {
-    private static final String CALL_RESULT_HEX = ""
+    static final String CALL_RESULT_HEX = ""
         + "00000000000000000000000000000000000000000000000000000000ffffffff"
         + "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         + "00000000000000000000000011223344556677889900aabbccddeeff00112233"

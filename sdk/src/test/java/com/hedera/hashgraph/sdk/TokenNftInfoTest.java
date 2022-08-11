@@ -9,8 +9,7 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenNftInfoTest {
     final static Instant creationTime = Instant.ofEpochSecond(1554158542);
@@ -41,7 +40,7 @@ public class TokenNftInfoTest {
         var originalTokenInfo = spawnTokenNftInfoExample(AccountId.fromString("8.9.10"));
         byte[] tokenInfoBytes = originalTokenInfo.toBytes();
         var copyTokenInfo = TokenNftInfo.fromBytes(tokenInfoBytes);
-        assertEquals(originalTokenInfo.toString(), copyTokenInfo.toString());
+        assertThat(copyTokenInfo.toString()).isEqualTo(originalTokenInfo.toString());
         SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
     }
 
@@ -50,7 +49,7 @@ public class TokenNftInfoTest {
         var originalTokenInfo = spawnTokenNftInfoExample(null);
         byte[] tokenInfoBytes = originalTokenInfo.toBytes();
         var copyTokenInfo = TokenNftInfo.fromBytes(tokenInfoBytes);
-        assertEquals(originalTokenInfo.toString(), copyTokenInfo.toString());
+        assertThat(copyTokenInfo.toString()).isEqualTo(originalTokenInfo.toString());
         SnapshotMatcher.expect(originalTokenInfo.toString()).toMatchSnapshot();
     }
 }
