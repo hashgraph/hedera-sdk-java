@@ -226,6 +226,7 @@ public class AddressBookQuery {
                         return;
                     }
                     warnAndDelay(attempt, error);
+                    addresses.clear();
                     executeAsync(client, deadline, returnFuture, attempt + 1);
                 }
 

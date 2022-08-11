@@ -287,6 +287,7 @@ public class MockingTest {
             Assertions.assertTrue(queryRequest.getCryptoGetInfo().hasAccountID());
             Assertions.assertEquals(accountId, AccountId.fromProtobuf(queryRequest.getCryptoGetInfo().getAccountID()));
         }
+        server.close();
     }
 
     @Test
