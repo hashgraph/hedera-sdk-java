@@ -56,7 +56,7 @@ public class FunctionalExecutableProcessor extends AbstractProcessor {
             var parameterName = annotation.onClient() ? annotation.inputType().toLowerCase() : "client";
             var clientVariableName = annotation.onClient() ? "this" : "client";
 
-            // are there any additional (checked) exceptions being through
+            // are there any additional (checked) exceptions being thrown
             var moreExceptions = new TypeName[annotation.exceptionTypes().length];
             for (var i = 0; i < moreExceptions.length; ++i) {
                 moreExceptions[i] = ClassName.get(packageName, annotation.exceptionTypes()[i]);
