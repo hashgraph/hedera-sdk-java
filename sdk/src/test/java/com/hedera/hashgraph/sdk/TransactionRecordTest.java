@@ -20,90 +20,92 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.AccountAmount;
-import com.hedera.hashgraph.sdk.proto.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.proto.ContractLoginfo;
-import com.hedera.hashgraph.sdk.proto.NftTransfer;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.TokenTransferList;
-import com.hedera.hashgraph.sdk.proto.TransactionGetRecordResponse;
-import com.hedera.hashgraph.sdk.proto.TransferList;
-import org.junit.jupiter.api.DisplayName;
+import com.google.protobuf.BytesValue;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.AfterClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
+import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static com.hedera.hashgraph.sdk.ContractFunctionResultTest.CALL_RESULT_HEX;
+import static com.hedera.hashgraph.sdk.TransactionReceiptTest.spawnReceiptExample;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionRecordTest {
-    final Instant exampleInstant = Instant.ofEpochSecond(1554158542);
+    final static Instant time = Instant.ofEpochSecond(1554158542);
+    private static final byte[] callResult = Hex.decode(CALL_RESULT_HEX);
+
+    @BeforeAll
+    public static void beforeAll() {
+        SnapshotMatcher.start();
+    }
+
+    @AfterClass
+    public static void afterAll() {
+        SnapshotMatcher.validateSnapshots();
+    }
+
+    private static TransactionRecord spawnRecordExample(@Nullable ByteString prngBytes, @Nullable Integer prngNumber) {
+        return new TransactionRecord(
+            spawnReceiptExample(),
+            ByteString.copyFrom("hello", StandardCharsets.UTF_8),
+            time,
+            TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
+            "memo",
+            3000L,
+            new ContractFunctionResult(
+                com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+                    .setContractID(ContractId.fromString("1.2.3").toProtobuf())
+                    .setContractCallResult(ByteString.copyFrom(callResult))
+                    .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())
+                    .setSenderId(AccountId.fromString("1.2.3").toProtobuf())
+            ),
+            List.of(new Transfer(AccountId.fromString("4.4.4"), Hbar.from(5))),
+            Map.of(TokenId.fromString("6.6.6"), Map.of(AccountId.fromString("1.1.1"), 4L)),
+            List.of(new TokenTransfer(TokenId.fromString("8.9.10"), AccountId.fromString("1.2.3"), 4L, 3, true)),
+            Map.of(TokenId.fromString("4.4.4"), List.of(new TokenNftTransfer(TokenId.fromString("4.4.4"), AccountId.fromString("1.2.3"), AccountId.fromString("3.2.1"), 4L, true))),
+            ScheduleId.fromString("3.3.3"),
+            List.of(new AssessedCustomFee(4L, TokenId.fromString("4.5.6"), AccountId.fromString("8.6.5"), List.of(AccountId.fromString("3.3.3")))),
+            List.of(new TokenAssociation(TokenId.fromString("5.4.3"), AccountId.fromString("8.7.6"))),
+            PrivateKey.fromStringECDSA("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048").getPublicKey(),
+            new ArrayList<>(),
+            new ArrayList<>(),
+            time,
+            ByteString.copyFrom("Some hash", StandardCharsets.UTF_8),
+            List.of(new Transfer(AccountId.fromString("1.2.3"), Hbar.from(8))),
+            prngBytes,
+            prngNumber
+        );
+    }
 
     @Test
-    @DisplayName("using toBytes and fromBytes will produce the correct response")
-    void toFromBytes() throws InvalidProtocolBufferException {
-        var hbarTransfer = AccountAmount.newBuilder()
-            .setAccountID(AccountId.fromString("0.0.5005").toProtobuf())
-            .setAmount(100_000);
+    void shouldSerialize() throws Exception {
+        var originalRecord = spawnRecordExample(
+            ByteString.copyFrom("very random bytes", StandardCharsets.UTF_8),
+            null
+        );
+        byte[] recordBytes = originalRecord.toBytes();
+        var copyRecord = TransactionRecord.fromBytes(recordBytes);
+        assertThat(copyRecord.toString()).isEqualTo(originalRecord.toString());
+        SnapshotMatcher.expect(originalRecord.toString()).toMatchSnapshot();
+    }
 
-        var hbarTransferList = TransferList.newBuilder();
-        hbarTransferList.addAccountAmounts(hbarTransfer);
-
-        var tokenTransfer = AccountAmount.newBuilder()
-            .setAccountID(AccountId.fromString("0.0.5006").toProtobuf())
-            .setAmount(100_000);
-
-        var tokenTransferList = TokenTransferList.newBuilder()
-            .setToken(TokenId.fromString("0.0.5007").toProtobuf());
-        tokenTransferList.addTransfers(tokenTransfer);
-
-        var nftTransfer = NftTransfer.newBuilder()
-            .setSenderAccountID(AccountId.fromString("0.0.5006").toProtobuf())
-            .setReceiverAccountID(AccountId.fromString("0.0.5007").toProtobuf())
-            .setSerialNumber(888);
-
-        var nftTransferList = TokenTransferList.newBuilder();
-        nftTransferList.addNftTransfers(nftTransfer);
-
-        Response response = Response.newBuilder()
-            .setTransactionGetRecord(
-                TransactionGetRecordResponse.newBuilder()
-                    .setTransactionRecord(com.hedera.hashgraph.sdk.proto.TransactionRecord.newBuilder()
-                        .setReceipt(com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder().build())
-                        .setTransactionHash(ByteString.copyFrom("hello", StandardCharsets.UTF_8))
-                        .setConsensusTimestamp(InstantConverter.toProtobuf(exampleInstant))
-                        .setTransactionID(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), exampleInstant).toProtobuf())
-                        .setMemo("hola")
-                        .setTransactionFee(100_000)
-                        .setTransferList(hbarTransferList)
-                        .addTokenTransferLists(tokenTransferList)
-                        .addTokenTransferLists(nftTransferList)
-                        .setContractCallResult(ContractFunctionResult.newBuilder()
-                            .addLogInfo(ContractLoginfo.newBuilder()
-                                .addTopic(ByteString.copyFrom("aloha", StandardCharsets.UTF_8))
-                                .setContractID(ContractId.fromString("0.0.5007").toProtobuf())
-                                .setBloom(ByteString.copyFrom("bonjour", StandardCharsets.UTF_8))
-                            )
-                            .setContractID(ContractId.fromString("0.0.5008").toProtobuf())
-                            .setContractCallResult(ByteString.copyFrom("hello again", StandardCharsets.UTF_8))
-                            .setBloom(ByteString.copyFrom("hola otra vez", StandardCharsets.UTF_8))
-                            .setGasUsed(100_000)
-                            .setErrorMessage("hello x3")
-                        ).setPrngNumber(12)
-                    )
-            )
-            .build();
-
-        TransactionRecord record = TransactionRecord.fromProtobuf(response.getTransactionGetRecord().getTransactionRecord());
-
-        assertNotNull(record);
-        assertNotNull(record.toBytes());
-
-        byte[] recordBytes = record.toBytes();
-        TransactionRecord newRecord = TransactionRecord.fromBytes(recordBytes);
-
-        assertEquals(record.toString(), newRecord.toString());
+    @Test
+    void shouldSerialize2() throws Exception {
+        var originalRecord = spawnRecordExample(
+            null,
+            4 /* chosen by fair dice roll.  Guaranteed to be random */
+        );
+        byte[] recordBytes = originalRecord.toBytes();
+        var copyRecord = TransactionRecord.fromBytes(recordBytes);
+        assertThat(copyRecord.toString()).isEqualTo(originalRecord.toString());
+        SnapshotMatcher.expect(originalRecord.toString()).toMatchSnapshot();
     }
 }

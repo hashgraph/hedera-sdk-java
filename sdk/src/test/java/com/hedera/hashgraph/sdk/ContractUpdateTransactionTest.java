@@ -53,6 +53,13 @@ public class ContractUpdateTransactionTest {
         ).toMatchSnapshot();
     }
 
+    @Test
+    void shouldSerialize2() {
+        SnapshotMatcher.expect(spawnTestTransaction2()
+            .toString()
+        ).toMatchSnapshot();
+    }
+
     private ContractUpdateTransaction spawnTestTransaction() {
         return new ContractUpdateTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
@@ -62,6 +69,25 @@ public class ContractUpdateTransactionTest {
             .setMaxAutomaticTokenAssociations(101)
             .setAutoRenewPeriod(Duration.ofDays(1))
             .setContractMemo("3")
+            .setStakedAccountId(AccountId.fromString("0.0.3"))
+            .setExpirationTime(Instant.ofEpochMilli(4))
+            .setProxyAccountId(new AccountId(4))
+            .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setAutoRenewAccountId(new AccountId(30))
+            .freeze()
+            .sign(privateKey);
+    }
+
+    private ContractUpdateTransaction spawnTestTransaction2() {
+        return new ContractUpdateTransaction()
+            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setContractId(ContractId.fromString("0.0.5007"))
+            .setAdminKey(privateKey)
+            .setMaxAutomaticTokenAssociations(101)
+            .setAutoRenewPeriod(Duration.ofDays(1))
+            .setContractMemo("3")
+            .setStakedNodeId(4L)
             .setExpirationTime(Instant.ofEpochMilli(4))
             .setProxyAccountId(new AccountId(4))
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
@@ -73,6 +99,13 @@ public class ContractUpdateTransactionTest {
     @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
+        var tx2 = ContractUpdateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void shouldBytes2() throws Exception {
+        var tx = spawnTestTransaction2();
         var tx2 = ContractUpdateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }

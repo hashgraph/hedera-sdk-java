@@ -103,38 +103,6 @@ public class TokenNftAllowance {
     }
 
     /**
-     * Create a nft token allowance from a protobuf.
-     *
-     * @param allowanceProto            the protobuf
-     * @return                          the nft token allowance
-     */
-    static TokenNftAllowance fromProtobuf(GrantedNftAllowance allowanceProto) {
-        return new TokenNftAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            Collections.emptyList(),
-            null
-        );
-    }
-
-    /**
-     * Create a nft token allowance from a protobuf.
-     *
-     * @param allowanceProto            the protobuf
-     * @return                          the nft token allowance
-     */
-    static TokenNftAllowance fromProtobuf(NftRemoveAllowance allowanceProto) {
-        return new TokenNftAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            null,
-            allowanceProto.getSerialNumbersList(),
-            null
-        );
-    }
-
-    /**
      * Create a nft token allowance from a byte array.
      *
      * @param bytes                     the byte array
@@ -182,22 +150,6 @@ public class TokenNftAllowance {
         builder.addAllSerialNumbers(serialNumbers);
         if (allSerials != null) {
             builder.setApprovedForAll(BoolValue.newBuilder().setValue(allSerials).build());
-        }
-        return builder.build();
-    }
-
-    /**
-     * Create the protobuf.
-     *
-     * @return                          the granted protobuf
-     */
-    GrantedNftAllowance toGrantedProtobuf() {
-        var builder = GrantedNftAllowance.newBuilder();
-        if (tokenId != null) {
-            builder.setTokenId(tokenId.toProtobuf());
-        }
-        if (spenderAccountId != null) {
-            builder.setSpender(spenderAccountId.toProtobuf());
         }
         return builder.build();
     }

@@ -272,6 +272,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      *
      * @return                          the proxy account id
      */
+    @Deprecated
     @Nullable
     public AccountId getProxyAccountId() {
         return proxyAccountId;
@@ -291,6 +292,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @param proxyAccountId The AccountId to be set
      * @return {@code this}
      */
+    @Deprecated
     public ContractCreateTransaction setProxyAccountId(AccountId proxyAccountId) {
         Objects.requireNonNull(proxyAccountId);
         requireNotFrozen();

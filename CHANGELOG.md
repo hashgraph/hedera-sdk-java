@@ -10,9 +10,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
  - `ContractUpdateTransaction.clearStaked[Account|Node]Id()`
+ 
+### Deprecated
+
+ - `[Contract|Account]CreateTransaction.[set|get]ProxyAccountId()` with no replacement
+ - `ContractCreateFlow.[set|get]ProxyAccountId()` with no replacement
 
 ### Fixed
 
+ - `ContractCreateFlow.setMaxAutomaticTokenAssociations()`
+ - `ContractFunctionResult.senderAccountId` now serializes correctly
+ - `CustomRoyaltyFee` now clones and `toString()`s correctly
+ - `ScheduleCreateTransaction.expirationTime` now deserializes correctly
+ - `ScheduleInfo` now deserializes correctly
+ - Made `StakingInfo.[to|from]Bytes()` public
+ - `TransactionReceipt.topicRunningHash` now `toString()`s correctly
+ - `TransactionRecord.[prngBytes|prngNumber|tokenNftTransfers]` now serializes/deserializes correctly
  - `[Account|Contract]UpdateTransaction.getDeclineStakingReward()` now returns `@Nullable Boolean` instead of `boolean`, and no longer throws a `NullPointerException`
 
 ## v2.17.1

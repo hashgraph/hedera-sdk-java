@@ -46,7 +46,7 @@ public final class ExchangeRate {
      */
     public final double exchangeRateInCents;
 
-    private ExchangeRate(int hbars, int cents, Instant expirationTime) {
+    ExchangeRate(int hbars, int cents, Instant expirationTime) {
         this.hbars = hbars;
         this.cents = cents;
         this.expirationTime = expirationTime;

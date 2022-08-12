@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.Fraction;
 import com.hedera.hashgraph.sdk.proto.RoyaltyFee;
 
@@ -51,7 +52,8 @@ public class CustomRoyaltyFee extends CustomFee {
         var returnFee = new CustomRoyaltyFee();
         returnFee.numerator = source.numerator;
         returnFee.denominator = source.denominator;
-        returnFee.fallbackFee = source.fallbackFee;
+        returnFee.fallbackFee = source.fallbackFee != null ?
+            CustomFixedFee.clonedFrom(source.fallbackFee) : null;
         returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
         return returnFee;
     }
@@ -181,4 +183,12 @@ public class CustomRoyaltyFee extends CustomFee {
         return finishToProtobuf(customFeeBuilder);
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("numerator", numerator)
+            .add("denominator", denominator)
+            .add("fallbackFee", fallbackFee)
+            .toString();
+    }
 }

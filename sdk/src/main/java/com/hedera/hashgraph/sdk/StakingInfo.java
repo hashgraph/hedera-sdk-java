@@ -58,7 +58,7 @@ public class StakingInfo {
         );
     }
 
-    static StakingInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+    public static StakingInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.StakingInfo.parseFrom(bytes));
     }
 
@@ -80,7 +80,7 @@ public class StakingInfo {
         return builder.build();
     }
 
-    byte[] toBytes() {
+    public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }
 

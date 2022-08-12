@@ -35,7 +35,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

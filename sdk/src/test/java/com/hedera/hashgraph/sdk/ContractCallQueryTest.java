@@ -19,8 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -44,7 +44,8 @@ public class ContractCallQueryTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(new ContractCallQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        new ContractCallQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .setGas(1541)
             .setSenderAccountId(AccountId.fromString("1.2.3"))
@@ -52,13 +53,14 @@ public class ContractCallQueryTest {
                 new ContractFunctionParameters()
                     .addString("Hello")
                     .addString("world!"))
-            .toString()
-        ).toMatchSnapshot();
+            .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
     @Test
     void setFunctionParameters() {
-        SnapshotMatcher.expect(new ContractCallQuery()
+        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        new ContractCallQuery()
             .setContractId(ContractId.fromString("0.0.5005"))
             .setGas(1541)
             .setSenderAccountId(AccountId.fromString("1.2.3"))
@@ -68,7 +70,7 @@ public class ContractCallQueryTest {
                     .addString("world!")
                     .toBytes(null)
                     .toByteArray())
-            .toString()
-        ).toMatchSnapshot();
+            .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 }

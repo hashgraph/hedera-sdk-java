@@ -37,7 +37,7 @@ public class AssessedCustomFee {
     public final AccountId feeCollectorAccountId;
     public final List<AccountId> payerAccountIdList;
 
-    private AssessedCustomFee(
+    AssessedCustomFee(
         long amount,
         @Nullable TokenId tokenId,
         @Nullable AccountId feeCollectorAccountId,

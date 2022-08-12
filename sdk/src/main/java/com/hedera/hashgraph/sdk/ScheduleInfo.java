@@ -116,7 +116,7 @@ public final class ScheduleInfo {
      * @param ledgerId                  the ledger id
      * @param waitForExpiry             the wait for expiry field
      */
-    private ScheduleInfo(
+    ScheduleInfo(
         ScheduleId scheduleId,
         AccountId creatorAccountId,
         AccountId payerAccountId,
@@ -152,9 +152,7 @@ public final class ScheduleInfo {
      * @param scheduleInfo              the protobuf
      * @return                          the new schedule info object
      */
-    static ScheduleInfo fromProtobuf(ScheduleGetInfoResponse scheduleInfo) {
-        var info = scheduleInfo.getScheduleInfo();
-
+    static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleInfo info) {
         var scheduleId = ScheduleId.fromProtobuf(info.getScheduleID());
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
         var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
@@ -188,7 +186,7 @@ public final class ScheduleInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(ScheduleGetInfoResponse.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleInfo.parseFrom(bytes).toBuilder().build());
     }
 
     /**

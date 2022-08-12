@@ -78,6 +78,7 @@ public class TopicUpdateTransactionTest {
             .setAutoRenewAccountId(AccountId.fromString("0.0.5009"))
             .setAutoRenewPeriod(Duration.ofHours(24))
             .setSubmitKey(unusedPrivateKey)
+            .setTopicMemo("Hello memo")
             .freeze()
             .sign(unusedPrivateKey);
     }

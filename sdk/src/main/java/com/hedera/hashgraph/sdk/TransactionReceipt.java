@@ -24,6 +24,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ExchangeRateSet;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
+import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -102,7 +103,7 @@ public final class TransactionReceipt {
 
     public final List<TransactionReceipt> children;
 
-    private TransactionReceipt(
+    TransactionReceipt(
         Status status,
         ExchangeRate exchangeRate,
         @Nullable AccountId accountId,
@@ -316,7 +317,7 @@ public final class TransactionReceipt {
             .add("topicId", topicId)
             .add("tokenId", tokenId)
             .add("topicSequenceNumber", topicSequenceNumber)
-            .add("topicRunningHash", topicRunningHash)
+            .add("topicRunningHash", topicRunningHash != null ? Hex.encode(topicRunningHash.toByteArray()) : null)
             .add("totalSupply", totalSupply)
             .add("scheduleId", scheduleId)
             .add("scheduledTransactionId", scheduledTransactionId)
