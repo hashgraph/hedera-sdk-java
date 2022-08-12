@@ -407,6 +407,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return network.isVerifyCertificates();
     }
 
+    /**
+     * Send a ping to the given node.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     */
    @Override
     public Void ping(AccountId nodeAccountId) {
         try {
@@ -421,6 +426,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return null;
     }
 
+    /**
+     * Send a ping to the given node.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     */
     @Override
     @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
     public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
@@ -434,6 +444,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
             });
     }
 
+    /**
+     * Sends pings to all nodes in the client's network.
+     * Synchronizes well with setMaxAttempts(1) to remove all dead nodes from the network.
+     */
     @Override
     public synchronized Void pingAll() {
         for (var nodeAccountId : network.getNetwork().values()) {
@@ -443,6 +457,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return null;
     }
 
+    /**
+     * Sends pings to all nodes in the client's network.
+     * Synchronizes well with setMaxAttempts(1) to remove all dead nodes from the network.
+     */
     @Override
     @FunctionalExecutable(type = "Void", onClient = true)
     public synchronized CompletableFuture<Void> pingAllAsync() {

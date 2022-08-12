@@ -96,11 +96,24 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         };
     }
 
+    /**
+     * When execution is attempted, a single attempt will timeout when this deadline is reached.
+     * (The SDK may subsequently retry the execution.)
+     *
+     * @return The timeout for each execution attempt
+     */
     @Nullable
     public final Duration grpcDeadline() {
         return grpcDeadline;
     }
 
+    /**
+     * When execution is attempted, a single attempt will timeout when this deadline is reached.
+     * (The SDK may subsequently retry the execution.)
+     *
+     * @param grpcDeadline The timeout for each execution attempt
+     * @return {@code this}
+     */
     public final SdkRequestT setGrpcDeadline(Duration grpcDeadline) {
         this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
 
@@ -233,11 +246,29 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return (SdkRequestT) this;
     }
 
+    /**
+     * Set a callback that will be called right before the request is sent.
+     * As input, the callback will receive the protobuf of the request, and the callback
+     * should return the request protobuf.  This means the callback has an opportunity to
+     * read, copy, or modify the request that will be sent.
+     *
+     * @param requestListener The callback to use
+     * @return {@code this}
+     */
     public final SdkRequestT setRequestListener(java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener) {
         this.requestListener = Objects.requireNonNull(requestListener);
         return (SdkRequestT) this;
     }
 
+    /**
+     * Set a callback that will be called right before the response is returned.
+     * As input, the callback will receive the protobuf of the response, and the callback
+     * should return the response protobuf.  This means the callback has an opportunity to
+     * read, copy, or modify the response that will be read.
+     *
+     * @param responseListener The callback to use
+     * @return {@code this}
+     */
     public final SdkRequestT setResponseListener(java8.util.function.Function<ResponseT, ResponseT> responseListener) {
         this.responseListener = Objects.requireNonNull(responseListener);
         return (SdkRequestT) this;

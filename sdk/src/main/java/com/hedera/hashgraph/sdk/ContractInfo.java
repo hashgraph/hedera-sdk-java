@@ -115,6 +115,9 @@ public final class ContractInfo {
      */
     public final LedgerId ledgerId;
 
+    /**
+     * Staking metadata for this account.
+     */
     @Nullable
     public final StakingInfo stakingInfo;
 

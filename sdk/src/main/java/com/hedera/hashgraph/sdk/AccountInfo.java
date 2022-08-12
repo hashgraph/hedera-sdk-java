@@ -120,10 +120,19 @@ public final class AccountInfo {
 
     public final String accountMemo;
 
+    /**
+     * The number of NFTs owned by this account
+     */
     public final long ownedNfts;
 
+    /**
+     * The maximum number of tokens that an Account can be implicitly associated with.
+     */
     public final int maxAutomaticTokenAssociations;
 
+    /**
+     * The public key which aliases to this account.
+     */
     @Nullable
     public final PublicKey aliasKey;
 
@@ -143,6 +152,9 @@ public final class AccountInfo {
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
+    /**
+     * Staking metadata for this account.
+     */
     @Nullable
     public final StakingInfo stakingInfo;
 

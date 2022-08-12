@@ -181,6 +181,10 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
         return this;
     }
 
+    /**
+     * Get the sender account ID
+     * @return the account that is the "sender"
+     */
     @Nullable
     public AccountId getSenderAccountId() {
         return senderAccountId;
