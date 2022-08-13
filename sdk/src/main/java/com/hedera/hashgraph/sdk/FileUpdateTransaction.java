@@ -38,7 +38,7 @@ import java.util.Objects;
 
 /**
  * Updates a file by submitting the transaction.
- *
+ * <p>
  * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file">Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
@@ -105,6 +105,8 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * Get the keys which must sign any transactions modifying this file.
+     *
       * @return                         the list of keys
      */
     @Nullable
@@ -113,7 +115,7 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
-     * <p>Set the keys which must sign any transactions modifying this file. Required.
+     * Set the keys which must sign any transactions modifying this file. Required.
      *
      * @param keys The Key or Keys to be set
      * @return {@code this}

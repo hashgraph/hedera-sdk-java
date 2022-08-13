@@ -32,8 +32,8 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
- * Schedule a delete` transaction.
- *
+ * Delete a scheduled transaction.
+ * <p>
  * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/delete-a-schedule-transaction">Hedera Documentation</a>
  */
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {

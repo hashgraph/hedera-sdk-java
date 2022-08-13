@@ -14,6 +14,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
+/**
+ * Execute an Ethereum transaction on Hedera
+ */
 public class EthereumTransaction extends Transaction<EthereumTransaction> {
     private byte[] ethereumData = new byte[0];
     private FileId callDataFileId = null;
@@ -32,6 +35,11 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
         initFromTransactionBody();
     }
 
+    /**
+     * Gets the raw Ethereum transaction
+     *
+     * @return the raw Ethereum transaction
+     */
     public byte[] getEthereumData() {
         return ethereumData;
     }
@@ -51,6 +59,11 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
         return this;
     }
 
+    /**
+     * Gets the FileId of the call data
+     *
+     * @return the FileId of the call data
+     */
     @Nullable
     public FileId getCallDataFileId() {
         return callDataFileId;
@@ -75,6 +88,12 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
         return this;
     }
 
+    /**
+     * Gets the maximum amount that the payer of the hedera transaction
+     * is willing to pay to complete the transaction.
+     *
+     * @return the max gas allowance
+     */
     public Hbar getMaxGasAllowanceHbar() {
         return maxGasAllowanceHbar;
     }

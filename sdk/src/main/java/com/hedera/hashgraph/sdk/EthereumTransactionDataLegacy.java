@@ -9,6 +9,9 @@ import org.bouncycastle.util.encoders.Hex;
 import java.math.BigInteger;
 import java.util.List;
 
+/**
+ * The ethereum transaction data, in the legacy format
+ */
 public class EthereumTransactionDataLegacy extends EthereumTransactionData {
     public byte[] chainId = new byte[]{};
     public byte[] nonce;

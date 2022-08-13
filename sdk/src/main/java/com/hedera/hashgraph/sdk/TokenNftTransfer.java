@@ -35,10 +35,26 @@ import java.util.Objects;
  * Internal utility class.
  */
 public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
+    /**
+     * The ID of the token
+     */
     public final TokenId tokenId;
+    /**
+     * The accountID of the sender
+     */
     public final AccountId sender;
+    /**
+     * The accountID of the receiver
+     */
     public final AccountId receiver;
+    /**
+     * The serial number of the NFT
+     */
     public final long serial;
+    /**
+     * If true then the transfer is expected to be an approved allowance and the
+     * sender is expected to be the owner. The default is false.
+     */
     public boolean isApproved;
 
     /**

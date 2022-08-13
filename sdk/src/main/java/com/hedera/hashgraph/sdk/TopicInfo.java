@@ -70,8 +70,16 @@ public final class TopicInfo {
     @Nullable
     public final Key submitKey;
 
+    /**
+     * If an auto-renew account is specified, when the topic expires, its lifetime will be extended
+     * by up to this duration (depending on the solvency of the auto-renew account). If the
+     * auto-renew account has no funds at all, the topic will be deleted instead.
+     */
     public final Duration autoRenewPeriod;
 
+    /**
+     * The account, if any, to charge for automatic renewal of the topic's lifetime upon expiry.
+     */
     @Nullable
     public final AccountId autoRenewAccountId;
 

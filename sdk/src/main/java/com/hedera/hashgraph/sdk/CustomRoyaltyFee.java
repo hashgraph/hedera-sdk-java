@@ -153,6 +153,11 @@ public class CustomRoyaltyFee extends CustomFee {
         return this;
     }
 
+    /**
+     * Get the fallback fixed fee.
+     *
+     * @return the fallback fixed fee
+     */
     @Nullable
     public CustomFixedFee getFallbackFee() {
         return this.fallbackFee;
