@@ -96,11 +96,24 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         };
     }
 
+    /**
+     * When execution is attempted, a single attempt will timeout when this deadline is reached.
+     * (The SDK may subsequently retry the execution.)
+     *
+     * @return The timeout for each execution attempt
+     */
     @Nullable
     public final Duration grpcDeadline() {
         return grpcDeadline;
     }
 
+    /**
+     * When execution is attempted, a single attempt will timeout when this deadline is reached.
+     * (The SDK may subsequently retry the execution.)
+     *
+     * @param grpcDeadline The timeout for each execution attempt
+     * @return {@code this}
+     */
     public final SdkRequestT setGrpcDeadline(Duration grpcDeadline) {
         this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
 
@@ -178,10 +191,21 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return setMaxAttempts(count);
     }
 
+    /**
+     * Get the maximum times execution will be attempted.
+     *
+     * @return Number of errors before execution will fail.
+     */
     public final int getMaxAttempts() {
         return maxAttempts != null ? maxAttempts : Client.DEFAULT_MAX_ATTEMPTS;
     }
 
+    /**
+     * Set the maximum times execution will be attempted.
+     *
+     * @param maxAttempts Execution will fail after this many errors.
+     * @return {@code this}
+     */
     public final SdkRequestT setMaxAttempts(int maxAttempts) {
         if (maxAttempts <= 0) {
             throw new IllegalArgumentException("maxAttempts must be greater than zero");
@@ -191,6 +215,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return (SdkRequestT) this;
     }
 
+    /**
+     * Get the list of account IDs for nodes with which execution will be attempted.
+     * @return
+     */
     @Nullable
     public final List<AccountId> getNodeAccountIds() {
         if (!nodeAccountIds.isEmpty()) {
@@ -218,11 +246,29 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return (SdkRequestT) this;
     }
 
+    /**
+     * Set a callback that will be called right before the request is sent.
+     * As input, the callback will receive the protobuf of the request, and the callback
+     * should return the request protobuf.  This means the callback has an opportunity to
+     * read, copy, or modify the request that will be sent.
+     *
+     * @param requestListener The callback to use
+     * @return {@code this}
+     */
     public final SdkRequestT setRequestListener(java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener) {
         this.requestListener = Objects.requireNonNull(requestListener);
         return (SdkRequestT) this;
     }
 
+    /**
+     * Set a callback that will be called right before the response is returned.
+     * As input, the callback will receive the protobuf of the response, and the callback
+     * should return the response protobuf.  This means the callback has an opportunity to
+     * read, copy, or modify the response that will be read.
+     *
+     * @param responseListener The callback to use
+     * @return {@code this}
+     */
     public final SdkRequestT setResponseListener(java8.util.function.Function<ResponseT, ResponseT> responseListener) {
         this.responseListener = Objects.requireNonNull(responseListener);
         return (SdkRequestT) this;
@@ -260,10 +306,27 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
     }
 
+    /**
+     * Execute this transaction or query
+     *
+     * @param client The client with which this will be executed.
+     * @return Result of execution
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
     public O execute(Client client) throws TimeoutException, PrecheckStatusException {
         return execute(client, client.getRequestTimeout());
     }
 
+    /**
+     * Execute this transaction or query with a timeout
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return Result of execution
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
     @Override
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
@@ -334,6 +397,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
     }
 
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @return Future result of execution
+     */
     @Override
     @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {

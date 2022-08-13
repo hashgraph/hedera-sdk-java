@@ -33,8 +33,8 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 /**
- * Schedule a create transaction.
- *
+ * Create a scheduled transaction.
+ * <p>
  * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/create-a-schedule-transaction">Hedera Documentation</a>
  */
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
@@ -70,34 +70,80 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
         initFromTransactionBody();
     }
 
+    /**
+     * Get the expiration time
+     *
+     * @return The expiration time
+     */
     @Nullable
     public Instant getExpirationTime() {
         return expirationTime;
     }
 
+    /**
+     * An optional timestamp for specifying when the transaction should be evaluated for execution and then expire.
+     * Defaults to 30 minutes after the transaction's consensus timestamp.
+     * <p>
+     * Note: This field is unused and forced to be unset until Long Term Scheduled Transactions are enabled - Transactions will always
+     *       expire in 30 minutes if Long Term Scheduled Transactions are not enabled.
+     *
+     * @param expirationTime The expiration time
+     * @return {@code this}
+     */
     public ScheduleCreateTransaction setExpirationTime(Instant expirationTime) {
         this.expirationTime = expirationTime;
         return this;
     }
 
+    /**
+     * get the status of the waitForExpiry boolean
+     *
+     * @return waitForExpiry boolean
+     */
     public boolean isWaitForExpiry() {
         return waitForExpiry;
     }
 
+    /**
+     * When set to true, the transaction will be evaluated for execution at expiration_time instead
+     * of when all required signatures are received.
+     * When set to false, the transaction will execute immediately after sufficient signatures are received
+     * to sign the contained transaction. During the initial ScheduleCreate transaction or via ScheduleSign transactions.
+     * Defaults to false.
+     * <p>
+     * Setting this to false does not necessarily mean that the transaction will never execute at expiration_time.
+     *  <p>
+     *  For Example - If the signature requirements for a Scheduled Transaction change via external means (e.g. CryptoUpdate)
+     *  such that the Scheduled Transaction would be allowed to execute, it will do so autonomously at expiration_time, unless a
+     *  ScheduleSign comes in to “poke” it and force it to go through immediately.
+     * <p>
+     * Note: This field is unused and forced to be unset until Long Term Scheduled Transactions are enabled. Before Long Term
+     *       Scheduled Transactions are enabled, Scheduled Transactions will _never_ execute at expiration  - they will _only_
+     *       execute during the initial ScheduleCreate transaction or via ScheduleSign transactions and will _always_
+     *       expire at expiration_time.
+     *
+     * @param waitForExpiry Whether to wait for expiry
+     * @return {@code this}
+     */
     public ScheduleCreateTransaction setWaitForExpiry(boolean waitForExpiry) {
         this.waitForExpiry = waitForExpiry;
         return this;
     }
 
+    /**
+     * Get the payer's account ID.
+     *
+     * @return The payer's account ID
+     */
     @Nullable
     public AccountId getPayerAccountId() {
         return payerAccountId;
     }
 
     /**
-     * Assign the payer's account id.
+     * Assign the payer's account ID.
      *
-     * @param accountId                 the payer's account id
+     * @param accountId                 the payer's account ID
      * @return {@code this}
      */
     public ScheduleCreateTransaction setPayerAccountId(AccountId accountId) {

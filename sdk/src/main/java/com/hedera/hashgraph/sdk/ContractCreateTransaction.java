@@ -398,7 +398,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
-     * @return ID of the account to which this contract is staking.
+     * ID of the account to which this contract will stake
+     *
+     * @return ID of the account to which this contract will stake.
      */
     @Nullable
     public AccountId getStakedAccountId() {
@@ -406,16 +408,22 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
-     * @param stakedAccountId ID of the account to which this contract is staking.
+     * Set the account to which this contract will stake
+     *
+     * @param stakedAccountId ID of the account to which this contract will stake.
      * @return {@code this}
      */
     public ContractCreateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        requireNotFrozen();
         this.stakedAccountId = stakedAccountId;
+        this.stakedNodeId = null;
         return this;
     }
 
     /**
-     * @return ID of the node this contract is staked to.
+     * The node to which this contract will stake
+     *
+     * @return ID of the node this contract will be staked to.
      */
     @Nullable
     public Long getStakedNodeId() {
@@ -423,15 +431,21 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
-     * @param stakedNodeId ID of the node this contract is staked to.
+     * Set the node to which this contract will stake
+     *
+     * @param stakedNodeId ID of the node this contract will be staked to.
      * @return {@code this}
      */
     public ContractCreateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        requireNotFrozen();
         this.stakedNodeId = stakedNodeId;
+        this.stakedAccountId = null;
         return this;
     }
 
     /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @return If true, the contract declines receiving a staking reward. The default value is false.
      */
     public boolean getDeclineStakingReward() {
@@ -439,10 +453,13 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
      * @return {@code this}
      */
     public ContractCreateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        requireNotFrozen();
         this.declineStakingReward = declineStakingReward;
         return this;
     }
@@ -503,9 +520,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
         if (stakedAccountId != null) {
             builder.setStakedAccountId(stakedAccountId.toProtobuf());
-        }
-
-        if (stakedNodeId != null) {
+        } else if (stakedNodeId != null) {
             builder.setStakedNodeId(stakedNodeId);
         }
 

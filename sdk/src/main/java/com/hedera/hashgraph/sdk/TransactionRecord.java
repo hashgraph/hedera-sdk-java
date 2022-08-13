@@ -92,15 +92,31 @@ public final class TransactionRecord {
      */
     public final List<Transfer> transfers;
 
+    /**
+     * All fungible token transfers as a result of this transaction as a map
+     */
     public final Map<TokenId, Map<AccountId, Long>> tokenTransfers;
 
+    /**
+     * All fungible token transfers as a result of this transaction as a list
+     */
     public final List<TokenTransfer> tokenTransferList;
 
+    /**
+     * All NFT Token transfers as a result of this transaction
+     */
     public final Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers;
 
+    /**
+     * Reference to the scheduled transaction ID that this transaction record represents
+     */
     @Nullable
     public final ScheduleId scheduleRef;
 
+    /**
+     * All custom fees that were assessed during a CryptoTransfer, and must be paid if the
+     * transaction status resolved to SUCCESS
+     */
     public final List<AssessedCustomFee> assessedCustomFees;
 
     /**
@@ -108,16 +124,36 @@ public final class TransactionRecord {
      */
     public final List<TokenAssociation> automaticTokenAssociations;
 
+    /**
+     * In the record of an internal CryptoCreate transaction triggered by a user
+     * transaction with a (previously unused) alias, the new account's alias.
+     */
     @Nullable
     public final PublicKey aliasKey;
 
+    /**
+     * The records of processing all child transaction spawned by the transaction with the given
+     * top-level id, in consensus order. Always empty if the top-level status is UNKNOWN.
+     */
     public final List<TransactionRecord> children;
 
+    /**
+     * The records of processing all consensus transaction with the same id as the distinguished
+     * record above, in chronological order.
+     */
     public final List<TransactionRecord> duplicates;
 
+    /**
+     * In the record of an internal transaction, the consensus timestamp of the user
+     * transaction that spawned it.
+     */
     @Nullable
     public final Instant parentConsensusTimestamp;
 
+    /**
+     * The keccak256 hash of the ethereumData. This field will only be populated for
+     * EthereumTransaction.
+     */
     public final ByteString ethereumHash;
 
     @Deprecated
@@ -129,11 +165,20 @@ public final class TransactionRecord {
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
 
+    /**
+     * List of accounts with the corresponding staking rewards paid as a result of a transaction.
+     */
     public final List<Transfer> paidStakingRewards;
 
+    /**
+     * In the record of a UtilPrng transaction with no output range, a pseudorandom 384-bit string.
+     */
     @Nullable
     public final ByteString prngBytes;
 
+    /**
+     * In the record of a PRNG transaction with an output range, the output of a PRNG whose input was a 384-bit string.
+     */
     @Nullable
     public final Integer prngNumber;
 

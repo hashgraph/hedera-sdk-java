@@ -28,9 +28,9 @@ import org.threeten.bp.Instant;
 import javax.annotation.Nullable;
 
 /**
- * A query that returns information about the current state of a schedule
+ * A query that returns information about the current state of a scheduled
  * transaction on a Hedera network.
- *
+ * <p>
  * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/get-schedule-info">Hedera Documentation</a>
  */
 public final class ScheduleInfo {
@@ -52,40 +52,53 @@ public final class ScheduleInfo {
      * transaction
      */
     public final KeyList signatories;
+
     /**
      * The Key which is able to delete the schedule transaction if set
      */
     @Nullable
     public final Key adminKey;
+
+    /**
+     * The scheduled transaction
+     */
     @Nullable
     public final TransactionId scheduledTransactionId;
+
     /**
      * Publicly visible information about the Schedule entity, up to
      * 100 bytes. No guarantee of uniqueness.
      */
     public final String memo;
+
     /**
      * The date and time the schedule transaction will expire
      */
     @Nullable
     public final Instant expirationTime;
+
     /**
      * The time the schedule transaction was executed. If the schedule
      * transaction has not executed this field will be left null.
      */
     @Nullable
     public final Instant executedAt;
+
     /**
      * The consensus time the schedule transaction was deleted. If the
      * schedule transaction was not deleted, this field will be left null.
      */
     @Nullable
     public final Instant deletedAt;
+
     /**
      * The scheduled transaction (inner transaction).
      */
     final SchedulableTransactionBody transactionBody;
 
+    /**
+     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     */
     @Nullable
     public final LedgerId ledgerId;
 
@@ -149,7 +162,7 @@ public final class ScheduleInfo {
     /**
      * Create a schedule info object from a protobuf.
      *
-     * @param scheduleInfo              the protobuf
+     * @param info              the protobuf
      * @return                          the new schedule info object
      */
     static ScheduleInfo fromProtobuf(com.hedera.hashgraph.sdk.proto.ScheduleInfo info) {

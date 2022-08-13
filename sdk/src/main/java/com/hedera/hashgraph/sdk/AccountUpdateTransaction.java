@@ -340,7 +340,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
-     * @return ID of the account to which this contract is staking.
+     * ID of the account to which this account will stake
+     *
+     * @return ID of the account to which this account will stake.
      */
     @Nullable
     public AccountId getStakedAccountId() {
@@ -348,24 +350,34 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
-     * @param stakedAccountId ID of the account to which this contract is staking.
+     * Set the account to which this account will stake
+     *
+     * @param stakedAccountId ID of the account to which this account will stake.
      * @return {@code this}
      */
     public AccountUpdateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        requireNotFrozen();
         this.stakedAccountId = stakedAccountId;
+        this.stakedNodeId = null;
         return this;
     }
 
     /**
+     * Clear the staked account ID
+     *
      * @return {@code this}
      */
     public AccountUpdateTransaction clearStakedAccountId() {
+        requireNotFrozen();
         this.stakedAccountId = new AccountId(0);
+        this.stakedNodeId = null;
         return this;
     }
 
     /**
-     * @return ID of the node this contract is staked to.
+     * The node to which this account will stake
+     *
+     * @return ID of the node this account will be staked to.
      */
     @Nullable
     public Long getStakedNodeId() {
@@ -373,44 +385,59 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     }
 
     /**
-     * @param stakedNodeId ID of the node this contract is staked to.
+     * Set the node to which this account will stake
+     *
+     * @param stakedNodeId ID of the node this account will be staked to.
      * @return {@code this}
      */
     public AccountUpdateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        requireNotFrozen();
         this.stakedNodeId = stakedNodeId;
+        this.stakedAccountId = null;
         return this;
     }
 
     /**
+     * Clear the staked node
+     *
      * @return {@code this}
      */
     public AccountUpdateTransaction clearStakedNodeId() {
-        this.stakedNodeId = Long.valueOf(-1);
+        requireNotFrozen();
+        this.stakedNodeId = -1L;
+        this.stakedAccountId = null;
         return this;
     }
 
     /**
-     * @return If true, the contract declines receiving a staking reward. The default value is false.
+     * If true, the account declines receiving a staking reward. The default value is false.
+     *
+     * @return If true, the account declines receiving a staking reward. The default value is false.
      */
-    public boolean getDeclineStakingReward() {
+    @Nullable
+    public Boolean getDeclineStakingReward() {
         return declineStakingReward;
     }
 
     /**
-     * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
+     * If true, the account declines receiving a staking reward. The default value is false.
+     *
+     * @param declineStakingReward - If true, the account declines receiving a staking reward. The default value is false.
      * @return {@code this}
      */
     public AccountUpdateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        requireNotFrozen();
         this.declineStakingReward = declineStakingReward;
         return this;
     }
 
     /**
-     * Clear the staking reward
+     * Clear decline staking reward
      *
      * @return {@code this}
      */
     public AccountUpdateTransaction clearDeclineStakingReward() {
+        requireNotFrozen();
         this.declineStakingReward = null;
         return this;
     }
@@ -512,9 +539,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
         if (stakedAccountId != null) {
             builder.setStakedAccountId(stakedAccountId.toProtobuf());
-        }
-
-        if (stakedNodeId != null) {
+        } else if (stakedNodeId != null) {
             builder.setStakedNodeId(stakedNodeId);
         }
 

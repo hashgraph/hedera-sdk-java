@@ -321,7 +321,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
-     * @return ID of the account to which this contract is staking.
+     * ID of the account to which this contract will stake
+     *
+     * @return ID of the account to which this contract will stake.
      */
     @Nullable
     public AccountId getStakedAccountId() {
@@ -329,16 +331,34 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
-     * @param stakedAccountId ID of the account to which this contract is staking.
+     * Set the account to which this contract will stake
+     *
+     * @param stakedAccountId ID of the account to which this contract will stake.
      * @return {@code this}
      */
     public ContractUpdateTransaction setStakedAccountId(@Nullable AccountId stakedAccountId) {
+        requireNotFrozen();
         this.stakedAccountId = stakedAccountId;
+        this.stakedNodeId = null;
         return this;
     }
 
     /**
-     * @return ID of the node this contract is staked to.
+     * Clear the staked account ID
+     *
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction clearStakedAccountId() {
+        requireNotFrozen();
+        this.stakedAccountId = new AccountId(0);
+        this.stakedNodeId = null;
+        return this;
+    }
+
+    /**
+     * The node to which this contract will stake
+     *
+     * @return ID of the node this contract will be staked to.
      */
     @Nullable
     public Long getStakedNodeId() {
@@ -346,36 +366,59 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     }
 
     /**
-     * @param stakedNodeId ID of the node this contract is staked to.
+     * Set the node to which this contract will stake
+     *
+     * @param stakedNodeId ID of the node this contract will be staked to.
      * @return {@code this}
      */
     public ContractUpdateTransaction setStakedNodeId(@Nullable Long stakedNodeId) {
+        requireNotFrozen();
         this.stakedNodeId = stakedNodeId;
+        this.stakedAccountId = null;
         return this;
     }
 
     /**
+     * clear the staked node account ID
+     *
+     * @return {@code this}
+     */
+    public ContractUpdateTransaction clearStakedNodeId() {
+        requireNotFrozen();
+        this.stakedNodeId = -1L;
+        this.stakedAccountId = null;
+        return this;
+    }
+
+    /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @return If true, the contract declines receiving a staking reward. The default value is false.
      */
-    public boolean getDeclineStakingReward() {
+    @Nullable
+    public Boolean getDeclineStakingReward() {
         return declineStakingReward;
     }
 
     /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
      * @return {@code this}
      */
     public ContractUpdateTransaction setDeclineStakingReward(boolean declineStakingReward) {
+        requireNotFrozen();
         this.declineStakingReward = declineStakingReward;
         return this;
     }
 
     /**
-     * Clear the staking reward
+     * Clear decline staking reward
      *
      * @return {@code this}
      */
     public ContractUpdateTransaction clearDeclineStakingReward() {
+        requireNotFrozen();
         this.declineStakingReward = null;
         return this;
     }

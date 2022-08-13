@@ -30,6 +30,51 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * Start a new smart contract instance.
+ * After the instance is created,
+ * the ContractID for it is in the receipt.
+ * <p>
+ * The instance will exist for autoRenewPeriod seconds. When that is reached, it will renew itself for another
+ * autoRenewPeriod seconds by charging its associated cryptocurrency account (which it creates here).
+ * If it has insufficient cryptocurrency to extend that long, it will extend as long as it can.
+ * If its balance is zero, the instance will be deleted.
+ * <p>
+ * A smart contract instance normally enforces rules, so "the code is law". For example, an
+ * ERC-20 contract prevents a transfer from being undone without a signature by the recipient of the transfer.
+ * This is always enforced if the contract instance was created with the adminKeys being null.
+ * But for some uses, it might be desirable to create something like an ERC-20 contract that has a
+ * specific group of trusted individuals who can act as a "supreme court" with the ability to override the normal
+ * operation, when a sufficient number of them agree to do so. If adminKeys is not null, then they can
+ * sign a transaction that can change the state of the smart contract in arbitrary ways, such as to reverse
+ * a transaction that violates some standard of behavior that is not covered by the code itself.
+ * The admin keys can also be used to change the autoRenewPeriod, and change the adminKeys field itself.
+ * The API currently does not implement this ability. But it does allow the adminKeys field to be set and
+ * queried, and will in the future implement such admin abilities for any instance that has a non-null adminKeys.
+ * <p>
+ * If this constructor stores information, it is charged gas to store it. There is a fee in hbars to
+ * maintain that storage until the expiration time, and that fee is added as part of the transaction fee.
+ * <p>
+ * An entity (account, file, or smart contract instance) must be created in a particular realm.
+ * If the realmID is left null, then a new realm will be created with the given admin key. If a new realm has
+ * a null adminKey, then anyone can create/modify/delete entities in that realm. But if an admin key is given,
+ * then any transaction to create/modify/delete an entity in that realm must be signed by that key,
+ * though anyone can still call functions on smart contract instances that exist in that realm.
+ * A realm ceases to exist when everything within it has expired and no longer exists.
+ * <p>
+ * The current API ignores shardID, realmID, and newRealmAdminKey, and creates everything in shard 0 and realm 0,
+ * with a null key. Future versions of the API will support multiple realms and multiple shards.
+ * <p>
+ * The optional memo field can contain a string whose length is up to 100 bytes. That is the size after Unicode
+ * NFD then UTF-8 conversion. This field can be used to describe the smart contract. It could also be used for
+ * other purposes. One recommended purpose is to hold a hexadecimal string that is the SHA-384 hash of a
+ * PDF file containing a human-readable legal contract. Then, if the admin keys are the
+ * public keys of human arbitrators, they can use that legal document to guide their decisions during a binding
+ * arbitration tribunal, convened to consider any changes to the smart contract in the future. The memo field can only
+ * be changed using the admin keys. If there are no admin keys, then it cannot be
+ * changed after the smart contract is created.
+ */
+
 // Re-use the WithExecute interface that was generated for Executable
 public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     static final int FILE_CREATE_MAX_BYTES = 2048;
@@ -296,7 +341,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
-     * @return ID of the account to which this contract is staking.
+     * ID of the account to which this contract will stake
+     *
+     * @return ID of the account to which this contract will stake.
      */
     @Nullable
     public AccountId getStakedAccountId() {
@@ -304,16 +351,21 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
-     * @param stakedAccountId ID of the account to which this contract is staking.
+     * Set the account to which this contract will stake
+     *
+     * @param stakedAccountId ID of the account to which this contract will stake.
      * @return {@code this}
      */
     public ContractCreateFlow setStakedAccountId(@Nullable AccountId stakedAccountId) {
         this.stakedAccountId = stakedAccountId;
+        this.stakedNodeId = null;
         return this;
     }
 
     /**
-     * @return ID of the node this contract is staked to.
+     * The node to which this contract will stake
+     *
+     * @return ID of the node this contract will be staked to.
      */
     @Nullable
     public Long getStakedNodeId() {
@@ -321,15 +373,20 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
-     * @param stakedNodeId ID of the node this contract is staked to.
+     * Set the node to which this contract will stake
+     *
+     * @param stakedNodeId ID of the node this contract will be staked to.
      * @return {@code this}
      */
     public ContractCreateFlow setStakedNodeId(@Nullable Long stakedNodeId) {
         this.stakedNodeId = stakedNodeId;
+        this.stakedAccountId = null;
         return this;
     }
 
     /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @return If true, the contract declines receiving a staking reward. The default value is false.
      */
     public boolean getDeclineStakingReward() {
@@ -337,6 +394,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
+     * If true, the contract declines receiving a staking reward. The default value is false.
+     *
      * @param declineStakingReward - If true, the contract declines receiving a staking reward. The default value is false.
      * @return {@code this}
      */
@@ -427,8 +486,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         }
         if (stakedAccountId != null) {
             contractCreateTx.setStakedAccountId(stakedAccountId);
-        }
-        if (stakedNodeId != null) {
+        } else if (stakedNodeId != null) {
             contractCreateTx.setStakedNodeId(stakedNodeId);
         }
         return contractCreateTx;

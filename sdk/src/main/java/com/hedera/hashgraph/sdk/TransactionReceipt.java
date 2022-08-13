@@ -89,18 +89,42 @@ public final class TransactionReceipt {
     @Nullable
     public final ByteString topicRunningHash;
 
+    /**
+     * In the receipt of TokenMint, TokenWipe, TokenBurn, For fungible tokens - the current total
+     * supply of this token. For non fungible tokens - the total number of NFTs issued for a given
+     * tokenID
+     */
     public final Long totalSupply;
 
+    /**
+     * In the receipt of a ScheduleCreate, the id of the newly created Scheduled Entity
+     */
     @Nullable
     public final ScheduleId scheduleId;
 
+    /**
+     * In the receipt of a ScheduleCreate or ScheduleSign that resolves to SUCCESS, the
+     * TransactionID that should be used to query for the receipt or record of the relevant
+     * scheduled transaction
+     */
     @Nullable
     public final TransactionId scheduledTransactionId;
 
+    /**
+     * In the receipt of a TokenMint for tokens of type NON_FUNGIBLE_UNIQUE, the serial numbers of
+     * the newly created NFTs
+     */
     public final List<Long> serials;
 
+    /**
+     * The receipts of processing all transactions with the given id, in consensus time order.
+     */
     public final List<TransactionReceipt> duplicates;
 
+    /**
+     * The receipts (if any) of all child transactions spawned by the transaction with the
+     * given top-level id, in consensus order. Always empty if the top-level status is UNKNOWN.
+     */
     public final List<TransactionReceipt> children;
 
     TransactionReceipt(
