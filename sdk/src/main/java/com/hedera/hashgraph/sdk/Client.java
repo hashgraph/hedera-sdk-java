@@ -46,6 +46,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -1004,7 +1005,15 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         try {
             network.close();
             mirrorNetwork.close();
+            executor.shutdown();
+            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    logger.warn("Executor did not terminate");
+                }
+            }
         } catch (InterruptedException e) {
+            executor.shutdownNow();
             throw new RuntimeException(e);
         }
     }
