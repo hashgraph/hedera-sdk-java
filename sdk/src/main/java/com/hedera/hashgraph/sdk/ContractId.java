@@ -104,10 +104,6 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
-    /**
-     * @deprecated with no replacement
-     */
-    @Deprecated
     public static ContractId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }
