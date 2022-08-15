@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `TransactionRecord.[prngBytes|prngNumber|tokenNftTransfers]` now serializes/deserializes correctly
  - `[Account|Contract]UpdateTransaction.getDeclineStakingReward()` now returns `@Nullable Boolean` instead of `boolean`, and no longer throws a `NullPointerException`
  - `Client.setNodeMaxBackoff()`
+ - Undeprecate `*ContractId.fromSolidityAddress()`
 
 ## v2.17.1
 
