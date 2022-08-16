@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 
@@ -79,7 +80,10 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      */
     static Network forMainnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.MAINNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(addressBook, ManagedNodeAddress.PORT_NODE_PLAIN);
+        HashMap<String, AccountId> network = addressBookToNetwork(
+            Objects.requireNonNull(addressBook),
+            ManagedNodeAddress.PORT_NODE_PLAIN
+        );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.MAINNET, addressBook);
     }
 
@@ -91,7 +95,10 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      */
     static Network forTestnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.TESTNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(addressBook, ManagedNodeAddress.PORT_NODE_PLAIN);
+        HashMap<String, AccountId> network = addressBookToNetwork(
+            Objects.requireNonNull(addressBook),
+            ManagedNodeAddress.PORT_NODE_PLAIN
+        );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.TESTNET, addressBook);
     }
 
@@ -103,7 +110,10 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      */
     static Network forPreviewnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.PREVIEWNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(addressBook, ManagedNodeAddress.PORT_NODE_PLAIN);
+        HashMap<String, AccountId> network = addressBookToNetwork(
+            Objects.requireNonNull(addressBook),
+            ManagedNodeAddress.PORT_NODE_PLAIN
+        );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.PREVIEWNET, addressBook);
     }
 
@@ -148,6 +158,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         return this;
     }
 
+    @Nullable
     private static Map<AccountId, NodeAddress> getAddressBookForLedger(@Nullable LedgerId ledgerId) {
         return (ledgerId == null || !ledgerId.isKnownNetwork()) ?
             null :
