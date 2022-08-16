@@ -375,6 +375,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
+        mirrorNetwork.setTransportSecurity(transportSecurity);
+        System.out.println(mirrorNetwork.getNetwork());
         return this;
     }
 
