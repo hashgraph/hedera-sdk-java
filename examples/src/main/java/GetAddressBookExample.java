@@ -17,24 +17,16 @@
  * limitations under the License.
  *
  */
-import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.AddressBookQuery;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.NodeAddressBook;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Get the network address book for inspecting the node public keys, among other things
@@ -49,7 +41,7 @@ public final class GetAddressBookExample {
     private GetAddressBookExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
         // NEW (Feb 25 2022): you can now fetch the address book for free from a mirror node with AddressBookQuery
 
         Client client = Client.forName(HEDERA_NETWORK)
