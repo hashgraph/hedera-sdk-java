@@ -1,0 +1,13 @@
+
+        return new Network(executor, network).setLedgerId(LedgerId.MAINNET);
+    }
+
+    /**
+     * Create a testnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new testnet network
+     */
+    static Network forTestnet(ExecutorService executor) {
+        var network = new HashMap<String, AccountId>();
+

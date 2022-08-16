@@ -1,0 +1,13 @@
+
+        return new Network(executor, network).setLedgerId(LedgerId.TESTNET);
+    }
+
+    /**
+     * Create a previewnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new previewnet network
+     */
+    static Network forPreviewnet(ExecutorService executor) {
+        var network = new HashMap<String, AccountId>();
+

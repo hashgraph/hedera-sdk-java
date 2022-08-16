@@ -1,0 +1,16 @@
+package com.hedera.hashgraph.sdk;
+
+import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+
+public class HardwiredNetwork {
+
+    /**
+     * Create a mainnet network.
+     *
+     * @param executor                  the executor service
+     * @return                          the new mainnet network
+     */
+    static Network forMainnet(ExecutorService executor) {
+        var network = new HashMap<String, AccountId>();
+

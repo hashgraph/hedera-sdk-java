@@ -193,7 +193,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public static Client forMainnet() {
         var executor = createExecutor();
-        var network = Network.forMainnet(executor);
+        var network = HardwiredNetwork.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
         return new Client(executor, network, mirrorNetwork);
@@ -207,7 +207,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public static Client forTestnet() {
         var executor = createExecutor();
-        var network = Network.forTestnet(executor);
+        var network = HardwiredNetwork.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
         return new Client(executor, network, mirrorNetwork);
@@ -221,7 +221,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public static Client forPreviewnet() {
         var executor = createExecutor();
-        var network = Network.forPreviewnet(executor);
+        var network = HardwiredNetwork.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
         return new Client(executor, network, mirrorNetwork);
