@@ -19,15 +19,29 @@ TESTNET_LEDGER_NAME = "testnet"
 PREVIEWNET_LEDGER_NAME = "previewnet"
 
 def get_network(ledger_name, network_name, port_is_desired):
-    response = requests.get("https://" + ledger_name + ".mirrornode.hedera.com/api/v1/network/nodes")
-    nodes = response.json()["nodes"]
+    return get_network_internal(
+        "https://" + ledger_name + ".mirrornode.hedera.com",
+        "/api/v1/network/nodes",
+        network_name,
+        port_is_desired
+    )
+
+
+def get_network_internal(domain, route, network_name, port_is_desired):
+    response = requests.get(domain + route)
+    response_json = response.json()
+    nodes = response_json["nodes"]
+    next = response_json["links"]["next"]
     result_lines = []
     for node in nodes:
         account_id = "AccountId.fromString(\"" + node["node_account_id"] + "\")"
         for ep in [ep for ep in node["service_endpoints"] if port_is_desired(ep["port"])]:
             endpoint = "\"" + ep["ip_address_v4"] + ":" + str(ep["port"]) + "\""
             result_lines.append(network_name + ".put(" + endpoint + ", " + account_id + ");")
-    return result_lines
+    if next is None:
+        return result_lines
+    else:
+        return result_lines + get_network_internal(domain, next, network_name, port_is_desired)
 
 def lines_to_string(tab_count, lines):
     return_string = ""
