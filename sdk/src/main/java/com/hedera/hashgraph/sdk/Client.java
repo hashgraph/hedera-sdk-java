@@ -302,7 +302,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
                 String mirror = config.mirrorNetwork.getAsString();
                 switch (mirror) {
                     case "mainnet":
-                        client.setMirrorNetwork(Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+                        client.setMirrorNetwork(Lists.of("mainnet-public.mirrornode.hedera.com:5600"));
                         break;
                     case "testnet":
                         client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
@@ -376,6 +376,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
+        mirrorNetwork.setTransportSecurity(transportSecurity);
         return this;
     }
 
