@@ -30,6 +30,7 @@ import java8.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -1003,20 +1004,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Override
     public synchronized void close() throws TimeoutException {
-        try {
-            network.close();
-            mirrorNetwork.close();
-            executor.shutdown();
-            if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
-                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
-                    logger.warn("Executor did not terminate");
-                }
-            }
-        } catch (InterruptedException e) {
-            executor.shutdownNow();
-            throw new RuntimeException(e);
-        }
+        close(closeTimeout);
     }
 
     /**
@@ -1030,9 +1018,17 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
         try {
-            network.close(timeout);
-            mirrorNetwork.close(timeout);
+            var closeDeadline = Instant.now().plus(timeout);
+            network.close(closeDeadline);
+            mirrorNetwork.close(closeDeadline);
+            executor.shutdown();
+            var executorTimeout = Duration.between(Instant.now(), closeDeadline);
+            if (executorTimeout.isNegative() || !executor.awaitTermination(executorTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
+                executor.shutdownNow();
+                throw new TimeoutException("Failed to shut down executor in an orderly fashion before closeTimeout");
+            }
         } catch (InterruptedException e) {
+            executor.shutdownNow();
             throw new RuntimeException(e);
         }
     }

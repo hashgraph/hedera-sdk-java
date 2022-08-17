@@ -572,24 +572,14 @@ abstract class ManagedNetwork<
     }
 
     /**
-     * Close the network with the {@link ManagedNetwork#closeTimeout} duration
-     *
-     * @throws TimeoutException         when the transaction times out
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    synchronized void close() throws TimeoutException, InterruptedException {
-        close(closeTimeout);
-    }
-
-    /**
      * Close the network with a specific timeout duration
      *
-     * @param timeout                   the timeout
+     * @param deadline                  the deadline
      * @throws TimeoutException         when the transaction times out
      * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
-    synchronized void close(Duration timeout) throws TimeoutException, InterruptedException {
-        var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
+    synchronized void close(Instant deadline) throws TimeoutException, InterruptedException {
+        var stopAt = deadline.getEpochSecond();
 
         // Start the shutdown process on all nodes
         for (var node : nodes) {
@@ -600,7 +590,7 @@ abstract class ManagedNetwork<
 
         // Await termination for all nodes
         for (var node : nodes) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
+            if (stopAt - Instant.now().getEpochSecond() <= 0) {
                 throw new TimeoutException("Failed to properly shutdown all channels");
             }
 
