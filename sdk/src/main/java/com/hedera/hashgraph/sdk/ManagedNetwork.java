@@ -586,7 +586,7 @@ abstract class ManagedNetwork<
 
     // returns null if successful, or Throwable if error occurred
     @Nullable
-    Throwable awaitClose(Instant deadline, @Nullable Throwable previousError) {
+    synchronized Throwable awaitClose(Instant deadline, @Nullable Throwable previousError) {
         try {
             if (previousError != null) {
                 throw previousError;
