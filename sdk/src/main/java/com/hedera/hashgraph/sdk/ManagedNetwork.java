@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
 import java8.util.Lists;
 import org.threeten.bp.Duration;
@@ -109,6 +110,9 @@ abstract class ManagedNetwork<
      */
     @Nullable
     private LedgerId ledgerId;
+
+    @VisibleForTesting
+    boolean hasShutDownNow = false;
 
     protected ManagedNetwork(ExecutorService executor) {
         this.executor = executor;
@@ -571,40 +575,47 @@ abstract class ManagedNetwork<
         return returnList;
     }
 
-    /**
-     * Close the network with a specific timeout duration
-     *
-     * @param deadline                  the deadline
-     * @throws TimeoutException         when the transaction times out
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    synchronized void close(Instant deadline) throws TimeoutException, InterruptedException {
-        var stopAt = deadline.getEpochSecond();
 
-        // Start the shutdown process on all nodes
+    synchronized void beginClose() {
         for (var node : nodes) {
             if (node.channel != null) {
                 node.channel = node.channel.shutdown();
             }
         }
+    }
 
-        // Await termination for all nodes
-        for (var node : nodes) {
-            if (stopAt - Instant.now().getEpochSecond() <= 0) {
-                throw new TimeoutException("Failed to properly shutdown all channels");
+    // returns null if successful, or Throwable if error occurred
+    @Nullable
+    Throwable awaitClose(Instant deadline, @Nullable Throwable previousError) {
+        try {
+            if (previousError != null) {
+                throw previousError;
             }
 
-            if (node.channel != null) {
-                // InterruptedException needs to be caught here to prevent early exist without releasing lock
-                try {
-                    node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+            for (var node : nodes) {
+                if (node.channel != null) {
+                    var timeoutMillis = Duration.between(Instant.now(), deadline).toMillis();
+                    if (timeoutMillis <= 0 || !node.channel.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                        throw new TimeoutException("Failed to properly shutdown all channels");
+                    } else {
+                        node.channel = null;
+                    }
                 }
             }
-        }
 
-        nodes.clear();
-        network.clear();
+            return null;
+        } catch (Throwable error) {
+            for (var node : nodes) {
+                if (node.channel != null) {
+                    node.channel.shutdownNow();
+                }
+            }
+            hasShutDownNow = true;
+
+            return error;
+        } finally {
+            nodes.clear();
+            network.clear();
+        }
     }
 }

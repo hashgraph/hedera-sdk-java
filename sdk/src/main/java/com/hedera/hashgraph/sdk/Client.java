@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -68,6 +69,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     final ExecutorService executor;
 
+    @VisibleForTesting
+    boolean executorHasShutDownNow = false;
+
     @Nullable
     Hbar defaultMaxTransactionFee = null;
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
@@ -98,6 +102,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param network                    the network
      * @param mirrorNetwork              the mirror network
      */
+    @VisibleForTesting
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
@@ -1017,19 +1022,45 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param timeout The Duration to be set
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
-        try {
-            var closeDeadline = Instant.now().plus(timeout);
-            network.close(closeDeadline);
-            mirrorNetwork.close(closeDeadline);
-            executor.shutdown();
-            var executorTimeout = Duration.between(Instant.now(), closeDeadline);
-            if (executorTimeout.isNegative() || !executor.awaitTermination(executorTimeout.toMillis(), TimeUnit.MILLISECONDS)) {
-                executor.shutdownNow();
-                throw new TimeoutException("Failed to shut down executor in an orderly fashion before closeTimeout");
+        var closeDeadline = Instant.now().plus(timeout);
+        network.beginClose();
+        mirrorNetwork.beginClose();
+        closeExecutor();
+
+        var networkError = network.awaitClose(closeDeadline, null);
+        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+        var executorError = awaitExecutorClose(closeDeadline, mirrorNetworkError);
+
+        if (executorError != null) {
+            if (executorError instanceof TimeoutException) {
+                throw (TimeoutException) executorError;
+            } else {
+                throw new RuntimeException(executorError);
             }
-        } catch (InterruptedException e) {
+        }
+    }
+
+    void closeExecutor() {
+        executor.shutdown();
+    }
+
+    @Nullable
+    Throwable awaitExecutorClose(Instant deadline, @Nullable Throwable previousError) {
+        try {
+            if (previousError != null) {
+                throw previousError;
+            }
+
+            var timeoutMillis = Duration.between(Instant.now(), deadline).toMillis();
+            if (timeoutMillis <= 0 || !executor.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                throw new TimeoutException("Failed to properly shutdown all channels");
+            }
+
+            return null;
+        } catch (Throwable error) {
             executor.shutdownNow();
-            throw new RuntimeException(e);
+            executorHasShutDownNow = true;
+            return error;
         }
     }
 
