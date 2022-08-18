@@ -156,7 +156,7 @@ public class LedgerId {
      * @return                          the byte array representation
      */
     public byte[] toBytes() {
-        return idBytes;
+        return Arrays.copyOf(idBytes, idBytes.length);
     }
 
     /**

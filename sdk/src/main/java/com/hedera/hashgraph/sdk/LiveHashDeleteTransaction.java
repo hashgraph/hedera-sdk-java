@@ -29,6 +29,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -100,7 +101,7 @@ public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteT
     public LiveHashDeleteTransaction setHash(byte[] hash) {
         requireNotFrozen();
         Objects.requireNonNull(hash);
-        this.hash = hash;
+        this.hash = Arrays.copyOf(hash, hash.length);
         return this;
     }
 

@@ -21,10 +21,13 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.checkerframework.checker.units.qual.A;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -33,7 +36,7 @@ import java.util.Objects;
  *
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/feeschedule">Hedera Documentation</a>
  */
-public class FeeSchedule {
+public class FeeSchedule implements Cloneable {
     private List<TransactionFeeSchedule> transactionFeeSchedules = new ArrayList<>();
     @Nullable
     private Instant expirationTime;
@@ -55,8 +58,7 @@ public class FeeSchedule {
             .setExpirationTime(feeSchedule.hasExpiryTime() ? InstantConverter.fromProtobuf(feeSchedule.getExpiryTime()) : null);
         for (var transactionFeeSchedule : feeSchedule.getTransactionFeeScheduleList()) {
             returnFeeSchedule
-                .getTransactionFeeSchedules()
-                .add(TransactionFeeSchedule.fromProtobuf(transactionFeeSchedule));
+                .addTransactionFeeSchedule(TransactionFeeSchedule.fromProtobuf(transactionFeeSchedule));
         }
         return returnFeeSchedule;
     }
@@ -78,7 +80,15 @@ public class FeeSchedule {
      * @return                          list of transaction fee schedules
      */
     public List<TransactionFeeSchedule> getTransactionFeeSchedules() {
-        return transactionFeeSchedules;
+        return cloneTransactionFeeSchedules(transactionFeeSchedules);
+    }
+
+    static List<TransactionFeeSchedule> cloneTransactionFeeSchedules(List<TransactionFeeSchedule> schedules) {
+        List<TransactionFeeSchedule> cloneSchedules = new ArrayList<>(schedules.size());
+        for (var schedule : schedules) {
+            cloneSchedules.add(schedule.clone());
+        }
+        return cloneSchedules;
     }
 
     /**
@@ -88,7 +98,7 @@ public class FeeSchedule {
      * @return {@code this}
      */
     public FeeSchedule setTransactionFeeSchedules(List<TransactionFeeSchedule> transactionFeeSchedules) {
-        this.transactionFeeSchedules = Objects.requireNonNull(transactionFeeSchedules);
+        this.transactionFeeSchedules = cloneTransactionFeeSchedules(Objects.requireNonNull(transactionFeeSchedules));
         return this;
     }
 
@@ -109,6 +119,10 @@ public class FeeSchedule {
      * @return                          the expiration time
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "An Instant can't actually be mutated"
+    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -119,6 +133,10 @@ public class FeeSchedule {
      * @param expirationTime            the expiration time
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "An Instant can't actually be mutated"
+    )
     public FeeSchedule setExpirationTime(@Nullable Instant expirationTime) {
         this.expirationTime = expirationTime;
         return this;
@@ -155,5 +173,16 @@ public class FeeSchedule {
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public FeeSchedule clone() {
+        try {
+            FeeSchedule clone = (FeeSchedule) super.clone();
+            clone.transactionFeeSchedules = cloneTransactionFeeSchedules(transactionFeeSchedules);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

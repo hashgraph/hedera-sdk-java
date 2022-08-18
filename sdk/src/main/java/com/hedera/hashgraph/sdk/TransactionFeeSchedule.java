@@ -24,6 +24,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,7 +33,7 @@ import java.util.Objects;
  *
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/transactionfeeschedule">Hedera Documentation</a>
  */
-public class TransactionFeeSchedule {
+public class TransactionFeeSchedule implements Cloneable {
     private RequestType requestType;
     @Nullable
     private FeeData feeData;
@@ -112,7 +113,7 @@ public class TransactionFeeSchedule {
      * @return                          the list of fee's
      */
     public List<FeeData> getFees() {
-        return fees;
+        return Collections.unmodifiableList(fees);
     }
 
     /**
@@ -160,5 +161,25 @@ public class TransactionFeeSchedule {
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    List<FeeData> cloneFees() {
+        List<FeeData> cloneFees = new ArrayList<>(fees.size());
+        for (var fee : fees) {
+            cloneFees.add(fee.clone());
+        }
+        return cloneFees;
+    }
+
+    @Override
+    public TransactionFeeSchedule clone() {
+        try {
+            TransactionFeeSchedule clone = (TransactionFeeSchedule) super.clone();
+            clone.feeData = feeData != null ? feeData.clone() : null;
+            clone.fees = fees != null ? cloneFees() : null;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

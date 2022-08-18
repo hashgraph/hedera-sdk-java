@@ -26,12 +26,14 @@ import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Instant;
 import org.threeten.bp.OffsetTime;
 import org.threeten.bp.ZoneOffset;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -92,6 +94,10 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      * @param startTime                 the start time
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "An Instant can't actually be mutated"
+    )
     public FreezeTransaction setStartTime(Instant startTime) {
         requireNotFrozen();
         Objects.requireNonNull(startTime);
@@ -156,7 +162,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      */
     @Deprecated
     public byte[] getUpdateFileHash() {
-        return fileHash;
+        return Arrays.copyOf(fileHash, fileHash.length);
     }
 
     /**
@@ -196,13 +202,13 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      * @return                          the file's hash
      */
     public byte[] getFileHash() {
-        return fileHash;
+        return Arrays.copyOf(fileHash, fileHash.length);
     }
 
     public FreezeTransaction setFileHash(byte[] fileHash) {
         requireNotFrozen();
         Objects.requireNonNull(fileHash);
-        this.fileHash = fileHash;
+        this.fileHash = Arrays.copyOf(fileHash, fileHash.length);
         return this;
     }
 

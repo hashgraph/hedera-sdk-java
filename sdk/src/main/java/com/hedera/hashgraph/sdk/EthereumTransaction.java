@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
@@ -41,7 +42,7 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
      * @return the raw Ethereum transaction
      */
     public byte[] getEthereumData() {
-        return ethereumData;
+        return Arrays.copyOf(ethereumData, ethereumData.length);
     }
 
     /**
@@ -55,7 +56,7 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
     public EthereumTransaction setEthereumData(byte[] ethereumData) {
         Objects.requireNonNull(ethereumData);
         requireNotFrozen();
-        this.ethereumData = ethereumData;
+        this.ethereumData = Arrays.copyOf(ethereumData, ethereumData.length);
         return this;
     }
 

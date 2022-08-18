@@ -133,7 +133,7 @@ public class PublicKeyECDSA extends PublicKey {
 
     @Override
     public byte[] toBytesRaw() {
-        return keyData;
+        return Arrays.copyOf(keyData, keyData.length);
     }
 
     @Override

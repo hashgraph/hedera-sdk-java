@@ -47,7 +47,7 @@ public class NodeAddressBook {
      * @return                          list of node addresses
      */
     public List<NodeAddress> getNodeAddresses() {
-        return nodeAddresses;
+        return cloneNodeAddresses(nodeAddresses);
     }
 
     /**
@@ -57,8 +57,16 @@ public class NodeAddressBook {
      * @return {@code this}
      */
     public NodeAddressBook setNodeAddresses(List<NodeAddress> nodeAddresses) {
-        this.nodeAddresses = nodeAddresses;
+        this.nodeAddresses = cloneNodeAddresses(nodeAddresses);
         return this;
+    }
+
+    static List<NodeAddress> cloneNodeAddresses(List<NodeAddress> addresses) {
+        List<NodeAddress> cloneAddresses = new ArrayList<>(addresses.size());
+        for (var address : addresses) {
+            cloneAddresses.add(address.clone());
+        }
+        return cloneAddresses;
     }
 
     /**

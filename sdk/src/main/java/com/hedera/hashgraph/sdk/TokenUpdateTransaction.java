@@ -26,6 +26,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -432,6 +433,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * @return                          the expiration time
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "An Instant can't actually be mutated"
+    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -442,6 +447,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * @param expirationTime            the expiration time
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "An Instant can't actually be mutated"
+    )
     public TokenUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
@@ -479,6 +488,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * @return                          the auto renew period
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -489,6 +502,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * @param period                    the auto renew period
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public TokenUpdateTransaction setAutoRenewPeriod(Duration period) {
         Objects.requireNonNull(period);
         requireNotFrozen();

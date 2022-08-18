@@ -37,7 +37,7 @@ public final class EvmAddress extends Key {
     private final byte[] bytes;
 
     public EvmAddress(byte[] bytes) {
-        this.bytes = bytes;
+        this.bytes = Arrays.copyOf(bytes, bytes.length);
     }
 
     public static EvmAddress fromString(String text) {
@@ -67,7 +67,7 @@ public final class EvmAddress extends Key {
     }
 
     public byte[] toBytes() {
-        return bytes;
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
     @Override

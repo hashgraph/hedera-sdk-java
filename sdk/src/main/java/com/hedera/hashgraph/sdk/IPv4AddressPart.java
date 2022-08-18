@@ -22,7 +22,7 @@ package com.hedera.hashgraph.sdk;
 /**
  * Simplified representation of the 16 bit half of an IPv4Address.
  */
-public class IPv4AddressPart {
+public class IPv4AddressPart implements Cloneable {
     /**
      * Represents the first byte.
      */
@@ -81,5 +81,14 @@ public class IPv4AddressPart {
     @Override
     public String toString() {
         return ((int) left & 0x000000FF) + "." + ((int) right & 0x000000FF);
+    }
+
+    @Override
+    public IPv4AddressPart clone() {
+        try {
+            return (IPv4AddressPart) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }
