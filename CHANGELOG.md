@@ -7,10 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+ - `Client.setTransportSecurity()` now updates mirror network
+ - `Client.forMainnet()`, `Client.forName()` and `Client.fromConfig()` now configure the mainnet mirror network correctly
+
+## v2.17.2
+
 ### Added
 
  - `ContractUpdateTransaction.clearStaked[Account|Node]Id()`
- 
+
 ### Deprecated
 
  - `[Contract|Account]CreateTransaction.[set|get]ProxyAccountId()` with no replacement
@@ -27,6 +34,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `TransactionReceipt.topicRunningHash` now `toString()`s correctly
  - `TransactionRecord.[prngBytes|prngNumber|tokenNftTransfers]` now serializes/deserializes correctly
  - `[Account|Contract]UpdateTransaction.getDeclineStakingReward()` now returns `@Nullable Boolean` instead of `boolean`, and no longer throws a `NullPointerException`
+ - `Client.setNodeMaxBackoff()`
+ - Undeprecate `*ContractId.fromSolidityAddress()`
 
 ## v2.17.1
 

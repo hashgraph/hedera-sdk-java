@@ -196,7 +196,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      * @return {@code this}
      */
     N setMaxBackoff(Duration maxBackoff) {
-        this.maxBackoff = ManagedNode.this.maxBackoff;
+        this.maxBackoff = maxBackoff;
 
         // noinspection unchecked
         return (N) this;
