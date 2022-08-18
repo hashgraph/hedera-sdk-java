@@ -300,7 +300,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     private void delay(long delay) {
         try {
-            Thread.sleep(delay);
+            if (delay > 0) {
+                Thread.sleep(delay);
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

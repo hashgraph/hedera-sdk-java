@@ -84,7 +84,7 @@ class HederaTrustManager implements X509TrustManager {
 
             try (
                 var outputStream = new ByteArrayOutputStream();
-                var pemWriter = new PemWriter(new OutputStreamWriter(outputStream))
+                var pemWriter = new PemWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))
             ) {
                 pemWriter.writeObject(new PemObject(CERTIFICATE, cert.getEncoded()));
                 pemWriter.flush();
@@ -95,15 +95,15 @@ class HederaTrustManager implements X509TrustManager {
                 continue;
             }
 
-            var certHash = new byte[0];
+            var certHashBytes = new byte[0];
 
             try {
-                certHash = MessageDigest.getInstance("SHA-384").digest(pem);
+                certHashBytes = MessageDigest.getInstance("SHA-384").digest(pem);
             } catch (NoSuchAlgorithmException e) {
                 throw new IllegalStateException("Failed to find SHA-384 digest for certificate hashing", e);
             }
 
-            if (this.certHash.equals(Hex.toHexString(certHash))) {
+            if (this.certHash.equals(Hex.toHexString(certHashBytes))) {
                 return;
             }
         }
