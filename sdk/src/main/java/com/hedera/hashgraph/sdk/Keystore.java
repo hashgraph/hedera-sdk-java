@@ -25,6 +25,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Optional;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.util.encoders.Hex;
@@ -168,6 +169,10 @@ final class Keystore {
         return new Keystore(Crypto.decryptAesCtr128(cipherKey, iv, cipherBytes));
     }
 
+    @SuppressFBWarnings(
+        value = "DCN_NULLPOINTER_EXCEPTION",
+        justification = "This control flow seems reasonable to me"
+    )
     private static JsonObject expectObject(JsonObject object, String key) {
         try {
             return object.get(key).getAsJsonObject();
@@ -176,6 +181,10 @@ final class Keystore {
         }
     }
 
+    @SuppressFBWarnings(
+        value = "DCN_NULLPOINTER_EXCEPTION",
+        justification = "This control flow seems reasonable to me"
+    )
     private static int expectInt(JsonObject object, String key) {
         try {
             return object.get(key).getAsInt();
@@ -184,6 +193,10 @@ final class Keystore {
         }
     }
 
+    @SuppressFBWarnings(
+        value = "DCN_NULLPOINTER_EXCEPTION",
+        justification = "This control flow seems reasonable to me"
+    )
     private static String expectString(JsonObject object, String key) {
         try {
             return object.get(key).getAsString();

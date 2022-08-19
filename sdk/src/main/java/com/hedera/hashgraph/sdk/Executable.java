@@ -758,7 +758,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace("Node IP {} Timestamp {} Transaction Type {}",
                 ipAddress,
                 System.currentTimeMillis(),
-                this.getClass() != null ? this.getClass().getSimpleName() : "NULL"
+                this.getClass().getSimpleName()
             );
         }
     }

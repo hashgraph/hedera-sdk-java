@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -74,6 +75,10 @@ class HederaTrustManager implements X509TrustManager {
     }
 
     @Override
+    @SuppressFBWarnings(
+        value = "DLS_DEAD_LOCAL_STORE",
+        justification = "SpotBugs seems to be getting confused by the control flow here.  It thinks certHashBytes is not used."
+    )
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         if (certHash == null) {
             return;

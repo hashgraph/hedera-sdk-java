@@ -295,7 +295,7 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

@@ -141,7 +141,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the list of mirror nodes
      */
-    public List<String> getMirrorNetwork() {
+    synchronized public List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
 
@@ -358,7 +358,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the client's network
      */
-    public Map<String, AccountId> getNetwork() {
+    synchronized public Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
 
@@ -1022,7 +1022,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the operator
      */
     @Nullable
-    Operator getOperator() {
+    synchronized Operator getOperator() {
         return this.operator;
     }
 

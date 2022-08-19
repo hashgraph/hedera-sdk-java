@@ -128,15 +128,11 @@ class ManagedNodeAddress {
      * @return                          the insecure managed node address
      */
     public ManagedNodeAddress toInsecure() {
-        var port = this.port;
-
-        switch (this.port) {
-            case PORT_NODE_TLS:
-                port = PORT_NODE_PLAIN;
-                break;
-            case PORT_MIRROR_TLS:
-                port = PORT_MIRROR_PLAIN;
-        }
+        var port = switch (this.port) {
+            case PORT_NODE_TLS -> PORT_NODE_PLAIN;
+            case PORT_MIRROR_TLS -> PORT_MIRROR_PLAIN;
+            default -> this.port;
+        };
 
         return new ManagedNodeAddress(name, address, port);
     }
@@ -147,15 +143,11 @@ class ManagedNodeAddress {
      * @return                          the secure managed node address
      */
     public ManagedNodeAddress toSecure() {
-        var port = this.port;
-
-        switch (this.port) {
-            case PORT_NODE_PLAIN:
-                port = PORT_NODE_TLS;
-                break;
-            case PORT_MIRROR_PLAIN:
-                port = PORT_MIRROR_TLS;
-        }
+        var port = switch (this.port) {
+            case PORT_NODE_PLAIN -> PORT_NODE_TLS;
+            case PORT_MIRROR_PLAIN -> PORT_MIRROR_TLS;
+            default -> this.port;
+        };
 
         return new ManagedNodeAddress(name, address, port);
     }

@@ -131,7 +131,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      * @param verifyCertificates        the desired status
      * @return {@code this}
      */
-    Network setVerifyCertificates(boolean verifyCertificates) {
+    synchronized Network setVerifyCertificates(boolean verifyCertificates) {
         this.verifyCertificates = verifyCertificates;
 
         for (var node : nodes) {
@@ -207,7 +207,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
      *
      * @return                          list of network records
      */
-    Map<String, AccountId> getNetwork() {
+    synchronized Map<String, AccountId> getNetwork() {
         Map<String, AccountId> returnMap = new HashMap<>();
         for (var node : nodes) {
             returnMap.put(node.address.toString(), node.getAccountId());
