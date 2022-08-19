@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -68,9 +69,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
     final ExecutorService executor;
-
-    @VisibleForTesting
-    boolean executorHasShutDownNow = false;
 
     @Nullable
     Hbar defaultMaxTransactionFee = null;
@@ -115,14 +113,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the executor service
      */
     static ExecutorService createExecutor() {
-        var threadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("hedera-sdk-%d")
-            .setDaemon(true)
-            .build();
-
-        return Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            threadFactory);
+        return ForkJoinPool.commonPool();
     }
 
     /**
@@ -1025,42 +1016,16 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         var closeDeadline = Instant.now().plus(timeout);
         network.beginClose();
         mirrorNetwork.beginClose();
-        closeExecutor();
 
         var networkError = network.awaitClose(closeDeadline, null);
         var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
-        var executorError = awaitExecutorClose(closeDeadline, mirrorNetworkError);
 
-        if (executorError != null) {
-            if (executorError instanceof TimeoutException) {
-                throw (TimeoutException) executorError;
+        if (mirrorNetworkError != null) {
+            if (mirrorNetworkError instanceof TimeoutException) {
+                throw (TimeoutException) mirrorNetworkError;
             } else {
-                throw new RuntimeException(executorError);
+                throw new RuntimeException(mirrorNetworkError);
             }
-        }
-    }
-
-    void closeExecutor() {
-        executor.shutdown();
-    }
-
-    @Nullable
-    Throwable awaitExecutorClose(Instant deadline, @Nullable Throwable previousError) {
-        try {
-            if (previousError != null) {
-                throw previousError;
-            }
-
-            var timeoutMillis = Duration.between(Instant.now(), deadline).toMillis();
-            if (timeoutMillis <= 0 || !executor.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
-                throw new TimeoutException("Failed to properly shutdown all channels");
-            }
-
-            return null;
-        } catch (Throwable error) {
-            executor.shutdownNow();
-            executorHasShutDownNow = true;
-            return error;
         }
     }
 

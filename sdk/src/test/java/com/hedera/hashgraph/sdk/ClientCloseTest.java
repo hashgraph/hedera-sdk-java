@@ -31,7 +31,6 @@ public class ClientCloseTest {
 
         assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("network timeout");
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
-        assertThat(client.executorHasShutDownNow).isTrue();
     }
 
     @Test
@@ -45,7 +44,6 @@ public class ClientCloseTest {
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
-        assertThat(client.executorHasShutDownNow).isTrue();
     }
 
     @Test
@@ -58,7 +56,6 @@ public class ClientCloseTest {
 
         assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("mirror timeout");
         assertThat(network.hasShutDownNow).isFalse();
-        assertThat(client.executorHasShutDownNow).isTrue();
     }
 
     @Test
@@ -72,33 +69,5 @@ public class ClientCloseTest {
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
         assertThat(network.hasShutDownNow).isFalse();
-        assertThat(client.executorHasShutDownNow).isTrue();
-    }
-
-    @Test
-    void closeHandlesExecutorTimeout() throws InterruptedException {
-        var executor = mock(ExecutorService.class);
-        when(executor.awaitTermination(anyLong(), any())).thenReturn(false);
-        var network = Network.forNetwork(executor, Collections.emptyMap());
-        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork);
-
-        assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close);
-        assertThat(network.hasShutDownNow).isFalse();
-        assertThat(mirrorNetwork.hasShutDownNow).isFalse();
-    }
-
-    @Test
-    void closeHandlesExecutorInterrupted() throws InterruptedException {
-        var interruptedException = new InterruptedException("executor interrupted");
-        var executor = mock(ExecutorService.class);
-        when(executor.awaitTermination(anyLong(), any())).thenThrow(interruptedException);
-        var network = Network.forNetwork(executor, Collections.emptyMap());
-        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork);
-
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
-        assertThat(network.hasShutDownNow).isFalse();
-        assertThat(mirrorNetwork.hasShutDownNow).isFalse();
     }
 }
