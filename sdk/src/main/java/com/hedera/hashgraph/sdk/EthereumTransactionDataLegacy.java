@@ -77,7 +77,7 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
     }
 
     public byte[] toBytes() {
-        return RLPEncoder.encodeAsList(nonce, gasPrice, gasLimit, to, value, callData, v, r, s);
+        return RLPEncoder.list(nonce, gasPrice, gasLimit, to, value, callData, v, r, s);
     }
 
     public String toString() {
