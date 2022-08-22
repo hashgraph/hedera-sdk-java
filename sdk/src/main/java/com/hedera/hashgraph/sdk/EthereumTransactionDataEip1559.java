@@ -8,6 +8,7 @@ import com.google.common.base.MoreObjects;
 import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,7 +92,7 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
     }
 
     public byte[] toBytes() {
-        return RLPEncoder.encodeSequentially(Integers.toBytes(0x02), Lists.of(
+        return RLPEncoder.sequence(Integers.toBytes(0x02), Lists.of(
             chainId, nonce, maxPriorityGas, maxGas, gasLimit, to,
             value, callData, new ArrayList<String>(), recoveryId, r, s
         ));
