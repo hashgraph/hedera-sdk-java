@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - Thread leak in `Client`
  - `Client.setTransportSecurity()` now updates mirror network
- - `Client.forMainnet()`, `Client.forName()` and `Client.fromConfig()` now configure the mainnet mirror network correctly
 
 ## v2.17.2
 
