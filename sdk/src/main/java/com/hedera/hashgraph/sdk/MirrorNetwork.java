@@ -60,7 +60,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
      * @return                          the new mirror network for mainnet
      */
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
     }
 
     /**
