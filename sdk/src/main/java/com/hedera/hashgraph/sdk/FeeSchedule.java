@@ -80,7 +80,7 @@ public class FeeSchedule implements Cloneable {
      * @return                          list of transaction fee schedules
      */
     public List<TransactionFeeSchedule> getTransactionFeeSchedules() {
-        return cloneTransactionFeeSchedules(transactionFeeSchedules);
+        return Collections.unmodifiableList(cloneTransactionFeeSchedules(transactionFeeSchedules));
     }
 
     static List<TransactionFeeSchedule> cloneTransactionFeeSchedules(List<TransactionFeeSchedule> schedules) {
