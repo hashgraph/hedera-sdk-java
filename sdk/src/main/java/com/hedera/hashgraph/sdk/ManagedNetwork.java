@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -112,6 +113,10 @@ abstract class ManagedNetwork<
     private LedgerId ledgerId;
 
     @VisibleForTesting
+    @SuppressFBWarnings(
+        value = "URF_UNREAD_FIELD",
+        justification = "this field is used for testing"
+    )
     boolean hasShutDownNow = false;
 
     protected ManagedNetwork(ExecutorService executor) {
