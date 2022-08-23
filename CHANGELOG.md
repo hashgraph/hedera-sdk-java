@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+ - Thread leak in `Client`
  - `Client.setTransportSecurity()` now updates mirror network
 
 ## v2.17.2

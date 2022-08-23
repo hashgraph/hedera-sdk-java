@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -30,6 +31,7 @@ import java8.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -46,6 +48,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -96,6 +100,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param network                    the network
      * @param mirrorNetwork              the mirror network
      */
+    @VisibleForTesting
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
@@ -108,14 +113,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the executor service
      */
     static ExecutorService createExecutor() {
-        var threadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("hedera-sdk-%d")
-            .setDaemon(true)
-            .build();
-
-        return Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            threadFactory);
+        return ForkJoinPool.commonPool();
     }
 
     /**
@@ -1002,12 +1000,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Override
     public synchronized void close() throws TimeoutException {
-        try {
-            network.close();
-            mirrorNetwork.close();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        close(closeTimeout);
     }
 
     /**
@@ -1020,11 +1013,19 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param timeout The Duration to be set
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
-        try {
-            network.close(timeout);
-            mirrorNetwork.close(timeout);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        var closeDeadline = Instant.now().plus(timeout);
+        network.beginClose();
+        mirrorNetwork.beginClose();
+
+        var networkError = network.awaitClose(closeDeadline, null);
+        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+
+        if (mirrorNetworkError != null) {
+            if (mirrorNetworkError instanceof TimeoutException) {
+                throw (TimeoutException) mirrorNetworkError;
+            } else {
+                throw new RuntimeException(mirrorNetworkError);
+            }
         }
     }
 
