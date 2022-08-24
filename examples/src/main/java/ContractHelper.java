@@ -127,6 +127,7 @@ public class ContractHelper {
                 return;
             }
         }
+
         System.out.println("All steps completed with valid results.");
     }
 }

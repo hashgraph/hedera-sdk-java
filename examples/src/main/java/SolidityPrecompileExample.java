@@ -23,7 +23,7 @@ You should go look at that PrecompileExample.sol file, because that's where the 
 This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
  */
 
-public class PrecompileExample {
+public class SolidityPrecompileExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -32,7 +32,7 @@ public class PrecompileExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private PrecompileExample() {
+    private SolidityPrecompileExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, IOException {
@@ -64,7 +64,7 @@ public class PrecompileExample {
         );
 
         contractHelper
-            // TODO: set parameter suppliers and result validator here
+            // TODO: set parameter suppliers and result validators here
             .executeSteps(3 /* TODO: put correct step count here */, client);
     }
 }
