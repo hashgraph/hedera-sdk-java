@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity >=0.4.9 <0.9.0;
 
+// This file was copied from https://github.com/hashgraph/hedera-smart-contracts/tree/main/hts-precompile
+
 abstract contract HederaResponseCodes {
 
     // response codes

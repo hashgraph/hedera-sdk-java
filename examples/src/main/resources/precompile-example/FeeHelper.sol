@@ -2,6 +2,8 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
+// This file was copied from https://github.com/hashgraph/hedera-smart-contracts/tree/main/hts-precompile
+
 import "./HederaTokenService.sol";
 import "./HederaResponseCodes.sol";
 import "./IHederaTokenService.sol";

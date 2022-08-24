@@ -114,15 +114,19 @@ public class ContractHelper {
                 tx.setFunction(functionName);
             }
 
-            ContractFunctionResult functionResult = tx
+            ContractFunctionResult functionResult = Objects.requireNonNull(tx
                 .execute(client)
                 .getRecord(client)
-                .contractFunctionResult;
+                .contractFunctionResult
+            );
 
-            if (!getResultValidator(stepIndex).apply(functionResult)) {
+            if (functionResult.errorMessage == null && getResultValidator(stepIndex).apply(functionResult)) {
+                System.out.println("step " + stepIndex + " completed, and returned valid result.");
+            } else {
                 System.out.println("ERROR: step " + stepIndex + " returned invalid result: " + functionResult);
                 return;
             }
         }
+        System.out.println("All steps completed with valid results.");
     }
 }

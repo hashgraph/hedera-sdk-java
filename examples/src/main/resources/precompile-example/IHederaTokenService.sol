@@ -2,6 +2,8 @@
 pragma solidity >=0.4.9 <0.9.0;
 pragma experimental ABIEncoderV2;
 
+// This file was copied from https://github.com/hashgraph/hedera-smart-contracts/tree/main/hts-precompile
+
 interface IHederaTokenService {
 
     /// Transfers cryptocurrency among two or more accounts by making the desired adjustments to their

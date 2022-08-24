@@ -18,7 +18,9 @@ This example just instantiates the solidity contract
 defined in examples/src/main/resources/precompile-example/PrecompileExample.sol, which has been
 compiled into examples/src/main/resources/precompile-example/PrecompileExample.json.
 
-This example uses the ContractHelper class which is also in this java package to declutter things.
+You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
+
+This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
  */
 
 public class PrecompileExample {
