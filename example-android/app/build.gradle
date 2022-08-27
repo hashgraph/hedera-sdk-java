@@ -72,6 +72,9 @@ dependencies {
 
 	implementation "io.grpc:grpc-core:1.48.1"
 	implementation "io.grpc:grpc-stub:1.48.1"
+
+    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.1'
 }
 repositories {
 	mavenCentral()
