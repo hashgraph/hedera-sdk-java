@@ -195,7 +195,7 @@ public final class ScheduleId implements Comparable<ScheduleId> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

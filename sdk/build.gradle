@@ -4,6 +4,7 @@ plugins {
     id "signing"
     id "maven-publish"
     id "com.google.protobuf" version "0.8.19"
+    id "com.github.spotbugs" version "5.0.9"
 }
 
 apply from: "../version.gradle"
@@ -35,13 +36,16 @@ dependencies {
 
     compileOnly project(":executable-annotation")
 
+    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.1'
+
     // NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
     // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
     implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:1.7.36'
-    
+
     implementation "io.grpc:grpc-core:1.48.1"
     implementation "io.grpc:grpc-stub:1.48.1"
 
@@ -70,6 +74,35 @@ protobuf {
     plugins {
         grpc {
             artifact = "io.grpc:protoc-gen-grpc-java:1.48.1"
+        }
+    }
+}
+
+spotbugs {
+    //ignoreFailures = false
+    //showStackTraces = true
+    //showProgress = false
+    //reportLevel = 'default'
+    //effort = 'default'
+    //visitors = [ 'FindSqlInjection', 'SwitchFallthrough' ]
+    //omitVisitors = [ 'FindNonShortCircuit' ]
+    reportsDir = file("$buildDir/reports/spotbugs")
+    //includeFilter = file('spotbugs-include.xml')
+    //excludeFilter = file('spotbugs-exclude.xml')
+    onlyAnalyze = ['com.hedera.hashgraph.sdk.*']
+    //projectName = name
+    //release = version
+    //extraArgs = [ '-nested:false' ]
+    //jvmArgs = [ '-Duser.language=ja' ]
+    //maxHeapSize = '512m'
+}
+
+spotbugsMain {
+    reports {
+        html {
+            required = true
+            outputLocation = file("$buildDir/reports/spotbugs/main/spotbugs.html")
+            stylesheet = 'fancy-hist.xsl'
         }
     }
 }

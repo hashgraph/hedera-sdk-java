@@ -148,7 +148,7 @@ public class EthereumFlow implements WithExecute<TransactionResponse> {
 
     public CompletableFuture<TransactionResponse> executeAsync(Client client) {
         if (ethereumData == null) {
-            CompletableFuture.failedFuture(new IllegalStateException("Cannot execute a ethereum flow when ethereum data was not provided"));
+            return CompletableFuture.failedFuture(new IllegalStateException("Cannot execute a ethereum flow when ethereum data was not provided"));
         }
 
         var ethereumTransaction = new EthereumTransaction();

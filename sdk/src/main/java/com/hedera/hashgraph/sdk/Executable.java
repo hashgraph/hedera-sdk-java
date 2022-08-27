@@ -303,7 +303,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             return;
         }
         try {
-            Thread.sleep(delay);
+            if (delay > 0) {
+                Thread.sleep(delay);
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -759,7 +761,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace("Node IP {} Timestamp {} Transaction Type {}",
                 ipAddress,
                 System.currentTimeMillis(),
-                this.getClass() != null ? this.getClass().getSimpleName() : "NULL"
+                this.getClass().getSimpleName()
             );
         }
     }

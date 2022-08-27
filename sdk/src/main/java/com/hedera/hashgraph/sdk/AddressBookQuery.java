@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.Deadline;
@@ -126,6 +127,10 @@ public class AddressBookQuery {
      * @param maxBackoff                the maximum backoff duration
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public AddressBookQuery setMaxBackoff(Duration maxBackoff) {
         Objects.requireNonNull(maxBackoff);
         if (maxBackoff.toMillis() < 500L) {

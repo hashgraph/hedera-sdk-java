@@ -25,7 +25,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 /**
  * Utility class used internally by the sdk.
  */
-public class FeeComponents {
+public class FeeComponents implements Cloneable {
     /**
      * A minimum, the calculated fee must be greater than this value
      */
@@ -374,5 +374,14 @@ public class FeeComponents {
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public FeeComponents clone() {
+        try {
+            return (FeeComponents) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

@@ -73,8 +73,8 @@ public class FeeSchedulesTest {
         var originalFeeSchedules = spawnFeeSchedulesExample();
         byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
         var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-        assertThat(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(copyFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        assertThat(copyFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""))
+            .isEqualTo(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""));
         SnapshotMatcher.expect(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }
 
@@ -83,6 +83,6 @@ public class FeeSchedulesTest {
         var originalFeeSchedules = new FeeSchedules();
         byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
         var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
-        assertThat(originalFeeSchedules.toString().equals(copyFeeSchedules.toString())).isTrue();
+        assertThat(copyFeeSchedules.toString()).isEqualTo(originalFeeSchedules.toString());
     }
 }

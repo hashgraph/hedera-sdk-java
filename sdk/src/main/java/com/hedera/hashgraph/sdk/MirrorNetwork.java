@@ -104,7 +104,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
      *
      * @return                          the network names
      */
-    List<String> getNetwork() {
+    synchronized List<String> getNetwork() {
         List<String> retval = new ArrayList<>(network.size());
         for (var address : network.keySet()) {
             retval.add(address.toString());

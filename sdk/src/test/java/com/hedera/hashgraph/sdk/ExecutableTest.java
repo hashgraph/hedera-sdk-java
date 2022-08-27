@@ -23,6 +23,7 @@ import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import java8.util.concurrent.CompletableFuture;
@@ -215,7 +216,7 @@ class ExecutableTest {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
-                    null,
+                    new byte[]{1, 2, 3},
                     null);
             }
         };
@@ -255,7 +256,7 @@ class ExecutableTest {
                 return new TransactionResponse(
                     new AccountId(4),
                     TransactionId.withValidStart(new AccountId(4), now),
-                    null,
+                    new byte[]{1, 2, 3},
                     null);
             }
         };
@@ -309,7 +310,7 @@ class ExecutableTest {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
-                    null,
+                    new byte[]{1, 2, 3},
                     null);
             }
         };
@@ -338,8 +339,6 @@ class ExecutableTest {
 
     @Test
     void executeExhaustRetries() {
-        AtomicInteger i = new AtomicInteger();
-
         when(node3.isHealthy()).thenReturn(true);
         when(node4.isHealthy()).thenReturn(true);
         when(node5.isHealthy()).thenReturn(true);
@@ -375,12 +374,6 @@ class ExecutableTest {
             new AccountId(5)
         );
         tx.setNodeAccountIds(nodeAccountIds);
-
-        var txResp =
-            com.hedera.hashgraph.sdk.proto.TransactionResponse
-                .newBuilder()
-                .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
-                .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> {
             if (i.getAndIncrement() == 0)
@@ -431,7 +424,7 @@ class ExecutableTest {
 
         var resp = Response.newBuilder().setTransactionGetReceipt(receiptResp).build();
         tx.blockingUnaryCall = (grpcRequest) -> resp;
-        TransactionReceipt rcp = (TransactionReceipt) tx.execute(client);
+        tx.execute(client);
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
@@ -469,6 +462,10 @@ class ExecutableTest {
     }
 
     @Test
+    @SuppressFBWarnings(
+        value = "NP_NONNULL_PARAM_VIOLATION",
+        justification = "Cannot make TransactionResponse constructor public"
+    )
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 

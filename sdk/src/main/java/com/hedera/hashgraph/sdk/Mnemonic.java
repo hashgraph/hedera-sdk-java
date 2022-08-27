@@ -40,6 +40,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -50,7 +52,9 @@ public final class Mnemonic {
     // by storing our word list in a SoftReference, the GC is free to evict it at its discretion
     // but the implementation is meant to wait until free space is needed
     @Nullable
-    private static SoftReference<List<String>> wordList;
+    private static SoftReference<List<String>> bip39WordList = null;
+    @Nullable
+    private static SoftReference<List<String>> legacyWordList = null;
 
     /**
      * The list of words in this mnemonic.
@@ -67,9 +71,6 @@ public final class Mnemonic {
         if (words.size() == 22) {
             isLegacy = true;
         }
-
-        // Set the wordList to null so we can fetch correct wordlist once we need it.
-        wordList = null;
 
         this.words = Collections.unmodifiableList(words);
     }
@@ -88,9 +89,6 @@ public final class Mnemonic {
      */
     public static Mnemonic fromWords(List<? extends CharSequence> words) throws BadMnemonicException {
         Mnemonic mnemonic = new Mnemonic(words);
-
-        // Set the wordList to null so we can fetch correct wordlist once we need it.
-        wordList = null;
 
         if (words.size() != 22) {
             mnemonic.validate();
@@ -209,18 +207,40 @@ public final class Mnemonic {
     }
 
     private static List<String> getWordList(boolean isLegacy) {
-        if (wordList == null || wordList.get() == null) {
+        if (isLegacy) {
+            return getSpecificWordList(
+                () -> legacyWordList,
+                () -> readWordList(true),
+                (newWordList) -> legacyWordList = newWordList
+            );
+        } else {
+            return getSpecificWordList(
+                () -> bip39WordList,
+                () -> readWordList(false),
+                (newWordList) -> bip39WordList = newWordList
+            );
+        }
+    }
+
+    private static List<String> getSpecificWordList(
+        Supplier<SoftReference<List<String>>> getCurrentWordList,
+        Supplier<List<String>> getNewWordList,
+        Consumer<SoftReference<List<String>>> setCurrentWordList
+    ) {
+        var localWordList = getCurrentWordList.get();
+        if (localWordList == null || localWordList.get() == null) {
             synchronized (Mnemonic.class) {
-                if (wordList == null || wordList.get() == null) {
-                    List<String> words = readWordList(isLegacy);
-                    wordList = new SoftReference<>(words);
+                localWordList = getCurrentWordList.get();
+                if (localWordList == null || localWordList.get() == null) {
+                    List<String> words = getNewWordList.get();
+                    setCurrentWordList.accept(new SoftReference<>(words));
                     // immediately return the strong reference
                     return words;
                 }
             }
         }
 
-        return wordList.get();
+        return localWordList.get();
     }
 
     private static List<String> readWordList(boolean isLegacy) {
@@ -303,8 +323,8 @@ public final class Mnemonic {
      *
      * @param passphrase the passphrase used to protect the mnemonic (not used in the
      *                   mobile wallets, use {@link #toPrivateKey()} instead.)
-     * @return           the recovered key; use {@link PrivateKey#derive(int)} to get a
-     *                   key for an account index (0 for default account)
+     * @return the recovered key; use {@link PrivateKey#derive(int)} to get a
+     * key for an account index (0 for default account)
      * @see PrivateKey#fromMnemonic(Mnemonic, String)
      */
     public PrivateKey toPrivateKey(String passphrase) throws BadMnemonicException {
@@ -320,8 +340,8 @@ public final class Mnemonic {
     /**
      * Extract the private key.
      *
-     * @return                          the private key
-     * @throws BadMnemonicException     when there are issues with the mnemonic
+     * @return the private key
+     * @throws BadMnemonicException when there are issues with the mnemonic
      */
     public PrivateKey toLegacyPrivateKey() throws BadMnemonicException {
         if (this.words.size() == 22) {
@@ -334,10 +354,10 @@ public final class Mnemonic {
     /**
      * Recover a private key from this mnemonic phrase.
      *
-     * @return                          the recovered key; use
-     *                                  {@link PrivateKey#derive(int)} to get
-     *                                  a key for an account index (0 for
-     *                                  default account)
+     * @return the recovered key; use
+     * {@link PrivateKey#derive(int)} to get
+     * a key for an account index (0 for
+     * default account)
      * @see PrivateKey#fromMnemonic(Mnemonic)
      */
     public PrivateKey toPrivateKey() throws BadMnemonicException {
@@ -394,8 +414,8 @@ public final class Mnemonic {
     /**
      * Convert passphrase to a byte array.
      *
-     * @param passphrase                the passphrase
-     * @return                          the byte array
+     * @param passphrase the passphrase
+     * @return the byte array
      */
     byte[] toSeed(String passphrase) {
         String salt = "mnemonic" + passphrase;

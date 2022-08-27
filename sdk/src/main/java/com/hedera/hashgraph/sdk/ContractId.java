@@ -255,7 +255,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

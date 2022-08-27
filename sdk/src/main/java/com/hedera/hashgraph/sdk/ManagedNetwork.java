@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -112,6 +113,10 @@ abstract class ManagedNetwork<
     private LedgerId ledgerId;
 
     @VisibleForTesting
+    @SuppressFBWarnings(
+        value = "URF_UNREAD_FIELD",
+        justification = "this field is used for testing"
+    )
     boolean hasShutDownNow = false;
 
     protected ManagedNetwork(ExecutorService executor) {
@@ -125,7 +130,7 @@ abstract class ManagedNetwork<
      * @return                          the ledger id
      */
     @Nullable
-    LedgerId getLedgerId() {
+    synchronized LedgerId getLedgerId() {
         return ledgerId;
     }
 
@@ -148,7 +153,7 @@ abstract class ManagedNetwork<
      *
      * @return                          maximum node attempts
      */
-    int getMaxNodeAttempts() {
+    synchronized int getMaxNodeAttempts() {
         return maxNodeAttempts;
     }
 
@@ -170,7 +175,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the minimum node backoff time
      */
-    Duration getMinNodeBackoff() {
+    synchronized Duration getMinNodeBackoff() {
         return minNodeBackoff;
     }
 
@@ -196,7 +201,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the maximum node backoff time
      */
-    Duration getMaxNodeBackoff() {
+    synchronized Duration getMaxNodeBackoff() {
         return maxNodeBackoff;
     }
 
@@ -222,7 +227,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the minimum node readmit time
      */
-    public Duration getMinNodeReadmitTime() {
+    synchronized public Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
@@ -231,7 +236,7 @@ abstract class ManagedNetwork<
      *
      * @param minNodeReadmitTime        the minimum node readmit time
      */
-    public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    synchronized public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
         for (var node : nodes) {
@@ -299,7 +304,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the close timeout
      */
-    Duration getCloseTimeout() {
+    synchronized Duration getCloseTimeout() {
         return closeTimeout;
     }
 

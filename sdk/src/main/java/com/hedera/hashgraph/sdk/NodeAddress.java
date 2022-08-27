@@ -22,6 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -34,7 +35,7 @@ import java.util.List;
  *
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/nodeaddress">Hedera Documentation</a>
  */
-public class NodeAddress {
+public class NodeAddress implements Cloneable {
     /**
      * The RSA public key of the node.
      */
@@ -179,6 +180,10 @@ public class NodeAddress {
      * @return                          the certificate hash
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A ByteString can't actually be mutated"
+    )
     public ByteString getCertHash() {
         return certHash;
     }
@@ -189,6 +194,11 @@ public class NodeAddress {
      * @param certHash                  the certificate hash
      * @return {@code this}
      */
+    @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A ByteString can't actually be mutated"
+    )
     public NodeAddress setCertHash(ByteString certHash) {
         this.certHash = certHash;
         return this;
@@ -200,7 +210,7 @@ public class NodeAddress {
      * @return                          the list of addresses
      */
     public List<Endpoint> getAddresses() {
-        return addresses;
+        return cloneEndpoints(addresses);
     }
 
     /**
@@ -210,8 +220,16 @@ public class NodeAddress {
      * @return {@code this}
      */
     public NodeAddress setAddresses(List<Endpoint> addresses) {
-        this.addresses = addresses;
+        this.addresses = cloneEndpoints(addresses);
         return this;
+    }
+
+    static List<Endpoint> cloneEndpoints(List<Endpoint> endpoints) {
+        List<Endpoint> cloneEndpoints = new ArrayList<>(endpoints.size());
+        for (var endpoint : endpoints) {
+            cloneEndpoints.add(endpoint.clone());
+        }
+        return cloneEndpoints;
     }
 
     /**
@@ -298,5 +316,16 @@ public class NodeAddress {
             .add("description", description)
             .add("stake", stake)
             .toString();
+    }
+
+    @Override
+    public NodeAddress clone() {
+        try {
+            NodeAddress clone = (NodeAddress) super.clone();
+            clone.addresses = cloneEndpoints(addresses);
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

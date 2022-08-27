@@ -26,6 +26,7 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Instant;
@@ -137,7 +138,11 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * @return                          the expiration time
      */
     @Nullable
-    public final Instant getExpirationTime() {
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "An Instant can't actually be mutated"
+    )
+    public Instant getExpirationTime() {
         return expirationTime;
     }
 
@@ -148,6 +153,10 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * @param expirationTime The Instant to be set as expiration time
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "An Instant can't actually be mutated"
+    )
     public SystemDeleteTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();

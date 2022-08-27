@@ -236,7 +236,7 @@ public final class KeyList extends Key implements Collection<Key> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

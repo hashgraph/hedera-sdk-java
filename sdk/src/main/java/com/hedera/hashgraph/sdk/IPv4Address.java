@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * A simplified representation of a 32 bit IPv4Address.
  */
-public class IPv4Address {
+public class IPv4Address implements Cloneable {
     /**
      * Represents the first 16 bits of the IPv4Address.
      */
@@ -122,5 +122,17 @@ public class IPv4Address {
     @Override
     public String toString() {
         return Objects.requireNonNull(network) + "." + Objects.requireNonNull(host);
+    }
+
+    @Override
+    public IPv4Address clone() {
+        try {
+            IPv4Address clone = (IPv4Address) super.clone();
+            clone.host = host != null ? host.clone() : null;
+            clone.network = network != null ? network.clone() : null;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

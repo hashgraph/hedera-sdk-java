@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -74,6 +75,10 @@ class HederaTrustManager implements X509TrustManager {
     }
 
     @Override
+    @SuppressFBWarnings(
+        value = "DLS_DEAD_LOCAL_STORE",
+        justification = "SpotBugs seems to be getting confused by the control flow here.  It thinks certHashBytes is not used."
+    )
     public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         if (certHash == null) {
             return;
@@ -84,7 +89,7 @@ class HederaTrustManager implements X509TrustManager {
 
             try (
                 var outputStream = new ByteArrayOutputStream();
-                var pemWriter = new PemWriter(new OutputStreamWriter(outputStream))
+                var pemWriter = new PemWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))
             ) {
                 pemWriter.writeObject(new PemObject(CERTIFICATE, cert.getEncoded()));
                 pemWriter.flush();
@@ -95,15 +100,15 @@ class HederaTrustManager implements X509TrustManager {
                 continue;
             }
 
-            var certHash = new byte[0];
+            var certHashBytes = new byte[0];
 
             try {
-                certHash = MessageDigest.getInstance("SHA-384").digest(pem);
+                certHashBytes = MessageDigest.getInstance("SHA-384").digest(pem);
             } catch (NoSuchAlgorithmException e) {
                 throw new IllegalStateException("Failed to find SHA-384 digest for certificate hashing", e);
             }
 
-            if (this.certHash.equals(Hex.toHexString(certHash))) {
+            if (this.certHash.equals(Hex.toHexString(certHashBytes))) {
                 return;
             }
         }

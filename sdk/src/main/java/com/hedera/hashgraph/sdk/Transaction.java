@@ -28,6 +28,7 @@ import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Function;
 import org.bouncycastle.crypto.digests.SHA384Digest;
@@ -692,6 +693,10 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return                          the transaction valid duration
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public final Duration getTransactionValidDuration() {
         return transactionValidDuration;
     }
@@ -704,6 +709,10 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param validDuration The duration to be set
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public final T setTransactionValidDuration(Duration validDuration) {
         requireNotFrozen();
         Objects.requireNonNull(validDuration);

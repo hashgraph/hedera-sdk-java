@@ -118,7 +118,7 @@ class PublicKeyED25519 extends PublicKey {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }
