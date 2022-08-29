@@ -73,7 +73,7 @@ protobuf {
     }
     plugins {
         grpc {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.48.1"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.49.0"
         }
     }
 }
