@@ -60,7 +60,7 @@ dependencies {
 
     testRuntimeOnly "org.slf4j:slf4j-simple:1.7.36"
     testRuntimeOnly "io.grpc:grpc-netty-shaded:1.49.0"
-    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-beta1'
+    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0'
 
     integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.48.1'
     integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.0-beta1'
