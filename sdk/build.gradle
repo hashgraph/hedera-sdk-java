@@ -44,7 +44,7 @@ dependencies {
     implementation "org.bouncycastle:bcprov-jdk15on:1.70"
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation 'org.slf4j:slf4j-api:1.7.36'
+    implementation 'org.slf4j:slf4j-api:2.0.0'
 
     implementation "io.grpc:grpc-core:1.49.0"
     implementation "io.grpc:grpc-stub:1.49.0"
