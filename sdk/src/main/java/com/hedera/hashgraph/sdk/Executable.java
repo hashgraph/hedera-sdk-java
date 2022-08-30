@@ -717,8 +717,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
 
         ExecutionState getStatus(ResponseT response) {
-            node.decreaseBackoff();
-
             this.response = Executable.this.responseListener.apply(response);
             this.responseStatus = Executable.this.mapResponseStatus(response);
 
@@ -737,12 +735,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                         node.getAccountId(), delay, attempt, responseStatus);
                     verboseLog(node);
+                    node.decreaseBackoff();
                     break;
                 case ServerError:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
+                    Objects.requireNonNull(network).increaseBackoff(node);
                     break;
                 default:
+                    node.decreaseBackoff();
                     // Do nothing
             }
 

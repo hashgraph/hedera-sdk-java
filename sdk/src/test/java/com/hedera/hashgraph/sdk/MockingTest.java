@@ -32,11 +32,13 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
 import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import java8.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -423,16 +425,18 @@ public class MockingTest {
 
     @ParameterizedTest(name = "[{2}] Executable retries on {1} Hedera status error(s) {0}")
     @CsvSource({
-        "BUSY, 2, sync",
-        "PLATFORM_TRANSACTION_NOT_CREATED, 2, sync",
-        "BUSY, 2, async",
-        "PLATFORM_TRANSACTION_NOT_CREATED, 2, async",
+        "BUSY, sync",
+        "PLATFORM_TRANSACTION_NOT_CREATED, sync",
+        "PLATFORM_NOT_ACTIVE, sync",
+        "BUSY, async",
+        "PLATFORM_TRANSACTION_NOT_CREATED, async",
+        "PLATFORM_NOT_ACTIVE, async",
     })
-    void shouldRetryErrorsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
+    void shouldRetryErrorsCorrectly(com.hedera.hashgraph.sdk.Status status, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("shouldRetryFunctionsCorrectly", service);
 
-        for (var i = 0; i < numberOfErrors; i++) {
+        for (var i = 0; i < 2; i++) {
             service.buffer.enqueueResponse(TestResponse.transaction(status));
         }
 
@@ -441,10 +445,12 @@ public class MockingTest {
         if (sync.equals("sync")) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
+                    .setNodeAccountIds(Lists.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
                     .execute(server.client);
             });
         } else {
             new AccountCreateTransaction()
+                .setNodeAccountIds(Lists.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
                 .executeAsync(server.client)
                 .handle((response, error) -> {
                     Assertions.assertNotNull(error);
@@ -455,7 +461,14 @@ public class MockingTest {
                 .get();
         }
 
-        Assertions.assertEquals(numberOfErrors, service.buffer.transactionRequestsReceived.size());
+        // Make sure that each attempt is directed at a different node.
+        Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
+        var requests = service.buffer.transactionRequestsReceived;
+        var signedTx0 = SignedTransaction.parseFrom(requests.get(0).getSignedTransactionBytes());
+        var signedTx1 = SignedTransaction.parseFrom(requests.get(1).getSignedTransactionBytes());
+        var txBody0 = TransactionBody.parseFrom(signedTx0.getBodyBytes());
+        var txBody1 = TransactionBody.parseFrom(signedTx1.getBodyBytes());
+        Assertions.assertNotEquals(txBody0.getNodeAccountID(), txBody1.getNodeAccountID());
 
         server.close();
     }
