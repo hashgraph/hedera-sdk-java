@@ -1488,7 +1488,19 @@ public enum Status {
     /**
      * The full prefix signature for precompile is not valid
      */
-    INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE(ResponseCodeEnum.INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE);
+    INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE(ResponseCodeEnum.INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE),
+
+    /**
+     * The combined balances of a contract and its auto-renew account (if any) did not cover
+     * the rent charged for net new storage used in a transaction.
+     */
+    INSUFFICIENT_BALANCES_FOR_STORAGE_RENT(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_STORAGE_RENT),
+
+    /**
+     * A contract transaction tried to use more than the allowed number of child records, via
+     * either system contract records or internal contract creations.
+     */
+    MAX_CHILD_RECORDS_EXCEEDED(ResponseCodeEnum.MAX_CHILD_RECORDS_EXCEEDED);
 
     final ResponseCodeEnum code;
 
@@ -2068,6 +2080,10 @@ public enum Status {
                 return MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED;
             case INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE:
                 return INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE;
+            case INSUFFICIENT_BALANCES_FOR_STORAGE_RENT:
+                return INSUFFICIENT_BALANCES_FOR_STORAGE_RENT;
+            case MAX_CHILD_RECORDS_EXCEEDED:
+                return MAX_CHILD_RECORDS_EXCEEDED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

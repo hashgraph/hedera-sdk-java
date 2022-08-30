@@ -55,6 +55,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
     private boolean declineStakingReward = false;
 
+    @Nullable
+    private PublicKey aliasKey = null;
+
+    @Nullable
+    private EvmAddress aliasEvmAddress = null;
+
     /**
      * Constructor.
      */
@@ -330,6 +336,28 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    @Nullable
+    public PublicKey getAliasKey() {
+        return aliasKey;
+    }
+
+    public AccountCreateTransaction setAliasKey(PublicKey aliasKey) {
+        requireNotFrozen();
+        this.aliasKey = aliasKey;
+        return this;
+    }
+
+    @Nullable
+    public EvmAddress getAliasEvmAddress() {
+        return aliasEvmAddress;
+    }
+
+    public AccountCreateTransaction setAliasEvmAddress(EvmAddress aliasEvmAddress) {
+        requireNotFrozen();
+        this.aliasEvmAddress = aliasEvmAddress;
+        return this;
+    }
+
     /**
      * Build the transaction body.
      *
@@ -350,6 +378,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
         if (key != null) {
             builder.setKey(key.toProtobufKey());
+        }
+
+        if (aliasKey != null) {
+            builder.setAlias(aliasKey.toProtobufKey().toByteString());
+        } else if (aliasEvmAddress != null) {
+            builder.setAlias(aliasEvmAddress.toProtobufKey().toByteString());
         }
 
         if (stakedAccountId != null) {
@@ -400,6 +434,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         if (body.hasStakedNodeId()) {
             stakedNodeId = body.getStakedNodeId();
         }
+
+        aliasKey = PublicKey.fromAliasBytes(body.getAlias());
+        aliasEvmAddress = EvmAddress.fromAliasBytes(body.getAlias());
     }
 
     @Override

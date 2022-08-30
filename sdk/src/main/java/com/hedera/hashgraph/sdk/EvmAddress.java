@@ -62,7 +62,7 @@ public final class EvmAddress extends Key {
 
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
         return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(bytes))
+            .setECDSASecp256K1(ByteString.copyFrom(bytes))
             .build();
     }
 

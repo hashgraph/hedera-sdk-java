@@ -87,7 +87,7 @@ public class AccountInfoTest {
 
     @Test
     void toProtobuf() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(AccountInfo.fromProtobuf(info).toProtobuf())
+        SnapshotMatcher.expect(AccountInfo.fromProtobuf(info).toProtobuf().toString())
             .toMatchSnapshot();
     }
 }

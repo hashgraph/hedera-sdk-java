@@ -1335,7 +1335,19 @@ enum ResponseCodeEnum {
   MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED = 325;
 
   /**
- * The full prefix signature for precompile is not valid
- */
+  * The full prefix signature for precompile is not valid
+  */
   INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE = 326;
+
+  /**
+  * The combined balances of a contract and its auto-renew account (if any) did not cover
+  * the rent charged for net new storage used in a transaction.
+  */
+  INSUFFICIENT_BALANCES_FOR_STORAGE_RENT = 327;
+
+  /**
+  * A contract transaction tried to use more than the allowed number of child records, via
+  * either system contract records or internal contract creations.
+  */
+  MAX_CHILD_RECORDS_EXCEEDED = 328;
 }

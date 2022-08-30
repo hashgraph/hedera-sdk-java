@@ -173,14 +173,13 @@ public final class AccountId implements Comparable<AccountId> {
      */
     static AccountId fromProtobuf(AccountID accountId) {
         Objects.requireNonNull(accountId);
-        boolean aliasIsEvmAddress = accountId.getAlias().size() == 20;
         return new AccountId(
             accountId.getShardNum(),
             accountId.getRealmNum(),
             accountId.getAccountNum(),
             null,
-            aliasIsEvmAddress ? null : PublicKey.fromAliasBytes(accountId.getAlias()),
-            aliasIsEvmAddress ? EvmAddress.fromAliasBytes(accountId.getAlias()) : null
+            accountId.hasAlias() ? PublicKey.fromAliasBytes(accountId.getAlias()) : null,
+            accountId.hasAlias() ? EvmAddress.fromAliasBytes(accountId.getAlias()) : null
         );
     }
 
