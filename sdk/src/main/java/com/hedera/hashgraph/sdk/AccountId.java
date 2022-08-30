@@ -26,6 +26,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -215,7 +216,7 @@ public final class AccountId implements Comparable<AccountId> {
         if (aliasKey != null) {
             accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         } else if (aliasEvmAddress != null) {
-            accountIdBuilder.setAlias(aliasEvmAddress.toProtobufKey().toByteString());
+            accountIdBuilder.setAlias(ByteString.copyFrom(aliasEvmAddress.toBytes()));
         }else {
             accountIdBuilder.setAccountNum(num);
         }
@@ -239,7 +240,7 @@ public final class AccountId implements Comparable<AccountId> {
      * @throws BadEntityIdException     when the account id and checksum are invalid
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
-        if (aliasKey == null) {
+        if (aliasKey == null && aliasEvmAddress == null) {
             EntityIdHelper.validate(shard, realm, num, client, checksum);
         }
     }
@@ -281,8 +282,8 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id with checksum
      */
     public String toStringWithChecksum(Client client) {
-        if (aliasKey != null) {
-            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey");
+        if (aliasKey != null || aliasEvmAddress != null) {
+            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey or aliasEvmAddress");
         } else {
             return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
         }
@@ -290,7 +291,10 @@ public final class AccountId implements Comparable<AccountId> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(shard, realm, num, (aliasKey != null) ? aliasKey.toBytes() : null);
+        return Objects.hash(
+            shard, realm, num,
+            (aliasKey != null) ? aliasKey.toBytes() : ((aliasEvmAddress != null) ? aliasEvmAddress.toBytes() : null)
+        );
     }
 
     @Override
@@ -307,8 +311,12 @@ public final class AccountId implements Comparable<AccountId> {
         if ((aliasKey == null) != (otherId.aliasKey == null)) {
             return false;
         }
+        if ((aliasEvmAddress == null) != (otherId.aliasEvmAddress == null)) {
+            return false;
+        }
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num &&
-            (aliasKey == null || aliasKey.equals(otherId.aliasKey));
+            (aliasKey == null || aliasKey.equals(otherId.aliasKey)) &&
+            (aliasEvmAddress == null || aliasEvmAddress.equals(otherId.aliasEvmAddress));
     }
 
     @Override
@@ -329,12 +337,15 @@ public final class AccountId implements Comparable<AccountId> {
         if ((aliasKey == null) != (o.aliasKey == null)) {
             return aliasKey != null ? 1 : -1;
         }
+        if (aliasKey != null) {
+            return aliasKey.toStringDER().compareTo(o.aliasKey.toStringDER());
+        }
         if ((aliasEvmAddress == null) != (o.aliasEvmAddress == null)) {
             return aliasEvmAddress != null ? 1 : -1;
         }
-        if (aliasKey == null) {
+        if (aliasEvmAddress == null) {
             return 0;
         }
-        return aliasKey.toStringDER().compareTo(o.aliasKey.toStringDER());
+        return aliasEvmAddress.toString().compareTo(o.aliasEvmAddress.toString());
     }
 }
