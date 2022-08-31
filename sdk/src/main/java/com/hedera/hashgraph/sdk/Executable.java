@@ -451,7 +451,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         Node candidate = null;
         long smallestDelay = Long.MAX_VALUE;
 
-        for (int i = 0; i < nodes.size(); i++) {
+        for (int _i = 0; _i < nodes.size(); _i++) {
+            // NOTE: _i is NOT the index into this.nodes, it is just keeping track of how many times we've iterated.
+            // In the event of ServerErrors, this method depends on nodeAccountIds.getIndex() to have advanced to
+            // the next node.  nodeAccountIds gets advanced in advanceRequest().
             node = nodes.get(nodeAccountIds.getIndex());
 
             if (!node.isHealthy()) {
@@ -717,6 +720,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
 
         ExecutionState getStatus(ResponseT response) {
+            node.decreaseBackoff();
+
             this.response = Executable.this.responseListener.apply(response);
             this.responseStatus = Executable.this.mapResponseStatus(response);
 
@@ -735,15 +740,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
                         node.getAccountId(), delay, attempt, responseStatus);
                     verboseLog(node);
-                    node.decreaseBackoff();
                     break;
                 case ServerError:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
-                    Objects.requireNonNull(network).increaseBackoff(node);
                     break;
                 default:
-                    node.decreaseBackoff();
                     // Do nothing
             }
 
