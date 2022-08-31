@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountIdTest {
@@ -177,13 +178,41 @@ class AccountIdTest {
     }
 
     @Test
+    void toFromProtobuf() {
+        var id1 = new AccountId(5005);
+        var id2 = AccountId.fromProtobuf(id1.toProtobuf());
+        assertThat(id2).isEqualTo(id1);
+    }
+
+    @Test
     void fromBytesAlias() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toBytes()).toString()).toMatchSnapshot();
     }
 
     @Test
+    void toFromProtobufAliasKey() {
+        var id1 = AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
+        var id2 = AccountId.fromProtobuf(id1.toProtobuf());
+        assertThat(id2).isEqualTo(id1);
+    }
+
+    @Test
+    void toFromProtobufEcdsaAliasKey() {
+        var id1 = AccountId.fromString("0.0.302d300706052b8104000a032200035d348292bbb8b511fdbe24e3217ec099944b4728999d337f9a025f4193324525");
+        var id2 = AccountId.fromProtobuf(id1.toProtobuf());
+        assertThat(id2).isEqualTo(id1);
+    }
+
+    @Test
     void fromBytesAliasEvmAddress() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes()).toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void toFromProtobufAliasEvmAddress() {
+        var id1 = AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da");
+        var id2 = AccountId.fromProtobuf(id1.toProtobuf());
+        assertThat(id2).isEqualTo(id1);
     }
 
     @Test

@@ -9,7 +9,7 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAlias=[
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAliasEvmAddress=[
-  "0.0.301e300506032b6570031500302a300506032b6570032100114e6abc371b82da"
+  "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
@@ -64,7 +64,7 @@ com.hedera.hashgraph.sdk.AccountIdTest.toBytesAlias=[
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.toBytesAliasEvmAddress=[
-  "22161214302a300506032b6570032100114e6abc371b82da"
+  "2214302a300506032b6570032100114e6abc371b82da"
 ]
 
 

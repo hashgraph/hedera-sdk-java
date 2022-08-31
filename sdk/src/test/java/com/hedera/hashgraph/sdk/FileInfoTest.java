@@ -62,7 +62,7 @@ public class FileInfoTest {
 
     @Test
     void toProtobuf() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(FileInfo.fromProtobuf(info).toProtobuf())
+        SnapshotMatcher.expect(FileInfo.fromProtobuf(info).toProtobuf().toString())
             .toMatchSnapshot();
     }
 
