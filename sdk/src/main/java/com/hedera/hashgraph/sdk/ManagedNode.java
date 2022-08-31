@@ -160,7 +160,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      *
      * @return                          the minimum backoff time
      */
-    Duration getMinBackoff() {
+    synchronized Duration getMinBackoff() {
         return minBackoff;
     }
 
@@ -170,7 +170,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      * @param minBackoff                the minimum backoff time
      * @return {@code this}
      */
-    N setMinBackoff(Duration minBackoff) {
+    synchronized N setMinBackoff(Duration minBackoff) {
         if (currentBackoff == this.minBackoff) {
             currentBackoff = minBackoff;
         }

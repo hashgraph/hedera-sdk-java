@@ -73,7 +73,7 @@ public class HederaTrustManagerTest {
         }
     }
 
-    public static final X509Certificate[] CERTIFICATE_CHAIN = new X509Certificate[]{PREVIEWNET_CERT_NODE_3};
+    static final X509Certificate[] CERTIFICATE_CHAIN = new X509Certificate[]{PREVIEWNET_CERT_NODE_3};
 
     @Test
     void skipsCheckIfVerificationIsDisabled() throws CertificateException {

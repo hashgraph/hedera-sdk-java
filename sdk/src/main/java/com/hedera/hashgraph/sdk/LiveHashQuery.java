@@ -28,6 +28,7 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -82,7 +83,7 @@ public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
      * @return {@code this}
      */
     public LiveHashQuery setHash(byte[] hash) {
-        this.hash = hash;
+        this.hash = Arrays.copyOf(hash, hash.length);
         return this;
     }
 

@@ -19,7 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -110,6 +112,13 @@ abstract class ManagedNetwork<
     @Nullable
     private LedgerId ledgerId;
 
+    @VisibleForTesting
+    @SuppressFBWarnings(
+        value = "URF_UNREAD_FIELD",
+        justification = "this field is used for testing"
+    )
+    boolean hasShutDownNow = false;
+
     protected ManagedNetwork(ExecutorService executor) {
         this.executor = executor;
         earliestReadmitTime = Instant.now().plus(minNodeReadmitTime);
@@ -121,7 +130,7 @@ abstract class ManagedNetwork<
      * @return                          the ledger id
      */
     @Nullable
-    LedgerId getLedgerId() {
+    synchronized LedgerId getLedgerId() {
         return ledgerId;
     }
 
@@ -144,7 +153,7 @@ abstract class ManagedNetwork<
      *
      * @return                          maximum node attempts
      */
-    int getMaxNodeAttempts() {
+    synchronized int getMaxNodeAttempts() {
         return maxNodeAttempts;
     }
 
@@ -166,7 +175,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the minimum node backoff time
      */
-    Duration getMinNodeBackoff() {
+    synchronized Duration getMinNodeBackoff() {
         return minNodeBackoff;
     }
 
@@ -192,7 +201,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the maximum node backoff time
      */
-    Duration getMaxNodeBackoff() {
+    synchronized Duration getMaxNodeBackoff() {
         return maxNodeBackoff;
     }
 
@@ -218,7 +227,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the minimum node readmit time
      */
-    public Duration getMinNodeReadmitTime() {
+    synchronized public Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
@@ -227,7 +236,7 @@ abstract class ManagedNetwork<
      *
      * @param minNodeReadmitTime        the minimum node readmit time
      */
-    public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    synchronized public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
         for (var node : nodes) {
@@ -295,7 +304,7 @@ abstract class ManagedNetwork<
      *
      * @return                          the close timeout
      */
-    Duration getCloseTimeout() {
+    synchronized Duration getCloseTimeout() {
         return closeTimeout;
     }
 
@@ -571,50 +580,47 @@ abstract class ManagedNetwork<
         return returnList;
     }
 
-    /**
-     * Close the network with the {@link ManagedNetwork#closeTimeout} duration
-     *
-     * @throws TimeoutException         when the transaction times out
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    synchronized void close() throws TimeoutException, InterruptedException {
-        close(closeTimeout);
-    }
 
-    /**
-     * Close the network with a specific timeout duration
-     *
-     * @param timeout                   the timeout
-     * @throws TimeoutException         when the transaction times out
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    synchronized void close(Duration timeout) throws TimeoutException, InterruptedException {
-        var stopAt = Instant.now().getEpochSecond() + timeout.getSeconds();
-
-        // Start the shutdown process on all nodes
+    synchronized void beginClose() {
         for (var node : nodes) {
             if (node.channel != null) {
                 node.channel = node.channel.shutdown();
             }
         }
+    }
 
-        // Await termination for all nodes
-        for (var node : nodes) {
-            if (stopAt - Instant.now().getEpochSecond() == 0) {
-                throw new TimeoutException("Failed to properly shutdown all channels");
+    // returns null if successful, or Throwable if error occurred
+    @Nullable
+    synchronized Throwable awaitClose(Instant deadline, @Nullable Throwable previousError) {
+        try {
+            if (previousError != null) {
+                throw previousError;
             }
 
-            if (node.channel != null) {
-                // InterruptedException needs to be caught here to prevent early exist without releasing lock
-                try {
-                    node.channel.awaitTermination(stopAt - Instant.now().getEpochSecond(), TimeUnit.SECONDS);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
+            for (var node : nodes) {
+                if (node.channel != null) {
+                    var timeoutMillis = Duration.between(Instant.now(), deadline).toMillis();
+                    if (timeoutMillis <= 0 || !node.channel.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
+                        throw new TimeoutException("Failed to properly shutdown all channels");
+                    } else {
+                        node.channel = null;
+                    }
                 }
             }
-        }
 
-        nodes.clear();
-        network.clear();
+            return null;
+        } catch (Throwable error) {
+            for (var node : nodes) {
+                if (node.channel != null) {
+                    node.channel.shutdownNow();
+                }
+            }
+            hasShutDownNow = true;
+
+            return error;
+        } finally {
+            nodes.clear();
+            network.clear();
+        }
     }
 }

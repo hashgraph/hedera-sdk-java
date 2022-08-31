@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * The total fees charged for a transaction. It contains three parts namely
  * node data, network data and service data.
  */
-public class FeeData {
+public class FeeData implements Cloneable {
     @Nullable
     private FeeComponents nodeData = null;
     @Nullable
@@ -188,5 +188,18 @@ public class FeeData {
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    @Override
+    public FeeData clone() {
+        try {
+            FeeData clone = (FeeData) super.clone();
+            clone.nodeData = nodeData != null ? nodeData.clone() : null;
+            clone.networkData = networkData != null ? networkData.clone() : null;
+            clone.serviceData = serviceData != null ? serviceData.clone() : null;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

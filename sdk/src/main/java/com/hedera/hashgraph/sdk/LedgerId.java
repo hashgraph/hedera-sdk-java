@@ -156,7 +156,7 @@ public class LedgerId {
      * @return                          the byte array representation
      */
     public byte[] toBytes() {
-        return idBytes;
+        return Arrays.copyOf(idBytes, idBytes.length);
     }
 
     /**
@@ -182,7 +182,7 @@ public class LedgerId {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

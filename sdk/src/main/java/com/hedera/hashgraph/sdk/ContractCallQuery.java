@@ -29,6 +29,7 @@ import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -128,7 +129,7 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
      * @return {@code this}
      */
     public ContractCallQuery setFunctionParameters(byte[] functionParameters) {
-        this.functionParameters = functionParameters;
+        this.functionParameters = Arrays.copyOf(functionParameters, functionParameters.length);
         return this;
     }
 

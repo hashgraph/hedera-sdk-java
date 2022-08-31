@@ -73,7 +73,7 @@ public class FeeSchedules {
      */
     @Nullable
     public FeeSchedule getCurrent() {
-        return current;
+        return current != null ? current.clone() : null;
     }
 
     /**
@@ -83,7 +83,7 @@ public class FeeSchedules {
      * @return {@code this}
      */
     public FeeSchedules setCurrent(@Nullable FeeSchedule current) {
-        this.current = current;
+        this.current = current != null ? current.clone() : null;
         return this;
     }
 
@@ -94,7 +94,7 @@ public class FeeSchedules {
      */
     @Nullable
     public FeeSchedule getNext() {
-        return next;
+        return next != null ? next.clone() : null;
     }
 
     /**
@@ -104,7 +104,7 @@ public class FeeSchedules {
      * @return {@code this}
      */
     public FeeSchedules setNext(@Nullable FeeSchedule next) {
-        this.next = next;
+        this.next = next != null ? next.clone() : null;
         return this;
     }
 

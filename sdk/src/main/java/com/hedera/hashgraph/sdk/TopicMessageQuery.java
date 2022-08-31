@@ -25,6 +25,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicQuery;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.Status;
@@ -159,6 +160,10 @@ public final class TopicMessageQuery {
      * @param maxBackoff                the maximum backoff
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public TopicMessageQuery setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toMillis() < 500L) {
             throw new IllegalArgumentException("maxBackoff must be at least 500 ms");

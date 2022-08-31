@@ -7,10 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+ - `AccountCreateTransaction.[set|get]alias[Key|EvmAddress]()`
+
 ### Fixed
 
+ - `AccountId`s with `aliasEvmAddress` now serialize/deserialize correctly.
+ - `validateChecksum()`, `toStringWithChecksum()`, `hashCode()`, `equals()`, and `compareTo()` now function correctly for `AccountId`s with `aliasEvmAddress`es.
+
+## v2.17.3
+
+### Fixed
+
+ - Thread leak in `Client`
  - `Client.setTransportSecurity()` now updates mirror network
- - `Client.forMainnet()`, `Client.forName()` and `Client.fromConfig()` now configure the mainnet mirror network correctly
 
 ## v2.17.2
 

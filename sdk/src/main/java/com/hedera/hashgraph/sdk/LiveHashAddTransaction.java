@@ -27,11 +27,14 @@ import com.hedera.hashgraph.sdk.proto.LiveHash;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 
@@ -107,7 +110,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
     public LiveHashAddTransaction setHash(byte[] hash) {
         requireNotFrozen();
         Objects.requireNonNull(hash);
-        this.hash = hash;
+        this.hash = Arrays.copyOf(hash, hash.length);
         return this;
     }
 
@@ -129,7 +132,7 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      */
     @Nullable
     public Collection<Key> getKeys() {
-        return keys;
+        return keys != null ? Collections.unmodifiableCollection(keys) : null;
     }
 
     /**
@@ -153,6 +156,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @return                          the duration
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getDuration() {
         return duration;
     }
@@ -163,6 +170,10 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @param duration The Duration to be set
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public LiveHashAddTransaction setDuration(Duration duration) {
         requireNotFrozen();
         Objects.requireNonNull(duration);

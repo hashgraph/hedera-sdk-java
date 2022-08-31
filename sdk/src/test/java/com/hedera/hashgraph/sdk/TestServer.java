@@ -34,28 +34,31 @@ import java.util.concurrent.TimeoutException;
 
 public class TestServer {
     public final Client client;
-    private final Server grpcServer;
+    private final Server[] grpcServers = new Server[2];
 
     public TestServer(String name, BindableService... services) throws IOException {
-        var serverBuilder = InProcessServerBuilder.forName(name);
-        for (var service : services) {
-            serverBuilder.addService(service);
+        for (int i = 0; i < 2; i++) {
+            var serverBuilder = InProcessServerBuilder.forName(name + "[" + i + "]");
+            for (var service : services) {
+                serverBuilder.addService(service);
+            }
+            grpcServers[i] = serverBuilder.directExecutor().build().start();
         }
-        grpcServer = serverBuilder.directExecutor().build().start();
 
         var network = new HashMap<String, AccountId>();
-        network.put("in-process:" + name, AccountId.fromString("1.1.1"));
+        network.put("in-process:" + name + "[0]", AccountId.fromString("1.1.1"));
+        network.put("in-process:" + name + "[1]", AccountId.fromString("2.2.2"));
         client = Client.forNetwork(network)
-            .setMinBackoff(Duration.ofMillis(1))
-            .setMaxBackoff(Duration.ofMillis(1))
-            .setNodeMinBackoff(Duration.ofMillis(1))
-            .setNodeMaxBackoff(Duration.ofMillis(1))
+            .setNodeMinBackoff(Duration.ofMillis(500))
+            .setNodeMaxBackoff(Duration.ofMillis(500))
             .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
     }
 
     public void close() throws TimeoutException, InterruptedException {
         client.close();
-        grpcServer.shutdown();
-        grpcServer.awaitTermination();
+        for (var server : grpcServers) {
+            server.shutdown();
+            server.awaitTermination();
+        }
     }
 }

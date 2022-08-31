@@ -299,8 +299,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     }
 
     private void delay(long delay) {
+        if (delay <= 0) {
+            return;
+        }
         try {
-            Thread.sleep(delay);
+            if (delay > 0) {
+                Thread.sleep(delay);
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -446,7 +451,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         Node candidate = null;
         long smallestDelay = Long.MAX_VALUE;
 
-        for (int i = 0; i < nodes.size(); i++) {
+        for (int _i = 0; _i < nodes.size(); _i++) {
+            // NOTE: _i is NOT the index into this.nodes, it is just keeping track of how many times we've iterated.
+            // In the event of ServerErrors, this method depends on nodeAccountIds.getIndex() to have advanced to
+            // the next node.  nodeAccountIds gets advanced in advanceRequest().
             node = nodes.get(nodeAccountIds.getIndex());
 
             if (!node.isHealthy()) {
@@ -756,7 +764,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace("Node IP {} Timestamp {} Transaction Type {}",
                 ipAddress,
                 System.currentTimeMillis(),
-                this.getClass() != null ? this.getClass().getSimpleName() : "NULL"
+                this.getClass().getSimpleName()
             );
         }
     }

@@ -224,7 +224,7 @@ public class TokenId implements Comparable<TokenId> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

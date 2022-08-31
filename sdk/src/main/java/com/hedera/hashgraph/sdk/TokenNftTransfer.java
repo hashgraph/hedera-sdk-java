@@ -156,7 +156,7 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

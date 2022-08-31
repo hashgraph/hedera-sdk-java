@@ -19,10 +19,12 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.Consumer;
@@ -30,6 +32,7 @@ import java8.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.io.File;
@@ -46,6 +49,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -96,6 +101,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param network                    the network
      * @param mirrorNetwork              the mirror network
      */
+    @VisibleForTesting
     Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
         this.executor = executor;
         this.network = network;
@@ -108,14 +114,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the executor service
      */
     static ExecutorService createExecutor() {
-        var threadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("hedera-sdk-%d")
-            .setDaemon(true)
-            .build();
-
-        return Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            threadFactory);
+        return ForkJoinPool.commonPool();
     }
 
     /**
@@ -140,7 +139,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the list of mirror nodes
      */
-    public List<String> getMirrorNetwork() {
+    synchronized public List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
 
@@ -357,7 +356,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the client's network
      */
-    public Map<String, AccountId> getNetwork() {
+    synchronized public Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
 
@@ -600,6 +599,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return maxBackoff
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getMaxBackoff() {
         return maxBackoff;
     }
@@ -611,6 +614,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param maxBackoff The maximum amount of time to wait between retries
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public Client setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("maxBackoff must be a positive duration");
@@ -626,6 +633,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return minBackoff
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getMinBackoff() {
         return minBackoff;
     }
@@ -637,6 +648,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param minBackoff The minimum amount of time to wait between retries
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public Client setMinBackoff(Duration minBackoff) {
         if (minBackoff == null || minBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("minBackoff must be a positive duration");
@@ -946,6 +961,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the timeout value
      */
     @Override
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public synchronized Duration getRequestTimeout() {
         return requestTimeout;
     }
@@ -956,6 +975,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param requestTimeout            the timeout value
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = Objects.requireNonNull(requestTimeout);
         return this;
@@ -966,6 +989,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the timeout value
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getCloseTimeout() {
         return closeTimeout;
     }
@@ -976,6 +1003,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param closeTimeout              the timeout value
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
@@ -989,7 +1020,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @return                          the operator
      */
     @Nullable
-    Operator getOperator() {
+    synchronized Operator getOperator() {
         return this.operator;
     }
 
@@ -1002,12 +1033,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     @Override
     public synchronized void close() throws TimeoutException {
-        try {
-            network.close();
-            mirrorNetwork.close();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+        close(closeTimeout);
     }
 
     /**
@@ -1020,11 +1046,19 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param timeout The Duration to be set
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
-        try {
-            network.close(timeout);
-            mirrorNetwork.close(timeout);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+        var closeDeadline = Instant.now().plus(timeout);
+        network.beginClose();
+        mirrorNetwork.beginClose();
+
+        var networkError = network.awaitClose(closeDeadline, null);
+        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+
+        if (mirrorNetworkError != null) {
+            if (mirrorNetworkError instanceof TimeoutException) {
+                throw (TimeoutException) mirrorNetworkError;
+            } else {
+                throw new RuntimeException(mirrorNetworkError);
+            }
         }
     }
 

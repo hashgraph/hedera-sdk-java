@@ -113,7 +113,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      * @param tokenId                   the token id
      * @return {@code this}
      */
-    public TokenMintTransaction setTokenId(@Nullable TokenId tokenId) {
+    public TokenMintTransaction setTokenId(TokenId tokenId) {
         Objects.requireNonNull(tokenId);
         requireNotFrozen();
         this.tokenId = tokenId;

@@ -37,7 +37,7 @@ public final class EvmAddress extends Key {
     private final byte[] bytes;
 
     public EvmAddress(byte[] bytes) {
-        this.bytes = bytes;
+        this.bytes = Arrays.copyOf(bytes, bytes.length);
     }
 
     public static EvmAddress fromString(String text) {
@@ -46,12 +46,8 @@ public final class EvmAddress extends Key {
 
     @Nullable
     static EvmAddress fromAliasBytes(ByteString aliasBytes) {
-        if (!aliasBytes.isEmpty()) {
-            try {
-                var key = Key.fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(aliasBytes));
-                return (key instanceof EvmAddress) ? ((EvmAddress) key) : null;
-            } catch (InvalidProtocolBufferException ignored) {
-            }
+        if (aliasBytes.size() == 20) {
+            return new EvmAddress(aliasBytes.toByteArray());
         }
         return null;
     }
@@ -60,14 +56,13 @@ public final class EvmAddress extends Key {
         return new EvmAddress(bytes);
     }
 
+    @Override
     com.hedera.hashgraph.sdk.proto.Key toProtobufKey() {
-        return com.hedera.hashgraph.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(bytes))
-            .build();
+        throw new UnsupportedOperationException("toProtobufKey() not implemented for EvmAddress");
     }
 
     public byte[] toBytes() {
-        return bytes;
+        return Arrays.copyOf(bytes, bytes.length);
     }
 
     @Override
@@ -81,7 +76,7 @@ public final class EvmAddress extends Key {
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }

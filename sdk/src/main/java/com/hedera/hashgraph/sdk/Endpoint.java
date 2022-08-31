@@ -28,7 +28,7 @@ import java.util.Objects;
 /**
  * Utility class used internally by the sdk.
  */
-public class Endpoint {
+public class Endpoint implements Cloneable {
     @Nullable
     IPv4Address address = null;
 
@@ -119,5 +119,16 @@ public class Endpoint {
         return Objects.requireNonNull(address) +
             ":" +
             port;
+    }
+
+    @Override
+    public Endpoint clone() {
+        try {
+            Endpoint clone = (Endpoint) super.clone();
+            clone.address = address != null ? address.clone() : null;
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 }

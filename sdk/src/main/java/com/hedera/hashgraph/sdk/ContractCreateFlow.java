@@ -20,13 +20,17 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -269,6 +273,10 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @return                          the auto renew period
      */
     @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -279,6 +287,10 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
     public ContractCreateFlow setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         this.autoRenewPeriod = autoRenewPeriod;
@@ -304,7 +316,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      * @return {@code this}
      */
     public ContractCreateFlow setConstructorParameters(byte[] constructorParameters) {
-        this.constructorParameters = constructorParameters;
+        this.constructorParameters = Arrays.copyOf(constructorParameters, constructorParameters.length);
         return this;
     }
 
@@ -411,7 +423,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      */
     @Nullable
     public List<AccountId> getNodeAccountIds() {
-        return nodeAccountIds;
+        return nodeAccountIds != null ? Collections.unmodifiableList(nodeAccountIds) : null;
     }
 
     /**
@@ -427,7 +439,7 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
      */
     public ContractCreateFlow setNodeAccountIds(List<AccountId> nodeAccountIds) {
         Objects.requireNonNull(nodeAccountIds);
-        this.nodeAccountIds = nodeAccountIds;
+        this.nodeAccountIds = new ArrayList(nodeAccountIds);
         return this;
     }
 

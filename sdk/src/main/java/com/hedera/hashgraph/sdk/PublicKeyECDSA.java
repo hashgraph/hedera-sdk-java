@@ -133,11 +133,11 @@ public class PublicKeyECDSA extends PublicKey {
 
     @Override
     public byte[] toBytesRaw() {
-        return keyData;
+        return Arrays.copyOf(keyData, keyData.length);
     }
 
     @Override
-    public boolean equals(@Nullable Object o) {
+    public boolean equals( Object o) {
         if (this == o) {
             return true;
         }
