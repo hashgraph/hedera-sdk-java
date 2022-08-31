@@ -139,9 +139,12 @@ message CryptoGetInfoResponse {
         repeated LiveHash liveHashes = 14;
 
         /**
-         * All tokens related to this account
+         * [DEPRECATED] The metadata of the tokens associated to the account. This field was 
+         * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed 
+         * an account to be associated to an unlimited number of tokens. This scale makes it more 
+         * efficient for users to consult mirror nodes to review their token associations.
          */
-        repeated TokenRelationship tokenRelationships = 15;
+        repeated TokenRelationship tokenRelationships = 15 [deprecated = true];
 
         /**
          * The memo associated with the account

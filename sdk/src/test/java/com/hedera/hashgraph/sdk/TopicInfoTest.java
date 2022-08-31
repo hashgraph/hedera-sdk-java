@@ -70,7 +70,7 @@ public class TopicInfoTest {
 
     @Test
     void toProtobuf() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(TopicInfo.fromProtobuf(info).toProtobuf())
+        SnapshotMatcher.expect(TopicInfo.fromProtobuf(info).toProtobuf().toString())
             .toMatchSnapshot();
     }
 

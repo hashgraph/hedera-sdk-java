@@ -76,7 +76,10 @@ message CryptoGetAccountBalanceResponse {
     uint64 balance = 3;
 
     /**
-     * The token balances possessed by the target account.
+     * [DEPRECATED] The balances of the tokens associated to the account. This field was 
+     * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed 
+     * an account to be associated to an unlimited number of tokens. This scale makes it more 
+     * efficient for users to consult mirror nodes to review their token balances.
      */
-    repeated TokenBalance tokenBalances = 4;
+    repeated TokenBalance tokenBalances = 4 [deprecated = true];
 }

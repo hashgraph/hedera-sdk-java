@@ -151,4 +151,20 @@ message CryptoCreateTransactionBody {
      * If true, the account declines receiving a staking reward. The default value is false.
      */
     bool decline_reward = 17;
+
+    /**
+     * The bytes to be used as the account's alias. The bytes will be 1 of 2 options. It will be the 
+     * serialization of a protobuf Key message for an ED25519/ECDSA_SECP256K1 primitive key type. If the 
+     * account is ECDSA_SECP256K1 based it may also be the public address, calcluated as the last 20 bytes of
+     * the keccak-256 hash of the ECDSA_SECP256K1 primitive key. Currently only primitive key bytes are 
+     * supported as the key for an account with an alias. ThresholdKey, KeyList, ContractID, and
+     * delegatable_contract_id are not supported.
+     *
+     * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
+     * relative to aliases currently on the network at alias assignment.
+     *
+     * If a transaction creates an account using an alias, any further crypto transfers to that alias will 
+     * simply be deposited in that account, without creating anything, and with no creation fee being charged.
+     */
+     bytes alias = 18;
 }
