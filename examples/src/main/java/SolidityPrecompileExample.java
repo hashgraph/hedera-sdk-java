@@ -7,9 +7,12 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -64,7 +67,10 @@ public class SolidityPrecompileExample {
         );
 
         contractHelper
-            // TODO: set parameter suppliers and result validators here
-            .executeSteps(3 /* TODO: put correct step count here */, client);
+            .setResultValidator(0, contractFunctionResult -> {
+                System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
+                return true;
+            }).setPayableAmount(1, Hbar.from(30))
+            .executeSteps(2, client);
     }
 }

@@ -6,8 +6,11 @@ import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,6 +46,7 @@ public class ContractHelper {
     final ContractId contractId;
     final Map<Integer, Function<ContractFunctionResult, Boolean>> stepResultValidators = new HashMap<>();
     final Map<Integer, Supplier<ContractFunctionParameters>> stepParameterSuppliers = new HashMap<>();
+    final Map<Integer, Hbar> stepPayableAmounts = new HashMap<>();
 
     public static JsonObject getJsonResource(String filename) throws IOException {
         ClassLoader cl = ContractHelper.class.getClassLoader();
@@ -85,11 +89,23 @@ public class ContractHelper {
         return this;
     }
 
+    public ContractHelper setPayableAmount(int stepIndex, Hbar amount) {
+        stepPayableAmounts.put(stepIndex, amount);
+        return this;
+    }
+
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
         return stepResultValidators.getOrDefault(
             stepIndex,
             // if no custom validator is given, assume that the step returns a response code which ought to be SUCCESS
-            contractFunctionResult -> contractFunctionResult.getInt32(0) == 22 /* SUCCESS */
+            contractFunctionResult -> {
+                int responseCode = contractFunctionResult.getInt32(0);
+                boolean isValid = responseCode == 22; // HederaResponseCodes.SUCCESS
+                if (!isValid) {
+                    System.out.println("Encountered invalid response code " + responseCode);
+                }
+                return isValid;
+            }
         );
     }
 
@@ -102,9 +118,15 @@ public class ContractHelper {
         Client client
     ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         for (int stepIndex = 0; stepIndex < stepsCount; stepIndex++) {
+            System.out.println("Attempting to execute step " + stepIndex);
             ContractExecuteTransaction tx = new ContractExecuteTransaction()
                 .setContractId(contractId)
-                .setGas(8_000_000);
+                .setGas(10_000_000);
+
+            Hbar payableAmount = stepPayableAmounts.get(stepIndex);
+            if (payableAmount != null) {
+                tx.setPayableAmount(payableAmount);
+            }
 
             String functionName = "step" + stepIndex;
             ContractFunctionParameters parameters = getParameterSupplier(stepIndex).get();
@@ -114,16 +136,17 @@ public class ContractHelper {
                 tx.setFunction(functionName);
             }
 
-            ContractFunctionResult functionResult = Objects.requireNonNull(tx
+            TransactionRecord record = tx
                 .execute(client)
-                .getRecord(client)
-                .contractFunctionResult
-            );
+                .getRecord(client);
+
+            ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
 
             if (functionResult.errorMessage == null && getResultValidator(stepIndex).apply(functionResult)) {
-                System.out.println("step " + stepIndex + " completed, and returned valid result.");
+                System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
             } else {
-                System.out.println("ERROR: step " + stepIndex + " returned invalid result: " + functionResult);
+                System.out.println("ERROR: step " + stepIndex + " returned invalid result");
+                System.out.println("Transaction record: " + record);
                 return;
             }
         }
