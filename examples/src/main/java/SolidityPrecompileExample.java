@@ -45,14 +45,22 @@ public class SolidityPrecompileExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // We need a new account for the contract to interact with in some of its steps
+        // We need some new accounts for the contract to interact with in some of its steps
 
-        // Generate a Ed25519 private, public key pair
-        PrivateKey newKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newKey.getPublicKey();
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
+            .setKey(alicePublicKey)
+            .setInitialBalance(Hbar.from(10))
+            .execute(client)
+            .getReceipt(client)
+            .accountId
+        );
 
-        AccountId newAccountId = Objects.requireNonNull(new AccountCreateTransaction()
-            .setKey(newPublicKey)
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
+        AccountId bobAccountId = Objects.requireNonNull(new AccountCreateTransaction()
+            .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
             .execute(client)
             .getReceipt(client)
@@ -62,7 +70,8 @@ public class SolidityPrecompileExample {
         ContractHelper contractHelper = new ContractHelper(
             ContractHelper.getJsonResource("precompile-example/PrecompileExample.json"),
             new ContractFunctionParameters()
-                .addAddress(newAccountId.toSolidityAddress()),
+                .addAddress(aliceAccountId.toSolidityAddress())
+                .addAddress(bobAccountId.toSolidityAddress()),
             client
         );
 
@@ -71,6 +80,11 @@ public class SolidityPrecompileExample {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
             }).setPayableAmount(1, Hbar.from(30))
-            .executeSteps(2, client);
+            .setParameterSupplier(2, () -> {
+                return new ContractFunctionParameters()
+                    // when contracts work with a public key, they handle the ASN1-DER encoded bytes of the public key
+                    .addBytes(alicePublicKey.toBytesDER());
+            }).setPayableAmount(2, Hbar.from(40))
+            .executeSteps(2, 3, client);
     }
 }

@@ -8,15 +8,20 @@ import com.hedera.hashgraph.sdk.ContractFunctionResult;
 import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionRecord;
+import java8.util.Lists;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -47,6 +52,7 @@ public class ContractHelper {
     final Map<Integer, Function<ContractFunctionResult, Boolean>> stepResultValidators = new HashMap<>();
     final Map<Integer, Supplier<ContractFunctionParameters>> stepParameterSuppliers = new HashMap<>();
     final Map<Integer, Hbar> stepPayableAmounts = new HashMap<>();
+    final Map<Integer, List<PrivateKey>> stepSigners = new HashMap<>();
 
     public static JsonObject getJsonResource(String filename) throws IOException {
         ClassLoader cl = ContractHelper.class.getClassLoader();
@@ -94,6 +100,17 @@ public class ContractHelper {
         return this;
     }
 
+    public ContractHelper addSigner(int stepIndex, PrivateKey signer) {
+        if (stepSigners.containsKey(stepIndex)) {
+            stepSigners.get(stepIndex).add(signer);
+        } else {
+            List<PrivateKey> signerList = new ArrayList<>(1);
+            signerList.add(signer);
+            stepSigners.put(stepIndex, signerList);
+        }
+        return this;
+    }
+
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
         return stepResultValidators.getOrDefault(
             stepIndex,
@@ -113,11 +130,16 @@ public class ContractHelper {
         return stepParameterSuppliers.getOrDefault(stepIndex, () -> null);
     }
 
+    private List<PrivateKey> getSigners(int stepIndex) {
+        return stepSigners.getOrDefault(stepIndex, Collections.emptyList());
+    }
+
     public void executeSteps(
+        int firstStepToExecute,
         int stepsCount,
         Client client
     ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        for (int stepIndex = 0; stepIndex < stepsCount; stepIndex++) {
+        for (int stepIndex = firstStepToExecute; stepIndex < stepsCount; stepIndex++) {
             System.out.println("Attempting to execute step " + stepIndex);
             ContractExecuteTransaction tx = new ContractExecuteTransaction()
                 .setContractId(contractId)
@@ -134,6 +156,11 @@ public class ContractHelper {
                 tx.setFunction(functionName, parameters);
             } else {
                 tx.setFunction(functionName);
+            }
+
+            tx.freezeWith(client);
+            for (PrivateKey signer : getSigners(stepIndex)) {
+                tx.sign(signer);
             }
 
             TransactionRecord record = tx

@@ -7,11 +7,11 @@ import "./PrngSystemContract.sol";
 
 //[X] prng
 //[X] create fungible
-//[ ] create NFT
+//[X] create NFT
 //[ ] mint fungible
 //[ ] mint NFT
 //[ ] associate
-//[ ] transfer
+//[ ] transfer (GOAL FOR TODAY)
 //[ ] approve fungible allowance
 //[ ] approve NFT allowance
 //[ ] pause
@@ -23,12 +23,15 @@ import "./PrngSystemContract.sol";
 
 contract PrecompileExample is ExpiryHelper, PrngSystemContract {
     address owner;
-    address payable otherAccount;
+    address payable aliceAccount;
+    address payable bobAccount;
     address fungibleToken;
+    address nftToken;
 
-    constructor(address payable _otherAccount) {
+    constructor(address payable _aliceAccount, address payable _bobAccount) {
         owner = msg.sender;
-        otherAccount = _otherAccount;
+        aliceAccount = _aliceAccount;
+        bobAccount = _bobAccount;
     }
 
     function step0() external returns (bytes32 result) {
@@ -43,7 +46,6 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
-
         // Set the admin key and the supply key to the key of the account that executed function (INHERIT_ACCOUNT_KEY).
         keys[0] = createSingleKey(ADMIN_KEY_TYPE | SUPPLY_KEY_TYPE, INHERIT_ACCOUNT_KEY, bytes(""));
 
@@ -57,12 +59,42 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
                 1000, // max supply
                 false, // freeze default (setting to false means that this token will not be initially frozen on creation)
                 keys, // the keys for the new token
-                // auto-renew fee paid by otherAccount every 7,000,000 seconds (approx. 81 days).
-                // This is the minimum auto renew period.
-                createAutoRenewExpiry(otherAccount, 7000000)
+            // auto-renew fee paid by aliceAccount every 7,000,000 seconds (approx. 81 days).
+            // This is the minimum auto renew period.
+                createAutoRenewExpiry(aliceAccount, 7000000)
             ),
             100, // initial supply
             0 // decimals
+        );
+    }
+
+    function step2(bytes memory keyBytes) external payable returns (int responseCode) {
+        require(msg.sender == owner);
+
+        IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
+        // Set the admin key and the supply key to given ED25519 public key bytes.
+        keys[0] = createSingleKey(ADMIN_KEY_TYPE | SUPPLY_KEY_TYPE, ED25519_KEY, keyBytes);
+
+        IHederaTokenService.FixedFee[] memory fixedFees = new IHederaTokenService.FixedFee[](1);
+        // Create a fixed fee of 1 Hbar (100,000,000 tinybar) that is collected by owner
+        fixedFees[0] = createFixedFeeForHbars(100000000, owner);
+
+        (responseCode, nftToken) = createNonFungibleTokenWithCustomFees(
+            IHederaTokenService.HederaToken(
+                "Example NFT token", // name
+                "ENFT", // symbol
+                owner, // treasury
+                "memo",
+                true, // supply type, false -> INFINITE, true -> FINITE
+                1000, // max supply
+                false, // freeze default (setting to false means that this token will not be initially frozen on creation)
+                keys, // the keys for the new token
+            // auto-renew fee paid by aliceAccount every 7,000,000 seconds (approx. 81 days).
+            // This is the minimum auto renew period.
+                createAutoRenewExpiry(aliceAccount, 7000000)
+            ),
+            fixedFees,
+            new IHederaTokenService.RoyaltyFee[](0)
         );
     }
 }
