@@ -5,9 +5,13 @@ pragma experimental ABIEncoderV2;
 import "./ExpiryHelper.sol";
 import "./PrngSystemContract.sol";
 
+// To alter the behavior of the SolidityPrecompileExample, re-compile this solidity file
+// (you will also need the other files in this directory)
+// and copy the outputted json file to ./PrecompileExample.json
+
 //[X] prng
 //[X] create fungible
-//[ ] mint fungible
+//[X] mint fungible
 //[ ] associate fungible
 //[ ] transfer fungible
 //[ ] approve fungible allowance
@@ -22,6 +26,7 @@ import "./PrngSystemContract.sol";
 //[ ] approve NFT allowance
 //[ ] spend NFT allowance
 //
+//burn?
 //KYC?
 
 // TODO: reorder steps to match this list
@@ -45,8 +50,10 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         result = this.getPseudorandomSeed();
     }
 
-    // In order for some functions (such as createFungibleToken) to work, the function that is calling them must be
-    // payable, and payment must be provided via ContractExecuteTransaction.setPayableAmount().
+    // In order for some functions (such as createFungibleToken) to work, the contract must possess the funds for
+    // the function call.  We are using ContractExecuteTransaction.setPayableAmount() to transfer some Hbar
+    // to the contract's account at each step (which means this function must be payable), and then transferring
+    // the excess Hbar back to the owner at the end of each step.
     function step1() external payable returns (int responseCode) {
         require(msg.sender == owner);
 
@@ -76,7 +83,36 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         owner.transfer(address(this).balance);
     }
 
-    function step2(bytes memory keyBytes) external payable returns (int responseCode) {
+    function step2() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        uint64 mintedCount;
+        int64[] memory mintedSerials; // applicable to NFT tokens only
+        (responseCode, mintedCount, mintedSerials) = mintToken(
+            fungibleToken,
+            100, // amount (applicable to fungible tokens only)
+            new bytes[](0) // metadatas (applicable to NFT tokens only)
+        );
+    }
+
+    function step3() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = associateToken(aliceAccount, fungibleToken);
+    }
+
+    function step4() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = transferToken(
+            fungibleToken,
+            owner, // sender
+            aliceAccount, // receiver
+            100 // amount to transfer
+        );
+    }
+
+    function step11(bytes memory keyBytes) external payable returns (int responseCode) {
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);

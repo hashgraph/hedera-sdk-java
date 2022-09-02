@@ -46,12 +46,14 @@ public class SolidityPrecompileExample {
             client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
             // We need some new accounts for the contract to interact with in some of its steps
+            // Bob can be automatically associated with up to 100 tokens,
+            // Alice requires manual association with each token
 
             PrivateKey alicePrivateKey = PrivateKey.generateED25519();
             PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
             AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
                 .setKey(alicePublicKey)
-                .setInitialBalance(Hbar.from(10))
+                .setInitialBalance(Hbar.fromTinybars(1000))
                 .execute(client)
                 .getReceipt(client)
                 .accountId
@@ -60,8 +62,9 @@ public class SolidityPrecompileExample {
             PrivateKey bobPrivateKey = PrivateKey.generateED25519();
             PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
             AccountId bobAccountId = Objects.requireNonNull(new AccountCreateTransaction()
-                .setKey(alicePublicKey)
-                .setInitialBalance(Hbar.from(10))
+                .setKey(bobPublicKey)
+                .setInitialBalance(Hbar.fromTinybars(1000))
+                .setMaxAutomaticTokenAssociations(100)
                 .execute(client)
                 .getReceipt(client)
                 .accountId
@@ -85,6 +88,8 @@ public class SolidityPrecompileExample {
                     System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                     return true;
                 }).setPayableAmountForStep(1, Hbar.from(20))
+                // step 3 associates Alice with the token, which requires Alice's signature
+                .addSignerForStep(3, alicePrivateKey)
                 .setParameterSupplierForStep(11, () -> {
                     return new ContractFunctionParameters()
                         // when contracts work with a public key, they handle the raw bytes of the public key
@@ -98,20 +103,20 @@ public class SolidityPrecompileExample {
             // step 1 creates a fungible token
             // step 2 mints it
             // step 3 associates Alice with it
-            // step 4 transfers it.
-            // step 5 approves an allowance of the fungible token with operator as the owner and alice as the spender
-            // step 6 Alice spends some of her fungible token allowance.
-            // steps 7 - 10 test misc functions on the fungible token.
-            // step 11 creates an NFT token
+            // step 4 transfers it to Alice.
+            // step 5 approves an allowance of the fungible token with operator as the owner and Alice as the spender
+            // step 6 Alice spends some of her fungible token allowance to transfer to Bob.
+            // steps 7 - 10 test misc functions on the fungible token (see PrecompileExample.sol for details).
+            // step 11 creates an NFT token with a custom fee, and with the admin and supply set to Alice's key
             // step 12 mints it
-            // step 13 transfers it
+            // step 13 transfers it to Alice
             // step 14 approves an NFT allowance with operator as the owner and Alice as the spender
-            // step 15 Alice spends some of her NFT allowance.
+            // step 15 Alice spends some of her NFT allowance to transfer to Bob.
 
             contractHelper
                 //.executeSteps(/* from step */ 0, /* to step */ 6, client)
-                //.executeSteps(/* from step */ 10, /* to step */ 15, client);
-                .executeSteps(/* from step */ 2, /* to step */ 2, client);
+                //.executeSteps(/* from step */ 11, /* to step */ 15, client);
+                .executeSteps(/* from step */ 1, /* to step */ 4, client);
 
         } catch (Exception e) {
             e.printStackTrace();

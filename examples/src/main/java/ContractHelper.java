@@ -42,7 +42,7 @@ the user can specify a supplier for a particular step with setParameterSupplier(
 and can specify an alternative validation method with setResultValidator(stepIndex, validateFunction)
 
 The contract is created on the Hedera network in the ContractHelper constructor, and when the user is ready to
-execute the step functions in the contract, they should call executeSteps(stepsCount).
+execute the step functions in the contract, they should call executeSteps(firstStepToExecute, lastStepToExecute).
  */
 
 public class ContractHelper {
@@ -171,7 +171,7 @@ public class ContractHelper {
 
             ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
 
-            if (functionResult.errorMessage == null && getResultValidator(stepIndex).apply(functionResult)) {
+            if (getResultValidator(stepIndex).apply(functionResult)) {
                 System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
             } else {
                 System.out.println("Transaction record: " + record);
