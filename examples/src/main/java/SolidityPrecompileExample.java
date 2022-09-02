@@ -23,7 +23,8 @@ You should go look at that PrecompileExample.sol file, because that's where the 
 
 This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
 
-When it spits out a raw response code, you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
+When this example spits out a raw response code,
+you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
 
 public class SolidityPrecompileExample {
@@ -53,7 +54,7 @@ public class SolidityPrecompileExample {
             PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
             AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
                 .setKey(alicePublicKey)
-                .setInitialBalance(Hbar.fromTinybars(1000))
+                .setInitialBalance(Hbar.from(50))
                 .execute(client)
                 .getReceipt(client)
                 .accountId
@@ -99,14 +100,13 @@ public class SolidityPrecompileExample {
                 // Alice must sign the ContractExecuteTransaction.
                 .addSignerForStep(11, alicePrivateKey);
 
-            // step 0 tests PRNG
+            // step 0 tests pseudo random number generator (PRNG)
             // step 1 creates a fungible token
             // step 2 mints it
             // step 3 associates Alice with it
             // step 4 transfers it to Alice.
             // step 5 approves an allowance of the fungible token with operator as the owner and Alice as the spender
-            // step 6 Alice spends some of her fungible token allowance to transfer to Bob.
-            // steps 7 - 10 test misc functions on the fungible token (see PrecompileExample.sol for details).
+            // steps 6 - 10 test misc functions on the fungible token (see PrecompileExample.sol for details).
             // step 11 creates an NFT token with a custom fee, and with the admin and supply set to Alice's key
             // step 12 mints it
             // step 13 transfers it to Alice
@@ -116,7 +116,7 @@ public class SolidityPrecompileExample {
             contractHelper
                 //.executeSteps(/* from step */ 0, /* to step */ 6, client)
                 //.executeSteps(/* from step */ 11, /* to step */ 15, client);
-                .executeSteps(/* from step */ 1, /* to step */ 4, client);
+                .executeSteps(/* from step */ 1, /* to step */ 5, client);
 
         } catch (Exception e) {
             e.printStackTrace();

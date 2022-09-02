@@ -1,5 +1,6 @@
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.ContractCreateFlow;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
@@ -10,6 +11,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ public class ContractHelper {
     final Map<Integer, Supplier<ContractFunctionParameters>> stepParameterSuppliers = new HashMap<>();
     final Map<Integer, Hbar> stepPayableAmounts = new HashMap<>();
     final Map<Integer, List<PrivateKey>> stepSigners = new HashMap<>();
+    final Map<Integer, AccountId> stepFeePayers = new HashMap<>();
 
     public static JsonObject getJsonResource(String filename) throws IOException {
         ClassLoader cl = ContractHelper.class.getClassLoader();
@@ -109,6 +112,11 @@ public class ContractHelper {
         return this;
     }
 
+    public ContractHelper setFeePayerForStep(int stepIndex, AccountId feePayerAccount, PrivateKey feePayerKey) {
+        stepFeePayers.put(stepIndex, feePayerAccount);
+        return addSignerForStep(stepIndex, feePayerKey);
+    }
+
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
         return stepResultValidators.getOrDefault(
             stepIndex,
@@ -158,6 +166,11 @@ public class ContractHelper {
                 tx.setFunction(functionName, parameters);
             } else {
                 tx.setFunction(functionName);
+            }
+
+            AccountId feePayerAccountId = stepFeePayers.get(stepIndex);
+            if (feePayerAccountId != null) {
+                tx.setTransactionId(TransactionId.generate(feePayerAccountId));
             }
 
             tx.freezeWith(client);
