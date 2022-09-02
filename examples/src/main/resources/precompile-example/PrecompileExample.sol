@@ -12,14 +12,14 @@ import "./PrngSystemContract.sol";
 //[X] prng
 //[X] create fungible
 //[X] mint fungible
-//[ ] associate fungible
-//[ ] transfer fungible
+//[X] associate fungible
+//[X] transfer fungible
 //[ ] approve fungible allowance
-//[ ] spend fungible allowance
 //[ ] pause fungible
 //[ ] unpause fungible
 //[ ] freeze fungible
 //[ ] unfreeze fungible
+//[ ] burn fungible
 //[X] create NFT
 //[ ] mint NFT
 //[ ]transfer NFT
@@ -109,6 +109,19 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
             owner, // sender
             aliceAccount, // receiver
             100 // amount to transfer
+        );
+    }
+
+    function step5() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        // Whichever account pays the fee for this ContractExecuteTransaction will be the owner for the allowance.
+        // (The AccountId in the TransactionId is the fee payer, in this case Alice)
+
+        responseCode = approve(
+            fungibleToken,
+            aliceAccount, // spender
+            100 // amount
         );
     }
 
