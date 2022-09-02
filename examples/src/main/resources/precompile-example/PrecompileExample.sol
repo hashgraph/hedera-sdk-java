@@ -22,14 +22,14 @@ import "./PrngSystemContract.sol";
 //KYC?
 
 contract PrecompileExample is ExpiryHelper, PrngSystemContract {
-    address owner;
+    address payable owner;
     address payable aliceAccount;
     address payable bobAccount;
     address fungibleToken;
     address nftToken;
 
-    constructor(address payable _aliceAccount, address payable _bobAccount) {
-        owner = msg.sender;
+    constructor(address payable _owner, address payable _aliceAccount, address payable _bobAccount) {
+        owner = _owner;
         aliceAccount = _aliceAccount;
         bobAccount = _bobAccount;
     }
@@ -66,6 +66,9 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
             100, // initial supply
             0 // decimals
         );
+
+        // send any excess Hbar back to the owner
+        owner.transfer(address(this).balance);
     }
 
     function step2(bytes memory keyBytes) external payable returns (int responseCode) {
@@ -96,6 +99,9 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
             fixedFees,
             new IHederaTokenService.RoyaltyFee[](0)
         );
+
+        // send any excess Hbar back to the owner
+        owner.transfer(address(this).balance);
     }
 }
 

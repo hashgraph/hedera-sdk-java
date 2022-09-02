@@ -24,6 +24,8 @@ compiled into examples/src/main/resources/precompile-example/PrecompileExample.j
 You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
 
 This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
+
+When it spits out a raw response code, you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
 
 public class SolidityPrecompileExample {
@@ -70,6 +72,7 @@ public class SolidityPrecompileExample {
         ContractHelper contractHelper = new ContractHelper(
             ContractHelper.getJsonResource("precompile-example/PrecompileExample.json"),
             new ContractFunctionParameters()
+                .addAddress(OPERATOR_ID.toSolidityAddress())
                 .addAddress(aliceAccountId.toSolidityAddress())
                 .addAddress(bobAccountId.toSolidityAddress()),
             client
@@ -79,12 +82,15 @@ public class SolidityPrecompileExample {
             .setResultValidator(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
-            }).setPayableAmount(1, Hbar.from(30))
+            }).setPayableAmount(1, Hbar.from(20))
             .setParameterSupplier(2, () -> {
                 return new ContractFunctionParameters()
-                    // when contracts work with a public key, they handle the ASN1-DER encoded bytes of the public key
-                    .addBytes(alicePublicKey.toBytesDER());
+                    // when contracts work with a public key, they handle the raw bytes of the public key
+                    .addBytes(alicePublicKey.toBytesRaw());
             }).setPayableAmount(2, Hbar.from(40))
+            // Because we're setting the adminKey for the created NFT token to Alice's key,
+            // Alice must sign the ContractExecuteTransaction.
+            .addSigner(2, alicePrivateKey)
             .executeSteps(2, 3, client);
     }
 }
