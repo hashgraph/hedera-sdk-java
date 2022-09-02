@@ -7,19 +7,23 @@ import "./PrngSystemContract.sol";
 
 //[X] prng
 //[X] create fungible
-//[X] create NFT
 //[ ] mint fungible
-//[ ] mint NFT
-//[ ] associate
-//[ ] transfer (GOAL FOR TODAY)
+//[ ] associate fungible
+//[ ] transfer fungible
 //[ ] approve fungible allowance
+//[ ] spend fungible allowance
+//[ ] pause fungible
+//[ ] unpause fungible
+//[ ] freeze fungible
+//[ ] unfreeze fungible
+//[X] create NFT
+//[ ] mint NFT
 //[ ] approve NFT allowance
-//[ ] pause
-//[ ] unpause
-//[ ] freeze
-//[ ] unfreeze
+//[ ] spend NFT allowance
 //
 //KYC?
+
+// TODO: reorder steps to match this list
 
 contract PrecompileExample is ExpiryHelper, PrngSystemContract {
     address payable owner;
@@ -76,6 +80,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
 
         IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
         // Set the admin key and the supply key to given ED25519 public key bytes.
+        // These must be the key's raw bytes acquired via key.toBytesRaw()
         keys[0] = createSingleKey(ADMIN_KEY_TYPE | SUPPLY_KEY_TYPE, ED25519_KEY, keyBytes);
 
         IHederaTokenService.FixedFee[] memory fixedFees = new IHederaTokenService.FixedFee[](1);

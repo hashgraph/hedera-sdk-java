@@ -10,9 +10,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionRecord;
-import java8.util.Lists;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,22 +83,22 @@ public class ContractHelper {
             .contractId);
     }
 
-    public ContractHelper setResultValidator(int stepIndex, Function<ContractFunctionResult, Boolean> validator) {
+    public ContractHelper setResultValidatorForStep(int stepIndex, Function<ContractFunctionResult, Boolean> validator) {
         stepResultValidators.put(stepIndex, validator);
         return this;
     }
 
-    public ContractHelper setParameterSupplier(int stepIndex, Supplier<ContractFunctionParameters> supplier) {
+    public ContractHelper setParameterSupplierForStep(int stepIndex, Supplier<ContractFunctionParameters> supplier) {
         stepParameterSuppliers.put(stepIndex, supplier);
         return this;
     }
 
-    public ContractHelper setPayableAmount(int stepIndex, Hbar amount) {
+    public ContractHelper setPayableAmountForStep(int stepIndex, Hbar amount) {
         stepPayableAmounts.put(stepIndex, amount);
         return this;
     }
 
-    public ContractHelper addSigner(int stepIndex, PrivateKey signer) {
+    public ContractHelper addSignerForStep(int stepIndex, PrivateKey signer) {
         if (stepSigners.containsKey(stepIndex)) {
             stepSigners.get(stepIndex).add(signer);
         } else {
@@ -130,22 +128,26 @@ public class ContractHelper {
         return stepParameterSuppliers.getOrDefault(stepIndex, () -> null);
     }
 
+    private Hbar getPayableAmount(int stepIndex) {
+        return stepPayableAmounts.get(stepIndex);
+    }
+
     private List<PrivateKey> getSigners(int stepIndex) {
         return stepSigners.getOrDefault(stepIndex, Collections.emptyList());
     }
 
     public void executeSteps(
         int firstStepToExecute,
-        int stepsCount,
+        int lastStepToExecute,
         Client client
     ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        for (int stepIndex = firstStepToExecute; stepIndex < stepsCount; stepIndex++) {
+        for (int stepIndex = firstStepToExecute; stepIndex <= lastStepToExecute; stepIndex++) {
             System.out.println("Attempting to execute step " + stepIndex);
             ContractExecuteTransaction tx = new ContractExecuteTransaction()
                 .setContractId(contractId)
                 .setGas(10_000_000);
 
-            Hbar payableAmount = stepPayableAmounts.get(stepIndex);
+            Hbar payableAmount = getPayableAmount(stepIndex);
             if (payableAmount != null) {
                 tx.setPayableAmount(payableAmount);
             }

@@ -7,12 +7,10 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -79,18 +77,18 @@ public class SolidityPrecompileExample {
         );
 
         contractHelper
-            .setResultValidator(0, contractFunctionResult -> {
+            .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
-            }).setPayableAmount(1, Hbar.from(20))
-            .setParameterSupplier(2, () -> {
+            }).setPayableAmountForStep(1, Hbar.from(20))
+            .setParameterSupplierForStep(2, () -> {
                 return new ContractFunctionParameters()
                     // when contracts work with a public key, they handle the raw bytes of the public key
                     .addBytes(alicePublicKey.toBytesRaw());
-            }).setPayableAmount(2, Hbar.from(40))
+            }).setPayableAmountForStep(2, Hbar.from(40))
             // Because we're setting the adminKey for the created NFT token to Alice's key,
             // Alice must sign the ContractExecuteTransaction.
-            .addSigner(2, alicePrivateKey)
-            .executeSteps(2, 3, client);
+            .addSignerForStep(2, alicePrivateKey)
+            .executeSteps(/* from step */ 2, /* to step */ 2, client);
     }
 }
