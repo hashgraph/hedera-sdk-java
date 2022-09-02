@@ -136,11 +136,11 @@ public class ContractHelper {
         return stepSigners.getOrDefault(stepIndex, Collections.emptyList());
     }
 
-    public void executeSteps(
+    public ContractHelper executeSteps(
         int firstStepToExecute,
         int lastStepToExecute,
         Client client
-    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    ) throws Exception {
         for (int stepIndex = firstStepToExecute; stepIndex <= lastStepToExecute; stepIndex++) {
             System.out.println("Attempting to execute step " + stepIndex);
             ContractExecuteTransaction tx = new ContractExecuteTransaction()
@@ -174,12 +174,12 @@ public class ContractHelper {
             if (functionResult.errorMessage == null && getResultValidator(stepIndex).apply(functionResult)) {
                 System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
             } else {
-                System.out.println("ERROR: step " + stepIndex + " returned invalid result");
                 System.out.println("Transaction record: " + record);
-                return;
+                throw new Exception("step " + stepIndex + " returned invalid result");
             }
         }
 
         System.out.println("All steps completed with valid results.");
+        return this;
     }
 }

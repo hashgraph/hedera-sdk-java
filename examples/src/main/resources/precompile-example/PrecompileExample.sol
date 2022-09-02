@@ -18,6 +18,7 @@ import "./PrngSystemContract.sol";
 //[ ] unfreeze fungible
 //[X] create NFT
 //[ ] mint NFT
+//[ ]transfer NFT
 //[ ] approve NFT allowance
 //[ ] spend NFT allowance
 //

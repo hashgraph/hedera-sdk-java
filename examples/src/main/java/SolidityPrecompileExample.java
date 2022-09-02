@@ -76,19 +76,38 @@ public class SolidityPrecompileExample {
             client
         );
 
-        contractHelper
-            .setResultValidatorForStep(0, contractFunctionResult -> {
-                System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
-                return true;
-            }).setPayableAmountForStep(1, Hbar.from(20))
-            .setParameterSupplierForStep(2, () -> {
-                return new ContractFunctionParameters()
-                    // when contracts work with a public key, they handle the raw bytes of the public key
-                    .addBytes(alicePublicKey.toBytesRaw());
-            }).setPayableAmountForStep(2, Hbar.from(40))
-            // Because we're setting the adminKey for the created NFT token to Alice's key,
-            // Alice must sign the ContractExecuteTransaction.
-            .addSignerForStep(2, alicePrivateKey)
-            .executeSteps(/* from step */ 2, /* to step */ 2, client);
+        try {
+            contractHelper
+                .setResultValidatorForStep(0, contractFunctionResult -> {
+                    System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
+                    return true;
+                }).setPayableAmountForStep(1, Hbar.from(20))
+                .setParameterSupplierForStep(2, () -> {
+                    return new ContractFunctionParameters()
+                        // when contracts work with a public key, they handle the raw bytes of the public key
+                        .addBytes(alicePublicKey.toBytesRaw());
+                }).setPayableAmountForStep(2, Hbar.from(40))
+                // Because we're setting the adminKey for the created NFT token to Alice's key,
+                // Alice must sign the ContractExecuteTransaction.
+                .addSignerForStep(2, alicePrivateKey)
+                // step 0 tests PRNG
+                // step 1 creates a fungible token
+                // step 2 mints it
+                // step 3 associates Alice with it
+                // step 4 transfers it.
+                // step 5 approves an allowance of the fungible token with operator as the owner and alice as the spender
+                // step 6 Alice spends some of her fungible token allowance.
+                // steps 7 - 10 test misc functions on the fungible token.
+                // step 11 creates an NFT token
+                // step 12 mints it
+                // step 13 transfers it
+                // step 14 approves an NFT allowance with operator as the owner and Alice as the spender
+                // step 15 Alice spends some of her NFT allowance.
+                .executeSteps(/* from step */ 2, /* to step */ 2, client);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        client.close();
     }
 }
