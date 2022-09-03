@@ -13,6 +13,8 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.TransactionRecordQuery;
+import com.hedera.hashgraph.sdk.TransactionResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +81,7 @@ public class ContractHelper {
     ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         contractId = Objects.requireNonNull(new ContractCreateFlow()
             .setBytecode(jsonObject.getAsJsonPrimitive("object").getAsString())
+            .setMaxChunks(30)
             .setGas(8_000_000)
             .setConstructorParameters(constructorParameters)
             .execute(client)
@@ -191,8 +194,6 @@ public class ContractHelper {
                 throw new Exception("step " + stepIndex + " returned invalid result");
             }
         }
-
-        System.out.println("All steps completed with valid results.");
         return this;
     }
 }

@@ -9,39 +9,15 @@ import "./PrngSystemContract.sol";
 // (you will also need the other files in this directory)
 // and copy the outputted json file to ./PrecompileExample.json
 
-//[X] prng
-//[X] create fungible
-//[X] mint fungible
-//[X] associate fungible
-//[X] transfer fungible
-//[ ] approve fungible allowance
-//[ ] pause fungible
-//[ ] unpause fungible
-//[ ] freeze fungible
-//[ ] unfreeze fungible
-//[ ] burn fungible
-//[X] create NFT
-//[ ] mint NFT
-//[ ]transfer NFT
-//[ ] approve NFT allowance
-//[ ] spend NFT allowance
-//
-//burn?
-//KYC?
-
-// TODO: reorder steps to match this list
-
 contract PrecompileExample is ExpiryHelper, PrngSystemContract {
     address payable owner;
     address payable aliceAccount;
-    address payable bobAccount;
     address fungibleToken;
     address nftToken;
 
-    constructor(address payable _owner, address payable _aliceAccount, address payable _bobAccount) {
+    constructor(address payable _owner, address payable _aliceAccount) {
         owner = _owner;
         aliceAccount = _aliceAccount;
-        bobAccount = _bobAccount;
     }
 
     function step0() external returns (bytes32 result) {
@@ -58,8 +34,8 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[] memory keys = new IHederaTokenService.TokenKey[](1);
-        // Set the admin key and the supply key to the key of the account that executed function (INHERIT_ACCOUNT_KEY).
-        keys[0] = createSingleKey(ADMIN_KEY_TYPE | SUPPLY_KEY_TYPE, INHERIT_ACCOUNT_KEY, bytes(""));
+        // Set the admin key, supply key, pause key, and freeze key to the key of the account that executed function (INHERIT_ACCOUNT_KEY).
+        keys[0] = createSingleKey(ADMIN_KEY_TYPE | SUPPLY_KEY_TYPE | PAUSE_KEY_TYPE | FREEZE_KEY_TYPE, INHERIT_ACCOUNT_KEY, bytes(""));
 
         (responseCode, fungibleToken) = createFungibleToken(
             IHederaTokenService.HederaToken(
@@ -86,13 +62,15 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
     function step2() external returns (int responseCode) {
         require(msg.sender == owner);
 
-        uint64 mintedCount;
+        uint64 newTotalSupply;
         int64[] memory mintedSerials; // applicable to NFT tokens only
-        (responseCode, mintedCount, mintedSerials) = mintToken(
+        (responseCode, newTotalSupply, mintedSerials) = mintToken(
             fungibleToken,
             100, // amount (applicable to fungible tokens only)
             new bytes[](0) // metadatas (applicable to NFT tokens only)
         );
+
+        require(newTotalSupply == 100 + 100);
     }
 
     function step3() external returns (int responseCode) {
@@ -116,13 +94,50 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         require(msg.sender == owner);
 
         // Whichever account pays the fee for this ContractExecuteTransaction will be the owner for the allowance.
-        // (The AccountId in the TransactionId is the fee payer, in this case Alice)
+        // (The AccountId in the TransactionId is the fee payer, in this case the operator ID)
 
         responseCode = approve(
             fungibleToken,
             aliceAccount, // spender
             100 // amount
         );
+    }
+
+    function step6() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = this.pauseToken(fungibleToken);
+    }
+
+    function step7() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = this.unpauseToken(fungibleToken);
+    }
+
+    function step8() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = freezeToken(fungibleToken, aliceAccount);
+    }
+
+    function step9() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = unfreezeToken(fungibleToken, aliceAccount);
+    }
+
+    function step10() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        uint64 totalSupplyLeftAfterBurn;
+        (responseCode, totalSupplyLeftAfterBurn) = burnToken(
+            fungibleToken,
+            50, // amount to burn (applicable to fungible tokens only)
+            new int64[](0) // serial numbers to burn (applicable to NFT tokens only)
+        );
+
+        require(totalSupplyLeftAfterBurn == 100 + 100 - 50);
     }
 
     function step11(bytes memory keyBytes) external payable returns (int responseCode) {
@@ -157,6 +172,66 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
 
         // send any excess Hbar back to the owner
         owner.transfer(address(this).balance);
+    }
+
+    function step12(bytes[] memory metadatas) external returns (int responseCode) {
+        require(msg.sender == owner);
+        require(metadatas.length == 3);
+
+        uint64 mintedCount;
+        int64[] memory mintedSerials; // applicable to NFT tokens only
+        (responseCode, mintedCount, mintedSerials) = mintToken(
+            nftToken,
+            0, // amount (applicable to fungible tokens only)
+            metadatas // (applicable to NFT tokens only)
+        );
+
+        require(mintedCount == 3);
+        require(mintedSerials.length == 3);
+        require(mintedSerials[0] == 1);
+        require(mintedSerials[1] == 2);
+        require(mintedSerials[2] == 3);
+    }
+
+    function step13() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = associateToken(aliceAccount, nftToken);
+    }
+
+    function step14() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        // You may also use transferNFTs to transfer more than one serial number at a time
+
+        responseCode = transferNFT(
+            nftToken,
+            owner, // sender
+            aliceAccount, // receiver
+            1 // serial number
+        );
+    }
+
+    function step15() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        responseCode = approveNFT(nftToken, aliceAccount, 2);
+    }
+
+    function step16() external returns (int responseCode) {
+        require(msg.sender == owner);
+
+        int64[] memory serialsToBurn = new int64[](1);
+        serialsToBurn[0] = 3;
+
+        uint64 totalSupplyLeftAfterBurn;
+        (responseCode, totalSupplyLeftAfterBurn) = burnToken(
+            nftToken,
+            0, // amount to burn (applicable to fungible tokens only)
+            serialsToBurn
+        );
+
+        require(totalSupplyLeftAfterBurn == 2);
     }
 }
 

@@ -85,6 +85,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
 
     private String bytecode = "";
     @Nullable
+    private Integer maxChunks = null;
+    @Nullable
     private Key adminKey = null;
     private long gas = 0;
     private Hbar initialBalance = Hbar.ZERO;
@@ -154,6 +156,16 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     public ContractCreateFlow setBytecode(ByteString bytecode) {
         Objects.requireNonNull(bytecode);
         return setBytecode(bytecode.toByteArray());
+    }
+
+    @Nullable
+    public Integer getMaxChunks() {
+        return maxChunks;
+    }
+
+    public ContractCreateFlow setMaxChunks(int maxChunks) {
+        this.maxChunks = maxChunks;
+        return this;
     }
 
     /**
@@ -467,6 +479,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         var fileAppendTx = new FileAppendTransaction()
             .setFileId(fileId)
             .setContents(appendBytecode);
+        if (maxChunks != null) {
+            fileAppendTx.setMaxChunks(maxChunks);
+        }
         if (nodeAccountIds != null) {
             fileAppendTx.setNodeAccountIds(nodeAccountIds);
         }
