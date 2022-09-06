@@ -21,6 +21,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
+import java.util.Objects;
+
 /**
  * Returned in {@link TransactionReceipt}, {@link PrecheckStatusException}
  * and {@link ReceiptStatusException}.
@@ -2095,6 +2097,14 @@ public enum Status {
             "response code "
                 + code.name()
                 + " is unhandled by the SDK; update your SDK or open an issue");
+    }
+
+    public static Status fromResponseCode(int reponseCode) {
+        return Status.valueOf(Objects.requireNonNull(ResponseCodeEnum.forNumber(reponseCode)));
+    }
+
+    public int toResponseCode() {
+        return code.getNumber();
     }
 
     @Override

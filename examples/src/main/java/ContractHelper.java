@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionRecordQuery;
@@ -125,10 +126,10 @@ public class ContractHelper {
             stepIndex,
             // if no custom validator is given, assume that the step returns a response code which ought to be SUCCESS
             contractFunctionResult -> {
-                int responseCode = contractFunctionResult.getInt32(0);
-                boolean isValid = responseCode == 22; // HederaResponseCodes.SUCCESS
+                Status responseStatus = Status.fromResponseCode(contractFunctionResult.getInt32(0));
+                boolean isValid = responseStatus == Status.SUCCESS;
                 if (!isValid) {
-                    System.out.println("Encountered invalid response code " + responseCode);
+                    System.out.println("Encountered invalid response code " + responseStatus.toResponseCode());
                 }
                 return isValid;
             }
