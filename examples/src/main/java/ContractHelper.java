@@ -129,7 +129,7 @@ public class ContractHelper {
                 Status responseStatus = Status.fromResponseCode(contractFunctionResult.getInt32(0));
                 boolean isValid = responseStatus == Status.SUCCESS;
                 if (!isValid) {
-                    System.out.println("Encountered invalid response code " + responseStatus.toResponseCode());
+                    System.out.println("Encountered invalid response status " + responseStatus);
                 }
                 return isValid;
             }

@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `AccountCreateTransaction.[set|get]alias[Key|EvmAddress]()`
  - `ContractCreateFlow.[set|get]MaxChunks()`
  - `Status.[to|from]ResponseCode()`
+ - `ContractCreateFlow.[set|get]AutoRenewAccountId()`
 
 ### Fixed
 
