@@ -149,7 +149,7 @@ jacocoTestReport {
     }
 
     // make sure we run all tests before this report is made
-    dependsOn tasks.withType(Test)
+    dependsOn test
 }
 
 task integrationTest(type: Test) {
