@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
@@ -48,10 +47,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+
+import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_TLS;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -64,6 +64,10 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     static final Duration DEFAULT_MIN_NODE_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_CLOSE_TIMEOUT = Duration.ofSeconds(30L);
     static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(2L);
+    static final Duration DEFAULT_NETWORK_UPDATE_PERIOD = Duration.ofHours(24);
+    // Initial delay of 10 seconds before we update the network for the first time,
+    // so that this doesn't happen in unit tests.
+    static final Duration NETWORK_UPDATE_INITIAL_DELAY = Duration.ofSeconds(10);
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -94,6 +98,12 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean defaultRegenerateTransactionId = true;
 
+    @Nullable
+    private Duration networkUpdatePeriod;
+
+    @Nullable
+    private CompletableFuture<Void> networkUpdateFuture;
+
     /**
      * Constructor.
      *
@@ -102,10 +112,18 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      * @param mirrorNetwork              the mirror network
      */
     @VisibleForTesting
-    Client(ExecutorService executor, Network network, MirrorNetwork mirrorNetwork) {
+    Client(
+        ExecutorService executor,
+        Network network,
+        MirrorNetwork mirrorNetwork,
+        @Nullable Duration networkUpdateInitialDelay,
+        @Nullable Duration networkUpdatePeriod
+    ) {
         this.executor = executor;
         this.network = network;
         this.mirrorNetwork = mirrorNetwork;
+        this.networkUpdatePeriod = networkUpdatePeriod;
+        scheduleNetworkUpdate(networkUpdateInitialDelay);
     }
 
     /**
@@ -161,7 +179,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         var network = Network.forNetwork(executor, networkMap);
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
 
-        return new Client(executor, network, mirrorNetwork);
+        return new Client(executor, network, mirrorNetwork, null, null);
     }
 
     /**
@@ -195,7 +213,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         var network = Network.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
-        return new Client(executor, network, mirrorNetwork);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -209,7 +227,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         var network = Network.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
-        return new Client(executor, network, mirrorNetwork);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -223,7 +241,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         var network = Network.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
-        return new Client(executor, network, mirrorNetwork);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -337,6 +355,40 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public static Client fromConfigFile(File file) throws Exception {
         return fromConfig(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
+    }
+
+    private synchronized void scheduleNetworkUpdate(@Nullable Duration delay) {
+        if (delay == null) {
+            networkUpdateFuture = null;
+            return;
+        }
+        networkUpdateFuture = Delayer.delayFor(delay.toMillis(), executor);
+        networkUpdateFuture.thenRun(() -> {
+            updateNetwork();
+            scheduleNetworkUpdate(networkUpdatePeriod);
+        });
+    }
+
+    private synchronized void updateNetwork() {
+        new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(nodeAddressBook -> {
+            try {
+                this.setNetworkFromAddressBook(nodeAddressBook);
+            } catch (Throwable error) {
+                return CompletableFuture.failedFuture(error);
+            }
+            return CompletableFuture.completedFuture(null);
+        }).exceptionally(error -> {
+            logger.warn("Failed to update address book via mirror node query", error);
+            return null;
+        });
+    }
+
+    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
+        network.setNetwork(Network.addressBookToNetwork(
+            addressBook.nodeAddresses,
+            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
+        ));
+        return this;
     }
 
     /**
@@ -1024,6 +1076,30 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         return this.operator;
     }
 
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
+    @Nullable
+    public synchronized Duration getNetworkUpdatePeriod() {
+        return this.networkUpdatePeriod;
+    }
+
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
+    public synchronized Client setNetworkUpdatePeriod(Duration networkUpdatePeriod) {
+        if (networkUpdateFuture != null) {
+            networkUpdateFuture.cancel(true);
+        }
+
+        this.networkUpdatePeriod = networkUpdatePeriod;
+        scheduleNetworkUpdate(networkUpdatePeriod);
+
+        return this;
+    }
+
     /**
      * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting
      * transactions or queries continue but more would be immediately cancelled.
@@ -1047,6 +1123,11 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
         var closeDeadline = Instant.now().plus(timeout);
+
+        if (networkUpdateFuture != null) {
+            networkUpdateFuture.cancel(true);
+        }
+
         network.beginClose();
         mirrorNetwork.beginClose();
 
