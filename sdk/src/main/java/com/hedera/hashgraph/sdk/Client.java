@@ -26,6 +26,7 @@ import com.google.gson.JsonParseException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletionStage;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Supplier;
 
 import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
 import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_TLS;
@@ -98,6 +100,7 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
 
     private boolean defaultRegenerateTransactionId = true;
 
+    // If networkUpdatePeriod is null, any network updates in progress will not complete
     @Nullable
     private Duration networkUpdatePeriod;
 
@@ -364,23 +367,35 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         }
         networkUpdateFuture = Delayer.delayFor(delay.toMillis(), executor);
         networkUpdateFuture.thenRun(() -> {
-            updateNetwork();
-            scheduleNetworkUpdate(networkUpdatePeriod);
+            // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
+            requireNetworkUpdatePeriodNotNull(() -> {
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> {
+                    return requireNetworkUpdatePeriodNotNull(() -> {
+                        try {
+                            this.setNetworkFromAddressBook(addressBook);
+                        } catch (Throwable error) {
+                            return CompletableFuture.failedFuture(error);
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    });
+                }).exceptionally(error -> {
+                    logger.warn("Failed to update address book via mirror node query", error);
+                    return null;
+                });
+                scheduleNetworkUpdate(networkUpdatePeriod);
+                return null;
+            });
         });
     }
 
-    private synchronized void updateNetwork() {
-        new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(nodeAddressBook -> {
-            try {
-                this.setNetworkFromAddressBook(nodeAddressBook);
-            } catch (Throwable error) {
-                return CompletableFuture.failedFuture(error);
-            }
-            return CompletableFuture.completedFuture(null);
-        }).exceptionally(error -> {
-            logger.warn("Failed to update address book via mirror node query", error);
-            return null;
-        });
+    private synchronized CompletionStage<?> requireNetworkUpdatePeriodNotNull(Supplier<CompletionStage<?>> task) {
+        return networkUpdatePeriod != null ? task.get() : CompletableFuture.completedFuture(null);
+    }
+
+    private void cancelScheduledNetworkUpdate() {
+        if (networkUpdateFuture != null) {
+            networkUpdateFuture.cancel(true);
+        }
     }
 
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
@@ -1090,13 +1105,9 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
         justification = "A Duration can't actually be mutated"
     )
     public synchronized Client setNetworkUpdatePeriod(Duration networkUpdatePeriod) {
-        if (networkUpdateFuture != null) {
-            networkUpdateFuture.cancel(true);
-        }
-
+        cancelScheduledNetworkUpdate();
         this.networkUpdatePeriod = networkUpdatePeriod;
         scheduleNetworkUpdate(networkUpdatePeriod);
-
         return this;
     }
 
@@ -1124,9 +1135,8 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     public synchronized void close(Duration timeout) throws TimeoutException {
         var closeDeadline = Instant.now().plus(timeout);
 
-        if (networkUpdateFuture != null) {
-            networkUpdateFuture.cancel(true);
-        }
+        networkUpdatePeriod = null;
+        cancelScheduledNetworkUpdate();
 
         network.beginClose();
         mirrorNetwork.beginClose();
