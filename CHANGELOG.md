@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
  - `AccountId`s with `aliasEvmAddress` now serialize/deserialize correctly.
+ - `TokenCreateTransaction`'s default fee is now 40 Hbar.
  - `validateChecksum()`, `toStringWithChecksum()`, `hashCode()`, `equals()`, and `compareTo()` now function correctly for `AccountId`s with `aliasEvmAddress`es.
 
 ## v2.17.3
