@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
  - `AccountId`s with `aliasEvmAddress` now serialize/deserialize correctly.
  - `validateChecksum()`, `toStringWithChecksum()`, `hashCode()`, `equals()`, and `compareTo()` now function correctly for `AccountId`s with `aliasEvmAddress`es.
+ - `PrivateKey.is[ED25519|ECDSA]()` is now correct for ED25519 private keys.
 
 ## v2.17.3
 
