@@ -372,8 +372,8 @@ abstract class ManagedNetwork<
      */
     synchronized ManagedNetworkT setNetwork(Map<String, KeyT> network) throws TimeoutException, InterruptedException {
         var newNodes = new ArrayList<ManagedNodeT>();
-        var newHealthyNodes = new ArrayList<ManagedNodeT>(newNodes.size());
-        var newNetwork = new HashMap<KeyT, List<ManagedNodeT>>(newNodes.size());
+        var newHealthyNodes = new ArrayList<ManagedNodeT>();
+        var newNetwork = new HashMap<KeyT, List<ManagedNodeT>>();
         var newNodeKeys = new HashSet<KeyT>();
         var newNodeAddresses = new HashSet<String>();
 
