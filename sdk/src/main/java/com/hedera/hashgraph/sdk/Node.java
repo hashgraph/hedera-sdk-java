@@ -31,8 +31,10 @@ import java.util.concurrent.ExecutorService;
 class Node extends ManagedNode<Node, AccountId> {
     private final AccountId accountId;
 
+    // This kind of shadows the address field inherited from ManagedNode.
+    // This is only needed for the cert hash
     @Nullable
-    private NodeAddress addressBook;
+    private NodeAddress addressBookEntry;
 
     private boolean verifyCertificates;
 
@@ -70,7 +72,7 @@ class Node extends ManagedNode<Node, AccountId> {
 
         this.accountId = node.accountId;
         this.verifyCertificates = node.verifyCertificates;
-        this.addressBook = node.addressBook;
+        this.addressBookEntry = node.addressBookEntry;
     }
 
     @Override
@@ -102,18 +104,18 @@ class Node extends ManagedNode<Node, AccountId> {
      *
      * @return                          the address book
      */
-    NodeAddress getAddressBook() {
-        return addressBook;
+    NodeAddress getAddressBookEntry() {
+        return addressBookEntry;
     }
 
     /**
      * Assign the address book.
      *
-     * @param addressBook               the address book
+     * @param addressBookEntry               the address book
      * @return {@code this}
      */
-    Node setAddressBook(@Nullable NodeAddress addressBook) {
-        this.addressBook = addressBook;
+    Node setAddressBookEntry(@Nullable NodeAddress addressBookEntry) {
+        this.addressBookEntry = addressBookEntry;
         return this;
     }
 
@@ -140,12 +142,12 @@ class Node extends ManagedNode<Node, AccountId> {
     @Override
     ChannelCredentials getChannelCredentials() {
         return TlsChannelCredentials.newBuilder()
-            .trustManager(new HederaTrustManager(addressBook == null ? null : addressBook.certHash, verifyCertificates))
+            .trustManager(new HederaTrustManager(addressBookEntry == null ? null : addressBookEntry.certHash, verifyCertificates))
             .build();
     }
 
     @Override
     public String toString() {
-        return accountId.toString();
+        return address.toString() + "->" + accountId.toString();
     }
 }

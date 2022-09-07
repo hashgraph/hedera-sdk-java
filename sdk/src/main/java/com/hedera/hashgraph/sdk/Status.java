@@ -1502,7 +1502,13 @@ public enum Status {
      * A contract transaction tried to use more than the allowed number of child records, via
      * either system contract records or internal contract creations.
      */
-    MAX_CHILD_RECORDS_EXCEEDED(ResponseCodeEnum.MAX_CHILD_RECORDS_EXCEEDED);
+    MAX_CHILD_RECORDS_EXCEEDED(ResponseCodeEnum.MAX_CHILD_RECORDS_EXCEEDED),
+
+    /**
+     * The combined balances of a contract and its auto-renew account (if any) or balance of an account did not cover
+     * the auto-renewal fees in a transaction.
+     */
+    INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES);
 
     final ResponseCodeEnum code;
 
@@ -2086,6 +2092,8 @@ public enum Status {
                 return INSUFFICIENT_BALANCES_FOR_STORAGE_RENT;
             case MAX_CHILD_RECORDS_EXCEEDED:
                 return MAX_CHILD_RECORDS_EXCEEDED;
+            case INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES:
+                return INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

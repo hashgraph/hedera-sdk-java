@@ -40,16 +40,44 @@ tasks:
     "update:snapshots":
         cmds:
             - rm sdk/src/test/java/com/hedera/hashgraph/sdk/*.snap
-            - ./gradlew test
+            - ./gradlew clean test
 
     "update:proto":
         cmds:
             - ./scripts/update_protobufs.py main
 
+    "update:addressbooks:mainnet":
+        cmds:
+            - ./gradlew runGetAddressBook
+            - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/mainnet.pb
+        env:
+            HEDERA_NETWORK: mainnet
+
+    "update:addressbooks:testnet":
+        cmds:
+            - ./gradlew runGetAddressBook
+            - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/testnet.pb
+        env:
+            HEDERA_NETWORK: testnet
+
+    "update:addressbooks:previewnet":
+        cmds:
+            - ./gradlew runGetAddressBook
+            - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/previewnet.pb
+        env:
+            HEDERA_NETWORK: previewnet
+
+    "update:addressbooks":
+        cmds:
+            - task: "update:addressbooks:mainnet"
+            - task: "update:addressbooks:testnet"
+            - task: "update:addressbooks:previewnet"
+
     update:
-        deps:
-            - "update:proto"
-            - "update:snapshots"
+        cmds:
+            - task: "update:proto"
+            - task: "update:snapshots"
+            - task: "update:addressbooks"
 
     publish:
         env:

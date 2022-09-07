@@ -4,7 +4,7 @@ plugins {
     id "signing"
     id "maven-publish"
     id "com.google.protobuf" version "0.8.19"
-    id "com.github.spotbugs" version "5.0.10"
+    id "com.github.spotbugs" version "5.0.12"
 }
 
 apply from: "../version.gradle"
@@ -37,7 +37,7 @@ dependencies {
     compileOnly project(":executable-annotation")
 
     // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
-    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.1'
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.2'
 
     // NOTE: BouncyCastle is frozen at v1.60 for compatibility with Corda <https://www.corda.net/>
     // <https://github.com/corda/corda/blob/2c10b6c3b9dace7831b5da73a065c3269a703d85/constants.properties#L23>
