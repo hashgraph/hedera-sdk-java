@@ -234,11 +234,11 @@ class PrivateKeyED25519 extends PrivateKey {
 
     @Override
     public boolean isED25519() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isECDSA() {
-        return true;
+        return false;
     }
 }
