@@ -46,6 +46,8 @@ public final class GetAddressBookExample {
     public static void main(String[] args) throws InterruptedException, IOException {
         // NEW (Feb 25 2022): you can now fetch the address book for free from a mirror node with AddressBookQuery
 
+        System.out.println("Getting address book for " + HEDERA_NETWORK);
+
         Client client = Client.forName(HEDERA_NETWORK);
 
         // The mirror network for mainnet is kinda wonky right now and requires some manual configuration for
