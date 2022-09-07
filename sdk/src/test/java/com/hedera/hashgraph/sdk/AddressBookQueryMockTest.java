@@ -7,14 +7,18 @@ import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.threeten.bp.Duration;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ForkJoinPool;
 
+import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 
@@ -72,6 +76,44 @@ class AddressBookQueryMockTest {
             addressBookQuery.executeAsync(client).get();
         assertThat(nodes.nodeAddresses).hasSize(1);
         assertThat(nodes.nodeAddresses.get(0).accountId).isEqualTo(AccountId.fromString("0.0.3"));
+    }
+
+    Endpoint spawnEndpoint() {
+        return new Endpoint()
+            .setAddress(
+                new IPv4Address()
+                    .setNetwork(
+                        new IPv4AddressPart()
+                            .setLeft((byte) 0x00)
+                            .setRight((byte) 0x01)
+                    ).setHost(
+                        new IPv4AddressPart()
+                            .setLeft((byte) 0x02)
+                            .setRight((byte) 0x03)
+                    )
+            ).setPort(PORT_NODE_PLAIN);
+    }
+
+    @Test
+    void networkUpdatePeriodWorks() throws Throwable {
+        addressBookServiceStub.requests.add(
+            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+                .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
+                .build()
+        );
+        addressBookServiceStub.responses.add(
+            new com.hedera.hashgraph.sdk.NodeAddress()
+                .setAccountId(AccountId.fromString("0.0.3"))
+                .setAddresses(Collections.singletonList(spawnEndpoint()))
+                .toProtobuf()
+        );
+
+        client.setNetworkUpdatePeriod(Duration.ofSeconds(1));
+        Thread.sleep(1400);
+
+        var clientNetwork = client.getNetwork();
+        assertThat(clientNetwork).hasSize(1);
+        assertThat(clientNetwork.values()).contains(AccountId.fromString("0.0.3"));
     }
 
     @ParameterizedTest(name = "[{0}] Retry recovers w/ status {1} and description {2}")
