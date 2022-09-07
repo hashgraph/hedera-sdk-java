@@ -151,7 +151,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
 
         this.addressBook = addressBook;
         for (var node : nodes) {
-            node.setAddressBook(addressBook == null ? null : addressBook.get(node.getAccountId()));
+            node.setAddressBookEntry(addressBook == null ? null : addressBook.get(node.getAccountId()));
         }
 
         return this;
