@@ -1350,4 +1350,10 @@ enum ResponseCodeEnum {
   * either system contract records or internal contract creations.
   */
   MAX_CHILD_RECORDS_EXCEEDED = 328;
+
+  /**
+  * The combined balances of a contract and its auto-renew account (if any) or balance of an account did not cover
+  * the auto-renewal fees in a transaction.
+  */
+  INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES = 329;
 }

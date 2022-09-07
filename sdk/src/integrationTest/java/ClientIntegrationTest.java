@@ -35,6 +35,8 @@ public class ClientIntegrationTest {
 
         assertThat(testEnv.operatorId).isNotNull();
 
+        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa");
+
         // Execute two simple queries so we create a channel for each network node.
         new AccountBalanceQuery()
             .setAccountId(new AccountId(3))
@@ -44,17 +46,23 @@ public class ClientIntegrationTest {
             .setAccountId(new AccountId(3))
             .execute(testEnv.client);
 
+        System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+
         network = new HashMap<>();
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
         network.put("2.testnet.hedera.com:50211", new AccountId(5));
 
         testEnv.client.setNetwork(network);
 
+        System.out.println("CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC");
+
         network = new HashMap<>();
         network.put("35.186.191.247:50211", new AccountId(4));
         network.put("35.192.2.25:50211", new AccountId(5));
 
         testEnv.client.setNetwork(network);
+
+        System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
 
         testEnv.close();
     }
