@@ -190,7 +190,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      */
     public TokenCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
-        defaultMaxTransactionFee = new Hbar(30);
+        defaultMaxTransactionFee = new Hbar(40);
     }
 
     /**

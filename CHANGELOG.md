@@ -9,10 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - `AccountCreateTransaction.[set|get]alias[Key|EvmAddress]()`
+ - Client now automatically updates the network via a mirror node query at regular intervals.  You can set/get the interval with `Client.[set|get]NetworkUpdatePeriod()`
+ - Client can now be set from a `NodeAddressBook` with `Client.setNetworkFromAddressBook()`
 
 ### Fixed
 
  - `AccountId`s with `aliasEvmAddress` now serialize/deserialize correctly.
+ - `TokenCreateTransaction`'s default fee is now 40 Hbar.
  - `validateChecksum()`, `toStringWithChecksum()`, `hashCode()`, `equals()`, and `compareTo()` now function correctly for `AccountId`s with `aliasEvmAddress`es.
 
 ## v2.17.3
