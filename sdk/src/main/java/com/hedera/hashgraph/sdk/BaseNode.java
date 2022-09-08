@@ -29,7 +29,6 @@ import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
 import java8.util.Objects;
 import java8.util.concurrent.CompletableFuture;
-import java8.util.concurrent.CompletableFuture;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -43,7 +42,7 @@ import java.util.concurrent.TimeUnit;
  * @param <N>                           the n type
  * @param <KeyT>                        the key t type
  */
-abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
+abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
     private static final int GET_STATE_MAX_ATTEMPTS = GET_STATE_TIMEOUT_MILLIS / GET_STATE_INTERVAL_MILLIS;
@@ -54,7 +53,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
     /**
      * Address of this node
      */
-    protected final ManagedNodeAddress address;
+    protected final BaseNodeAddress address;
 
     /**
      * Timestamp of when this node will be considered healthy again
@@ -90,7 +89,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      * @param address                   the node address
      * @param executor                  the client
      */
-    protected ManagedNode(ManagedNodeAddress address, ExecutorService executor) {
+    protected BaseNode(BaseNodeAddress address, ExecutorService executor) {
         this.executor = executor;
         this.address = address;
         this.currentBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
@@ -105,7 +104,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      * @param node                      the node object
      * @param address                   the address to assign
      */
-    protected ManagedNode(N node, ManagedNodeAddress address) {
+    protected BaseNode(N node, BaseNodeAddress address) {
         this.address = address;
 
         this.executor = node.executor;
@@ -151,7 +150,7 @@ abstract class ManagedNode<N extends ManagedNode<N, KeyT>, KeyT> {
      *
      * @return                          the address for the node
      */
-    ManagedNodeAddress getAddress() {
+    BaseNodeAddress getAddress() {
         return address;
     }
 
