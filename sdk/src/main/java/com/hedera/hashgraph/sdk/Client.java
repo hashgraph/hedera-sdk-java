@@ -52,8 +52,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_TLS;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -428,30 +428,52 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * Set if transport security should be used.
+     * Set if transport security should be used to connect to consensus nodes.
      *
-     * If transport security is enabled all connections to nodes will use TLS, and the server's certificate hash will be
-     * compared to the hash stored in the {@link NodeAddressBook} for the given network.
+     * If transport security is enabled all connections to consensus nodes will use TLS, and
+     * the server's certificate hash will be compared to the hash stored in the {@link NodeAddressBook}
+     * for the given network.
      *
      * *Note*: If transport security is enabled, but {@link Client#isVerifyCertificates()} is disabled then server certificates
      * will not be verified.
      *
-     * @param transportSecurity - enable or disable transport security
+     * @param transportSecurity - enable or disable transport security for consensus nodes
      * @return {@code this} for fluent API usage.
      */
     public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
+        return this;
+    }
+
+    /**
+     * Set if transport security should be used to connect to mirror nodes.
+     *
+     * If transport security is enabled all connections to mirror nodes will use TLS.
+     *
+     * @param transportSecurity - enable or disable transport security for mirror nodes
+     * @return {@code this} for fluent API usage.
+     */
+    public Client setMirrorTransportSecurity(boolean transportSecurity) throws InterruptedException {
         mirrorNetwork.setTransportSecurity(transportSecurity);
         return this;
     }
 
     /**
-     * Is tls enabled.
+     * Is tls enabled for consensus nodes.
      *
      * @return                          is tls enabled
      */
     public boolean isTransportSecurity() {
         return network.isTransportSecurity();
+    }
+
+    /**
+     * Is tls enabled for mirror nodes.
+     *
+     * @return                          is tls enabled
+     */
+    public boolean mirrorIsTransportSecurity() {
+        return mirrorNetwork.isTransportSecurity();
     }
 
     /**

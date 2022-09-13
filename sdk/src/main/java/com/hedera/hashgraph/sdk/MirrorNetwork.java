@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Utility class.
  */
-class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, MirrorNode> {
+class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNode> {
     private MirrorNetwork(ExecutorService executor, List<String> addresses) {
         super(executor);
 
@@ -60,7 +60,13 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
      * @return                          the new mirror network for mainnet
      */
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.mainnet.mirrornode.hedera.com:5600"));
+        try {
+            return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:5600"))
+                .setTransportSecurity(true);
+        } catch (InterruptedException e) {
+            // should never happen
+            throw new RuntimeException(e);
+        }
     }
 
     /**
@@ -92,9 +98,9 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
      * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     synchronized MirrorNetwork setNetwork(List<String> network) throws TimeoutException, InterruptedException {
-        var map = new HashMap<String, ManagedNodeAddress>(network.size());
+        var map = new HashMap<String, BaseNodeAddress>(network.size());
         for (var address : network) {
-            map.put(address, ManagedNodeAddress.fromString(address));
+            map.put(address, BaseNodeAddress.fromString(address));
         }
         return super.setNetwork(map);
     }
@@ -113,7 +119,7 @@ class MirrorNetwork extends ManagedNetwork<MirrorNetwork, ManagedNodeAddress, Mi
     }
 
     @Override
-    protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, ManagedNodeAddress> entry) {
+    protected MirrorNode createNodeFromNetworkEntry(Map.Entry<String, BaseNodeAddress> entry) {
         return new MirrorNode(entry.getKey(), executor);
     }
 

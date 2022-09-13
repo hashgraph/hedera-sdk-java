@@ -37,7 +37,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Internal utility class.
  */
-class Network extends ManagedNetwork<Network, AccountId, Node> {
+class Network extends BaseNetwork<Network, AccountId, Node> {
     @Nullable
     private Integer maxNodesPerRequest;
 
@@ -82,7 +82,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         var addressBook = getAddressBookForLedger(LedgerId.MAINNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
             Objects.requireNonNull(addressBook).values(),
-            ManagedNodeAddress.PORT_NODE_PLAIN
+            BaseNodeAddress.PORT_NODE_PLAIN
         );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.MAINNET, addressBook);
     }
@@ -97,7 +97,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         var addressBook = getAddressBookForLedger(LedgerId.TESTNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
             Objects.requireNonNull(addressBook).values(),
-            ManagedNodeAddress.PORT_NODE_PLAIN
+            BaseNodeAddress.PORT_NODE_PLAIN
         );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.TESTNET, addressBook);
     }
@@ -112,7 +112,7 @@ class Network extends ManagedNetwork<Network, AccountId, Node> {
         var addressBook = getAddressBookForLedger(LedgerId.PREVIEWNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
             Objects.requireNonNull(addressBook).values(),
-            ManagedNodeAddress.PORT_NODE_PLAIN
+            BaseNodeAddress.PORT_NODE_PLAIN
         );
         return new Network(executor, network).setLedgerIdInternal(LedgerId.PREVIEWNET, addressBook);
     }
