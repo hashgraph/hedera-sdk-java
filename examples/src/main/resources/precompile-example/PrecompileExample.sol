@@ -41,7 +41,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
             IHederaTokenService.HederaToken(
                 "Example Fungible token", // name
                 "E", // symbol
-                owner, // treasury
+                address(this), // treasury
                 "memo",
                 true, // supply type, false -> INFINITE, true -> FINITE
                 1000, // max supply
@@ -84,7 +84,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
 
         responseCode = transferToken(
             fungibleToken,
-            owner, // sender
+            address(this), // sender
             aliceAccount, // receiver
             100 // amount to transfer
         );
@@ -93,9 +93,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
     function step5() external returns (int responseCode) {
         require(msg.sender == owner);
 
-        // Whichever account pays the fee for this ContractExecuteTransaction will be the owner for the allowance.
-        // (The AccountId in the TransactionId is the fee payer, in this case the operator ID)
-
+        // this contract will be the allowance owner
         responseCode = approve(
             fungibleToken,
             aliceAccount, // spender
@@ -156,7 +154,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
             IHederaTokenService.HederaToken(
                 "Example NFT token", // name
                 "ENFT", // symbol
-                owner, // treasury
+                address(this), // treasury
                 "memo",
                 true, // supply type, false -> INFINITE, true -> FINITE
                 1000, // max supply
@@ -206,7 +204,7 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
 
         responseCode = transferNFT(
             nftToken,
-            owner, // sender
+            address(this), // sender
             aliceAccount, // receiver
             1 // serial number
         );

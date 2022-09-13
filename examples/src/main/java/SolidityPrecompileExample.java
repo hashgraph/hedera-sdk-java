@@ -112,9 +112,7 @@ public class SolidityPrecompileExample {
             // step 16 burn some NFTs
 
             contractHelper
-                .executeSteps(/* from step */ 0, /* to step */ 4, client)
-                .executeSteps(/* from step */ 6, /* to step */ 14, client)
-                .executeSteps(/* from step */ 16, /* to step */ 16, client)
+                .executeSteps(/* from step */ 0, /* to step */ 16, client)
             ;
 
             System.out.println("All steps completed with valid results.");
