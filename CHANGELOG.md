@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - `AccountCreateTransaction.[set|get]alias[Key|EvmAddress]()`
+ - `ContractCreateFlow.[set|get]MaxChunks()`
+ - `Status.[to|from]ResponseCode()`
+ - `ContractCreateFlow.[set|get]AutoRenewAccountId()`
  - Client now automatically updates the network via a mirror node query at regular intervals.  You can set/get the interval with `Client.[set|get]NetworkUpdatePeriod()`
  - Client can now be set from a `NodeAddressBook` with `Client.setNetworkFromAddressBook()`
  - `Client.setMirrorTransportSecurity()`
@@ -19,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `AccountId`s with `aliasEvmAddress` now serialize/deserialize correctly.
  - `TokenCreateTransaction`'s default fee is now 40 Hbar.
  - `validateChecksum()`, `toStringWithChecksum()`, `hashCode()`, `equals()`, and `compareTo()` now function correctly for `AccountId`s with `aliasEvmAddress`es.
+ - Changed the default transaction fee for `AccountCreateTransaction` to 5 Hbar.
  - `PrivateKey.is[ED25519|ECDSA]()` is now correct for ED25519 private keys.
  - Default mirror node for mainnet is now `mainnet-public.mirrornode.hedera.com:443` instead of `hcs.mainnet.mirrornode.hedera.com:5600`
 
