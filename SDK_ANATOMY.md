@@ -66,23 +66,23 @@ An `Operator` is an inner class of `Client`, and has an `AccountId`, a `PublicKe
 
 A `Client` can be initialized from a config file (json).  A `Client` can be initialized for previewnet, testnet, or mainnet, or a custom network, where a custom network is a list of `<"ipAddress:portNumber", AccountID>` pairs (in the form of a hashtable).  Multiple endpoints may be mapped to the same node account ID (put another way, there may be multiple proxies for the same node).  If initialized for previewnet, testnet, or mainnet, the `Client` just uses a hard-coded list of `<"ipAddress:portNumber", AccountID>` pairs.
 
-`executor` will be used to initialize the gRPC `ManagedChannel`, and in the event that an RPC fails and needs to be retried after a delay, `executor` will be used to schedule that delayed retry.
+`executor` will be used to initialize the gRPC `BaseChannel`, and in the event that an RPC fails and needs to be retried after a delay, `executor` will be used to schedule that delayed retry.
 
 
 
 
 
-### `ManagedNode`:
+### `BaseNode`:
 
 Has an `address`, a `channel`, an `executor` (ultimately from `Client`), `lastUsed` and `useCount`.
 
-`ManagedNode` is inherited by `Node` and `MirrorNode`.
+`BaseNode` is inherited by `Node` and `MirrorNode`.
 
-`ManagedNode` keeps track of stats about how this node has been used, and it constructs its channel on demand, which is a `grpc.ManagedChannel`, and which is built as a plaintext channel, using the `executor`, and using the user agent from `getUserAgent()`.
+`BaseNode` keeps track of stats about how this node has been used, and it constructs its channel on demand, which is a `grpc.BaseChannel`, and which is built as a plaintext channel, using the `executor`, and using the user agent from `getUserAgent()`.
 
-`channel` is a `grpc.ManagedChannel` instead of a normal `grpc.Channel` so that we can customize how it is set up (for example, we can give it the specified executor, and we can shut it down in the desired manner).
+`channel` is a `grpc.BaseChannel` instead of a normal `grpc.Channel` so that we can customize how it is set up (for example, we can give it the specified executor, and we can shut it down in the desired manner).
 
-`ManagedNode` has the methods `inUse()`, which causes the `ManagedNode` to record that it is being used, `getChannel()`, `close()`, and `getUserAgent()`.
+`BaseNode` has the methods `inUse()`, which causes the `BaseNode` to record that it is being used, `getChannel()`, `close()`, and `getUserAgent()`.
 
 The user agent is a string that is used to identify the client to the server.  In this case, it's `"hedera-sdk-java/v{NUMBER}"`.
 
@@ -90,12 +90,12 @@ The user agent is a string that is used to identify the client to the server.  I
 
 
 
-### `ManagedNetwork`:
+### `BaseNetwork`:
 
-This represents a network of `ManagedNode`s.  `Network` and `MirrorNetwork` inherit from this.
+This represents a network of `BaseNode`s.  `Network` and `MirrorNetwork` inherit from this.
 
 Has these critical fields:
-* `network`, which is a map of `<KeyT, List<ManagedNodeT>>`.  In `Network`, `KeyT` is `AccountId`, so that we can get a list of proxies for a given node account ID (each proxy is represented by a separate `ManagedNodeT`).
+* `network`, which is a map of `<KeyT, List<BaseNodeT>>`.  In `Network`, `KeyT` is `AccountId`, so that we can get a list of proxies for a given node account ID (each proxy is represented by a separate `BaseNodeT`).
 * `nodes`, which is a list of all `ManageNodeT`s in the network.
 * `healthyNodes`, a list of currently healthy nodes which are selected from while attempting to execute a transaction or query.
 * `executor`, a reference to the executor which will be used to create channels for the `Node`s (in practice, this is always the `Client`'s executor).
@@ -118,7 +118,7 @@ This represents a network of Hedera nodes, a `Client` connects to a `Network`.
 
 ### `Node`:
 
-This is a connection to one node in the network.  Inherits from `ManagedNode` (which is where much of the meat is).
+This is a connection to one node in the network.  Inherits from `BaseNode` (which is where much of the meat is).
 
 
 

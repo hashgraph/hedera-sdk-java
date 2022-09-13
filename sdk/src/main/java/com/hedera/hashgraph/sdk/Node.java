@@ -28,10 +28,10 @@ import java.util.concurrent.ExecutorService;
 /**
  * Internal utility class.
  */
-class Node extends ManagedNode<Node, AccountId> {
+class Node extends BaseNode<Node, AccountId> {
     private final AccountId accountId;
 
-    // This kind of shadows the address field inherited from ManagedNode.
+    // This kind of shadows the address field inherited from BaseNode.
     // This is only needed for the cert hash
     @Nullable
     private NodeAddress addressBookEntry;
@@ -45,7 +45,7 @@ class Node extends ManagedNode<Node, AccountId> {
      * @param address                   the address as a managed node address
      * @param executor                  the executor service
      */
-    Node(AccountId accountId, ManagedNodeAddress address, ExecutorService executor) {
+    Node(AccountId accountId, BaseNodeAddress address, ExecutorService executor) {
         super(address, executor);
 
         this.accountId = accountId;
@@ -58,7 +58,7 @@ class Node extends ManagedNode<Node, AccountId> {
      * @param executor                  the executor service
      */
     Node(AccountId accountId, String address, ExecutorService executor) {
-        this(accountId, ManagedNodeAddress.fromString(address), executor);
+        this(accountId, BaseNodeAddress.fromString(address), executor);
     }
 
     /**
@@ -67,7 +67,7 @@ class Node extends ManagedNode<Node, AccountId> {
      * @param node                      the node
      * @param address                   the address as a managed node address
      */
-    Node(Node node, ManagedNodeAddress address) {
+    Node(Node node, BaseNodeAddress address) {
         super(node, address);
 
         this.accountId = node.accountId;

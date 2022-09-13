@@ -21,17 +21,17 @@ package com.hedera.hashgraph.sdk;
 
 import org.junit.jupiter.api.Test;
 
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_MIRROR_PLAIN;
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_MIRROR_TLS;
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_TLS;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_MIRROR_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_MIRROR_TLS;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class ManagedNodeAddressTest {
+public class BaseNodeAddressTest {
     @Test
     void fromString() {
-        var ipAddress = ManagedNodeAddress.fromString("35.237.200.180:50211");
+        var ipAddress = BaseNodeAddress.fromString("35.237.200.180:50211");
         assertThat(ipAddress.getName()).isNull();
         assertThat(ipAddress.getAddress()).isEqualTo("35.237.200.180");
         assertThat(ipAddress.getPort()).isEqualTo(PORT_NODE_PLAIN);
@@ -49,7 +49,7 @@ public class ManagedNodeAddressTest {
         assertThat(ipAddressInsecure.getPort()).isEqualTo(PORT_NODE_PLAIN);
         assertThat(ipAddressInsecure.toString()).isEqualTo("35.237.200.180:50211");
 
-        var urlAddress = ManagedNodeAddress.fromString("0.testnet.hedera.com:50211");
+        var urlAddress = BaseNodeAddress.fromString("0.testnet.hedera.com:50211");
         assertThat(urlAddress.getName()).isNull();
         assertThat(urlAddress.getAddress()).isEqualTo("0.testnet.hedera.com");
         assertThat(urlAddress.getPort()).isEqualTo(PORT_NODE_PLAIN);
@@ -67,7 +67,7 @@ public class ManagedNodeAddressTest {
         assertThat(urlAddressInsecure.getPort()).isEqualTo(PORT_NODE_PLAIN);
         assertThat(urlAddressInsecure.toString()).isEqualTo("0.testnet.hedera.com:50211");
 
-        var processAddress = ManagedNodeAddress.fromString("in-process:testingProcess");
+        var processAddress = BaseNodeAddress.fromString("in-process:testingProcess");
         assertThat(processAddress.getName()).isEqualTo("testingProcess");
         assertThat(processAddress.getAddress()).isNull();
         assertThat(processAddress.getPort()).isEqualTo(0);
@@ -85,7 +85,7 @@ public class ManagedNodeAddressTest {
         assertThat(processAddressInsecure.getPort()).isEqualTo(0);
         assertThat(processAddressInsecure.toString()).isEqualTo("testingProcess");
 
-        var mirrorNodeAddress = ManagedNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:5600");
+        var mirrorNodeAddress = BaseNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:5600");
         assertThat(mirrorNodeAddress.getName()).isNull();
         assertThat(mirrorNodeAddress.getAddress()).isEqualTo("hcs.mainnet.mirrornode.hedera.com");
         assertThat(mirrorNodeAddress.getPort()).isEqualTo(PORT_MIRROR_PLAIN);
@@ -103,7 +103,7 @@ public class ManagedNodeAddressTest {
         assertThat(mirrorNodeAddressInsecure.getPort()).isEqualTo(PORT_MIRROR_PLAIN);
         assertThat(mirrorNodeAddressInsecure.toString()).isEqualTo("hcs.mainnet.mirrornode.hedera.com:5600");
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("this is a random string with spaces:443"));
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> ManagedNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:notarealport"));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("this is a random string with spaces:443"));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("hcs.mainnet.mirrornode.hedera.com:notarealport"));
     }
 }
