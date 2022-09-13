@@ -16,9 +16,8 @@ import java.util.ArrayDeque;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ForkJoinPool;
 
-import static com.hedera.hashgraph.sdk.ManagedNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 

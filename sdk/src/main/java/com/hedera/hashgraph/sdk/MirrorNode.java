@@ -24,14 +24,14 @@ import java.util.concurrent.ExecutorService;
 /**
  * An individual mirror node.
  */
-class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
+class MirrorNode extends BaseNode<MirrorNode, BaseNodeAddress> {
     /**
      * Constructor.
      *
      * @param address                   the node address as a managed node address
      * @param executor                  the executor service
      */
-    MirrorNode(ManagedNodeAddress address, ExecutorService executor) {
+    MirrorNode(BaseNodeAddress address, ExecutorService executor) {
         super(address, executor);
     }
 
@@ -42,7 +42,7 @@ class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
      * @param executor                  the executor service
      */
     MirrorNode(String address, ExecutorService executor) {
-        this(ManagedNodeAddress.fromString(address), executor);
+        this(BaseNodeAddress.fromString(address), executor);
     }
 
     /**
@@ -51,7 +51,7 @@ class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
      * @param node                      the mirror node
      * @param address                   the address as a managed node address
      */
-    private MirrorNode(MirrorNode node, ManagedNodeAddress address) {
+    private MirrorNode(MirrorNode node, BaseNodeAddress address) {
         super(node, address);
     }
 
@@ -71,7 +71,7 @@ class MirrorNode extends ManagedNode<MirrorNode, ManagedNodeAddress> {
     }
 
     @Override
-    ManagedNodeAddress getKey() {
+    BaseNodeAddress getKey() {
         return address;
     }
 }

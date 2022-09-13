@@ -57,19 +57,7 @@ public final class CreateSimpleContractExample {
     }
 
     public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
-        ClassLoader cl = CreateSimpleContractExample.class.getClassLoader();
-
-        Gson gson = new Gson();
-
-        JsonObject jsonObject;
-
-        try (InputStream jsonStream = cl.getResourceAsStream("hello_world.json")) {
-            if (jsonStream == null) {
-                throw new RuntimeException("failed to get hello_world.json");
-            }
-
-            jsonObject = gson.fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class);
-        }
+        JsonObject jsonObject = ContractHelper.getJsonResource("hello_world.json");
 
         String byteCodeHex = jsonObject.getAsJsonPrimitive("object")
             .getAsString();

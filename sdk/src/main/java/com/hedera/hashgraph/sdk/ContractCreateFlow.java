@@ -85,6 +85,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
 
     private String bytecode = "";
     @Nullable
+    private Integer maxChunks = null;
+    @Nullable
     private Key adminKey = null;
     private long gas = 0;
     private Hbar initialBalance = Hbar.ZERO;
@@ -93,6 +95,8 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     private int maxAutomaticTokenAssociations = 0;
     @Nullable
     private Duration autoRenewPeriod = null;
+    @Nullable
+    private AccountId autoRenewAccountId = null;
     private byte[] constructorParameters = {};
     @Nullable
     private String contractMemo = null;
@@ -154,6 +158,16 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     public ContractCreateFlow setBytecode(ByteString bytecode) {
         Objects.requireNonNull(bytecode);
         return setBytecode(bytecode.toByteArray());
+    }
+
+    @Nullable
+    public Integer getMaxChunks() {
+        return maxChunks;
+    }
+
+    public ContractCreateFlow setMaxChunks(int maxChunks) {
+        this.maxChunks = maxChunks;
+        return this;
     }
 
     /**
@@ -294,6 +308,17 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     public ContractCreateFlow setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         this.autoRenewPeriod = autoRenewPeriod;
+        return this;
+    }
+
+    @Nullable
+    public AccountId getAutoRenewAccountId() {
+        return autoRenewAccountId;
+    }
+
+    public ContractCreateFlow setAutoRenewAccountId(AccountId autoRenewAccountId) {
+        Objects.requireNonNull(autoRenewAccountId);
+        this.autoRenewAccountId = autoRenewAccountId;
         return this;
     }
 
@@ -467,6 +492,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         var fileAppendTx = new FileAppendTransaction()
             .setFileId(fileId)
             .setContents(appendBytecode);
+        if (maxChunks != null) {
+            fileAppendTx.setMaxChunks(maxChunks);
+        }
         if (nodeAccountIds != null) {
             fileAppendTx.setNodeAccountIds(nodeAccountIds);
         }
@@ -489,6 +517,9 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
         }
         if (autoRenewPeriod != null) {
             contractCreateTx.setAutoRenewPeriod(autoRenewPeriod);
+        }
+        if (autoRenewAccountId != null) {
+            contractCreateTx.setAutoRenewAccountId(autoRenewAccountId);
         }
         if (contractMemo != null) {
             contractCreateTx.setContractMemo(contractMemo);

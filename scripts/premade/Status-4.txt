@@ -11,6 +11,14 @@
                 + " is unhandled by the SDK; update your SDK or open an issue");
     }
 
+    public static Status fromResponseCode(int reponseCode) {
+        return Status.valueOf(Objects.requireNonNull(ResponseCodeEnum.forNumber(reponseCode)));
+    }
+
+    public int toResponseCode() {
+        return code.getNumber();
+    }
+
     @Override
     public String toString() {
         return code.name();
