@@ -50,14 +50,6 @@ public final class GetAddressBookExample {
 
         Client client = Client.forName(HEDERA_NETWORK);
 
-        // The mirror network for mainnet is kinda wonky right now and requires some manual configuration for
-        // mirror network queries like AddressBookQuery to work.
-        if (HEDERA_NETWORK.equals("mainnet")) {
-            client
-                .setMirrorNetwork(Collections.singletonList("mainnet-public.mirrornode.hedera.com:5600"))
-                .setTransportSecurity(true);
-        }
-
         NodeAddressBook addressBook = new AddressBookQuery()
             .setFileId(FileId.ADDRESS_BOOK)
             .execute(client);

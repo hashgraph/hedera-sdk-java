@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Internal utility class.
  */
-class ManagedNodeAddress {
+class BaseNodeAddress {
     private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
     private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
     static final int PORT_MIRROR_PLAIN = 5600;
@@ -49,7 +49,7 @@ class ManagedNodeAddress {
      * @param address                   the address part
      * @param port                      the port part
      */
-    public ManagedNodeAddress(@Nullable String name, @Nullable String address, int port) {
+    public BaseNodeAddress(@Nullable String name, @Nullable String address, int port) {
         this.name = name;
         this.address = address;
         this.port = port;
@@ -61,7 +61,7 @@ class ManagedNodeAddress {
      * @param string                    the string representation
      * @return                          the new managed node address
      */
-    public static ManagedNodeAddress fromString(String string) {
+    public static BaseNodeAddress fromString(String string) {
         var hostAndPortMatcher = HOST_AND_PORT.matcher(string);
         var inProcessMatcher = IN_PROCESS.matcher(string);
 
@@ -69,9 +69,9 @@ class ManagedNodeAddress {
             var address = hostAndPortMatcher.group(1);
             var port = hostAndPortMatcher.group(2);
 
-            return new ManagedNodeAddress(null, address, Integer.parseInt(port));
+            return new BaseNodeAddress(null, address, Integer.parseInt(port));
         } else if (inProcessMatcher.matches() && inProcessMatcher.groupCount() == 1) {
-            return new ManagedNodeAddress(inProcessMatcher.group(1), null, 0);
+            return new BaseNodeAddress(inProcessMatcher.group(1), null, 0);
         } else {
             throw new IllegalStateException("failed to parse node address");
         }
@@ -127,14 +127,14 @@ class ManagedNodeAddress {
      *
      * @return                          the insecure managed node address
      */
-    public ManagedNodeAddress toInsecure() {
+    public BaseNodeAddress toInsecure() {
         var port = switch (this.port) {
             case PORT_NODE_TLS -> PORT_NODE_PLAIN;
             case PORT_MIRROR_TLS -> PORT_MIRROR_PLAIN;
             default -> this.port;
         };
 
-        return new ManagedNodeAddress(name, address, port);
+        return new BaseNodeAddress(name, address, port);
     }
 
     /**
@@ -142,14 +142,14 @@ class ManagedNodeAddress {
      *
      * @return                          the secure managed node address
      */
-    public ManagedNodeAddress toSecure() {
+    public BaseNodeAddress toSecure() {
         var port = switch (this.port) {
             case PORT_NODE_PLAIN -> PORT_NODE_TLS;
             case PORT_MIRROR_PLAIN -> PORT_MIRROR_TLS;
             default -> this.port;
         };
 
-        return new ManagedNodeAddress(name, address, port);
+        return new BaseNodeAddress(name, address, port);
     }
 
     @Override
@@ -165,7 +165,7 @@ class ManagedNodeAddress {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ManagedNodeAddress that = (ManagedNodeAddress) o;
+        BaseNodeAddress that = (BaseNodeAddress) o;
         return Objects.equals(getName(), that.getName()) && Objects.equals(getAddress(), that.getAddress()) && port == that.port;
     }
 

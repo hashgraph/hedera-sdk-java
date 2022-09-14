@@ -496,19 +496,19 @@ public class MockingTest {
             .enqueueResponse(TestResponse.transactionOk())
             .enqueueResponse(TestResponse.transactionOk());
 
-        new AccountCreateTransaction()
+        new AccountDeleteTransaction()
             .execute(server.client);
 
-        new AccountCreateTransaction()
+        new AccountDeleteTransaction()
             .setMaxTransactionFee(new Hbar(5))
             .execute(server.client);
 
         server.client.setDefaultMaxTransactionFee(new Hbar(1));
 
-        new AccountCreateTransaction()
+        new AccountDeleteTransaction()
             .execute(server.client);
 
-        new AccountCreateTransaction()
+        new AccountDeleteTransaction()
             .setMaxTransactionFee(new Hbar(3))
             .execute(server.client);
 
@@ -635,6 +635,11 @@ public class MockingTest {
 
         @Override
         public void createAccount(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
+            respondToTransactionFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void cryptoDelete(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
             respondToTransactionFromQueue(request, responseObserver);
         }
 

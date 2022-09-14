@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java8.util.Lists;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
@@ -36,14 +35,14 @@ import java.util.concurrent.TimeoutException;
 /**
  * Abstracts away most of the similar functionality between {@link Network} and {@link MirrorNetwork}
  *
- * @param <ManagedNetworkT> - The network that is extending this class. This is used for builder pattern setter methods.
+ * @param <BaseNetworkT> - The network that is extending this class. This is used for builder pattern setter methods.
  * @param <KeyT> - The identifying type for the network.
- * @param <ManagedNodeT> - The specific node type for this network.
+ * @param <BaseNodeT> - The specific node type for this network.
  */
-abstract class ManagedNetwork<
-    ManagedNetworkT extends ManagedNetwork<ManagedNetworkT, KeyT, ManagedNodeT>,
+abstract class BaseNetwork<
+    BaseNetworkT extends BaseNetwork<BaseNetworkT, KeyT, BaseNodeT>,
     KeyT,
-    ManagedNodeT extends ManagedNode<ManagedNodeT, KeyT>> {
+    BaseNodeT extends BaseNode<BaseNodeT, KeyT>> {
     protected static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
     protected static final Random random = new Random();
 
@@ -52,17 +51,17 @@ abstract class ManagedNetwork<
     /**
      * Map of node identifiers to nodes. Used to quickly fetch node for identifier.
      */
-    protected Map<KeyT, List<ManagedNodeT>> network = new ConcurrentHashMap<>();
+    protected Map<KeyT, List<BaseNodeT>> network = new ConcurrentHashMap<>();
 
     /**
      * The list of all nodes.
      */
-    protected List<ManagedNodeT> nodes = new ArrayList<>();
+    protected List<BaseNodeT> nodes = new ArrayList<>();
 
     /**
      * The list of currently healthy nodes.
      */
-    protected List<ManagedNodeT> healthyNodes = new ArrayList<>();
+    protected List<BaseNodeT> healthyNodes = new ArrayList<>();
 
     /**
      * The current minimum backoff for the nodes in the network. This backoff is used when nodes return a bad
@@ -119,7 +118,7 @@ abstract class ManagedNetwork<
     )
     boolean hasShutDownNow = false;
 
-    protected ManagedNetwork(ExecutorService executor) {
+    protected BaseNetwork(ExecutorService executor) {
         this.executor = executor;
         earliestReadmitTime = Instant.now().plus(minNodeReadmitTime);
     }
@@ -141,11 +140,11 @@ abstract class ManagedNetwork<
      * @param ledgerId                  the ledger id
      * @return {@code this}
      */
-    synchronized ManagedNetworkT setLedgerId(@Nullable LedgerId ledgerId) {
+    synchronized BaseNetworkT setLedgerId(@Nullable LedgerId ledgerId) {
         this.ledgerId = ledgerId;
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
     /**
@@ -163,11 +162,11 @@ abstract class ManagedNetwork<
      * @param maxNodeAttempts           the max node attempts
      * @return {@code this}
      */
-    synchronized ManagedNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
+    synchronized BaseNetworkT setMaxNodeAttempts(int maxNodeAttempts) {
         this.maxNodeAttempts = maxNodeAttempts;
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
     /**
@@ -185,7 +184,7 @@ abstract class ManagedNetwork<
      * @param minNodeBackoff            the min node backoff
      * @return {@code this}
      */
-    synchronized ManagedNetworkT setMinNodeBackoff(Duration minNodeBackoff) {
+    synchronized BaseNetworkT setMinNodeBackoff(Duration minNodeBackoff) {
         this.minNodeBackoff = minNodeBackoff;
 
         for (var node : nodes) {
@@ -193,7 +192,7 @@ abstract class ManagedNetwork<
         }
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
     /**
@@ -211,7 +210,7 @@ abstract class ManagedNetwork<
      * @param maxNodeBackoff            the max node backoff
      * @return {@code this}
      */
-    synchronized ManagedNetworkT setMaxNodeBackoff(Duration maxNodeBackoff) {
+    synchronized BaseNetworkT setMaxNodeBackoff(Duration maxNodeBackoff) {
         this.maxNodeBackoff = maxNodeBackoff;
 
         for (var node : nodes) {
@@ -219,7 +218,7 @@ abstract class ManagedNetwork<
         }
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
     /**
@@ -278,7 +277,7 @@ abstract class ManagedNetwork<
      * @return {@code this}
      * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
-    synchronized ManagedNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
+    synchronized BaseNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         if (this.transportSecurity != transportSecurity) {
             network.clear();
 
@@ -293,10 +292,12 @@ abstract class ManagedNetwork<
             }
         }
 
+        healthyNodes = new ArrayList<>(nodes);
+
         this.transportSecurity = transportSecurity;
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
     /**
@@ -314,19 +315,19 @@ abstract class ManagedNetwork<
      * @param closeTimeout              the close timeout
      * @return {@code this}
      */
-    synchronized ManagedNetworkT setCloseTimeout(Duration closeTimeout) {
+    synchronized BaseNetworkT setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = closeTimeout;
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
-    protected abstract ManagedNodeT createNodeFromNetworkEntry(Map.Entry<String, KeyT> entry);
+    protected abstract BaseNodeT createNodeFromNetworkEntry(Map.Entry<String, KeyT> entry);
 
     /**
      * Returns a list of index in descending order to remove from the current node list.
      *
-     * Descending order is important here because {@link ManagedNetwork#setNetwork(Map<String, KeyT>)} uses a for-each loop.
+     * Descending order is important here because {@link BaseNetwork#setNetwork(Map<String, KeyT>)} uses a for-each loop.
      *
      * @param network - the new network
      * @return - list of indexes in descending order
@@ -345,11 +346,11 @@ abstract class ManagedNetwork<
         return nodes;
     }
 
-    private boolean nodeIsInGivenNetwork(ManagedNodeT node, Map<String,KeyT> network) {
+    private boolean nodeIsInGivenNetwork(BaseNodeT node, Map<String,KeyT> network) {
         for (var entry : network.entrySet()) {
             if (
                 node.getKey().equals(entry.getValue()) &&
-                node.address.equals(ManagedNodeAddress.fromString(entry.getKey()))
+                node.address.equals(BaseNodeAddress.fromString(entry.getKey()))
             ) {
                 return true;
             }
@@ -370,10 +371,10 @@ abstract class ManagedNetwork<
      * @throws TimeoutException - when shutting down nodes
      * @throws InterruptedException - when acquiring the lock
      */
-    synchronized ManagedNetworkT setNetwork(Map<String, KeyT> network) throws TimeoutException, InterruptedException {
-        var newNodes = new ArrayList<ManagedNodeT>();
-        var newHealthyNodes = new ArrayList<ManagedNodeT>();
-        var newNetwork = new HashMap<KeyT, List<ManagedNodeT>>();
+    synchronized BaseNetworkT setNetwork(Map<String, KeyT> network) throws TimeoutException, InterruptedException {
+        var newNodes = new ArrayList<BaseNodeT>();
+        var newHealthyNodes = new ArrayList<BaseNodeT>();
+        var newNetwork = new HashMap<KeyT, List<BaseNodeT>>();
         var newNodeKeys = new HashSet<KeyT>();
         var newNodeAddresses = new HashSet<String>();
 
@@ -413,7 +414,7 @@ abstract class ManagedNetwork<
             if (newNetwork.containsKey(node.getKey())) {
                 newNetwork.get(node.getKey()).add(node);
             } else {
-                var list = new ArrayList<ManagedNodeT>();
+                var list = new ArrayList<BaseNodeT>();
                 list.add(node);
                 newNetwork.put(node.getKey(), list);
             }
@@ -427,19 +428,19 @@ abstract class ManagedNetwork<
         healthyNodes = newHealthyNodes;
 
         // noinspection unchecked
-        return (ManagedNetworkT) this;
+        return (BaseNetworkT) this;
     }
 
-    void increaseBackoff(ManagedNodeT node) {
+    void increaseBackoff(BaseNodeT node) {
         node.increaseBackoff();
         healthyNodes.remove(node);
     }
 
-    void decreaseBackoff(ManagedNodeT node) {
+    void decreaseBackoff(BaseNodeT node) {
         node.decreaseBackoff();
     }
 
-    private void removeNodeFromNetwork(ManagedNodeT node) {
+    private void removeNodeFromNetwork(BaseNodeT node) {
         var nodesForKey = this.network.get(node.getKey());
         nodesForKey.remove(node);
         if (nodesForKey.isEmpty()) {
@@ -447,18 +448,18 @@ abstract class ManagedNetwork<
         }
     }
 
-    private List<ManagedNodeT> getNodesForKey(KeyT key) {
+    private List<BaseNodeT> getNodesForKey(KeyT key) {
         if (network.containsKey(key)) {
             return network.get(key);
         } else {
-            var newList = new ArrayList<ManagedNodeT>();
+            var newList = new ArrayList<BaseNodeT>();
             network.put(key, newList);
             return newList;
         }
     }
 
-    private boolean addressIsInNodeList(String addressString, List<ManagedNodeT> nodes) {
-        var address = ManagedNodeAddress.fromString(addressString);
+    private boolean addressIsInNodeList(String addressString, List<BaseNodeT> nodes) {
+        var address = BaseNodeAddress.fromString(addressString);
         for (var node : nodes) {
             if (node.address.equals(address)) {
                 return true;
@@ -468,7 +469,7 @@ abstract class ManagedNetwork<
     }
 
     /**
-     * Remove any nodes from the network when they've exceeded the {@link ManagedNetwork#maxNodeAttempts} limit
+     * Remove any nodes from the network when they've exceeded the {@link BaseNetwork#maxNodeAttempts} limit
      *
      * @throws InterruptedException - when shutting down nodes
      */
@@ -533,7 +534,7 @@ abstract class ManagedNetwork<
      * @param key                       the desired key
      * @return                          the node
      */
-    synchronized ManagedNodeT getNode(@Nullable KeyT key) {
+    synchronized BaseNodeT getNode(@Nullable KeyT key) {
         // Attempt to readmit nodes each time a node is fetched.
         // Note: Readmitting nodes will only happen periodically so calling it each time should not harm
         // performance.
@@ -553,7 +554,7 @@ abstract class ManagedNetwork<
 
     /**
      * Returns `count` number of the most healthy nodes. Healthy-ness is determined by sort order; leftmost being most
-     * healthy. This will also remove any nodes which have hit or exceeded {@link ManagedNetwork#maxNodeAttempts}.
+     * healthy. This will also remove any nodes which have hit or exceeded {@link BaseNetwork#maxNodeAttempts}.
      *
      * Returns a list of nodes where each node has a unique key.
      *
@@ -561,11 +562,11 @@ abstract class ManagedNetwork<
      * @return                          List of nodes to use
      * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
-    protected synchronized List<ManagedNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
+    protected synchronized List<BaseNodeT> getNumberOfMostHealthyNodes(int count) throws InterruptedException {
         readmitNodes();
         removeDeadNodes();
 
-        var returnNodes = new HashMap<KeyT, ManagedNodeT>(count);
+        var returnNodes = new HashMap<KeyT, BaseNodeT>(count);
 
         for (var i = 0; i < count; i++ ) {
             var node = getNode(null);
@@ -575,7 +576,7 @@ abstract class ManagedNetwork<
             }
         }
 
-        var returnList = new ArrayList<ManagedNodeT>();
+        var returnList = new ArrayList<BaseNodeT>();
         returnList.addAll(returnNodes.values());
         return returnList;
     }

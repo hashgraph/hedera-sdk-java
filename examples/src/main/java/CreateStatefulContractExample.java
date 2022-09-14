@@ -57,19 +57,7 @@ public final class CreateStatefulContractExample {
     }
 
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException {
-        ClassLoader cl = CreateStatefulContractExample.class.getClassLoader();
-
-        Gson gson = new Gson();
-
-        JsonObject jsonObject;
-
-        try (InputStream jsonStream = cl.getResourceAsStream("stateful.json")) {
-            if (jsonStream == null) {
-                throw new RuntimeException("failed to get stateful.json");
-            }
-
-            jsonObject = gson.fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class);
-        }
+        JsonObject jsonObject = ContractHelper.getJsonResource("stateful.json");
 
         String byteCodeHex = jsonObject.getAsJsonPrimitive("object")
             .getAsString();

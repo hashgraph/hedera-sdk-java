@@ -66,6 +66,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * Constructor.
      */
     public AccountCreateTransaction() {
+        defaultMaxTransactionFee = Hbar.from(5);
     }
 
     /**
