@@ -156,18 +156,18 @@ class Ed25519PublicKeyTest {
     }
 
     @Test
-    @DisplayName("public key is is ECDSA")
+    @DisplayName("public key is is ED25519")
     void keyIsECDSA() {
-        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+        PublicKey key = PrivateKey.generateED25519().getPublicKey();
 
-        assertThat(key.isECDSA()).isTrue();
+        assertThat(key.isED25519()).isTrue();
     }
 
     @Test
-    @DisplayName("public key is is not Ed25519")
+    @DisplayName("public key is is not ECDSA")
     void keyIsNotEd25519() {
-        PublicKey key = PrivateKey.generateECDSA().getPublicKey();
+        PublicKey key = PrivateKey.generateED25519().getPublicKey();
 
-        assertThat(key.isED25519()).isFalse();
+        assertThat(key.isECDSA()).isFalse();
     }
 }

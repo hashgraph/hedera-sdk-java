@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Client can now be set from a `NodeAddressBook` with `Client.setNetworkFromAddressBook()`
  - `Client.setMirrorTransportSecurity()`
  - `Client.mirrorIsTransportSecurity()`
+ - `SolidityPrecompileExample`
 
 ### Fixed
 

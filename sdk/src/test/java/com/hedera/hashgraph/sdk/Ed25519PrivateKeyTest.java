@@ -349,16 +349,16 @@ class Ed25519PrivateKeyTest {
     @Test
     @DisplayName("private key is is ECDSA")
     void keyIsECDSA() {
-        PrivateKey key = PrivateKey.generateECDSA();
+        PrivateKey key = PrivateKey.generateED25519();
 
-        assertThat(key.isECDSA()).isTrue();
+        assertThat(key.isED25519()).isTrue();
     }
 
     @Test
     @DisplayName("private key is is not Ed25519")
     void keyIsNotEd25519() {
-        PrivateKey key = PrivateKey.generateECDSA();
+        PrivateKey key = PrivateKey.generateED25519();
 
-        assertThat(key.isED25519()).isFalse();
+        assertThat(key.isECDSA()).isFalse();
     }
 }
