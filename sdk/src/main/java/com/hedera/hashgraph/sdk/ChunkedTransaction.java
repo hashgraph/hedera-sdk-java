@@ -28,7 +28,10 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.concurrent.CompletionStage;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import java8.util.function.Function;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -38,12 +41,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
  * A common base for file and topic message transactions.
  */
-abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> implements WithExecuteAll {
+abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> {
     private int chunkSize = 1024;
     protected ByteString data = ByteString.EMPTY;
     /**
@@ -283,24 +287,44 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     @Override
-    public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
-        return executeAll(client).get(0);
+    public TransactionResponse execute(Client client, Duration timeoutPerChunk) throws TimeoutException, PrecheckStatusException {
+        return executeAll(client, timeoutPerChunk).get(0);
     }
 
-    @Override
+    /**
+     * Execute this transaction or query
+     *
+     * @param client The client with which this will be executed.
+     * @return Result of execution for each chunk
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
     public List<TransactionResponse> executeAll(Client client) throws PrecheckStatusException, TimeoutException {
+        return executeAll(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Execute this transaction or query
+     *
+     * @param client The client with which this will be executed.
+     * @param timeoutPerChunk The timeout after which the execution attempt will be cancelled.
+     * @return Result of execution for each chunk
+     * @throws TimeoutException
+     * @throws PrecheckStatusException
+     */
+    public List<TransactionResponse> executeAll(Client client, Duration timeoutPerChunk) throws PrecheckStatusException, TimeoutException {
         freezeAndSign(client);
 
         var responses = new ArrayList<TransactionResponse>(transactionIds.size());
 
         for (var i = 0; i < transactionIds.size(); i++) {
-            var response = super.execute(client);
+            var response = super.execute(client, timeoutPerChunk);
 
             if (shouldGetReceipt()) {
                 new TransactionReceiptQuery()
                     .setNodeAccountIds(Collections.singletonList(response.nodeId))
                     .setTransactionId(response.transactionId)
-                    .execute(client);
+                    .execute(client, timeoutPerChunk);
             }
 
             responses.add(response);
@@ -309,9 +333,24 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return responses;
     }
 
-    @Override
-    @FunctionalExecutable(type = "java.util.List<TransactionResponse>")
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @return Future result of execution for each chunk
+     */
     public CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client) {
+        return executeAllAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeoutPerChunk The timeout after which the execution attempt will be cancelled.
+     * @return Future result of execution for each chunk
+     */
+    public CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client, Duration timeoutPerChunk) {
         freezeAndSign(client);
 
         @Var
@@ -320,10 +359,10 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
         for (var i = 0; i < transactionIds.size(); i++) {
             future = future.thenCompose(list -> {
-                var responseFuture = super.executeAsync(client);
+                var responseFuture = super.executeAsync(client, timeoutPerChunk);
 
                 Function<TransactionResponse, ? extends CompletionStage<TransactionResponse>> receiptFuture =
-                    (TransactionResponse response) -> response.getReceiptAsync(client)
+                    (TransactionResponse response) -> response.getReceiptAsync(client, timeoutPerChunk)
                         .thenApply(receipt -> response);
 
                 Function<TransactionResponse, List<TransactionResponse>> addToList =
@@ -343,9 +382,53 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         return future;
     }
 
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAllAsync(Client client, BiConsumer<List<TransactionResponse>, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAllAsync(client), callback);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAllAsync(Client client, Duration timeout, BiConsumer<List<TransactionResponse>, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAllAsync(client, timeout), callback);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAllAsync(Client client, Consumer<List<TransactionResponse>> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAllAsync(client), onSuccess, onFailure);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAllAsync(Client client, Duration timeout, Consumer<List<TransactionResponse>> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAllAsync(client, timeout), onSuccess, onFailure);
+    }
+
     @Override
-    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client) {
-        return executeAllAsync(client).thenApply(responses -> responses.get(0));
+    public CompletableFuture<com.hedera.hashgraph.sdk.TransactionResponse> executeAsync(Client client, Duration timeoutPerChunk) {
+        return executeAllAsync(client, timeoutPerChunk).thenApply(responses -> responses.get(0));
     }
 
     @Override

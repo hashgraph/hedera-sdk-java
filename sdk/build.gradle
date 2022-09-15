@@ -31,11 +31,6 @@ dependencies {
     // https://github.com/bsideup/jabel
     annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:0.4.2'
 
-    // custom annotation processor to help generate methods around executables
-    annotationProcessor project(":executable-processor")
-
-    compileOnly project(":executable-annotation")
-
     // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
     implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.2'
 

@@ -27,6 +27,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.concurrent.CompletionStage;
+import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
 import java8.util.function.Function;
 import org.slf4j.Logger;
@@ -49,6 +50,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
 
@@ -58,7 +60,7 @@ import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
 /**
  * Managed client for use on the Hedera Hashgraph network.
  */
-public final class Client implements AutoCloseable, WithPing, WithPingAll {
+public final class Client implements AutoCloseable {
     static final int DEFAULT_MAX_ATTEMPTS = 10;
     static final Duration DEFAULT_MAX_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_MIN_BACKOFF = Duration.ofMillis(250L);
@@ -501,13 +503,22 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @param nodeAccountId Account ID of the node to ping
      */
-   @Override
     public Void ping(AccountId nodeAccountId) {
+        return ping(nodeAccountId, getRequestTimeout());
+    }
+
+    /**
+     * Send a ping to the given node.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     */
+    public Void ping(AccountId nodeAccountId, Duration timeout) {
         try {
             new AccountBalanceQuery()
                 .setAccountId(nodeAccountId)
                 .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-                .execute(this);
+                .execute(this, timeout);
         } catch (Exception e) {
             logger.debug("pinging account {} failed with exception {}", nodeAccountId, e.getMessage());
         }
@@ -516,17 +527,25 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * Send a ping to the given node.
+     * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
      */
-    @Override
-    @FunctionalExecutable(type = "Void", onClient = true, inputType = "AccountId")
-    public synchronized CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
+    public CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
+        return pingAsync(nodeAccountId, getRequestTimeout());
+    }
+
+    /**
+     * Send a ping to the given node asynchronously.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     */
+    public CompletableFuture<Void> pingAsync(AccountId nodeAccountId, Duration timeout) {
         return new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-            .executeAsync(this)
+            .executeAsync(this, timeout)
             .handle((balance, e) -> {
                 // Do nothing
                 return null;
@@ -534,33 +553,138 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
     }
 
     /**
-     * Sends pings to all nodes in the client's network.
-     * Synchronizes well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Send a ping to the given node asynchronously.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param callback a BiConsumer which handles the result or error.
      */
-    @Override
+    public void pingAsync(AccountId nodeAccountId, BiConsumer<Void, Throwable> callback) {
+        ConsumerHelper.biConsumer(pingAsync(nodeAccountId), callback);
+    }
+
+    /**
+     * Send a ping to the given node asynchronously.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void pingAsync(AccountId nodeAccountId, Duration timeout, BiConsumer<Void, Throwable> callback) {
+        ConsumerHelper.biConsumer(pingAsync(nodeAccountId, timeout), callback);
+    }
+
+    /**
+     * Send a ping to the given node asynchronously.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void pingAsync(AccountId nodeAccountId, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(pingAsync(nodeAccountId), onSuccess, onFailure);
+    }
+
+    /**
+     * Send a ping to the given node asynchronously.
+     *
+     * @param nodeAccountId Account ID of the node to ping
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     */
     public synchronized Void pingAll() {
+        return pingAll(getRequestTimeout());
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     */
+    public synchronized Void pingAll(Duration timeoutPerPing) {
         for (var nodeAccountId : network.getNetwork().values()) {
-            ping(nodeAccountId);
+            ping(nodeAccountId, timeoutPerPing);
         }
 
         return null;
     }
 
     /**
-     * Sends pings to all nodes in the client's network.
-     * Synchronizes well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
      */
-    @Override
-    @FunctionalExecutable(type = "Void", onClient = true)
     public synchronized CompletableFuture<Void> pingAllAsync() {
+        return pingAllAsync(getRequestTimeout());
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     */
+    public synchronized CompletableFuture<Void> pingAllAsync(Duration timeoutPerPing) {
         var network = this.network.getNetwork();
         var list = new ArrayList<CompletableFuture<Void>>(network.size());
 
         for (var nodeAccountId : network.values()) {
-            list.add(pingAsync(nodeAccountId));
+            list.add(pingAsync(nodeAccountId, timeoutPerPing));
         }
 
         return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply((v) -> null);
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void pingAllAsync(BiConsumer<Void, Throwable> callback) {
+        ConsumerHelper.biConsumer(pingAllAsync(), callback);
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void pingAllAsync(Duration timeoutPerPing, BiConsumer<Void, Throwable> callback) {
+        ConsumerHelper.biConsumer(pingAllAsync(timeoutPerPing), callback);
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void pingAllAsync(Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(pingAllAsync(), onSuccess, onFailure);
+    }
+
+    /**
+     * Sends pings to all nodes in the client's network asynchronously.
+     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void pingAllAsync(Duration timeoutPerPing, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(pingAllAsync(timeoutPerPing), onSuccess, onFailure);
     }
 
     /**
@@ -1049,7 +1173,6 @@ public final class Client implements AutoCloseable, WithPing, WithPingAll {
      *
      * @return                          the timeout value
      */
-    @Override
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
         justification = "A Duration can't actually be mutated"
