@@ -32,6 +32,14 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.jcajce.interfaces.EdDSAPrivateKey;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
+import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -113,93 +121,30 @@ final class Pem {
      * @throws IOException              if IO operations fail
      */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
-        PemReader pemReader = new PemReader(input);
-
-        @Var PemObject readObject = null;
-
-        for (; ; ) {
-            PemObject nextObject = pemReader.readPemObject();
-
-            if (nextObject == null) {
-                break;
-            }
-
-            readObject = nextObject;
-
-            String objType = readObject.getType();
-
-            if (passphrase != null && !passphrase.isEmpty() && objType.equals(TYPE_ENCRYPTED_PRIVATE_KEY)) {
-                return decryptPrivateKey(readObject.getContent(), passphrase);
-            } else if (objType.equals(TYPE_PRIVATE_KEY)) {
-                return PrivateKeyInfo.getInstance(readObject.getContent());
-            }
-        }
-
-        if (readObject != null && readObject.getType().equals(TYPE_ENCRYPTED_PRIVATE_KEY)) {
-            throw new BadKeyException("PEM file contained an encrypted private key but no passphrase was given");
-        }
-
-        throw new BadKeyException("PEM file did not contain a private key");
-    }
-
-    /**
-     * Create a private key info object from a byte array.
-     *
-     * @param encodedStruct             the byte array
-     * @param passphrase                passphrase
-     * @return                          private key info object
-     * @throws IOException              if IO operations fail
-     */
-    private static PrivateKeyInfo decryptPrivateKey(byte[] encodedStruct, String passphrase) throws IOException {
-        var encryptedPrivateKeyInfo = EncryptedPrivateKeyInfo.getInstance(ASN1Primitive.fromByteArray(encodedStruct));
-
-        AlgorithmIdentifier encryptAlg = encryptedPrivateKeyInfo.getEncryptionAlgorithm();
-
-        if (!encryptAlg.getAlgorithm().equals(PKCSObjectIdentifiers.id_PBES2)) {
-            throw new BadKeyException("unsupported PEM key encryption: " + encryptAlg);
-        }
-
-        PBES2Parameters params = PBES2Parameters.getInstance(encryptAlg.getParameters());
-        KeyDerivationFunc kdf = params.getKeyDerivationFunc();
-        EncryptionScheme encScheme = params.getEncryptionScheme();
-
-        if (!kdf.getAlgorithm().equals(PKCSObjectIdentifiers.id_PBKDF2)) {
-            throw new BadKeyException("unsupported KDF: " + kdf.getAlgorithm());
-        }
-
-        if (!encScheme.getAlgorithm().equals(NISTObjectIdentifiers.id_aes128_CBC)) {
-            throw new BadKeyException("unsupported encryption: " + encScheme.getAlgorithm());
-        }
-
-        PBKDF2Params kdfParams = PBKDF2Params.getInstance(kdf.getParameters());
-
-        if (!kdfParams.getPrf().getAlgorithm().equals(PKCSObjectIdentifiers.id_hmacWithSHA256)) {
-            throw new BadKeyException("unsupported PRF: " + kdfParams.getPrf());
-        }
-
-        int keyLength = kdfParams.getKeyLength() != null
-            ? kdfParams.getKeyLength().intValue()
-            : Crypto.CBC_DK_LEN;
-
-        KeyParameter derivedKey = Crypto.deriveKeySha256(
-            passphrase,
-            kdfParams.getSalt(),
-            kdfParams.getIterationCount().intValue(),
-            keyLength);
-
-        AlgorithmParameters aesParams;
         try {
-            aesParams = AlgorithmParameters.getInstance("AES");
-        } catch (NoSuchAlgorithmException e) {
+            var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
+                .setProvider(new BouncyCastleProvider())
+                .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
+            try (final var parser = new PEMParser(input)) {
+                Object parsedObject = parser.readObject();
+                if (parsedObject == null) {
+                    throw new BadKeyException("PEM file did not contain a private key");
+                } else if (parsedObject instanceof PKCS8EncryptedPrivateKeyInfo) {
+                    var encryptedPrivateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parsedObject;
+                    return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptProvider);
+                } else if (parsedObject instanceof PrivateKeyInfo){
+                    return (PrivateKeyInfo) parsedObject;
+                } else {
+                    throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: " + parsedObject.getClass().getName());
+                }
+            }
+        } catch (PKCSException e) {
+            if (e.getMessage().contains("password empty")) {
+                throw new BadKeyException("PEM file contained an encrypted private key but no passphrase was given");
+            }
+            throw new RuntimeException(e);
+        } catch (OperatorCreationException e) {
             throw new RuntimeException(e);
         }
-        aesParams.init(encScheme.getParameters().toASN1Primitive().getEncoded());
-
-        Cipher cipher = Crypto.initAesCbc128Decrypt(derivedKey, aesParams);
-        byte[] decrypted = Crypto.runCipher(cipher, encryptedPrivateKeyInfo.getEncryptedData());
-
-        // we need to parse our input data as the cipher may add padding
-        ASN1InputStream inputStream = new ASN1InputStream(new ByteArrayInputStream(decrypted));
-        return PrivateKeyInfo.getInstance(inputStream.readObject());
     }
 }
