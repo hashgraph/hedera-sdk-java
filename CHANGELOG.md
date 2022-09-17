@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `Client.setMirrorTransportSecurity()`
  - `Client.mirrorIsTransportSecurity()`
  - `SolidityPrecompileExample`
+ - Improved PEM file support via `PrivateKey.fromPem()`
 
 ### Fixed
 
