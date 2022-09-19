@@ -23,11 +23,15 @@ import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import org.threeten.bp.Clock;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java8.util.concurrent.CompletableFuture.completedFuture;
@@ -40,7 +44,7 @@ import static java8.util.concurrent.CompletableFuture.failedFuture;
  * right after creating it, for instantiating a smart contract with bytecode in a file just created,
  * and internally by the network for detecting when duplicate transactions are submitted.
  */
-public final class TransactionId implements WithGetReceipt, WithGetRecord, Comparable<TransactionId> {
+public final class TransactionId implements Comparable<TransactionId> {
     /**
      * The Account ID that paid for this transaction.
      */
@@ -200,18 +204,32 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
-     * Return the receipt for the transaction.
+     * Fetch the receipt of the transaction.
      *
-     * @param client                    the configured client
-     * @return                          the receipt
+     * @param client                    The client with which this will be executed.
+     * @return                          the transaction receipt
      * @throws TimeoutException             when the transaction times out
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        return getReceipt(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Fetch the receipt of the transaction.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          the transaction receipt
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
+     */
+    public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = new TransactionReceiptQuery()
             .setTransactionId(this)
-            .execute(client);
+            .execute(client, timeout);
 
         if (receipt.status != Status.SUCCESS) {
             throw new ReceiptStatusException(this, receipt);
@@ -220,12 +238,27 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
         return receipt;
     }
 
-    @Override
-    @FunctionalExecutable(type = "TransactionReceipt", exceptionTypes = {"ReceiptStatusException"})
+    /**
+     * Fetch the receipt of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @return                          future result of the transaction receipt
+     */
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client) {
+        return getReceiptAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Fetch the receipt of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          the transaction receipt
+     */
+    public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client, Duration timeout) {
         return new TransactionReceiptQuery()
             .setTransactionId(this)
-            .executeAsync(client)
+            .executeAsync(client, timeout)
             .thenCompose(receipt -> {
                 if (receipt.status != Status.SUCCESS) {
                     return failedFuture(new ReceiptStatusException(this, receipt));
@@ -236,29 +269,146 @@ public final class TransactionId implements WithGetReceipt, WithGetRecord, Compa
     }
 
     /**
-     * Create a new transaction record.
+     * Fetch the receipt of the transaction asynchronously.
      *
-     * @param client                    the configured client
-     * @return                          the new receipt
+     * @param client                    The client with which this will be executed.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getReceiptAsync(Client client, BiConsumer<TransactionReceipt, Throwable> callback) {
+        ConsumerHelper.biConsumer(getReceiptAsync(client), callback);
+    }
+
+    /**
+     * Fetch the receipt of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getReceiptAsync(Client client, Duration timeout, BiConsumer<TransactionReceipt, Throwable> callback) {
+        ConsumerHelper.biConsumer(getReceiptAsync(client, timeout), callback);
+    }
+
+    /**
+     * Fetch the receipt of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getReceiptAsync(Client client, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getReceiptAsync(client), onSuccess, onFailure);
+    }
+
+    /**
+     * Fetch the receipt of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getReceiptAsync(client, timeout), onSuccess, onFailure);
+    }
+
+    /**
+     * Fetch the record of the transaction.
+     *
+     * @param client                    The client with which this will be executed.
+     * @return                          the transaction record
      * @throws TimeoutException             when the transaction times out
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        getReceipt(client);
+        return getRecord(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Fetch the record of the transaction.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          the transaction record
+     * @throws TimeoutException             when the transaction times out
+     * @throws PrecheckStatusException      when the precheck fails
+     * @throws ReceiptStatusException       when there is an issue with the receipt
+     */
+    public TransactionRecord getRecord(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        getReceipt(client, timeout);
 
         return new TransactionRecordQuery()
             .setTransactionId(this)
-            .execute(client);
+            .execute(client, timeout);
     }
 
-    @Override
-    @FunctionalExecutable(type = "TransactionRecord", exceptionTypes = {"ReceiptStatusException"})
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @return                          future result of the transaction record
+     */
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client) {
+        return getRecordAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          future result of the transaction record
+     */
+    public CompletableFuture<TransactionRecord> getRecordAsync(Client client, Duration timeout) {
         // note: we get the receipt first to ensure consensus has been reached
-        return getReceiptAsync(client).thenCompose(receipt -> new TransactionRecordQuery()
+        return getReceiptAsync(client, timeout).thenCompose(receipt -> new TransactionRecordQuery()
             .setTransactionId(this)
-            .executeAsync(client));
+            .executeAsync(client, timeout));
+    }
+
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getRecordAsync(Client client, BiConsumer<TransactionRecord, Throwable> callback) {
+        ConsumerHelper.biConsumer(getRecordAsync(client), callback);
+    }
+
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getRecordAsync(Client client, Duration timeout, BiConsumer<TransactionRecord, Throwable> callback) {
+        ConsumerHelper.biConsumer(getRecordAsync(client, timeout), callback);
+    }
+
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getRecordAsync(Client client, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getRecordAsync(client), onSuccess, onFailure);
+    }
+
+    /**
+     * Fetch the record of the transaction asynchronously.
+     *
+     * @param client                    The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getRecordAsync(client, timeout), onSuccess, onFailure);
     }
 
     /**

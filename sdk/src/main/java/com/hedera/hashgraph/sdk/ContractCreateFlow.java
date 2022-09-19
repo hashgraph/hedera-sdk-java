@@ -23,8 +23,11 @@ import com.google.protobuf.ByteString;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -32,6 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -80,7 +84,7 @@ import java.util.concurrent.TimeoutException;
  */
 
 // Re-use the WithExecute interface that was generated for Executable
-public class ContractCreateFlow implements WithExecute<TransactionResponse> {
+public class ContractCreateFlow {
     static final int FILE_CREATE_MAX_BYTES = 2048;
 
     private String bytecode = "";
@@ -548,57 +552,129 @@ public class ContractCreateFlow implements WithExecute<TransactionResponse> {
     }
 
     /**
-     * Execute the transaction from the passed in client.
+     * Execute the transactions in the flow with the passed in client.
      *
      * @param client                    the client with the transaction to execute
      * @return                          the response
      * @throws PrecheckStatusException  when the precheck fails
      * @throws TimeoutException         when the transaction times out
      */
-    @Override
     public TransactionResponse execute(Client client) throws PrecheckStatusException, TimeoutException {
+        return execute(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
+     * @return                          the response
+     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException         when the transaction times out
+     */
+    public TransactionResponse execute(Client client, Duration timeoutPerTransaction) throws PrecheckStatusException, TimeoutException {
         try {
             splitBytecode();
             var fileId = createFileCreateTransaction(client)
-                .execute(client)
-                .getReceipt(client)
+                .execute(client, timeoutPerTransaction)
+                .getReceipt(client, timeoutPerTransaction)
                 .fileId;
             Objects.requireNonNull(fileId);
             if (!appendBytecode.isEmpty()) {
                 createFileAppendTransaction(fileId)
-                    .execute(client);
+                    .execute(client, timeoutPerTransaction);
             }
-            var response = createContractCreateTransaction(fileId).execute(client);
-            response.getReceipt(client);
+            var response = createContractCreateTransaction(fileId).execute(client, timeoutPerTransaction);
+            response.getReceipt(client, timeoutPerTransaction);
             new FileDeleteTransaction()
                 .setFileId(fileId)
-                .execute(client);
+                .execute(client, timeoutPerTransaction);
             return response;
         } catch (ReceiptStatusException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @return                          the response
+     */
     public CompletableFuture<TransactionResponse> executeAsync(Client client) {
+        return executeAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
+     * @return                          the response
+     */
+    public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
         splitBytecode();
-        return createFileCreateTransaction(client).executeAsync(client).thenCompose(fileCreateResponse -> {
+        return createFileCreateTransaction(client).executeAsync(client, timeoutPerTransaction).thenCompose(fileCreateResponse -> {
             return createTransactionReceiptQuery(fileCreateResponse)
-                .executeAsync(client)
+                .executeAsync(client, timeoutPerTransaction)
                 .thenApply(receipt -> receipt.fileId);
         }).thenCompose(fileId -> {
             CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
-                createFileAppendTransaction(fileId).executeAsync(client).thenApply(ignored -> null);
+                createFileAppendTransaction(fileId).executeAsync(client, timeoutPerTransaction).thenApply(ignored -> null);
             return appendFuture.thenCompose(ignored -> {
-                return createContractCreateTransaction(fileId).executeAsync(client).thenApply(contractCreateResponse -> {
-                    contractCreateResponse.getReceiptAsync(client).thenRun(() -> {
+                return createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction).thenApply(contractCreateResponse -> {
+                    createTransactionReceiptQuery(contractCreateResponse).executeAsync(client, timeoutPerTransaction).thenRun(() -> {
                         new FileDeleteTransaction()
                             .setFileId(fileId)
-                            .executeAsync(client);
+                            .executeAsync(client, timeoutPerTransaction);
                     });
                     return contractCreateResponse;
                 });
             });
         });
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAsync(Client client, BiConsumer<TransactionResponse, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAsync(client), callback);
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAsync(Client client, Duration timeoutPerTransaction, BiConsumer<TransactionResponse, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAsync(client, timeoutPerTransaction), callback);
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAsync(Client client, Consumer<TransactionResponse> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAsync(client), onSuccess, onFailure);
+    }
+
+    /**
+     * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * @param client                    the client with the transaction to execute
+     * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAsync(Client client, Duration timeoutPerTransaction, Consumer<TransactionResponse> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAsync(client, timeoutPerTransaction), onSuccess, onFailure);
     }
 }

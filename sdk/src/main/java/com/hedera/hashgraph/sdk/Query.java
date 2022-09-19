@@ -29,7 +29,9 @@ import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.grpc.MethodDescriptor;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
+import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -37,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -45,7 +48,7 @@ import java.util.concurrent.TimeoutException;
  * @param <O> The output type of the query.
  * @param <T> The type of the query itself. Used to enable chaining.
  */
-public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.hedera.hashgraph.sdk.proto.Query, Response, O> implements WithGetCost {
+public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.hedera.hashgraph.sdk.proto.Query, Response, O> {
     private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
@@ -140,23 +143,95 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     }
 
     /**
-     * Calculate the expected cost.
+     * Fetch the expected cost.
      *
-     * @param client                    the configured client
+     * @param client                    the client
      * @return                          the cost in hbar
      * @throws TimeoutException         when the transaction times out
      * @throws PrecheckStatusException  when the precheck fails
      */
     public Hbar getCost(Client client) throws TimeoutException, PrecheckStatusException {
-        initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client);
+        return getCost(client, client.getRequestTimeout());
     }
 
-    @Override
-    @FunctionalExecutable(type = "Hbar")
-    public CompletableFuture<Hbar> getCostAsync(Client client) {
+    /**
+     * Fetch the expected cost.
+     *
+     * @param client                    the client
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          the cost in hbar
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
+     */
+    public Hbar getCost(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client);
+        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client, timeout);
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @return                          Future result of the cost in hbar
+     */
+    public CompletableFuture<Hbar> getCostAsync(Client client) {
+        return getCostAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return                          Future result of the cost in hbar
+     */
+    public CompletableFuture<Hbar> getCostAsync(Client client, Duration timeout) {
+        initWithNodeIds(client);
+        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client, timeout);
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getCostAsync(Client client, Duration timeout, BiConsumer<Hbar, Throwable> callback) {
+        ConsumerHelper.biConsumer(getCostAsync(client, timeout), callback);
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void getCostAsync(Client client, BiConsumer<Hbar, Throwable> callback) {
+        ConsumerHelper.biConsumer(getCostAsync(client), callback);
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getCostAsync(Client client, Duration timeout, Consumer<Hbar> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getCostAsync(client, timeout), onSuccess, onFailure);
+    }
+
+    /**
+     * Fetch the expected cost asynchronously.
+     *
+     * @param client                    the client
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void getCostAsync(Client client, Consumer<Hbar> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(getCostAsync(client), onSuccess, onFailure);
     }
 
     /**

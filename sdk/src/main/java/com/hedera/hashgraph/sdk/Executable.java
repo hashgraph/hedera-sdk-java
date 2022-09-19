@@ -29,6 +29,7 @@ import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
@@ -56,7 +57,7 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
  * @param <ResponseT>                   the response
  * @param <O>                           the O type
  */
-abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, ResponseT extends MessageLite, O> implements WithExecute<O> {
+abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, ResponseT extends MessageLite, O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -316,8 +317,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      *
      * @param client The client with which this will be executed.
      * @return Result of execution
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
+     * @throws TimeoutException when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
     public O execute(Client client) throws TimeoutException, PrecheckStatusException {
         return execute(client, client.getRequestTimeout());
@@ -329,10 +330,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * @param client The client with which this will be executed.
      * @param timeout The timeout after which the execution attempt will be cancelled.
      * @return Result of execution
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
+     * @throws TimeoutException when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
-    @Override
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
 
@@ -408,10 +408,19 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * @param client The client with which this will be executed.
      * @return Future result of execution
      */
-    @Override
-    @FunctionalExecutable
     public CompletableFuture<O> executeAsync(Client client) {
-        var retval = new CompletableFuture<O>().orTimeout(client.getRequestTimeout().toMillis(), TimeUnit.MILLISECONDS);
+        return executeAsync(client, client.getRequestTimeout());
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return Future result of execution
+     */
+    public CompletableFuture<O> executeAsync(Client client, Duration timeout) {
+        var retval = new CompletableFuture<O>().orTimeout(timeout.toMillis(), TimeUnit.MILLISECONDS);
 
         mergeFromClient(client);
 
@@ -425,6 +434,50 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             return null;
         });
         return retval;
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAsync(Client client, BiConsumer<O, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAsync(client), callback);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param callback a BiConsumer which handles the result or error.
+     */
+    public void executeAsync(Client client, Duration timeout, BiConsumer<O, Throwable> callback) {
+        ConsumerHelper.biConsumer(executeAsync(client, timeout), callback);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAsync(Client client, Consumer<O> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAsync(client), onSuccess, onFailure);
+    }
+
+    /**
+     * Execute this transaction or query asynchronously.
+     *
+     * @param client The client with which this will be executed.
+     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess a Consumer which consumes the result on success.
+     * @param onFailure a Consumer which consumes the error on failure.
+     */
+    public void executeAsync(Client client, Duration timeout, Consumer<O> onSuccess, Consumer<Throwable> onFailure) {
+        ConsumerHelper.twoConsumers(executeAsync(client, timeout), onSuccess, onFailure);
     }
 
     @VisibleForTesting

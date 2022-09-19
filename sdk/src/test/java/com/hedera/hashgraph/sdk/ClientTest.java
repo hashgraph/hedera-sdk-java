@@ -22,6 +22,7 @@ package com.hedera.hashgraph.sdk;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.threeten.bp.Duration;
@@ -242,13 +243,16 @@ class ClientTest {
         client.close();
     }
 
-    @Test
-    void testExecuteAsyncTimeout() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+        "onClient",
+        "onQuery"
+    })
+    void testExecuteAsyncTimeout(String timeoutSite) throws Exception {
         AccountId accountId = AccountId.fromString("0.0.1");
         Duration timeout = Duration.ofSeconds(5);
 
         Client client = Client.forNetwork(Map.of("127.0.0.1:50211", accountId))
-            .setRequestTimeout(timeout)
             .setNodeMinBackoff(Duration.ofMillis(0))
             .setNodeMaxBackoff(Duration.ofMillis(0))
             .setMinNodeReadmitTime(Duration.ofMillis(0))
@@ -259,7 +263,12 @@ class ClientTest {
         Instant start = Instant.now();
 
         try {
-            query.executeAsync(client).get();
+            if (timeoutSite.equals("onClient")) {
+                client.setRequestTimeout(timeout);
+                query.executeAsync(client).get();
+            } else {
+                query.executeAsync(client, timeout).get();
+            }
         } catch (ExecutionException e) {
             // fine...
         }
@@ -271,8 +280,12 @@ class ClientTest {
         client.close();
     }
 
-    @Test
-    void testExecuteSyncTimeout() throws Exception {
+    @ParameterizedTest
+    @CsvSource({
+        "onClient",
+        "onQuery"
+    })
+    void testExecuteSyncTimeout(String timeoutSite) throws Exception {
         AccountId accountId = AccountId.fromString("0.0.1");
         // Executing requests in sync mode will require at most 10 seconds to connect
         // to a gRPC node. If we're not able to connect to a gRPC node within 10 seconds
@@ -284,21 +297,31 @@ class ClientTest {
         Duration timeout = Duration.ofSeconds(5);
 
         Client client = Client.forNetwork(Map.of("127.0.0.1:50211", accountId))
-                .setRequestTimeout(timeout);
+            .setNodeMinBackoff(Duration.ofMillis(0))
+            .setNodeMaxBackoff(Duration.ofMillis(0))
+            .setMinNodeReadmitTime(Duration.ofMillis(0))
+            .setMaxNodeReadmitTime(Duration.ofMillis(0));
+
         AccountBalanceQuery query = new AccountBalanceQuery()
-                .setAccountId(accountId)
-                .setMaxAttempts(3);
+            .setAccountId(accountId)
+            .setMaxAttempts(3)
+            .setGrpcDeadline(Duration.ofSeconds(5));
         Instant start = Instant.now();
 
         try {
-            query.execute(client);
+            if (timeoutSite.equals("onClient")) {
+                client.setRequestTimeout(timeout);
+                query.execute(client);
+            } else {
+                query.execute(client, timeout);
+            }
         } catch (TimeoutException e) {
             // fine...
         }
         long secondsTaken = java.time.Duration.between(start, Instant.now()).toSeconds();
 
         // 20 seconds would indicate we tried 2 times to connect
-        assertThat(secondsTaken).isLessThan(20);
+        assertThat(secondsTaken).isLessThan(15);
 
         client.close();
     }
