@@ -182,17 +182,21 @@ public class ContractHelper {
                 tx.sign(signer);
             }
 
-            TransactionRecord record = tx
-                .execute(client)
-                .getRecord(client);
+            TransactionResponse response = tx.execute(client);
+            response.getReceiptQuery().execute(client);
+            TransactionRecord record = response.getRecordQuery().execute(client);
 
             ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
 
-            if (getResultValidator(stepIndex).apply(functionResult)) {
-                System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
-            } else {
+            try {
+                if (getResultValidator(stepIndex).apply(functionResult)) {
+                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
+                } else {
+                    throw new Exception("step " + stepIndex + " returned invalid result");
+                }
+            } catch (Throwable error) {
+                System.out.println("Error occurred: " + error.getMessage());
                 System.out.println("Transaction record: " + record);
-                throw new Exception("step " + stepIndex + " returned invalid result");
             }
         }
         return this;

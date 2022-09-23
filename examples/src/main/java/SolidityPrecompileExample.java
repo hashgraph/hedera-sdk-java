@@ -58,6 +58,8 @@ public class SolidityPrecompileExample {
                 .accountId
             );
 
+            System.out.println("Alice ID: " + aliceAccountId);
+
             // Instantiate ContractHelper
 
             ContractHelper contractHelper = new ContractHelper(
@@ -94,8 +96,10 @@ public class SolidityPrecompileExample {
                         .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}});
                 }) // and alice must sign to become associated with the token.
                 .addSignerForStep(13, alicePrivateKey)
-                // Alice must sign to burn the token because her key is the supply key
-                .addSignerForStep(16, alicePrivateKey);
+                    .setResultValidatorForStep(15, contractFunctionResult -> {
+                        System.out.println("owner address is " + AccountId.fromSolidityAddress(contractFunctionResult.getAddress(0)));
+                        return true;
+                    });
 
             // step 0 tests pseudo random number generator (PRNG)
             // step 1 creates a fungible token
@@ -112,7 +116,7 @@ public class SolidityPrecompileExample {
             // step 16 burn some NFTs
 
             contractHelper
-                .executeSteps(/* from step */ 0, /* to step */ 16, client)
+                .executeSteps(/* from step */ 11, /* to step */ 15, client)
             ;
 
             System.out.println("All steps completed with valid results.");
