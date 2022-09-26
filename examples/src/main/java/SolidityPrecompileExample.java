@@ -97,10 +97,13 @@ public class SolidityPrecompileExample {
                         .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}});
                 }) // and alice must sign to become associated with the token.
                 .addSignerForStep(13, alicePrivateKey)
-                    .setResultValidatorForStep(15, contractFunctionResult -> {
-                        System.out.println("function response code is " + Status.fromResponseCode(contractFunctionResult.getInt32(0)) + ",  owner address is " + AccountId.fromSolidityAddress(contractFunctionResult.getAddress(1)));
-                        return true;
-                    });
+                .setResultValidatorForStep(15, contractFunctionResult -> {
+                    System.out.println("function response code is " + Status.fromResponseCode(contractFunctionResult.getInt32(0)) + ",  owner address is " + AccountId.fromSolidityAddress(contractFunctionResult.getAddress(1)));
+                    return true;
+                }).setResultValidatorForStep(16, contractFunctionResult -> {
+                    System.out.println("$1 = " + Hbar.fromTinybars(contractFunctionResult.getInt32(0)));
+                    return true;
+                });
 
             // step 0 tests pseudo random number generator (PRNG)
             // step 1 creates a fungible token
@@ -117,7 +120,7 @@ public class SolidityPrecompileExample {
             // step 16 burn some NFTs
 
             contractHelper
-                .executeSteps(/* from step */ 11, /* to step */ 15, client)
+                .executeSteps(/* from step */ 11, /* to step */ 16, client)
             ;
 
             System.out.println("All steps completed with valid results.");

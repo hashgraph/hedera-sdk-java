@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity >=0.4.9 <0.9.0;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 31 2022
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 26 2022
 
 interface IPrngSystemContract {
     // Generates a 256-bit pseudorandom seed using the first 256-bits of running hash of n-3 transaction record.

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 31 2022
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 26 2022
 
 import "./IPrngSystemContract.sol";
 

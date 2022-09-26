@@ -2,7 +2,7 @@
 pragma solidity >=0.4.9 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 31 2022
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 26 2022
 
 interface IHederaTokenService {
 

@@ -3,12 +3,13 @@ pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
 import "./ExpiryHelper.sol";
+import "./SelfFunding.sol";
 
 // To alter the behavior of the SolidityPrecompileExample, re-compile this solidity file
 // (you will also need the other files in this directory)
 // and copy the outputted json file to ./PrecompileExample.json
 
-contract PrecompileExample is ExpiryHelper {
+contract PrecompileExample is ExpiryHelper, SelfFunding {
     address payable owner;
     address payable aliceAccount;
     address fungibleToken;
@@ -92,7 +93,7 @@ contract PrecompileExample is ExpiryHelper {
     }
 
     function step15() external returns (int responseCode, address ownerAddress) {
-        //require(msg.sender == owner);
+        require(msg.sender == owner);
 
         IHederaTokenService.NonFungibleTokenInfo memory info;
         (responseCode, info) = getNonFungibleTokenInfo(nftToken, 1);
@@ -101,6 +102,14 @@ contract PrecompileExample is ExpiryHelper {
         } else {
             ownerAddress = address(0);
         }
+    }
+
+    function step16() external returns (int tinybars) {
+        require(msg.sender == owner);
+
+        // 1 cent = 100_000_000 tinycents, so 10_000_000_000 tinycents = 1$
+        // (See docs in IExchangeRate.sol)
+        tinybars = int(tinycentsToTinybars(10_000_000_000));
     }
 }
 
