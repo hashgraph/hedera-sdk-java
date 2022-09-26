@@ -7,6 +7,7 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
@@ -97,7 +98,7 @@ public class SolidityPrecompileExample {
                 }) // and alice must sign to become associated with the token.
                 .addSignerForStep(13, alicePrivateKey)
                     .setResultValidatorForStep(15, contractFunctionResult -> {
-                        System.out.println("owner address is " + AccountId.fromSolidityAddress(contractFunctionResult.getAddress(0)));
+                        System.out.println("function response code is " + Status.fromResponseCode(contractFunctionResult.getInt32(0)) + ",  owner address is " + AccountId.fromSolidityAddress(contractFunctionResult.getAddress(1)));
                         return true;
                     });
 

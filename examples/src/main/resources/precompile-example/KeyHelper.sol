@@ -2,8 +2,6 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 31 2022
-
 import "./HederaTokenService.sol";
 
 contract KeyHelper is HederaTokenService {

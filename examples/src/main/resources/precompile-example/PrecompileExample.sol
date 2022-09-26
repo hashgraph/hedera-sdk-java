@@ -3,13 +3,12 @@ pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
 import "./ExpiryHelper.sol";
-import "./PrngSystemContract.sol";
 
 // To alter the behavior of the SolidityPrecompileExample, re-compile this solidity file
 // (you will also need the other files in this directory)
 // and copy the outputted json file to ./PrecompileExample.json
 
-contract PrecompileExample is ExpiryHelper, PrngSystemContract {
+contract PrecompileExample is ExpiryHelper {
     address payable owner;
     address payable aliceAccount;
     address fungibleToken;
@@ -92,13 +91,16 @@ contract PrecompileExample is ExpiryHelper, PrngSystemContract {
         );
     }
 
-    function step15() external returns (address ownerAddress) {
-        require(msg.sender == owner);
+    function step15() external returns (int responseCode, address ownerAddress) {
+        //require(msg.sender == owner);
 
-        int responseCode;
         IHederaTokenService.NonFungibleTokenInfo memory info;
         (responseCode, info) = getNonFungibleTokenInfo(nftToken, 1);
-        ownerAddress = info.ownerId;
+        if (responseCode == SUCCESS) {
+            ownerAddress = info.ownerId;
+        } else {
+            ownerAddress = address(0);
+        }
     }
 }
 

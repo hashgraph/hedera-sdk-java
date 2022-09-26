@@ -142,7 +142,7 @@ interface IHederaTokenService {
         // IWA Compatibility. Depends on TokenSupplyType. For tokens of type FUNGIBLE_COMMON - the
         // maximum number of tokens that can be in circulation. For tokens of type NON_FUNGIBLE_UNIQUE -
         // the maximum number of NFTs (serial numbers) that can be minted. This field can never be changed!
-        uint32 maxSupply;
+        int64 maxSupply;
 
         // The default Freeze status (frozen or unfrozen) of Hedera accounts relative to this token. If
         // true, an account must be unfrozen before it can receive the token
@@ -157,6 +157,8 @@ interface IHederaTokenService {
 
     /// Additional post creation fungible and non fungible properties of a Hedera Token.
     struct TokenInfo {
+        /*
+        THIS VERSION IS FROM https://github.com/hashgraph/hedera-smart-contracts
         /// The hedera token;
         HederaToken hedera;
 
@@ -183,6 +185,28 @@ interface IHederaTokenService {
 
         /// The number of tokens (fungible) or serials (non-fungible) of the token
         uint64 totalSupply;
+        */
+
+        // THIS VERSION IS FROM https://github.com/hashgraph/hedera-json-rpc-relay/blob/main/packages/server/tests/contracts/IHederaTokenService.sol
+
+        //Basic properties of a Hedera Token
+        HederaToken token;
+        //The number of tokens (fungible) or serials (non-fungible) of the token
+        uint64 totalSupply;
+        //Specifies whether the token is deleted or not
+        bool deleted;
+        //Specifies whether the token kyc was defaulted with KycNotApplicable (true) or Revoked (false)
+        bool defaultKycStatus;
+        //Specifies whether the token is currently paused or not
+        bool pauseStatus;
+        //The fixed fees collected when transferring the token
+        FixedFee[] fixedFees;
+        //The fractional fees collected when transferring the token
+        FractionalFee[] fractionalFees;
+        //The royalty fees collected when transferring the token
+        RoyaltyFee[] royaltyFees;
+        //The ID of the network ledger
+        string ledgerId;
     }
 
     /// Additional fungible properties of a Hedera Token.
@@ -397,8 +421,8 @@ interface IHederaTokenService {
     /// @return tokenAddress the created token's address
     function createFungibleToken(
         HederaToken memory token,
-        uint initialTotalSupply,
-        uint decimals
+        uint64 initialTotalSupply,
+        uint32 decimals
     ) external payable returns (int64 responseCode, address tokenAddress);
 
     /// Creates a Fungible Token with the specified properties
@@ -412,8 +436,8 @@ interface IHederaTokenService {
     /// @return tokenAddress the created token's address
     function createFungibleTokenWithCustomFees(
         HederaToken memory token,
-        uint initialTotalSupply,
-        uint decimals,
+        uint64 initialTotalSupply,
+        uint32 decimals,
         FixedFee[] memory fixedFees,
         FractionalFee[] memory fractionalFees
     ) external payable returns (int64 responseCode, address tokenAddress);
@@ -537,7 +561,7 @@ interface IHederaTokenService {
     /// @param serialNumber The NFT to find the approved address for
     /// @return responseCode The response code for the status of the request. SUCCESS is 22.
     /// @return approved The approved address for this NFT, or the zero address if there is none
-    function getApproved(address token, int64 serialNumber)
+    function getApproved(address token, uint256 serialNumber)
         external
         returns (int64 responseCode, address approved);
 

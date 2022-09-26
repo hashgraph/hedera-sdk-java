@@ -189,6 +189,7 @@ public class ContractHelper {
             ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
 
             try {
+                System.out.println("gas used: " + functionResult.gasUsed);
                 if (getResultValidator(stepIndex).apply(functionResult)) {
                     System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
                 } else {
@@ -197,6 +198,7 @@ public class ContractHelper {
             } catch (Throwable error) {
                 System.out.println("Error occurred: " + error.getMessage());
                 System.out.println("Transaction record: " + record);
+                break;
             }
         }
         return this;
