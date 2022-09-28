@@ -29,6 +29,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
@@ -80,6 +81,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      */
     @Nullable
     private Duration autoRenewPeriod = null;
+
+    @Nullable
+    private Instant expirationTime = null;
 
     /**
      * Constructor.
@@ -313,6 +317,36 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * @return Expiration time
+     */
+    @Nullable
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "An Instant can't actually be mutated"
+    )
+    public Instant getExpirationTime() {
+        return expirationTime;
+    }
+
+    /**
+     * Sets the effective consensus timestamp at (and after) which all consensus transactions and queries will fail.
+     * The expirationTime may be no longer than MAX_AUTORENEW_PERIOD (8000001 seconds) from the consensus timestamp of
+     * this transaction.
+     * On topics with no adminKey, extending the expirationTime is the only updateTopic option allowed on the topic.
+     * @param expirationTime the new expiration time
+     * @return {@code this}
+     */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "An Instant can't actually be mutated"
+    )
+    public TopicUpdateTransaction setExpirationTime(Instant expirationTime) {
+        requireNotFrozen();
+        this.expirationTime = Objects.requireNonNull(expirationTime);
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -334,6 +368,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
         if (body.hasMemo()) {
             topicMemo = body.getMemo().getValue();
+        }
+        if (body.hasExpirationTime()) {
+            expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
         }
     }
 
@@ -362,6 +399,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
         if (topicMemo != null) {
             builder.setMemo(StringValue.of(topicMemo));
+        }
+        if (expirationTime != null) {
+            builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
         }
         return builder;
     }
