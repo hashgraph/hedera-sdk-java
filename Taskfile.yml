@@ -81,7 +81,7 @@ tasks:
 
     publish:
         env:
-            FILES: "sdk/src/main/java/com/hedera/hashgraph/sdk/*.java executable-processor/src/main/java/com/hedera/hashgraph/sdk/*.java"
+            FILES: "sdk/src/main/java/com/hedera/hashgraph/sdk/*.java
         preconditions:
             - git diff-index --quiet HEAD
         cmds:
@@ -102,4 +102,4 @@ tasks:
             - perl -p -i -e "s#sdk\.gradle#sdk-full.gradle#g" sdk/build.gradle
             - git clean -ffdx
             - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-            - git restore sdk executable-processor
+            - git restore sdk
