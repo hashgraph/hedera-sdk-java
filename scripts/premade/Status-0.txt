@@ -21,6 +21,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 
+import java.util.Objects;
+
 /**
  * Returned in {@link TransactionReceipt}, {@link PrecheckStatusException}
  * and {@link ReceiptStatusException}.
