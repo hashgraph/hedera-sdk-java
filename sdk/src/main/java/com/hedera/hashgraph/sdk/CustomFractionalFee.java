@@ -29,7 +29,7 @@ import java.util.Objects;
  * Custom fractional fee utility class.
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee">Hedera Documentation</a>
  */
-public class CustomFractionalFee extends CustomFee {
+public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     private long numerator = 0;
     private long denominator = 1;
     private long min = 0;
@@ -40,23 +40,6 @@ public class CustomFractionalFee extends CustomFee {
      * Constructor.
      */
     public CustomFractionalFee() {
-    }
-
-    /**
-     * Clone a custom fractional fee object.
-     *
-     * @param source                    the source fee object
-     * @return                          the new custom fractional fee object
-     */
-    static CustomFractionalFee clonedFrom(CustomFractionalFee source) {
-        var returnFee = new CustomFractionalFee();
-        returnFee.numerator = source.numerator;
-        returnFee.denominator = source.denominator;
-        returnFee.min = source.min;
-        returnFee.max = source.max;
-        returnFee.assessmentMethod = source.assessmentMethod;
-        returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
-        return returnFee;
     }
 
     /**
@@ -75,29 +58,15 @@ public class CustomFractionalFee extends CustomFee {
             .setAssessmentMethod(FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers()));
     }
 
-    /**
-     * Create a custom fractional fee from a fixed fee protobuf.
-     *
-     * @param customFee                 the custom fee protobuf
-     * @return                          the new custom fractional fee object
-     */
-    static CustomFractionalFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        var returnFee = fromProtobuf(customFee.getFractionalFee());
-        if (customFee.hasFeeCollectorAccountId()) {
-            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
-        }
-        return returnFee;
-    }
-
-    /**
-     * Assign the fee collector account id.
-     *
-     * @param feeCollectorAccountId     the account id of the fee collector
-     * @return {@code this}
-     */
-    public CustomFractionalFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
-        doSetFeeCollectorAccountId(feeCollectorAccountId);
-        return this;
+    @Override
+    CustomFractionalFee deepCloneSubclass() {
+        return new CustomFractionalFee()
+            .setNumerator(numerator)
+            .setDenominator(denominator)
+            .setMin(min)
+            .setMax(max)
+            .setAssessmentMethod(assessmentMethod)
+            .finishDeepClone(this);
     }
 
     /**
@@ -211,8 +180,7 @@ public class CustomFractionalFee extends CustomFee {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("feeCollectorAccountId", getFeeCollectorAccountId())
+        return toStringHelper()
             .add("numerator", getNumerator())
             .add("denominator", getDenominator())
             .add("min", getMin())

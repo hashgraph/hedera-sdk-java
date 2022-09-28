@@ -30,7 +30,7 @@ import java.util.Objects;
  * Custom royalty fee utility class.
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee">Hedera Documentation</a>
  */
-public class CustomRoyaltyFee extends CustomFee {
+public class CustomRoyaltyFee extends CustomFeeBase<CustomRoyaltyFee> {
     private long numerator = 0;
     private long denominator = 1;
     @Nullable
@@ -40,22 +40,6 @@ public class CustomRoyaltyFee extends CustomFee {
      * Constructor.
      */
     public CustomRoyaltyFee() {
-    }
-
-    /**
-     * Clone the custom royalty fee object.
-     *
-     * @param source                    the source fee object
-     * @return                          the new custom fee object
-     */
-    static CustomRoyaltyFee clonedFrom(CustomRoyaltyFee source) {
-        var returnFee = new CustomRoyaltyFee();
-        returnFee.numerator = source.numerator;
-        returnFee.denominator = source.denominator;
-        returnFee.fallbackFee = source.fallbackFee != null ?
-            CustomFixedFee.clonedFrom(source.fallbackFee) : null;
-        returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
-        return returnFee;
     }
 
     /**
@@ -75,29 +59,16 @@ public class CustomRoyaltyFee extends CustomFee {
         return returnFee;
     }
 
-    /**
-     * Create a royalty fee from a custom fee protobuf.
-     *
-     * @param customFee                 the custom fee protobuf
-     * @return                          the custom fee
-     */
-    static CustomRoyaltyFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        var returnFee = fromProtobuf(customFee.getRoyaltyFee());
-        if (customFee.hasFeeCollectorAccountId()) {
-            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
-        }
+    @Override
+    CustomRoyaltyFee deepCloneSubclass() {
+        var returnFee = new CustomRoyaltyFee();
+        returnFee.numerator = numerator;
+        returnFee.denominator = denominator;
+        returnFee.fallbackFee = fallbackFee != null ? fallbackFee.deepCloneSubclass() : null;
+        returnFee.feeCollectorAccountId = feeCollectorAccountId;
+        returnFee.allCollectorsAreExempt = allCollectorsAreExempt;
         return returnFee;
-    }
 
-    /**
-     * Assign the fee collector account id.
-     *
-     * @param feeCollectorAccountId     the account id of the fee collector
-     * @return {@code this}
-     */
-    public CustomRoyaltyFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
-        doSetFeeCollectorAccountId(feeCollectorAccountId);
-        return this;
     }
 
     /**
@@ -149,7 +120,7 @@ public class CustomRoyaltyFee extends CustomFee {
      */
     public CustomRoyaltyFee setFallbackFee(CustomFixedFee fallbackFee) {
         Objects.requireNonNull(fallbackFee);
-        this.fallbackFee = CustomFixedFee.clonedFrom(fallbackFee);
+        this.fallbackFee = fallbackFee.deepCloneSubclass();
         return this;
     }
 
@@ -160,7 +131,7 @@ public class CustomRoyaltyFee extends CustomFee {
      */
     @Nullable
     public CustomFixedFee getFallbackFee() {
-        return this.fallbackFee;
+        return fallbackFee != null ? fallbackFee.deepCloneSubclass() : null;
     }
 
     /**
@@ -190,7 +161,7 @@ public class CustomRoyaltyFee extends CustomFee {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
+        return toStringHelper()
             .add("numerator", numerator)
             .add("denominator", denominator)
             .add("fallbackFee", fallbackFee)
