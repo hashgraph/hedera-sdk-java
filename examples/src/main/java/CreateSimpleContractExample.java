@@ -57,10 +57,7 @@ public final class CreateSimpleContractExample {
     }
 
     public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
-        JsonObject jsonObject = ContractHelper.getJsonResource("hello_world.json");
-
-        String byteCodeHex = jsonObject.getAsJsonPrimitive("object")
-            .getAsString();
+        String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
 
 
         Client client = Client.forName(HEDERA_NETWORK);

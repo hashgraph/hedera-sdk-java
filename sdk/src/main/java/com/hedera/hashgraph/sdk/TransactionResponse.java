@@ -47,6 +47,8 @@ public final class TransactionResponse {
 
     public final TransactionId transactionId;
 
+    private boolean validateStatus = true;
+
     @Nullable
     @Deprecated
     public final TransactionId scheduledTransactionId;
@@ -69,6 +71,24 @@ public final class TransactionResponse {
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
         this.scheduledTransactionId = scheduledTransactionId;
+    }
+
+    /**
+     *
+     * @return whether `getReceipt()` or `getRecord()` will throw an exception if the receipt status is not SUCCESS
+     */
+    public boolean getValidateStatus() {
+        return validateStatus;
+    }
+
+    /**
+     *
+     * @param validateStatus whether `getReceipt()` or `getRecord()` will throw an exception if the receipt status is not SUCCESS
+     * @return {@code this}
+     */
+    public TransactionResponse setValidateStatus(boolean validateStatus) {
+        this.validateStatus = validateStatus;
+        return this;
     }
 
     /**
@@ -97,7 +117,7 @@ public final class TransactionResponse {
     public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         var receipt = getReceiptQuery().execute(client, timeout);
 
-        if (receipt.status != Status.SUCCESS) {
+        if (validateStatus && receipt.status != Status.SUCCESS) {
             throw new ReceiptStatusException(transactionId, receipt);
         }
 

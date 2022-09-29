@@ -57,11 +57,7 @@ public final class CreateStatefulContractExample {
     }
 
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException {
-        JsonObject jsonObject = ContractHelper.getJsonResource("stateful.json");
-
-        String byteCodeHex = jsonObject.getAsJsonPrimitive("object")
-            .getAsString();
-        byte[] byteCode = byteCodeHex.getBytes(StandardCharsets.UTF_8);
+        String byteCodeHex = ContractHelper.getBytecodeHex("stateful.json");
 
         Client client = Client.forName(HEDERA_NETWORK);
 
@@ -77,7 +73,7 @@ public final class CreateStatefulContractExample {
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
             .setKeys(OPERATOR_KEY)
-            .setContents(byteCode)
+            .setContents(byteCodeHex)
             .execute(client);
 
 
