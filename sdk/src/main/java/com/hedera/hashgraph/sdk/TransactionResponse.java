@@ -75,7 +75,7 @@ public final class TransactionResponse {
 
     /**
      *
-     * @return whether `getReceipt()` or `getRecord()` will throw an exception if the receipt status is not SUCCESS
+     * @return whether getReceipt() or getRecord() will throw an exception if the receipt status is not SUCCESS
      */
     public boolean getValidateStatus() {
         return validateStatus;
@@ -83,7 +83,7 @@ public final class TransactionResponse {
 
     /**
      *
-     * @param validateStatus whether `getReceipt()` or `getRecord()` will throw an exception if the receipt status is not SUCCESS
+     * @param validateStatus whether getReceipt() or getRecord() will throw an exception if the receipt status is not SUCCESS
      * @return {@code this}
      */
     public TransactionResponse setValidateStatus(boolean validateStatus) {

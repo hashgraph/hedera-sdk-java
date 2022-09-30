@@ -281,6 +281,13 @@ public final class TransactionReceipt {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());
     }
 
+    /**
+     * Validate the transaction status in the receipt.
+     *
+     * @param shouldValidate Whether to perform transaction status validation
+     * @return {@code this}
+     * @throws ReceiptStatusException when shouldValidate is true and the transaction status is not SUCCESS
+     */
     public TransactionReceipt validateStatus(boolean shouldValidate) throws ReceiptStatusException {
         if (shouldValidate && status != Status.SUCCESS) {
             throw new ReceiptStatusException(transactionId, this);
