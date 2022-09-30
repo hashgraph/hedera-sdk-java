@@ -51,6 +51,8 @@ public final class TransactionResponse {
     @Deprecated
     public final TransactionId scheduledTransactionId;
 
+    private boolean validateStatus = true;
+
     /**
      * Constructor.
      *
@@ -69,6 +71,24 @@ public final class TransactionResponse {
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
         this.scheduledTransactionId = scheduledTransactionId;
+    }
+
+    /**
+     *
+     * @return whether getReceipt() or getRecord() will throw an exception if the receipt status is not SUCCESS
+     */
+    public boolean getValidateStatus() {
+        return validateStatus;
+    }
+
+    /**
+     *
+     * @param validateStatus whether getReceipt() or getRecord() will throw an exception if the receipt status is not SUCCESS
+     * @return {@code this}
+     */
+    public TransactionResponse setValidateStatus(boolean validateStatus) {
+        this.validateStatus = validateStatus;
+        return this;
     }
 
     /**
@@ -95,11 +115,9 @@ public final class TransactionResponse {
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        var receipt = getReceiptQuery().execute(client, timeout);
-
-        if (receipt.status != Status.SUCCESS) {
-            throw new ReceiptStatusException(transactionId, receipt);
-        }
+        var receipt = getReceiptQuery()
+            .execute(client, timeout)
+            .validateStatus(validateStatus);
 
         return receipt;
     }
@@ -128,7 +146,15 @@ public final class TransactionResponse {
      * @return                          the transaction receipt
      */
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client, Duration timeout) {
-        return getReceiptQuery().executeAsync(client, timeout);
+        return getReceiptQuery()
+            .executeAsync(client, timeout)
+            .thenCompose(receipt -> {
+                try {
+                    return CompletableFuture.completedFuture(receipt.validateStatus(validateStatus));
+                } catch (ReceiptStatusException e) {
+                    return CompletableFuture.failedFuture(e);
+                }
+            });
     }
 
     /**

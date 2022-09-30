@@ -81,7 +81,7 @@ tasks:
 
     publish:
         env:
-            FILES: "sdk/src/main/java/com/hedera/hashgraph/sdk/*.java
+            FILES: "sdk/src/main/java/com/hedera/hashgraph/sdk/*.java"
         preconditions:
             - git diff-index --quiet HEAD
         cmds:

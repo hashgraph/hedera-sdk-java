@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import javax.annotation.Nullable;
+
 /**
  * An Exception thrown on error status by {@link TransactionId#getReceipt(Client)}.
  * <p>
@@ -30,6 +32,7 @@ public class ReceiptStatusException extends Exception {
      * The ID of the transaction that failed, in case that context is no longer available
      * (e.g. the exception was bubbled up).
      */
+    @Nullable
     public final TransactionId transactionId;
 
     /**
@@ -44,7 +47,7 @@ public class ReceiptStatusException extends Exception {
      * @param transactionId             the transaction id
      * @param receipt                   the receipt
      */
-    ReceiptStatusException(TransactionId transactionId, TransactionReceipt receipt) {
+    ReceiptStatusException(@Nullable TransactionId transactionId, TransactionReceipt receipt) {
         this.transactionId = transactionId;
         this.receipt = receipt;
     }

@@ -157,7 +157,7 @@ public final class TransactionReceiptQuery
         var receiptResponse = response.getTransactionGetReceipt();
         var duplicates = mapReceiptList(receiptResponse.getDuplicateTransactionReceiptsList());
         var children = mapReceiptList(receiptResponse.getChildTransactionReceiptsList());
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children);
+        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children, transactionId);
     }
 
     /**

@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 import javax.annotation.Nullable;
@@ -33,6 +34,8 @@ abstract public class CustomFee {
     @Nullable
     protected AccountId feeCollectorAccountId = null;
 
+    protected boolean allCollectorsAreExempt = false;
+
     /**
      * Constructor.
      */
@@ -45,20 +48,30 @@ abstract public class CustomFee {
      * @param customFee                 protobuf response object
      * @return                          the converted custom fee object
      */
-    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
+    static CustomFee fromProtobufInner(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
         switch (customFee.getFeeCase()) {
             case FIXED_FEE:
-                return CustomFixedFee.fromProtobuf(customFee);
+                return CustomFixedFee.fromProtobuf(customFee.getFixedFee());
 
             case FRACTIONAL_FEE:
-                return CustomFractionalFee.fromProtobuf(customFee);
+                return CustomFractionalFee.fromProtobuf(customFee.getFractionalFee());
 
             case ROYALTY_FEE:
-                return CustomRoyaltyFee.fromProtobuf(customFee);
+                return CustomRoyaltyFee.fromProtobuf(customFee.getRoyaltyFee());
 
             default:
                 throw new IllegalStateException("CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
         }
+    }
+
+    static CustomFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
+        var outFee = fromProtobufInner(customFee);
+        if (customFee.hasFeeCollectorAccountId()) {
+            outFee.feeCollectorAccountId = AccountId.fromProtobuf(customFee.getFeeCollectorAccountId());
+        }
+        outFee.allCollectorsAreExempt = customFee.getAllCollectorsAreExempt();
+
+        return outFee;
     }
 
     /**
@@ -97,12 +110,11 @@ abstract public class CustomFee {
     }
 
     /**
-     * Assign the fee collector account id.
      *
-     * @param feeCollectorAccountId     the fee collector account id
+     * @return whether all fee collectors are exempt from fees
      */
-    protected void doSetFeeCollectorAccountId(AccountId feeCollectorAccountId) {
-        this.feeCollectorAccountId = Objects.requireNonNull(feeCollectorAccountId);
+    public boolean getAllCollectorsAreExempt() {
+        return allCollectorsAreExempt;
     }
 
     /**
@@ -110,15 +122,7 @@ abstract public class CustomFee {
      *
      * @return                          the correct cloned fee type
      */
-    CustomFee deepClone() {
-        if (this instanceof CustomFixedFee) {
-            return CustomFixedFee.clonedFrom((CustomFixedFee) this);
-        } else if (this instanceof CustomFractionalFee) {
-            return CustomFractionalFee.clonedFrom((CustomFractionalFee) this);
-        } else {
-            return CustomRoyaltyFee.clonedFrom((CustomRoyaltyFee) this);
-        }
-    }
+    abstract CustomFee deepClone();
 
     /**
      * Verify the validity of the client object.
@@ -139,9 +143,10 @@ abstract public class CustomFee {
      * @return                              the protobuf
      */
     protected com.hedera.hashgraph.sdk.proto.CustomFee finishToProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee.Builder customFeeBuilder) {
-        if (getFeeCollectorAccountId() != null) {
-            customFeeBuilder.setFeeCollectorAccountId(getFeeCollectorAccountId().toProtobuf());
+        if (feeCollectorAccountId != null) {
+            customFeeBuilder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
         }
+        customFeeBuilder.setAllCollectorsAreExempt(allCollectorsAreExempt);
         return customFeeBuilder.build();
     }
 
@@ -159,5 +164,11 @@ abstract public class CustomFee {
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
+    }
+
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(this)
+            .add("feeCollectorAccountId", feeCollectorAccountId)
+            .add("allCollectorsAreExempt", allCollectorsAreExempt);
     }
 }
