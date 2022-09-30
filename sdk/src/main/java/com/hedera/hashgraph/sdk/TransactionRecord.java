@@ -244,7 +244,8 @@ public final class TransactionRecord {
     static TransactionRecord fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord,
         List<TransactionRecord> children,
-        List<TransactionRecord> duplicates
+        List<TransactionRecord> duplicates,
+        @Nullable TransactionId transactionId
     ) {
         var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
@@ -294,7 +295,7 @@ public final class TransactionRecord {
         }
 
         return new TransactionRecord(
-            TransactionReceipt.fromProtobuf(transactionRecord.getReceipt()),
+            TransactionReceipt.fromProtobuf(transactionRecord.getReceipt(), transactionId),
             transactionRecord.getTransactionHash(),
             InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
             TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
@@ -327,7 +328,7 @@ public final class TransactionRecord {
      * @return the new transaction record
      */
     static TransactionRecord fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord transactionRecord) {
-        return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>());
+        return fromProtobuf(transactionRecord, new ArrayList<>(), new ArrayList<>(), null);
     }
 
     /**
@@ -339,6 +340,11 @@ public final class TransactionRecord {
      */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
+    }
+
+    public TransactionRecord validateReceiptStatus(boolean shouldValidate) throws ReceiptStatusException {
+        receipt.validateStatus(shouldValidate);
+        return this;
     }
 
     /**

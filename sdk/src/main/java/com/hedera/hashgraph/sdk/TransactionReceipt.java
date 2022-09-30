@@ -35,6 +35,8 @@ import java.util.List;
  * known, or may succeed or fail.
  */
 public final class TransactionReceipt {
+    @Nullable
+    public final TransactionId transactionId;
     /**
      * Whether the transaction succeeded or failed (or is unknown).
      */
@@ -128,6 +130,7 @@ public final class TransactionReceipt {
     public final List<TransactionReceipt> children;
 
     TransactionReceipt(
+        @Nullable TransactionId transactionId,
         Status status,
         ExchangeRate exchangeRate,
         @Nullable AccountId accountId,
@@ -144,6 +147,7 @@ public final class TransactionReceipt {
         List<TransactionReceipt> duplicates,
         List<TransactionReceipt> children
     ) {
+        this.transactionId = transactionId;
         this.status = status;
         this.exchangeRate = exchangeRate;
         this.accountId = accountId;
@@ -172,7 +176,8 @@ public final class TransactionReceipt {
     static TransactionReceipt fromProtobuf(
         com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt,
         List<TransactionReceipt> duplicates,
-        List<TransactionReceipt> children
+        List<TransactionReceipt> children,
+        @Nullable TransactionId transactionId
     ) {
         var status = Status.valueOf(transactionReceipt.getStatus());
 
@@ -229,6 +234,7 @@ public final class TransactionReceipt {
         var serials = transactionReceipt.getSerialNumbersList();
 
         return new TransactionReceipt(
+            transactionId,
             status,
             exchangeRate,
             accountId,
@@ -254,7 +260,14 @@ public final class TransactionReceipt {
      * @return                          the new transaction receipt
      */
     public static TransactionReceipt fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt) {
-        return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>());
+        return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>(), null);
+    }
+
+    static TransactionReceipt fromProtobuf(
+        com.hedera.hashgraph.sdk.proto.TransactionReceipt transactionReceipt,
+        @Nullable TransactionId transactionId
+    ) {
+        return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>(), transactionId);
     }
 
     /**
@@ -266,6 +279,13 @@ public final class TransactionReceipt {
      */
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder().build());
+    }
+
+    public TransactionReceipt validateStatus(boolean shouldValidate) throws ReceiptStatusException {
+        if (shouldValidate && status != Status.SUCCESS) {
+            throw new ReceiptStatusException(transactionId, this);
+        }
+        return this;
     }
 
     /**
@@ -333,6 +353,7 @@ public final class TransactionReceipt {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
+            .add("transactionId", transactionId)
             .add("status", status)
             .add("exchangeRate", exchangeRate)
             .add("accountId", accountId)

@@ -155,7 +155,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         var recordResponse = response.getTransactionGetRecord();
         List<TransactionRecord> children = mapRecordList(recordResponse.getChildTransactionRecordsList());
         List<TransactionRecord> duplicates = mapRecordList(recordResponse.getDuplicateTransactionRecordsList());
-        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children, duplicates);
+        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children, duplicates, transactionId);
     }
 
     private List<TransactionRecord> mapRecordList(
@@ -187,7 +187,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case RECORD_NOT_FOUND:
                 return ExecutionState.Retry;
             case OK:
-                // When fetching payment an `OK` in there query header means the cost is in the response
+                // When fetching payment an `OK` in the query header means the cost is in the response
                 if (paymentTransactions == null || paymentTransactions.isEmpty()) {
                     return ExecutionState.Success;
                 } else {
