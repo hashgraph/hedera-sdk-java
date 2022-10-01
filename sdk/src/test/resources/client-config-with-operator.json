@@ -2,6 +2,9 @@
     "network": {
         "0.0.21": "0.testnet.hedera.com:50211"
     },
+    "mirrorNetwork": [
+        "hcs.testnet.mirrornode.hedera.com:5600"
+    ],
     "networkName": "testnet",
     "operator": {
         "accountId": "0.0.21",
