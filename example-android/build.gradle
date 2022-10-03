@@ -10,8 +10,8 @@ buildscript {
 	}
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.3.0'>>>>>>> 6faef55b9 (Make the Android example use the maven version by default and create a script for running it with the local SDK version)
-		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:7.3.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.quittle:android-emulator-plugin:0.4.5'
 
         // NOTE: Do not place your application dependencies here; they belong
