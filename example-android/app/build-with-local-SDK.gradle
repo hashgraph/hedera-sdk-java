@@ -1,7 +1,5 @@
-plugins {
-    id "com.android.application"
-    id "kotlin-android"
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 33
@@ -24,14 +22,9 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
     }
-
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
 	namespace 'com.hedera.android_example'
 }
 
@@ -50,13 +43,19 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-<<<<<<< HEAD
-    implementation 'com.hedera.hashgraph:sdk-jdk7:2.17.4'
-
+    implementation files('../../sdk/build/libs/sdk-2.17.4.jar')
+    implementation "org.bouncycastle:bcprov-jdk15on:1.70"
+    implementation "org.threeten:threetenbp:1.6.1"
     implementation 'org.slf4j:slf4j-simple:2.0.3'
-    implementation 'io.grpc:grpc-okhttp:1.46.0'
-=======
-    implementation 'com.hedera.hashgraph:sdk:2.17.4'
+    implementation "net.sourceforge.streamsupport:streamsupport:1.7.4"
+    implementation "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
+    implementation "io.grpc:grpc-core:1.49.1"
+    implementation "io.grpc:grpc-stub:1.49.1"
+
+    implementation "com.google.code.gson:gson:2.9.1"
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation "com.esaulpaugh:headlong:8.1.0"
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.2'
 
     implementation 'org.slf4j:slf4j-api:2.0.3'
     implementation 'io.grpc:grpc-okhttp:1.46.0'
@@ -66,9 +65,7 @@ dependencies {
 	// Protobuf Lite is used to maintain easy compatibility with Android
 	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
 	implementation "com.google.protobuf:protobuf-javalite:3.21.1"
->>>>>>> 6faef55b9 (Make the Android example use the maven version by default and create a script for running it with the local SDK version)
 }
-
 repositories {
 	mavenCentral()
 }
