@@ -69,7 +69,8 @@ abstract public class CustomFee {
         if (customFee.hasFeeCollectorAccountId()) {
             outFee.feeCollectorAccountId = AccountId.fromProtobuf(customFee.getFeeCollectorAccountId());
         }
-        outFee.allCollectorsAreExempt = customFee.getAllCollectorsAreExempt();
+        // TODO: allCollectorsAreExempt is temporarily commented out for 2.18.0, it is implemented in 2.18.0-beta.1
+        //outFee.allCollectorsAreExempt = customFee.getAllCollectorsAreExempt();
 
         return outFee;
     }
@@ -113,7 +114,8 @@ abstract public class CustomFee {
      *
      * @return whether all fee collectors are exempt from fees
      */
-    public boolean getAllCollectorsAreExempt() {
+    // TODO: this is temporarily made private for 2.18.0, it is public in 2.18.0-beta.1
+    private boolean getAllCollectorsAreExempt() {
         return allCollectorsAreExempt;
     }
 
@@ -146,7 +148,8 @@ abstract public class CustomFee {
         if (feeCollectorAccountId != null) {
             customFeeBuilder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
         }
-        customFeeBuilder.setAllCollectorsAreExempt(allCollectorsAreExempt);
+        // TODO: allCollectorsAreExempt is temporarily commented out for 2.18.0, it is implemented in 2.18.0-beta.1
+        //customFeeBuilder.setAllCollectorsAreExempt(allCollectorsAreExempt);
         return customFeeBuilder.build();
     }
 
@@ -167,8 +170,9 @@ abstract public class CustomFee {
     }
 
     protected MoreObjects.ToStringHelper toStringHelper() {
+        // TODO: allCollectorsAreExempt is temporarily commented out for 2.18.0, it is implemented in 2.18.0-beta.1
         return MoreObjects.toStringHelper(this)
-            .add("feeCollectorAccountId", feeCollectorAccountId)
-            .add("allCollectorsAreExempt", allCollectorsAreExempt);
+            .add("feeCollectorAccountId", feeCollectorAccountId);
+            //.add("allCollectorsAreExempt", allCollectorsAreExempt);
     }
 }

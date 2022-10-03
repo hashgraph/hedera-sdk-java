@@ -44,7 +44,8 @@ abstract class CustomFeeBase <F extends CustomFeeBase<F>> extends CustomFee {
      * @param allCollectorsAreExempt whether all fee collectors are exempt from fees
      * @return {@code this}
      */
-    public F setAllCollectorsAreExempt(boolean allCollectorsAreExempt) {
+    // TODO: this is temporarily made private for 2.18.0, it is public in 2.18.0-beta.1
+    private F setAllCollectorsAreExempt(boolean allCollectorsAreExempt) {
         this.allCollectorsAreExempt = allCollectorsAreExempt;
         // noinspection unchecked
         return (F) this;
@@ -54,7 +55,7 @@ abstract class CustomFeeBase <F extends CustomFeeBase<F>> extends CustomFee {
 
     protected F finishDeepClone(CustomFeeBase<F> source) {
         feeCollectorAccountId = source.feeCollectorAccountId;
-        allCollectorsAreExempt = source.getAllCollectorsAreExempt();
+        allCollectorsAreExempt = source.allCollectorsAreExempt;
 
         // noinspection unchecked
         return (F) this;
