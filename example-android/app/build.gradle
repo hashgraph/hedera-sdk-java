@@ -47,12 +47,6 @@ dependencies {
 
     implementation 'org.slf4j:slf4j-api:2.0.3'
     implementation 'io.grpc:grpc-okhttp:1.46.0'
-
-	implementation "io.grpc:grpc-protobuf-lite:1.46.0"
-
-	// Protobuf Lite is used to maintain easy compatibility with Android
-	// https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-	implementation "com.google.protobuf:protobuf-javalite:3.21.1"
 }
 repositories {
 	mavenCentral()
