@@ -15,8 +15,6 @@ mv app/build.gradle app/build.gradle.bak
 mv app/build-with-local-SDK.gradle app/build.gradle
 
 # Build the app and install it on the emulator
-
-
 if ../gradlew assembleDebug; then
     ../gradlew installDebug
     adb -s emulator-5554 shell am start -n com.hedera.android_example/.MainActivity

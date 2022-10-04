@@ -98,7 +98,7 @@ allprojects {
 tasks.register('buildAndroidAppWithLocalSDKVersion') {
     dependsOn ':sdk:build'
     exec {
-        commandLine 'sh', './build-sdk-with-local-sdk.sh'
+        commandLine 'sh', './build-android-example-with-local-sdk.sh'
     }
 }
 
