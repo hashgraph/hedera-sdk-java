@@ -96,11 +96,9 @@ allprojects {
     }
 }
 
-tasks.register('buildAndroidAppWithLocalSDKVersion') {
+tasks.register('buildAndroidAppWithLocalSDKVersion', Exec) {
     dependsOn ':sdk:build'
-    exec {
-        commandLine 'sh', './build-android-example-with-local-sdk.sh'
-    }
+    commandLine 'sh', './build-android-example-with-local-sdk.sh'
 }
 
 nexusPublishing {
