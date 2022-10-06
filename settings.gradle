@@ -1,5 +1,4 @@
 include 'sdk'
 include 'examples'
-include 'example-android'
 include 'executable-annotation'
 include 'executable-processor'

@@ -243,5 +243,7 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.mavenJava
+    if (!tasks.findByName("publishToMavenLocal").enabled) {
+        sign publishing.publications.mavenJava
+    }
 }
