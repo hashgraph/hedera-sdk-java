@@ -134,7 +134,10 @@ jacocoTestReport {
     // remove generated proto files from report
     afterEvaluate {
         classDirectories.setFrom(files(classDirectories.files.collect {
-            fileTree(dir: it, exclude: '**/proto/**')
+            fileTree(dir: it, exclude: [
+                '**/proto/**',
+                '**/AccountAllowanceAdjustTransaction.*'
+            ])
         }))
     }
 

@@ -61,7 +61,7 @@ public class SolidityPrecompileExample {
             // Instantiate ContractHelper
 
             ContractHelper contractHelper = new ContractHelper(
-                ContractHelper.getJsonResource("precompile-example/PrecompileExample.json"),
+                "precompile-example/PrecompileExample.json",
                 new ContractFunctionParameters()
                     .addAddress(OPERATOR_ID.toSolidityAddress())
                     .addAddress(aliceAccountId.toSolidityAddress()),

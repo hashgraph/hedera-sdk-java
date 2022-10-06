@@ -102,7 +102,7 @@ public class MockingTest {
         var cryptoService = new TestCryptoService();
         var fileService = new TestFileService();
         var contractService = new TestContractService();
-        var server = new TestServer("contractCreateFlow", cryptoService, fileService, contractService);
+        var server = new TestServer("contractCreateFlow" + versionToTest + stakeType, cryptoService, fileService, contractService);
 
         var fileId = FileId.fromString("1.2.3");
         var maxAutomaticTokenAssociations = 101;
@@ -316,7 +316,7 @@ public class MockingTest {
     })
     void shouldRetryExceptionallyFunctionsCorrectly(Status.Code code, String description, String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("executableRetry", service);
+        var server = new TestServer("executableRetry" + code + (description != null ? description.replace(" ", "") : "NULL") + sync, service);
 
         var exception = Status.fromCode(code)
             .withDescription(description)
@@ -351,7 +351,7 @@ public class MockingTest {
     })
     void hitsTxMaxAttemptsCorrectly(Integer numberOfErrors, Integer maxAttempts, String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("executableMaxAttemptsSync", service);
+        var server = new TestServer("executableMaxAttemptsSync" + numberOfErrors + maxAttempts + sync, service);
 
         var exception = Status.UNAVAILABLE.asRuntimeException();
 
@@ -405,7 +405,7 @@ public class MockingTest {
     })
     void shouldRetryFunctionsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("shouldRetryFunctionsCorrectly", service);
+        var server = new TestServer("shouldRetryFunctionsCorrectly" + status + numberOfErrors + sync, service);
 
         for (var i = 0; i < numberOfErrors; i++) {
             service.buffer.enqueueResponse(TestResponse.transaction(status));
@@ -443,7 +443,7 @@ public class MockingTest {
     })
     void hitsClientMaxAttemptsCorrectly(com.hedera.hashgraph.sdk.Status status, String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("shouldRetryFunctionsCorrectly", service);
+        var server = new TestServer("shouldRetryFunctionsCorrectly" + status + sync, service);
 
         for (var i = 0; i < 2; i++) {
             service.buffer.enqueueResponse(TestResponse.transaction(status));

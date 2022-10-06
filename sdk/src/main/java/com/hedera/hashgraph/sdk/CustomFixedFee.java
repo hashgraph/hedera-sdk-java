@@ -28,7 +28,7 @@ import javax.annotation.Nullable;
  * Custom fixed fee utility class.
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee">Hedera Documentation</a>
  */
-public class CustomFixedFee extends CustomFee {
+public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
     private long amount = 0;
     /**
      * The shard, realm, number of the tokens.
@@ -40,20 +40,6 @@ public class CustomFixedFee extends CustomFee {
      * Constructor.
      */
     public CustomFixedFee() {
-    }
-
-    /**
-     * Clone the custom fixed fee object.
-     *
-     * @param source                    the source fee object
-     * @return                          the new custom fee object
-     */
-    static CustomFixedFee clonedFrom(CustomFixedFee source) {
-        var returnFee = new CustomFixedFee();
-        returnFee.amount = source.amount;
-        returnFee.denominatingTokenId = source.denominatingTokenId;
-        returnFee.feeCollectorAccountId = source.feeCollectorAccountId;
-        return returnFee;
     }
 
     /**
@@ -71,29 +57,12 @@ public class CustomFixedFee extends CustomFee {
         return returnFee;
     }
 
-    /**
-     * Create a custom fixed fee from a custom fee protobuf.
-     *
-     * @param customFee                 the custom fee protobuf
-     * @return                          the new custom fixed fee object
-     */
-    static CustomFixedFee fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFee customFee) {
-        var returnFee = fromProtobuf(customFee.getFixedFee());
-        if (customFee.hasFeeCollectorAccountId()) {
-            returnFee.setFeeCollectorAccountId(AccountId.fromProtobuf(customFee.getFeeCollectorAccountId()));
-        }
-        return returnFee;
-    }
-
-    /**
-     * Assign the fee collector account id.
-     *
-     * @param feeCollectorAccountId     the account id of the fee collector
-     * @return {@code this}
-     */
-    public CustomFixedFee setFeeCollectorAccountId(AccountId feeCollectorAccountId) {
-        doSetFeeCollectorAccountId(feeCollectorAccountId);
-        return this;
+    @Override
+    CustomFixedFee deepCloneSubclass() {
+        return new CustomFixedFee()
+            .setAmount(amount)
+            .setDenominatingTokenId(denominatingTokenId)
+            .finishDeepClone(this);
     }
 
     /**
@@ -178,8 +147,7 @@ public class CustomFixedFee extends CustomFee {
 
     @Override
     public String toString() {
-        return MoreObjects.toStringHelper(this)
-            .add("feeCollectorAccountId", getFeeCollectorAccountId())
+        return toStringHelper()
             .add("amount", getAmount())
             .add("demoninatingTokenId", getDenominatingTokenId())
             .toString();

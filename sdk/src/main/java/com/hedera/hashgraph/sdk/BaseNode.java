@@ -95,7 +95,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         this.currentBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.minBackoff = Client.DEFAULT_MIN_NODE_BACKOFF;
         this.maxBackoff = Client.DEFAULT_MAX_NODE_BACKOFF;
-        this.readmitTime = Instant.now();
+        this.readmitTime = Instant.EPOCH;
     }
 
     /**

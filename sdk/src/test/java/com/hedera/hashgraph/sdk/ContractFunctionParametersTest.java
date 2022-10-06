@@ -20,8 +20,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import io.github.jsonSnapshot.SnapshotMatcher;
 import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.AfterClass;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,14 +32,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ContractFunctionParametersTest {
+    @BeforeAll
+    public static void beforeAll() {
+        SnapshotMatcher.start();
+    }
+
+    @AfterClass
+    public static void afterAll() {
+        SnapshotMatcher.validateSnapshots();
+    }
+
     @SuppressWarnings("unused")
     private static List<Arguments> int256Arguments() {
         return Lists.of(
@@ -524,5 +540,57 @@ public class ContractFunctionParametersTest {
         assertThat(hexString).isEqualTo(
             Hex.toHexString(ContractFunctionParameters.uint256(val, bitWidth).toByteArray())
         );
+    }
+
+    @Test
+    void intSizesEncodeCorrectly() throws Exception {
+        List<String> snapshotStrings = new ArrayList<>();
+        for (int n = 8; n <= 256; n+= 8) {
+            var bitWidth = n;
+
+            var argType = ((Supplier<Class<?>>)() -> {
+                if (bitWidth == 8) {
+                    return byte.class;
+                } else if (bitWidth <= 32) {
+                    return int.class;
+                } else if (bitWidth <= 64) {
+                    return long.class;
+                } else {
+                    return BigInteger.class;
+                }
+            }).get();
+
+            var argVal = ((Supplier<Object>)() -> {
+                if (bitWidth == 8) {
+                    return (byte) (1 << (bitWidth - 1));
+                } else if (bitWidth <= 32) {
+                    return (int) (1 << (bitWidth - 1));
+                } else if (bitWidth <= 64) {
+                    return (long) (1L << (bitWidth - 1));
+                } else {
+                    return BigInteger.ONE.shiftLeft(bitWidth - 1);
+                }
+            }).get();
+
+            var argArrayVal = Array.newInstance(argType, 2);
+            Array.set(argArrayVal, 0, argVal);
+            Array.set(argArrayVal, 1, argVal);
+            var argArrayType = argArrayVal.getClass();
+
+            var cl = ContractFunctionParameters.class;
+            var addIntMethod = cl.getMethod("addInt" + n, argType);
+            var addUintMethod = cl.getMethod("addUint" + n, argType);
+            var addIntArrayMethod = cl.getMethod("addInt" + n + "Array", argArrayType);
+            var addUintArrayMethod = cl.getMethod("addUint" + n + "Array", argArrayType);
+
+            var params = new ContractFunctionParameters();
+            addIntMethod.invoke(params, argVal);
+            addUintMethod.invoke(params, argVal);
+            addIntArrayMethod.invoke(params, argArrayVal);
+            addUintArrayMethod.invoke(params, argArrayVal);
+
+            snapshotStrings.add("bitWidth = " + bitWidth + ": " + Hex.toHexString(params.toBytes(null).toByteArray()));
+        }
+        SnapshotMatcher.expect(snapshotStrings.toArray()).toMatchSnapshot();
     }
 }

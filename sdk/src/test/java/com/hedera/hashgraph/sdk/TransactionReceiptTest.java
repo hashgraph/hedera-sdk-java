@@ -29,6 +29,7 @@ public class TransactionReceiptTest {
 
     static TransactionReceipt spawnReceiptExample() {
         return new TransactionReceipt(
+            null,
             Status.SCHEDULE_ALREADY_DELETED,
             new ExchangeRate(3, 4, time),
             AccountId.fromString("1.2.3"),

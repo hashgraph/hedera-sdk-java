@@ -58,30 +58,26 @@ public class ContractHelper {
     final Map<Integer, List<PrivateKey>> stepSigners = new HashMap<>();
     final Map<Integer, AccountId> stepFeePayers = new HashMap<>();
 
-    public static JsonObject getJsonResource(String filename) throws IOException {
-        ClassLoader cl = ContractHelper.class.getClassLoader();
-
-        Gson gson = new Gson();
-
-        JsonObject jsonObject;
-
-        try (InputStream jsonStream = cl.getResourceAsStream(filename)) {
+    public static String getBytecodeHex(String filename) throws IOException {
+        try (InputStream jsonStream = ContractHelper.class.getClassLoader().getResourceAsStream(filename)) {
             if (jsonStream == null) {
                 throw new RuntimeException("failed to get " + filename);
             }
 
-            jsonObject = gson.fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class);
+            return new Gson()
+                .fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class)
+                .getAsJsonPrimitive("object")
+                .getAsString();
         }
-        return jsonObject;
     }
 
     public ContractHelper(
-        JsonObject jsonObject,
+        String filename,
         ContractFunctionParameters constructorParameters,
         Client client
-    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
         contractId = Objects.requireNonNull(new ContractCreateFlow()
-            .setBytecode(jsonObject.getAsJsonPrimitive("object").getAsString())
+            .setBytecode(getBytecodeHex(filename))
             .setMaxChunks(30)
             .setGas(8_000_000)
             .setConstructorParameters(constructorParameters)
@@ -184,15 +180,24 @@ public class ContractHelper {
 
             TransactionRecord record = tx
                 .execute(client)
+                .setValidateStatus(false)
                 .getRecord(client);
 
-            ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
-
-            if (getResultValidator(stepIndex).apply(functionResult)) {
-                System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
-            } else {
+            try {
+                if (record.receipt.status != Status.SUCCESS) {
+                    throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
+                }
+                ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
+                System.out.println("gas used: " + functionResult.gasUsed);
+                if (getResultValidator(stepIndex).apply(functionResult)) {
+                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
+                } else {
+                    throw new Exception("returned invalid result");
+                }
+            } catch (Throwable error) {
+                System.out.println("Error occurred in step " + stepIndex + ": " + error.getMessage());
                 System.out.println("Transaction record: " + record);
-                throw new Exception("step " + stepIndex + " returned invalid result");
+                break;
             }
         }
         return this;

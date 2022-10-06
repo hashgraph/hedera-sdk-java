@@ -45,6 +45,7 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
 import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
@@ -570,57 +571,58 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
 
-        // Sleeping if a node is not healthy should not increment attempt as we didn't really make an attempt
-        if (!grpcRequest.getNode().isHealthy()) {
-            Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor)
-                .thenRun(() -> executeAsyncInternal(client, attempt, lastException, returnFuture));
-            return;
-        }
+        Supplier<CompletableFuture<Void>> afterUnhealthyDelay = () -> {
+            return grpcRequest.getNode().isHealthy() ?
+                CompletableFuture.completedFuture((Void) null) :
+                Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor);
+        };
 
-        grpcRequest.getNode().channelFailedToConnectAsync().thenAccept(connectionFailed -> {
-            if (connectionFailed) {
-                var connectionException = grpcRequest.reactToConnectionFailure();
-                executeAsyncInternal(client, attempt + 1, connectionException, returnFuture);
-                return;
-            }
-
-            toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
-                if (grpcRequest.shouldRetryExceptionally(error)) {
-                    // the transaction had a network failure reaching Hedera
-                    executeAsyncInternal(client, attempt + 1, error, returnFuture);
-                    return null;
+        afterUnhealthyDelay.get().thenRun(() -> {
+            grpcRequest.getNode().channelFailedToConnectAsync().thenAccept(connectionFailed -> {
+                if (connectionFailed) {
+                    var connectionException = grpcRequest.reactToConnectionFailure();
+                    executeAsyncInternal(client, attempt + 1, connectionException, returnFuture);
+                    return;
                 }
 
-                if (error != null) {
-                    // not a network failure, some other weirdness going on; just fail fast
-                    returnFuture.completeExceptionally(new CompletionException(error));
-                    return null;
-                }
+                toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
+                    if (grpcRequest.shouldRetryExceptionally(error)) {
+                        // the transaction had a network failure reaching Hedera
+                        executeAsyncInternal(client, attempt + 1, error, returnFuture);
+                        return null;
+                    }
 
-                switch (grpcRequest.getStatus(response)) {
-                    case ServerError:
-                        executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
-                        break;
-                    case Retry:
-                        Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
+                    if (error != null) {
+                        // not a network failure, some other weirdness going on; just fail fast
+                        returnFuture.completeExceptionally(new CompletionException(error));
+                        return null;
+                    }
+
+                    switch (grpcRequest.getStatus(response)) {
+                        case ServerError:
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
-                        });
-                        break;
-                    case RequestError:
-                        returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
-                        break;
-                    case Success:
-                    default:
-                        returnFuture.complete(grpcRequest.mapResponse());
-                }
-                return null;
+                            break;
+                        case Retry:
+                            Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
+                                executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                            });
+                            break;
+                        case RequestError:
+                            returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
+                            break;
+                        case Success:
+                        default:
+                            returnFuture.complete(grpcRequest.mapResponse());
+                    }
+                    return null;
+                }).exceptionally(error -> {
+                    returnFuture.completeExceptionally(error);
+                    return null;
+                });
             }).exceptionally(error -> {
                 returnFuture.completeExceptionally(error);
                 return null;
             });
-        }).exceptionally(error -> {
-            returnFuture.completeExceptionally(error);
-            return null;
         });
     }
 
@@ -705,7 +707,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             this.network = network;
             this.attempt = attempt;
             this.node = getNodeForExecute(attempt);
-            this.request = getRequestForExecute();
+            this.request = getRequestForExecute(); // node index gets incremented here
             this.startAt = System.nanoTime();
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s

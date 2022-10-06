@@ -323,13 +323,13 @@ public final class Client implements AutoCloseable {
                 String mirror = config.mirrorNetwork.getAsString();
                 switch (mirror) {
                     case "mainnet":
-                        client.setMirrorNetwork(Lists.of("mainnet-public.mirrornode.hedera.com:5600"));
+                        client.mirrorNetwork = MirrorNetwork.forMainnet(client.executor);
                         break;
                     case "testnet":
-                        client.setMirrorNetwork(Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+                        client.mirrorNetwork = MirrorNetwork.forTestnet(client.executor);
                         break;
                     case "previewnet":
-                        client.setMirrorNetwork(Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+                        client.mirrorNetwork = MirrorNetwork.forPreviewnet(client.executor);
                         break;
                     default:
                         throw new JsonParseException("Illegal argument for mirrorNetwork.");
