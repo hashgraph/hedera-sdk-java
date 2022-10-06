@@ -1,5 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
+plugins {
+    id "com.android.application"
+    id "kotlin-android"
+    id "com.quittle.android-emulator"
+}
 
 android {
     compileSdkVersion 33
@@ -22,10 +25,31 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
 	namespace 'com.hedera.android_example'
+}
+
+androidEmulator {
+    def arch = System.getProperty("os.arch")
+    def abiVersion = arch.contains('arm64') || arch.contains("aarch64") ? 'arm64-v8a' : 'x86_64'
+    emulator {
+        name "emulator-5554"
+        sdkVersion 33
+        device 'pixel_3a'
+        abi abiVersion
+        includeGoogleApis true
+    }
+    enableForAndroidTests false
+    headless false
+    logEmulatorOutput true
+    additionalEmulatorArguments '-no-snapshot'
 }
 
 dependencies {
@@ -48,6 +72,19 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.3'
     implementation 'io.grpc:grpc-okhttp:1.46.0'
 }
+
 repositories {
+    mavenLocal()
 	mavenCentral()
+}
+
+tasks.create("run") {
+    group 'application'
+    afterEvaluate {
+        dependsOn tasks.waitForAndroidEmulator
+        dependsOn tasks.installDebug
+
+        tasks.installDebug.configure { mustRunAfter tasks.waitForAndroidEmulator }
+        tasks.stopAndroidEmulator.configure { enabled false }
+    }
 }
