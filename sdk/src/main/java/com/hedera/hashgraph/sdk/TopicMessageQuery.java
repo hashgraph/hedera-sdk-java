@@ -329,7 +329,8 @@ public final class TopicMessageQuery {
             @Override
             public void onError(Throwable t) {
                 // Return without logging an error if the call is cancelled
-                if (((StatusRuntimeException) t).getStatus().getCode().equals(Status.Code.CANCELLED)) {
+                if (t instanceof StatusRuntimeException &&
+                    ((StatusRuntimeException) t).getStatus().getCode().equals(Status.Code.CANCELLED)) {
                     return;
                 }
 
