@@ -354,6 +354,18 @@ class TopicMessageQueryTest {
             .isEqualTo(Status.RESOURCE_EXHAUSTED);
     }
 
+    @Test
+    @Timeout(5)
+    void noErrorWhenCallIsCancelled() {
+        consensusServiceStub.requests.add(request().build());
+        consensusServiceStub.responses.add(Status.CANCELLED.asRuntimeException());
+
+        subscribeToMirror(received::add);
+
+        assertThat(errors).hasSize(0);
+        assertThat(received).isEmpty();
+    }
+
     private void subscribeToMirror(Consumer<TopicMessage> onNext) {
         SubscriptionHandle subscriptionHandle = topicMessageQuery.subscribe(client, onNext);
         Stopwatch stopwatch = Stopwatch.createStarted();
