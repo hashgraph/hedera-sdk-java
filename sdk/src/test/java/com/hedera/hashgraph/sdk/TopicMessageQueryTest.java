@@ -362,7 +362,7 @@ class TopicMessageQueryTest {
 
         subscribeToMirror(received::add);
 
-        assertThat(errors).hasSize(0);
+        assertThat(errors).isEmpty();
         assertThat(received).isEmpty();
     }
 
