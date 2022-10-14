@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - Execute with a timeout can ignore timeout and block indefinitely in CI tests
+ - The Android example can now be run with the local SDK version
 
 ## 2.17.4
 
