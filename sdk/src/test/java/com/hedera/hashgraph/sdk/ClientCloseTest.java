@@ -74,20 +74,44 @@ public class ClientCloseTest {
     }
 
     @Test
-    void closeHandlesExecutorNotTerminatingInTime() throws InterruptedException, TimeoutException {
+    void closeHandlesExecutorTerminatingInTime() throws InterruptedException, TimeoutException {
         var duration = Duration.ofSeconds(30);
-        var executor = (ThreadPoolExecutor) Client.createExecutor();
-        var executorSpy = spy(ThreadPoolExecutor.class);
-        doNothing().when(executorSpy).shutdown();
-//        when(executorSpy.shutdownNow()).thenCallRealMethod();
-//        FieldSetter.setField(executorSpy, executorSpy.getClass().getDeclaredField("mainLock"), new ReentrantLock());
-//        when(executorSpy.awaitTermination(30, TimeUnit.SECONDS)).thenReturn(false);
-        doReturn(false).when(executorSpy).awaitTermination(30 / 2, TimeUnit.SECONDS);
-        var network = Network.forNetwork(executorSpy, Collections.emptyMap());
-        var mirrorNetwork = MirrorNetwork.forNetwork(executorSpy, Collections.emptyList());
-        var client = new Client(executorSpy, network, mirrorNetwork, null, null);
+        var executor = mock(ThreadPoolExecutor.class);
+        var network = Network.forNetwork(executor, Collections.emptyMap());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
+        var client = new Client(executor, network, mirrorNetwork, null, null);
+
+        doReturn(true).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
 
         client.close(duration);
-        assertThat(executorSpy.isShutdown()).isTrue();
+        verify(executor, times(0)).shutdownNow();
+    }
+
+    @Test
+    void closeHandlesExecutorNotTerminatingInTime() throws InterruptedException, TimeoutException {
+        var duration = Duration.ofSeconds(30);
+        var executor = mock(ThreadPoolExecutor.class);
+        var network = Network.forNetwork(executor, Collections.emptyMap());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
+        var client = new Client(executor, network, mirrorNetwork, null, null);
+
+        doReturn(false).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
+
+        client.close(duration);
+        verify(executor, times(1)).shutdownNow();
+    }
+
+    @Test
+    void closeHandlesExecutorWhenThreadIsInterrupted() throws InterruptedException, TimeoutException {
+        var duration = Duration.ofSeconds(30);
+        var executor = mock(ThreadPoolExecutor.class);
+        var network = Network.forNetwork(executor, Collections.emptyMap());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
+        var client = new Client(executor, network, mirrorNetwork, null, null);
+
+        doThrow(new InterruptedException()).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
+
+        client.close(duration);
+        verify(executor, times(1)).shutdownNow();
     }
 }
