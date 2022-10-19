@@ -1,24 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
-import org.bouncycastle.asn1.x509.Time;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockSettings;
+import org.threeten.bp.Duration;
 
 import java.util.Collections;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.in;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class ClientCloseTest {
     @Test
@@ -69,5 +60,34 @@ public class ClientCloseTest {
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
         assertThat(network.hasShutDownNow).isFalse();
+    }
+
+    @Test
+    void closeHandlesExecutorShutdown() throws TimeoutException {
+        var executor = Client.createExecutor();
+        var network = Network.forNetwork(executor, Collections.emptyMap());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
+        var client = new Client(executor, network, mirrorNetwork, null, null);
+
+        client.close();
+        assertThat(executor.isShutdown()).isTrue();
+    }
+
+    @Test
+    void closeHandlesExecutorNotTerminatingInTime() throws InterruptedException, TimeoutException {
+        var duration = Duration.ofSeconds(30);
+        var executor = (ThreadPoolExecutor) Client.createExecutor();
+        var executorSpy = spy(ThreadPoolExecutor.class);
+        doNothing().when(executorSpy).shutdown();
+//        when(executorSpy.shutdownNow()).thenCallRealMethod();
+//        FieldSetter.setField(executorSpy, executorSpy.getClass().getDeclaredField("mainLock"), new ReentrantLock());
+//        when(executorSpy.awaitTermination(30, TimeUnit.SECONDS)).thenReturn(false);
+        doReturn(false).when(executorSpy).awaitTermination(30 / 2, TimeUnit.SECONDS);
+        var network = Network.forNetwork(executorSpy, Collections.emptyMap());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executorSpy, Collections.emptyList());
+        var client = new Client(executorSpy, network, mirrorNetwork, null, null);
+
+        client.close(duration);
+        assertThat(executorSpy.isShutdown()).isTrue();
     }
 }
