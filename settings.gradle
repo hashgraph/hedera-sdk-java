@@ -1,4 +1,2 @@
 include 'sdk'
 include 'examples'
-include 'executable-annotation'
-include 'executable-processor'

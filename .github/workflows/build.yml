@@ -64,14 +64,11 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build
         run: ./gradlew build
+      - name: Generate Jacoco report
+        run: ./gradlew jacocoTestReport
       - name: Build with Sonar
         if: github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
-      - name: Generate Jacoco report
-        run: ./gradlew jacocoTestReport
-      - name: Publish To Codecov
-        if: always()
-        uses: codecov/codecov-action@v3
