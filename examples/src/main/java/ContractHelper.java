@@ -64,10 +64,14 @@ public class ContractHelper {
                 throw new RuntimeException("failed to get " + filename);
             }
 
-            return new Gson()
-                .fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class)
-                .getAsJsonPrimitive("object")
-                .getAsString();
+            JsonObject json = new Gson()
+                .fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class);
+
+            if (json.has("object")) {
+                return json.getAsJsonPrimitive("object").getAsString();
+            }
+
+            return json.getAsJsonPrimitive("bytecode").getAsString();
         }
     }
 
