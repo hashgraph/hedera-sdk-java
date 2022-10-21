@@ -20,11 +20,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.concurrent.CompletionStage;
 import java8.util.function.BiConsumer;
@@ -48,10 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.function.Supplier;
 
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
@@ -137,7 +134,14 @@ public final class Client implements AutoCloseable {
      * @return                          the executor service
      */
     static ExecutorService createExecutor() {
-        return ForkJoinPool.commonPool();
+        var threadFactory = new ThreadFactoryBuilder()
+            .setNameFormat("hedera-sdk-%d")
+            .setDaemon(true)
+            .build();
+
+        return Executors.newFixedThreadPool(
+            Runtime.getRuntime().availableProcessors(),
+            threadFactory);
     }
 
     /**
@@ -1288,6 +1292,20 @@ public final class Client implements AutoCloseable {
 
         var networkError = network.awaitClose(closeDeadline, null);
         var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+
+        // https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html
+        try {
+            executor.shutdown();
+            if (!executor.awaitTermination(timeout.getSeconds() / 2, TimeUnit.SECONDS)) {
+                executor.shutdownNow();
+                if (!executor.awaitTermination(timeout.getSeconds() / 2, TimeUnit.SECONDS)) {
+                    logger.warn("Pool did not terminate");
+                }
+            }
+        } catch (InterruptedException ex) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
 
         if (mirrorNetworkError != null) {
             if (mirrorNetworkError instanceof TimeoutException) {
