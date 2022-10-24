@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+- `ContractHelper` now supports `bytecode` property in compiled contract JSON.
+- `ZeroTokenOperationsExample`
  - `TransactionResponse.[get|set]ValidateStatus()`
  - `TransactionReceipt.validateStatus()`
  - `TransactionRecord.validateReceiptStatus()`
