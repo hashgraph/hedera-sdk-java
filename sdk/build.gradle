@@ -32,7 +32,7 @@ dependencies {
     annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:1.0.0'
 
     // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
-    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.2'
+    implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.3'
 
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15to18
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.72'
