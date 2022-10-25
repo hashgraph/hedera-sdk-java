@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `TopicUpdateTransaction.[get|set]ExpirationTime()`
  - `CustomFee.[set|get]AllCollectorsAreExempt()`
  - `ExemptCustomFeesExample`
+ - `AccountCreateWithHtsExample`
 
 ### Fixed
  - Execute with a timeout can ignore timeout and block indefinitely in CI tests
