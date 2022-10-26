@@ -15,7 +15,7 @@
     <string name="tab_3_send">Send Hbar</string>
 
     <!-- NOTE: These strings must be set to real values for the example to work -->
-    <string name="operator_id">0.0.47439</string>
-    <string name="operator_key">302e020100300506032b6570042204208f4014a3f7f7a6c7147070da98d88f9cea074c13ed0554783471825d801888cf</string>
+    <string name="operator_id"></string>
+    <string name="operator_key"></string>
 
 </resources>
