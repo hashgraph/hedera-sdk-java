@@ -4,7 +4,7 @@ plugins {
     id "signing"
     id "maven-publish"
     id "com.google.protobuf" version "0.9.1"
-    id "com.github.spotbugs" version "5.0.12"
+    id "com.github.spotbugs" version "5.0.13"
 }
 
 apply from: "../version.gradle"
