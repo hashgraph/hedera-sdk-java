@@ -89,11 +89,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     Executable() {
         requestListener = request -> {
-            logger.trace("Sent protobuf {}", Hex.toHexString(request.toByteArray()));
+            if (logger.isTraceEnabled()) {
+                logger.trace("Sent protobuf {}", Hex.toHexString(request.toByteArray()));
+            }
             return request;
         };
         responseListener = response -> {
-            logger.trace("Received protobuf {}", Hex.toHexString(response.toByteArray()));
+            if (logger.isTraceEnabled()) {
+                logger.trace("Received protobuf {}", Hex.toHexString(response.toByteArray()));
+            }
             return response;
         };
     }
