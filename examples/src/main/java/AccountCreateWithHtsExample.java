@@ -149,7 +149,7 @@ public final class AccountCreateWithHtsExample {
 
         System.out.println("The normal account ID of the given alias: " + accountId);
 
-        if (nftOwnerAccountId == accountId)
+        if (nftOwnerAccountId.equals(accountId))
             System.out.println("The NFT owner accountId matches the accountId created with the HTS");
         else
             System.out.println("The two account IDs does not match");
