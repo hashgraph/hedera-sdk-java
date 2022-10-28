@@ -99,7 +99,6 @@ allprojects {
 nexusPublishing {
     repositories {
         sonatype {
-            stagingProfileId = "890139c7fb9c81"
         }
     }
 }
