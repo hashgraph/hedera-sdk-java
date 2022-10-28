@@ -20,33 +20,33 @@ Select _one_ of the following depending on your target platform.
 
 ```groovy
 // Android, Corda DJVM, Java 7+
-implementation 'com.hedera.hashgraph:sdk-jdk7:2.17.5'
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.18.1'
 
 // Java 9+, Kotlin
-implementation 'com.hedera.hashgraph:sdk:2.17.5'
+implementation 'com.hedera.hashgraph:sdk:2.18.1'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
 
 ```groovy
 // netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded:1.44.0'
+implementation 'io.grpc:grpc-netty-shaded:1.46.0'
 
 // netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty:1.44.0'
+implementation 'io.grpc:grpc-netty:1.46.0'
 
 // okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.44.0'
+implementation 'io.grpc:grpc-okhttp:1.46.0'
 ```
 
 Select _one_ of the following to enable or disable Simple Logging Facade for Java (SLFJ4).
 
 ```groovy
 // Enable logs
-implementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+implementation 'org.slf4j:slf4j-simple:2.0.3'
 
 // Disable logs
-implementation 'org.slf4j:slf4j-nop:2.0.0-alpha1'
+implementation 'org.slf4j:slf4j-nop:2.0.3'
 
 ```
 
@@ -61,14 +61,14 @@ Select _one_ of the following depending on your target platform.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk-jdk7</artifactId>
-  <version>2.17.5</version>
+  <version>2.18.1</version>
 </dependency>
 
 <!-- Java 9+, Kotlin -->
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.17.5</version>
+  <version>2.18.1</version>
 </dependency>
 ```
 
@@ -79,21 +79,21 @@ Select _one_ of the following to provide the gRPC implementation.
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.40.0</version>
+  <version>1.46.0</version>
 </dependency>
 
 <!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty</artifactId>
-  <version>1.40.0</version>
+  <version>1.46.0</version>
 </dependency>
 
 <!-- okhttp transport (for lighter-weight applications or Android) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-okhttp</artifactId>
-  <version>1.40.0</version>
+  <version>1.46.0</version>
 </dependency>
 ```
 
