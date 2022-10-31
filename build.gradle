@@ -31,7 +31,7 @@ allprojects {
         errorprone "com.google.errorprone:error_prone_core:2.16"
 
         // https://github.com/uber/NullAway
-        errorprone "com.uber.nullaway:nullaway:0.10.2"
+        errorprone "com.uber.nullaway:nullaway:0.10.3"
 
         // https://github.com/grpc/grpc-java-api-checker
         errorprone "io.grpc:grpc-java-api-checker:1.1.0"
