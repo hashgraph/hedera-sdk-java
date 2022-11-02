@@ -507,7 +507,7 @@ public final class Client implements AutoCloseable {
      *
      * @param nodeAccountId Account ID of the node to ping
      */
-    public Void ping(AccountId nodeAccountId) {
+    public Void ping(AccountId nodeAccountId) throws PrecheckStatusException, TimeoutException {
         return ping(nodeAccountId, getRequestTimeout());
     }
 
@@ -517,15 +517,11 @@ public final class Client implements AutoCloseable {
      * @param nodeAccountId Account ID of the node to ping
      * @param timeout The timeout after which the execution attempt will be cancelled.
      */
-    public Void ping(AccountId nodeAccountId, Duration timeout) {
-        try {
-            new AccountBalanceQuery()
-                .setAccountId(nodeAccountId)
-                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-                .execute(this, timeout);
-        } catch (Exception e) {
-            logger.debug("pinging account {} failed with exception {}", nodeAccountId, e.getMessage());
-        }
+    public Void ping(AccountId nodeAccountId, Duration timeout) throws PrecheckStatusException, TimeoutException {
+        new AccountBalanceQuery()
+            .setAccountId(nodeAccountId)
+            .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+            .execute(this, timeout);
 
         return null;
     }
@@ -546,14 +542,19 @@ public final class Client implements AutoCloseable {
      * @param timeout The timeout after which the execution attempt will be cancelled.
      */
     public CompletableFuture<Void> pingAsync(AccountId nodeAccountId, Duration timeout) {
-        return new AccountBalanceQuery()
+        var result = new CompletableFuture<Void>();
+        new AccountBalanceQuery()
             .setAccountId(nodeAccountId)
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
             .executeAsync(this, timeout)
-            .handle((balance, e) -> {
-                // Do nothing
-                return null;
-            });
+            .whenComplete((balance, error) -> {
+                if (error == null){
+                    result.complete(null);
+                } else {
+                    result.completeExceptionally(error);
+                }
+        });
+        return result;
     }
 
     /**
@@ -604,7 +605,7 @@ public final class Client implements AutoCloseable {
      * Sends pings to all nodes in the client's network.
      * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
      */
-    public synchronized Void pingAll() {
+    public synchronized Void pingAll() throws PrecheckStatusException, TimeoutException {
         return pingAll(getRequestTimeout());
     }
 
@@ -614,7 +615,7 @@ public final class Client implements AutoCloseable {
      *
      * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
      */
-    public synchronized Void pingAll(Duration timeoutPerPing) {
+    public synchronized Void pingAll(Duration timeoutPerPing) throws PrecheckStatusException, TimeoutException {
         for (var nodeAccountId : network.getNetwork().values()) {
             ping(nodeAccountId, timeoutPerPing);
         }
