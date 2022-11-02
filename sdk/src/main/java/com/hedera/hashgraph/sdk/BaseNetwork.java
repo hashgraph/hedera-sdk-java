@@ -431,12 +431,12 @@ abstract class BaseNetwork<
         return (BaseNetworkT) this;
     }
 
-    void increaseBackoff(BaseNodeT node) {
+    synchronized void increaseBackoff(BaseNodeT node) {
         node.increaseBackoff();
         healthyNodes.remove(node);
     }
 
-    void decreaseBackoff(BaseNodeT node) {
+    synchronized void decreaseBackoff(BaseNodeT node) {
         node.decreaseBackoff();
     }
 
