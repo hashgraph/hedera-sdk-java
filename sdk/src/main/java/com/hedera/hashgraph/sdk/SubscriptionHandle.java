@@ -51,8 +51,13 @@ public final class SubscriptionHandle {
      * Call the callback.
      */
     public void unsubscribe() {
-        if (this.onUnsubscribe != null) {
-            this.onUnsubscribe.run();
+        var unsubscribe = this.onUnsubscribe;
+
+        // Set onUnsubscribe back to null to make sure it is run just once.
+        this.onUnsubscribe = null;
+
+        if (unsubscribe != null) {
+            unsubscribe.run();
         }
     }
 }

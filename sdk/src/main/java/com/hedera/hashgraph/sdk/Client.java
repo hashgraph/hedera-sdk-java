@@ -101,7 +101,7 @@ public final class Client implements AutoCloseable {
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
 
-    private Set<SubscriptionHandle> subscriptions = new HashSet<>();
+    private Set<SubscriptionHandle> subscriptions = Collections.synchronizedSet(new HashSet<>());
 
     /**
      * Constructor.
@@ -403,21 +403,15 @@ public final class Client implements AutoCloseable {
 
     private void cancelAllSubscriptions() {
         ArrayList<SubscriptionHandle> handles = new ArrayList<>(subscriptions);
-        for (SubscriptionHandle handle : handles) {
-            handle.unsubscribe();
-        }
+        handles.forEach(SubscriptionHandle::unsubscribe);
     }
 
     void trackSubscription(SubscriptionHandle subscriptionHandle) {
-        if (!subscriptions.contains(subscriptionHandle)) {
-            subscriptions.add(subscriptionHandle);
-        }
+        subscriptions.add(subscriptionHandle);
     }
 
     void untrackSubscription(SubscriptionHandle subscriptionHandle) {
-        if (subscriptions.contains(subscriptionHandle)) {
-            subscriptions.remove(subscriptionHandle);
-        }
+        subscriptions.remove(subscriptionHandle);
     }
 
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
