@@ -158,6 +158,9 @@ public final class AccountInfo {
     @Nullable
     public final StakingInfo stakingInfo;
 
+    @Nullable
+    public final AccountId autoRenewAccountId;
+
     /**
      * Constructor.
      *
@@ -172,7 +175,7 @@ public final class AccountInfo {
      * @param receiveRecordThreshold    @depreciated no replacement
      * @param receiverSignatureRequired is the receiver's signature required
      * @param expirationTime            the expiration time
-     * @param autoRenewPeriod           the auto renew period
+     * @param autoRenewPeriod           the auto-renewal period
      * @param liveHashes                the live hashes
      * @param tokenRelationships        list of token id and token relationship records
      * @param accountMemo               the account melo
@@ -180,6 +183,9 @@ public final class AccountInfo {
      * @param maxAutomaticTokenAssociations     max number of token associations
      * @param aliasKey                  public alias key
      * @param ledgerId                  the ledger id
+     * @param ethereumNonce             the Ethereum nonce
+     * @param stakingInfo               the staking information
+     * @param autoRenewAccountId        the auto-renewal account ID
      */
     private AccountInfo(
         AccountId accountId,
@@ -202,7 +208,8 @@ public final class AccountInfo {
         @Nullable PublicKey aliasKey,
         LedgerId ledgerId,
         long ethereumNonce,
-        @Nullable StakingInfo stakingInfo
+        @Nullable StakingInfo stakingInfo,
+        @Nullable AccountId autoRenewAccountId
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -228,6 +235,7 @@ public final class AccountInfo {
         this.tokenAllowances = Collections.emptyList();
         this.tokenNftAllowances = Collections.emptyList();
         this.stakingInfo = stakingInfo;
+        this.autoRenewAccountId = autoRenewAccountId;
     }
 
     /**
@@ -278,7 +286,8 @@ public final class AccountInfo {
             aliasKey,
             LedgerId.fromByteString(accountInfo.getLedgerId()),
             accountInfo.getEthereumNonce(),
-            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null
+            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null,
+            accountInfo.hasAutoRenewAccount() ? AccountId.fromProtobuf(accountInfo.getAutoRenewAccount()) : null
         );
     }
 
@@ -337,6 +346,10 @@ public final class AccountInfo {
             accountInfoBuilder.setStakingInfo(stakingInfo.toProtobuf());
         }
 
+        if (autoRenewAccountId != null) {
+            accountInfoBuilder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
         return accountInfoBuilder.build();
     }
 
@@ -364,6 +377,7 @@ public final class AccountInfo {
             .add("ledgerId", ledgerId)
             .add("ethereumNonce", ethereumNonce)
             .add("stakingInfo", stakingInfo)
+            .add("autoRenewAccountId", autoRenewAccountId)
             .toString();
     }
 

@@ -62,6 +62,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     @Nullable
     private EvmAddress aliasEvmAddress = null;
 
+    @Nullable
+    private AccountId autoRenewAccount = null;
+
     /**
      * Constructor.
      */
@@ -402,6 +405,28 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
+     * ID of the account to charge for auto-renewal of this account
+     *
+     * @return the ID
+     */
+    @Nullable
+    public AccountId getAutoRenewAccount() {
+        return autoRenewAccount;
+    }
+
+    /**
+     * Set the account to charge for auto-renewal of this account
+     *
+     * @param autoRenewAccount ID of the account to charge for auto-renewal of this account
+     * @return {@code this}
+     */
+    public AccountCreateTransaction setAutoRenewAccount(AccountId autoRenewAccount) {
+        requireNotFrozen();
+        this.autoRenewAccount = autoRenewAccount;
+        return this;
+    }
+
+    /**
      * Build the transaction body.
      *
      * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}
@@ -433,6 +458,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             builder.setStakedAccountId(stakedAccountId.toProtobuf());
         } else if (stakedNodeId != null) {
             builder.setStakedNodeId(stakedNodeId);
+        }
+
+        if (autoRenewAccount != null) {
+            builder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
 
         return builder;
@@ -480,6 +509,10 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
         aliasKey = PublicKey.fromAliasBytes(body.getAlias());
         aliasEvmAddress = EvmAddress.fromAliasBytes(body.getAlias());
+
+        if (body.hasAutoRenewAccount()) {
+            autoRenewAccount = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
     }
 
     @Override

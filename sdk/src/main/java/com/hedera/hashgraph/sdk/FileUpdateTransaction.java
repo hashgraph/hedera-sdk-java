@@ -56,6 +56,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     @Nullable
     private String fileMemo = null;
 
+    @Nullable
+    private AccountId autoRenewAccount = null;
+
     /**
      * Constructor.
      */
@@ -265,6 +268,28 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
     }
 
     /**
+     * ID of the account to charge for auto-renewal of this file
+     *
+     * @return the ID
+     */
+    @Nullable
+    public AccountId getAutoRenewAccount() {
+        return autoRenewAccount;
+    }
+
+    /**
+     * Set the account to charge for auto-renewal of this file
+     *
+     * @param autoRenewAccount ID of the account to charge for auto-renewal of this file
+     * @return {@code this}
+     */
+    public FileUpdateTransaction setAutoRenewAccount(AccountId autoRenewAccount) {
+        requireNotFrozen();
+        this.autoRenewAccount = autoRenewAccount;
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -280,6 +305,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         }
         if (body.hasMemo()) {
             fileMemo = body.getMemo().getValue();
+        }
+        if (body.hasAutoRenewAccount()) {
+            autoRenewAccount = AccountId.fromProtobuf(body.getAutoRenewAccount());
         }
         contents = body.getContents().toByteArray();
     }
@@ -303,6 +331,9 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
         builder.setContents(ByteString.copyFrom(contents));
         if (fileMemo != null) {
             builder.setMemo(StringValue.of(fileMemo));
+        }
+        if (autoRenewAccount != null) {
+            builder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
 
         return builder;

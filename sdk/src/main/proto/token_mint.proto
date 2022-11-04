@@ -39,8 +39,9 @@ import "basic_types.proto";
  * returned.
  * If the metadata list contains metadata which is too large, a METADATA_TOO_LONG response code will
  * be returned.
- * If neither the amount nor the metadata list get filled, a INVALID_TOKEN_MINT_AMOUNT response code
- * will be returned.
+ * If the metadata list is not filled for a non-fungible token type, a INVALID_TOKEN_MINT_AMOUNT response
+ * code will be returned.
+ * If a zero amount is provided for a fungible token type, it will be treated as a regular transaction.
  * If the metadata list count is greater than the batch size limit global dynamic property, a
  * BATCH_SIZE_LIMIT_EXCEEDED response code will be returned.
  */

@@ -35,7 +35,8 @@ import "google/protobuf/wrappers.proto";
  * in the top level of a key list (M-of-M) of the file being updated. If the keys themselves are
  * being updated, then the transaction must also be signed by all the new keys. If the keys contain
  * additional KeyList or ThresholdKey then M-of-M secondary KeyList or ThresholdKey signing
- * requirements must be meet
+ * requirements must be meet If the update transaction sets the <tt>auto_renew_account_id</tt> field 
+ * to anything other than the sentinel <tt>0.0.0</tt>, the key of the referenced account must sign.
  */
 message FileUpdateTransactionBody {
     /**
@@ -62,4 +63,10 @@ message FileUpdateTransactionBody {
      * If set, the new memo to be associated with the file (UTF-8 encoding max 100 bytes)
      */
     google.protobuf.StringValue memo = 5;
+
+    /**
+     * If set to the sentinel <tt>0.0.0</tt> AccountID, this field removes the file's auto-renew 
+     * account. Otherwise it updates the file's auto-renew account to the referenced account.
+     */
+    AccountID auto_renew_account = 6;
 }

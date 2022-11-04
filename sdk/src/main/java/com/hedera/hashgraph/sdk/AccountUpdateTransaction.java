@@ -82,6 +82,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     @Nullable
     private Boolean declineStakingReward = null;
 
+    @Nullable
+    private AccountId autoRenewAccount = null;
+
     /**
      * Constructor.
      */
@@ -459,6 +462,28 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         return this;
     }
 
+    /**
+     * ID of the account to charge for auto-renewal of this account
+     *
+     * @return the ID
+     */
+    @Nullable
+    public AccountId getAutoRenewAccount() {
+        return autoRenewAccount;
+    }
+
+    /**
+     * Set the account to charge for auto-renewal of this account
+     *
+     * @param autoRenewAccount ID of the account to charge for auto-renewal of this account
+     * @return {@code this}
+     */
+    public AccountUpdateTransaction setAutoRenewAccount(AccountId autoRenewAccount) {
+        requireNotFrozen();
+        this.autoRenewAccount = autoRenewAccount;
+        return this;
+    }
+
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
         if (accountId != null) {
@@ -515,6 +540,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         if (body.hasStakedNodeId()) {
             stakedNodeId = body.getStakedNodeId();
         }
+
+        if (body.hasAutoRenewAccount()) {
+            autoRenewAccount = AccountId.fromProtobuf(body.getAutoRenewAccount());
+        }
     }
 
     @Override
@@ -562,6 +591,10 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
         if (declineStakingReward != null) {
             builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+        }
+
+        if (autoRenewAccount != null) {
+            builder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
 
         return builder;

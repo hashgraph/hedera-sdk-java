@@ -28,7 +28,6 @@ import javax.annotation.Nullable;
 
 /**
  * Current information for a file, including its size.
- *
  * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/get-file-info">Hedera Documentation</a>
  */
 public final class FileInfo {
@@ -66,6 +65,9 @@ public final class FileInfo {
      */
     public final LedgerId ledgerId;
 
+    @Nullable
+    public final AccountId autoRenewAccountId;
+
     private FileInfo(
         FileId fileId,
         long size,
@@ -73,7 +75,8 @@ public final class FileInfo {
         boolean isDeleted,
         @Nullable KeyList keys,
         String fileMemo,
-        LedgerId ledgerId
+        LedgerId ledgerId,
+        @Nullable AccountId autoRenewAccountId
     ) {
         this.fileId = fileId;
         this.size = size;
@@ -82,6 +85,7 @@ public final class FileInfo {
         this.keys = keys;
         this.fileMemo = fileMemo;
         this.ledgerId = ledgerId;
+        this.autoRenewAccountId = autoRenewAccountId;
     }
 
     /**
@@ -102,7 +106,8 @@ public final class FileInfo {
             fileInfo.getDeleted(),
             keys,
             fileInfo.getMemo(),
-            LedgerId.fromByteString(fileInfo.getLedgerId())
+            LedgerId.fromByteString(fileInfo.getLedgerId()),
+            AccountId.fromProtobuf(fileInfo.getAutoRenewAccount())
         );
     }
 
@@ -141,6 +146,10 @@ public final class FileInfo {
             fileInfoBuilder.setKeys(keyList);
         }
 
+        if (autoRenewAccountId != null) {
+            fileInfoBuilder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
         return fileInfoBuilder.build();
     }
 
@@ -154,6 +163,7 @@ public final class FileInfo {
             .add("keys", keys)
             .add("fileMemo", fileMemo)
             .add("ledgerId", ledgerId)
+            .add("autoRenewAccountId", autoRenewAccountId)
             .toString();
     }
 
