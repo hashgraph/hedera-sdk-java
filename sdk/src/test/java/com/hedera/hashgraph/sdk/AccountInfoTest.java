@@ -55,6 +55,7 @@ public class AccountInfoTest {
         .addLiveHashes(liveHash)
         .setLedgerId(LedgerId.PREVIEWNET.toByteString())
         .setEthereumNonce(1001)
+        .setAutoRenewAccount(new AccountId(9).toProtobuf())
         .build();
 
     @BeforeAll

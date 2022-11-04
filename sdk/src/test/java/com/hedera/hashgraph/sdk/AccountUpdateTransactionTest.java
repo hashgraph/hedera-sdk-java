@@ -60,6 +60,7 @@ public class AccountUpdateTransactionTest {
             .setAccountMemo("Some memo")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .setStakedAccountId(AccountId.fromString("0.0.3"))
+            .setAutoRenewAccount(AccountId.fromString("0.0.1002"))
             .freeze()
             .sign(unusedPrivateKey);
     }
@@ -78,6 +79,7 @@ public class AccountUpdateTransactionTest {
             .setAccountMemo("Some memo")
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .setStakedNodeId(4L)
+            .setAutoRenewAccount(AccountId.fromString("0.0.1002"))
             .freeze()
             .sign(unusedPrivateKey);
     }

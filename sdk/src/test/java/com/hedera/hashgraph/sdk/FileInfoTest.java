@@ -42,6 +42,7 @@ public class FileInfoTest {
         .setKeys(KeyList.newBuilder()
             .addKeys(privateKey.getPublicKey().toProtobufKey()))
         .setLedgerId(LedgerId.MAINNET.toByteString())
+        .setAutoRenewAccount(new AccountId(9).toProtobuf())
         .build();
 
     @BeforeAll

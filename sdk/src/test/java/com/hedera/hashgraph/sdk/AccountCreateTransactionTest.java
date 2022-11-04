@@ -60,6 +60,7 @@ public class AccountCreateTransactionTest {
             .setAliasKey(PublicKey.fromString("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048"))
             .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setAutoRenewAccount(AccountId.fromString("0.0.1002"))
             .freeze()
             .sign(unusedPrivateKey);
     }
@@ -78,6 +79,7 @@ public class AccountCreateTransactionTest {
             .setAliasEvmAddress(EvmAddress.fromString("302a300506032b6570032100114e6abc371b82da"))
             .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
+            .setAutoRenewAccount(AccountId.fromString("0.0.1002"))
             .freeze()
             .sign(unusedPrivateKey);
     }

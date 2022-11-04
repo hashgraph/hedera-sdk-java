@@ -61,6 +61,7 @@ public class FileCreateTransactionTest {
             .setKeys(unusedPrivateKey)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .setFileMemo("Hello memo")
+            .setAutoRenewAccount(AccountId.fromString("0.0.5007"))
             .freeze()
             .sign(unusedPrivateKey);
     }

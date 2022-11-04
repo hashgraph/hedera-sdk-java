@@ -96,6 +96,11 @@ message FileGetInfoResponse {
          * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
          */
         bytes ledger_id = 7;
+
+        /**
+         * If set, the account that is used to pay for auto-renewal of the file.
+         */
+        AccountID auto_renew_account = 8;
     }
 
     /**

@@ -52,6 +52,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
     private byte[] contents = {};
     private String fileMemo = "";
 
+    @Nullable
+    private AccountId autoRenewAccount = null;
+
     /**
      * Constructor.
      */
@@ -230,6 +233,28 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         return this;
     }
 
+    /**
+     * ID of the account to charge for auto-renewal of this file
+     *
+     * @return the ID
+     */
+    @Nullable
+    public AccountId getAutoRenewAccount() {
+        return autoRenewAccount;
+    }
+
+    /**
+     * Set the account to charge for auto-renewal of this file
+     *
+     * @param autoRenewAccount ID of the account to charge for auto-renewal of this file
+     * @return {@code this}
+     */
+    public FileCreateTransaction setAutoRenewAccount(AccountId autoRenewAccount) {
+        requireNotFrozen();
+        this.autoRenewAccount = autoRenewAccount;
+        return this;
+    }
+
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
         return FileServiceGrpc.getCreateFileMethod();
@@ -253,6 +278,7 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         }
         contents = body.getContents().toByteArray();
         fileMemo = body.getMemo();
+        autoRenewAccount = AccountId.fromProtobuf(body.getAutoRenewAccount());
     }
 
     /**
@@ -271,6 +297,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
         }
         builder.setContents(ByteString.copyFrom(contents));
         builder.setMemo(fileMemo);
+
+        if (autoRenewAccount != null) {
+            builder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
+        }
 
         return builder;
     }
