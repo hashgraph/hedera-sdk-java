@@ -63,8 +63,6 @@ public class TopicMessageIntegrationTest {
             Thread.sleep(2000);
         }
 
-        handle.unsubscribe();
-
         new TopicDeleteTransaction()
             .setTopicId(topicId)
             .execute(testEnv.client)
@@ -119,8 +117,6 @@ public class TopicMessageIntegrationTest {
 
             Thread.sleep(1000);
         }
-
-        handle.unsubscribe();
 
         new TopicDeleteTransaction()
             .setTopicId(topicId)

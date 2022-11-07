@@ -101,7 +101,7 @@ public final class Client implements AutoCloseable {
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
 
-    private Set<SubscriptionHandle> subscriptions = Collections.synchronizedSet(new HashSet<>());
+    private Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructor.
@@ -402,8 +402,7 @@ public final class Client implements AutoCloseable {
     }
 
     private void cancelAllSubscriptions() {
-        ArrayList<SubscriptionHandle> handles = new ArrayList<>(subscriptions);
-        handles.forEach(SubscriptionHandle::unsubscribe);
+        subscriptions.forEach(SubscriptionHandle::unsubscribe);
     }
 
     void trackSubscription(SubscriptionHandle subscriptionHandle) {
