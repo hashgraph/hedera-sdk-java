@@ -262,8 +262,12 @@ public final class TopicMessageQuery {
                 .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         subscriptionHandle.setOnUnsubscribe(() -> {
+            client.untrackSubscription(subscriptionHandle);
+
             call.cancel("unsubscribe", null);
         });
+
+        client.trackSubscription(subscriptionHandle);
 
         @Var
         var newBuilder = builder;

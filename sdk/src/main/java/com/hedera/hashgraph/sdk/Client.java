@@ -42,12 +42,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Supplier;
 
@@ -105,6 +100,8 @@ public final class Client implements AutoCloseable {
 
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
+
+    private Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructor.
@@ -402,6 +399,18 @@ public final class Client implements AutoCloseable {
         if (networkUpdateFuture != null) {
             networkUpdateFuture.cancel(true);
         }
+    }
+
+    private void cancelAllSubscriptions() {
+        subscriptions.forEach(SubscriptionHandle::unsubscribe);
+    }
+
+    void trackSubscription(SubscriptionHandle subscriptionHandle) {
+        subscriptions.add(subscriptionHandle);
+    }
+
+    void untrackSubscription(SubscriptionHandle subscriptionHandle) {
+        subscriptions.remove(subscriptionHandle);
     }
 
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
@@ -1286,6 +1295,7 @@ public final class Client implements AutoCloseable {
 
         networkUpdatePeriod = null;
         cancelScheduledNetworkUpdate();
+        cancelAllSubscriptions();
 
         network.beginClose();
         mirrorNetwork.beginClose();
