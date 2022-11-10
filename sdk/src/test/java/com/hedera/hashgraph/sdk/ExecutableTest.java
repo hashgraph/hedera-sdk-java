@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -107,6 +108,49 @@ class ExecutableTest {
         var timeRemaining = grpcRequest.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
         assertThat(timeRemaining).isLessThan(10000);
         assertThat(timeRemaining).isGreaterThan(9000);
+    }
+
+    @Test
+    void executableShouldUseGrpcDeadline() throws InterruptedException, PrecheckStatusException, TimeoutException {
+        when(node3.isHealthy()).thenReturn(true);
+
+        var tx = new DummyTransaction();
+        tx.setNodeAccountIds(nodeAccountIds);
+        tx.setNodesFromNodeAccountIds(client);
+        tx.setMinBackoff(Duration.ofMillis(10));
+        tx.setMaxBackoff(Duration.ofMillis(1000));
+
+        var timeout = Duration.ofSeconds(10);
+        var currentTimeRemaining = new AtomicLong(timeout.toMillis());
+        final long minimumRetryDelayMs = 50;
+        tx.blockingUnaryCall = (grpcRequest) -> {
+            var grpc = (Executable.GrpcRequest)grpcRequest;
+
+            var grpcTimeRemaining = grpc.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
+
+            // grpc deadline should decrease with each retry
+            assertThat(grpcTimeRemaining).isLessThanOrEqualTo(currentTimeRemaining.get());
+            assertThat(grpcTimeRemaining).isGreaterThan(0);
+
+            currentTimeRemaining.set(currentTimeRemaining.get() - minimumRetryDelayMs);
+
+            if (currentTimeRemaining.get() > 0) {
+                try {
+                    Thread.sleep(minimumRetryDelayMs);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+
+                // Status.UNAVAILABLE tells the Executable to retry the request
+                throw new StatusRuntimeException(io.grpc.Status.UNAVAILABLE);
+            }
+
+            throw new StatusRuntimeException(io.grpc.Status.ABORTED);
+        };
+
+        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> {
+            tx.execute(client, timeout);
+        });
     }
 
     @Test

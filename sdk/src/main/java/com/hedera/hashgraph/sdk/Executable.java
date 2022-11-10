@@ -353,9 +353,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new MaxAttemptsExceededException(lastException);
             }
 
-            if (Instant.now().isAfter(timeoutTime)) {
+            Duration deadline = Duration.between(Instant.now(), timeoutTime);
+            if (deadline.isNegative() || deadline.isZero()) {
                 throw new TimeoutException();
             }
+
+            this.setGrpcDeadline(deadline);
 
             GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
             Node node = grpcRequest.getNode();
