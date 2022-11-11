@@ -302,6 +302,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         if (minBackoff == null) {
             minBackoff = client.getMinBackoff();
         }
+
+        if (grpcDeadline == null) {
+            grpcDeadline = client.getGrpcDeadline();
+        }
     }
 
     private void delay(long delay) {
@@ -358,9 +362,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new TimeoutException();
             }
 
-            this.setGrpcDeadline(deadline);
-
-            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
+            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, deadline);
             Node node = grpcRequest.getNode();
             ResponseT response = null;
 
@@ -576,7 +578,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             return;
         }
 
-        GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
+        GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, null);
 
         Supplier<CompletableFuture<Void>> afterUnhealthyDelay = () -> {
             return grpcRequest.getNode().isHealthy() ?
@@ -636,7 +638,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     abstract ProtoRequestT makeRequest();
 
     GrpcRequest getGrpcRequest(int attempt) {
-        return new GrpcRequest(null, attempt);
+        return new GrpcRequest(null, attempt, null);
     }
 
     void advanceRequest() {
@@ -705,14 +707,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         private final ProtoRequestT request;
         private final long startAt;
         private final long delay;
+        @Nullable
+        private Duration grpcDeadline;
 
         private ResponseT response;
         private double latency;
         private Status responseStatus;
 
-        GrpcRequest(@Nullable Network network, int attempt) {
+        GrpcRequest(@Nullable Network network, int attempt, @Nullable Duration grpcDeadline) {
             this.network = network;
             this.attempt = attempt;
+            this.grpcDeadline = grpcDeadline;
             this.node = getNodeForExecute(attempt);
             this.request = getRequestForExecute(); // node index gets incremented here
             this.startAt = System.nanoTime();
@@ -724,11 +729,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         public CallOptions getCallOptions() {
             var options = CallOptions.DEFAULT;
 
-            if (Executable.this.grpcDeadline != null) {
-                return options.withDeadlineAfter(Executable.this.grpcDeadline.toMillis(), TimeUnit.MILLISECONDS);
-            } else {
+            if (this.grpcDeadline == null && Executable.this.grpcDeadline == null ) {
                 return options;
             }
+
+            long deadline = Math.min(
+                this.grpcDeadline == null ? Long.MAX_VALUE : this.grpcDeadline.toMillis(),
+                Executable.this.grpcDeadline == null ? Long.MAX_VALUE : Executable.this.grpcDeadline.toMillis());
+
+            return options.withDeadlineAfter(deadline, TimeUnit.MILLISECONDS);
         }
 
         public Node getNode() {

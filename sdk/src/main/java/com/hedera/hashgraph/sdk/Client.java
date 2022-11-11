@@ -60,6 +60,7 @@ public final class Client implements AutoCloseable {
     static final Duration DEFAULT_MIN_NODE_BACKOFF = Duration.ofSeconds(8L);
     static final Duration DEFAULT_CLOSE_TIMEOUT = Duration.ofSeconds(30L);
     static final Duration DEFAULT_REQUEST_TIMEOUT = Duration.ofMinutes(2L);
+    static final Duration DEFAULT_GRPC_DEADLINE = Duration.ofSeconds(10L);
     static final Duration DEFAULT_NETWORK_UPDATE_PERIOD = Duration.ofHours(24);
     // Initial delay of 10 seconds before we update the network for the first time,
     // so that this doesn't happen in unit tests.
@@ -83,6 +84,7 @@ public final class Client implements AutoCloseable {
 
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
+    private Duration grpcDeadline = DEFAULT_GRPC_DEADLINE;
 
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
 
@@ -1237,6 +1239,34 @@ public final class Client implements AutoCloseable {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
         mirrorNetwork.setCloseTimeout(closeTimeout);
+        return this;
+    }
+
+    /**
+     * Maximum amount of time a gRPC request can run
+     *
+     * @return                          the gRPC deadline value
+     */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP",
+        justification = "A Duration can't actually be mutated"
+    )
+    public synchronized Duration getGrpcDeadline() {
+        return grpcDeadline;
+    }
+
+    /**
+     * Set the maximum amount of time a gRPC request can run.
+     *
+     * @param grpcDeadline            the gRPC deadline value
+     * @return {@code this}
+     */
+    @SuppressFBWarnings(
+        value = "EI_EXPOSE_REP2",
+        justification = "A Duration can't actually be mutated"
+    )
+    public synchronized Client setGrpcDeadline(Duration grpcDeadline) {
+        this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
         return this;
     }
 

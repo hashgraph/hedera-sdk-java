@@ -119,18 +119,30 @@ class ExecutableTest {
         tx.setNodesFromNodeAccountIds(client);
         tx.setMinBackoff(Duration.ofMillis(10));
         tx.setMaxBackoff(Duration.ofMillis(1000));
+        tx.setMaxAttempts(10);
 
-        var timeout = Duration.ofSeconds(10);
+        var timeout = Duration.ofSeconds(5);
         var currentTimeRemaining = new AtomicLong(timeout.toMillis());
-        final long minimumRetryDelayMs = 50;
+        final long minimumRetryDelayMs = 100;
+        final long defaultDeadlineMs = timeout.toMillis() - (minimumRetryDelayMs * (tx.getMaxAttempts() / 2));
+
+        // later on when the transaction is executed its grpc deadline should not be modified...
+        tx.setGrpcDeadline(Duration.ofMillis(defaultDeadlineMs));
+
         tx.blockingUnaryCall = (grpcRequest) -> {
             var grpc = (Executable.GrpcRequest)grpcRequest;
 
             var grpcTimeRemaining = grpc.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
 
-            // grpc deadline should decrease with each retry
+            // the actual grpc deadline should be no larger than the smaller of the two values -
+            // the default transaction level grpc deadline and the remaining timeout
+            assertThat(grpcTimeRemaining).isLessThanOrEqualTo(defaultDeadlineMs);
             assertThat(grpcTimeRemaining).isLessThanOrEqualTo(currentTimeRemaining.get());
+
             assertThat(grpcTimeRemaining).isGreaterThan(0);
+
+            // transaction's grpc deadline should keep its original value
+            assertThat(tx.grpcDeadline().toMillis()).isEqualTo(defaultDeadlineMs);
 
             currentTimeRemaining.set(currentTimeRemaining.get() - minimumRetryDelayMs);
 
