@@ -84,7 +84,7 @@ public final class Client implements AutoCloseable {
 
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
-    private Duration grpcDeadline = DEFAULT_GRPC_DEADLINE;
+    private volatile Duration grpcDeadline = DEFAULT_GRPC_DEADLINE;
 
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
 
@@ -1251,7 +1251,7 @@ public final class Client implements AutoCloseable {
         value = "EI_EXPOSE_REP",
         justification = "A Duration can't actually be mutated"
     )
-    public synchronized Duration getGrpcDeadline() {
+    public Duration getGrpcDeadline() {
         return grpcDeadline;
     }
 
@@ -1265,7 +1265,7 @@ public final class Client implements AutoCloseable {
         value = "EI_EXPOSE_REP2",
         justification = "A Duration can't actually be mutated"
     )
-    public synchronized Client setGrpcDeadline(Duration grpcDeadline) {
+    public Client setGrpcDeadline(Duration grpcDeadline) {
         this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
         return this;
     }
