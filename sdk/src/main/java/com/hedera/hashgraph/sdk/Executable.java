@@ -355,12 +355,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new MaxAttemptsExceededException(lastException);
             }
 
-            Duration deadline = Duration.between(Instant.now(), timeoutTime);
-            if (deadline.isNegative() || deadline.isZero()) {
+            Duration currentTimeout = Duration.between(Instant.now(), timeoutTime);
+            if (currentTimeout.isNegative() || currentTimeout.isZero()) {
                 throw new TimeoutException();
             }
 
-            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, deadline);
+            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, currentTimeout);
             Node node = grpcRequest.getNode();
             ResponseT response = null;
 

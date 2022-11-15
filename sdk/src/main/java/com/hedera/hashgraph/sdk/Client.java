@@ -44,6 +44,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
@@ -84,7 +85,7 @@ public final class Client implements AutoCloseable {
 
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
-    private volatile Duration grpcDeadline = DEFAULT_GRPC_DEADLINE;
+    private AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
 
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
 
@@ -1252,7 +1253,7 @@ public final class Client implements AutoCloseable {
         justification = "A Duration can't actually be mutated"
     )
     public Duration getGrpcDeadline() {
-        return grpcDeadline;
+        return grpcDeadline.get();
     }
 
     /**
@@ -1266,7 +1267,7 @@ public final class Client implements AutoCloseable {
         justification = "A Duration can't actually be mutated"
     )
     public Client setGrpcDeadline(Duration grpcDeadline) {
-        this.grpcDeadline = Objects.requireNonNull(grpcDeadline);
+        this.grpcDeadline.set(Objects.requireNonNull(grpcDeadline));
         return this;
     }
 
