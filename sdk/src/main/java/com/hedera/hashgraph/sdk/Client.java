@@ -85,7 +85,7 @@ public final class Client implements AutoCloseable {
 
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
-    private AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
+    private final AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
 
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
 
