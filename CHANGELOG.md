@@ -5,11 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Fixed
+ - `Executable.execute(Client client, Duration timeout)` now sets gRPC deadline to the underlying gRPC request
+ - Transaction sometimes being reported as duplicate when submitting large number of transactions
+
 ## 2.18.2
 
 ### Fixed
  - `Client.close()` now tracks and automatically unsubscribes from Mirror Node Topic Queries
- - `Executable.execute(Client client, Duration timeout)` now sets gRPC deadline to the underlying gRPC request
 
 ## 2.18.1
 
