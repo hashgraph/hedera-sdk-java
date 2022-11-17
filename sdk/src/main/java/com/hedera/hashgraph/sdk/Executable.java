@@ -82,7 +82,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     Function<GrpcRequest, ResponseT> blockingUnaryCall =
         (grpcRequest) -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
 
-    @Nullable
     protected Duration grpcDeadline;
     private java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
     private java8.util.function.Function<ResponseT, ResponseT> responseListener;
@@ -108,7 +107,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      *
      * @return The timeout for each execution attempt
      */
-    @Nullable
     public final Duration grpcDeadline() {
         return grpcDeadline;
     }
@@ -302,6 +300,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         if (minBackoff == null) {
             minBackoff = client.getMinBackoff();
         }
+
+        if (grpcDeadline == null) {
+            grpcDeadline = client.getGrpcDeadline();
+        }
     }
 
     private void delay(long delay) {
@@ -353,11 +355,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new MaxAttemptsExceededException(lastException);
             }
 
-            if (Instant.now().isAfter(timeoutTime)) {
+            Duration currentTimeout = Duration.between(Instant.now(), timeoutTime);
+            if (currentTimeout.isNegative() || currentTimeout.isZero()) {
                 throw new TimeoutException();
             }
 
-            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
+            GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, currentTimeout);
             Node node = grpcRequest.getNode();
             ResponseT response = null;
 
@@ -433,7 +436,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             checkNodeAccountIds();
             setNodesFromNodeAccountIds(client);
 
-            executeAsyncInternal(client, 1, null, retval);
+            executeAsyncInternal(client, 1, null, retval, timeout);
         }).exceptionally(error -> {
             retval.completeExceptionally(error);
             return null;
@@ -562,7 +565,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         Client client,
         int attempt,
         @Nullable Throwable lastException,
-        CompletableFuture<O> returnFuture
+        CompletableFuture<O> returnFuture,
+        Duration timeout
     ) {
         if (returnFuture.isCancelled() || returnFuture.isCompletedExceptionally() || returnFuture.isDone()) {
             return;
@@ -573,7 +577,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             return;
         }
 
-        GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt);
+        var timeoutTime = Instant.now().plus(timeout);
+
+        GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, Duration.between(Instant.now(), timeoutTime));
 
         Supplier<CompletableFuture<Void>> afterUnhealthyDelay = () -> {
             return grpcRequest.getNode().isHealthy() ?
@@ -585,14 +591,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             grpcRequest.getNode().channelFailedToConnectAsync().thenAccept(connectionFailed -> {
                 if (connectionFailed) {
                     var connectionException = grpcRequest.reactToConnectionFailure();
-                    executeAsyncInternal(client, attempt + 1, connectionException, returnFuture);
+                    executeAsyncInternal(client, attempt + 1, connectionException, returnFuture, Duration.between(Instant.now(), timeoutTime));
                     return;
                 }
 
                 toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
                     if (grpcRequest.shouldRetryExceptionally(error)) {
                         // the transaction had a network failure reaching Hedera
-                        executeAsyncInternal(client, attempt + 1, error, returnFuture);
+                        executeAsyncInternal(client, attempt + 1, error, returnFuture, Duration.between(Instant.now(), timeoutTime));
                         return null;
                     }
 
@@ -604,11 +610,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
                     switch (grpcRequest.getStatus(response)) {
                         case ServerError:
-                            executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                            executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             break;
                         case Retry:
                             Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
-                                executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture);
+                                executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             });
                             break;
                         case RequestError:
@@ -633,7 +639,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     abstract ProtoRequestT makeRequest();
 
     GrpcRequest getGrpcRequest(int attempt) {
-        return new GrpcRequest(null, attempt);
+        return new GrpcRequest(null, attempt, this.grpcDeadline);
     }
 
     void advanceRequest() {
@@ -702,14 +708,16 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         private final ProtoRequestT request;
         private final long startAt;
         private final long delay;
+        private Duration grpcDeadline;
 
         private ResponseT response;
         private double latency;
         private Status responseStatus;
 
-        GrpcRequest(@Nullable Network network, int attempt) {
+        GrpcRequest(@Nullable Network network, int attempt, Duration grpcDeadline) {
             this.network = network;
             this.attempt = attempt;
+            this.grpcDeadline = grpcDeadline;
             this.node = getNodeForExecute(attempt);
             this.request = getRequestForExecute(); // node index gets incremented here
             this.startAt = System.nanoTime();
@@ -719,13 +727,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
 
         public CallOptions getCallOptions() {
-            var options = CallOptions.DEFAULT;
+            long deadline = Math.min(
+                this.grpcDeadline.toMillis(),
+                Executable.this.grpcDeadline.toMillis());
 
-            if (Executable.this.grpcDeadline != null) {
-                return options.withDeadlineAfter(Executable.this.grpcDeadline.toMillis(), TimeUnit.MILLISECONDS);
-            } else {
-                return options;
-            }
+            return CallOptions.DEFAULT.withDeadlineAfter(deadline, TimeUnit.MILLISECONDS);
         }
 
         public Node getNode() {
