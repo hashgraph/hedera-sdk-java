@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Fixed
+ - `Executable.execute(Client client, Duration timeout)` now sets gRPC deadline to the underlying gRPC request
+ - Transaction sometimes being reported as duplicate when submitting large number of transactions
  - `RejectedExecutionException` under heavy load
 
 ## 2.18.2
