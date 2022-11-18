@@ -16,7 +16,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - `Client.close()` now tracks and automatically unsubscribes from Mirror Node Topic Queries
- - `Executable.execute(Client client, Duration timeout)` now sets gRPC deadline to the underlying gRPC request
 
 ## 2.18.1
 
