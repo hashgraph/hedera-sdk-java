@@ -139,9 +139,11 @@ public final class Client implements AutoCloseable {
             .setDaemon(true)
             .build();
 
-        return Executors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors(),
-            threadFactory);
+        int nThreads = Runtime.getRuntime().availableProcessors();
+        return new ThreadPoolExecutor(nThreads, nThreads,
+                        0L, TimeUnit.MILLISECONDS,
+                        new LinkedBlockingQueue<>(),
+                        threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     /**
