@@ -57,10 +57,10 @@ dependencies {
 
     testRuntimeOnly "org.slf4j:slf4j-simple:2.0.3"
     testRuntimeOnly "io.grpc:grpc-netty-shaded:1.50.2"
-    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.3'
+    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.4'
 
     integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.50.2'
-    integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.2'
+    integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.4'
 }
 
 // https://github.com/google/protobuf-gradle-plugin
