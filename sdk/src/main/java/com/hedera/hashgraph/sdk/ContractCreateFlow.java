@@ -21,13 +21,12 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java8.util.Lists;
 import java8.util.concurrent.CompletableFuture;
 import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
+import java8.util.function.Function;
 import org.bouncycastle.util.encoders.Hex;
 import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -35,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -116,6 +114,18 @@ public class ContractCreateFlow {
     private Long stakedNodeId = null;
 
     private boolean declineStakingReward = false;
+
+    @Nullable
+    private Client freezeWithClient = null;
+
+    @Nullable
+    private PrivateKey signPrivateKey = null;
+
+    @Nullable
+    private PublicKey signPublicKey = null;
+
+    @Nullable
+    private Function<byte[], byte[]> transactionSigner = null;
 
     public ContractCreateFlow() {
     }
@@ -472,6 +482,53 @@ public class ContractCreateFlow {
         return this;
     }
 
+    /**
+     * Set the client that this transaction will be frozen with.
+     *
+     * @return {@code this}
+     */
+    public ContractCreateFlow freezeWith(Client client) {
+        this.freezeWithClient = client;
+        return this;
+    }
+
+    /**
+     * Set the private key that this transaction will be signed with.
+     *
+     * @return {@code this}
+     */
+    public ContractCreateFlow sign(PrivateKey privateKey) {
+        this.signPrivateKey = privateKey;
+        this.signPublicKey = null;
+        this.transactionSigner = null;
+        return this;
+    }
+
+    /**
+     * Set the public key and key list that this transaction will be signed with.
+     *
+     * @return {@code this}
+     */
+    public ContractCreateFlow signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        this.signPublicKey = publicKey;
+        this.transactionSigner = transactionSigner;
+        this.signPrivateKey = null;
+        return this;
+    }
+
+    /**
+     * Set the operator that this transaction will be signed with.
+     *
+     * @return {@code this}
+     */
+    public ContractCreateFlow signWithOperator(Client client) {
+        var operator = Objects.requireNonNull(client.getOperator());
+        this.signPublicKey = operator.publicKey;
+        this.transactionSigner = operator.transactionSigner;
+        this.signPrivateKey = null;
+        return this;
+    }
+
     private void splitBytecode() {
         if(bytecode.length() > FILE_CREATE_MAX_BYTES) {
             createBytecode = bytecode.substring(0, FILE_CREATE_MAX_BYTES);
@@ -535,6 +592,14 @@ public class ContractCreateFlow {
             contractCreateTx.setStakedAccountId(stakedAccountId);
         } else if (stakedNodeId != null) {
             contractCreateTx.setStakedNodeId(stakedNodeId);
+        }
+        if (freezeWithClient != null) {
+            contractCreateTx.freezeWith(freezeWithClient);
+        }
+        if (signPrivateKey != null) {
+            contractCreateTx.sign(signPrivateKey);
+        } else if (signPublicKey != null && transactionSigner != null) {
+            contractCreateTx.signWith(signPublicKey, transactionSigner);
         }
         return contractCreateTx;
     }
