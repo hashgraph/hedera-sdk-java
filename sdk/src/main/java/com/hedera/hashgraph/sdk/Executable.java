@@ -490,6 +490,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     @VisibleForTesting
     void setNodesFromNodeAccountIds(Client client) {
+        nodes.clear();
         for (var accountId : nodeAccountIds) {
             @Nullable
             var node = client.network.getNode(accountId);
