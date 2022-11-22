@@ -41,7 +41,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.72'
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation 'org.slf4j:slf4j-api:2.0.3'
+    implementation 'org.slf4j:slf4j-api:2.0.4'
 
     implementation "io.grpc:grpc-core:1.50.2"
     implementation "io.grpc:grpc-stub:1.50.2"
