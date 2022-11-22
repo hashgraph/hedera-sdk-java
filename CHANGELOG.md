@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Transaction sometimes being reported as duplicate when submitting large number of transactions
  - `RejectedExecutionException` under heavy load
  - `nodes` not clearing when reusing transaction
+ - BIP-39 - unicode mnemonic passphrases are normalized to NFKD
 
 ## 2.18.2
 
