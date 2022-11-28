@@ -3,7 +3,7 @@ dependencies {
     implementation project(":sdk")
 
     implementation "com.google.code.gson:gson:2.10"
-    implementation "org.slf4j:slf4j-simple:2.0.4"
+    implementation "org.slf4j:slf4j-simple:2.0.5"
     implementation "io.grpc:grpc-netty-shaded:1.51.0"
     implementation "io.github.cdimascio:java-dotenv:5.3.1"
     implementation "com.google.errorprone:error_prone_core:2.16"
