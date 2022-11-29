@@ -41,7 +41,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.72'
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation 'org.slf4j:slf4j-api:2.0.4'
+    implementation 'org.slf4j:slf4j-api:2.0.5'
 
     implementation "io.grpc:grpc-core:1.51.0"
     implementation "io.grpc:grpc-stub:1.51.0"
@@ -55,9 +55,9 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:5.9.1"
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.9.1"
 
-    testRuntimeOnly "org.slf4j:slf4j-simple:2.0.4"
+    testRuntimeOnly "org.slf4j:slf4j-simple:2.0.5"
     testRuntimeOnly "io.grpc:grpc-netty-shaded:1.51.0"
-    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.4'
+    testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.5'
 
     integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.50.2'
     integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.4'
