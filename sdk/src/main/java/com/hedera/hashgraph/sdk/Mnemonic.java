@@ -35,6 +35,7 @@ import java.lang.ref.SoftReference;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -418,7 +419,7 @@ public final class Mnemonic {
      * @return the byte array
      */
     byte[] toSeed(String passphrase) {
-        String salt = "mnemonic" + passphrase;
+        String salt = Normalizer.normalize("mnemonic" + passphrase, Normalizer.Form.NFKD);
 
         // BIP-39 seed generation
         PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());

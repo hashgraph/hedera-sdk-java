@@ -321,4 +321,18 @@ public class MnemonicTest {
         PrivateKey key = mnemonic.toPrivateKey();
         assertThat(key.toString()).isEqualTo(MNEMONIC_PRIVATE_KEY);
     }
+
+    @Test
+    @DisplayName("Mnemonic passphrase test")
+    void mnemonicPassphraseTest() throws Exception {
+        // Test if mnemonic passphrase is BIP-39 compliant which requires unicode phrases to be NFKD normalized.
+        // Use unicode string as a passphrase. If it is properly normalized to NFKD,
+        // it should generate the expectedPrivateKey bellow:
+        String passphrase = "\u03B4\u03BF\u03BA\u03B9\u03BC\u03AE";
+        String expectedPrivateKey = "302e020100300506032b6570042204203fefe1000db9485372851d542453b07e7970de4e2ecede7187d733ac037f4d2c";
+
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        PrivateKey key = mnemonic.toPrivateKey(passphrase);
+        assertThat(key.toString()).isEqualTo(expectedPrivateKey);
+    }
 }
