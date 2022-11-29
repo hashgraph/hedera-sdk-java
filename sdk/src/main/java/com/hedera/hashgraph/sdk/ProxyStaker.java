@@ -53,4 +53,12 @@ public final class ProxyStaker {
     static ProxyStaker fromProtobuf(com.hedera.hashgraph.sdk.proto.ProxyStaker proxyStaker) {
         return new ProxyStaker(AccountId.fromProtobuf(proxyStaker.getAccountID()), proxyStaker.getAmount());
     }
+
+    @Override
+    public String toString() {
+        return "ProxyStaker{" +
+            "accountId=" + accountId +
+            ", amount=" + amount +
+            '}';
+    }
 }
