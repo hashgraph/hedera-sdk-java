@@ -298,7 +298,6 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
             .keepAliveTimeout(10, TimeUnit.SECONDS)
             .userAgent(getUserAgent())
             .executor(executor)
-            .disableRetry()
             .build();
 
         return channel;

@@ -5,19 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.19.0
-
-### Added
- - `freezeWith()` and `sign()` to `ContractCreateFlow`
-
-### Fixed
- - `Executable.execute(Client client, Duration timeout)` now sets gRPC deadline to the underlying gRPC request
- - Transaction sometimes being reported as duplicate when submitting large number of transactions
- - `RejectedExecutionException` under heavy load
- - `nodes` not clearing when reusing transaction
- - Renamed allowanceSpenderAccountId to spenderId in TokenNftInfo
-
-## 2.18.2
+## Unreleased
 
 ### Fixed
  - `Client.close()` now tracks and automatically unsubscribes from Mirror Node Topic Queries

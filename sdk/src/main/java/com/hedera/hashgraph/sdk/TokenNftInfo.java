@@ -22,6 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoResponse;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
@@ -62,7 +63,7 @@ public class TokenNftInfo {
      * If an allowance is granted for the NFT, its corresponding spender account
      */
     @Nullable
-    public final AccountId spenderId;
+    public final AccountId allowanceSpenderAccountId;
 
     /**
      * Constructor.
@@ -72,7 +73,7 @@ public class TokenNftInfo {
      * @param creationTime              the effective consensus time
      * @param metadata                  the unique metadata
      * @param ledgerId                  the ledger id of the response
-     * @param spenderId the spender of the allowance (null if not an allowance)
+     * @param allowanceSpenderAccountId the spender of the allowance (null if not an allowance)
      */
     TokenNftInfo(
         NftId nftId,
@@ -80,14 +81,14 @@ public class TokenNftInfo {
         Instant creationTime,
         byte[] metadata,
         LedgerId ledgerId,
-        @Nullable AccountId spenderId
+        @Nullable AccountId allowanceSpenderAccountId
     ) {
         this.nftId = nftId;
         this.accountId = accountId;
         this.creationTime = Objects.requireNonNull(creationTime);
         this.metadata = metadata;
         this.ledgerId = ledgerId;
-        this.spenderId = spenderId;
+        this.allowanceSpenderAccountId = allowanceSpenderAccountId;
     }
 
     /**
@@ -130,8 +131,8 @@ public class TokenNftInfo {
             .setCreationTime(InstantConverter.toProtobuf(creationTime))
             .setMetadata(ByteString.copyFrom(metadata))
             .setLedgerId(ledgerId.toByteString());
-        if (spenderId != null) {
-            builder.setSpenderId(spenderId.toProtobuf());
+        if (allowanceSpenderAccountId != null) {
+            builder.setSpenderId(allowanceSpenderAccountId.toProtobuf());
         }
         return builder.build();
     }
@@ -144,7 +145,7 @@ public class TokenNftInfo {
             .add("creationTime", creationTime)
             .add("metadata", metadata)
             .add("ledgerId", ledgerId)
-            .add("spenderId", spenderId)
+            .add("allowanceSpenderAccountId", allowanceSpenderAccountId)
             .toString();
     }
 
