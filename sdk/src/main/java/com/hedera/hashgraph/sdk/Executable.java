@@ -490,7 +490,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         ConsumerHelper.twoConsumers(executeAsync(client, timeout), onSuccess, onFailure);
     }
 
-    protected void logTransaction(TransactionId transactionId, Client client, Node node, boolean isAsync, int attempt, ResponseT response, Throwable error) {
+    protected void logTransaction(
+        TransactionId transactionId,
+        Client client,
+        Node node,
+        boolean isAsync,
+        int attempt,
+        @Nullable ResponseT response,
+        @Nullable Throwable error) {
+
         if (!logger.isTraceEnabled())
             return;
 
