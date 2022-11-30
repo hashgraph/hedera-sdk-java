@@ -378,8 +378,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
             try {
                 response = blockingUnaryCall.apply(grpcRequest);
+                logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
             } catch (Throwable e) {
                 lastException = e;
+                logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
             }
 
             if (response == null) {
@@ -486,6 +488,24 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      */
     public void executeAsync(Client client, Duration timeout, Consumer<O> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(executeAsync(client, timeout), onSuccess, onFailure);
+    }
+
+    protected void logTransaction(TransactionId transactionId, Client client, Node node, boolean isAsync, int attempt, ResponseT response, Throwable error) {
+        if (!logger.isTraceEnabled())
+            return;
+
+        logger.trace("Execute{} Transaction ID: {}, submit to {}, node: {}, attempt: {}",
+            isAsync ? "Async" : "",
+            transactionId,
+            client.network,
+            node.getAccountId(),
+            attempt);
+
+        if (response != null)
+            logger.trace(" - Response: {}", response);
+
+        if (error != null)
+            logger.trace(" - Error: {}", error.getMessage());
     }
 
     @VisibleForTesting
@@ -597,6 +617,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 }
 
                 toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
+                    logTransaction(this.getTransactionIdInternal(), client, grpcRequest.getNode(), true, attempt, response, error);
+
                     if (grpcRequest.shouldRetryExceptionally(error)) {
                         // the transaction had a network failure reaching Hedera
                         executeAsyncInternal(client, attempt + 1, error, returnFuture, Duration.between(Instant.now(), timeoutTime));
