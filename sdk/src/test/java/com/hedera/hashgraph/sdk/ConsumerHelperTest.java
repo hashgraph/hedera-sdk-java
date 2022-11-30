@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletionException;
 import java8.util.function.BiConsumer;
 import java8.util.function.Consumer;
 import org.junit.jupiter.api.Test;
@@ -23,10 +24,9 @@ public class ConsumerHelperTest {
         Consumer<String> onSuccess = mock(Consumer.class);
         Consumer<Throwable> onFailure = mock(Consumer.class);
         ConsumerHelper.twoConsumers(future, onSuccess, onFailure);
-        verify(onSuccess, times(1)).accept(any());
+        verify(onSuccess, times(1)).accept("Hello");
         verify(onFailure, times(0)).accept(any());
     }
-
     @Test
     void twoConsumersWithError() {
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
@@ -36,6 +36,6 @@ public class ConsumerHelperTest {
         Consumer<Throwable> onFailure = mock(Consumer.class);
         ConsumerHelper.twoConsumers(future, onSuccess, onFailure);
         verify(onSuccess, times(0)).accept(any());
-        verify(onFailure, times(1)).accept(any());
+        verify(onFailure, times(1)).accept(any(CompletionException.class));
     }
 }
