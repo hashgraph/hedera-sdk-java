@@ -480,7 +480,6 @@ public class ContractFunctionParametersTest {
     }
 
     @Test
-    @Disabled
     @DisplayName("BigInteger checks")
     void bigIntChecks() {
         ContractFunctionParameters params = new ContractFunctionParameters();

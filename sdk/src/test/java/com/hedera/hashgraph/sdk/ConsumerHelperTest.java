@@ -8,8 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ConsumerHelperTest {
-
+class ConsumerHelperTest {
     @Test
     void biConsumer() {
         CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> "Hello");
