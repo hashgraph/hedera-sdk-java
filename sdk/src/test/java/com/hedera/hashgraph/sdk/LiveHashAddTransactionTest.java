@@ -52,6 +52,6 @@ class LiveHashAddTransactionTest {
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = LiveHashAddTransaction.fromBytes(tx.toBytes());
-        assertThat(tx2.toString()).isEqualTo(tx.toString());
+        assertThat(tx2).hasToString(tx.toString());
     }
 }
