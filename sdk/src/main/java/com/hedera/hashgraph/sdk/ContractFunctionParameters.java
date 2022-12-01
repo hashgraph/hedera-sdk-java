@@ -162,12 +162,6 @@ public final class ContractFunctionParameters {
     }
 
     static ByteString int256(BigInteger bigInt, int bitWidth) {
-        if (bigInt.compareTo(BigInteger.ONE.shiftLeft(255)) >= 0 ||
-            bigInt.compareTo(BigInteger.ONE.negate().shiftLeft(255)) < 0
-        ) {
-            throw new IllegalArgumentException("BigInteger out of range for Solidity integers");
-        }
-
         return leftPad32(getTruncatedBytes(bigInt, bitWidth), bigInt.signum() < 0);
     }
 
