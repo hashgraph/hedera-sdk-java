@@ -200,16 +200,12 @@ public final class Client implements AutoCloseable {
      * @return                          the configured client
      */
     public static Client forName(String name) {
-        switch (name) {
-            case "mainnet":
-                return Client.forMainnet();
-            case "testnet":
-                return Client.forTestnet();
-            case "previewnet":
-                return Client.forPreviewnet();
-            default:
-                throw new IllegalArgumentException("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
-        }
+        return switch (name) {
+            case "mainnet" -> Client.forMainnet();
+            case "testnet" -> Client.forTestnet();
+            case "previewnet" -> Client.forPreviewnet();
+            default -> throw new IllegalArgumentException("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
+        };
     }
 
     /**

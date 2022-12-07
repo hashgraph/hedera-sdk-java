@@ -39,8 +39,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
 
 class ClientTest {
     @Test
@@ -243,7 +242,41 @@ class ClientTest {
         client.close();
     }
 
-    @ParameterizedTest
+    @Test
+    @DisplayName("setMirrorNetwork() throws exception if there is no time to remove the old nodes")
+    void setMirrorNetworkFails() throws Exception {
+        var defaultNetwork = List.of(
+            "hcs.testnet.mirrornode.hedera.com:5600",
+            "hcs.testnet.mirrornode2.hedera.com:5600"
+        );
+
+        Client client = Client.forNetwork(new HashMap<>()).setMirrorNetwork(defaultNetwork);
+        assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
+
+        client.setCloseTimeout(Duration.ZERO);
+        final List<String> updatedNetwork = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+
+        assertThatThrownBy(() -> client.setMirrorNetwork(updatedNetwork))
+            .hasMessageEndingWith("Failed to properly shutdown all channels");
+    }
+
+    @Test
+    @DisplayName("forName() sets the correct network")
+    void forNameReturnsCorrectNetwork() {
+        Client mainnetClient = Client.forName("mainnet");
+        assertThat(mainnetClient.getLedgerId()).isEqualTo(LedgerId.MAINNET);
+
+        Client testnetClient = Client.forName("testnet");
+        assertThat(testnetClient.getLedgerId()).isEqualTo(LedgerId.TESTNET);
+
+        Client previewnetClient = Client.forName("previewnet");
+        assertThat(previewnetClient.getLedgerId()).isEqualTo(LedgerId.PREVIEWNET);
+
+        assertThatThrownBy(() -> Client.forName("unknown"))
+            .hasMessageEndingWith("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
+    }
+
+        @ParameterizedTest
     @CsvSource({
         "onClient",
         "onQuery"

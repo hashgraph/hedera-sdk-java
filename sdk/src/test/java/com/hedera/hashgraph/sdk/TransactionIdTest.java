@@ -23,6 +23,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.threeten.bp.Instant;
 
 import java.util.Objects;
 
@@ -102,5 +103,62 @@ class TransactionIdTest {
         assertThat(transactionId.getNonce()).isEqualTo(4);
 
         assertThat(transactionId.toString()).isEqualTo("0.0.23847@1588539964.632521325/4");
+    }
+
+    @Test
+    void compare() {
+        // Compare when only one of the txs is schedules
+        var transactionId1 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        var transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled");
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
+
+        transactionId1 = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled");
+        transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(1);
+
+        // Compare when only one of the txs has accountId
+        transactionId1 = new TransactionId(null, Instant.ofEpochSecond(1588539964));
+        transactionId2 = new TransactionId(AccountId.fromString("0.0.23847"), Instant.ofEpochSecond(1588539964));
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
+
+        transactionId1 = new TransactionId(AccountId.fromString("0.0.23847"), Instant.ofEpochSecond(1588539964));
+        transactionId2 = new TransactionId(null, Instant.ofEpochSecond(1588539964));
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(1);
+
+        // Compare the AccountIds
+        transactionId1 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(0);
+
+        transactionId1 = TransactionId.fromString("0.0.23848@1588539964.632521325");
+        transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(1);
+
+        transactionId1 = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        transactionId2 = TransactionId.fromString("0.0.23848@1588539964.632521325");
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
+
+        // Compare when only one of the txs has valid start
+        transactionId1 = new TransactionId(null, null);
+        transactionId2 = new TransactionId(null, Instant.ofEpochSecond(1588539964));
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
+
+        transactionId1 = new TransactionId(AccountId.fromString("0.0.23847"), Instant.ofEpochSecond(1588539964));
+        transactionId2 = new TransactionId(null, null);
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(1);
+
+        // Compare the validStarts
+        transactionId1 = new TransactionId(null, Instant.ofEpochSecond(1588539965));
+        transactionId2 = new TransactionId(null, Instant.ofEpochSecond(1588539964));
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(1);
+
+        transactionId1 = new TransactionId(null, Instant.ofEpochSecond(1588539964));
+        transactionId2 = new TransactionId(null, Instant.ofEpochSecond(1588539965));
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
+
+
+        transactionId1 = new TransactionId(null, null);
+        transactionId2 = new TransactionId(null, null);
+        assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(0);
     }
 }
