@@ -71,6 +71,10 @@ public final class Client implements AutoCloseable {
 
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
+    private static final String MAINNET = "mainnet";
+    private static final String TESTNET = "testnet";
+    private static final String PREVIEWNET = "previewnet";
+
     final ExecutorService executor;
 
     @Nullable
@@ -201,9 +205,9 @@ public final class Client implements AutoCloseable {
      */
     public static Client forName(String name) {
         return switch (name) {
-            case "mainnet" -> Client.forMainnet();
-            case "testnet" -> Client.forTestnet();
-            case "previewnet" -> Client.forPreviewnet();
+            case MAINNET -> Client.forMainnet();
+            case TESTNET -> Client.forTestnet();
+            case PREVIEWNET -> Client.forPreviewnet();
             default -> throw new IllegalArgumentException("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
         };
     }
@@ -290,19 +294,12 @@ public final class Client implements AutoCloseable {
             }
         } else {
             String networks = config.network.getAsString();
-            switch (networks) {
-                case "mainnet":
-                    client = Client.forMainnet();
-                    break;
-                case "testnet":
-                    client = Client.forTestnet();
-                    break;
-                case "previewnet":
-                    client = Client.forPreviewnet();
-                    break;
-                default:
-                    throw new JsonParseException("Illegal argument for network.");
-            }
+            client = switch (networks) {
+                case MAINNET -> Client.forMainnet();
+                case TESTNET -> Client.forTestnet();
+                case PREVIEWNET -> Client.forPreviewnet();
+                default -> throw new JsonParseException("Illegal argument for network.");
+            };
         }
 
         if (config.operator != null) {
@@ -324,17 +321,10 @@ public final class Client implements AutoCloseable {
             } else {
                 String mirror = config.mirrorNetwork.getAsString();
                 switch (mirror) {
-                    case "mainnet":
-                        client.mirrorNetwork = MirrorNetwork.forMainnet(client.executor);
-                        break;
-                    case "testnet":
-                        client.mirrorNetwork = MirrorNetwork.forTestnet(client.executor);
-                        break;
-                    case "previewnet":
-                        client.mirrorNetwork = MirrorNetwork.forPreviewnet(client.executor);
-                        break;
-                    default:
-                        throw new JsonParseException("Illegal argument for mirrorNetwork.");
+                    case MAINNET -> client.mirrorNetwork = MirrorNetwork.forMainnet(client.executor);
+                    case TESTNET -> client.mirrorNetwork = MirrorNetwork.forTestnet(client.executor);
+                    case PREVIEWNET -> client.mirrorNetwork = MirrorNetwork.forPreviewnet(client.executor);
+                    default -> throw new JsonParseException("Illegal argument for mirrorNetwork.");
                 }
             }
         }

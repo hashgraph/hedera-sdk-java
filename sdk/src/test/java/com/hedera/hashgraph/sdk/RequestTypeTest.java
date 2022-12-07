@@ -9,7 +9,7 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class RequestTypeTest {
+class RequestTypeTest {
 
     @Test
     void valueOf() {
