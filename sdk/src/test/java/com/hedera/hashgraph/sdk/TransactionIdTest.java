@@ -128,7 +128,7 @@ class TransactionIdTest {
         // Compare the AccountIds
         transactionId1 = TransactionId.fromString("0.0.23847@1588539964.632521325");
         transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325");
-        assertThat(transactionId1.compareTo(transactionId2)).isZero();
+        assertThat(transactionId1).isEqualByComparingTo(transactionId2);
 
         transactionId1 = TransactionId.fromString("0.0.23848@1588539964.632521325");
         transactionId2 = TransactionId.fromString("0.0.23847@1588539964.632521325");
@@ -159,6 +159,6 @@ class TransactionIdTest {
 
         transactionId1 = new TransactionId(null, null);
         transactionId2 = new TransactionId(null, null);
-        assertThat(transactionId1.compareTo(transactionId2)).isZero();
+        assertThat(transactionId1).isEqualByComparingTo(transactionId2);
     }
 }
