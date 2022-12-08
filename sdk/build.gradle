@@ -66,7 +66,7 @@ dependencies {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.9"
+        artifact = "com.google.protobuf:protoc:3.21.10"
     }
     plugins {
         grpc {
