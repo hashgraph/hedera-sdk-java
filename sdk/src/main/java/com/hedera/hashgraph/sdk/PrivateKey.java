@@ -74,6 +74,17 @@ public abstract class PrivateKey extends Key {
         return PrivateKeyECDSA.generateInternal();
     }
 
+    public static PrivateKey fromSeed(byte[] seed) {
+        var hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
+        hmacSha512.update(seed, 0, seed.length);
+
+        var derivedState = new byte[hmacSha512.getMacSize()];
+        hmacSha512.doFinal(derivedState, 0);
+
+        return PrivateKeyED25519.derivableKeyED25519(derivedState);
+    }
+
     /**
      * Recover a private key from a generated mnemonic phrase and a passphrase.
      * <p>
@@ -88,15 +99,7 @@ public abstract class PrivateKey extends Key {
      */
     public static PrivateKey fromMnemonic(Mnemonic mnemonic, String passphrase) {
         var seed = mnemonic.toSeed(passphrase);
-
-        var hmacSha512 = new HMac(new SHA512Digest());
-        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
-        hmacSha512.update(seed, 0, seed.length);
-
-        var derivedState = new byte[hmacSha512.getMacSize()];
-        hmacSha512.doFinal(derivedState, 0);
-
-        @Var PrivateKey derivedKey = PrivateKeyED25519.derivableKeyED25519(derivedState);
+        @Var PrivateKey derivedKey = fromSeed(seed);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index

@@ -361,4 +361,91 @@ class Ed25519PrivateKeyTest {
 
         assertThat(key.isECDSA()).isFalse();
     }
+
+    // TODO: replace with HexFormat.of().parseHex when the required Java version is 17
+    public static byte[] hexStringToByteArray(String s) {
+        int len = s.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+                + Character.digit(s.charAt(i+1), 16));
+        }
+        return data;
+    }
+
+    @Test
+    @DisplayName("SLIP10 test vector 1")
+    void slip10TestVector1() {
+        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-ed25519
+        var TEST1 = "2b4be7f19ee27bbf30c667b642d5f4aa69fd169872f8fc3059c08ebae2eb19e7";
+        var TEST2 = "68e0fe46dfb67e368c75379acec591dad19df3cde26e63b93a8e704f1dade7a3";
+        var TEST3 = "b1d0bad404bf35da785a64ca1ac54b2617211d2777696fbffaf208f746ae84f2";
+        var TEST4 = "92a5b23c0b8a99e37d07df3fb9966917f5d06e02ddbd909c7e184371463e9fc9";
+        var TEST5 = "30d1dc7e5fc04c31219ab25a27ae00b50f6fd66622f6e9c913253d6511d1e662";
+        var TEST6 = "8f94d394a8e8fd6b1bc2f3f49f5c47e385281d5c17e65324b0f62483e37e8793";
+
+        var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
+
+        // Chain m
+        var key1 = PrivateKey.fromSeed(seed);
+        assertThat(key1.toStringRaw()).isEqualTo(TEST1);
+
+        // Chain m/0'
+        var key2 = key1.derive(0);
+        assertThat(key2.toStringRaw()).isEqualTo(TEST2);
+
+        // Chain m/0'/1'
+        var key3 = key2.derive(1);
+        assertThat(key3.toStringRaw()).isEqualTo(TEST3);
+
+        // Chain m/0'/1'/2'
+        var key4 = key3.derive(2);
+        assertThat(key4.toStringRaw()).isEqualTo(TEST4);
+
+        // Chain m/0'/1'/2'/2'
+        var key5 = key4.derive(2);
+        assertThat(key5.toStringRaw()).isEqualTo(TEST5);
+
+        // Chain m/0'/1'/2'/2'/1000000000'
+        var key6 = key5.derive(1000000000);
+        assertThat(key6.toStringRaw()).isEqualTo(TEST6);
+    }
+
+    @Test
+    @DisplayName("SLIP10 test vector 2")
+    void slip10TestVector2() {
+        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-ed25519
+        var TEST1 = "171cb88b1b3c1db25add599712e36245d75bc65a1a5c9e18d76f9f2b1eab4012";
+        var TEST2 = "1559eb2bbec5790b0c65d8693e4d0875b1747f4970ae8b650486ed7470845635";
+        var TEST3 = "ea4f5bfe8694d8bb74b7b59404632fd5968b774ed545e810de9c32a4fb4192f4";
+        var TEST4 = "3757c7577170179c7868353ada796c839135b3d30554bbb74a4b1e4a5a58505c";
+        var TEST5 = "5837736c89570de861ebc173b1086da4f505d4adb387c6a1b1342d5e4ac9ec72";
+        var TEST6 = "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d";
+
+        var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
+
+        // Chain m
+        var key1 = PrivateKey.fromSeed(seed);
+        assertThat(key1.toStringRaw()).isEqualTo(TEST1);
+
+        // Chain m/0'
+        var key2 = key1.derive(0);
+        assertThat(key2.toStringRaw()).isEqualTo(TEST2);
+
+        // Chain m/0'/2147483647'
+        var key3 = key2.derive(2147483647);
+        assertThat(key3.toStringRaw()).isEqualTo(TEST3);
+
+        // Chain m/0'/2147483647'/1'
+        var key4 = key3.derive(1);
+        assertThat(key4.toStringRaw()).isEqualTo(TEST4);
+
+        // Chain m/0'/2147483647'/1'/2147483646'
+        var key5 = key4.derive(2147483646);
+        assertThat(key5.toStringRaw()).isEqualTo(TEST5);
+
+        // Chain m/0'/2147483647'/1'/2147483646'/2'
+        var key6 = key5.derive(2);
+        assertThat(key6.toStringRaw()).isEqualTo(TEST6);
+    }
 }
