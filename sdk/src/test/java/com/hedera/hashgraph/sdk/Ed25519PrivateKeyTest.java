@@ -377,12 +377,12 @@ class Ed25519PrivateKeyTest {
     @DisplayName("SLIP10 test vector 1")
     void slip10TestVector1() {
         // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-ed25519
-        var TEST1 = "2b4be7f19ee27bbf30c667b642d5f4aa69fd169872f8fc3059c08ebae2eb19e7";
-        var TEST2 = "68e0fe46dfb67e368c75379acec591dad19df3cde26e63b93a8e704f1dade7a3";
-        var TEST3 = "b1d0bad404bf35da785a64ca1ac54b2617211d2777696fbffaf208f746ae84f2";
-        var TEST4 = "92a5b23c0b8a99e37d07df3fb9966917f5d06e02ddbd909c7e184371463e9fc9";
-        var TEST5 = "30d1dc7e5fc04c31219ab25a27ae00b50f6fd66622f6e9c913253d6511d1e662";
-        var TEST6 = "8f94d394a8e8fd6b1bc2f3f49f5c47e385281d5c17e65324b0f62483e37e8793";
+        final String TEST1 = "2b4be7f19ee27bbf30c667b642d5f4aa69fd169872f8fc3059c08ebae2eb19e7";
+        final String TEST2 = "68e0fe46dfb67e368c75379acec591dad19df3cde26e63b93a8e704f1dade7a3";
+        final String TEST3 = "b1d0bad404bf35da785a64ca1ac54b2617211d2777696fbffaf208f746ae84f2";
+        final String TEST4 = "92a5b23c0b8a99e37d07df3fb9966917f5d06e02ddbd909c7e184371463e9fc9";
+        final String TEST5 = "30d1dc7e5fc04c31219ab25a27ae00b50f6fd66622f6e9c913253d6511d1e662";
+        final String TEST6 = "8f94d394a8e8fd6b1bc2f3f49f5c47e385281d5c17e65324b0f62483e37e8793";
 
         var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
 
@@ -415,12 +415,12 @@ class Ed25519PrivateKeyTest {
     @DisplayName("SLIP10 test vector 2")
     void slip10TestVector2() {
         // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-ed25519
-        var TEST1 = "171cb88b1b3c1db25add599712e36245d75bc65a1a5c9e18d76f9f2b1eab4012";
-        var TEST2 = "1559eb2bbec5790b0c65d8693e4d0875b1747f4970ae8b650486ed7470845635";
-        var TEST3 = "ea4f5bfe8694d8bb74b7b59404632fd5968b774ed545e810de9c32a4fb4192f4";
-        var TEST4 = "3757c7577170179c7868353ada796c839135b3d30554bbb74a4b1e4a5a58505c";
-        var TEST5 = "5837736c89570de861ebc173b1086da4f505d4adb387c6a1b1342d5e4ac9ec72";
-        var TEST6 = "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d";
+        final String TEST1 = "171cb88b1b3c1db25add599712e36245d75bc65a1a5c9e18d76f9f2b1eab4012";
+        final String TEST2 = "1559eb2bbec5790b0c65d8693e4d0875b1747f4970ae8b650486ed7470845635";
+        final String TEST3 = "ea4f5bfe8694d8bb74b7b59404632fd5968b774ed545e810de9c32a4fb4192f4";
+        final String TEST4 = "3757c7577170179c7868353ada796c839135b3d30554bbb74a4b1e4a5a58505c";
+        final String TEST5 = "5837736c89570de861ebc173b1086da4f505d4adb387c6a1b1342d5e4ac9ec72";
+        final String TEST6 = "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d";
 
         var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
 
