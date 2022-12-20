@@ -90,7 +90,7 @@ class PrivateKeyED25519 extends PrivateKey {
      * @param deriveData                data to derive the key
      * @return                          the new key
      */
-    static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) {
+    static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) { // TODO: reuse (move to PrivateKey?)
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
@@ -200,6 +200,10 @@ class PrivateKeyED25519 extends PrivateKey {
 
         publicKey = new PublicKeyED25519(publicKeyData);
         return publicKey;
+    }
+
+    public KeyParameter getChainCode() {
+        return chainCode;
     }
 
     @Override

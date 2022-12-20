@@ -74,6 +74,7 @@ public abstract class PrivateKey extends Key {
         return PrivateKeyECDSA.generateInternal();
     }
 
+    // TODO: refactor; either make it work for both or move it to ed25519
     public static PrivateKey fromSeed(byte[] seed) {
         var hmacSha512 = new HMac(new SHA512Digest());
         hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
