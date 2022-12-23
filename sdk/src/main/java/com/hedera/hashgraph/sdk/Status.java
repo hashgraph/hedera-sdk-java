@@ -618,7 +618,7 @@ public enum Status {
     INVALID_TOPIC_ID(ResponseCodeEnum.INVALID_TOPIC_ID),
 
     /**
-     * A provided admin key was invalid.
+     * A provided admin key was invalid. Verify the bytes for an Ed25519 public key are exactly 32 bytes; and the bytes for a compressed ECDSA(secp256k1) key are exactly 33 bytes, with the first byte either 0x02 or 0x03..
      */
     INVALID_ADMIN_KEY(ResponseCodeEnum.INVALID_ADMIN_KEY),
 
@@ -1508,7 +1508,18 @@ public enum Status {
      * The combined balances of a contract and its auto-renew account (if any) or balance of an account did not cover
      * the auto-renewal fees in a transaction.
      */
-    INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES);
+    INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES),
+
+    /**
+     * A transaction's protobuf message includes unknown fields; could mean that a client
+     * expects not-yet-released functionality to be available.
+     */
+    TRANSACTION_HAS_UNKNOWN_FIELDS(ResponseCodeEnum.TRANSACTION_HAS_UNKNOWN_FIELDS),
+
+    /**
+     * The account cannot be modified. Account's key is not set
+     */
+    ACCOUNT_IS_IMMUTABLE(ResponseCodeEnum.ACCOUNT_IS_IMMUTABLE);
 
     final ResponseCodeEnum code;
 
@@ -2094,6 +2105,10 @@ public enum Status {
                 return MAX_CHILD_RECORDS_EXCEEDED;
             case INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES:
                 return INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES;
+            case TRANSACTION_HAS_UNKNOWN_FIELDS:
+                return TRANSACTION_HAS_UNKNOWN_FIELDS;
+            case ACCOUNT_IS_IMMUTABLE:
+                return ACCOUNT_IS_IMMUTABLE;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

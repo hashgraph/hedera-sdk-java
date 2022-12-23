@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "timestamp.proto";
@@ -180,6 +181,19 @@ message CryptoGetInfoResponse {
          * Staking metadata for this account.
          */
         StakingInfo staking_info = 22;
+
+
+        /**
+         * If present, the account that will be charged for auto-renewal of this account. If not set, 
+         * or set to an account with zero hbar balance, the account's own hbar balance will be used to
+         * cover auto-renewal fees.
+         */
+        AccountID auto_renew_account = 23;
+
+        /**
+         * List of virtual addresses each of which is an EVM address that maps to an ECDSA key pair a user must prove ownership of.
+         */
+        repeated VirtualAddress virtual_addresses = 24;
     }
 
     /**

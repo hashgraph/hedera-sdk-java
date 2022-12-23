@@ -22,6 +22,7 @@ package proto;
  * ‍
  */
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.freeze">>> This comment is special code for setting PBJ Compiler java package
 
 import "transaction_response.proto";
 import "transaction.proto";
