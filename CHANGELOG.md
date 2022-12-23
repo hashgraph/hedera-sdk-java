@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 
-- `AccountCreateTransaction.setAliasEvmAddress()` use `AccountCreateTransaction.setEvmAddress() instead`
+- `AccountCreateTransaction.setAliasEvmAddress()` use `AccountCreateTransaction.setEvmAddress()` instead
 
 ## 2.19.0
 
