@@ -13,6 +13,11 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAliasEvmAddress=[
 ]
 
 
+com.hedera.hashgraph.sdk.AccountIdTest.fromBytesEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
 com.hedera.hashgraph.sdk.AccountIdTest.fromSolidityAddress=[
   "0.0.5005"
 ]
@@ -53,6 +58,11 @@ com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnTestnet=[
 ]
 
 
+com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
 com.hedera.hashgraph.sdk.AccountIdTest.toBytes=[
   "188d27"
 ]
@@ -64,6 +74,11 @@ com.hedera.hashgraph.sdk.AccountIdTest.toBytesAlias=[
 
 
 com.hedera.hashgraph.sdk.AccountIdTest.toBytesAliasEvmAddress=[
+  "2214302a300506032b6570032100114e6abc371b82da"
+]
+
+
+com.hedera.hashgraph.sdk.AccountIdTest.toBytesEvmAddress=[
   "2214302a300506032b6570032100114e6abc371b82da"
 ]
 

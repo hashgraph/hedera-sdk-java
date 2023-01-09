@@ -143,7 +143,7 @@ class AccountIdTest {
     }
 
     @Test
-    void fromStringWithAliasEvmAddress() {
+    void fromStringWithEvmAddress() {
         SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toString()).toMatchSnapshot();
     }
 
@@ -168,7 +168,7 @@ class AccountIdTest {
     }
 
     @Test
-    void toBytesAliasEvmAddress() {
+    void toBytesEvmAddress() {
         SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes())).toMatchSnapshot();
     }
 
@@ -204,12 +204,12 @@ class AccountIdTest {
     }
 
     @Test
-    void fromBytesAliasEvmAddress() throws InvalidProtocolBufferException {
+    void fromBytesEvmAddress() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes()).toString()).toMatchSnapshot();
     }
 
     @Test
-    void toFromProtobufAliasEvmAddress() {
+    void toFromProtobufEvmAddress() {
         var id1 = AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da");
         var id2 = AccountId.fromProtobuf(id1.toProtobuf());
         assertThat(id2).isEqualTo(id1);
@@ -218,5 +218,15 @@ class AccountIdTest {
     @Test
     void toSolidityAddress() {
         SnapshotMatcher.expect(new AccountId(5005).toSolidityAddress()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromEvmAddress() {
+        String evmAddress = "302a300506032b6570032100114e6abc371b82da";
+        var id = AccountId.fromEvmAddress(evmAddress, 5, 9);
+
+        assertThat(id.evmAddress.toString()).isEqualTo(evmAddress);
+        assertThat(id.shard).isEqualTo(5);
+        assertThat(id.realm).isEqualTo(9);
     }
 }
