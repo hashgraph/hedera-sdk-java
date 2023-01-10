@@ -139,15 +139,15 @@ public class PublicKeyECDSA extends PublicKey {
         return Arrays.copyOf(keyData, keyData.length);
     }
 
-    public String toEvmAddress() {
+    @Override
+    public EvmAddress toEvmAddress() {
         // Calculate the Keccak-256 hash of the uncompressed key without "04" prefix
         byte[] uncompressed = Key.ECDSA_SECP256K1_CURVE
             .getCurve().decodePoint(toBytesRaw()).getEncoded(false);
         byte[] keccakBytes = calcKeccak256(Arrays.copyOfRange(uncompressed, 1, uncompressed.length));
 
-        // Return the last 20 bytes prefixed by "0x"
-        String keccakString = Hex.toHexString(keccakBytes);
-        return "0x" + keccakString.substring(24);
+        // Return the last 20 bytes
+        return EvmAddress.fromBytes(Arrays.copyOfRange(keccakBytes, 12, 32));
     }
 
     @Override
