@@ -132,6 +132,9 @@ public final class AccountId implements Comparable<AccountId> {
      * @throws IllegalArgumentException when the account id and checksum are invalid
      */
     public static AccountId fromString(String id) {
+        if ((id.startsWith("0x") && id.length() == 42) || id.length() == 40)
+            return fromEvmAddress(id);
+
         try {
             return EntityIdHelper.fromString(id, AccountId::new);
         } catch (IllegalArgumentException error) {

@@ -216,6 +216,13 @@ class AccountIdTest {
     }
 
     @Test
+    void toFromProtobufRawEvmAddress() {
+        var id1 = AccountId.fromString("302a300506032b6570032100114e6abc371b82da");
+        var id2 = AccountId.fromProtobuf(id1.toProtobuf());
+        assertThat(id2).isEqualTo(id1);
+    }
+
+    @Test
     void toSolidityAddress() {
         SnapshotMatcher.expect(new AccountId(5005).toSolidityAddress()).toMatchSnapshot();
     }
