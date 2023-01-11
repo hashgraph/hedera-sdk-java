@@ -42,9 +42,7 @@ public class AccountCreateEvmAddressExample {
     */
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
 //        Client client = Client.forName(HEDERA_NETWORK);
-
         Client client = Client.forNetwork(Collections.singletonMap("127.0.0.1:50211", AccountId.fromString("0.0.3"))).setMirrorNetwork(List.of("127.0.0.1:5600"));
-        client.setOperator(AccountId.fromString("0.0.2"), PrivateKey.fromString("302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"));
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -54,7 +52,7 @@ public class AccountCreateEvmAddressExample {
          * Step 1
          * Create an ECSDA private key
          */
-        PrivateKey privateKey = PrivateKeyECDSA.generateECDSA();
+        PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
          * Step 2
@@ -97,7 +95,6 @@ public class AccountCreateEvmAddressExample {
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
-
 
         if (info.contractAccountId.equals(evmAddress.toString())) {
             System.out.println("The addresses match");

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `TransactionRecord.evmAddress`
  - `PublicKeyECDSA.toEvmAddress()`
  - `AccountCreateTransaction.setEvmAddress()`
+ - `AccountCreateEvmAddressExample`
+ - `CreateAccountWithAliasExample`
+ - `LazyCreateAccountTransactionExample`
+ - `LazyCreateTransferTransactionExample`
 
 ### Deprecated
 
