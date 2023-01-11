@@ -78,7 +78,7 @@ public class LazyCreateTransferTransactionExample {
          */
         TransferTransaction transferTransaction = new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())
-            .addHbarTransfer(AccountId.fromEvmAddress(evmAddress.toString()), Hbar.from(10))
+            .addHbarTransfer(AccountId.fromEvmAddress(evmAddress), Hbar.from(10))
             .freezeWith(client);
 
         /*

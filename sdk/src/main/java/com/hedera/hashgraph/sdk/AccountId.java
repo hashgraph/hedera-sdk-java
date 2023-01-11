@@ -177,13 +177,35 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromEvmAddress(String evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
+        return fromEvmAddress(EvmAddress.fromString(evmAddress), shard, realm);
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                an EvmAddress instance
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(EvmAddress evmAddress) {
+        return fromEvmAddress(evmAddress, 0, 0);
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                an EvmAddress instance
+     * @param shard                     the shard part of the account id
+     * @param realm                     the shard realm of the account id
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(EvmAddress evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
         return new AccountId(
             shard,
             realm,
             0,
             null,
             null,
-            EvmAddress.fromString(evmAddress)
+            evmAddress
         );
     }
 
