@@ -41,7 +41,8 @@ public final class EvmAddress extends Key {
     }
 
     public static EvmAddress fromString(String text) {
-        return new EvmAddress(Hex.decode(text));
+        String address = text.startsWith("0x") ? text.substring(2) : text;
+        return new EvmAddress(Hex.decode(address));
     }
 
     @Nullable
