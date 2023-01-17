@@ -51,8 +51,7 @@ public class CreateAccountWithAliasExample {
     - Show the public key and the public key alias are the same on the account
     */
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
-//        Client client = Client.forName(HEDERA_NETWORK);
-        Client client = Client.forNetwork(Collections.singletonMap("127.0.0.1:50211", AccountId.fromString("0.0.3"))).setMirrorNetwork(List.of("127.0.0.1:5600"));
+        Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -131,7 +130,8 @@ public class CreateAccountWithAliasExample {
          * Show this account has a corresponding EVM address in the mirror node
          */
         Thread.sleep(5000);
-        URL url = new URL("http://127.0.0.1:5551/api/v1/accounts?account.id=" + newAccountId);
+        String link = "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/accounts?account.id=" + newAccountId;
+        URL url = new URL(link);
         HttpURLConnection con = (HttpURLConnection)url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("Accept", "application/json");
@@ -221,35 +221,6 @@ public class CreateAccountWithAliasExample {
             System.out.println("The public key and the public key alias are the same");
         } else {
             System.out.println("The public key and the public key alias differ");
-        }
-
-        /*
-         * Step 9
-         * Show this account has a corresponding EVM address in the mirror node
-         */
-        Thread.sleep(5000);
-        URL url2 = new URL("http://127.0.0.1:5551/api/v1/accounts?account.id=" + newAccountId2);
-        HttpURLConnection con2 = (HttpURLConnection)url2.openConnection();
-        con2.setRequestMethod("GET");
-        con2.setRequestProperty("Accept", "application/json");
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(con2.getInputStream(), StandardCharsets.UTF_8))) {
-            StringBuilder builder = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                builder.append(responseLine.trim());
-            }
-            JsonObject jsonObject = JsonParser.parseString(builder.toString()).getAsJsonObject();
-            String mirrorNodeEvmAddress = jsonObject
-                .getAsJsonArray("accounts")
-                .get(0).getAsJsonObject()
-                .get("evm_address")
-                .toString();
-
-            if (mirrorNodeEvmAddress.equals("null")) {
-                System.out.println("The EVM address of the account is missing in the mirror node");
-            } else {
-                System.out.println("The account has a corresponding EVM address in the mirror node");
-            }
         }
     }
 }

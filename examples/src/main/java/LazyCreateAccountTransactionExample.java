@@ -43,8 +43,7 @@ public class LazyCreateAccountTransactionExample {
     - Get the `AccountInfo` and show that the account is now a complete account i.e. returns a public key of the account
     */
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
-//        Client client = Client.forName(HEDERA_NETWORK);
-        Client client = Client.forNetwork(Collections.singletonMap("127.0.0.1:50211", AccountId.fromString("0.0.3"))).setMirrorNetwork(List.of("127.0.0.1:5600"));
+        Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key

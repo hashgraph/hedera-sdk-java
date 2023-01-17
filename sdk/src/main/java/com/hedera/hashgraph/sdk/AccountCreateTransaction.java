@@ -400,10 +400,30 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         return this;
     }
 
+    /**
+     * NOT YET SUPPORTED ON MAINNET AS OF DEC/23/2022
+     * <p>
+     * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
+     * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+     * <p>
+     * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
+     * relative to aliases currently on the network at alias assignment.
+     * <p>
+     * If a transaction creates an account using an alias, any further crypto transfers to that alias will
+     * simply be deposited in that account, without creating anything, and with no creation fee being charged.
+     *
+     * @param evmAddress The ethereum account 20-byte EVM address
+     * @return {@code this}
+     * @throws IllegalArgumentException when evmAddress is invalid or doesn't have "0x" prefix
+     */
     public AccountCreateTransaction setEvmAddress(String evmAddress) {
-        // Remove the "0x" prefix
-        EvmAddress address = EvmAddress.fromString(evmAddress.substring(2));
-        return this.setEvmAddress(address);
+        if (evmAddress.startsWith("0x") || evmAddress.length() == 42) {
+            // Remove the "0x" prefix
+            EvmAddress address = EvmAddress.fromString(evmAddress.substring(2));
+            return this.setEvmAddress(address);
+        } else {
+            throw new IllegalArgumentException("evmAddress must be an a valid EVM address with \"0x\" prefix");
+        }
     }
 
     /**
