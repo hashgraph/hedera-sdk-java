@@ -191,7 +191,13 @@ public final class TopicMessageQuery {
 
     private void onError(Throwable throwable, TopicMessage topicMessage) {
         var topicId = TopicId.fromProtobuf(builder.getTopicID());
-        LOGGER.error("Error attempting to subscribe to topic {}:", topicId, throwable);
+
+        if (throwable instanceof StatusRuntimeException && ((StatusRuntimeException)throwable).getStatus().getCode().equals(Status.Code.CANCELLED)) {
+            LOGGER.warn("Call is cancelled for topic {}.", topicId);
+        }
+        else {
+            LOGGER.error("Error attempting to subscribe to topic {}:", topicId, throwable);
+        }
     }
 
     /**
@@ -332,12 +338,6 @@ public final class TopicMessageQuery {
 
             @Override
             public void onError(Throwable t) {
-                // Return without logging an error if the call is cancelled
-                if (t instanceof StatusRuntimeException &&
-                    ((StatusRuntimeException) t).getStatus().getCode().equals(Status.Code.CANCELLED)) {
-                    return;
-                }
-
                 if (attempt >= maxAttempts || !retryHandler.test(t)) {
                     errorHandler.accept(t, null);
                     return;
