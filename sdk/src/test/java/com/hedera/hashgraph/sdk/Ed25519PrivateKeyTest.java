@@ -404,37 +404,37 @@ class Ed25519PrivateKeyTest {
         var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
 
         // Chain m
-        PrivateKeyED25519 key1 = (PrivateKeyED25519) PrivateKey.fromSeed(seed);
+        PrivateKey key1 = PrivateKey.fromSeedED25519(seed);
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
 
         // Chain m/0'
-        PrivateKeyED25519 key2 = (PrivateKeyED25519) key1.derive(0);
+        PrivateKey key2 = key1.derive(0);
         assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
         assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
 
         // Chain m/0'/1'
-        PrivateKeyED25519 key3 = (PrivateKeyED25519) key2.derive(1);
+        PrivateKey key3 = key2.derive(1);
         assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
         assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
         assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
 
         // Chain m/0'/1'/2'
-        PrivateKeyED25519 key4 = (PrivateKeyED25519) key3.derive(2);
+        PrivateKey key4 = key3.derive(2);
         assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
         assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
         assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
 
         // Chain m/0'/1'/2'/2'
-        PrivateKeyED25519 key5 = (PrivateKeyED25519) key4.derive(2);
+        PrivateKey key5 = key4.derive(2);
         assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
         assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
         assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
 
         // Chain m/0'/1'/2'/2'/1000000000'
-        PrivateKeyED25519 key6 = (PrivateKeyED25519) key5.derive(1000000000);
+        PrivateKey key6 = key5.derive(1000000000);
         assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
         assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
         assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
@@ -471,37 +471,37 @@ class Ed25519PrivateKeyTest {
         var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
 
         // Chain m
-        PrivateKeyED25519 key1 = (PrivateKeyED25519) PrivateKey.fromSeed(seed);
+        PrivateKey key1 = PrivateKey.fromSeedED25519(seed);
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
 
         // Chain m/0'
-        PrivateKeyED25519 key2 = (PrivateKeyED25519) key1.derive(0);
+        PrivateKey key2 = key1.derive(0);
         assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
         assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
 
         // Chain m/0'/2147483647'
-        PrivateKeyED25519 key3 = (PrivateKeyED25519) key2.derive(2147483647);
+        PrivateKey key3 = key2.derive(2147483647);
         assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
         assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
         assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
 
         // Chain m/0'/2147483647'/1'
-        PrivateKeyED25519 key4 = (PrivateKeyED25519) key3.derive(1);
+        PrivateKey key4 = key3.derive(1);
         assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
         assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
         assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
 
         // Chain m/0'/2147483647'/1'/2147483646'
-        PrivateKeyED25519 key5 = (PrivateKeyED25519) key4.derive(2147483646);
+        PrivateKey key5 = key4.derive(2147483646);
         assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
         assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
         assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
 
         // Chain m/0'/2147483647'/1'/2147483646'/2'
-        PrivateKeyED25519 key6 = (PrivateKeyED25519) key5.derive(2);
+        PrivateKey key6 = key5.derive(2);
         assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
         assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
         assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);

@@ -125,7 +125,7 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     @Override
     public boolean isDerivable() {
-        return false;
+        return this.chainCode != null;
     }
 
     @Override
@@ -150,33 +150,31 @@ public class PrivateKeyECDSA extends PrivateKey {
         var I = hmacSha512(chainCode.getKey(), data.array());
 
         var IL = java.util.Arrays.copyOfRange(I, 0, 32);
-        var IR = java.util.Arrays.copyOfRange(I, 33, 64);
+        var IR = java.util.Arrays.copyOfRange(I, 32, 64);
 
         var ki = keyData.add(new BigInteger(1, IL)).mod(ECDSA_SECP256K1_CURVE.getN());
 
         return new PrivateKeyECDSA(ki, new KeyParameter(IR));
     }
 
-    // REMOVE!!!
-    static HMac createHmacSha512Digest(byte[] key) {
+    private static byte[] hmacSha512(byte[] key, byte[] data) {
         SHA512Digest digest = new SHA512Digest();
-        HMac hMac = new HMac(digest);
-        hMac.init(new KeyParameter(key));
-        return hMac;
-    }
+        HMac hmacSha512 = new HMac(digest);
+        hmacSha512.init(new KeyParameter(key));
 
-    static byte[] hmacSha512(HMac hmacSha512, byte[] input) {
         hmacSha512.reset();
-        hmacSha512.update(input, 0, input.length);
+        hmacSha512.update(data, 0, data.length);
         byte[] out = new byte[64];
         hmacSha512.doFinal(out, 0);
         return out;
     }
 
-    public static byte[] hmacSha512(byte[] key, byte[] data) {
-        return hmacSha512(createHmacSha512Digest(key), data);
-    }
-
+    /**
+     * Create an ECDSA key from seed.
+     *
+     * @param seed                      the seed bytes
+     * @return                          the new key
+     */
     public static PrivateKey fromSeed(byte[] seed) {
         var hmacSha512 = new HMac(new SHA512Digest());
         hmacSha512.init(new KeyParameter("Bitcoin seed".getBytes(StandardCharsets.UTF_8)));
@@ -188,6 +186,12 @@ public class PrivateKeyECDSA extends PrivateKey {
         return derivableKeyECDSA(derivedState);
     }
 
+    /**
+     * Create a derived key.
+     *
+     * @param deriveData                data to derive the key
+     * @return                          the new key
+     */
     static PrivateKeyECDSA derivableKeyECDSA(byte[] deriveData) {
         var keyData = java.util.Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);

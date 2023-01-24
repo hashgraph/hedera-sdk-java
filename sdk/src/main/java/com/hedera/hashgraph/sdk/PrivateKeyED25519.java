@@ -33,6 +33,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -85,12 +86,29 @@ class PrivateKeyED25519 extends PrivateKey {
     }
 
     /**
+     * Create an ED25519 key from seed.
+     *
+     * @param seed                      the seed bytes
+     * @return                          the new key
+     */
+    public static PrivateKey fromSeed(byte[] seed) {
+        var hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
+        hmacSha512.update(seed, 0, seed.length);
+
+        var derivedState = new byte[hmacSha512.getMacSize()];
+        hmacSha512.doFinal(derivedState, 0);
+
+        return PrivateKeyED25519.derivableKeyED25519(derivedState);
+    }
+
+    /**
      * Create a derived key.
      *
      * @param deriveData                data to derive the key
      * @return                          the new key
      */
-    static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) { // TODO: reuse (move to PrivateKey?)
+    static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) {
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
@@ -165,6 +183,10 @@ class PrivateKeyED25519 extends PrivateKey {
     public PrivateKey derive(int index) {
         if (this.chainCode == null) {
             throw new IllegalStateException("this private key does not support derivation");
+        }
+
+        if (index == (index | 0x80000000)) {
+            throw new IllegalArgumentException("the index should not be pre-hardened");
         }
 
         // SLIP-10 child key derivation

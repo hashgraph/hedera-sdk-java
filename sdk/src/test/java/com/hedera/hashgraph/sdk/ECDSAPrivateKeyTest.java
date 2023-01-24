@@ -138,15 +138,14 @@ public class ECDSAPrivateKeyTest {
         return data;
     }
 
-    // TODO: not sure if we should move it in the ECDSA key
-    public static int toHardened(int index) {
+    private static int toHardened(int index) {
         return index | 0x80000000;
     }
 
     @Test
     @DisplayName("SLIP10 test vector 1")
     void slip10TestVector1() {
-        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-ed25519
+        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-secp256k1
         final String CHAIN_CODE1 = "873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508";
         final String PRIVATE_KEY1 = "e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35";
         final String PUBLIC_KEY1 = "0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2";
@@ -174,37 +173,37 @@ public class ECDSAPrivateKeyTest {
         var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
 
         // Chain m
-        PrivateKeyECDSA key1 = (PrivateKeyECDSA) PrivateKeyECDSA.fromSeed(seed);
+        PrivateKey key1 = PrivateKey.fromSeedECDSA(seed);
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
 
         // Chain m/0'
-        PrivateKeyECDSA key2 = (PrivateKeyECDSA) key1.derive(toHardened(0));
+        PrivateKey key2 = key1.derive(toHardened(0));
         assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
         assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
 
         // Chain m/0'/1
-        PrivateKeyECDSA key3 = (PrivateKeyECDSA) key2.derive(1);
+        PrivateKey key3 = key2.derive(1);
         assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
         assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
         assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
 
         // Chain m/0'/1/2'
-        PrivateKeyECDSA key4 = (PrivateKeyECDSA) key3.derive(toHardened(2));
+        PrivateKey key4 = key3.derive(toHardened(2));
         assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
         assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
         assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
 
         // Chain m/0'/1/2'/2
-        PrivateKeyECDSA key5 = (PrivateKeyECDSA) key4.derive(2);
+        PrivateKey key5 = key4.derive(2);
         assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
         assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
         assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
 
         // Chain m/0'/1/2'/2/1000000000
-        PrivateKeyECDSA key6 = (PrivateKeyECDSA) key5.derive(1000000000);
+        PrivateKey key6 = key5.derive(1000000000);
         assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
         assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
         assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
@@ -213,68 +212,68 @@ public class ECDSAPrivateKeyTest {
     @Test
     @DisplayName("SLIP10 test vector 2")
     void slip10TestVector2() {
-        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-ed25519
-        final String CHAIN_CODE1 = "ef70a74db9c3a5af931b5fe73ed8e1a53464133654fd55e7a66f8570b8e33c3b";
-        final String PRIVATE_KEY1 = "171cb88b1b3c1db25add599712e36245d75bc65a1a5c9e18d76f9f2b1eab4012";
-        final String PUBLIC_KEY1 = "008fe9693f8fa62a4305a140b9764c5ee01e455963744fe18204b4fb948249308a";
+        // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-2-for-secp256k1
+        final String CHAIN_CODE1 = "60499f801b896d83179a4374aeb7822aaeaceaa0db1f85ee3e904c4defbd9689";
+        final String PRIVATE_KEY1 = "4b03d6fc340455b363f51020ad3ecca4f0850280cf436c70c727923f6db46c3e";
+        final String PUBLIC_KEY1 = "03cbcaa9c98c877a26977d00825c956a238e8dddfbd322cce4f74b0b5bd6ace4a7";
 
-        final String CHAIN_CODE2 = "0b78a3226f915c082bf118f83618a618ab6dec793752624cbeb622acb562862d";
-        final String PRIVATE_KEY2 = "1559eb2bbec5790b0c65d8693e4d0875b1747f4970ae8b650486ed7470845635";
-        final String PUBLIC_KEY2 = "0086fab68dcb57aa196c77c5f264f215a112c22a912c10d123b0d03c3c28ef1037";
+        final String CHAIN_CODE2 = "f0909affaa7ee7abe5dd4e100598d4dc53cd709d5a5c2cac40e7412f232f7c9c";
+        final String PRIVATE_KEY2 = "abe74a98f6c7eabee0428f53798f0ab8aa1bd37873999041703c742f15ac7e1e";
+        final String PUBLIC_KEY2 = "02fc9e5af0ac8d9b3cecfe2a888e2117ba3d089d8585886c9c826b6b22a98d12ea";
 
-        final String CHAIN_CODE3 = "138f0b2551bcafeca6ff2aa88ba8ed0ed8de070841f0c4ef0165df8181eaad7f";
-        final String PRIVATE_KEY3 = "ea4f5bfe8694d8bb74b7b59404632fd5968b774ed545e810de9c32a4fb4192f4";
-        final String PUBLIC_KEY3 = "005ba3b9ac6e90e83effcd25ac4e58a1365a9e35a3d3ae5eb07b9e4d90bcf7506d";
+        final String CHAIN_CODE3 = "be17a268474a6bb9c61e1d720cf6215e2a88c5406c4aee7b38547f585c9a37d9";
+        final String PRIVATE_KEY3 = "877c779ad9687164e9c2f4f0f4ff0340814392330693ce95a58fe18fd52e6e93";
+        final String PUBLIC_KEY3 = "03c01e7425647bdefa82b12d9bad5e3e6865bee0502694b94ca58b666abc0a5c3b";
 
-        final String CHAIN_CODE4 = "73bd9fff1cfbde33a1b846c27085f711c0fe2d66fd32e139d3ebc28e5a4a6b90";
-        final String PRIVATE_KEY4 = "3757c7577170179c7868353ada796c839135b3d30554bbb74a4b1e4a5a58505c";
-        final String PUBLIC_KEY4 = "002e66aa57069c86cc18249aecf5cb5a9cebbfd6fadeab056254763874a9352b45";
+        final String CHAIN_CODE4 = "f366f48f1ea9f2d1d3fe958c95ca84ea18e4c4ddb9366c336c927eb246fb38cb";
+        final String PRIVATE_KEY4 = "704addf544a06e5ee4bea37098463c23613da32020d604506da8c0518e1da4b7";
+        final String PUBLIC_KEY4 = "03a7d1d856deb74c508e05031f9895dab54626251b3806e16b4bd12e781a7df5b9";
 
-        final String CHAIN_CODE5 = "0902fe8a29f9140480a00ef244bd183e8a13288e4412d8389d140aac1794825a";
-        final String PRIVATE_KEY5 = "5837736c89570de861ebc173b1086da4f505d4adb387c6a1b1342d5e4ac9ec72";
-        final String PUBLIC_KEY5 = "00e33c0f7d81d843c572275f287498e8d408654fdf0d1e065b84e2e6f157aab09b";
+        final String CHAIN_CODE5 = "637807030d55d01f9a0cb3a7839515d796bd07706386a6eddf06cc29a65a0e29";
+        final String PRIVATE_KEY5 = "f1c7c871a54a804afe328b4c83a1c33b8e5ff48f5087273f04efa83b247d6a2d";
+        final String PUBLIC_KEY5 = "02d2b36900396c9282fa14628566582f206a5dd0bcc8d5e892611806cafb0301f0";
 
-        final String CHAIN_CODE6 = "5d70af781f3a37b829f0d060924d5e960bdc02e85423494afc0b1a41bbe196d4";
-        final String PRIVATE_KEY6 = "551d333177df541ad876a60ea71f00447931c0a9da16f227c11ea080d7391b8d";
-        final String PUBLIC_KEY6 = "0047150c75db263559a70d5778bf36abbab30fb061ad69f69ece61a72b0cfa4fc0";
+        final String CHAIN_CODE6 = "9452b549be8cea3ecb7a84bec10dcfd94afe4d129ebfd3b3cb58eedf394ed271";
+        final String PRIVATE_KEY6 = "bb7d39bdb83ecf58f2fd82b6d918341cbef428661ef01ab97c28a4842125ac23";
+        final String PUBLIC_KEY6 = "024d902e1a2fc7a8755ab5b694c575fce742c48d9ff192e63df5193e4c7afe1f9c";
 
         var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
 
         // Chain m
-        PrivateKeyECDSA key1 = (PrivateKeyECDSA) PrivateKeyECDSA.fromSeed(seed);
+        PrivateKey key1 = PrivateKey.fromSeedECDSA(seed);;
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
 
         // Chain m/0
-        PrivateKeyECDSA key2 = (PrivateKeyECDSA) key1.derive(0);
+        PrivateKey key2 = key1.derive(0);
         assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
         assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
 
-//        // Chain m/0/2147483647'
-//        PrivateKeyECDSA key3 = (PrivateKeyECDSA) key2.derive(toHardened(2147483647));
-//        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
-//        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
-//        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
-//
-//        // Chain m/0'/2147483647'/1'
-//        PrivateKeyECDSA key4 = (PrivateKeyECDSA) key3.derive(1);
-//        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
-//        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
-//        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
-//
-//        // Chain m/0'/2147483647'/1'/2147483646'
-//        PrivateKeyECDSA key5 = (PrivateKeyECDSA) key4.derive(2147483646);
-//        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
-//        assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
-//        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
-//
-//        // Chain m/0'/2147483647'/1'/2147483646'/2'
-//        PrivateKeyECDSA key6 = (PrivateKeyECDSA) key5.derive(2);
-//        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
-//        assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
-//        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
+        // Chain m/0/2147483647'
+        PrivateKey key3 = key2.derive(toHardened(2147483647));
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+
+        // Chain m/0/2147483647'/1
+        PrivateKey key4 = key3.derive(1);
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
+
+        // Chain m/0/2147483647'/1/2147483646'
+        PrivateKey key5 = key4.derive(toHardened(2147483646));
+        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
+        assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
+        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
+
+        // Chain m/0/2147483647'/1/2147483646'/2
+        PrivateKey key6 = key5.derive(2);
+        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
+        assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
+        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
     }
 
     // TODO: get fromPem working, and test it
