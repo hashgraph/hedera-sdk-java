@@ -72,7 +72,6 @@ public class PrivateKeyECDSA extends PrivateKey {
         generator.init(keygenParams);
         var keypair = generator.generateKeyPair();
         var privParams = (ECPrivateKeyParameters) keypair.getPrivate();
-        var pubParams = (ECPublicKeyParameters) keypair.getPublic();
         return new PrivateKeyECDSA(privParams.getD(), null);
     }
 
