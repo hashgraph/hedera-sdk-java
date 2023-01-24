@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.protobuf.ByteString;
 import com.google.protobuf.MessageLite;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
@@ -392,7 +391,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 }
             }
 
-            switch (grpcRequest.getStatus(response)) {
+            var status = mapResponseStatus(response);
+            var executionState = getExecutionState(status, response);
+            grpcRequest.handleResponse(response, status, executionState);
+
+            switch (executionState) {
                 case ServerError:
                     lastException = grpcRequest.mapStatusException();
                     continue;
@@ -639,7 +642,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                         return null;
                     }
 
-                    switch (grpcRequest.getStatus(response)) {
+                    var status = mapResponseStatus(response);
+                    var executionState = getExecutionState(status, response);
+                    grpcRequest.handleResponse(response, status, executionState);
+
+                    switch (executionState) {
                         case ServerError:
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             break;
@@ -716,7 +723,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * after receiving the query response from Hedera. By default it triggers a retry when the pre-check
      * status is {@code BUSY}.
      */
-    ExecutionState shouldRetry(Status status, ResponseT response) {
+    ExecutionState getExecutionState(Status status, ResponseT response) {
         switch (status) {
             case PLATFORM_TRANSACTION_NOT_CREATED:
             case PLATFORM_NOT_ACTIVE:
@@ -815,18 +822,15 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             return Executable.this.mapResponse(response, node.getAccountId(), request);
         }
 
-        ExecutionState getStatus(ResponseT response) {
+        void handleResponse(ResponseT response, Status status, ExecutionState executionState) {
             node.decreaseBackoff();
 
             this.response = Executable.this.responseListener.apply(response);
-            this.responseStatus = Executable.this.mapResponseStatus(response);
+            this.responseStatus = status;
 
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
                 responseStatus, latency, node.getAccountId(), attempt, response);
 
-            // Delegate interpretation of response status to subclass. Queries will initiate retries
-            // differently from transaction submissions.
-            var executionState = Executable.this.shouldRetry(responseStatus, response);
             if (executionState == ExecutionState.ServerError && attemptedAllNodes) {
                 executionState = ExecutionState.Retry;
                 attemptedAllNodes = false;
@@ -844,8 +848,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 default:
                     // Do nothing
             }
-
-            return executionState;
         }
 
         void verboseLog(Node node) {
