@@ -147,7 +147,13 @@ public class PrivateKeyECDSA extends PrivateKey {
         }
         data.putInt(index);
 
-        var I = hmacSha512(chainCode.getKey(), data.array());
+        byte[] dataArray = data.array();
+        HMac hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter(chainCode.getKey()));
+        hmacSha512.update(dataArray, 0, dataArray.length);
+
+        byte[] I = new byte[64];
+        hmacSha512.doFinal(I, 0);
 
         var IL = java.util.Arrays.copyOfRange(I, 0, 32);
         var IR = java.util.Arrays.copyOfRange(I, 32, 64);
@@ -155,18 +161,6 @@ public class PrivateKeyECDSA extends PrivateKey {
         var ki = keyData.add(new BigInteger(1, IL)).mod(ECDSA_SECP256K1_CURVE.getN());
 
         return new PrivateKeyECDSA(ki, new KeyParameter(IR));
-    }
-
-    private static byte[] hmacSha512(byte[] key, byte[] data) {
-        SHA512Digest digest = new SHA512Digest();
-        HMac hmacSha512 = new HMac(digest);
-        hmacSha512.init(new KeyParameter(key));
-
-        hmacSha512.reset();
-        hmacSha512.update(data, 0, data.length);
-        byte[] out = new byte[64];
-        hmacSha512.doFinal(out, 0);
-        return out;
     }
 
     /**

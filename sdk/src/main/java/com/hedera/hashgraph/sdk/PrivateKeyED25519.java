@@ -185,7 +185,7 @@ class PrivateKeyED25519 extends PrivateKey {
             throw new IllegalStateException("this private key does not support derivation");
         }
 
-        if (index == (index | 0x80000000)) {
+        if ((index & 0x80000000) != 0) {
             throw new IllegalArgumentException("the index should not be pre-hardened");
         }
 
