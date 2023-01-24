@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+ - `toStandard[Ed25519|ECDSAsecp256k1]PrivateKey()` to `Mnemonic`
+ - `fromSeed[ED25519|ECDSAsecp256k1]()` to `PrivateKey`
+ - `[PrivateKeyED25519|PrivateKeyECDSA].fromSeed()`
+
+### Fixed
+ - ECDSA secp256k1 keys now support derivation
+
+### Deprecated
+ - `Mnemonic.toPrivateKey()` use `Mnemonic.toStandard[Ed25519|ECDSAsecp256k1]PrivateKey` instead
+ - `PrivateKey.fromMnemonic()` use `Mnemonic.toStandard[Ed25519|ECDSAsecp256k1]PrivateKey` instead
+
 ## 2.19.0
 
 ### Added

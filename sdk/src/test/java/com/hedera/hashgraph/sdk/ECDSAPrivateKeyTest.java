@@ -173,7 +173,7 @@ public class ECDSAPrivateKeyTest {
         var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
 
         // Chain m
-        PrivateKey key1 = PrivateKey.fromSeedECDSA(seed);
+        PrivateKey key1 = PrivateKey.fromSeedECDSAsecp256k1(seed);
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
@@ -240,7 +240,7 @@ public class ECDSAPrivateKeyTest {
         var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
 
         // Chain m
-        PrivateKey key1 = PrivateKey.fromSeedECDSA(seed);;
+        PrivateKey key1 = PrivateKey.fromSeedECDSAsecp256k1(seed);;
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);

@@ -569,7 +569,7 @@ public final class Mnemonic {
      */
     public PrivateKey toStandardECDSAsecp256k1PrivateKey(String passphrase, int index) {
         var seed = this.toSeed(passphrase);
-        PrivateKey derivedKey = PrivateKey.fromSeedECDSA(seed);
+        PrivateKey derivedKey = PrivateKey.fromSeedECDSAsecp256k1(seed);
 
         // Harden the first 3 indexes
         for (int i : new int[]{44 | 0x80000000, 3030 | 0x80000000, 0 | 0x80000000, 0, index}) {
