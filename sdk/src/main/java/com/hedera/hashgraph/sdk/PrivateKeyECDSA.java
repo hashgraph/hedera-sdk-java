@@ -129,7 +129,7 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     @Override
     public PrivateKey derive(int index) {
-        if (this.chainCode == null) {
+        if (!isDerivable()) {
             throw new IllegalStateException("this private key does not support derivation");
         }
 
@@ -151,15 +151,15 @@ public class PrivateKeyECDSA extends PrivateKey {
         hmacSha512.init(new KeyParameter(chainCode.getKey()));
         hmacSha512.update(dataArray, 0, dataArray.length);
 
-        byte[] I = new byte[64];
-        hmacSha512.doFinal(I, 0);
+        byte[] i = new byte[64];
+        hmacSha512.doFinal(i, 0);
 
-        var IL = java.util.Arrays.copyOfRange(I, 0, 32);
-        var IR = java.util.Arrays.copyOfRange(I, 32, 64);
+        var il = java.util.Arrays.copyOfRange(i, 0, 32);
+        var ir = java.util.Arrays.copyOfRange(i, 32, 64);
 
-        var ki = keyData.add(new BigInteger(1, IL)).mod(ECDSA_SECP256K1_CURVE.getN());
+        var ki = keyData.add(new BigInteger(1, il)).mod(ECDSA_SECP256K1_CURVE.getN());
 
-        return new PrivateKeyECDSA(ki, new KeyParameter(IR));
+        return new PrivateKeyECDSA(ki, new KeyParameter(ir));
     }
 
     /**

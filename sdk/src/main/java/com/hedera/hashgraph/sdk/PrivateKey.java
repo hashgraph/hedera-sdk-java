@@ -104,6 +104,7 @@ public abstract class PrivateKey extends Key {
      * @return the recovered key; use {@link #derive(int)} to get a key for an account index (0
      * for default account)
      */
+    @Deprecated
     public static PrivateKey fromMnemonic(Mnemonic mnemonic, String passphrase) {
         var seed = mnemonic.toSeed(passphrase);
         @Var PrivateKey derivedKey = fromSeedED25519(seed);
@@ -120,6 +121,7 @@ public abstract class PrivateKey extends Key {
     }
 
     /**
+     * @deprecated use {@link Mnemonic#toStandardEd25519PrivateKey(String, int)} ()} or {@link Mnemonic#toStandardECDSAsecp256k1PrivateKey(String, int)} (String, int)} instead
      * Recover a private key from a mnemonic phrase compatible with the iOS and Android wallets.
      * <p>
      * An overload of {@link #fromMnemonic(Mnemonic, String)} which uses an empty string for the
@@ -129,6 +131,7 @@ public abstract class PrivateKey extends Key {
      * @return the recovered key; use {@link #derive(int)} to get a key for an account index (0
      * for default account)
      */
+    @Deprecated
     public static PrivateKey fromMnemonic(Mnemonic mnemonic) {
         return fromMnemonic(mnemonic, "");
     }
