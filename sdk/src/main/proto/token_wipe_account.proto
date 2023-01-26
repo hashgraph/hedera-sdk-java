@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "basic_types.proto";
@@ -44,8 +45,9 @@ import "basic_types.proto";
  * 
  * If both amount and serialNumbers get filled, a INVALID_TRANSACTION_BODY response code will be
  * returned.
- * If neither the amount nor the serialNumbers get filled, a INVALID_WIPING_AMOUNT response code
- * will be returned.
+ * If the serialNumbers don't get filled for a non-fungible token type, a INVALID_WIPING_AMOUNT response
+ * code will be returned.
+ * If a zero amount is provided for a fungible token type, it will be treated as a regular transaction.
  * If the serialNumbers list contains a non-positive integer as a serial number, a INVALID_NFT_ID
  * response code will be returned.
  * If the serialNumbers' list count is greater than the batch size limit global dynamic property, a

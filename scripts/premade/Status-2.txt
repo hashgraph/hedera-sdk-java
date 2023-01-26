@@ -5,4 +5,4 @@
     }
 
     static Status valueOf(ResponseCodeEnum code) {
-        switch (code) {
+        return switch (code) {
