@@ -1,8 +1,7 @@
-            default:
-                throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
-        }
+            default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
+        };
     }
 
     @Override
     public String toString() {
-        switch (this) {
+        return switch (this) {

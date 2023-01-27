@@ -26,6 +26,7 @@ import "timestamp.proto";
 import "google/protobuf/wrappers.proto";
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.base">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 /**
@@ -80,7 +81,7 @@ message AccountID {
     int64 realmNum = 2;
 
     /**
-     * The account number unique within its realm which can be either a non-negative integer or an alias public key.
+     * The account number unique within its realm which can be a non-negative integer, an alias public key or an EVM address.
      * For any AccountID fields in the query response, transaction record or transaction receipt only accountNum will
      * be populated.
      */
@@ -95,21 +96,23 @@ message AccountID {
          * a protobuf Key message for any primitive key type. Currently only primitive key bytes are supported as an alias
          * (ThresholdKey, KeyList, ContractID, and delegatable_contract_id are not supported)
          *
-         * May also be the ethereum account 20-byte EVM address to be used initially in place of the public key bytes. This EVM
-         * address may be either the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
-         *
          * At most one account can ever have a given alias and it is used for account creation if it
          * was automatically created using a crypto transfer. It will be null if an account is created normally.
          * It is immutable once it is set for an account.
          *
          * If a transaction auto-creates the account, any further transfers to that alias will simply be deposited
          * in that account, without creating anything, and with no creation fee being charged.
-         *
-         * If a transaction lazily-creates this account, a subsequent transaction will be required containing the public key bytes 
-         * that map to the EVM address bytes. The provided public key bytes will then serve as the final alias bytes.
          */
         bytes alias = 4;
 
+        /**
+         * The ethereum account 20-byte EVM address to be used initially in place of the public key bytes. This EVM
+         * address may be either the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+         *
+         * If a transaction lazily-creates this account, a subsequent transaction will be required containing the public key bytes
+         * that map to the EVM address bytes. Lazy account creates will only support the keccak-256 hash of a ECDSA_SECP256K1 primitive key form.
+         */
+        bytes evm_address = 5;
     }
 }
 
@@ -1591,4 +1594,16 @@ message StakingInfo {
          */
         int64 staked_node_id = 6;
     }
+}
+
+message VirtualAddress {
+    /**
+     * The 20-byte EVM address that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+     */
+    bytes address = 1;
+
+    /**
+     * Flag if this address should now be set or is the default address on the account.
+     */
+    bool is_default = 2;
 }

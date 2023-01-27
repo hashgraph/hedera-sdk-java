@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "basic_types.proto";
@@ -45,7 +46,8 @@ import "duration.proto";
  * used to extend its expiration as long as possible. If it is has a zero balance when it expires,
  * then it is deleted. This transaction must be signed by the payer account. If receiverSigRequired
  * is false, then the transaction does not have to be signed by the keys in the keys field. If it is
- * true, then it must be signed by them, in addition to the keys of the payer account.
+ * true, then it must be signed by them, in addition to the keys of the payer account. If the 
+ * auto_renew_account field is set, the key of the referenced account must sign.
  *
  * An entity (account, file, or smart contract instance) must be created in a particular realm. If
  * the realmID is left null, then a new realm will be created with the given admin key. If a new
@@ -153,10 +155,8 @@ message CryptoCreateTransactionBody {
     bool decline_reward = 17;
 
     /**
-     * The bytes to be used as the account's alias. The bytes will be 1 of 2 options. It will be the 
-     * serialization of a protobuf Key message for an ED25519/ECDSA_SECP256K1 primitive key type. If the 
-     * account is ECDSA_SECP256K1 based it may also be the public address, calcluated as the last 20 bytes of
-     * the keccak-256 hash of the ECDSA_SECP256K1 primitive key. Currently only primitive key bytes are 
+     * The bytes to be used as the account's alias. It will be the
+     * serialization of a protobuf Key message for an ED25519/ECDSA_SECP256K1 primitive key type. Currently only primitive key bytes are
      * supported as the key for an account with an alias. ThresholdKey, KeyList, ContractID, and
      * delegatable_contract_id are not supported.
      *
@@ -167,4 +167,9 @@ message CryptoCreateTransactionBody {
      * simply be deposited in that account, without creating anything, and with no creation fee being charged.
      */
      bytes alias = 18;
+
+    /**
+     * EOA 20-byte address to create that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+     */
+    bytes evm_address = 20;
 }

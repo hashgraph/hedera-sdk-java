@@ -6,4 +6,4 @@
     }
 
     static FeeDataType valueOf(SubType code) {
-        switch (code) {
+        return switch (code) {

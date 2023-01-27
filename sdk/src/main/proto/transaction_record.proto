@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "timestamp.proto";
@@ -145,4 +146,10 @@ message TransactionRecord {
          */
         int32 prng_number = 20;
     }
+
+    /**
+     * The new default EVM address of the account created by this transaction.
+     * This field is populated only when the EVM address is not specified in the related transaction body.
+     */
+    bytes evm_address = 21;
 }
