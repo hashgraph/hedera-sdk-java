@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
@@ -218,5 +219,23 @@ class AccountIdTest {
     @Test
     void toSolidityAddress() {
         SnapshotMatcher.expect(new AccountId(5005).toSolidityAddress()).toMatchSnapshot();
+    }
+
+    @Test
+    void equalsVirtualAddresses() {
+        var id1 = new AccountId(1, 2, 3);
+        var id2 = new AccountId(1, 2, 3);
+
+        var address1 = "302a300506032b6570032100114e6abc371b82d1";
+        var address2 = "302a300506032b6570032100114e6abc371b82d2";
+
+        id1.virtualAddresses.add(new VirtualAddress(address1, true));
+        id1.virtualAddresses.add(new VirtualAddress(address2, false));
+
+        // TODO - swap address 1 and 2
+        id2.virtualAddresses.add(new VirtualAddress(address1, true));
+        id2.virtualAddresses.add(new VirtualAddress(address2, false));
+
+        assertThat(id2).isEqualTo(id1);
     }
 }
