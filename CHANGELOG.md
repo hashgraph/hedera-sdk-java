@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
  - `TRANSACTION_HAS_UNKNOWN_FIELDS` and `ACCOUNT_IS_IMMUTABLE` in `Status`
 
+### Fixed
+ - Misleading logging when an unhealthy node is hit
+
 ## 2.19.0
 
 ### Added
