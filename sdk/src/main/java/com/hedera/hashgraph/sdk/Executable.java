@@ -784,8 +784,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         Throwable reactToConnectionFailure() {
             Objects.requireNonNull(network).increaseBackoff(node);
-            logger.warn("Retrying node {} in {} ms after channel connection failure during attempt #{}",
-                node.getAccountId(), node.getRemainingTimeForBackoff(), attempt);
+            logger.warn("Retrying in {} ms after channel connection failure with node {} during attempt #{}",
+                node.getRemainingTimeForBackoff(), node.getAccountId(), attempt);
             verboseLog(node);
             return new IllegalStateException("Failed to connect to node " + node.getAccountId());
         }
@@ -797,8 +797,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
             if (retry) {
                 Objects.requireNonNull(network).increaseBackoff(node);
-                logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                    node.getAccountId(), node.getRemainingTimeForBackoff(), attempt, e != null ? e.getMessage() : "NULL");
+                logger.warn("Retrying in {} ms after failure with node {} during attempt #{}: {}",
+                    node.getRemainingTimeForBackoff(), node.getAccountId(), attempt, e != null ? e.getMessage() : "NULL");
                 verboseLog(node);
             }
 
@@ -833,8 +833,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             }
             switch (executionState) {
                 case Retry:
-                    logger.warn("Retrying node {} in {} ms after failure during attempt #{}: {}",
-                        node.getAccountId(), delay, attempt, responseStatus);
+                    logger.warn("Retrying in {} ms after failure with node {} during attempt #{}: {}",
+                        delay, node.getAccountId(), attempt, responseStatus);
                     verboseLog(node);
                     break;
                 case ServerError:
