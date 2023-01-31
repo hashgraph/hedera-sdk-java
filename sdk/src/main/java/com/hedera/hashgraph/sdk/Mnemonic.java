@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
@@ -574,7 +575,12 @@ public final class Mnemonic {
         PrivateKey derivedKey = PrivateKey.fromSeedECDSAsecp256k1(seed);
 
         // Harden the first 3 indexes
-        for (int i : new int[]{44 | 0x80000000, 3030 | 0x80000000, 0 | 0x80000000, 0, index}) {
+        for (int i : new int[]{
+            Bip32Utils.toHardenedIndex(44),
+            Bip32Utils.toHardenedIndex(3030),
+            Bip32Utils.toHardenedIndex(0),
+            0,
+            index}) {
             derivedKey = derivedKey.derive(i);
         }
 

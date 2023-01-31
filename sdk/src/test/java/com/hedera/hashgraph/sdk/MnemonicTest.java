@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -425,7 +426,7 @@ public class MnemonicTest {
     @DisplayName("Mnemonic.toStandardED25519PrivateKey() should fail when index is pre-hardened")
     void toStandardED25519PrivateKeyShouldFailWhenIndexIsPreHardened() throws BadMnemonicException {
         Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
-        int hardenedIndex = 10 | 0x80000000;
+        int hardenedIndex = Bip32Utils.toHardenedIndex(10);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
             () -> mnemonic.toStandardEd25519PrivateKey("", hardenedIndex)
@@ -441,19 +442,19 @@ public class MnemonicTest {
         PrivateKey privateKey1 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", 0);
         assertThat(Hex.toHexString(privateKey1.toBytesRaw())).isEqualTo("0fde7bfd57ae6ec310bdd8b95967d98e8762a2c02da6f694b152cf9860860ab8");
 
-        PrivateKey privateKey2 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", 0 | 0x80000000);  // Hardened index
+        PrivateKey privateKey2 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", Bip32Utils.toHardenedIndex(0));
         assertThat(Hex.toHexString(privateKey2.toBytesRaw())).isEqualTo("aab7d720a32c2d1ea6123f58b074c865bb07f6c621f14cb012f66c08e64996bb");
 
         PrivateKey privateKey3 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 0);
         assertThat(Hex.toHexString(privateKey3.toBytesRaw())).isEqualTo("6df5ed217cf6d5586fdf9c69d39c843eb9d152ca19d3e41f7bab483e62f6ac25");
 
-        PrivateKey privateKey4 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 0 | 0x80000000); // Hardened index
+        PrivateKey privateKey4 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(0));
         assertThat(Hex.toHexString(privateKey4.toBytesRaw())).isEqualTo("80df01f79ee1b1f4e9ab80491c592c0ef912194ccca1e58346c3d35cb5b7c098");
 
         PrivateKey privateKey5 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 2147483647);
         assertThat(Hex.toHexString(privateKey5.toBytesRaw())).isEqualTo("60cb2496a623e1201d4e0e7ce5da3833cd4ec7d6c2c06bce2bcbcbc9dfef22d6");
 
-        PrivateKey privateKey6 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 2147483647 | 0x80000000); // Hardened index
+        PrivateKey privateKey6 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(2147483647));
         assertThat(Hex.toHexString(privateKey6.toBytesRaw())).isEqualTo("100477c333028c8849250035be2a0a166a347a5074a8a727bce1db1c65181a50");
     }
 }

@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -133,7 +134,7 @@ public class PrivateKeyECDSA extends PrivateKey {
             throw new IllegalStateException("this private key does not support derivation");
         }
 
-        boolean isHardened = (index & 0x80000000) != 0;
+        boolean isHardened = Bip32Utils.isHardenedIndex(index);
         ByteBuffer data = ByteBuffer.allocate(37);
 
         if (isHardened) {

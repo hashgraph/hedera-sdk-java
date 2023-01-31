@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -138,10 +139,6 @@ public class ECDSAPrivateKeyTest {
         return data;
     }
 
-    private static int toHardened(int index) {
-        return index | 0x80000000;
-    }
-
     @Test
     @DisplayName("SLIP10 test vector 1")
     void slip10TestVector1() {
@@ -179,7 +176,7 @@ public class ECDSAPrivateKeyTest {
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
 
         // Chain m/0'
-        PrivateKey key2 = key1.derive(toHardened(0));
+        PrivateKey key2 = key1.derive(Bip32Utils.toHardenedIndex(0));
         assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
         assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
@@ -191,7 +188,7 @@ public class ECDSAPrivateKeyTest {
         assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
 
         // Chain m/0'/1/2'
-        PrivateKey key4 = key3.derive(toHardened(2));
+        PrivateKey key4 = key3.derive(Bip32Utils.toHardenedIndex(2));
         assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
         assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
         assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
@@ -252,7 +249,7 @@ public class ECDSAPrivateKeyTest {
         assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
 
         // Chain m/0/2147483647'
-        PrivateKey key3 = key2.derive(toHardened(2147483647));
+        PrivateKey key3 = key2.derive(Bip32Utils.toHardenedIndex(2147483647));
         assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
         assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
         assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
@@ -264,7 +261,7 @@ public class ECDSAPrivateKeyTest {
         assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
 
         // Chain m/0/2147483647'/1/2147483646'
-        PrivateKey key5 = key4.derive(toHardened(2147483646));
+        PrivateKey key5 = key4.derive(Bip32Utils.toHardenedIndex(2147483646));
         assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
         assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
         assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
