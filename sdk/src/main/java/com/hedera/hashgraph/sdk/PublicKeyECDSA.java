@@ -25,11 +25,14 @@ import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.signers.ECDSASigner;
+import org.bouncycastle.jcajce.provider.digest.Keccak;
+import org.bouncycastle.util.encoders.Hex;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+
+import static com.hedera.hashgraph.sdk.Crypto.calcKeccak256;
 
 /**
  * Encapsulate the ECDSA public key.
@@ -85,7 +88,7 @@ public class PublicKeyECDSA extends PublicKey {
 
     @Override
     public boolean verify(byte[] message, byte[] signature) {
-        var hash = Crypto.calcKeccak256(message);
+        var hash = calcKeccak256(message);
 
         ECDSASigner signer = new ECDSASigner();
         signer.init(false, new ECPublicKeyParameters(
@@ -134,6 +137,17 @@ public class PublicKeyECDSA extends PublicKey {
     @Override
     public byte[] toBytesRaw() {
         return Arrays.copyOf(keyData, keyData.length);
+    }
+
+    @Override
+    public EvmAddress toEvmAddress() {
+        // Calculate the Keccak-256 hash of the uncompressed key without "04" prefix
+        byte[] uncompressed = Key.ECDSA_SECP256K1_CURVE
+            .getCurve().decodePoint(toBytesRaw()).getEncoded(false);
+        byte[] keccakBytes = calcKeccak256(Arrays.copyOfRange(uncompressed, 1, uncompressed.length));
+
+        // Return the last 20 bytes
+        return EvmAddress.fromBytes(Arrays.copyOfRange(keccakBytes, 12, 32));
     }
 
     @Override

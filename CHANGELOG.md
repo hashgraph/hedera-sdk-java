@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
  - `TRANSACTION_HAS_UNKNOWN_FIELDS` and `ACCOUNT_IS_IMMUTABLE` in `Status`
+ - `TransactionRecord.evmAddress`
+ - `PublicKeyECDSA.toEvmAddress()`
+ - `AccountCreateTransaction.setEvmAddress()`
+ - `AccountId.fromEvmAddress()`
+ - `AccountId.fromString()` now supports EVM address
+ - `TransferTransaction.addHbarTransfer()` now supports EVM address
+ - `AccountCreateEvmAddressExample`
+ - `CreateAccountWithAliasExample`
+ - `LazyCreateAccountTransactionExample`
+ - `LazyCreateTransferTransactionExample`
+ - `TransferUsingEvmAddressExample`
+ - `AccountCreationWaysExample`
+
+### Deprecated
+
+- `AccountCreateTransaction.setAliasEvmAddress()` use `AccountCreateTransaction.setEvmAddress()` instead
 
 ### Fixed
  - Misleading logging when an unhealthy node is hit

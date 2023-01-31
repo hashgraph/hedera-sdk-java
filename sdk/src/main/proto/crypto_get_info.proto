@@ -140,9 +140,9 @@ message CryptoGetInfoResponse {
         repeated LiveHash liveHashes = 14;
 
         /**
-         * [DEPRECATED] The metadata of the tokens associated to the account. This field was 
-         * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed 
-         * an account to be associated to an unlimited number of tokens. This scale makes it more 
+         * [DEPRECATED] The metadata of the tokens associated to the account. This field was
+         * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed
+         * an account to be associated to an unlimited number of tokens. This scale makes it more
          * efficient for users to consult mirror nodes to review their token associations.
          */
         repeated TokenRelationship tokenRelationships = 15 [deprecated = true];
@@ -168,7 +168,7 @@ message CryptoGetInfoResponse {
         bytes alias = 19;
 
         /**
-         * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
+         * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
          */
         bytes ledger_id = 20;
 
@@ -181,6 +181,14 @@ message CryptoGetInfoResponse {
          * Staking metadata for this account.
          */
         StakingInfo staking_info = 22;
+
+
+        /**
+         * If present, the account that will be charged for auto-renewal of this account. If not set,
+         * or set to an account with zero hbar balance, the account's own hbar balance will be used to
+         * cover auto-renewal fees.
+         */
+        AccountID auto_renew_account = 23;
 
         /**
          * List of virtual addresses each of which is an EVM address that maps to an ECDSA key pair a user must prove ownership of.

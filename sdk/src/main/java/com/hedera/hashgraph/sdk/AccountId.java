@@ -58,7 +58,7 @@ public final class AccountId implements Comparable<AccountId> {
     public final PublicKey aliasKey;
 
     @Nullable
-    public final EvmAddress aliasEvmAddress;
+    public final EvmAddress evmAddress;
 
     @Nonnull
     public final List<VirtualAddress> virtualAddresses;
@@ -101,7 +101,7 @@ public final class AccountId implements Comparable<AccountId> {
         this.num = num;
         this.checksum = checksum;
         this.aliasKey = null;
-        this.aliasEvmAddress = null;
+        this.evmAddress = null;
         this.virtualAddresses = new ArrayList<>();
     }
 
@@ -119,14 +119,14 @@ public final class AccountId implements Comparable<AccountId> {
         @Nonnegative long num,
         @Nullable String checksum,
         @Nullable PublicKey aliasKey,
-        @Nullable EvmAddress aliasEvmAddress
+        @Nullable EvmAddress evmAddress
     ) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
         this.checksum = checksum;
         this.aliasKey = aliasKey;
-        this.aliasEvmAddress = aliasEvmAddress;
+        this.evmAddress = evmAddress;
         this.virtualAddresses = new ArrayList<>();
     }
 
@@ -138,6 +138,9 @@ public final class AccountId implements Comparable<AccountId> {
      * @throws IllegalArgumentException when the account id and checksum are invalid
      */
     public static AccountId fromString(String id) {
+        if ((id.startsWith("0x") && id.length() == 42) || id.length() == 40)
+            return fromEvmAddress(id);
+
         try {
             return EntityIdHelper.fromString(id, AccountId::new);
         } catch (IllegalArgumentException error) {
@@ -159,6 +162,57 @@ public final class AccountId implements Comparable<AccountId> {
                 );
             }
         }
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                a string representing the EVM address
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(String evmAddress) {
+        return fromEvmAddress(evmAddress, 0, 0);
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                a string representing the EVM address
+     * @param shard                     the shard part of the account id
+     * @param realm                     the shard realm of the account id
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(String evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
+        return fromEvmAddress(EvmAddress.fromString(evmAddress), shard, realm);
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                an EvmAddress instance
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(EvmAddress evmAddress) {
+        return fromEvmAddress(evmAddress, 0, 0);
+    }
+
+    /**
+     * Retrieve the account id from an EVM address.
+     *
+     * @param evmAddress                an EvmAddress instance
+     * @param shard                     the shard part of the account id
+     * @param realm                     the shard realm of the account id
+     * @return                          the account id object
+     */
+    public static AccountId fromEvmAddress(EvmAddress evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
+        return new AccountId(
+            shard,
+            realm,
+            0,
+            null,
+            null,
+            evmAddress
+        );
     }
 
     /**
@@ -221,8 +275,8 @@ public final class AccountId implements Comparable<AccountId> {
 
         if (aliasKey != null) {
             accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
-        } else if (aliasEvmAddress != null) {
-            accountIdBuilder.setAlias(ByteString.copyFrom(aliasEvmAddress.toBytes()));
+        } else if (evmAddress != null) {
+            accountIdBuilder.setAlias(ByteString.copyFrom(evmAddress.toBytes()));
         }else {
             accountIdBuilder.setAccountNum(num);
         }
@@ -252,7 +306,7 @@ public final class AccountId implements Comparable<AccountId> {
      * @throws BadEntityIdException     when the account id and checksum are invalid
      */
     public void validateChecksum(Client client) throws BadEntityIdException {
-        if (aliasKey == null && aliasEvmAddress == null) {
+        if (aliasKey == null && evmAddress == null) {
             EntityIdHelper.validate(shard, realm, num, client, checksum);
         }
     }
@@ -280,8 +334,8 @@ public final class AccountId implements Comparable<AccountId> {
     public String toString() {
         if (aliasKey != null) {
             return "" + shard + "." + realm + "." + aliasKey.toStringDER();
-        } else if (aliasEvmAddress != null) {
-            return "" + shard + "." + realm + "." + aliasEvmAddress.toString();
+        } else if (evmAddress != null) {
+            return "" + shard + "." + realm + "." + evmAddress.toString();
         } else {
             return EntityIdHelper.toString(shard, realm, num);
         }
@@ -294,8 +348,8 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id with checksum
      */
     public String toStringWithChecksum(Client client) {
-        if (aliasKey != null || aliasEvmAddress != null) {
-            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey or aliasEvmAddress");
+        if (aliasKey != null || evmAddress != null) {
+            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey or evmAddress");
         } else {
             return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
         }
@@ -305,7 +359,7 @@ public final class AccountId implements Comparable<AccountId> {
     public int hashCode() {
         return Objects.hash(
             shard, realm, num,
-            (aliasKey != null) ? aliasKey.toBytes() : ((aliasEvmAddress != null) ? aliasEvmAddress.toBytes() : null),
+            (aliasKey != null) ? aliasKey.toBytes() : ((evmAddress != null) ? evmAddress.toBytes() : null),
             // TODO - support multiple virtual addresses
             !virtualAddresses.isEmpty() ? virtualAddresses.get(0).toBytes() : null
         );
@@ -325,12 +379,12 @@ public final class AccountId implements Comparable<AccountId> {
         if ((aliasKey == null) != (otherId.aliasKey == null)) {
             return false;
         }
-        if ((aliasEvmAddress == null) != (otherId.aliasEvmAddress == null)) {
+        if ((evmAddress == null) != (otherId.evmAddress == null)) {
             return false;
         }
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num &&
             (aliasKey == null || aliasKey.equals(otherId.aliasKey)) &&
-            (aliasEvmAddress == null || aliasEvmAddress.equals(otherId.aliasEvmAddress)) &&
+            (evmAddress == null || evmAddress.equals(otherId.evmAddress)) &&
             // TBD - if the addresses are the same but in different order should we consider them equal?
             // Or should we sort the collections first?
             virtualAddresses.equals(otherId.virtualAddresses);
@@ -357,12 +411,12 @@ public final class AccountId implements Comparable<AccountId> {
         if (aliasKey != null) {
             return aliasKey.toStringDER().compareTo(o.aliasKey.toStringDER());
         }
-        if ((aliasEvmAddress == null) != (o.aliasEvmAddress == null)) {
-            return aliasEvmAddress != null ? 1 : -1;
+        if ((evmAddress == null) != (o.evmAddress == null)) {
+            return evmAddress != null ? 1 : -1;
         }
-        if (aliasEvmAddress == null) {
+        if (evmAddress == null) {
             return 0;
         }
-        return aliasEvmAddress.toString().compareTo(o.aliasEvmAddress.toString());
+        return evmAddress.toString().compareTo(o.evmAddress.toString());
     }
 }
