@@ -393,309 +393,160 @@ public enum RequestType {
     }
 
     static RequestType valueOf(HederaFunctionality code) {
-        switch (code) {
-            case NONE:
-                return NONE;
-            case CryptoTransfer:
-                return CRYPTO_TRANSFER;
-            case CryptoUpdate:
-                return CRYPTO_UPDATE;
-            case CryptoDelete:
-                return CRYPTO_DELETE;
-            case CryptoAddLiveHash:
-                return CRYPTO_ADD_LIVE_HASH;
-            case CryptoDeleteLiveHash:
-                return CRYPTO_DELETE_LIVE_HASH;
-            case ContractCall:
-                return CONTRACT_CALL;
-            case ContractCreate:
-                return CONTRACT_CREATE;
-            case ContractUpdate:
-                return CONTRACT_UPDATE;
-            case FileCreate:
-                return FILE_CREATE;
-            case FileAppend:
-                return FILE_APPEND;
-            case FileUpdate:
-                return FILE_UPDATE;
-            case FileDelete:
-                return FILE_DELETE;
-            case CryptoGetAccountBalance:
-                return CRYPTO_GET_ACCOUNT_BALANCE;
-            case CryptoGetAccountRecords:
-                return CRYPTO_GET_ACCOUNT_RECORDS;
-            case CryptoGetInfo:
-                return CRYPTO_GET_INFO;
-            case ContractCallLocal:
-                return CONTRACT_CALL_LOCAL;
-            case ContractGetInfo:
-                return CONTRACT_GET_INFO;
-            case ContractGetBytecode:
-                return CONTRACT_GET_BYTECODE;
-            case GetBySolidityID:
-                return GET_BY_SOLIDITY_ID;
-            case GetByKey:
-                return GET_BY_KEY;
-            case CryptoGetLiveHash:
-                return CRYPTO_GET_LIVE_HASH;
-            case CryptoGetStakers:
-                return CRYPTO_GET_STAKERS;
-            case FileGetContents:
-                return FILE_GET_CONTENTS;
-            case FileGetInfo:
-                return FILE_GET_INFO;
-            case TransactionGetRecord:
-                return TRANSACTION_GET_RECORD;
-            case ContractGetRecords:
-                return CONTRACT_GET_RECORDS;
-            case CryptoCreate:
-                return CRYPTO_CREATE;
-            case SystemDelete:
-                return SYSTEM_DELETE;
-            case SystemUndelete:
-                return SYSTEM_UNDELETE;
-            case ContractDelete:
-                return CONTRACT_DELETE;
-            case Freeze:
-                return FREEZE;
-            case CreateTransactionRecord:
-                return CREATE_TRANSACTION_RECORD;
-            case CryptoAccountAutoRenew:
-                return CRYPTO_ACCOUNT_AUTO_RENEW;
-            case ContractAutoRenew:
-                return CONTRACT_AUTO_RENEW;
-            case GetVersionInfo:
-                return GET_VERSION_INFO;
-            case TransactionGetReceipt:
-                return TRANSACTION_GET_RECEIPT;
-            case ConsensusCreateTopic:
-                return CONSENSUS_CREATE_TOPIC;
-            case ConsensusUpdateTopic:
-                return CONSENSUS_UPDATE_TOPIC;
-            case ConsensusDeleteTopic:
-                return CONSENSUS_DELETE_TOPIC;
-            case ConsensusGetTopicInfo:
-                return CONSENSUS_GET_TOPIC_INFO;
-            case ConsensusSubmitMessage:
-                return CONSENSUS_SUBMIT_MESSAGE;
-            case UncheckedSubmit:
-                return UNCHECKED_SUBMIT;
-            case TokenCreate:
-                return TOKEN_CREATE;
-            case TokenGetInfo:
-                return TOKEN_GET_INFO;
-            case TokenFreezeAccount:
-                return TOKEN_FREEZE_ACCOUNT;
-            case TokenUnfreezeAccount:
-                return TOKEN_UNFREEZE_ACCOUNT;
-            case TokenGrantKycToAccount:
-                return TOKEN_GRANT_KYC_TO_ACCOUNT;
-            case TokenRevokeKycFromAccount:
-                return TOKEN_REVOKE_KYC_FROM_ACCOUNT;
-            case TokenDelete:
-                return TOKEN_DELETE;
-            case TokenUpdate:
-                return TOKEN_UPDATE;
-            case TokenMint:
-                return TOKEN_MINT;
-            case TokenBurn:
-                return TOKEN_BURN;
-            case TokenAccountWipe:
-                return TOKEN_ACCOUNT_WIPE;
-            case TokenAssociateToAccount:
-                return TOKEN_ASSOCIATE_TO_ACCOUNT;
-            case TokenDissociateFromAccount:
-                return TOKEN_DISSOCIATE_FROM_ACCOUNT;
-            case ScheduleCreate:
-                return SCHEDULE_CREATE;
-            case ScheduleDelete:
-                return SCHEDULE_DELETE;
-            case ScheduleSign:
-                return SCHEDULE_SIGN;
-            case ScheduleGetInfo:
-                return SCHEDULE_GET_INFO;
-            case TokenGetAccountNftInfos:
-                return TOKEN_GET_ACCOUNT_NFT_INFOS;
-            case TokenGetNftInfo:
-                return TOKEN_GET_NFT_INFO;
-            case TokenGetNftInfos:
-                return TOKEN_GET_NFT_INFOS;
-            case TokenFeeScheduleUpdate:
-                return TOKEN_FEE_SCHEDULE_UPDATE;
-            case NetworkGetExecutionTime:
-                return NETWORK_GET_EXECUTION_TIME;
-            case TokenPause:
-                return TOKEN_PAUSE;
-            case TokenUnpause:
-                return TOKEN_UNPAUSE;
-            case CryptoApproveAllowance:
-                return CRYPTO_APPROVE_ALLOWANCE;
-            case CryptoDeleteAllowance:
-                return CRYPTO_DELETE_ALLOWANCE;
-            case GetAccountDetails:
-                return GET_ACCOUNT_DETAILS;
-            case EthereumTransaction:
-                return ETHEREUM_TRANSACTION;
-            case NodeStakeUpdate:
-                return NODE_STAKE_UPDATE;
-            case UtilPrng:
-                return PRNG;
-            default:
-                throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
-        }
+        return switch (code) {
+            case NONE -> NONE;
+            case CryptoTransfer -> CRYPTO_TRANSFER;
+            case CryptoUpdate -> CRYPTO_UPDATE;
+            case CryptoDelete -> CRYPTO_DELETE;
+            case CryptoAddLiveHash -> CRYPTO_ADD_LIVE_HASH;
+            case CryptoDeleteLiveHash -> CRYPTO_DELETE_LIVE_HASH;
+            case ContractCall -> CONTRACT_CALL;
+            case ContractCreate -> CONTRACT_CREATE;
+            case ContractUpdate -> CONTRACT_UPDATE;
+            case FileCreate -> FILE_CREATE;
+            case FileAppend -> FILE_APPEND;
+            case FileUpdate -> FILE_UPDATE;
+            case FileDelete -> FILE_DELETE;
+            case CryptoGetAccountBalance -> CRYPTO_GET_ACCOUNT_BALANCE;
+            case CryptoGetAccountRecords -> CRYPTO_GET_ACCOUNT_RECORDS;
+            case CryptoGetInfo -> CRYPTO_GET_INFO;
+            case ContractCallLocal -> CONTRACT_CALL_LOCAL;
+            case ContractGetInfo -> CONTRACT_GET_INFO;
+            case ContractGetBytecode -> CONTRACT_GET_BYTECODE;
+            case GetBySolidityID -> GET_BY_SOLIDITY_ID;
+            case GetByKey -> GET_BY_KEY;
+            case CryptoGetLiveHash -> CRYPTO_GET_LIVE_HASH;
+            case CryptoGetStakers -> CRYPTO_GET_STAKERS;
+            case FileGetContents -> FILE_GET_CONTENTS;
+            case FileGetInfo -> FILE_GET_INFO;
+            case TransactionGetRecord -> TRANSACTION_GET_RECORD;
+            case ContractGetRecords -> CONTRACT_GET_RECORDS;
+            case CryptoCreate -> CRYPTO_CREATE;
+            case SystemDelete -> SYSTEM_DELETE;
+            case SystemUndelete -> SYSTEM_UNDELETE;
+            case ContractDelete -> CONTRACT_DELETE;
+            case Freeze -> FREEZE;
+            case CreateTransactionRecord -> CREATE_TRANSACTION_RECORD;
+            case CryptoAccountAutoRenew -> CRYPTO_ACCOUNT_AUTO_RENEW;
+            case ContractAutoRenew -> CONTRACT_AUTO_RENEW;
+            case GetVersionInfo -> GET_VERSION_INFO;
+            case TransactionGetReceipt -> TRANSACTION_GET_RECEIPT;
+            case ConsensusCreateTopic -> CONSENSUS_CREATE_TOPIC;
+            case ConsensusUpdateTopic -> CONSENSUS_UPDATE_TOPIC;
+            case ConsensusDeleteTopic -> CONSENSUS_DELETE_TOPIC;
+            case ConsensusGetTopicInfo -> CONSENSUS_GET_TOPIC_INFO;
+            case ConsensusSubmitMessage -> CONSENSUS_SUBMIT_MESSAGE;
+            case UncheckedSubmit -> UNCHECKED_SUBMIT;
+            case TokenCreate -> TOKEN_CREATE;
+            case TokenGetInfo -> TOKEN_GET_INFO;
+            case TokenFreezeAccount -> TOKEN_FREEZE_ACCOUNT;
+            case TokenUnfreezeAccount -> TOKEN_UNFREEZE_ACCOUNT;
+            case TokenGrantKycToAccount -> TOKEN_GRANT_KYC_TO_ACCOUNT;
+            case TokenRevokeKycFromAccount -> TOKEN_REVOKE_KYC_FROM_ACCOUNT;
+            case TokenDelete -> TOKEN_DELETE;
+            case TokenUpdate -> TOKEN_UPDATE;
+            case TokenMint -> TOKEN_MINT;
+            case TokenBurn -> TOKEN_BURN;
+            case TokenAccountWipe -> TOKEN_ACCOUNT_WIPE;
+            case TokenAssociateToAccount -> TOKEN_ASSOCIATE_TO_ACCOUNT;
+            case TokenDissociateFromAccount -> TOKEN_DISSOCIATE_FROM_ACCOUNT;
+            case ScheduleCreate -> SCHEDULE_CREATE;
+            case ScheduleDelete -> SCHEDULE_DELETE;
+            case ScheduleSign -> SCHEDULE_SIGN;
+            case ScheduleGetInfo -> SCHEDULE_GET_INFO;
+            case TokenGetAccountNftInfos -> TOKEN_GET_ACCOUNT_NFT_INFOS;
+            case TokenGetNftInfo -> TOKEN_GET_NFT_INFO;
+            case TokenGetNftInfos -> TOKEN_GET_NFT_INFOS;
+            case TokenFeeScheduleUpdate -> TOKEN_FEE_SCHEDULE_UPDATE;
+            case NetworkGetExecutionTime -> NETWORK_GET_EXECUTION_TIME;
+            case TokenPause -> TOKEN_PAUSE;
+            case TokenUnpause -> TOKEN_UNPAUSE;
+            case CryptoApproveAllowance -> CRYPTO_APPROVE_ALLOWANCE;
+            case CryptoDeleteAllowance -> CRYPTO_DELETE_ALLOWANCE;
+            case GetAccountDetails -> GET_ACCOUNT_DETAILS;
+            case EthereumTransaction -> ETHEREUM_TRANSACTION;
+            case NodeStakeUpdate -> NODE_STAKE_UPDATE;
+            case UtilPrng -> PRNG;
+            default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
+        };
     }
 
     @Override
     public String toString() {
-        switch (this) {
-            case NONE:
-                return "NONE";
-            case CRYPTO_TRANSFER:
-                return "CRYPTO_TRANSFER";
-            case CRYPTO_UPDATE:
-                return "CRYPTO_UPDATE";
-            case CRYPTO_DELETE:
-                return "CRYPTO_DELETE";
-            case CRYPTO_ADD_LIVE_HASH:
-                return "CRYPTO_ADD_LIVE_HASH";
-            case CRYPTO_DELETE_LIVE_HASH:
-                return "CRYPTO_DELETE_LIVE_HASH";
-            case CONTRACT_CALL:
-                return "CONTRACT_CALL";
-            case CONTRACT_CREATE:
-                return "CONTRACT_CREATE";
-            case CONTRACT_UPDATE:
-                return "CONTRACT_UPDATE";
-            case FILE_CREATE:
-                return "FILE_CREATE";
-            case FILE_APPEND:
-                return "FILE_APPEND";
-            case FILE_UPDATE:
-                return "FILE_UPDATE";
-            case FILE_DELETE:
-                return "FILE_DELETE";
-            case CRYPTO_GET_ACCOUNT_BALANCE:
-                return "CRYPTO_GET_ACCOUNT_BALANCE";
-            case CRYPTO_GET_ACCOUNT_RECORDS:
-                return "CRYPTO_GET_ACCOUNT_RECORDS";
-            case CRYPTO_GET_INFO:
-                return "CRYPTO_GET_INFO";
-            case CONTRACT_CALL_LOCAL:
-                return "CONTRACT_CALL_LOCAL";
-            case CONTRACT_GET_INFO:
-                return "CONTRACT_GET_INFO";
-            case CONTRACT_GET_BYTECODE:
-                return "CONTRACT_GET_BYTECODE";
-            case GET_BY_SOLIDITY_ID:
-                return "GET_BY_SOLIDITY_ID";
-            case GET_BY_KEY:
-                return "GET_BY_KEY";
-            case CRYPTO_GET_LIVE_HASH:
-                return "CRYPTO_GET_LIVE_HASH";
-            case CRYPTO_GET_STAKERS:
-                return "CRYPTO_GET_STAKERS";
-            case FILE_GET_CONTENTS:
-                return "FILE_GET_CONTENTS";
-            case FILE_GET_INFO:
-                return "FILE_GET_INFO";
-            case TRANSACTION_GET_RECORD:
-                return "TRANSACTION_GET_RECORD";
-            case CONTRACT_GET_RECORDS:
-                return "CONTRACT_GET_RECORDS";
-            case CRYPTO_CREATE:
-                return "CRYPTO_CREATE";
-            case SYSTEM_DELETE:
-                return "SYSTEM_DELETE";
-            case SYSTEM_UNDELETE:
-                return "SYSTEM_UNDELETE";
-            case CONTRACT_DELETE:
-                return "CONTRACT_DELETE";
-            case FREEZE:
-                return "FREEZE";
-            case CREATE_TRANSACTION_RECORD:
-                return "CREATE_TRANSACTION_RECORD";
-            case CRYPTO_ACCOUNT_AUTO_RENEW:
-                return "CRYPTO_ACCOUNT_AUTO_RENEW";
-            case CONTRACT_AUTO_RENEW:
-                return "CONTRACT_AUTO_RENEW";
-            case GET_VERSION_INFO:
-                return "GET_VERSION_INFO";
-            case TRANSACTION_GET_RECEIPT:
-                return "TRANSACTION_GET_RECEIPT";
-            case CONSENSUS_CREATE_TOPIC:
-                return "CONSENSUS_CREATE_TOPIC";
-            case CONSENSUS_UPDATE_TOPIC:
-                return "CONSENSUS_UPDATE_TOPIC";
-            case CONSENSUS_DELETE_TOPIC:
-                return "CONSENSUS_DELETE_TOPIC";
-            case CONSENSUS_GET_TOPIC_INFO:
-                return "CONSENSUS_GET_TOPIC_INFO";
-            case CONSENSUS_SUBMIT_MESSAGE:
-                return "CONSENSUS_SUBMIT_MESSAGE";
-            case UNCHECKED_SUBMIT:
-                return "UNCHECKED_SUBMIT";
-            case TOKEN_CREATE:
-                return "TOKEN_CREATE";
-            case TOKEN_GET_INFO:
-                return "TOKEN_GET_INFO";
-            case TOKEN_FREEZE_ACCOUNT:
-                return "TOKEN_FREEZE_ACCOUNT";
-            case TOKEN_UNFREEZE_ACCOUNT:
-                return "TOKEN_UNFREEZE_ACCOUNT";
-            case TOKEN_GRANT_KYC_TO_ACCOUNT:
-                return "TOKEN_GRANT_KYC_TO_ACCOUNT";
-            case TOKEN_REVOKE_KYC_FROM_ACCOUNT:
-                return "TOKEN_REVOKE_KYC_FROM_ACCOUNT";
-            case TOKEN_DELETE:
-                return "TOKEN_DELETE";
-            case TOKEN_UPDATE:
-                return "TOKEN_UPDATE";
-            case TOKEN_MINT:
-                return "TOKEN_MINT";
-            case TOKEN_BURN:
-                return "TOKEN_BURN";
-            case TOKEN_ACCOUNT_WIPE:
-                return "TOKEN_ACCOUNT_WIPE";
-            case TOKEN_ASSOCIATE_TO_ACCOUNT:
-                return "TOKEN_ASSOCIATE_TO_ACCOUNT";
-            case TOKEN_DISSOCIATE_FROM_ACCOUNT:
-                return "TOKEN_DISSOCIATE_FROM_ACCOUNT";
-            case SCHEDULE_CREATE:
-                return "SCHEDULE_CREATE";
-            case SCHEDULE_DELETE:
-                return "SCHEDULE_DELETE";
-            case SCHEDULE_SIGN:
-                return "SCHEDULE_SIGN";
-            case SCHEDULE_GET_INFO:
-                return "SCHEDULE_GET_INFO";
-            case TOKEN_GET_ACCOUNT_NFT_INFOS:
-                return "TOKEN_GET_ACCOUNT_NFT_INFOS";
-            case TOKEN_GET_NFT_INFO:
-                return "TOKEN_GET_NFT_INFO";
-            case TOKEN_GET_NFT_INFOS:
-                return "TOKEN_GET_NFT_INFOS";
-            case TOKEN_FEE_SCHEDULE_UPDATE:
-                return "TOKEN_FEE_SCHEDULE_UPDATE";
-            case NETWORK_GET_EXECUTION_TIME:
-                return "NETWORK_GET_EXECUTION_TIME";
-            case TOKEN_PAUSE:
-                return "TOKEN_PAUSE";
-            case TOKEN_UNPAUSE:
-                return "TOKEN_UNPAUSE";
-            case CRYPTO_APPROVE_ALLOWANCE:
-                return "CRYPTO_APPROVE_ALLOWANCE";
-            case CRYPTO_DELETE_ALLOWANCE:
-                return "CRYPTO_DELETE_ALLOWANCE";
-            case GET_ACCOUNT_DETAILS:
-                return "GET_ACCOUNT_DETAILS";
-            case ETHEREUM_TRANSACTION:
-                return "ETHEREUM_TRANSACTION";
-            case NODE_STAKE_UPDATE:
-                return "NODE_STAKE_UPDATE";
-            case PRNG:
-                return "PRNG";
-            default:
-                return "<UNRECOGNIZED VALUE>";
-        }
+        return switch (this) {
+            case NONE -> "NONE";
+            case CRYPTO_TRANSFER -> "CRYPTO_TRANSFER";
+            case CRYPTO_UPDATE -> "CRYPTO_UPDATE";
+            case CRYPTO_DELETE -> "CRYPTO_DELETE";
+            case CRYPTO_ADD_LIVE_HASH -> "CRYPTO_ADD_LIVE_HASH";
+            case CRYPTO_DELETE_LIVE_HASH -> "CRYPTO_DELETE_LIVE_HASH";
+            case CONTRACT_CALL -> "CONTRACT_CALL";
+            case CONTRACT_CREATE -> "CONTRACT_CREATE";
+            case CONTRACT_UPDATE -> "CONTRACT_UPDATE";
+            case FILE_CREATE -> "FILE_CREATE";
+            case FILE_APPEND -> "FILE_APPEND";
+            case FILE_UPDATE -> "FILE_UPDATE";
+            case FILE_DELETE -> "FILE_DELETE";
+            case CRYPTO_GET_ACCOUNT_BALANCE -> "CRYPTO_GET_ACCOUNT_BALANCE";
+            case CRYPTO_GET_ACCOUNT_RECORDS -> "CRYPTO_GET_ACCOUNT_RECORDS";
+            case CRYPTO_GET_INFO -> "CRYPTO_GET_INFO";
+            case CONTRACT_CALL_LOCAL -> "CONTRACT_CALL_LOCAL";
+            case CONTRACT_GET_INFO -> "CONTRACT_GET_INFO";
+            case CONTRACT_GET_BYTECODE -> "CONTRACT_GET_BYTECODE";
+            case GET_BY_SOLIDITY_ID -> "GET_BY_SOLIDITY_ID";
+            case GET_BY_KEY -> "GET_BY_KEY";
+            case CRYPTO_GET_LIVE_HASH -> "CRYPTO_GET_LIVE_HASH";
+            case CRYPTO_GET_STAKERS -> "CRYPTO_GET_STAKERS";
+            case FILE_GET_CONTENTS -> "FILE_GET_CONTENTS";
+            case FILE_GET_INFO -> "FILE_GET_INFO";
+            case TRANSACTION_GET_RECORD -> "TRANSACTION_GET_RECORD";
+            case CONTRACT_GET_RECORDS -> "CONTRACT_GET_RECORDS";
+            case CRYPTO_CREATE -> "CRYPTO_CREATE";
+            case SYSTEM_DELETE -> "SYSTEM_DELETE";
+            case SYSTEM_UNDELETE -> "SYSTEM_UNDELETE";
+            case CONTRACT_DELETE -> "CONTRACT_DELETE";
+            case FREEZE -> "FREEZE";
+            case CREATE_TRANSACTION_RECORD -> "CREATE_TRANSACTION_RECORD";
+            case CRYPTO_ACCOUNT_AUTO_RENEW -> "CRYPTO_ACCOUNT_AUTO_RENEW";
+            case CONTRACT_AUTO_RENEW -> "CONTRACT_AUTO_RENEW";
+            case GET_VERSION_INFO -> "GET_VERSION_INFO";
+            case TRANSACTION_GET_RECEIPT -> "TRANSACTION_GET_RECEIPT";
+            case CONSENSUS_CREATE_TOPIC -> "CONSENSUS_CREATE_TOPIC";
+            case CONSENSUS_UPDATE_TOPIC -> "CONSENSUS_UPDATE_TOPIC";
+            case CONSENSUS_DELETE_TOPIC -> "CONSENSUS_DELETE_TOPIC";
+            case CONSENSUS_GET_TOPIC_INFO -> "CONSENSUS_GET_TOPIC_INFO";
+            case CONSENSUS_SUBMIT_MESSAGE -> "CONSENSUS_SUBMIT_MESSAGE";
+            case UNCHECKED_SUBMIT -> "UNCHECKED_SUBMIT";
+            case TOKEN_CREATE -> "TOKEN_CREATE";
+            case TOKEN_GET_INFO -> "TOKEN_GET_INFO";
+            case TOKEN_FREEZE_ACCOUNT -> "TOKEN_FREEZE_ACCOUNT";
+            case TOKEN_UNFREEZE_ACCOUNT -> "TOKEN_UNFREEZE_ACCOUNT";
+            case TOKEN_GRANT_KYC_TO_ACCOUNT -> "TOKEN_GRANT_KYC_TO_ACCOUNT";
+            case TOKEN_REVOKE_KYC_FROM_ACCOUNT -> "TOKEN_REVOKE_KYC_FROM_ACCOUNT";
+            case TOKEN_DELETE -> "TOKEN_DELETE";
+            case TOKEN_UPDATE -> "TOKEN_UPDATE";
+            case TOKEN_MINT -> "TOKEN_MINT";
+            case TOKEN_BURN -> "TOKEN_BURN";
+            case TOKEN_ACCOUNT_WIPE -> "TOKEN_ACCOUNT_WIPE";
+            case TOKEN_ASSOCIATE_TO_ACCOUNT -> "TOKEN_ASSOCIATE_TO_ACCOUNT";
+            case TOKEN_DISSOCIATE_FROM_ACCOUNT -> "TOKEN_DISSOCIATE_FROM_ACCOUNT";
+            case SCHEDULE_CREATE -> "SCHEDULE_CREATE";
+            case SCHEDULE_DELETE -> "SCHEDULE_DELETE";
+            case SCHEDULE_SIGN -> "SCHEDULE_SIGN";
+            case SCHEDULE_GET_INFO -> "SCHEDULE_GET_INFO";
+            case TOKEN_GET_ACCOUNT_NFT_INFOS -> "TOKEN_GET_ACCOUNT_NFT_INFOS";
+            case TOKEN_GET_NFT_INFO -> "TOKEN_GET_NFT_INFO";
+            case TOKEN_GET_NFT_INFOS -> "TOKEN_GET_NFT_INFOS";
+            case TOKEN_FEE_SCHEDULE_UPDATE -> "TOKEN_FEE_SCHEDULE_UPDATE";
+            case NETWORK_GET_EXECUTION_TIME -> "NETWORK_GET_EXECUTION_TIME";
+            case TOKEN_PAUSE -> "TOKEN_PAUSE";
+            case TOKEN_UNPAUSE -> "TOKEN_UNPAUSE";
+            case CRYPTO_APPROVE_ALLOWANCE -> "CRYPTO_APPROVE_ALLOWANCE";
+            case CRYPTO_DELETE_ALLOWANCE -> "CRYPTO_DELETE_ALLOWANCE";
+            case GET_ACCOUNT_DETAILS -> "GET_ACCOUNT_DETAILS";
+            case ETHEREUM_TRANSACTION -> "ETHEREUM_TRANSACTION";
+            case NODE_STAKE_UPDATE -> "NODE_STAKE_UPDATE";
+            case PRNG -> "PRNG";
+        };
     }
 }

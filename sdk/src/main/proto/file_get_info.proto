@@ -30,7 +30,6 @@ import "timestamp.proto";
 import "basic_types.proto";
 import "query_header.proto";
 import "response_header.proto";
-import "duration.proto";
 
 /**
  * Get all of the information about a file, except for its contents. When a file expires, it no
@@ -98,16 +97,6 @@ message FileGetInfoResponse {
          * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
          */
         bytes ledger_id = 7;
-
-        /**
-         * If set, the account that is used to pay for auto-renewal of the file.
-         */
-        AccountID auto_renew_account = 8;
-
-        /**
-         * If an auto-renew account is in use, the added lifetime (in seconds) of each auto-renewal.
-         */
-        Duration auto_renew_period = 9;
     }
 
     /**

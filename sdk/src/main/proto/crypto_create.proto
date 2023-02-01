@@ -46,7 +46,7 @@ import "duration.proto";
  * used to extend its expiration as long as possible. If it is has a zero balance when it expires,
  * then it is deleted. This transaction must be signed by the payer account. If receiverSigRequired
  * is false, then the transaction does not have to be signed by the keys in the keys field. If it is
- * true, then it must be signed by them, in addition to the keys of the payer account. If the
+ * true, then it must be signed by them, in addition to the keys of the payer account. If the 
  * auto_renew_account field is set, the key of the referenced account must sign.
  *
  * An entity (account, file, or smart contract instance) must be created in a particular realm. If
@@ -163,17 +163,10 @@ message CryptoCreateTransactionBody {
      * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
      * relative to aliases currently on the network at alias assignment.
      *
-     * If a transaction creates an account using an alias, any further crypto transfers to that alias will
+     * If a transaction creates an account using an alias, any further crypto transfers to that alias will 
      * simply be deposited in that account, without creating anything, and with no creation fee being charged.
      */
      bytes alias = 18;
-
-    /**
-     * An account to charge for auto-renewal of this account . If not set, or set to an
-     * account with zero hbar balance, the account's own hbar balance will be used to
-     * cover auto-renewal fees.
-     */
-    AccountID auto_renew_account = 19;
 
     /**
      * EOA 20-byte address to create that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.

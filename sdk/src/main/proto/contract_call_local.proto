@@ -162,6 +162,12 @@ message ContractFunctionResult {
      * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     AccountID sender_id = 13;
+
+    /**
+    * Map used to track contract nonces for all contracts that have participated in the transaction.
+    * The keys would have the different contract IDs as strings in "shard.realm.num" format and the values are the new nonce values.
+    */
+    map<string, int64> contract_nonces = 14;
 }
 
 /**

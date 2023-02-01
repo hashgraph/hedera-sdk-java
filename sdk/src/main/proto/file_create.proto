@@ -28,7 +28,6 @@ option java_multiple_files = true;
 
 import "basic_types.proto";
 import "timestamp.proto";
-import "duration.proto";
 
 /**
  * Create a new file, containing the given contents.
@@ -102,21 +101,4 @@ message FileCreateTransactionBody {
      * The memo associated with the file (UTF-8 encoding max 100 bytes)
      */
     string memo = 8;
-
-    /**
-     * An account to charge for auto-renewal of this file. If not set, or set to an
-     * account with zero hbar balance, the file's expiration must be manually extended
-     * using a FileUpdate transaction, since the network will not have authorization
-     * for any kind of auto-renewal fee collection.
-     */
-    AccountID auto_renew_account = 9;
-
-    /**
-     * If an auto-renew account is in use, the lifetime to be added by each
-     * auto-renewal. When both auto-renew account and auto-renew period are
-     * set in the create transaction, the initial expiry of the file will be 
-     * the valid start of the create transaction plus the auto-renew period. 
-     * (I.e., the expirationTime field will be ignored.)
-     */
-    Duration auto_renew_period = 10;
 }
