@@ -3,7 +3,7 @@
         "0.0.21": "0.testnet.hedera.com:50211"
     },
     "mirrorNetwork": [
-        "hcs.testnet.mirrornode.hedera.com:5600"
+        "testnet.mirrornode.hedera.com:443"
     ],
     "networkName": "testnet",
     "operator": {
