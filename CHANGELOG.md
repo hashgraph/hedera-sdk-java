@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - Misleading logging when an unhealthy node is hit
+ - Default mirror node for mainnet is now `mainnet-public.mirrornode.hedera.com:443` instead of `mainnet-public.mirrornode.hedera.com:5600`
+ - Default mirror node for testnet is now `testnet.mirrornode.hedera.com:443` instead of `hcs.testnet.mirrornode.hedera.com:5600`
+ - Default mirror node for previewnet is now `previewnet.mirrornode.hedera.com:443` instead of `hcs.previewnet.mirrornode.hedera.com:5600`
 
 ## 2.19.0
 
