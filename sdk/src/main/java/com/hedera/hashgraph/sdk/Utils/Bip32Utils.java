@@ -1,6 +1,9 @@
 package com.hedera.hashgraph.sdk.Utils;
 
 public class Bip32Utils {
+
+    public static final int HARDENED_BIT = 0x80000000;
+
     /**
      * Harden the index
      *
@@ -8,7 +11,7 @@ public class Bip32Utils {
      * @return              the hardened index
      */
     public static int toHardenedIndex(int index) {
-        return index | 0x80000000;
+        return index | HARDENED_BIT;
     }
 
     /**
@@ -18,6 +21,6 @@ public class Bip32Utils {
      * @return              true if the index is hardened
      */
     public static boolean isHardenedIndex(int index) {
-        return (index & 0x80000000) != 0;
+        return (index & HARDENED_BIT) != 0;
     }
 }
