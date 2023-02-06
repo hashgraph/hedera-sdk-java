@@ -65,30 +65,18 @@ public enum FreezeType {
     }
 
     static FreezeType valueOf(com.hedera.hashgraph.sdk.proto.FreezeType code) {
-        switch (code) {
-            case UNKNOWN_FREEZE_TYPE:
-                return UNKNOWN_FREEZE_TYPE;
-            case FREEZE_ONLY:
-                return FREEZE_ONLY;
-            case PREPARE_UPGRADE:
-                return PREPARE_UPGRADE;
-            case FREEZE_UPGRADE:
-                return FREEZE_UPGRADE;
-            case FREEZE_ABORT:
-                return FREEZE_ABORT;
-            case TELEMETRY_UPGRADE:
-                return TELEMETRY_UPGRADE;
-            case UNRECOGNIZED:
+        return switch (code) {
+            case UNKNOWN_FREEZE_TYPE -> UNKNOWN_FREEZE_TYPE;
+            case FREEZE_ONLY -> FREEZE_ONLY;
+            case PREPARE_UPGRADE -> PREPARE_UPGRADE;
+            case FREEZE_UPGRADE -> FREEZE_UPGRADE;
+            case FREEZE_ABORT -> FREEZE_ABORT;
+            case TELEMETRY_UPGRADE -> TELEMETRY_UPGRADE;
+            case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
                     "network returned unrecognized response code; your SDK may be out of date");
-        }
-
-        // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
-        throw new IllegalArgumentException(
-            "response code "
-                + code.name()
-                + " is unhandled by the SDK; update your SDK or open an issue");
+        };
     }
 
     @Override

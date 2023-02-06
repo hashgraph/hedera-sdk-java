@@ -22,6 +22,7 @@ package proto;
  * ‍
  */
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "timestamp.proto";

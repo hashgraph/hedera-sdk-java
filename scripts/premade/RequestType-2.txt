@@ -5,4 +5,4 @@
     }
 
     static RequestType valueOf(HederaFunctionality code) {
-        switch (code) {
+        return switch (code) {

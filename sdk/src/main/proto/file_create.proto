@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.file">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "basic_types.proto";
@@ -44,7 +45,8 @@ import "timestamp.proto";
  * (including other threshold keys). In other words, the behavior is an AND for create/modify, OR
  * for delete. This is useful for acting as a revocation server. If it is desired to have the
  * behavior be AND for all 3 operations (or OR for all 3), then the list should have only a single
- * Key, which is a threshold key, with N=1 for OR, N=M for AND.
+ * Key, which is a threshold key, with N=1 for OR, N=M for AND. If the auto_renew_account field 
+ * is set, the key of the referenced account must sign.
  *
  * If a file is created without ANY keys in the keys field, the file is immutable and ONLY the
  * expirationTime of the file can be changed with a FileUpdate transaction. The file contents or its

@@ -356,13 +356,19 @@ class TopicMessageQueryTest {
 
     @Test
     @Timeout(5)
-    void noErrorWhenCallIsCancelled() {
+    void errorWhenCallIsCancelled() {
         consensusServiceStub.requests.add(request().build());
         consensusServiceStub.responses.add(Status.CANCELLED.asRuntimeException());
 
         subscribeToMirror(received::add);
 
-        assertThat(errors).isEmpty();
+        assertThat(errors)
+            .hasSize(1)
+            .first()
+            .isInstanceOf(StatusRuntimeException.class)
+            .extracting(t -> ((StatusRuntimeException)t).getStatus())
+            .isEqualTo(Status.CANCELLED);
+
         assertThat(received).isEmpty();
     }
 

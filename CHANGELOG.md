@@ -8,12 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 
 ### Added
+ - `TRANSACTION_HAS_UNKNOWN_FIELDS` and `ACCOUNT_IS_IMMUTABLE` in `Status`
  - `toStandard[Ed25519|ECDSAsecp256k1]PrivateKey()` to `Mnemonic`
  - `fromSeed[ED25519|ECDSAsecp256k1]()` to `PrivateKey`
  - `[PrivateKeyED25519|PrivateKeyECDSA].fromSeed()`
  - `Bip32Utils` class
 
 ### Fixed
+ - Misleading logging when an unhealthy node is hit
  - ECDSA secp256k1 keys now support derivation
 
 ### Deprecated
