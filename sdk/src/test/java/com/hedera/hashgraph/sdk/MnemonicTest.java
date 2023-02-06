@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
+import com.hedera.hashgraph.sdk.utils.Bip32Utils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

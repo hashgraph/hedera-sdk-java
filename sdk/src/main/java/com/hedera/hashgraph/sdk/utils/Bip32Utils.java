@@ -1,8 +1,12 @@
-package com.hedera.hashgraph.sdk.Utils;
+package com.hedera.hashgraph.sdk.utils;
 
 public class Bip32Utils {
 
     public static final int HARDENED_BIT = 0x80000000;
+
+    private Bip32Utils() {
+        throw new IllegalStateException("Utility class");
+    }
 
     /**
      * Harden the index

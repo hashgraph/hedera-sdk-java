@@ -21,7 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.Utils.Bip32Utils;
+import com.hedera.hashgraph.sdk.utils.Bip32Utils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
