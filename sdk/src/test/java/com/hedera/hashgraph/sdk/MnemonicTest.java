@@ -32,13 +32,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class MnemonicTest {
-    private static final String MNEMONIC3_STRING = "obvious favorite remain caution remove laptop base vacant increase video erase pass sniff sausage knock grid argue salt romance way alone fever slush dune";
+    private static final String MNEMONIC_LEGACY_V2_STRING = "obvious favorite remain caution remove laptop base vacant increase video erase pass sniff sausage knock grid argue salt romance way alone fever slush dune";
 
-    private static final String MNEMONIC_LEGACY_STRING = "jolly kidnap tom lawn drunk chick optic lust mutter mole bride galley dense member sage neural widow decide curb aboard margin manure";
+    private static final String MNEMONIC_LEGACY_V1_STRING = "jolly kidnap tom lawn drunk chick optic lust mutter mole bride galley dense member sage neural widow decide curb aboard margin manure";
 
     private static final String MNEMONIC_STRING = "inmate flip alley wear offer often piece magnet surge toddler submit right radio absent pear floor belt raven price stove replace reduce plate home";
-    private static final String MNEMONIC_PRIVATE_KEY = "302e020100300506032b657004220420853f15aecd22706b105da1d709b4ac05b4906170c2b9c7495dff9af49e1391da";
-
     @Test
     @DisplayName("Mnemonic.generate() creates a valid mnemonic")
     void generateValidMnemonic() {
@@ -278,7 +276,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Mnemonic 3 test")
     void thirdMnemonicTest() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC3_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V2_STRING);
         PrivateKey key = mnemonic.toLegacyPrivateKey();
         PrivateKey derivedKey = key.legacyDerive(0);
         PrivateKey derivedKey2 = key.legacyDerive(-1);
@@ -293,7 +291,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Legacy mnemonic test")
     void legacyMnemonicTest() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V1_STRING);
         PrivateKey key = mnemonic.toLegacyPrivateKey();
         PrivateKey derivedKey = key.legacyDerive(0);
         PrivateKey derivedKey2 = key.legacyDerive(-1);
@@ -308,7 +306,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("should match MyHbarWallet v1")
     void myHbarWalletV1Test() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V1_STRING);
         PrivateKey key = mnemonic.toLegacyPrivateKey();
         PrivateKey derivedKey = key.legacyDerive(1099511627775L);
         assertThat(derivedKey.getPublicKey().toString()).isEqualTo(
@@ -321,7 +319,9 @@ public class MnemonicTest {
     void mnemonicTest() throws Exception {
         Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
         PrivateKey key = mnemonic.toPrivateKey();
-        assertThat(key.toString()).isEqualTo(MNEMONIC_PRIVATE_KEY);
+        assertThat(key.toString()).isEqualTo(
+            "302e020100300506032b657004220420853f15aecd22706b105da1d709b4ac05b4906170c2b9c7495dff9af49e1391da"
+        );
     }
 
     @Test

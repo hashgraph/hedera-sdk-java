@@ -87,23 +87,6 @@ class PrivateKeyED25519 extends PrivateKey {
     }
 
     /**
-     * Create an ED25519 key from seed.
-     *
-     * @param seed                      the seed bytes
-     * @return                          the new key
-     */
-    public static PrivateKey fromSeed(byte[] seed) {
-        var hmacSha512 = new HMac(new SHA512Digest());
-        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
-        hmacSha512.update(seed, 0, seed.length);
-
-        var derivedState = new byte[hmacSha512.getMacSize()];
-        hmacSha512.doFinal(derivedState, 0);
-
-        return PrivateKeyED25519.derivableKeyED25519(derivedState);
-    }
-
-    /**
      * Create a derived key.
      *
      * @param deriveData                data to derive the key
