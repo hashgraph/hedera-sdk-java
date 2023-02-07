@@ -81,14 +81,7 @@ public abstract class PrivateKey extends Key {
      * @return      the ED25519 private key
      */
     public static PrivateKey fromSeedED25519(byte[] seed) {
-        var hmacSha512 = new HMac(new SHA512Digest());
-        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
-        hmacSha512.update(seed, 0, seed.length);
-
-        var derivedState = new byte[hmacSha512.getMacSize()];
-        hmacSha512.doFinal(derivedState, 0);
-
-        return PrivateKeyED25519.derivableKeyED25519(derivedState);
+        return PrivateKeyED25519.fromSeed(seed);
     }
 
     /**
@@ -98,14 +91,7 @@ public abstract class PrivateKey extends Key {
      * @return      the ECDSA private key
      */
     public static PrivateKey fromSeedECDSAsecp256k1(byte[] seed) {
-        var hmacSha512 = new HMac(new SHA512Digest());
-        hmacSha512.init(new KeyParameter("Bitcoin seed".getBytes(StandardCharsets.UTF_8)));
-        hmacSha512.update(seed, 0, seed.length);
-
-        var derivedState = new byte[hmacSha512.getMacSize()];
-        hmacSha512.doFinal(derivedState, 0);
-
-        return PrivateKeyECDSA.derivableKeyECDSA(derivedState);
+        return PrivateKeyECDSA.fromSeed(seed);
     }
 
     /**
