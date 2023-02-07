@@ -164,10 +164,9 @@ message ContractFunctionResult {
     AccountID sender_id = 13;
 
     /**
-    * Map used to track contract nonces for all contracts that have participated in the transaction.
-    * The keys would have the different contract IDs as strings in "shard.realm.num" format and the values are the new nonce values.
+    * A list of updated contract account nonces containing the new nonce value for each contract account
     */
-    map<string, int64> contract_nonces = 14;
+    repeated ContractNonceInfo contract_nonces = 14;
 }
 
 /**

@@ -25,7 +25,6 @@ import com.hedera.hashgraph.sdk.proto.AccountID;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -59,9 +58,6 @@ public final class AccountId implements Comparable<AccountId> {
 
     @Nullable
     public final EvmAddress evmAddress;
-
-    @Nonnull
-    public final List<VirtualAddress> virtualAddresses;
 
     @Nullable
     private final String checksum;
@@ -102,7 +98,6 @@ public final class AccountId implements Comparable<AccountId> {
         this.checksum = checksum;
         this.aliasKey = null;
         this.evmAddress = null;
-        this.virtualAddresses = new ArrayList<>();
     }
 
     /**
@@ -127,7 +122,6 @@ public final class AccountId implements Comparable<AccountId> {
         this.checksum = checksum;
         this.aliasKey = aliasKey;
         this.evmAddress = evmAddress;
-        this.virtualAddresses = new ArrayList<>();
     }
 
     /**
@@ -281,11 +275,6 @@ public final class AccountId implements Comparable<AccountId> {
             accountIdBuilder.setAccountNum(num);
         }
 
-        // TODO - waiting for protobuf update
-        //if (virtualAddresses != null && !virtualAddresses.isEmpty()) {
-        //    accountIdBuilder.setVirtualAddresses();
-        //}
-
         return accountIdBuilder.build();
     }
 
@@ -359,9 +348,7 @@ public final class AccountId implements Comparable<AccountId> {
     public int hashCode() {
         return Objects.hash(
             shard, realm, num,
-            (aliasKey != null) ? aliasKey.toBytes() : ((evmAddress != null) ? evmAddress.toBytes() : null),
-            // TODO - support multiple virtual addresses
-            !virtualAddresses.isEmpty() ? virtualAddresses.get(0).toBytes() : null
+            (aliasKey != null) ? aliasKey.toBytes() : ((evmAddress != null) ? evmAddress.toBytes() : null)
         );
     }
 
@@ -384,10 +371,7 @@ public final class AccountId implements Comparable<AccountId> {
         }
         return shard == otherId.shard && realm == otherId.realm && num == otherId.num &&
             (aliasKey == null || aliasKey.equals(otherId.aliasKey)) &&
-            (evmAddress == null || evmAddress.equals(otherId.evmAddress)) &&
-            // TBD - if the addresses are the same but in different order should we consider them equal?
-            // Or should we sort the collections first?
-            virtualAddresses.equals(otherId.virtualAddresses);
+            (evmAddress == null || evmAddress.equals(otherId.evmAddress));
     }
 
     @Override
