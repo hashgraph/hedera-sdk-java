@@ -182,10 +182,27 @@ message CryptoGetInfoResponse {
          */
         StakingInfo staking_info = 22;
 
+        message VirtualAddressInfo {
+            /**
+             * The 20-byte EVM address that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+             */
+            bytes address = 1;
+
+            /**
+             * Flag if this address should now be set or is the default address on the account.
+             */
+            bool is_default = 2;
+
+            /**
+             * The EthereumTransaction type nonce associated with this virtual address.
+             */
+            int64 nonce = 3;
+        }
+
         /**
-         * List of virtual addresses each of which is an EVM address that maps to an ECDSA key pair a user must prove ownership of.
+         * List of virtual addresses each of which is an EVM address that maps to an ECDSA key pair a user must prove ownership of and their corresponding nonce value.
          */
-        repeated VirtualAddress virtual_addresses = 24;
+        repeated VirtualAddressInfo virtual_addresses = 24;
     }
 
     /**

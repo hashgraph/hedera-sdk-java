@@ -82,6 +82,8 @@ public final class ContractFunctionResult {
     @Nullable
     public final AccountId senderAccountId;
 
+    public final List<ContractNonce> contractNonces;
+
     /**
      * Constructor.
      *
@@ -128,6 +130,8 @@ public final class ContractFunctionResult {
         contractFunctionParametersBytes = inner.getFunctionParameters().toByteArray();
 
         senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
+
+        contractNonces = StreamSupport.stream(inner.getContractNoncesList()).map(ContractNonce::fromProtobuf).collect(Collectors.toList());
     }
 
     /**
@@ -411,6 +415,10 @@ public final class ContractFunctionResult {
             contractFunctionResult.setSenderId(senderAccountId.toProtobuf());
         }
 
+        for (var contractNonce : contractNonces) {
+            contractFunctionResult.addContractNonces(contractNonce.toProtobuf());
+        }
+
         // for (var stateChange : stateChanges) {
         //     contractFunctionResult.addStateChanges(stateChange.toProtobuf());
         // }
@@ -434,6 +442,7 @@ public final class ContractFunctionResult {
             .add("contractFunctionparametersBytes", Hex.toHexString(contractFunctionParametersBytes))
             .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
             .add("senderAccountId", senderAccountId)
+            .add("contractNonces", contractNonces)
             .toString();
     }
 }

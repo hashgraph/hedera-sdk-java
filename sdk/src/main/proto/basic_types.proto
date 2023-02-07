@@ -1607,3 +1607,20 @@ message VirtualAddress {
      */
     bool is_default = 2;
 }
+
+/**
+ * Info about a contract account's nonce value.
+ * A nonce of a contract is only incremented when that contract creates another contract.
+ */
+message ContractNonceInfo {
+
+    /**
+    * Id of the contract
+    */
+    ContractID contract_id = 1;
+
+    /**
+    * The current value of the contract account's nonce property
+    */
+    int64 nonce = 2;
+}

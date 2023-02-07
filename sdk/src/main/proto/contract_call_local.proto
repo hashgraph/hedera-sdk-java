@@ -162,6 +162,11 @@ message ContractFunctionResult {
      * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     AccountID sender_id = 13;
+
+    /**
+    * A list of updated contract account nonces containing the new nonce value for each contract account
+    */
+    repeated ContractNonceInfo contract_nonces = 14;
 }
 
 /**

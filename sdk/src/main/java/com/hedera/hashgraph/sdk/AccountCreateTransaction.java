@@ -60,7 +60,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private PublicKey aliasKey = null;
 
     @Nullable
-    private EvmAddress aliasEvmAddress = null;
+    private EvmAddress evmAddress = null;
 
     /**
      * Constructor.
@@ -372,16 +372,15 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * The ethereum account 20-byte EVM address to be used as the account's alias.
-     * @return the EvmAddress
+     * EOA 20-byte address to create that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
      */
     @Nullable
-    public EvmAddress getAliasEvmAddress() {
-        return aliasEvmAddress;
+    public EvmAddress getEvmAddress() {
+        return evmAddress;
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF OCT/3/2022
+     * NOT YET SUPPORTED ON MAINNET AS OF DEC/23/2022
      * <p>
      * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
      * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
@@ -392,13 +391,39 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * If a transaction creates an account using an alias, any further crypto transfers to that alias will
      * simply be deposited in that account, without creating anything, and with no creation fee being charged.
      *
-     * @param aliasEvmAddress The ethereum account 20-byte EVM address
+     * @param evmAddress The ethereum account 20-byte EVM address
      * @return {@code this}
      */
-    public AccountCreateTransaction setAliasEvmAddress(EvmAddress aliasEvmAddress) {
+    public AccountCreateTransaction setEvmAddress(EvmAddress evmAddress) {
         requireNotFrozen();
-        this.aliasEvmAddress = aliasEvmAddress;
+        this.evmAddress = evmAddress;
         return this;
+    }
+
+    /**
+     * NOT YET SUPPORTED ON MAINNET AS OF DEC/23/2022
+     * <p>
+     * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
+     * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+     * <p>
+     * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
+     * relative to aliases currently on the network at alias assignment.
+     * <p>
+     * If a transaction creates an account using an alias, any further crypto transfers to that alias will
+     * simply be deposited in that account, without creating anything, and with no creation fee being charged.
+     *
+     * @param evmAddress The ethereum account 20-byte EVM address
+     * @return {@code this}
+     * @throws IllegalArgumentException when evmAddress is invalid or doesn't have "0x" prefix
+     */
+    public AccountCreateTransaction setEvmAddress(String evmAddress) {
+        if (evmAddress.startsWith("0x") || evmAddress.length() == 42) {
+            // Remove the "0x" prefix
+            EvmAddress address = EvmAddress.fromString(evmAddress.substring(2));
+            return this.setEvmAddress(address);
+        } else {
+            throw new IllegalArgumentException("evmAddress must be an a valid EVM address with \"0x\" prefix");
+        }
     }
 
     /**
@@ -425,14 +450,16 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
 
         if (aliasKey != null) {
             builder.setAlias(aliasKey.toProtobufKey().toByteString());
-        } else if (aliasEvmAddress != null) {
-            builder.setAlias(ByteString.copyFrom(aliasEvmAddress.toBytes()));
         }
 
         if (stakedAccountId != null) {
             builder.setStakedAccountId(stakedAccountId.toProtobuf());
         } else if (stakedNodeId != null) {
             builder.setStakedNodeId(stakedNodeId);
+        }
+
+        if (evmAddress != null) {
+            builder.setEvmAddress(ByteString.copyFrom(evmAddress.toBytes()));
         }
 
         return builder;
@@ -479,7 +506,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
         }
 
         aliasKey = PublicKey.fromAliasBytes(body.getAlias());
-        aliasEvmAddress = EvmAddress.fromAliasBytes(body.getAlias());
+        evmAddress = EvmAddress.fromAliasBytes(body.getEvmAddress());
     }
 
     @Override

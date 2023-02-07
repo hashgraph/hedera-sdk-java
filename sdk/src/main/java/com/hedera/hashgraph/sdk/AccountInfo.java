@@ -28,7 +28,6 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -159,6 +158,12 @@ public final class AccountInfo {
     public final StakingInfo stakingInfo;
 
     /**
+     * List of virtual addresses each of which is an EVM address that maps to an ECDSA key pair a user must prove ownership of.
+     */
+    public final List<VirtualAddressInfo> virtualAddresses;
+
+
+    /**
      * Constructor.
      *
      * @param accountId                 the account id
@@ -202,7 +207,8 @@ public final class AccountInfo {
         @Nullable PublicKey aliasKey,
         LedgerId ledgerId,
         long ethereumNonce,
-        @Nullable StakingInfo stakingInfo
+        @Nullable StakingInfo stakingInfo,
+        List<VirtualAddressInfo> virtualAddresses
     ) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -228,6 +234,7 @@ public final class AccountInfo {
         this.tokenAllowances = Collections.emptyList();
         this.tokenNftAllowances = Collections.emptyList();
         this.stakingInfo = stakingInfo;
+        this.virtualAddresses = virtualAddresses;
     }
 
     /**
@@ -257,6 +264,10 @@ public final class AccountInfo {
         @Nullable
         var aliasKey = PublicKey.fromAliasBytes(accountInfo.getAlias());
 
+        var virtualAddresses = J8Arrays.stream(accountInfo.getVirtualAddressesList().toArray())
+            .map((virtualAddress) -> VirtualAddressInfo.fromProtobuf((com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse.AccountInfo.VirtualAddressInfo)virtualAddress))
+            .collect(Collectors.toList());
+
         return new AccountInfo(
             accountId,
             accountInfo.getContractAccountID(),
@@ -278,7 +289,8 @@ public final class AccountInfo {
             aliasKey,
             LedgerId.fromByteString(accountInfo.getLedgerId()),
             accountInfo.getEthereumNonce(),
-            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null
+            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null,
+            virtualAddresses
         );
     }
 
@@ -303,6 +315,10 @@ public final class AccountInfo {
             .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
             .collect(Collectors.toList());
 
+        var addresses = J8Arrays.stream(virtualAddresses.toArray())
+            .map((virtualAddress) -> ((VirtualAddressInfo)virtualAddress).toProtobuf())
+            .collect(Collectors.toList());
+
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
             .setDeleted(isDeleted)
@@ -319,7 +335,8 @@ public final class AccountInfo {
             .setOwnedNfts(ownedNfts)
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
             .setLedgerId(ledgerId.toByteString())
-            .setEthereumNonce(ethereumNonce);
+            .setEthereumNonce(ethereumNonce)
+            .addAllVirtualAddresses(addresses);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -364,6 +381,7 @@ public final class AccountInfo {
             .add("ledgerId", ledgerId)
             .add("ethereumNonce", ethereumNonce)
             .add("stakingInfo", stakingInfo)
+            .add("virtualAddresses", virtualAddresses)
             .toString();
     }
 
