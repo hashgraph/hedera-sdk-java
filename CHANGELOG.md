@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `TRANSACTION_HAS_UNKNOWN_FIELDS` and `ACCOUNT_IS_IMMUTABLE` in `Status`
  - `toStandard[Ed25519|ECDSAsecp256k1]PrivateKey()` to `Mnemonic`
  - `fromSeed[ED25519|ECDSAsecp256k1]()` to `PrivateKey`
+ - `[PrivateKeyED25519|PrivateKeyECDSA].fromSeed()`
  - `Bip32Utils` class
 
 ### Fixed

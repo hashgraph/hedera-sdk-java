@@ -32,11 +32,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class MnemonicTest {
-    private static final String MNEMONIC_LEGACY_V2_STRING = "obvious favorite remain caution remove laptop base vacant increase video erase pass sniff sausage knock grid argue salt romance way alone fever slush dune";
-
     private static final String MNEMONIC_LEGACY_V1_STRING = "jolly kidnap tom lawn drunk chick optic lust mutter mole bride galley dense member sage neural widow decide curb aboard margin manure";
-
-    private static final String MNEMONIC_STRING = "inmate flip alley wear offer often piece magnet surge toddler submit right radio absent pear floor belt raven price stove replace reduce plate home";
+    private static final String MNEMONIC_LEGACY_V2_STRING = "obvious favorite remain caution remove laptop base vacant increase video erase pass sniff sausage knock grid argue salt romance way alone fever slush dune";
+    private static final String MNEMONIC_24_WORD_STRING = "inmate flip alley wear offer often piece magnet surge toddler submit right radio absent pear floor belt raven price stove replace reduce plate home";
+    private static final String MNEMONIC_12_WORD_STRING = "finish furnace tomorrow wine mass goose festival air palm easy region guilt";
     @Test
     @DisplayName("Mnemonic.generate() creates a valid mnemonic")
     void generateValidMnemonic() {
@@ -274,50 +273,79 @@ public class MnemonicTest {
     }
 
     @Test
-    @DisplayName("Mnemonic 3 test")
-    void thirdMnemonicTest() throws Exception {
+    @DisplayName("Legacy V1 mnemonic test")
+    void legacyV1MnemonicTest() throws Exception {
+        // TODO: add link to reference test vectors
+        final String PRIVATE_KEY1 = "00c2f59212cb3417f0ee0d38e7bd876810d04f2dd2cb5c2d8f26ff406573f2bd";
+        final String PUBLIC_KEY1 = "0c5bb4624df6b64c2f07a8cb8753945dd42d4b9a2ed4c0bf98e87ef154f473e9";
+
+        final String PRIVATE_KEY2 = "fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6";
+        final String PUBLIC_KEY2 = "f40f9fdb1f161c31ed656794ada7af8025e8b5c70e538f38a4dfb46a0a6b0392";
+
+        final String PRIVATE_KEY3 = "882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf";
+        final String PUBLIC_KEY3 = "53c6b451e695d6abc52168a269316a0d20deee2331f612d4fb8b2b379e5c6854";
+
+        final String PRIVATE_KEY4 = "6890dc311754ce9d3fc36bdf83301aa1c8f2556e035a6d0d13c2cccdbbab1242";
+        final String PUBLIC_KEY4 = "45f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9";
+
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V1_STRING);
+
+        // Chain m
+        PrivateKey key1 = mnemonic.toLegacyPrivateKey();
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
+
+        // Chain m/0
+        PrivateKey key2 = key1.legacyDerive(0);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY2);
+
+        // Chain m/-1
+        PrivateKey key3 = key1.legacyDerive(-1);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY3);
+
+        // Chain m/1099511627775
+        PrivateKey key4 = key1.legacyDerive(1099511627775L);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY4);
+    }
+
+    @Test
+    @DisplayName("Legacy V2 mnemonic test")
+    void legacyV2MnemonicTest() throws Exception {
+        // TODO: add link to reference test vectors
+        final String PRIVATE_KEY1 = "98aa82d6125b5efa04bf8372be7931d05cd77f5ef3330b97d6ee7c006eaaf312";
+        final String PUBLIC_KEY1 = "e0ce688d614f22f96d9d213ca513d58a7d03d954fe45790006e6e86b25456465";
+
+        final String PRIVATE_KEY2 = "2b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb";
+        final String PUBLIC_KEY2 = "0e19f99800b007cc7c82f9d85b73e0f6e48799469450caf43f253b48c4d0d91a";
+
+        final String PRIVATE_KEY3 = "caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5";
+        final String PUBLIC_KEY3 = "9fe11da3fcfba5d28a6645ecb611a9a43dbe6014b102279ba1d34506ea86974b";
+
         Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V2_STRING);
-        PrivateKey key = mnemonic.toLegacyPrivateKey();
-        PrivateKey derivedKey = key.legacyDerive(0);
-        PrivateKey derivedKey2 = key.legacyDerive(-1);
-        assertThat(derivedKey.toString()).isEqualTo(
-            "302e020100300506032b6570042204202b7345f302a10c2a6d55bf8b7af40f125ec41d780957826006d30776f0c441fb"
-        );
-        assertThat(derivedKey2.toString()).isEqualTo(
-            "302e020100300506032b657004220420caffc03fdb9853e6a91a5b3c57a5c0031d164ce1c464dea88f3114786b5199e5"
-        );
-    }
 
-    @Test
-    @DisplayName("Legacy mnemonic test")
-    void legacyMnemonicTest() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V1_STRING);
-        PrivateKey key = mnemonic.toLegacyPrivateKey();
-        PrivateKey derivedKey = key.legacyDerive(0);
-        PrivateKey derivedKey2 = key.legacyDerive(-1);
-        assertThat(derivedKey.toString()).isEqualTo(
-            "302e020100300506032b657004220420fae0002d2716ea3a60c9cd05ee3c4bb88723b196341b68a02d20975f9d049dc6"
-        );
-        assertThat(derivedKey2.toString()).isEqualTo(
-            "302e020100300506032b657004220420882a565ad8cb45643892b5366c1ee1c1ef4a730c5ce821a219ff49b6bf173ddf"
-        );
-    }
+        // Chain m
+        PrivateKey key1 = mnemonic.toLegacyPrivateKey();
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
 
-    @Test
-    @DisplayName("should match MyHbarWallet v1")
-    void myHbarWalletV1Test() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_LEGACY_V1_STRING);
-        PrivateKey key = mnemonic.toLegacyPrivateKey();
-        PrivateKey derivedKey = key.legacyDerive(1099511627775L);
-        assertThat(derivedKey.getPublicKey().toString()).isEqualTo(
-            "302a300506032b657003210045f3a673984a0b4ee404a1f4404ed058475ecd177729daa042e437702f7791e9"
-        );
+        // Chain m/0
+        PrivateKey key2 = key1.legacyDerive(0);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY2);
+
+        // Chain m/-1
+        PrivateKey key3 = key1.legacyDerive(-1);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY3);
     }
 
     @Test
     @DisplayName("Mnemonic test")
     void mnemonicTest() throws Exception {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
         PrivateKey key = mnemonic.toPrivateKey();
         assertThat(key.toString()).isEqualTo(
             "302e020100300506032b657004220420853f15aecd22706b105da1d709b4ac05b4906170c2b9c7495dff9af49e1391da"
@@ -333,7 +361,7 @@ public class MnemonicTest {
         String passphrase = "\u03B4\u03BF\u03BA\u03B9\u03BC\u03AE";
         String expectedPrivateKey = "302e020100300506032b6570042204203fefe1000db9485372851d542453b07e7970de4e2ecede7187d733ac037f4d2c";
 
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
         PrivateKey key = mnemonic.toPrivateKey(passphrase);
         assertThat(key.toString()).isEqualTo(expectedPrivateKey);
     }
@@ -405,27 +433,103 @@ public class MnemonicTest {
     }
 
     @Test
-    @DisplayName("Mnemonic.toStandardED25519PrivateKey() validation test")
+    @DisplayName("Mnemonic.toStandardED25519PrivateKey() test vector")
     void toStandardED25519PrivateKey() throws BadMnemonicException {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        // TODO: add link to reference test vectors
+        final String CHAIN_CODE1 = "404914563637c92d688deb9d41f3f25cbe8d6659d859cc743712fcfac72d7eda";
+        final String PRIVATE_KEY1 = "f8dcc99a1ced1cc59bc2fee161c26ca6d6af657da9aa654da724441343ecd16f";
+        final String PUBLIC_KEY1 = "2e42c9f5a5cdbde64afa65ce3dbaf013d5f9ff8d177f6ef4eb89fbe8c084ec0d";
 
-        PrivateKey privateKey1 = mnemonic.toStandardEd25519PrivateKey("", 0);
-        assertThat(Hex.toHexString(privateKey1.toBytesRaw())).isEqualTo("f8dcc99a1ced1cc59bc2fee161c26ca6d6af657da9aa654da724441343ecd16f");
+        final String CHAIN_CODE2 = "9c2b0073ac934696cd0b52c6c521b9bd1902aac134380a737282fdfe29014bf1";
+        final String PRIVATE_KEY2 = "e978a6407b74a0730f7aeb722ad64ab449b308e56006c8bff9aad070b9b66ddf";
+        final String PUBLIC_KEY2 = "c4b33dca1f83509f17b69b2686ee46b8556143f79f4b9df7fe7ed3864c0c64d0";
 
-        PrivateKey privateKey2 = mnemonic.toStandardEd25519PrivateKey("", 2147483647);
-        assertThat(Hex.toHexString(privateKey2.toBytesRaw())).isEqualTo("e978a6407b74a0730f7aeb722ad64ab449b308e56006c8bff9aad070b9b66ddf");
+        final String CHAIN_CODE3 = "699344acc5e07c77eb63b154b4c5c3d33cab8bf85ee21bea4cc29ab7f0502259";
+        final String PRIVATE_KEY3 = "abeca64d2337db386e289482a252334c68c7536daaefff55dc169ddb77fbae28";
+        final String PUBLIC_KEY3 = "fd311925a7a04b38f7508931c6ae6a93e5dc4394d83dafda49b051c0017d3380";
 
-        PrivateKey privateKey3 = mnemonic.toStandardEd25519PrivateKey("some pass", 0);
-        assertThat(Hex.toHexString(privateKey3.toBytesRaw())).isEqualTo("abeca64d2337db386e289482a252334c68c7536daaefff55dc169ddb77fbae28");
+        final String CHAIN_CODE4 = "e5af7c95043a912af57a6e031ddcad191677c265d75c39954152a2733c750a3b";
+        final String PRIVATE_KEY4 = "9a601db3e24b199912cec6573e6a3d01ffd3600d50524f998b8169c105165ae5";
+        final String PUBLIC_KEY4 = "cf525500706faa7752dca65a086c9381d30d72cc67f23bf334f330579074a890";
 
-        PrivateKey privateKey4 = mnemonic.toStandardEd25519PrivateKey("some pass", 2147483647);
-        assertThat(Hex.toHexString(privateKey4.toBytesRaw())).isEqualTo("9a601db3e24b199912cec6573e6a3d01ffd3600d50524f998b8169c105165ae5");
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
+
+        // Chain m/44'/3030'/0'/0'/0'
+        PrivateKey key1 = mnemonic.toStandardEd25519PrivateKey("", 0);
+        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
+
+        // Chain m/44'/3030'/0'/0'/2147483647'
+        PrivateKey key2 = mnemonic.toStandardEd25519PrivateKey("", 2147483647);
+        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
+
+        // Chain m/44'/3030'/0'/0'/0'; Passphrase: "some pass"
+        PrivateKey key3 = mnemonic.toStandardEd25519PrivateKey("some pass", 0);
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+
+        // Chain m/44'/3030'/0'/0'/2147483647'; Passphrase: "some pass"
+        PrivateKey key4 = mnemonic.toStandardEd25519PrivateKey("some pass", 2147483647);
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
+    }
+
+    @Test
+    @DisplayName("Mnemonic.toStandardED25519PrivateKey() test vector 2")
+    void toStandardED25519PrivateKey2() throws BadMnemonicException {
+        // TODO: add link to reference test vectors
+        final String CHAIN_CODE1 = "48c89d67e9920e443f09d2b14525213ff83b245c8b98d63747ea0801e6d0ff3f";
+        final String PRIVATE_KEY1 = "020487611f3167a68482b0f4aacdeb02cc30c52e53852af7b73779f67eeca3c5";
+        final String PUBLIC_KEY1 = "2d047ff02a2091f860633f849ea2024b23e7803cfd628c9bdd635010cbd782d3";
+
+        final String CHAIN_CODE2 = "c0bcdbd9df6d8a4f214f20f3e5c7856415b68be34a1f406398c04690818bea16";
+        final String PRIVATE_KEY2 = "d0c4484480944db698dd51936b7ecc81b0b87e8eafc3d5563c76339338f9611a";
+        final String PUBLIC_KEY2 = "a1a2573c2c45bd57b0fd054865b5b3d8f492a6e1572bf04b44471e07e2f589b2";
+
+        final String CHAIN_CODE3 = "998a156855ab5398afcde06164b63c5523ff2c8900db53962cc2af191df59e1c";
+        final String PRIVATE_KEY3 = "d06630d6e4c17942155819bbbe0db8306cd989ba7baf3c29985c8455fbefc37f";
+        final String PUBLIC_KEY3 = "6bd0a51e0ca6fcc8b13cf25efd0b4814978bcaca7d1cf7dbedf538eb02969acb";
+
+        final String CHAIN_CODE4 = "19d99506a5ce2dc0080092068d278fe29b85ffb8d9c26f8956bfca876307c79c";
+        final String PRIVATE_KEY4 = "a095ef77ee88da28f373246e9ae143f76e5839f680746c3f921e90bf76c81b08";
+        final String PUBLIC_KEY4 = "35be6a2a37ff6bbb142e9f4d9b558308f4f75d7c51d5632c6a084257455e1461";
+
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_12_WORD_STRING);
+
+        // Chain m/44'/3030'/0'/0'/0'
+        PrivateKey key1 = mnemonic.toStandardEd25519PrivateKey("", 0);
+        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
+
+        // Chain m/44'/3030'/0'/0'/2147483647'
+        PrivateKey key2 = mnemonic.toStandardEd25519PrivateKey("", 2147483647);
+        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
+
+        // Chain m/44'/3030'/0'/0'/0'; Passphrase: "some pass"
+        PrivateKey key3 = mnemonic.toStandardEd25519PrivateKey("some pass", 0);
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+
+        // Chain m/44'/3030'/0'/0'/2147483647'; Passphrase: "some pass"
+        PrivateKey key4 = mnemonic.toStandardEd25519PrivateKey("some pass", 2147483647);
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
     }
 
     @Test
     @DisplayName("Mnemonic.toStandardED25519PrivateKey() should fail when index is pre-hardened")
     void toStandardED25519PrivateKeyShouldFailWhenIndexIsPreHardened() throws BadMnemonicException {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
         int hardenedIndex = Bip32Utils.toHardenedIndex(10);
 
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
@@ -435,26 +539,136 @@ public class MnemonicTest {
     }
 
     @Test
-    @DisplayName("Mnemonic.toStandardECDSAsecp256k1PrivateKey() validation test")
+    @DisplayName("Mnemonic.toStandardECDSAsecp256k1PrivateKey() test vector")
     void toStandardECDSAsecp256k1PrivateKey() throws BadMnemonicException {
-        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_STRING);
+        // TODO: add link to reference test vectors
+        final String CHAIN_CODE1 = "7717bc71194c257d4b233e16cf48c24adef630052f874a262d19aeb2b527620d";
+        final String PRIVATE_KEY1 = "0fde7bfd57ae6ec310bdd8b95967d98e8762a2c02da6f694b152cf9860860ab8";
+        final String PUBLIC_KEY1 = "03b1c064b4d04d52e51f6c8e8bb1bff75d62fa7b1446412d5901d424f6aedd6fd4";
 
-        PrivateKey privateKey1 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", 0);
-        assertThat(Hex.toHexString(privateKey1.toBytesRaw())).isEqualTo("0fde7bfd57ae6ec310bdd8b95967d98e8762a2c02da6f694b152cf9860860ab8");
+        final String CHAIN_CODE2 = "e333da4bd9e21b5dbd2b0f6d88bad02f0fa24cf4b70b2fb613368d0364cdf8af";
+        final String PRIVATE_KEY2 = "aab7d720a32c2d1ea6123f58b074c865bb07f6c621f14cb012f66c08e64996bb";
+        final String PUBLIC_KEY2 = "03a0ea31bb3562f8a309b1436bc4b2f537301778e8a5e12b68cec26052f567a235";
 
-        PrivateKey privateKey2 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", Bip32Utils.toHardenedIndex(0));
-        assertThat(Hex.toHexString(privateKey2.toBytesRaw())).isEqualTo("aab7d720a32c2d1ea6123f58b074c865bb07f6c621f14cb012f66c08e64996bb");
+        final String CHAIN_CODE3 = "0ff552587f6baef1f0818136bacac0bb37236473f6ecb5a8c1cc68a716726ed1";
+        final String PRIVATE_KEY3 = "6df5ed217cf6d5586fdf9c69d39c843eb9d152ca19d3e41f7bab483e62f6ac25";
+        final String PUBLIC_KEY3 = "0357d69bb36fee569838fe7b325c07ca511e8c1b222873cde93fc6bb541eb7ecea";
 
-        PrivateKey privateKey3 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 0);
-        assertThat(Hex.toHexString(privateKey3.toBytesRaw())).isEqualTo("6df5ed217cf6d5586fdf9c69d39c843eb9d152ca19d3e41f7bab483e62f6ac25");
+        final String CHAIN_CODE4 = "3a5048e93aad88f1c42907163ba4dce914d3aaf2eea87b4dd247ca7da7530f0b";
+        final String PRIVATE_KEY4 = "80df01f79ee1b1f4e9ab80491c592c0ef912194ccca1e58346c3d35cb5b7c098";
+        final String PUBLIC_KEY4 = "039ebe79f85573baa065af5883d0509a5634245f7864ddead76a008c9e42aa758d";
 
-        PrivateKey privateKey4 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(0));
-        assertThat(Hex.toHexString(privateKey4.toBytesRaw())).isEqualTo("80df01f79ee1b1f4e9ab80491c592c0ef912194ccca1e58346c3d35cb5b7c098");
+        final String CHAIN_CODE5 = "e54254940db58ef4913a377062ac6e411daebf435ad592d262d5a66d808a8b94";
+        final String PRIVATE_KEY5 = "60cb2496a623e1201d4e0e7ce5da3833cd4ec7d6c2c06bce2bcbcbc9dfef22d6";
+        final String PUBLIC_KEY5 = "02b59f348a6b69bd97afa80115e2d5331749b3c89c61297255430c487d6677f404";
 
-        PrivateKey privateKey5 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 2147483647);
-        assertThat(Hex.toHexString(privateKey5.toBytesRaw())).isEqualTo("60cb2496a623e1201d4e0e7ce5da3833cd4ec7d6c2c06bce2bcbcbc9dfef22d6");
+        final String CHAIN_CODE6 = "cb23165e9d2d798c85effddc901a248a1a273fab2a56fe7976df97b016e7bb77";
+        final String PRIVATE_KEY6 = "100477c333028c8849250035be2a0a166a347a5074a8a727bce1db1c65181a50";
+        final String PUBLIC_KEY6 = "03d10ebfa2d8ff2cd34aa96e5ef59ca2e69316b4c0996e6d5f54b6932fe51be560";
 
-        PrivateKey privateKey6 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(2147483647));
-        assertThat(Hex.toHexString(privateKey6.toBytesRaw())).isEqualTo("100477c333028c8849250035be2a0a166a347a5074a8a727bce1db1c65181a50");
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
+
+        // Chain m/44'/3030'/0'/0/0
+        PrivateKey key1 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", 0);
+        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
+
+        // Chain m/44'/3030'/0'/0/0'
+        PrivateKey key2 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", Bip32Utils.toHardenedIndex(0));
+        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
+
+        // Chain m/44'/3030'/0'/0/0; Passphrase "some pass"
+        PrivateKey key3 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 0);
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+
+        // Chain m/44'/3030'/0'/0/0'; Passphrase "some pass"
+        PrivateKey key4 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(0));
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
+
+        // Chain m/44'/3030'/0'/0/2147483647; Passphrase "some pass"
+        PrivateKey key5 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 2147483647);
+        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
+        assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
+        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
+
+        // Chain m/44'/3030'/0'/0/2147483647'; Passphrase "some pass"
+        PrivateKey key6 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(2147483647));
+        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
+        assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
+        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
+    }
+
+    @Test
+    @DisplayName("Mnemonic.toStandardECDSAsecp256k1PrivateKey() test vector 2")
+    void toStandardECDSAsecp256k1PrivateKey2() throws BadMnemonicException {
+        // TODO: add link to reference test vectors
+        final String CHAIN_CODE1 = "e76e0480faf2790e62dc1a7bac9dce51db1b3571fd74d8e264abc0d240a55d09";
+        final String PRIVATE_KEY1 = "f033824c20dd9949ad7a4440f67120ee02a826559ed5884077361d69b2ad51dd";
+        final String PUBLIC_KEY1 = "0294bf84a54806989a74ca4b76291d386914610b40b610d303162b9e495bc06416";
+
+        final String CHAIN_CODE2 = "60c39c6a77bd68c0aaabfe2f4711dc9c2247214c4f4dae15ad4cb76905f5f544";
+        final String PRIVATE_KEY2 = "962f549dafe2d9c8091ac918cb4fc348ab0767353f37501067897efbc84e7651";
+        final String PUBLIC_KEY2 = "027123855357fd41d28130fbc59053192b771800d28ef47319ef277a1a032af78f";
+
+        final String CHAIN_CODE3 = "911a1095b64b01f7f3a06198df3d618654e5ed65862b211997c67515e3167892";
+        final String PRIVATE_KEY3 = "c139ebb363d7f441ccbdd7f58883809ec0cc3ee7a122ef67974eec8534de65e8";
+        final String PUBLIC_KEY3 = "0293bdb1507a26542ed9c1ec42afe959cf8b34f39daab4bf842cdac5fa36d50ef7";
+
+        final String CHAIN_CODE4 = "64173f2dcb1d65e15e787ef882fa15f54db00209e2dab16fa1661244cd98e95c";
+        final String PRIVATE_KEY4 = "87c1d8d4bb0cebb4e230852f2a6d16f6847881294b14eb1d6058b729604afea0";
+        final String PUBLIC_KEY4 = "03358e7761a422ca1c577f145fe845c77563f164b2c93b5b34516a8fa13c2c0888";
+
+        final String CHAIN_CODE5 = "a7250c2b07b368a054f5c91e6a3dbe6ca3bbe01eb0489fe8778304bd0a19c711";
+        final String PRIVATE_KEY5 = "2583170ee745191d2bb83474b1de41a1621c47f6e23db3f2bf413a1acb5709e4";
+        final String PUBLIC_KEY5 = "03f9eb27cc73f751e8e476dd1db79037a7df2c749fa75b6cc6951031370d2f95a5";
+
+        final String CHAIN_CODE6 = "66a1175e7690e3714d53ffce16ee6bb4eb02065516be2c2ad6bf6c9df81ec394";
+        final String PRIVATE_KEY6 = "f2d008cd7349bdab19ed85b523ba218048f35ca141a3ecbc66377ad50819e961";
+        final String PUBLIC_KEY6 = "027b653d04958d4bf83dd913a9379b4f9a1a1e64025a691830a67383bc3157c044";
+
+        Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_12_WORD_STRING);
+
+        // Chain m/44'/3030'/0'/0/0
+        PrivateKey key1 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", 0);
+        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
+        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
+
+        // Chain m/44'/3030'/0'/0/0'
+        PrivateKey key2 = mnemonic.toStandardECDSAsecp256k1PrivateKey("", Bip32Utils.toHardenedIndex(0));
+        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
+        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
+
+        // Chain m/44'/3030'/0'/0/0; Passphrase "some pass"
+        PrivateKey key3 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 0);
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
+        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+
+        // Chain m/44'/3030'/0'/0/0'; Passphrase "some pass"
+        PrivateKey key4 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(0));
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
+        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
+
+        // Chain m/44'/3030'/0'/0/2147483647; Passphrase "some pass"
+        PrivateKey key5 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", 2147483647);
+        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
+        assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
+        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
+
+        // Chain m/44'/3030'/0'/0/2147483647'; Passphrase "some pass"
+        PrivateKey key6 = mnemonic.toStandardECDSAsecp256k1PrivateKey("some pass", Bip32Utils.toHardenedIndex(2147483647));
+        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
+        assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
+        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
     }
 }
