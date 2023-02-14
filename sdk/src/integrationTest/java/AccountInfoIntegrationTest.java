@@ -1,11 +1,4 @@
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountInfoFlow;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,7 +19,7 @@ class AccountInfoIntegrationTest {
 
         assertThat(info.accountId).isEqualTo(testEnv.operatorId);
         assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(((KeyList)info.key).iterator().next()).isEqualTo(testEnv.operatorKey);
         assertThat(info.balance.toTinybars()).isGreaterThan(0);
         assertThat(info.proxyAccountId).isNull();
         assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
