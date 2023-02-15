@@ -31,10 +31,19 @@ public class IntegrationTestEnv {
     public AccountId operatorId;
     private Client originalClient;
 
+    public IntegrationTestEnv() throws Exception {
+        this(0);
+    }
+
     @SuppressWarnings("EmptyCatch")
     public IntegrationTestEnv(int numberOfNodes) throws Exception {
-        client = createTestEnvClient()
-            .setMaxNodesPerTransaction(numberOfNodes);
+        client = createTestEnvClient();
+
+        if (numberOfNodes == 0) {
+            numberOfNodes = client.getNetwork().size();
+        }
+
+        client.setMaxNodesPerTransaction(numberOfNodes);
         originalClient = client;
 
         try {

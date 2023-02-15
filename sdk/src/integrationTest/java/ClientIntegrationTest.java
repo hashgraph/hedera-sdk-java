@@ -106,7 +106,7 @@ public class ClientIntegrationTest {
 
     @Test
     void pingAll() throws Exception {
-        var testEnv = new IntegrationTestEnv(3);
+        var testEnv = new IntegrationTestEnv();
 
         testEnv.client.setMaxNodeAttempts(1);
         testEnv.client.pingAll();
