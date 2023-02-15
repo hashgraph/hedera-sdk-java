@@ -347,7 +347,7 @@ public class MnemonicTest {
     void mnemonicTest() throws Exception {
         Mnemonic mnemonic = Mnemonic.fromString(MNEMONIC_24_WORD_STRING);
         PrivateKey key = mnemonic.toPrivateKey();
-        assertThat(key.toString()).isEqualTo(
+        assertThat(key).hasToString(
             "302e020100300506032b657004220420853f15aecd22706b105da1d709b4ac05b4906170c2b9c7495dff9af49e1391da"
         );
     }
