@@ -14,5 +14,5 @@ com.hedera.hashgraph.sdk.FileInfoTest.toBytes=[
 
 
 com.hedera.hashgraph.sdk.FileInfoTest.toProtobuf=[
-  "# com.hedera.hashgraph.sdk.proto.FileGetInfoResponse$FileInfo@5de8e70f\ndeleted: true\nexpiration_time {\n  nanos: 3000000\n  seconds: 0\n}\nfile_i_d {\n  file_num: 1\n  realm_num: 0\n  shard_num: 0\n}\nkeys {\n  keys {\n    ed25519: \"\\340\\310\\354\\'X\\245\\207\\237\\372\\302&\\241<\\fQky\\236r\\343QA\\240\\335\\202\\217\\224\\323y\\210\\244\\267\"\n  }\n}\nledger_id: \"\\000\"\nsize: 2"
+  "# com.hedera.hashgraph.sdk.proto.FileGetInfoResponse$FileInfo@e51665b9\ndeleted: true\nexpiration_time {\n  nanos: 3000000\n  seconds: 0\n}\nfile_i_d {\n  file_num: 1\n  realm_num: 0\n  shard_num: 0\n}\nkeys {\n  keys {\n    ed25519: \"\\340\\310\\354\\'X\\245\\207\\237\\372\\302&\\241<\\fQky\\236r\\343QA\\240\\335\\202\\217\\224\\323y\\210\\244\\267\"\n  }\n}\nledger_id: \"\\000\"\nsize: 2"
 ]

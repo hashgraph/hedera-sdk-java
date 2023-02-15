@@ -1519,7 +1519,12 @@ public enum Status {
     /**
      * The account cannot be modified. Account's key is not set
      */
-    ACCOUNT_IS_IMMUTABLE(ResponseCodeEnum.ACCOUNT_IS_IMMUTABLE);
+    ACCOUNT_IS_IMMUTABLE(ResponseCodeEnum.ACCOUNT_IS_IMMUTABLE),
+
+    /**
+     * An alias that is assigned to an account or contract cannot be assigned to another account or contract.
+     */
+    ALIAS_ALREADY_ASSIGNED(ResponseCodeEnum.ALIAS_ALREADY_ASSIGNED);
 
     final ResponseCodeEnum code;
 
@@ -2109,6 +2114,8 @@ public enum Status {
                 return TRANSACTION_HAS_UNKNOWN_FIELDS;
             case ACCOUNT_IS_IMMUTABLE:
                 return ACCOUNT_IS_IMMUTABLE;
+            case ALIAS_ALREADY_ASSIGNED:
+                return ALIAS_ALREADY_ASSIGNED;
             case UNRECOGNIZED:
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

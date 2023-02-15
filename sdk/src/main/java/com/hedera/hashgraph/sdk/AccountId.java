@@ -226,14 +226,24 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     static AccountId fromProtobuf(AccountID accountId) {
+        PublicKey aliasKey = null;
+        EvmAddress evmAddress = null;
+
+        if (accountId.hasAlias()) {
+            if (accountId.getAlias().size() == 20) {
+                evmAddress = EvmAddress.fromAliasBytes(accountId.getAlias());
+            } else {
+               aliasKey = PublicKey.fromAliasBytes(accountId.getAlias());
+            }
+        }
         Objects.requireNonNull(accountId);
         return new AccountId(
             accountId.getShardNum(),
             accountId.getRealmNum(),
             accountId.getAccountNum(),
             null,
-            accountId.hasAlias() ? PublicKey.fromAliasBytes(accountId.getAlias()) : null,
-            accountId.hasAlias() ? EvmAddress.fromAliasBytes(accountId.getAlias()) : null
+            aliasKey,
+            evmAddress
         );
     }
 

@@ -47,7 +47,7 @@ public final class EvmAddress extends Key {
 
     @Nullable
     static EvmAddress fromAliasBytes(ByteString aliasBytes) {
-        if (aliasBytes.size() == 20) {
+        if (!aliasBytes.isEmpty() && aliasBytes.size() == 20) {
             return new EvmAddress(aliasBytes.toByteArray());
         }
         return null;
