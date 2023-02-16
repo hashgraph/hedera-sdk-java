@@ -213,7 +213,7 @@ class ClientTest {
     @Test
     @DisplayName("setMirrorNetwork() functions correctly")
     void setMirrorNetworkWorks() throws Exception {
-        var defaultNetwork = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+        var defaultNetwork = List.of("testnet.mirrornode.hedera.com:443");
 
         Client client = Client.forNetwork(new HashMap<>()).setMirrorNetwork(defaultNetwork);
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
@@ -222,19 +222,19 @@ class ClientTest {
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
 
         var defaultNetworkWithExtraNode = List.of(
-                "hcs.testnet.mirrornode.hedera.com:5600",
-                "hcs.testnet1.mirrornode.hedera.com:5600"
+                "testnet.mirrornode.hedera.com:443",
+                "testnet1.mirrornode.hedera.com:443"
         );
 
         client.setMirrorNetwork(defaultNetworkWithExtraNode);
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetworkWithExtraNode);
 
-        var singleNodeNetwork = List.of("hcs.testnet1.mirrornode.hedera.com:5600");
+        var singleNodeNetwork = List.of("testnet1.mirrornode.hedera.com:443");
 
         client.setMirrorNetwork(singleNodeNetwork);
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(singleNodeNetwork);
 
-        var singleNodeNetworkWithDifferentNode = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+        var singleNodeNetworkWithDifferentNode = List.of("testnet.mirrornode.hedera.com:443");
 
         client.setMirrorNetwork(singleNodeNetworkWithDifferentNode);
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(singleNodeNetworkWithDifferentNode);
@@ -246,15 +246,15 @@ class ClientTest {
     @DisplayName("setMirrorNetwork() throws exception if there is no time to remove the old nodes")
     void setMirrorNetworkFails() throws Exception {
         var defaultNetwork = List.of(
-            "hcs.testnet.mirrornode.hedera.com:5600",
-            "hcs.testnet.mirrornode2.hedera.com:5600"
+            "testnet.mirrornode.hedera.com:443",
+            "testnet.mirrornode2.hedera.com:443"
         );
 
         Client client = Client.forNetwork(new HashMap<>()).setMirrorNetwork(defaultNetwork);
         assertThat(client.getMirrorNetwork()).containsExactlyInAnyOrderElementsOf(defaultNetwork);
 
         client.setCloseTimeout(Duration.ZERO);
-        final List<String> updatedNetwork = List.of("hcs.testnet.mirrornode.hedera.com:5600");
+        final List<String> updatedNetwork = List.of("testnet.mirrornode.hedera.com:443");
 
         assertThatThrownBy(() -> client.setMirrorNetwork(updatedNetwork))
             .hasMessageEndingWith("Failed to properly shutdown all channels");

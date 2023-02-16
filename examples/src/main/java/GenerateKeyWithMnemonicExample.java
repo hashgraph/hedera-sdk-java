@@ -28,21 +28,11 @@ class GenerateKeyWithMnemonicExample {
 
     public static void main(String[] args) {
         Mnemonic mnemonic = Mnemonic.generate24();
-        PrivateKey privateKey;
-        try {
-            privateKey = mnemonic.toPrivateKey();
-        } catch (BadMnemonicException e) {
-            throw new Error(e.reason.toString());
-        }
+        PrivateKey privateKey = mnemonic.toStandardEd25519PrivateKey("", 0);
         PublicKey publicKey = privateKey.getPublicKey();
 
         Mnemonic mnemonic12 = Mnemonic.generate12();
-        PrivateKey privateKey12;
-        try {
-            privateKey12 = mnemonic12.toPrivateKey();
-        } catch (BadMnemonicException e) {
-            throw new Error(e.reason.toString());
-        }
+        PrivateKey privateKey12 = mnemonic12.toStandardEd25519PrivateKey("", 0);
         PublicKey publicKey12 = privateKey12.getPublicKey();
 
         System.out.println("mnemonic 24 word = " + mnemonic);

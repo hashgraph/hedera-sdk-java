@@ -174,9 +174,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
     }
 
     /**
-     * Extract the admin key.
+     * Extract the bytecode.
      *
-     * @return                          the admin key
+     * @return                          the bytecode
      */
     @Nullable
     public byte[] getBytecode() {

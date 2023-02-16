@@ -61,7 +61,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      */
     static MirrorNetwork forMainnet(ExecutorService executor) {
         try {
-            return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:5600"))
+            return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:443"))
                 .setTransportSecurity(true);
         } catch (InterruptedException e) {
             // should never happen
@@ -76,7 +76,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for testnet
      */
     static MirrorNetwork forTestnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.testnet.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Lists.of("testnet.mirrornode.hedera.com:443"));
     }
 
     /**
@@ -86,7 +86,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for previewnet
      */
     static MirrorNetwork forPreviewnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("hcs.previewnet.mirrornode.hedera.com:5600"));
+        return new MirrorNetwork(executor, Lists.of("previewnet.mirrornode.hedera.com:443"));
     }
 
     /**
