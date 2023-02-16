@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.utils.Bip32Utils;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -33,6 +34,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -82,6 +84,23 @@ class PrivateKeyED25519 extends PrivateKey {
         } catch (IOException e) {
             throw new BadKeyException(e);
         }
+    }
+
+    /**
+     * Create an ED25519 key from seed.
+     *
+     * @param seed                      the seed bytes
+     * @return                          the new key
+     */
+    public static PrivateKey fromSeed(byte[] seed) {
+        var hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
+        hmacSha512.update(seed, 0, seed.length);
+
+        var derivedState = new byte[hmacSha512.getMacSize()];
+        hmacSha512.doFinal(derivedState, 0);
+
+        return PrivateKeyED25519.derivableKeyED25519(derivedState);
     }
 
     /**
@@ -167,6 +186,10 @@ class PrivateKeyED25519 extends PrivateKey {
             throw new IllegalStateException("this private key does not support derivation");
         }
 
+        if (Bip32Utils.isHardenedIndex(index)) {
+            throw new IllegalArgumentException("the index should not be pre-hardened");
+        }
+
         // SLIP-10 child key derivation
         // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#master-key-generation
         var hmacSha512 = new HMac(new SHA512Digest());
@@ -200,6 +223,10 @@ class PrivateKeyED25519 extends PrivateKey {
 
         publicKey = new PublicKeyED25519(publicKeyData);
         return publicKey;
+    }
+
+    public KeyParameter getChainCode() {
+        return chainCode;
     }
 
     @Override
