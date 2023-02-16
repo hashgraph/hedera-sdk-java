@@ -373,7 +373,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * EOA 20-byte address to create that is derived from the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
+     * The ethereum account 20-byte EVM address to be used as the account's alias.
+     * @return the EvmAddress
      */
     @Nullable
     public EvmAddress getAliasEvmAddress() {
