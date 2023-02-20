@@ -218,22 +218,17 @@ public final class Mnemonic {
         }
     }
 
-    private static List<String> getSpecificWordList(
+    private static synchronized List<String> getSpecificWordList(
         Supplier<SoftReference<List<String>>> getCurrentWordList,
         Supplier<List<String>> getNewWordList,
         Consumer<SoftReference<List<String>>> setCurrentWordList
     ) {
         var localWordList = getCurrentWordList.get();
         if (localWordList == null || localWordList.get() == null) {
-            synchronized (Mnemonic.class) {
-                localWordList = getCurrentWordList.get();
-                if (localWordList == null || localWordList.get() == null) {
-                    List<String> words = getNewWordList.get();
-                    setCurrentWordList.accept(new SoftReference<>(words));
-                    // immediately return the strong reference
-                    return words;
-                }
-            }
+            List<String> words = getNewWordList.get();
+            setCurrentWordList.accept(new SoftReference<>(words));
+            // immediately return the strong reference
+            return words;
         }
 
         return localWordList.get();
