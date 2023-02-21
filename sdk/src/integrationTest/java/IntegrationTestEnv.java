@@ -29,21 +29,26 @@ public class IntegrationTestEnv {
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
+    public boolean isLocalNode = false;
     private Client originalClient;
+
+    // Note: this is temporarily needed while the local node supports a single node only.
+    // When multiple nodes are supported this constant and all related code should be removed.
+    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
 
     public IntegrationTestEnv() throws Exception {
         this(0);
     }
 
     @SuppressWarnings("EmptyCatch")
-    public IntegrationTestEnv(int numberOfNodes) throws Exception {
+    public IntegrationTestEnv(int maxNodesPerTransaction) throws Exception {
         client = createTestEnvClient();
 
-        if (numberOfNodes == 0) {
-            numberOfNodes = client.getNetwork().size();
+        if (maxNodesPerTransaction == 0) {
+            maxNodesPerTransaction = client.getNetwork().size();
         }
 
-        client.setMaxNodesPerTransaction(numberOfNodes);
+        client.setMaxNodesPerTransaction(maxNodesPerTransaction);
         originalClient = client;
 
         try {
@@ -61,9 +66,15 @@ public class IntegrationTestEnv {
         assertThat(client.getOperatorAccountId()).isNotNull();
         assertThat(client.getOperatorPublicKey()).isNotNull();
 
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+            isLocalNode = true;
+        }
+
         var nodeGetter = new TestEnvNodeGetter(client);
         var network = new HashMap<String, AccountId>();
-        for (@Var int i = 0; i < numberOfNodes; i++) {
+
+        var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
+        for (@Var int i = 0; i < nodeCount; i++) {
             nodeGetter.nextNode(network);
         }
         client.setNetwork(network);

@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.TransactionId;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -128,6 +129,10 @@ public class ClientIntegrationTest {
     @Test
     void pingAllBadNetwork() throws Exception {
         var testEnv = new IntegrationTestEnv(3);
+
+        // Skip if using local node.
+        // Note: this check should be removed once the local node is supporting multiple nodes.
+        Assumptions.assumeFalse(testEnv.isLocalNode);
 
         testEnv.client.setMaxNodeAttempts(1);
         testEnv.client.setMaxAttempts(1);

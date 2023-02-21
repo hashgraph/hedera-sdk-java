@@ -1,12 +1,9 @@
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
+import org.junit.jupiter.api.Assumptions;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
@@ -75,6 +72,10 @@ public class TopicMessageIntegrationTest {
     @DisplayName("Can receive a large topic message")
     void canReceiveALargeTopicMessage() throws Exception {
         var testEnv = new IntegrationTestEnv(2);
+
+        // Skip if using local node.
+        // Note: this check should be removed once the local node is supporting multiple nodes.
+        Assumptions.assumeFalse(testEnv.isLocalNode);
 
         var response = new TopicCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
