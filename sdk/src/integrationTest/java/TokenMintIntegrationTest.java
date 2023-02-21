@@ -99,8 +99,8 @@ class TokenMintIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot mint tokens when amount is not set")
-    void cannotMintTokensWhenAmountIsNotSet() throws Exception {
+    @DisplayName("Can mint tokens when amount is not set")
+    void canMintTokensWhenAmountIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var tokenId = Objects.requireNonNull(
@@ -121,12 +121,12 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenMintTransaction()
-                .setTokenId(tokenId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TOKEN_MINT_AMOUNT.toString());
+        var receipt = new TokenMintTransaction()
+            .setTokenId(tokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
         testEnv.close(tokenId);
     }
