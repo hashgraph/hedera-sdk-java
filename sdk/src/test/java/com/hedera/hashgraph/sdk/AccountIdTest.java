@@ -163,7 +163,7 @@ class AccountIdTest {
     }
 
     @Test
-    void toBytesAlias() throws InvalidProtocolBufferException {
+    void toBytesAlias() {
         SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toBytes())).toMatchSnapshot();
     }
 
@@ -232,7 +232,7 @@ class AccountIdTest {
         String evmAddress = "302a300506032b6570032100114e6abc371b82da";
         var id = AccountId.fromEvmAddress(evmAddress, 5, 9);
 
-        assertThat(id.evmAddress.toString()).isEqualTo(evmAddress);
+        assertThat(id.evmAddress).hasToString(evmAddress);
         assertThat(id.shard).isEqualTo(5);
         assertThat(id.realm).isEqualTo(9);
     }

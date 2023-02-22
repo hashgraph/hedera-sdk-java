@@ -350,7 +350,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF OCT/3/2022
+     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
      * <p>
      * The key to be used as the account's alias. Currently only primitive key bytes are
      * supported as the key for an account with an alias. ThresholdKey, KeyList, ContractID, and
@@ -382,7 +382,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF DEC/23/2022
+     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
      * <p>
      * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
      * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
@@ -404,7 +404,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF DEC/23/2022
+     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
      * <p>
      * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
      * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.

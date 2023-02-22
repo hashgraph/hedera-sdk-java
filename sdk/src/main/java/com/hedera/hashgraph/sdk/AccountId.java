@@ -26,6 +26,7 @@ import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -354,9 +355,16 @@ public final class AccountId implements Comparable<AccountId> {
 
     @Override
     public int hashCode() {
+        byte[] aliasBytes = null;
+
+        if (aliasKey != null) {
+            aliasBytes = aliasKey.toBytes();
+        } else if (evmAddress != null) {
+            aliasBytes = evmAddress.toBytes();
+        }
+
         return Objects.hash(
-            shard, realm, num,
-            (aliasKey != null) ? aliasKey.toBytes() : ((evmAddress != null) ? evmAddress.toBytes() : null)
+            shard, realm, num, Arrays.hashCode(aliasBytes)
         );
     }
 
