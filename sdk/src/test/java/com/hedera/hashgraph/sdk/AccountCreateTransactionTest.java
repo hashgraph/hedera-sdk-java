@@ -75,7 +75,6 @@ public class AccountCreateTransactionTest {
             .setReceiverSignatureRequired(true)
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setStakedNodeId(4L)
-            .setAliasEvmAddress(EvmAddress.fromString("302a300506032b6570032100114e6abc371b82da"))
             .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()

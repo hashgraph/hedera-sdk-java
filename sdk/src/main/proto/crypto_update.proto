@@ -155,16 +155,4 @@ message CryptoUpdateTransactionBody {
      * If true, the account declines receiving a staking reward. The default value is false.
      */
     google.protobuf.BoolValue decline_reward = 18;
-
-    oneof virtual_address_update {
-        /**
-         * The virtual address to be added.
-         */
-        VirtualAddress add = 20;
-
-        /**
-         * The 20-byte EVM address of the virtual address that is being removed.
-         */
-        bytes remove = 21;
-    }
 }

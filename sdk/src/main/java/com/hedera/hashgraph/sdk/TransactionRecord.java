@@ -182,6 +182,12 @@ public final class TransactionRecord {
     @Nullable
     public final Integer prngNumber;
 
+    /**
+     * The new default EVM address of the account created by this transaction.
+     * This field is populated only when the EVM address is not specified in the related transaction body.
+     */
+    public final ByteString evmAddress;
+
     TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -204,7 +210,8 @@ public final class TransactionRecord {
         ByteString ethereumHash,
         List<Transfer> paidStakingRewards,
         @Nullable ByteString prngBytes,
-        @Nullable Integer prngNumber
+        @Nullable Integer prngNumber,
+        ByteString evmAddress
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -231,6 +238,7 @@ public final class TransactionRecord {
         this.paidStakingRewards = paidStakingRewards;
         this.prngBytes = prngBytes;
         this.prngNumber = prngNumber;
+        this.evmAddress = evmAddress;
     }
 
     /**
@@ -317,7 +325,8 @@ public final class TransactionRecord {
             transactionRecord.getEthereumHash(),
             paidStakingRewards,
             transactionRecord.hasPrngBytes() ? transactionRecord.getPrngBytes() : null,
-            transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null
+            transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null,
+            transactionRecord.getEvmAddress()
         );
     }
 
@@ -373,7 +382,8 @@ public final class TransactionRecord {
             .setMemo(transactionMemo)
             .setTransactionFee(transactionFee.toTinybars())
             .setTransferList(transferList)
-            .setEthereumHash(ethereumHash);
+            .setEthereumHash(ethereumHash)
+            .setEvmAddress(evmAddress);
 
         for (var tokenEntry : tokenTransfers.entrySet()) {
             var tokenTransfersList = TokenTransferList.newBuilder()
@@ -468,6 +478,7 @@ public final class TransactionRecord {
             .add("paidStakingRewards", paidStakingRewards)
             .add("prngBytes", prngBytes != null ? Hex.toHexString(prngBytes.toByteArray()) : null)
             .add("prngNumber", prngNumber)
+            .add("evmAddress", Hex.toHexString(evmAddress.toByteArray()))
             .toString();
     }
 
