@@ -19,9 +19,6 @@ public class AccountAllowanceIntegrationTest {
     void canSpendHbarAllowance() throws Throwable {
         var testEnv = new IntegrationTestEnv(1);
 
-        // Test A failure
-        assertThat(1).isEqualTo(2);
-
         var aliceKey = PrivateKey.generateED25519();
         var aliceId = new AccountCreateTransaction()
             .setKey(aliceKey)
