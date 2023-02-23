@@ -1,0 +1,12 @@
+{
+    "network": {
+        "0.0.3":  "127.0.0.1:50211"
+    },
+    "mirrorNetwork": [
+        "127.0.0.1:5600"
+    ],
+    "operator": {
+        "accountId": "0.0.1022",
+        "privateKey": "0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4"
+    }
+}
