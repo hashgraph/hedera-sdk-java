@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - `AccountId.fromEvmAddress()`
  - `AccountId.fromString()` now supports EVM address
  - `TransferTransaction.addHbarTransfer()` now supports EVM address
- - `LazyCreateTransferTransactionExample`
+ - `AutoCreateAccountTransferTransactionExample`
  - `TransferUsingEvmAddressExample`
  - `AccountCreationWaysExample`
 
