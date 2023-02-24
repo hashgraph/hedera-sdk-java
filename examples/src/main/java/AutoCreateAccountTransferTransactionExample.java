@@ -2,12 +2,10 @@ import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class LazyCreateTransferTransactionExample {
+public class AutoCreateAccountTransferTransactionExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
@@ -15,11 +13,11 @@ public class LazyCreateTransferTransactionExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private LazyCreateTransferTransactionExample() {
+    private AutoCreateAccountTransferTransactionExample() {
     }
 
     /*
-    Lazy-create a new account using a public-address via a `TransferTransaction`.
+    Auto-create a new account using a public-address via a `TransferTransaction`.
     Reference: [HIP-583 Expand alias support in CryptoCreate & CryptoTransfer Transactions](https://hips.hedera.com/hip/hip-583)
     ## Example 2
     - Create an ECSDA private key
