@@ -132,7 +132,7 @@ public class ClientIntegrationTest {
 
         // Skip if using local node.
         // Note: this check should be removed once the local node is supporting multiple nodes.
-        Assumptions.assumeFalse(testEnv.isLocalNode);
+        testEnv.assumeNotLocalNode();
 
         testEnv.client.setMaxNodeAttempts(1);
         testEnv.client.setMaxAttempts(1);

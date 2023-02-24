@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import java8.util.function.Function;
+import org.junit.jupiter.api.Assumptions;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -121,6 +122,18 @@ public class IntegrationTestEnv {
 
     public IntegrationTestEnv useThrowawayAccount() throws Exception {
         return useThrowawayAccount(new Hbar(50));
+    }
+
+    // Note: this is a temporary workaround.
+    // The assumption should be removed once the local node is supporting multiple nodes.
+    public void assumeNotLocalNode() throws Exception {
+        // first clean up the current IntegrationTestEnv...
+        if (isLocalNode) {
+            close();
+        }
+
+        // then skip the current test
+        Assumptions.assumeFalse(isLocalNode);
     }
 
     public void close(

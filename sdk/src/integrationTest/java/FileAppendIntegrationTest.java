@@ -73,7 +73,7 @@ public class FileAppendIntegrationTest {
 
         // Skip if using local node.
         // Note: this check should be removed once the local node is supporting multiple nodes.
-        Assumptions.assumeFalse(testEnv.isLocalNode);
+        testEnv.assumeNotLocalNode();
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -134,7 +134,7 @@ public class FileAppendIntegrationTest {
 
         // Skip if using local node.
         // Note: this check should be removed once the local node is supporting multiple nodes.
-        Assumptions.assumeFalse(testEnv.isLocalNode);
+        testEnv.assumeNotLocalNode();
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
