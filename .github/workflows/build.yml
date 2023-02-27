@@ -105,7 +105,12 @@ jobs:
         run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Run Integration Tests
-        run:  CONFIG_FILE=a1 ./gradlew integrationTest -PCONFIG_FILE=../sdk/src/test/resources/client-config-ci.json
+        run:  CONFIG_FILE=a1 ./gradlew integrationTest -PCONFIG_FILE=../sdk/src/test/resources/client-config-ci.json jacocoTestReport && bash <(curl -s https://codecov.io/bash)
+      - uses: codecov/codecov-action@v1
+        with:
+            token: ${{ secrets.CODECOV_TOKEN }}
+            fail_ci_if_error: true
+            verbose: true
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
