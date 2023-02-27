@@ -105,7 +105,7 @@ jobs:
         run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Run Integration Tests
-        run:  CONFIG_FILE=asd ./gradlew integrationTest -PCONFIG_FILE=../sdk/src/test/resources/client-config-ci.json
+        run:  CONFIG_FILE=a1 ./gradlew integrationTest -PCONFIG_FILE=../sdk/src/test/resources/client-config-ci.json
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
