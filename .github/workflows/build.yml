@@ -105,7 +105,12 @@ jobs:
         run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Run Integration Tests
-        run:  CONFIG_FILE=a1 ./gradlew integrationTest -PCONFIG_FILE=../sdk/src/test/resources/client-config-ci.json jacocoTestReport && bash <(curl -s https://codecov.io/bash)
+        env:
+          OPERATOR_KEY: 0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4
+          OPERATOR_ID: 0.0.1022
+          HEDERA_NETWORK: localhost
+        run: |
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=testnet jacocoTestReport && bash <(curl -s https://codecov.io/bash)
       - uses: codecov/codecov-action@v1
         with:
             token: ${{ secrets.CODECOV_TOKEN }}

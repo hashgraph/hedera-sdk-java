@@ -88,9 +88,7 @@ public class IntegrationTestEnv {
             return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new HashMap<String, AccountId>();
-            network.put("127.0.0.1:50213", new AccountId(3));
-            network.put("127.0.0.1:50214", new AccountId(4));
-            network.put("127.0.0.1:50215", new AccountId(5));
+            network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
 
             return Client.forNetwork(network);
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
