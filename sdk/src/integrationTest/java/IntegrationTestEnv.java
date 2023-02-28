@@ -36,6 +36,8 @@ public class IntegrationTestEnv {
     // When multiple nodes are supported this constant and all related code should be removed.
     private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
 
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+
     public IntegrationTestEnv() throws Exception {
         this(0);
     }
@@ -90,7 +92,9 @@ public class IntegrationTestEnv {
             var network = new HashMap<String, AccountId>();
             network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
 
-            return Client.forNetwork(network);
+            return Client
+                .forNetwork(network)
+                .setMirrorNetwork(List.of(DEFAULT_LOCAL_MIRROR_NODE_ADDRESS));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
