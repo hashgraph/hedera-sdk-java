@@ -59,6 +59,7 @@ public class AllowancesTest {
             TokenId.fromString("1.1.1"),
             AccountId.fromString("2.2.2"),
             AccountId.fromString("3.3.3"),
+            null,
             serials,
             null
         );
@@ -69,6 +70,7 @@ public class AllowancesTest {
             TokenId.fromString("1.1.1"),
             AccountId.fromString("2.2.2"),
             AccountId.fromString("3.3.3"),
+            null,
             Collections.emptyList(),
             true
         );
