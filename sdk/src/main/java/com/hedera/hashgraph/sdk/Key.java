@@ -52,30 +52,32 @@ public abstract class Key {
      */
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
-            case ED25519:
+            case ED25519 -> {
                 return new PublicKeyED25519(key.getEd25519().toByteArray());
-
-            case ECDSA_SECP256K1:
+            }
+            case ECDSA_SECP256K1 -> {
                 if (key.getECDSASecp256K1().size() == 20) {
                     return new EvmAddress(key.getECDSASecp256K1().toByteArray());
                 } else {
                     return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
                 }
-
-            case KEYLIST:
+            }
+            case KEYLIST -> {
                 return KeyList.fromProtobuf(key.getKeyList(), null);
-
-            case THRESHOLDKEY:
+            }
+            case THRESHOLDKEY -> {
                 return KeyList.fromProtobuf(key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold());
-
-            case CONTRACTID:
+            }
+            case CONTRACTID -> {
                 return ContractId.fromProtobuf(key.getContractID());
-
-            case DELEGATABLE_CONTRACT_ID:
+            }
+            case DELEGATABLE_CONTRACT_ID -> {
                 return DelegateContractId.fromProtobuf(key.getDelegatableContractId());
-
-            default:
-                throw new IllegalStateException("Key#fromProtobuf: unhandled key case: " + key.getKeyCase());
+            }
+            case KEY_NOT_SET -> {
+                return null;
+            }
+            default -> throw new IllegalStateException("Key#fromProtobuf: unhandled key case: " + key.getKeyCase());
         }
     }
 

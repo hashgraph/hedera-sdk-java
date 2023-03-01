@@ -205,6 +205,7 @@ public class AccountAllowanceDeleteTransaction extends com.hedera.hashgraph.sdk.
             tokenId,
             ownerAccountId,
             null,
+            null,
             new ArrayList<>(),
             null
         );

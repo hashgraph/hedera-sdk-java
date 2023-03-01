@@ -5,16 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## 2.21.0
+
+### Added
+ - `TransactionRecord.evmAddress`
+ - `PublicKeyECDSA.toEvmAddress()`
+ - `AccountId.fromEvmAddress()`
+ - `AccountId.fromString()` now supports EVM address
+ - `TransferTransaction.addHbarTransfer()` now supports EVM address
+ - `AutoCreateAccountTransferTransactionExample`
+ - `TransferUsingEvmAddressExample`
+ - `AccountCreationWaysExample`
+
+## 2.20.0
 
 ### Added
  - `TRANSACTION_HAS_UNKNOWN_FIELDS` and `ACCOUNT_IS_IMMUTABLE` in `Status`
+ - `toStandard[Ed25519|ECDSAsecp256k1]PrivateKey()` to `Mnemonic`
+ - `fromSeed[ED25519|ECDSAsecp256k1]()` to `PrivateKey`
+ - `[PrivateKeyED25519|PrivateKeyECDSA].fromSeed()`
+ - `Bip32Utils` class
 
 ### Fixed
  - Misleading logging when an unhealthy node is hit
  - Default mirror node for mainnet is now `mainnet-public.mirrornode.hedera.com:443` instead of `mainnet-public.mirrornode.hedera.com:5600`
  - Default mirror node for testnet is now `testnet.mirrornode.hedera.com:443` instead of `hcs.testnet.mirrornode.hedera.com:5600`
  - Default mirror node for previewnet is now `previewnet.mirrornode.hedera.com:443` instead of `hcs.previewnet.mirrornode.hedera.com:5600`
+ - ECDSA secp256k1 keys now support derivation
+
+### Deprecated
+ - `Mnemonic.toPrivateKey()` use `Mnemonic.toStandard[Ed25519|ECDSAsecp256k1]PrivateKey` instead
+ - `PrivateKey.fromMnemonic()` use `Mnemonic.toStandard[Ed25519|ECDSAsecp256k1]PrivateKey` instead
 
 ## 2.19.0
 

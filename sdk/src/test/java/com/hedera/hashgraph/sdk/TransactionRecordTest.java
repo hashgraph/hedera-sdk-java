@@ -81,7 +81,8 @@ public class TransactionRecordTest {
             ByteString.copyFrom("Some hash", StandardCharsets.UTF_8),
             List.of(new Transfer(AccountId.fromString("1.2.3"), Hbar.from(8))),
             prngBytes,
-            prngNumber
+            prngNumber,
+            ByteString.copyFrom("0x00", StandardCharsets.UTF_8)
         );
     }
 

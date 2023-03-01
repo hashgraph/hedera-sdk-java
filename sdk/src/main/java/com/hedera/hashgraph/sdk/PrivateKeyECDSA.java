@@ -19,15 +19,19 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.utils.Bip32Utils;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
+import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.ECKeyGenerationParameters;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.util.Arrays;
@@ -35,6 +39,8 @@ import org.bouncycastle.util.Arrays;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Encapsulate the ECDSA private key.
@@ -43,15 +49,17 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     private final BigInteger keyData;
 
+    @Nullable
+    private final KeyParameter chainCode;
+
     /**
      * Constructor.
      *
      * @param keyData                   the key data
-     * @param publicKey                 the public key
      */
-    PrivateKeyECDSA(BigInteger keyData, @Nullable PublicKey publicKey) {
+    PrivateKeyECDSA(BigInteger keyData, @Nullable KeyParameter chainCode) {
         this.keyData = keyData;
-        this.publicKey = publicKey;
+        this.chainCode = chainCode;
     }
 
     /**
@@ -65,8 +73,7 @@ public class PrivateKeyECDSA extends PrivateKey {
         generator.init(keygenParams);
         var keypair = generator.generateKeyPair();
         var privParams = (ECPrivateKeyParameters) keypair.getPrivate();
-        var pubParams = (ECPublicKeyParameters) keypair.getPublic();
-        return new PrivateKeyECDSA(privParams.getD(), new PublicKeyECDSA(pubParams.getQ().getEncoded(true)));
+        return new PrivateKeyECDSA(privParams.getD(), null);
     }
 
     /**
@@ -118,12 +125,72 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     @Override
     public boolean isDerivable() {
-        return false;
+        return this.chainCode != null;
     }
 
     @Override
     public PrivateKey derive(int index) {
-        throw new IllegalStateException("ECDSA secp256k1 keys do not currently support derivation");
+        if (!isDerivable()) {
+            throw new IllegalStateException("this private key does not support derivation");
+        }
+
+        boolean isHardened = Bip32Utils.isHardenedIndex(index);
+        ByteBuffer data = ByteBuffer.allocate(37);
+
+        if (isHardened) {
+            byte[] bytes33 = new byte[33];
+            byte[] priv = toBytesRaw();
+            System.arraycopy(priv, 0, bytes33, 33 - priv.length, priv.length);
+            data.put(bytes33);
+        } else {
+            data.put(getPublicKey().toBytesRaw());
+        }
+        data.putInt(index);
+
+        byte[] dataArray = data.array();
+        HMac hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter(chainCode.getKey()));
+        hmacSha512.update(dataArray, 0, dataArray.length);
+
+        byte[] i = new byte[64];
+        hmacSha512.doFinal(i, 0);
+
+        var il = java.util.Arrays.copyOfRange(i, 0, 32);
+        var ir = java.util.Arrays.copyOfRange(i, 32, 64);
+
+        var ki = keyData.add(new BigInteger(1, il)).mod(ECDSA_SECP256K1_CURVE.getN());
+
+        return new PrivateKeyECDSA(ki, new KeyParameter(ir));
+    }
+
+    /**
+     * Create an ECDSA key from seed.
+     *
+     * @param seed                      the seed bytes
+     * @return                          the new key
+     */
+    public static PrivateKey fromSeed(byte[] seed) {
+        var hmacSha512 = new HMac(new SHA512Digest());
+        hmacSha512.init(new KeyParameter("Bitcoin seed".getBytes(StandardCharsets.UTF_8)));
+        hmacSha512.update(seed, 0, seed.length);
+
+        var derivedState = new byte[hmacSha512.getMacSize()];
+        hmacSha512.doFinal(derivedState, 0);
+
+        return derivableKeyECDSA(derivedState);
+    }
+
+    /**
+     * Create a derived key.
+     *
+     * @param deriveData                data to derive the key
+     * @return                          the new key
+     */
+    static PrivateKeyECDSA derivableKeyECDSA(byte[] deriveData) {
+        var keyData = java.util.Arrays.copyOfRange(deriveData, 0, 32);
+        var chainCode = new KeyParameter(deriveData, 32, 32);
+
+        return new PrivateKeyECDSA(new BigInteger(1, keyData), chainCode);
     }
 
     @Override
@@ -136,6 +203,10 @@ public class PrivateKeyECDSA extends PrivateKey {
         var publicParams = new ECPublicKeyParameters(q, ECDSA_SECP256K1_DOMAIN);
         publicKey = new PublicKeyECDSA(publicParams.getQ().getEncoded(true));
         return publicKey;
+    }
+
+    public KeyParameter getChainCode() {
+        return chainCode;
     }
 
     @Override

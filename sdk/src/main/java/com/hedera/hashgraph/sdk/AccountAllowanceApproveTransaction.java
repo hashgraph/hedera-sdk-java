@@ -90,6 +90,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
                 getNftSerials(
                     allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
                     AccountId.fromProtobuf(allowanceProto.getSpender()),
+                    allowanceProto.hasDelegatingSpender() ? AccountId.fromProtobuf(allowanceProto.getDelegatingSpender()) : null,
                     TokenId.fromProtobuf(allowanceProto.getTokenId())
                 ).addAll(allowanceProto.getSerialNumbersList());
             }
@@ -228,23 +229,24 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
      * Return a list of NFT serial numbers.
      *
      * @param ownerAccountId            owner's account id
-     * @param spenderAccountId          spenders account id
+     * @param spenderAccountId          spender's account id
+     * @param delegatingSpender         delegating spender's account id
      * @param tokenId                   the token's id
      * @return list of NFT serial numbers
      */
-    private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, AccountId spenderAccountId, TokenId tokenId) {
+    private List<Long> getNftSerials(@Nullable AccountId ownerAccountId, AccountId spenderAccountId, @Nullable AccountId delegatingSpender, TokenId tokenId) {
         var key = ownerToString(ownerAccountId) + ":" + spenderAccountId;
         if (nftMap.containsKey(key)) {
             var innerMap = nftMap.get(key);
             if (innerMap.containsKey(tokenId)) {
                 return Objects.requireNonNull(nftAllowances.get(innerMap.get(tokenId)).serialNumbers);
             } else {
-                return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
+                return newNftSerials(ownerAccountId, spenderAccountId, delegatingSpender, tokenId, innerMap);
             }
         } else {
             Map<TokenId, Integer> innerMap = new HashMap<>();
             nftMap.put(key, innerMap);
-            return newNftSerials(ownerAccountId, spenderAccountId, tokenId, innerMap);
+            return newNftSerials(ownerAccountId, spenderAccountId, delegatingSpender, tokenId, innerMap);
         }
     }
 
@@ -253,6 +255,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
      *
      * @param ownerAccountId            owner's account id
      * @param spenderAccountId          spender's account id
+     * @param delegatingSpender         delegating spender's account id
      * @param tokenId                   the token's id
      * @param innerMap                  list of token id's and serial number records
      * @return list of NFT serial numbers
@@ -260,6 +263,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     private List<Long> newNftSerials(
         @Nullable AccountId ownerAccountId,
         AccountId spenderAccountId,
+        @Nullable AccountId delegatingSpender,
         TokenId tokenId,
         Map<TokenId, Integer> innerMap
     ) {
@@ -268,6 +272,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
             tokenId,
             ownerAccountId,
             spenderAccountId,
+            delegatingSpender,
             new ArrayList<>(),
             null
         );
@@ -276,7 +281,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     }
 
     /**
-     * @deprecated - Use {@link #approveTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     * @deprecated - Use {@link #approveTokenNftAllowance(NftId, AccountId, AccountId, AccountId)} instead
      *
      * @param nftId                     the nft id
      * @param spenderAccountId          the spender's account id
@@ -285,7 +290,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     @Deprecated
     public AccountAllowanceApproveTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
         requireNotFrozen();
-        getNftSerials(null, spenderAccountId, nftId.tokenId).add(nftId.serial);
+        getNftSerials(null, spenderAccountId, null, nftId.tokenId).add(nftId.serial);
         return this;
     }
 
@@ -301,10 +306,38 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         requireNotFrozen();
         nftAllowances.add(new TokenNftAllowance(
             tokenId,
-            null, spenderAccountId,
+            null,
+            spenderAccountId,
+            null,
             Collections.emptyList(),
             true
         ));
+        return this;
+    }
+
+    /**
+     * Approve the NFT allowance.
+     *
+     * @param nftId                     nft's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @param delegatingSpender         delegating spender's account id
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction approveTokenNftAllowance(
+        NftId nftId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId,
+        @Nullable AccountId delegatingSpender
+    ) {
+        requireNotFrozen();
+        Objects.requireNonNull(nftId);
+        getNftSerials(
+            ownerAccountId,
+            Objects.requireNonNull(spenderAccountId),
+            delegatingSpender,
+            nftId.tokenId
+        ).add(nftId.serial);
         return this;
     }
 
@@ -326,6 +359,7 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
         getNftSerials(
             ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
+            null,
             nftId.tokenId
         ).add(nftId.serial);
         return this;
@@ -349,8 +383,34 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
             Objects.requireNonNull(tokenId),
             ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
+            null,
             Collections.emptyList(),
             true
+        ));
+        return this;
+    }
+
+    /**
+     * Delete the token nft allowance on all serials.
+     *
+     * @param tokenId                   the token's id
+     * @param ownerAccountId            owner's account id
+     * @param spenderAccountId          spender's account id
+     * @return {@code this}
+     */
+    public AccountAllowanceApproveTransaction deleteTokenNftAllowanceAllSerials(
+        TokenId tokenId,
+        @Nullable AccountId ownerAccountId,
+        AccountId spenderAccountId
+    ) {
+        requireNotFrozen();
+        nftAllowances.add(new TokenNftAllowance(
+            Objects.requireNonNull(tokenId),
+            ownerAccountId,
+            Objects.requireNonNull(spenderAccountId),
+            null,
+            Collections.emptyList(),
+            false
         ));
         return this;
     }
