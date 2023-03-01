@@ -194,7 +194,7 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         Map<TokenId, Integer> innerMap
     ) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, new ArrayList<>(), null);
+        TokenNftAllowance newAllowance = new TokenNftAllowance(tokenId, ownerAccountId, spenderAccountId, null, new ArrayList<>(), null);
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }
@@ -221,6 +221,7 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
             Objects.requireNonNull(tokenId),
             ownerAccountId,
             Objects.requireNonNull(spenderAccountId),
+            null,
             Collections.emptyList(),
             allSerials
         ));
