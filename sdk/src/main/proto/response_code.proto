@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.base">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 /**
@@ -616,7 +617,7 @@ enum ResponseCodeEnum {
   INVALID_TOPIC_ID = 150;
 
   /**
-   * A provided admin key was invalid.
+   * A provided admin key was invalid. Verify the bytes for an Ed25519 public key are exactly 32 bytes; and the bytes for a compressed ECDSA(secp256k1) key are exactly 33 bytes, with the first byte either 0x02 or 0x03..
    */
   INVALID_ADMIN_KEY = 155;
 
@@ -1356,4 +1357,20 @@ enum ResponseCodeEnum {
   * the auto-renewal fees in a transaction.
   */
   INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES = 329;
+
+  /**
+  * A transaction's protobuf message includes unknown fields; could mean that a client 
+  * expects not-yet-released functionality to be available.
+  */
+  TRANSACTION_HAS_UNKNOWN_FIELDS = 330;
+
+  /**
+   * The account cannot be modified. Account's key is not set
+   */
+  ACCOUNT_IS_IMMUTABLE = 331;
+
+  /**
+   * An alias that is assigned to an account or contract cannot be assigned to another account or contract.
+   */
+  ALIAS_ALREADY_ASSIGNED = 332;
 }

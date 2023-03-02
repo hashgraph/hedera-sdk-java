@@ -43,6 +43,7 @@ public class TokenNftAllowance {
     public final AccountId ownerAccountId;
     @Nullable
     public final AccountId spenderAccountId;
+    @Nullable AccountId delegatingSpender;
     public final List<Long> serialNumbers;
     @Nullable
     public final Boolean allSerials;
@@ -53,6 +54,7 @@ public class TokenNftAllowance {
      * @param tokenId                   the token id
      * @param ownerAccountId            the grantor's account id
      * @param spenderAccountId          the spender's account id
+     * @param delegatingSpender         the delegating spender's account id
      * @param serialNumbers             the list of serial numbers
      * @param allSerials                grant for all serial's
      */
@@ -60,12 +62,14 @@ public class TokenNftAllowance {
         @Nullable TokenId tokenId,
         @Nullable AccountId ownerAccountId,
         @Nullable AccountId spenderAccountId,
+        @Nullable AccountId delegatingSpender,
         Collection<Long> serialNumbers,
         @Nullable Boolean allSerials
     ) {
         this.tokenId = tokenId;
         this.ownerAccountId = ownerAccountId;
         this.spenderAccountId = spenderAccountId;
+        this.delegatingSpender = delegatingSpender;
         this.serialNumbers = new ArrayList<>(serialNumbers);
         this.allSerials = allSerials;
     }
@@ -81,6 +85,7 @@ public class TokenNftAllowance {
             allowance.tokenId,
             allowance.ownerAccountId,
             allowance.spenderAccountId,
+            allowance.delegatingSpender,
             allowance.serialNumbers,
             allowance.allSerials
         );
@@ -97,6 +102,7 @@ public class TokenNftAllowance {
             allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
             allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
             allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+            allowanceProto.hasDelegatingSpender() ? AccountId.fromProtobuf(allowanceProto.getDelegatingSpender()) : null,
             allowanceProto.getSerialNumbersList(),
             allowanceProto.hasApprovedForAll() ? allowanceProto.getApprovedForAll().getValue() : null
         );
@@ -129,6 +135,9 @@ public class TokenNftAllowance {
         if (spenderAccountId != null) {
             spenderAccountId.validateChecksum(client);
         }
+        if (delegatingSpender != null) {
+            delegatingSpender.validateChecksum(client);
+        }
     }
 
     /**
@@ -146,6 +155,9 @@ public class TokenNftAllowance {
         }
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
+        }
+        if (delegatingSpender != null) {
+            builder.setDelegatingSpender(delegatingSpender.toProtobuf());
         }
         builder.addAllSerialNumbers(serialNumbers);
         if (allSerials != null) {
@@ -185,7 +197,8 @@ public class TokenNftAllowance {
         var stringHelper = MoreObjects.toStringHelper(this)
             .add("tokenId", tokenId)
             .add("ownerAccountId", ownerAccountId)
-            .add("spenderAccountId", spenderAccountId);
+            .add("spenderAccountId", spenderAccountId)
+            .add("delegatingSpender", delegatingSpender);
         if (allSerials != null) {
             stringHelper.add("allSerials", allSerials);
         } else {

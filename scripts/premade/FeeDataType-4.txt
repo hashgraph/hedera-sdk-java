@@ -1,8 +1,7 @@
-            default:
-                throw new IllegalStateException("(BUG) unhandled SubType (FeeDataType)");
-        }
+            default -> throw new IllegalStateException("(BUG) unhandled SubType (FeeDataType)");
+        };
     }
 
     @Override
     public String toString() {
-        switch (this) {
+        return switch (this) {

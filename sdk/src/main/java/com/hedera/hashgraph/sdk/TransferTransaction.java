@@ -422,6 +422,18 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
     }
 
     /**
+     * Add a non approved hbar transfer to an EVM address.
+     *
+     * @param evmAddress                the EVM address
+     * @param value                     the value
+     * @return                          the updated transaction
+     */
+    public TransferTransaction addHbarTransfer(EvmAddress evmAddress, Hbar value) {
+        AccountId accountId = AccountId.fromEvmAddress(evmAddress);
+        return doAddHbarTransfer(accountId, value, false);
+    }
+
+    /**
      * Add a non approved hbar transfer.
      *
      * @param accountId                 the account id

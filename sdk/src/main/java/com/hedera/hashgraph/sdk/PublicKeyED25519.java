@@ -118,6 +118,11 @@ class PublicKeyED25519 extends PublicKey {
     }
 
     @Override
+    public EvmAddress toEvmAddress() {
+        throw new IllegalStateException("unsupported operation on Ed25519PublicKey");
+    }
+
+    @Override
     public boolean equals( Object o) {
         if (this == o) {
             return true;

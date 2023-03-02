@@ -23,6 +23,7 @@ package proto;
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
 import "basic_types.proto";
@@ -79,6 +80,24 @@ message FixedFee {
  * value" includes both ℏ and units of fungible HTS tokens.) When the NFT sender does not receive
  * any fungible value, the ledger will assess the fallback fee, if present, to the new NFT owner.
  * Royalty fees can only be added to tokens of type type NON_FUNGIBLE_UNIQUE.
+ *
+ * **IMPORTANT:** Users must understand that native royalty fees are _strictly_ a convenience feature, 
+ * and that the network cannot enforce inescapable royalties on the exchange of a non-fractional NFT. 
+ * For example, if the counterparties agree to split their value transfer and NFT exchange into separate 
+ * transactions, the network cannot possibly intervene. (And note the counterparties could use a smart 
+ * contract to make this split transaction atomic if they do not trust each other.)
+ * 
+ * Counterparties that _do_ wish to respect creator royalties should follow the pattern the network 
+ * recognizes: The NFT sender and receiver should both sign a single `CryptoTransfer` that credits 
+ * the sender with all the fungible value the receiver is exchanging for the NFT.
+ * 
+ * Similarly, a marketplace using an approved spender account for an escrow transaction should credit 
+ * the account selling the NFT in the same `CryptoTransfer` that deducts fungible value from the buying 
+ * account. 
+ * 
+ * There is an [open HIP discussion](https://github.com/hashgraph/hedera-improvement-proposal/discussions/578)
+ * that proposes to broaden the class of transactions for which the network automatically collects
+ * royalties. If this interests or concerns you, please add your voice to that discussion.
  */
 message RoyaltyFee {
   /**

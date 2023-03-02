@@ -349,13 +349,11 @@ def generate_enum(original_name, cap_snake_name, comment_lines, enum_name, tabs_
 
 
 def generate_valueOf(original_name, cap_snake_name, tabs_count):
-    return tabs(tabs_count) + "case " + original_name + ":\n" + \
-        tabs(tabs_count + 1) + "return " + cap_snake_name + ";\n"
+    return tabs(tabs_count) + "case " + original_name + " -> " + cap_snake_name + ";\n"
 
 
 def generate_toString(original_name, cap_snake_name, tabs_count):
-    return tabs(tabs_count) + "case " + cap_snake_name + ":\n" + \
-        tabs(tabs_count + 1) + "return \"" + cap_snake_name + "\";\n"
+    return tabs(tabs_count) + "case " + cap_snake_name + " -> " + "\"" + cap_snake_name + "\";\n"
 
 
 

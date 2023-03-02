@@ -618,7 +618,7 @@ public enum Status {
     INVALID_TOPIC_ID(ResponseCodeEnum.INVALID_TOPIC_ID),
 
     /**
-     * A provided admin key was invalid.
+     * A provided admin key was invalid. Verify the bytes for an Ed25519 public key are exactly 32 bytes; and the bytes for a compressed ECDSA(secp256k1) key are exactly 33 bytes, with the first byte either 0x02 or 0x03..
      */
     INVALID_ADMIN_KEY(ResponseCodeEnum.INVALID_ADMIN_KEY),
 
@@ -1508,7 +1508,23 @@ public enum Status {
      * The combined balances of a contract and its auto-renew account (if any) or balance of an account did not cover
      * the auto-renewal fees in a transaction.
      */
-    INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES);
+    INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES(ResponseCodeEnum.INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES),
+
+    /**
+     * A transaction's protobuf message includes unknown fields; could mean that a client
+     * expects not-yet-released functionality to be available.
+     */
+    TRANSACTION_HAS_UNKNOWN_FIELDS(ResponseCodeEnum.TRANSACTION_HAS_UNKNOWN_FIELDS),
+
+    /**
+     * The account cannot be modified. Account's key is not set
+     */
+    ACCOUNT_IS_IMMUTABLE(ResponseCodeEnum.ACCOUNT_IS_IMMUTABLE),
+
+    /**
+     * An alias that is assigned to an account or contract cannot be assigned to another account or contract.
+     */
+    ALIAS_ALREADY_ASSIGNED(ResponseCodeEnum.ALIAS_ALREADY_ASSIGNED);
 
     final ResponseCodeEnum code;
 
@@ -1517,594 +1533,303 @@ public enum Status {
     }
 
     static Status valueOf(ResponseCodeEnum code) {
-        switch (code) {
-            case OK:
-                return OK;
-            case INVALID_TRANSACTION:
-                return INVALID_TRANSACTION;
-            case PAYER_ACCOUNT_NOT_FOUND:
-                return PAYER_ACCOUNT_NOT_FOUND;
-            case INVALID_NODE_ACCOUNT:
-                return INVALID_NODE_ACCOUNT;
-            case TRANSACTION_EXPIRED:
-                return TRANSACTION_EXPIRED;
-            case INVALID_TRANSACTION_START:
-                return INVALID_TRANSACTION_START;
-            case INVALID_TRANSACTION_DURATION:
-                return INVALID_TRANSACTION_DURATION;
-            case INVALID_SIGNATURE:
-                return INVALID_SIGNATURE;
-            case MEMO_TOO_LONG:
-                return MEMO_TOO_LONG;
-            case INSUFFICIENT_TX_FEE:
-                return INSUFFICIENT_TX_FEE;
-            case INSUFFICIENT_PAYER_BALANCE:
-                return INSUFFICIENT_PAYER_BALANCE;
-            case DUPLICATE_TRANSACTION:
-                return DUPLICATE_TRANSACTION;
-            case BUSY:
-                return BUSY;
-            case NOT_SUPPORTED:
-                return NOT_SUPPORTED;
-            case INVALID_FILE_ID:
-                return INVALID_FILE_ID;
-            case INVALID_ACCOUNT_ID:
-                return INVALID_ACCOUNT_ID;
-            case INVALID_CONTRACT_ID:
-                return INVALID_CONTRACT_ID;
-            case INVALID_TRANSACTION_ID:
-                return INVALID_TRANSACTION_ID;
-            case RECEIPT_NOT_FOUND:
-                return RECEIPT_NOT_FOUND;
-            case RECORD_NOT_FOUND:
-                return RECORD_NOT_FOUND;
-            case INVALID_SOLIDITY_ID:
-                return INVALID_SOLIDITY_ID;
-            case UNKNOWN:
-                return UNKNOWN;
-            case SUCCESS:
-                return SUCCESS;
-            case FAIL_INVALID:
-                return FAIL_INVALID;
-            case FAIL_FEE:
-                return FAIL_FEE;
-            case FAIL_BALANCE:
-                return FAIL_BALANCE;
-            case KEY_REQUIRED:
-                return KEY_REQUIRED;
-            case BAD_ENCODING:
-                return BAD_ENCODING;
-            case INSUFFICIENT_ACCOUNT_BALANCE:
-                return INSUFFICIENT_ACCOUNT_BALANCE;
-            case INVALID_SOLIDITY_ADDRESS:
-                return INVALID_SOLIDITY_ADDRESS;
-            case INSUFFICIENT_GAS:
-                return INSUFFICIENT_GAS;
-            case CONTRACT_SIZE_LIMIT_EXCEEDED:
-                return CONTRACT_SIZE_LIMIT_EXCEEDED;
-            case LOCAL_CALL_MODIFICATION_EXCEPTION:
-                return LOCAL_CALL_MODIFICATION_EXCEPTION;
-            case CONTRACT_REVERT_EXECUTED:
-                return CONTRACT_REVERT_EXECUTED;
-            case CONTRACT_EXECUTION_EXCEPTION:
-                return CONTRACT_EXECUTION_EXCEPTION;
-            case INVALID_RECEIVING_NODE_ACCOUNT:
-                return INVALID_RECEIVING_NODE_ACCOUNT;
-            case MISSING_QUERY_HEADER:
-                return MISSING_QUERY_HEADER;
-            case ACCOUNT_UPDATE_FAILED:
-                return ACCOUNT_UPDATE_FAILED;
-            case INVALID_KEY_ENCODING:
-                return INVALID_KEY_ENCODING;
-            case NULL_SOLIDITY_ADDRESS:
-                return NULL_SOLIDITY_ADDRESS;
-            case CONTRACT_UPDATE_FAILED:
-                return CONTRACT_UPDATE_FAILED;
-            case INVALID_QUERY_HEADER:
-                return INVALID_QUERY_HEADER;
-            case INVALID_FEE_SUBMITTED:
-                return INVALID_FEE_SUBMITTED;
-            case INVALID_PAYER_SIGNATURE:
-                return INVALID_PAYER_SIGNATURE;
-            case KEY_NOT_PROVIDED:
-                return KEY_NOT_PROVIDED;
-            case INVALID_EXPIRATION_TIME:
-                return INVALID_EXPIRATION_TIME;
-            case NO_WACL_KEY:
-                return NO_WACL_KEY;
-            case FILE_CONTENT_EMPTY:
-                return FILE_CONTENT_EMPTY;
-            case INVALID_ACCOUNT_AMOUNTS:
-                return INVALID_ACCOUNT_AMOUNTS;
-            case EMPTY_TRANSACTION_BODY:
-                return EMPTY_TRANSACTION_BODY;
-            case INVALID_TRANSACTION_BODY:
-                return INVALID_TRANSACTION_BODY;
-            case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY:
-                return INVALID_SIGNATURE_TYPE_MISMATCHING_KEY;
-            case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY:
-                return INVALID_SIGNATURE_COUNT_MISMATCHING_KEY;
-            case EMPTY_LIVE_HASH_BODY:
-                return EMPTY_LIVE_HASH_BODY;
-            case EMPTY_LIVE_HASH:
-                return EMPTY_LIVE_HASH;
-            case EMPTY_LIVE_HASH_KEYS:
-                return EMPTY_LIVE_HASH_KEYS;
-            case INVALID_LIVE_HASH_SIZE:
-                return INVALID_LIVE_HASH_SIZE;
-            case EMPTY_QUERY_BODY:
-                return EMPTY_QUERY_BODY;
-            case EMPTY_LIVE_HASH_QUERY:
-                return EMPTY_LIVE_HASH_QUERY;
-            case LIVE_HASH_NOT_FOUND:
-                return LIVE_HASH_NOT_FOUND;
-            case ACCOUNT_ID_DOES_NOT_EXIST:
-                return ACCOUNT_ID_DOES_NOT_EXIST;
-            case LIVE_HASH_ALREADY_EXISTS:
-                return LIVE_HASH_ALREADY_EXISTS;
-            case INVALID_FILE_WACL:
-                return INVALID_FILE_WACL;
-            case SERIALIZATION_FAILED:
-                return SERIALIZATION_FAILED;
-            case TRANSACTION_OVERSIZE:
-                return TRANSACTION_OVERSIZE;
-            case TRANSACTION_TOO_MANY_LAYERS:
-                return TRANSACTION_TOO_MANY_LAYERS;
-            case CONTRACT_DELETED:
-                return CONTRACT_DELETED;
-            case PLATFORM_NOT_ACTIVE:
-                return PLATFORM_NOT_ACTIVE;
-            case KEY_PREFIX_MISMATCH:
-                return KEY_PREFIX_MISMATCH;
-            case PLATFORM_TRANSACTION_NOT_CREATED:
-                return PLATFORM_TRANSACTION_NOT_CREATED;
-            case INVALID_RENEWAL_PERIOD:
-                return INVALID_RENEWAL_PERIOD;
-            case INVALID_PAYER_ACCOUNT_ID:
-                return INVALID_PAYER_ACCOUNT_ID;
-            case ACCOUNT_DELETED:
-                return ACCOUNT_DELETED;
-            case FILE_DELETED:
-                return FILE_DELETED;
-            case ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS:
-                return ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS;
-            case SETTING_NEGATIVE_ACCOUNT_BALANCE:
-                return SETTING_NEGATIVE_ACCOUNT_BALANCE;
-            case OBTAINER_REQUIRED:
-                return OBTAINER_REQUIRED;
-            case OBTAINER_SAME_CONTRACT_ID:
-                return OBTAINER_SAME_CONTRACT_ID;
-            case OBTAINER_DOES_NOT_EXIST:
-                return OBTAINER_DOES_NOT_EXIST;
-            case MODIFYING_IMMUTABLE_CONTRACT:
-                return MODIFYING_IMMUTABLE_CONTRACT;
-            case FILE_SYSTEM_EXCEPTION:
-                return FILE_SYSTEM_EXCEPTION;
-            case AUTORENEW_DURATION_NOT_IN_RANGE:
-                return AUTORENEW_DURATION_NOT_IN_RANGE;
-            case ERROR_DECODING_BYTESTRING:
-                return ERROR_DECODING_BYTESTRING;
-            case CONTRACT_FILE_EMPTY:
-                return CONTRACT_FILE_EMPTY;
-            case CONTRACT_BYTECODE_EMPTY:
-                return CONTRACT_BYTECODE_EMPTY;
-            case INVALID_INITIAL_BALANCE:
-                return INVALID_INITIAL_BALANCE;
-            case INVALID_RECEIVE_RECORD_THRESHOLD:
-                return INVALID_RECEIVE_RECORD_THRESHOLD;
-            case INVALID_SEND_RECORD_THRESHOLD:
-                return INVALID_SEND_RECORD_THRESHOLD;
-            case ACCOUNT_IS_NOT_GENESIS_ACCOUNT:
-                return ACCOUNT_IS_NOT_GENESIS_ACCOUNT;
-            case PAYER_ACCOUNT_UNAUTHORIZED:
-                return PAYER_ACCOUNT_UNAUTHORIZED;
-            case INVALID_FREEZE_TRANSACTION_BODY:
-                return INVALID_FREEZE_TRANSACTION_BODY;
-            case FREEZE_TRANSACTION_BODY_NOT_FOUND:
-                return FREEZE_TRANSACTION_BODY_NOT_FOUND;
-            case TRANSFER_LIST_SIZE_LIMIT_EXCEEDED:
-                return TRANSFER_LIST_SIZE_LIMIT_EXCEEDED;
-            case RESULT_SIZE_LIMIT_EXCEEDED:
-                return RESULT_SIZE_LIMIT_EXCEEDED;
-            case NOT_SPECIAL_ACCOUNT:
-                return NOT_SPECIAL_ACCOUNT;
-            case CONTRACT_NEGATIVE_GAS:
-                return CONTRACT_NEGATIVE_GAS;
-            case CONTRACT_NEGATIVE_VALUE:
-                return CONTRACT_NEGATIVE_VALUE;
-            case INVALID_FEE_FILE:
-                return INVALID_FEE_FILE;
-            case INVALID_EXCHANGE_RATE_FILE:
-                return INVALID_EXCHANGE_RATE_FILE;
-            case INSUFFICIENT_LOCAL_CALL_GAS:
-                return INSUFFICIENT_LOCAL_CALL_GAS;
-            case ENTITY_NOT_ALLOWED_TO_DELETE:
-                return ENTITY_NOT_ALLOWED_TO_DELETE;
-            case AUTHORIZATION_FAILED:
-                return AUTHORIZATION_FAILED;
-            case FILE_UPLOADED_PROTO_INVALID:
-                return FILE_UPLOADED_PROTO_INVALID;
-            case FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK:
-                return FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK;
-            case FEE_SCHEDULE_FILE_PART_UPLOADED:
-                return FEE_SCHEDULE_FILE_PART_UPLOADED;
-            case EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED:
-                return EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED;
-            case MAX_CONTRACT_STORAGE_EXCEEDED:
-                return MAX_CONTRACT_STORAGE_EXCEEDED;
-            case TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT:
-                return TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT;
-            case TOTAL_LEDGER_BALANCE_INVALID:
-                return TOTAL_LEDGER_BALANCE_INVALID;
-            case EXPIRATION_REDUCTION_NOT_ALLOWED:
-                return EXPIRATION_REDUCTION_NOT_ALLOWED;
-            case MAX_GAS_LIMIT_EXCEEDED:
-                return MAX_GAS_LIMIT_EXCEEDED;
-            case MAX_FILE_SIZE_EXCEEDED:
-                return MAX_FILE_SIZE_EXCEEDED;
-            case RECEIVER_SIG_REQUIRED:
-                return RECEIVER_SIG_REQUIRED;
-            case INVALID_TOPIC_ID:
-                return INVALID_TOPIC_ID;
-            case INVALID_ADMIN_KEY:
-                return INVALID_ADMIN_KEY;
-            case INVALID_SUBMIT_KEY:
-                return INVALID_SUBMIT_KEY;
-            case UNAUTHORIZED:
-                return UNAUTHORIZED;
-            case INVALID_TOPIC_MESSAGE:
-                return INVALID_TOPIC_MESSAGE;
-            case INVALID_AUTORENEW_ACCOUNT:
-                return INVALID_AUTORENEW_ACCOUNT;
-            case AUTORENEW_ACCOUNT_NOT_ALLOWED:
-                return AUTORENEW_ACCOUNT_NOT_ALLOWED;
-            case TOPIC_EXPIRED:
-                return TOPIC_EXPIRED;
-            case INVALID_CHUNK_NUMBER:
-                return INVALID_CHUNK_NUMBER;
-            case INVALID_CHUNK_TRANSACTION_ID:
-                return INVALID_CHUNK_TRANSACTION_ID;
-            case ACCOUNT_FROZEN_FOR_TOKEN:
-                return ACCOUNT_FROZEN_FOR_TOKEN;
-            case TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED:
-                return TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED;
-            case INVALID_TOKEN_ID:
-                return INVALID_TOKEN_ID;
-            case INVALID_TOKEN_DECIMALS:
-                return INVALID_TOKEN_DECIMALS;
-            case INVALID_TOKEN_INITIAL_SUPPLY:
-                return INVALID_TOKEN_INITIAL_SUPPLY;
-            case INVALID_TREASURY_ACCOUNT_FOR_TOKEN:
-                return INVALID_TREASURY_ACCOUNT_FOR_TOKEN;
-            case INVALID_TOKEN_SYMBOL:
-                return INVALID_TOKEN_SYMBOL;
-            case TOKEN_HAS_NO_FREEZE_KEY:
-                return TOKEN_HAS_NO_FREEZE_KEY;
-            case TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN:
-                return TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN;
-            case MISSING_TOKEN_SYMBOL:
-                return MISSING_TOKEN_SYMBOL;
-            case TOKEN_SYMBOL_TOO_LONG:
-                return TOKEN_SYMBOL_TOO_LONG;
-            case ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN:
-                return ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN;
-            case TOKEN_HAS_NO_KYC_KEY:
-                return TOKEN_HAS_NO_KYC_KEY;
-            case INSUFFICIENT_TOKEN_BALANCE:
-                return INSUFFICIENT_TOKEN_BALANCE;
-            case TOKEN_WAS_DELETED:
-                return TOKEN_WAS_DELETED;
-            case TOKEN_HAS_NO_SUPPLY_KEY:
-                return TOKEN_HAS_NO_SUPPLY_KEY;
-            case TOKEN_HAS_NO_WIPE_KEY:
-                return TOKEN_HAS_NO_WIPE_KEY;
-            case INVALID_TOKEN_MINT_AMOUNT:
-                return INVALID_TOKEN_MINT_AMOUNT;
-            case INVALID_TOKEN_BURN_AMOUNT:
-                return INVALID_TOKEN_BURN_AMOUNT;
-            case TOKEN_NOT_ASSOCIATED_TO_ACCOUNT:
-                return TOKEN_NOT_ASSOCIATED_TO_ACCOUNT;
-            case CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT:
-                return CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT;
-            case INVALID_KYC_KEY:
-                return INVALID_KYC_KEY;
-            case INVALID_WIPE_KEY:
-                return INVALID_WIPE_KEY;
-            case INVALID_FREEZE_KEY:
-                return INVALID_FREEZE_KEY;
-            case INVALID_SUPPLY_KEY:
-                return INVALID_SUPPLY_KEY;
-            case MISSING_TOKEN_NAME:
-                return MISSING_TOKEN_NAME;
-            case TOKEN_NAME_TOO_LONG:
-                return TOKEN_NAME_TOO_LONG;
-            case INVALID_WIPING_AMOUNT:
-                return INVALID_WIPING_AMOUNT;
-            case TOKEN_IS_IMMUTABLE:
-                return TOKEN_IS_IMMUTABLE;
-            case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT:
-                return TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT;
-            case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES:
-                return TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES;
-            case ACCOUNT_IS_TREASURY:
-                return ACCOUNT_IS_TREASURY;
-            case TOKEN_ID_REPEATED_IN_TOKEN_LIST:
-                return TOKEN_ID_REPEATED_IN_TOKEN_LIST;
-            case TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED:
-                return TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED;
-            case EMPTY_TOKEN_TRANSFER_BODY:
-                return EMPTY_TOKEN_TRANSFER_BODY;
-            case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS:
-                return EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS;
-            case INVALID_SCHEDULE_ID:
-                return INVALID_SCHEDULE_ID;
-            case SCHEDULE_IS_IMMUTABLE:
-                return SCHEDULE_IS_IMMUTABLE;
-            case INVALID_SCHEDULE_PAYER_ID:
-                return INVALID_SCHEDULE_PAYER_ID;
-            case INVALID_SCHEDULE_ACCOUNT_ID:
-                return INVALID_SCHEDULE_ACCOUNT_ID;
-            case NO_NEW_VALID_SIGNATURES:
-                return NO_NEW_VALID_SIGNATURES;
-            case UNRESOLVABLE_REQUIRED_SIGNERS:
-                return UNRESOLVABLE_REQUIRED_SIGNERS;
-            case SCHEDULED_TRANSACTION_NOT_IN_WHITELIST:
-                return SCHEDULED_TRANSACTION_NOT_IN_WHITELIST;
-            case SOME_SIGNATURES_WERE_INVALID:
-                return SOME_SIGNATURES_WERE_INVALID;
-            case TRANSACTION_ID_FIELD_NOT_ALLOWED:
-                return TRANSACTION_ID_FIELD_NOT_ALLOWED;
-            case IDENTICAL_SCHEDULE_ALREADY_CREATED:
-                return IDENTICAL_SCHEDULE_ALREADY_CREATED;
-            case INVALID_ZERO_BYTE_IN_STRING:
-                return INVALID_ZERO_BYTE_IN_STRING;
-            case SCHEDULE_ALREADY_DELETED:
-                return SCHEDULE_ALREADY_DELETED;
-            case SCHEDULE_ALREADY_EXECUTED:
-                return SCHEDULE_ALREADY_EXECUTED;
-            case MESSAGE_SIZE_TOO_LARGE:
-                return MESSAGE_SIZE_TOO_LARGE;
-            case OPERATION_REPEATED_IN_BUCKET_GROUPS:
-                return OPERATION_REPEATED_IN_BUCKET_GROUPS;
-            case BUCKET_CAPACITY_OVERFLOW:
-                return BUCKET_CAPACITY_OVERFLOW;
-            case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION:
-                return NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION;
-            case BUCKET_HAS_NO_THROTTLE_GROUPS:
-                return BUCKET_HAS_NO_THROTTLE_GROUPS;
-            case THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC:
-                return THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC;
-            case SUCCESS_BUT_MISSING_EXPECTED_OPERATION:
-                return SUCCESS_BUT_MISSING_EXPECTED_OPERATION;
-            case UNPARSEABLE_THROTTLE_DEFINITIONS:
-                return UNPARSEABLE_THROTTLE_DEFINITIONS;
-            case INVALID_THROTTLE_DEFINITIONS:
-                return INVALID_THROTTLE_DEFINITIONS;
-            case ACCOUNT_EXPIRED_AND_PENDING_REMOVAL:
-                return ACCOUNT_EXPIRED_AND_PENDING_REMOVAL;
-            case INVALID_TOKEN_MAX_SUPPLY:
-                return INVALID_TOKEN_MAX_SUPPLY;
-            case INVALID_TOKEN_NFT_SERIAL_NUMBER:
-                return INVALID_TOKEN_NFT_SERIAL_NUMBER;
-            case INVALID_NFT_ID:
-                return INVALID_NFT_ID;
-            case METADATA_TOO_LONG:
-                return METADATA_TOO_LONG;
-            case BATCH_SIZE_LIMIT_EXCEEDED:
-                return BATCH_SIZE_LIMIT_EXCEEDED;
-            case INVALID_QUERY_RANGE:
-                return INVALID_QUERY_RANGE;
-            case FRACTION_DIVIDES_BY_ZERO:
-                return FRACTION_DIVIDES_BY_ZERO;
-            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE:
-                return INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE;
-            case CUSTOM_FEES_LIST_TOO_LONG:
-                return CUSTOM_FEES_LIST_TOO_LONG;
-            case INVALID_CUSTOM_FEE_COLLECTOR:
-                return INVALID_CUSTOM_FEE_COLLECTOR;
-            case INVALID_TOKEN_ID_IN_CUSTOM_FEES:
-                return INVALID_TOKEN_ID_IN_CUSTOM_FEES;
-            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR:
-                return TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR;
-            case TOKEN_MAX_SUPPLY_REACHED:
-                return TOKEN_MAX_SUPPLY_REACHED;
-            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO:
-                return SENDER_DOES_NOT_OWN_NFT_SERIAL_NO;
-            case CUSTOM_FEE_NOT_FULLY_SPECIFIED:
-                return CUSTOM_FEE_NOT_FULLY_SPECIFIED;
-            case CUSTOM_FEE_MUST_BE_POSITIVE:
-                return CUSTOM_FEE_MUST_BE_POSITIVE;
-            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY:
-                return TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
-            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE:
-                return CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
-            case ROYALTY_FRACTION_CANNOT_EXCEED_ONE:
-                return ROYALTY_FRACTION_CANNOT_EXCEED_ONE;
-            case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT:
-                return FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
-            case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES:
-                return CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES;
-            case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON:
-                return CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON;
-            case CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON:
-                return CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
-            case INVALID_CUSTOM_FEE_SCHEDULE_KEY:
-                return INVALID_CUSTOM_FEE_SCHEDULE_KEY;
-            case INVALID_TOKEN_MINT_METADATA:
-                return INVALID_TOKEN_MINT_METADATA;
-            case INVALID_TOKEN_BURN_METADATA:
-                return INVALID_TOKEN_BURN_METADATA;
-            case CURRENT_TREASURY_STILL_OWNS_NFTS:
-                return CURRENT_TREASURY_STILL_OWNS_NFTS;
-            case ACCOUNT_STILL_OWNS_NFTS:
-                return ACCOUNT_STILL_OWNS_NFTS;
-            case TREASURY_MUST_OWN_BURNED_NFT:
-                return TREASURY_MUST_OWN_BURNED_NFT;
-            case ACCOUNT_DOES_NOT_OWN_WIPED_NFT:
-                return ACCOUNT_DOES_NOT_OWN_WIPED_NFT;
-            case ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON:
-                return ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
-            case MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED:
-                return MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED;
-            case PAYER_ACCOUNT_DELETED:
-                return PAYER_ACCOUNT_DELETED;
-            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH:
-                return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH;
-            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS:
-                return CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS;
-            case INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE:
-                return INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE;
-            case SERIAL_NUMBER_LIMIT_REACHED:
-                return SERIAL_NUMBER_LIMIT_REACHED;
-            case CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE:
-                return CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE;
-            case NO_REMAINING_AUTOMATIC_ASSOCIATIONS:
-                return NO_REMAINING_AUTOMATIC_ASSOCIATIONS;
-            case EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT:
-                return EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT;
-            case REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT:
-                return REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT;
-            case TOKEN_IS_PAUSED:
-                return TOKEN_IS_PAUSED;
-            case TOKEN_HAS_NO_PAUSE_KEY:
-                return TOKEN_HAS_NO_PAUSE_KEY;
-            case INVALID_PAUSE_KEY:
-                return INVALID_PAUSE_KEY;
-            case FREEZE_UPDATE_FILE_DOES_NOT_EXIST:
-                return FREEZE_UPDATE_FILE_DOES_NOT_EXIST;
-            case FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH:
-                return FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH;
-            case NO_UPGRADE_HAS_BEEN_PREPARED:
-                return NO_UPGRADE_HAS_BEEN_PREPARED;
-            case NO_FREEZE_IS_SCHEDULED:
-                return NO_FREEZE_IS_SCHEDULED;
-            case UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE:
-                return UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE;
-            case FREEZE_START_TIME_MUST_BE_FUTURE:
-                return FREEZE_START_TIME_MUST_BE_FUTURE;
-            case PREPARED_UPDATE_FILE_IS_IMMUTABLE:
-                return PREPARED_UPDATE_FILE_IS_IMMUTABLE;
-            case FREEZE_ALREADY_SCHEDULED:
-                return FREEZE_ALREADY_SCHEDULED;
-            case FREEZE_UPGRADE_IN_PROGRESS:
-                return FREEZE_UPGRADE_IN_PROGRESS;
-            case UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED:
-                return UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED;
-            case UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED:
-                return UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED;
-            case CONSENSUS_GAS_EXHAUSTED:
-                return CONSENSUS_GAS_EXHAUSTED;
-            case REVERTED_SUCCESS:
-                return REVERTED_SUCCESS;
-            case MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED:
-                return MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED;
-            case INVALID_ALIAS_KEY:
-                return INVALID_ALIAS_KEY;
-            case UNEXPECTED_TOKEN_DECIMALS:
-                return UNEXPECTED_TOKEN_DECIMALS;
-            case INVALID_PROXY_ACCOUNT_ID:
-                return INVALID_PROXY_ACCOUNT_ID;
-            case INVALID_TRANSFER_ACCOUNT_ID:
-                return INVALID_TRANSFER_ACCOUNT_ID;
-            case INVALID_FEE_COLLECTOR_ACCOUNT_ID:
-                return INVALID_FEE_COLLECTOR_ACCOUNT_ID;
-            case ALIAS_IS_IMMUTABLE:
-                return ALIAS_IS_IMMUTABLE;
-            case SPENDER_ACCOUNT_SAME_AS_OWNER:
-                return SPENDER_ACCOUNT_SAME_AS_OWNER;
-            case AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY:
-                return AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY;
-            case NEGATIVE_ALLOWANCE_AMOUNT:
-                return NEGATIVE_ALLOWANCE_AMOUNT;
-            case CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON:
-                return CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON;
-            case SPENDER_DOES_NOT_HAVE_ALLOWANCE:
-                return SPENDER_DOES_NOT_HAVE_ALLOWANCE;
-            case AMOUNT_EXCEEDS_ALLOWANCE:
-                return AMOUNT_EXCEEDS_ALLOWANCE;
-            case MAX_ALLOWANCES_EXCEEDED:
-                return MAX_ALLOWANCES_EXCEEDED;
-            case EMPTY_ALLOWANCES:
-                return EMPTY_ALLOWANCES;
-            case SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES:
-                return SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES;
-            case REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES:
-                return REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES;
-            case FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES:
-                return FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
-            case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES:
-                return NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
-            case INVALID_ALLOWANCE_OWNER_ID:
-                return INVALID_ALLOWANCE_OWNER_ID;
-            case INVALID_ALLOWANCE_SPENDER_ID:
-                return INVALID_ALLOWANCE_SPENDER_ID;
-            case REPEATED_ALLOWANCES_TO_DELETE:
-                return REPEATED_ALLOWANCES_TO_DELETE;
-            case INVALID_DELEGATING_SPENDER:
-                return INVALID_DELEGATING_SPENDER;
-            case DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL:
-                return DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL;
-            case DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL:
-                return DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL;
-            case SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE:
-                return SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE;
-            case SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME:
-                return SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME;
-            case SCHEDULE_FUTURE_THROTTLE_EXCEEDED:
-                return SCHEDULE_FUTURE_THROTTLE_EXCEEDED;
-            case SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED:
-                return SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED;
-            case INVALID_ETHEREUM_TRANSACTION:
-                return INVALID_ETHEREUM_TRANSACTION;
-            case WRONG_CHAIN_ID:
-                return WRONG_CHAIN_ID;
-            case WRONG_NONCE:
-                return WRONG_NONCE;
-            case ACCESS_LIST_UNSUPPORTED:
-                return ACCESS_LIST_UNSUPPORTED;
-            case SCHEDULE_PENDING_EXPIRATION:
-                return SCHEDULE_PENDING_EXPIRATION;
-            case CONTRACT_IS_TOKEN_TREASURY:
-                return CONTRACT_IS_TOKEN_TREASURY;
-            case CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES:
-                return CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES;
-            case CONTRACT_EXPIRED_AND_PENDING_REMOVAL:
-                return CONTRACT_EXPIRED_AND_PENDING_REMOVAL;
-            case CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT:
-                return CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT;
-            case PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION:
-                return PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION;
-            case PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED:
-                return PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED;
-            case SELF_STAKING_IS_NOT_ALLOWED:
-                return SELF_STAKING_IS_NOT_ALLOWED;
-            case INVALID_STAKING_ID:
-                return INVALID_STAKING_ID;
-            case STAKING_NOT_ENABLED:
-                return STAKING_NOT_ENABLED;
-            case INVALID_PRNG_RANGE:
-                return INVALID_PRNG_RANGE;
-            case MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED:
-                return MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED;
-            case INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE:
-                return INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE;
-            case INSUFFICIENT_BALANCES_FOR_STORAGE_RENT:
-                return INSUFFICIENT_BALANCES_FOR_STORAGE_RENT;
-            case MAX_CHILD_RECORDS_EXCEEDED:
-                return MAX_CHILD_RECORDS_EXCEEDED;
-            case INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES:
-                return INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES;
-            case UNRECOGNIZED:
+        return switch (code) {
+            case OK -> OK;
+            case INVALID_TRANSACTION -> INVALID_TRANSACTION;
+            case PAYER_ACCOUNT_NOT_FOUND -> PAYER_ACCOUNT_NOT_FOUND;
+            case INVALID_NODE_ACCOUNT -> INVALID_NODE_ACCOUNT;
+            case TRANSACTION_EXPIRED -> TRANSACTION_EXPIRED;
+            case INVALID_TRANSACTION_START -> INVALID_TRANSACTION_START;
+            case INVALID_TRANSACTION_DURATION -> INVALID_TRANSACTION_DURATION;
+            case INVALID_SIGNATURE -> INVALID_SIGNATURE;
+            case MEMO_TOO_LONG -> MEMO_TOO_LONG;
+            case INSUFFICIENT_TX_FEE -> INSUFFICIENT_TX_FEE;
+            case INSUFFICIENT_PAYER_BALANCE -> INSUFFICIENT_PAYER_BALANCE;
+            case DUPLICATE_TRANSACTION -> DUPLICATE_TRANSACTION;
+            case BUSY -> BUSY;
+            case NOT_SUPPORTED -> NOT_SUPPORTED;
+            case INVALID_FILE_ID -> INVALID_FILE_ID;
+            case INVALID_ACCOUNT_ID -> INVALID_ACCOUNT_ID;
+            case INVALID_CONTRACT_ID -> INVALID_CONTRACT_ID;
+            case INVALID_TRANSACTION_ID -> INVALID_TRANSACTION_ID;
+            case RECEIPT_NOT_FOUND -> RECEIPT_NOT_FOUND;
+            case RECORD_NOT_FOUND -> RECORD_NOT_FOUND;
+            case INVALID_SOLIDITY_ID -> INVALID_SOLIDITY_ID;
+            case UNKNOWN -> UNKNOWN;
+            case SUCCESS -> SUCCESS;
+            case FAIL_INVALID -> FAIL_INVALID;
+            case FAIL_FEE -> FAIL_FEE;
+            case FAIL_BALANCE -> FAIL_BALANCE;
+            case KEY_REQUIRED -> KEY_REQUIRED;
+            case BAD_ENCODING -> BAD_ENCODING;
+            case INSUFFICIENT_ACCOUNT_BALANCE -> INSUFFICIENT_ACCOUNT_BALANCE;
+            case INVALID_SOLIDITY_ADDRESS -> INVALID_SOLIDITY_ADDRESS;
+            case INSUFFICIENT_GAS -> INSUFFICIENT_GAS;
+            case CONTRACT_SIZE_LIMIT_EXCEEDED -> CONTRACT_SIZE_LIMIT_EXCEEDED;
+            case LOCAL_CALL_MODIFICATION_EXCEPTION -> LOCAL_CALL_MODIFICATION_EXCEPTION;
+            case CONTRACT_REVERT_EXECUTED -> CONTRACT_REVERT_EXECUTED;
+            case CONTRACT_EXECUTION_EXCEPTION -> CONTRACT_EXECUTION_EXCEPTION;
+            case INVALID_RECEIVING_NODE_ACCOUNT -> INVALID_RECEIVING_NODE_ACCOUNT;
+            case MISSING_QUERY_HEADER -> MISSING_QUERY_HEADER;
+            case ACCOUNT_UPDATE_FAILED -> ACCOUNT_UPDATE_FAILED;
+            case INVALID_KEY_ENCODING -> INVALID_KEY_ENCODING;
+            case NULL_SOLIDITY_ADDRESS -> NULL_SOLIDITY_ADDRESS;
+            case CONTRACT_UPDATE_FAILED -> CONTRACT_UPDATE_FAILED;
+            case INVALID_QUERY_HEADER -> INVALID_QUERY_HEADER;
+            case INVALID_FEE_SUBMITTED -> INVALID_FEE_SUBMITTED;
+            case INVALID_PAYER_SIGNATURE -> INVALID_PAYER_SIGNATURE;
+            case KEY_NOT_PROVIDED -> KEY_NOT_PROVIDED;
+            case INVALID_EXPIRATION_TIME -> INVALID_EXPIRATION_TIME;
+            case NO_WACL_KEY -> NO_WACL_KEY;
+            case FILE_CONTENT_EMPTY -> FILE_CONTENT_EMPTY;
+            case INVALID_ACCOUNT_AMOUNTS -> INVALID_ACCOUNT_AMOUNTS;
+            case EMPTY_TRANSACTION_BODY -> EMPTY_TRANSACTION_BODY;
+            case INVALID_TRANSACTION_BODY -> INVALID_TRANSACTION_BODY;
+            case INVALID_SIGNATURE_TYPE_MISMATCHING_KEY -> INVALID_SIGNATURE_TYPE_MISMATCHING_KEY;
+            case INVALID_SIGNATURE_COUNT_MISMATCHING_KEY -> INVALID_SIGNATURE_COUNT_MISMATCHING_KEY;
+            case EMPTY_LIVE_HASH_BODY -> EMPTY_LIVE_HASH_BODY;
+            case EMPTY_LIVE_HASH -> EMPTY_LIVE_HASH;
+            case EMPTY_LIVE_HASH_KEYS -> EMPTY_LIVE_HASH_KEYS;
+            case INVALID_LIVE_HASH_SIZE -> INVALID_LIVE_HASH_SIZE;
+            case EMPTY_QUERY_BODY -> EMPTY_QUERY_BODY;
+            case EMPTY_LIVE_HASH_QUERY -> EMPTY_LIVE_HASH_QUERY;
+            case LIVE_HASH_NOT_FOUND -> LIVE_HASH_NOT_FOUND;
+            case ACCOUNT_ID_DOES_NOT_EXIST -> ACCOUNT_ID_DOES_NOT_EXIST;
+            case LIVE_HASH_ALREADY_EXISTS -> LIVE_HASH_ALREADY_EXISTS;
+            case INVALID_FILE_WACL -> INVALID_FILE_WACL;
+            case SERIALIZATION_FAILED -> SERIALIZATION_FAILED;
+            case TRANSACTION_OVERSIZE -> TRANSACTION_OVERSIZE;
+            case TRANSACTION_TOO_MANY_LAYERS -> TRANSACTION_TOO_MANY_LAYERS;
+            case CONTRACT_DELETED -> CONTRACT_DELETED;
+            case PLATFORM_NOT_ACTIVE -> PLATFORM_NOT_ACTIVE;
+            case KEY_PREFIX_MISMATCH -> KEY_PREFIX_MISMATCH;
+            case PLATFORM_TRANSACTION_NOT_CREATED -> PLATFORM_TRANSACTION_NOT_CREATED;
+            case INVALID_RENEWAL_PERIOD -> INVALID_RENEWAL_PERIOD;
+            case INVALID_PAYER_ACCOUNT_ID -> INVALID_PAYER_ACCOUNT_ID;
+            case ACCOUNT_DELETED -> ACCOUNT_DELETED;
+            case FILE_DELETED -> FILE_DELETED;
+            case ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS -> ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS;
+            case SETTING_NEGATIVE_ACCOUNT_BALANCE -> SETTING_NEGATIVE_ACCOUNT_BALANCE;
+            case OBTAINER_REQUIRED -> OBTAINER_REQUIRED;
+            case OBTAINER_SAME_CONTRACT_ID -> OBTAINER_SAME_CONTRACT_ID;
+            case OBTAINER_DOES_NOT_EXIST -> OBTAINER_DOES_NOT_EXIST;
+            case MODIFYING_IMMUTABLE_CONTRACT -> MODIFYING_IMMUTABLE_CONTRACT;
+            case FILE_SYSTEM_EXCEPTION -> FILE_SYSTEM_EXCEPTION;
+            case AUTORENEW_DURATION_NOT_IN_RANGE -> AUTORENEW_DURATION_NOT_IN_RANGE;
+            case ERROR_DECODING_BYTESTRING -> ERROR_DECODING_BYTESTRING;
+            case CONTRACT_FILE_EMPTY -> CONTRACT_FILE_EMPTY;
+            case CONTRACT_BYTECODE_EMPTY -> CONTRACT_BYTECODE_EMPTY;
+            case INVALID_INITIAL_BALANCE -> INVALID_INITIAL_BALANCE;
+            case INVALID_RECEIVE_RECORD_THRESHOLD -> INVALID_RECEIVE_RECORD_THRESHOLD;
+            case INVALID_SEND_RECORD_THRESHOLD -> INVALID_SEND_RECORD_THRESHOLD;
+            case ACCOUNT_IS_NOT_GENESIS_ACCOUNT -> ACCOUNT_IS_NOT_GENESIS_ACCOUNT;
+            case PAYER_ACCOUNT_UNAUTHORIZED -> PAYER_ACCOUNT_UNAUTHORIZED;
+            case INVALID_FREEZE_TRANSACTION_BODY -> INVALID_FREEZE_TRANSACTION_BODY;
+            case FREEZE_TRANSACTION_BODY_NOT_FOUND -> FREEZE_TRANSACTION_BODY_NOT_FOUND;
+            case TRANSFER_LIST_SIZE_LIMIT_EXCEEDED -> TRANSFER_LIST_SIZE_LIMIT_EXCEEDED;
+            case RESULT_SIZE_LIMIT_EXCEEDED -> RESULT_SIZE_LIMIT_EXCEEDED;
+            case NOT_SPECIAL_ACCOUNT -> NOT_SPECIAL_ACCOUNT;
+            case CONTRACT_NEGATIVE_GAS -> CONTRACT_NEGATIVE_GAS;
+            case CONTRACT_NEGATIVE_VALUE -> CONTRACT_NEGATIVE_VALUE;
+            case INVALID_FEE_FILE -> INVALID_FEE_FILE;
+            case INVALID_EXCHANGE_RATE_FILE -> INVALID_EXCHANGE_RATE_FILE;
+            case INSUFFICIENT_LOCAL_CALL_GAS -> INSUFFICIENT_LOCAL_CALL_GAS;
+            case ENTITY_NOT_ALLOWED_TO_DELETE -> ENTITY_NOT_ALLOWED_TO_DELETE;
+            case AUTHORIZATION_FAILED -> AUTHORIZATION_FAILED;
+            case FILE_UPLOADED_PROTO_INVALID -> FILE_UPLOADED_PROTO_INVALID;
+            case FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK -> FILE_UPLOADED_PROTO_NOT_SAVED_TO_DISK;
+            case FEE_SCHEDULE_FILE_PART_UPLOADED -> FEE_SCHEDULE_FILE_PART_UPLOADED;
+            case EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED -> EXCHANGE_RATE_CHANGE_LIMIT_EXCEEDED;
+            case MAX_CONTRACT_STORAGE_EXCEEDED -> MAX_CONTRACT_STORAGE_EXCEEDED;
+            case TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT -> TRANSFER_ACCOUNT_SAME_AS_DELETE_ACCOUNT;
+            case TOTAL_LEDGER_BALANCE_INVALID -> TOTAL_LEDGER_BALANCE_INVALID;
+            case EXPIRATION_REDUCTION_NOT_ALLOWED -> EXPIRATION_REDUCTION_NOT_ALLOWED;
+            case MAX_GAS_LIMIT_EXCEEDED -> MAX_GAS_LIMIT_EXCEEDED;
+            case MAX_FILE_SIZE_EXCEEDED -> MAX_FILE_SIZE_EXCEEDED;
+            case RECEIVER_SIG_REQUIRED -> RECEIVER_SIG_REQUIRED;
+            case INVALID_TOPIC_ID -> INVALID_TOPIC_ID;
+            case INVALID_ADMIN_KEY -> INVALID_ADMIN_KEY;
+            case INVALID_SUBMIT_KEY -> INVALID_SUBMIT_KEY;
+            case UNAUTHORIZED -> UNAUTHORIZED;
+            case INVALID_TOPIC_MESSAGE -> INVALID_TOPIC_MESSAGE;
+            case INVALID_AUTORENEW_ACCOUNT -> INVALID_AUTORENEW_ACCOUNT;
+            case AUTORENEW_ACCOUNT_NOT_ALLOWED -> AUTORENEW_ACCOUNT_NOT_ALLOWED;
+            case TOPIC_EXPIRED -> TOPIC_EXPIRED;
+            case INVALID_CHUNK_NUMBER -> INVALID_CHUNK_NUMBER;
+            case INVALID_CHUNK_TRANSACTION_ID -> INVALID_CHUNK_TRANSACTION_ID;
+            case ACCOUNT_FROZEN_FOR_TOKEN -> ACCOUNT_FROZEN_FOR_TOKEN;
+            case TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED -> TOKENS_PER_ACCOUNT_LIMIT_EXCEEDED;
+            case INVALID_TOKEN_ID -> INVALID_TOKEN_ID;
+            case INVALID_TOKEN_DECIMALS -> INVALID_TOKEN_DECIMALS;
+            case INVALID_TOKEN_INITIAL_SUPPLY -> INVALID_TOKEN_INITIAL_SUPPLY;
+            case INVALID_TREASURY_ACCOUNT_FOR_TOKEN -> INVALID_TREASURY_ACCOUNT_FOR_TOKEN;
+            case INVALID_TOKEN_SYMBOL -> INVALID_TOKEN_SYMBOL;
+            case TOKEN_HAS_NO_FREEZE_KEY -> TOKEN_HAS_NO_FREEZE_KEY;
+            case TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN -> TRANSFERS_NOT_ZERO_SUM_FOR_TOKEN;
+            case MISSING_TOKEN_SYMBOL -> MISSING_TOKEN_SYMBOL;
+            case TOKEN_SYMBOL_TOO_LONG -> TOKEN_SYMBOL_TOO_LONG;
+            case ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN -> ACCOUNT_KYC_NOT_GRANTED_FOR_TOKEN;
+            case TOKEN_HAS_NO_KYC_KEY -> TOKEN_HAS_NO_KYC_KEY;
+            case INSUFFICIENT_TOKEN_BALANCE -> INSUFFICIENT_TOKEN_BALANCE;
+            case TOKEN_WAS_DELETED -> TOKEN_WAS_DELETED;
+            case TOKEN_HAS_NO_SUPPLY_KEY -> TOKEN_HAS_NO_SUPPLY_KEY;
+            case TOKEN_HAS_NO_WIPE_KEY -> TOKEN_HAS_NO_WIPE_KEY;
+            case INVALID_TOKEN_MINT_AMOUNT -> INVALID_TOKEN_MINT_AMOUNT;
+            case INVALID_TOKEN_BURN_AMOUNT -> INVALID_TOKEN_BURN_AMOUNT;
+            case TOKEN_NOT_ASSOCIATED_TO_ACCOUNT -> TOKEN_NOT_ASSOCIATED_TO_ACCOUNT;
+            case CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT -> CANNOT_WIPE_TOKEN_TREASURY_ACCOUNT;
+            case INVALID_KYC_KEY -> INVALID_KYC_KEY;
+            case INVALID_WIPE_KEY -> INVALID_WIPE_KEY;
+            case INVALID_FREEZE_KEY -> INVALID_FREEZE_KEY;
+            case INVALID_SUPPLY_KEY -> INVALID_SUPPLY_KEY;
+            case MISSING_TOKEN_NAME -> MISSING_TOKEN_NAME;
+            case TOKEN_NAME_TOO_LONG -> TOKEN_NAME_TOO_LONG;
+            case INVALID_WIPING_AMOUNT -> INVALID_WIPING_AMOUNT;
+            case TOKEN_IS_IMMUTABLE -> TOKEN_IS_IMMUTABLE;
+            case TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT -> TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT;
+            case TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES -> TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES;
+            case ACCOUNT_IS_TREASURY -> ACCOUNT_IS_TREASURY;
+            case TOKEN_ID_REPEATED_IN_TOKEN_LIST -> TOKEN_ID_REPEATED_IN_TOKEN_LIST;
+            case TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED -> TOKEN_TRANSFER_LIST_SIZE_LIMIT_EXCEEDED;
+            case EMPTY_TOKEN_TRANSFER_BODY -> EMPTY_TOKEN_TRANSFER_BODY;
+            case EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS -> EMPTY_TOKEN_TRANSFER_ACCOUNT_AMOUNTS;
+            case INVALID_SCHEDULE_ID -> INVALID_SCHEDULE_ID;
+            case SCHEDULE_IS_IMMUTABLE -> SCHEDULE_IS_IMMUTABLE;
+            case INVALID_SCHEDULE_PAYER_ID -> INVALID_SCHEDULE_PAYER_ID;
+            case INVALID_SCHEDULE_ACCOUNT_ID -> INVALID_SCHEDULE_ACCOUNT_ID;
+            case NO_NEW_VALID_SIGNATURES -> NO_NEW_VALID_SIGNATURES;
+            case UNRESOLVABLE_REQUIRED_SIGNERS -> UNRESOLVABLE_REQUIRED_SIGNERS;
+            case SCHEDULED_TRANSACTION_NOT_IN_WHITELIST -> SCHEDULED_TRANSACTION_NOT_IN_WHITELIST;
+            case SOME_SIGNATURES_WERE_INVALID -> SOME_SIGNATURES_WERE_INVALID;
+            case TRANSACTION_ID_FIELD_NOT_ALLOWED -> TRANSACTION_ID_FIELD_NOT_ALLOWED;
+            case IDENTICAL_SCHEDULE_ALREADY_CREATED -> IDENTICAL_SCHEDULE_ALREADY_CREATED;
+            case INVALID_ZERO_BYTE_IN_STRING -> INVALID_ZERO_BYTE_IN_STRING;
+            case SCHEDULE_ALREADY_DELETED -> SCHEDULE_ALREADY_DELETED;
+            case SCHEDULE_ALREADY_EXECUTED -> SCHEDULE_ALREADY_EXECUTED;
+            case MESSAGE_SIZE_TOO_LARGE -> MESSAGE_SIZE_TOO_LARGE;
+            case OPERATION_REPEATED_IN_BUCKET_GROUPS -> OPERATION_REPEATED_IN_BUCKET_GROUPS;
+            case BUCKET_CAPACITY_OVERFLOW -> BUCKET_CAPACITY_OVERFLOW;
+            case NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION -> NODE_CAPACITY_NOT_SUFFICIENT_FOR_OPERATION;
+            case BUCKET_HAS_NO_THROTTLE_GROUPS -> BUCKET_HAS_NO_THROTTLE_GROUPS;
+            case THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC -> THROTTLE_GROUP_HAS_ZERO_OPS_PER_SEC;
+            case SUCCESS_BUT_MISSING_EXPECTED_OPERATION -> SUCCESS_BUT_MISSING_EXPECTED_OPERATION;
+            case UNPARSEABLE_THROTTLE_DEFINITIONS -> UNPARSEABLE_THROTTLE_DEFINITIONS;
+            case INVALID_THROTTLE_DEFINITIONS -> INVALID_THROTTLE_DEFINITIONS;
+            case ACCOUNT_EXPIRED_AND_PENDING_REMOVAL -> ACCOUNT_EXPIRED_AND_PENDING_REMOVAL;
+            case INVALID_TOKEN_MAX_SUPPLY -> INVALID_TOKEN_MAX_SUPPLY;
+            case INVALID_TOKEN_NFT_SERIAL_NUMBER -> INVALID_TOKEN_NFT_SERIAL_NUMBER;
+            case INVALID_NFT_ID -> INVALID_NFT_ID;
+            case METADATA_TOO_LONG -> METADATA_TOO_LONG;
+            case BATCH_SIZE_LIMIT_EXCEEDED -> BATCH_SIZE_LIMIT_EXCEEDED;
+            case INVALID_QUERY_RANGE -> INVALID_QUERY_RANGE;
+            case FRACTION_DIVIDES_BY_ZERO -> FRACTION_DIVIDES_BY_ZERO;
+            case INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE -> INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE;
+            case CUSTOM_FEES_LIST_TOO_LONG -> CUSTOM_FEES_LIST_TOO_LONG;
+            case INVALID_CUSTOM_FEE_COLLECTOR -> INVALID_CUSTOM_FEE_COLLECTOR;
+            case INVALID_TOKEN_ID_IN_CUSTOM_FEES -> INVALID_TOKEN_ID_IN_CUSTOM_FEES;
+            case TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR -> TOKEN_NOT_ASSOCIATED_TO_FEE_COLLECTOR;
+            case TOKEN_MAX_SUPPLY_REACHED -> TOKEN_MAX_SUPPLY_REACHED;
+            case SENDER_DOES_NOT_OWN_NFT_SERIAL_NO -> SENDER_DOES_NOT_OWN_NFT_SERIAL_NO;
+            case CUSTOM_FEE_NOT_FULLY_SPECIFIED -> CUSTOM_FEE_NOT_FULLY_SPECIFIED;
+            case CUSTOM_FEE_MUST_BE_POSITIVE -> CUSTOM_FEE_MUST_BE_POSITIVE;
+            case TOKEN_HAS_NO_FEE_SCHEDULE_KEY -> TOKEN_HAS_NO_FEE_SCHEDULE_KEY;
+            case CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE -> CUSTOM_FEE_OUTSIDE_NUMERIC_RANGE;
+            case ROYALTY_FRACTION_CANNOT_EXCEED_ONE -> ROYALTY_FRACTION_CANNOT_EXCEED_ONE;
+            case FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT -> FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT;
+            case CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES -> CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES;
+            case CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON -> CUSTOM_FEE_DENOMINATION_MUST_BE_FUNGIBLE_COMMON;
+            case CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON -> CUSTOM_FRACTIONAL_FEE_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
+            case INVALID_CUSTOM_FEE_SCHEDULE_KEY -> INVALID_CUSTOM_FEE_SCHEDULE_KEY;
+            case INVALID_TOKEN_MINT_METADATA -> INVALID_TOKEN_MINT_METADATA;
+            case INVALID_TOKEN_BURN_METADATA -> INVALID_TOKEN_BURN_METADATA;
+            case CURRENT_TREASURY_STILL_OWNS_NFTS -> CURRENT_TREASURY_STILL_OWNS_NFTS;
+            case ACCOUNT_STILL_OWNS_NFTS -> ACCOUNT_STILL_OWNS_NFTS;
+            case TREASURY_MUST_OWN_BURNED_NFT -> TREASURY_MUST_OWN_BURNED_NFT;
+            case ACCOUNT_DOES_NOT_OWN_WIPED_NFT -> ACCOUNT_DOES_NOT_OWN_WIPED_NFT;
+            case ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON -> ACCOUNT_AMOUNT_TRANSFERS_ONLY_ALLOWED_FOR_FUNGIBLE_COMMON;
+            case MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED -> MAX_NFTS_IN_PRICE_REGIME_HAVE_BEEN_MINTED;
+            case PAYER_ACCOUNT_DELETED -> PAYER_ACCOUNT_DELETED;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH -> CUSTOM_FEE_CHARGING_EXCEEDED_MAX_RECURSION_DEPTH;
+            case CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS -> CUSTOM_FEE_CHARGING_EXCEEDED_MAX_ACCOUNT_AMOUNTS;
+            case INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE -> INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE;
+            case SERIAL_NUMBER_LIMIT_REACHED -> SERIAL_NUMBER_LIMIT_REACHED;
+            case CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE -> CUSTOM_ROYALTY_FEE_ONLY_ALLOWED_FOR_NON_FUNGIBLE_UNIQUE;
+            case NO_REMAINING_AUTOMATIC_ASSOCIATIONS -> NO_REMAINING_AUTOMATIC_ASSOCIATIONS;
+            case EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT -> EXISTING_AUTOMATIC_ASSOCIATIONS_EXCEED_GIVEN_LIMIT;
+            case REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT -> REQUESTED_NUM_AUTOMATIC_ASSOCIATIONS_EXCEEDS_ASSOCIATION_LIMIT;
+            case TOKEN_IS_PAUSED -> TOKEN_IS_PAUSED;
+            case TOKEN_HAS_NO_PAUSE_KEY -> TOKEN_HAS_NO_PAUSE_KEY;
+            case INVALID_PAUSE_KEY -> INVALID_PAUSE_KEY;
+            case FREEZE_UPDATE_FILE_DOES_NOT_EXIST -> FREEZE_UPDATE_FILE_DOES_NOT_EXIST;
+            case FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH -> FREEZE_UPDATE_FILE_HASH_DOES_NOT_MATCH;
+            case NO_UPGRADE_HAS_BEEN_PREPARED -> NO_UPGRADE_HAS_BEEN_PREPARED;
+            case NO_FREEZE_IS_SCHEDULED -> NO_FREEZE_IS_SCHEDULED;
+            case UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE -> UPDATE_FILE_HASH_CHANGED_SINCE_PREPARE_UPGRADE;
+            case FREEZE_START_TIME_MUST_BE_FUTURE -> FREEZE_START_TIME_MUST_BE_FUTURE;
+            case PREPARED_UPDATE_FILE_IS_IMMUTABLE -> PREPARED_UPDATE_FILE_IS_IMMUTABLE;
+            case FREEZE_ALREADY_SCHEDULED -> FREEZE_ALREADY_SCHEDULED;
+            case FREEZE_UPGRADE_IN_PROGRESS -> FREEZE_UPGRADE_IN_PROGRESS;
+            case UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED -> UPDATE_FILE_ID_DOES_NOT_MATCH_PREPARED;
+            case UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED -> UPDATE_FILE_HASH_DOES_NOT_MATCH_PREPARED;
+            case CONSENSUS_GAS_EXHAUSTED -> CONSENSUS_GAS_EXHAUSTED;
+            case REVERTED_SUCCESS -> REVERTED_SUCCESS;
+            case MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED -> MAX_STORAGE_IN_PRICE_REGIME_HAS_BEEN_USED;
+            case INVALID_ALIAS_KEY -> INVALID_ALIAS_KEY;
+            case UNEXPECTED_TOKEN_DECIMALS -> UNEXPECTED_TOKEN_DECIMALS;
+            case INVALID_PROXY_ACCOUNT_ID -> INVALID_PROXY_ACCOUNT_ID;
+            case INVALID_TRANSFER_ACCOUNT_ID -> INVALID_TRANSFER_ACCOUNT_ID;
+            case INVALID_FEE_COLLECTOR_ACCOUNT_ID -> INVALID_FEE_COLLECTOR_ACCOUNT_ID;
+            case ALIAS_IS_IMMUTABLE -> ALIAS_IS_IMMUTABLE;
+            case SPENDER_ACCOUNT_SAME_AS_OWNER -> SPENDER_ACCOUNT_SAME_AS_OWNER;
+            case AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY -> AMOUNT_EXCEEDS_TOKEN_MAX_SUPPLY;
+            case NEGATIVE_ALLOWANCE_AMOUNT -> NEGATIVE_ALLOWANCE_AMOUNT;
+            case CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON -> CANNOT_APPROVE_FOR_ALL_FUNGIBLE_COMMON;
+            case SPENDER_DOES_NOT_HAVE_ALLOWANCE -> SPENDER_DOES_NOT_HAVE_ALLOWANCE;
+            case AMOUNT_EXCEEDS_ALLOWANCE -> AMOUNT_EXCEEDS_ALLOWANCE;
+            case MAX_ALLOWANCES_EXCEEDED -> MAX_ALLOWANCES_EXCEEDED;
+            case EMPTY_ALLOWANCES -> EMPTY_ALLOWANCES;
+            case SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES -> SPENDER_ACCOUNT_REPEATED_IN_ALLOWANCES;
+            case REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES -> REPEATED_SERIAL_NUMS_IN_NFT_ALLOWANCES;
+            case FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES -> FUNGIBLE_TOKEN_IN_NFT_ALLOWANCES;
+            case NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES -> NFT_IN_FUNGIBLE_TOKEN_ALLOWANCES;
+            case INVALID_ALLOWANCE_OWNER_ID -> INVALID_ALLOWANCE_OWNER_ID;
+            case INVALID_ALLOWANCE_SPENDER_ID -> INVALID_ALLOWANCE_SPENDER_ID;
+            case REPEATED_ALLOWANCES_TO_DELETE -> REPEATED_ALLOWANCES_TO_DELETE;
+            case INVALID_DELEGATING_SPENDER -> INVALID_DELEGATING_SPENDER;
+            case DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL -> DELEGATING_SPENDER_CANNOT_GRANT_APPROVE_FOR_ALL;
+            case DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL -> DELEGATING_SPENDER_DOES_NOT_HAVE_APPROVE_FOR_ALL;
+            case SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE -> SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE;
+            case SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME -> SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME;
+            case SCHEDULE_FUTURE_THROTTLE_EXCEEDED -> SCHEDULE_FUTURE_THROTTLE_EXCEEDED;
+            case SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED -> SCHEDULE_FUTURE_GAS_LIMIT_EXCEEDED;
+            case INVALID_ETHEREUM_TRANSACTION -> INVALID_ETHEREUM_TRANSACTION;
+            case WRONG_CHAIN_ID -> WRONG_CHAIN_ID;
+            case WRONG_NONCE -> WRONG_NONCE;
+            case ACCESS_LIST_UNSUPPORTED -> ACCESS_LIST_UNSUPPORTED;
+            case SCHEDULE_PENDING_EXPIRATION -> SCHEDULE_PENDING_EXPIRATION;
+            case CONTRACT_IS_TOKEN_TREASURY -> CONTRACT_IS_TOKEN_TREASURY;
+            case CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES -> CONTRACT_HAS_NON_ZERO_TOKEN_BALANCES;
+            case CONTRACT_EXPIRED_AND_PENDING_REMOVAL -> CONTRACT_EXPIRED_AND_PENDING_REMOVAL;
+            case CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT -> CONTRACT_HAS_NO_AUTO_RENEW_ACCOUNT;
+            case PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION -> PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION;
+            case PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED -> PROXY_ACCOUNT_ID_FIELD_IS_DEPRECATED;
+            case SELF_STAKING_IS_NOT_ALLOWED -> SELF_STAKING_IS_NOT_ALLOWED;
+            case INVALID_STAKING_ID -> INVALID_STAKING_ID;
+            case STAKING_NOT_ENABLED -> STAKING_NOT_ENABLED;
+            case INVALID_PRNG_RANGE -> INVALID_PRNG_RANGE;
+            case MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED -> MAX_ENTITIES_IN_PRICE_REGIME_HAVE_BEEN_CREATED;
+            case INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE -> INVALID_FULL_PREFIX_SIGNATURE_FOR_PRECOMPILE;
+            case INSUFFICIENT_BALANCES_FOR_STORAGE_RENT -> INSUFFICIENT_BALANCES_FOR_STORAGE_RENT;
+            case MAX_CHILD_RECORDS_EXCEEDED -> MAX_CHILD_RECORDS_EXCEEDED;
+            case INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES -> INSUFFICIENT_BALANCES_FOR_RENEWAL_FEES;
+            case TRANSACTION_HAS_UNKNOWN_FIELDS -> TRANSACTION_HAS_UNKNOWN_FIELDS;
+            case ACCOUNT_IS_IMMUTABLE -> ACCOUNT_IS_IMMUTABLE;
+            case ALIAS_ALREADY_ASSIGNED -> ALIAS_ALREADY_ASSIGNED;
+            case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
                     "network returned unrecognized response code; your SDK may be out of date");
-        }
-
-        // NOTE: This should be unreachable as error prone has enum exhaustiveness checking
-        throw new IllegalArgumentException(
-            "response code "
-                + code.name()
-                + " is unhandled by the SDK; update your SDK or open an issue");
+        };
     }
 
     public static Status fromResponseCode(int reponseCode) {

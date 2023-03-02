@@ -278,4 +278,11 @@ public abstract class PublicKey extends Key {
      * @return                          is this an ECDSA key
      */
     public abstract boolean isECDSA();
+
+    /**
+     * Converts the key to EVM address
+     *
+     * @return                          the EVM address
+     */
+    public abstract EvmAddress toEvmAddress();
 }
