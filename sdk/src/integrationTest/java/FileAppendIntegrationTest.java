@@ -5,6 +5,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.KeyList;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Duration;
@@ -70,6 +71,10 @@ public class FileAppendIntegrationTest {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
 
+        // Skip if using local node.
+        // Note: this check should be removed once the local node is supporting multiple nodes.
+        testEnv.assumeNotLocalNode();
+
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents("[e2e::FileCreateTransaction]")
@@ -126,6 +131,10 @@ public class FileAppendIntegrationTest {
     void canAppendLargeContentsToFileDespiteExpiration() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
+
+        // Skip if using local node.
+        // Note: this check should be removed once the local node is supporting multiple nodes.
+        testEnv.assumeNotLocalNode();
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)

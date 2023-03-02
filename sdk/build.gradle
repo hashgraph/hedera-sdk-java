@@ -127,6 +127,15 @@ idea {
     }
 }
 
+task integrationTest(type: Test) {
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+
+    onlyIf {
+        System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null || System.getenv('CONFIG_FILE') != null
+    }
+}
+
 jacocoTestReport {
     // make sure to use any/all test coverage data for the report
     executionData fileTree(dir: buildDir, include: "jacoco/*.exec")
@@ -149,16 +158,7 @@ jacocoTestReport {
     }
 
     // make sure we run all tests before this report is made
-    dependsOn test
-}
-
-task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    classpath = sourceSets.integrationTest.runtimeClasspath
-
-    onlyIf {
-        System.getenv('OPERATOR_ID') != null && System.getenv('OPERATOR_KEY') != null || System.getenv('CONFIG_FILE') != null
-    }
+    dependsOn test, integrationTest
 }
 
 tasks.withType(Javadoc) {

@@ -68,8 +68,8 @@ class TokenBurnIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot burn tokens when amount is not set")
-    void cannotBurnTokensWhenAmountIsNotSet() throws Exception {
+    @DisplayName("Can burn tokens when amount is not set")
+    void canBurnTokensWhenAmountIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var response = new TokenCreateTransaction()
@@ -88,12 +88,12 @@ class TokenBurnIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenBurnTransaction()
-                .setTokenId(tokenId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TOKEN_BURN_AMOUNT.toString());
+        var receipt = new TokenBurnTransaction()
+            .setTokenId(tokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
         testEnv.close(tokenId);
     }

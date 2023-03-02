@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenWipeIntegrationTest {
@@ -345,8 +346,8 @@ class TokenWipeIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot wipe accounts balance when amount is not set")
-    void cannotWipeAccountsBalanceWhenAmountIsNotSet() throws Exception {
+    @DisplayName("Can wipe accounts balance when amount is not set")
+    void canWipeAccountsBalanceWhenAmountIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var key = PrivateKey.generateED25519();
@@ -396,13 +397,14 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenWipeTransaction()
-                .setTokenId(tokenId)
-                .setAccountId(accountId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_WIPING_AMOUNT.toString());
+
+        var receipt = new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAccountId(accountId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
         testEnv.close(tokenId, accountId, key);
     }

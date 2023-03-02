@@ -13,6 +13,7 @@ import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import java8.util.function.Function;
+import org.junit.jupiter.api.Assumptions;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -29,12 +30,25 @@ public class IntegrationTestEnv {
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
+    public boolean isLocalNode = false;
     private Client originalClient;
 
+    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+
+    public IntegrationTestEnv() throws Exception {
+        this(0);
+    }
+
     @SuppressWarnings("EmptyCatch")
-    public IntegrationTestEnv(int numberOfNodes) throws Exception {
-        client = createTestEnvClient()
-            .setMaxNodesPerTransaction(numberOfNodes);
+    public IntegrationTestEnv(int maxNodesPerTransaction) throws Exception {
+        client = createTestEnvClient();
+
+        if (maxNodesPerTransaction == 0) {
+            maxNodesPerTransaction = client.getNetwork().size();
+        }
+
+        client.setMaxNodesPerTransaction(maxNodesPerTransaction);
         originalClient = client;
 
         try {
@@ -52,9 +66,15 @@ public class IntegrationTestEnv {
         assertThat(client.getOperatorAccountId()).isNotNull();
         assertThat(client.getOperatorPublicKey()).isNotNull();
 
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+            isLocalNode = true;
+        }
+
         var nodeGetter = new TestEnvNodeGetter(client);
         var network = new HashMap<String, AccountId>();
-        for (@Var int i = 0; i < numberOfNodes; i++) {
+
+        var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
+        for (@Var int i = 0; i < nodeCount; i++) {
             nodeGetter.nextNode(network);
         }
         client.setNetwork(network);
@@ -68,11 +88,11 @@ public class IntegrationTestEnv {
             return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new HashMap<String, AccountId>();
-            network.put("127.0.0.1:50213", new AccountId(3));
-            network.put("127.0.0.1:50214", new AccountId(4));
-            network.put("127.0.0.1:50215", new AccountId(5));
+            network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
 
-            return Client.forNetwork(network);
+            return Client
+                .forNetwork(network)
+                .setMirrorNetwork(List.of(DEFAULT_LOCAL_MIRROR_NODE_ADDRESS));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
@@ -101,6 +121,18 @@ public class IntegrationTestEnv {
 
     public IntegrationTestEnv useThrowawayAccount() throws Exception {
         return useThrowawayAccount(new Hbar(50));
+    }
+
+    // Note: this is a temporary workaround.
+    // The assumption should be removed once the local node is supporting multiple nodes.
+    public void assumeNotLocalNode() throws Exception {
+        // first clean up the current IntegrationTestEnv...
+        if (isLocalNode) {
+            close();
+        }
+
+        // then skip the current test
+        Assumptions.assumeFalse(isLocalNode);
     }
 
     public void close(

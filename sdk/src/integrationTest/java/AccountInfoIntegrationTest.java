@@ -26,7 +26,7 @@ class AccountInfoIntegrationTest {
 
         assertThat(info.accountId).isEqualTo(testEnv.operatorId);
         assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.key).isEqualTo(testEnv.operatorKey);
         assertThat(info.balance.toTinybars()).isGreaterThan(0);
         assertThat(info.proxyAccountId).isNull();
         assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
