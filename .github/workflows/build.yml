@@ -5,7 +5,6 @@ on:
     branches:
       - main
       - develop
-      - fix/1324-integration-tests
       - release/*
   pull_request:
     branches:
@@ -93,7 +92,7 @@ jobs:
       - name: Start the local node
         run: npx @hashgraph/hedera-local start -d --network local
 
-      - name: Run Integration Tests
+      - name: Run Tests
         env:
           OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
           OPERATOR_ID: '0.0.1022'
