@@ -19,15 +19,23 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.*;
+import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
+import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.threeten.bp.Instant;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 class TransactionIdTest {
     @BeforeAll
@@ -61,6 +69,13 @@ class TransactionIdTest {
     void shouldToBytes2() {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled/2");
         var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
+        assertThat(copyId.toString()).isEqualTo(originalId.toString());
+    }
+
+    @Test
+    void shouldFromBytes() throws InvalidProtocolBufferException {
+        var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325");
+        var copyId = TransactionId.fromBytes(originalId.toProtobuf().toByteArray());
         assertThat(copyId.toString()).isEqualTo(originalId.toString());
     }
 
@@ -160,5 +175,16 @@ class TransactionIdTest {
         transactionId1 = new TransactionId(null, null);
         transactionId2 = new TransactionId(null, null);
         assertThat(transactionId1).isEqualByComparingTo(transactionId2);
+    }
+
+    @Test
+    void shouldFail() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+            () -> TransactionId.fromString("0.0.23847.1588539964.632521325/4")
+        );
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+            () -> TransactionId.fromString("0.0.23847@1588539964/4")
+        );
     }
 }
