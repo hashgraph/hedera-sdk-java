@@ -192,7 +192,7 @@ public final class TransactionReceiptQuery
     }
 
     @Override
-    ExecutionState shouldRetry(Status status, Response response) {
+    ExecutionState getExecutionState(Status status, Response response) {
         switch (status) {
             case BUSY:
             case UNKNOWN:

@@ -1358,7 +1358,7 @@ public abstract class Transaction<T extends Transaction<T>>
     }
 
     @Override
-    ExecutionState shouldRetry(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+    ExecutionState getExecutionState(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
         switch (status) {
             case TRANSACTION_EXPIRED:
                 if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
@@ -1371,7 +1371,7 @@ public abstract class Transaction<T extends Transaction<T>>
                     return ExecutionState.Retry;
                 }
             default:
-                return super.shouldRetry(status, response);
+                return super.getExecutionState(status, response);
         }
     }
 

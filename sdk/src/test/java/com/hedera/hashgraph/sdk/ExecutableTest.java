@@ -460,7 +460,7 @@ class ExecutableTest {
             }
 
             @Override
-            ExecutionState shouldRetry(Status status, Response response) {
+            ExecutionState getExecutionState(Status status, Response response) {
                 return i.getAndIncrement() == 0 ? ExecutionState.Retry : ExecutionState.Success;
             }
         };
@@ -525,11 +525,11 @@ class ExecutableTest {
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 
-        assertThat(tx.shouldRetry(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(ExecutionState.ServerError);
-        assertThat(tx.shouldRetry(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.ServerError);
-        assertThat(tx.shouldRetry(Status.BUSY, null)).isEqualTo(ExecutionState.ServerError);
-        assertThat(tx.shouldRetry(Status.OK, null)).isEqualTo(ExecutionState.Success);
-        assertThat(tx.shouldRetry(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.RequestError);
+        assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.ServerError);
+        assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.Success);
+        assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.RequestError);
     }
 
     static class DummyTransaction<T extends Transaction<T>>
