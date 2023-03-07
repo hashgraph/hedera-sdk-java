@@ -146,10 +146,8 @@ jacocoTestReport {
             fileTree(dir: it, exclude: [
                 '**/proto/**',
                 '**/AccountAllowanceAdjustTransaction.*',
-                '**/ContractStateChange.*',
                 '**/HederaPreCheckStatusException.*',
-                '**/HederaReceiptStatusException.*',
-                '**/StorageChange.*'
+                '**/HederaReceiptStatusException.*'
             ])
         }))
     }
