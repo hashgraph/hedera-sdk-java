@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class FileAppendTransactionTest {
     public static final String BIG_CONTENTS = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur aliquam augue sem, ut mattis dui laoreet a. Curabitur consequat est euismod, scelerisque metus et, tristique dui. Nulla commodo mauris ut faucibus ultricies. Quisque venenatis nisl nec augue tempus, at efficitur elit eleifend. Duis pharetra felis metus, sed dapibus urna vehicula id. Duis non venenatis turpis, sit amet ornare orci. Donec non interdum quam. Sed finibus nunc et risus finibus, non sagittis lorem cursus. Proin pellentesque tempor aliquam. Sed congue nisl in enim bibendum, condimentum vehicula nisi feugiat.\n" +
@@ -214,5 +215,8 @@ public class FileAppendTransactionTest {
         var tx = spawnTestTransactionBigContents(nodeAccountIds);
         var tx2 = FileAppendTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHash());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHashPerNode());
     }
 }
