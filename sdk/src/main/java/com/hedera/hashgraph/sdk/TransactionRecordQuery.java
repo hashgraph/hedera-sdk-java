@@ -174,8 +174,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     }
 
     @Override
-    ExecutionState shouldRetry(Status status, Response response) {
-        var retry = super.shouldRetry(status, response);
+    ExecutionState getExecutionState(Status status, Response response) {
+        var retry = super.getExecutionState(status, response);
         if (retry != ExecutionState.Success) {
             return retry;
         }
