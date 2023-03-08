@@ -215,7 +215,8 @@ public class IntegrationTestEnv {
                     nodes.remove(index);
                     outMap.put(node.getKey(), node.getValue());
                     return;
-                } catch (Throwable ignored) {
+                } catch (Throwable err) {
+                    System.out.println(err);
                 }
             }
             throw new Exception("Failed to find working node in " + nodes + " for IntegrationTestEnv");
