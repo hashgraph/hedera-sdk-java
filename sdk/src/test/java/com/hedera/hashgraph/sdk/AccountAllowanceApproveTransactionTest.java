@@ -80,4 +80,16 @@ public class AccountAllowanceApproveTransactionTest {
         var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
+
+    @Test
+    void propertiesTest() {
+        var tx = spawnTestTransaction();
+
+        assertThat(tx.getHbarAllowances()).isNotEmpty();
+        assertThat(tx.getHbarApprovals()).isNotEmpty();
+        assertThat(tx.getTokenAllowances()).isNotEmpty();
+        assertThat(tx.getTokenApprovals()).isNotEmpty();
+        assertThat(tx.getTokenNftAllowances()).isNotEmpty();
+        assertThat(tx.getTokenNftApprovals()).isNotEmpty();
+    }
 }

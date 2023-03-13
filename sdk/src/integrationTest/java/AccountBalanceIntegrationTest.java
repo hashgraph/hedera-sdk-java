@@ -225,12 +225,15 @@ class AccountBalanceIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var balance = new AccountBalanceQuery()
+        var query = new AccountBalanceQuery();
+        var balance = query
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
         assertThat(balance.tokens.get(tokenId)).isEqualTo(10000);
         assertThat(balance.tokenDecimals.get(tokenId)).isEqualTo(50);
+        assertThat(query.toString()).isNotEmpty();
+        assertThat(query.getPaymentTransactionId()).isNull();
 
         testEnv.close(tokenId);
     }

@@ -132,4 +132,30 @@ public class TokenCreateTransactionTest {
         var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
+
+    @Test
+    void propertiesTest() {
+        var tx = spawnTestTransaction();
+
+        assertThat(tx.getTokenName()).isEqualTo("floof");
+        assertThat(tx.getTokenSymbol()).isEqualTo("F");
+        assertThat(tx.getDecimals()).isEqualTo(3);
+        assertThat(tx.getInitialSupply()).isEqualTo(30);
+        assertThat(tx.getTreasuryAccountId()).hasToString("0.0.456");
+        assertThat(tx.getAdminKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getKycKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getFreezeKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getWipeKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getSupplyKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getFeeScheduleKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getPauseKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getFreezeDefault()).isTrue();
+        assertThat(tx.getExpirationTime()).isEqualTo(validStart);
+        assertThat(tx.getAutoRenewAccountId()).hasToString("0.0.123");
+        assertThat(tx.getAutoRenewPeriod()).isNull();
+        assertThat(tx.getTokenMemo()).isEqualTo("Floof says hi");
+        assertThat(tx.getTokenType()).isEqualTo(TokenType.FUNGIBLE_COMMON);
+        assertThat(tx.getSupplyType()).isEqualTo(TokenSupplyType.INFINITE);
+        assertThat(tx.getMaxSupply()).isEqualTo(0);
+    }
 }
