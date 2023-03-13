@@ -62,21 +62,21 @@ class TransactionIdTest {
     void shouldToBytes() {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325");
         var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
-        assertThat(copyId.toString()).isEqualTo(originalId.toString());
+        assertThat(copyId).hasToString(originalId.toString());
     }
 
     @Test
     void shouldToBytes2() {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled/2");
         var copyId = TransactionId.fromProtobuf(originalId.toProtobuf());
-        assertThat(copyId.toString()).isEqualTo(originalId.toString());
+        assertThat(copyId).hasToString(originalId.toString());
     }
 
     @Test
     void shouldFromBytes() throws InvalidProtocolBufferException {
         var originalId = TransactionId.fromString("0.0.23847@1588539964.632521325");
         var copyId = TransactionId.fromBytes(originalId.toProtobuf().toByteArray());
-        assertThat(copyId.toString()).isEqualTo(originalId.toString());
+        assertThat(copyId).hasToString(originalId.toString());
     }
 
     @Test

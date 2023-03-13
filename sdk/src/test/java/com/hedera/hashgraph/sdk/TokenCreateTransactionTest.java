@@ -156,6 +156,6 @@ public class TokenCreateTransactionTest {
         assertThat(tx.getTokenMemo()).isEqualTo("Floof says hi");
         assertThat(tx.getTokenType()).isEqualTo(TokenType.FUNGIBLE_COMMON);
         assertThat(tx.getSupplyType()).isEqualTo(TokenSupplyType.INFINITE);
-        assertThat(tx.getMaxSupply()).isEqualTo(0);
+        assertThat(tx.getMaxSupply()).isZero();
     }
 }
