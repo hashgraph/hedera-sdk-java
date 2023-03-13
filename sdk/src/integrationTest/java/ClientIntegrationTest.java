@@ -1,11 +1,5 @@
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -149,7 +143,10 @@ public class ClientIntegrationTest {
 
         testEnv.client.setNetwork(network);
 
-        testEnv.client.pingAll();
+
+        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> {
+            testEnv.client.pingAll();
+        }).withMessageContaining("exceeded maximum attempts");
 
         var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
         assertThat(nodes.isEmpty()).isFalse();
