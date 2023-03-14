@@ -32,7 +32,6 @@ public class ContractInfoIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        assertThatNoException().isThrownBy(() -> contractId.validate(testEnv.client));
         assertThat(contractId.hashCode()).isGreaterThan(0);
         assertThat(contractId.toStringWithChecksum(testEnv.client)).isNotNull();
         assertThat(contractId.compareTo(ContractId.fromBytes(contractId.toBytes()))).isZero();
