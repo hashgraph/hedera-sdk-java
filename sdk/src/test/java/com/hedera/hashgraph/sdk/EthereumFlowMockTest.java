@@ -103,22 +103,32 @@ class EthereumFlowMockTest {
 
         var responses = List.of(responses1);
 
+        EthereumFlow ethereumFlow;
         try (var mocker = Mocker.withResponses(responses)) {
             var ethereumData = EthereumTransactionData.fromBytes(ETHEREUM_DATA.toByteArray());
             ethereumData.callData = LONG_CALL_DATA.toByteArray();
 
             if (versionToTest.equals("sync")) {
-                new EthereumFlow()
-                    .setEthereumData(ethereumData.toBytes())
+                ethereumFlow = new EthereumFlow()
+                    .setMaxGasAllowance(Hbar.fromTinybars(25))
+                    .setEthereumData(ethereumData.toBytes());
+
+                ethereumFlow
                     .execute(mocker.client)
                     .getReceipt(mocker.client);
             } else {
-                new EthereumFlow()
-                    .setEthereumData(ethereumData.toBytes())
+                ethereumFlow = new EthereumFlow()
+                    .setMaxGasAllowance(Hbar.fromTinybars(25))
+                    .setEthereumData(ethereumData.toBytes());
+
+                ethereumFlow
                     .executeAsync(mocker.client)
                     .thenCompose(response -> response.getReceiptAsync(mocker.client))
                     .get();
             }
+
+            assertThat(ethereumFlow.getEthereumData()).isNotNull();
+            assertThat(ethereumFlow.getMaxGasAllowance().toTinybars()).isEqualTo(25);
         }
     }
 }

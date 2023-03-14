@@ -272,7 +272,8 @@ class ExecutableTest {
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
                     new byte[]{1, 2, 3},
-                    null);
+                    null)
+                    .setValidateStatus(true);
             }
         };
 

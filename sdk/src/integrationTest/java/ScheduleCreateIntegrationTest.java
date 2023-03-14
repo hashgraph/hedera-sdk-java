@@ -188,6 +188,10 @@ public class ScheduleCreateIntegrationTest {
 
         assertThat(info.executedAt).isNotNull();
 
+        assertThat(scheduleId.getChecksum()).isNull();
+        assertThat(scheduleId.hashCode()).isNotZero();
+        assertThat(scheduleId.compareTo(ScheduleId.fromBytes(scheduleId.toBytes()))).isZero();
+
         new AccountDeleteTransaction()
             .setAccountId(accountId)
             .setTransferAccountId(testEnv.operatorId)
