@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The ethereum transaction data, in the format defined in <a href="https://githuab.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md">EIP-1559</a>
+ * The ethereum transaction data, in the format defined in <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md">EIP-1559</a>
  */
 public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
 
