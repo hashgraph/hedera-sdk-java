@@ -198,13 +198,13 @@ public final class TransactionReceiptQuery
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
-                return ExecutionState.Retry;
+                return ExecutionState.RETRY;
 
             case OK:
                 break;
 
             default:
-                return ExecutionState.RequestError;
+                return ExecutionState.REQUEST_ERROR;
         }
 
         var receiptStatus =
@@ -216,10 +216,10 @@ public final class TransactionReceiptQuery
             case OK:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
-                return ExecutionState.Retry;
+                return ExecutionState.RETRY;
 
             default:
-                return ExecutionState.Success;
+                return ExecutionState.SUCCESS;
         }
     }
 }

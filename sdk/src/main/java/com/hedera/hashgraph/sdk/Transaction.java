@@ -1411,13 +1411,13 @@ public abstract class Transaction<T extends Transaction<T>>
         switch (status) {
             case TRANSACTION_EXPIRED:
                 if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
-                    return ExecutionState.RequestError;
+                    return ExecutionState.REQUEST_ERROR;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
                     var accountId = Objects.requireNonNull(firstTransactionId.accountId);
                     generateTransactionIds(TransactionId.generate(accountId), transactionIds.size());
                     wipeTransactionLists(transactionIds.size());
-                    return ExecutionState.Retry;
+                    return ExecutionState.RETRY;
                 }
             default:
                 return super.getExecutionState(status, response);

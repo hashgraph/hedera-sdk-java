@@ -427,19 +427,19 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             grpcRequest.handleResponse(response, status, executionState);
 
             switch (executionState) {
-                case ServerError:
+                case SERVER_ERROR:
                     lastException = grpcRequest.mapStatusException();
                     continue;
-                case Retry:
+                case RETRY:
                     // Response is not ready yet from server, need to wait.
                     lastException = grpcRequest.mapStatusException();
                     if (attempt < maxAttempts) {
                         delay(grpcRequest.getDelay());
                     }
                     continue;
-                case RequestError:
+                case REQUEST_ERROR:
                     throw grpcRequest.mapStatusException();
-                case Success:
+                case SUCCESS:
                 default:
                     return grpcRequest.mapResponse();
             }
@@ -689,18 +689,18 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     grpcRequest.handleResponse(response, status, executionState);
 
                     switch (executionState) {
-                        case ServerError:
+                        case SERVER_ERROR:
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             break;
-                        case Retry:
+                        case RETRY:
                             Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
                                 executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             });
                             break;
-                        case RequestError:
+                        case REQUEST_ERROR:
                             returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
                             break;
-                        case Success:
+                        case SUCCESS:
                         default:
                             returnFuture.complete(grpcRequest.mapResponse());
                     }
@@ -770,11 +770,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             case PLATFORM_TRANSACTION_NOT_CREATED:
             case PLATFORM_NOT_ACTIVE:
             case BUSY:
-                return ExecutionState.ServerError;
+                return ExecutionState.SERVER_ERROR;
             case OK:
-                return ExecutionState.Success;
+                return ExecutionState.SUCCESS;
             default:
-                return ExecutionState.RequestError;     // user error
+                return ExecutionState.REQUEST_ERROR;     // user error
         }
     }
 
@@ -873,17 +873,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
                 responseStatus, latency, node.getAccountId(), attempt, response);
 
-            if (executionState == ExecutionState.ServerError && attemptedAllNodes) {
-                executionState = ExecutionState.Retry;
+            if (executionState == ExecutionState.SERVER_ERROR && attemptedAllNodes) {
+                executionState = ExecutionState.RETRY;
                 attemptedAllNodes = false;
             }
             switch (executionState) {
-                case Retry:
+                case RETRY:
                     logger.warn("Retrying in {} ms after failure with node {} during attempt #{}: {}",
                         delay, node.getAccountId(), attempt, responseStatus);
                     verboseLog(node);
                     break;
-                case ServerError:
+                case SERVER_ERROR:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
                     break;

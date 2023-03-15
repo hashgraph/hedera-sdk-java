@@ -5,11 +5,9 @@ import com.esaulpaugh.headlong.rlp.RLPEncoder;
 import com.esaulpaugh.headlong.rlp.RLPItem;
 import com.esaulpaugh.headlong.util.Integers;
 import com.google.common.base.MoreObjects;
-import com.google.protobuf.InvalidProtocolBufferException;
 import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -26,17 +26,17 @@ public enum ExecutionState {
     /**
      * Indicates that the execution was successful
      */
-    Success,
+    SUCCESS,
     /**
      * Indicates that the call was successful but the operation did not complete. Retry with same/new node
      */
-    Retry,
+    RETRY,
     /**
      * Indicates that the receiver was bad node. Retry with new node
      */
-    ServerError,
+    SERVER_ERROR,
     /**
      * Indicates that the request was incorrect
      */
-    RequestError
+    REQUEST_ERROR
 }
