@@ -185,7 +185,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     /**
      * Sets the smart contract byte code.
-     *
+     * <br>
      * The bytes of the smart contract initcode. This is only useful if the smart contract init
      * is less than the hedera transaction limit. In those cases fileID must be used.
      *
@@ -201,6 +201,11 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Get the admin key
+     *
+     * @return the adminKey
+     */
     @Nullable
     public Key getAdminKey() {
         return adminKey;
@@ -302,6 +307,12 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
         return this;
     }
 
+    /**
+     * Get the maximum number of tokens that this contract can be
+     * automatically associated with (i.e., receive air-drops from).
+     *
+     * @return the maxAutomaticTokenAssociations
+     */
     public int getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }

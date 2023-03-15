@@ -49,10 +49,15 @@ import java.util.concurrent.TimeoutException;
  */
 abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Transaction<T> {
     private int chunkSize = 1024;
+
+    /**
+     * The transaction data
+     */
     protected ByteString data = ByteString.EMPTY;
+
     /**
      * Maximum number of chunks this message will get broken up into when
-     * its frozen.
+     * it's frozen.
      */
     private int maxChunks = 20;
 
@@ -296,8 +301,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      *
      * @param client The client with which this will be executed.
      * @return Result of execution for each chunk
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public List<TransactionResponse> executeAll(Client client) throws PrecheckStatusException, TimeoutException {
         return executeAll(client, client.getRequestTimeout());
@@ -309,8 +314,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @param client The client with which this will be executed.
      * @param timeoutPerChunk The timeout after which the execution attempt will be cancelled.
      * @return Result of execution for each chunk
-     * @throws TimeoutException
-     * @throws PrecheckStatusException
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public List<TransactionResponse> executeAll(Client client, Duration timeoutPerChunk) throws PrecheckStatusException, TimeoutException {
         freezeAndSign(client);

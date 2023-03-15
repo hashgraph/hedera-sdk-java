@@ -56,18 +56,40 @@ public class ContractId extends Key implements Comparable<ContractId> {
     @Nullable
     private final String checksum;
 
+    /**
+     * The 20-byte EVM address of the contract to call.
+     */
     @Nullable
     public final byte[] evmAddress;
 
+    /**
+     * Assign the num part of the contract id.
+     *
+     * @param num                       the num part of the account id
+     */
     public ContractId(@Nonnegative long num) {
         this(0, 0, num);
     }
 
+    /**
+     * Assign all parts of the contract id.
+     *
+     * @param shard                     the shard part of the contract id
+     * @param realm                     the realm part of the contract id
+     * @param num                       the num part of the contract id
+     */
     @SuppressWarnings("InconsistentOverloads")
     public ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num) {
         this(shard, realm, num, null);
     }
 
+    /**
+     * Assign all parts of the contract id.
+     *
+     * @param shard                     the shard part of the contract id
+     * @param realm                     the realm part of the contract id
+     * @param num                       the num part of the contract id
+     */
     @SuppressWarnings("InconsistentOverloads")
     ContractId(@Nonnegative long shard, @Nonnegative long realm, @Nonnegative long num, @Nullable String checksum) {
         this.shard = shard;
@@ -104,6 +126,12 @@ public class ContractId extends Key implements Comparable<ContractId> {
         }
     }
 
+    /**
+     * Parse contract id from a solidity address string.
+     *
+     * @param address                   the address string
+     * @return                          the contract id object
+     */
     public static ContractId fromSolidityAddress(String address) {
         return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
     }

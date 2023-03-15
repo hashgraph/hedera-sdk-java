@@ -78,6 +78,8 @@ public enum HbarUnit {
      * Get the preferred symbol of the current unit.
      * <p>
      * E.g. {@link #TINYBAR}.getSymbol() returns "tℏ".
+     *
+     * @return the symbol
      */
     public String getSymbol() {
         return symbol;

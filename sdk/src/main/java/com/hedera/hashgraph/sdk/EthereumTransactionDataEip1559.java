@@ -5,6 +5,7 @@ import com.esaulpaugh.headlong.rlp.RLPEncoder;
 import com.esaulpaugh.headlong.rlp.RLPItem;
 import com.esaulpaugh.headlong.util.Integers;
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.InvalidProtocolBufferException;
 import java8.util.Lists;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -13,19 +14,65 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The ethereum transaction data, in the format defined in <a href="https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md">EIP-1559</a>
+ * The ethereum transaction data, in the format defined in <a href="https://githuab.com/ethereum/EIPs/blob/master/EIPS/eip-1559.md">EIP-1559</a>
  */
 public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
+
+    /**
+     * ID of the chain
+     */
     public byte[] chainId;
+
+    /**
+     * Transaction's nonce
+     */
     public byte[] nonce;
+
+    /**
+     * An 'optional' additional fee in Ethereum that is paid directly to miners in order to incentivize
+     * them to include your transaction in a block. Not used in Hedera
+     */
     public byte[] maxPriorityGas;
+
+    /**
+     * The maximum amount, in tinybars, that the payer of the hedera transaction
+     * is willing to pay to complete the transaction
+     */
     public byte[] maxGas;
+
+    /**
+     * The amount of gas available for the transaction
+     */
     public byte[] gasLimit;
+
+    /**
+     * The receiver of the transaction
+     */
     public byte[] to;
+
+    /**
+     * The transaction value
+     */
     public byte[] value;
+
+    /**
+     * specifies an array of addresses and storage keys that the transaction plans to access
+     */
     public byte[] accessList;
+
+    /**
+     * recovery parameter used to ease the signature verification
+     */
     public byte[] recoveryId;
+
+    /**
+     * The R value of the signature
+     */
     public byte[] r;
+
+    /**
+     * The S value of the signature
+     */
     public byte[] s;
 
     EthereumTransactionDataEip1559(
@@ -57,6 +104,12 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
         this.s = s;
     }
 
+    /**
+     * Convert a byte array to an ethereum transaction data.
+     *
+     * @param bytes                     the byte array
+     * @return                          the ethereum transaction data
+     */
     public static EthereumTransactionDataEip1559 fromBytes(byte[] bytes) {
         var decoder = RLPDecoder.RLP_STRICT.sequenceIterator(bytes);
         var rlpItem = decoder.next();

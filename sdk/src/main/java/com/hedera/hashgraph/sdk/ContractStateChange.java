@@ -32,7 +32,14 @@ import java.util.List;
  */
 @Deprecated
 public class ContractStateChange {
+    /**
+     * The contract to which the storage changes apply to
+     */
     public final ContractId contractId;
+
+    /**
+     * The list of storage changes
+     */
     public final List<StorageChange> storageChanges;
 
     /**

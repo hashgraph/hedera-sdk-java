@@ -111,6 +111,11 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return this;
     }
 
+    /**
+     * Extract the token id
+     *
+     * @return the tokenId
+     */
     @Nullable
     @Deprecated
     public TokenId getTokenId() {
@@ -131,12 +136,22 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return this;
     }
 
+    /**
+     * Get the Account ID for which information is requested
+     *
+     * @return the accountId
+     */
     @Nullable
     @Deprecated
     public AccountId getAccountId() {
         return accountId;
     }
 
+    /**
+     * Get the start of the index range for which information is requested
+     *
+     * @return the start
+     */
     @Deprecated
     public long getStart() {
         return start;
@@ -155,6 +170,11 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         return this;
     }
 
+    /**
+     * Get the end of the index range for which information is requested
+     *
+     * @return the end
+     */
     @Deprecated
     public long getEnd() {
         return end;

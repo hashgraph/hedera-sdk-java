@@ -160,7 +160,10 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
     }
 
     /**
+     * Get the max number of bytes that the result might include
+     *
      * @deprecated with no replacement
+     * @return the max number of byes
      */
     @Deprecated
     public long getMaxResultSize() {
@@ -169,9 +172,9 @@ public final class ContractCallQuery extends Query<ContractFunctionResult, Contr
 
     /**
      * @deprecated with no replacement
-     *
+     * <br>
      * Sets the max number of bytes that the result might include.
-     * The run will fail if it would have returned more than this number of bytes.
+     * The run will fail if it had returned more than this number of bytes.
      *
      * @param size The long to be set as size
      * @return {@code this}

@@ -29,11 +29,15 @@ public abstract class EthereumTransactionData {
 
     /**
      * Serialize the ethereum transaction data into bytes using RLP
+     *
+     * @return the serialized transaction as a byte array
      */
     public abstract byte[] toBytes();
 
     /**
      * Serialize the ethereum transaction data into a string
+     *
+     * @return the serialized transaction as a string
      */
     public abstract String toString();
 }

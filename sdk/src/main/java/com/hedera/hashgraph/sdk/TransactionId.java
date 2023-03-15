@@ -67,6 +67,9 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
+     *
+     * @param accountId     the account id
+     * @param validStart    the valid start time
      */
     public TransactionId(@Nullable AccountId accountId, @Nullable Instant validStart) {
         this.accountId = accountId;

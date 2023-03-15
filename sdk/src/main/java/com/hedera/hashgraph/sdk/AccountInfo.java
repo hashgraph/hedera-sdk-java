@@ -44,7 +44,7 @@ public final class AccountInfo {
     public final AccountId accountId;
 
     /**
-     * The Contract Account ID comprising of both the contract instance and the cryptocurrency
+     * The Contract Account ID comprising both the contract instance and the cryptocurrency
      * account owned by the contract instance, in the format used by Solidity.
      */
     public final String contractAccountId;
@@ -110,6 +110,10 @@ public final class AccountInfo {
      */
     public final Duration autoRenewPeriod;
 
+    /**
+     * All the livehashes attached to the account (each of which is a hash along with the
+     * keys that authorized it and can delete it)
+     */
     public final List<LiveHash> liveHashes;
 
     /**
@@ -118,6 +122,9 @@ public final class AccountInfo {
     @Deprecated
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
+    /**
+     * The memo associated with the account
+     */
     public final String accountMemo;
 
     /**
@@ -141,14 +148,26 @@ public final class AccountInfo {
      */
     public final LedgerId ledgerId;
 
+    /**
+     * The ethereum transaction nonce associated with this account.
+     */
     public final long ethereumNonce;
 
+    /**
+     * List of Hbar allowances
+     */
     @Deprecated
     public final List<HbarAllowance> hbarAllowances;
 
+    /**
+     * List of token allowances
+     */
     @Deprecated
     public final List<TokenAllowance> tokenAllowances;
 
+    /**
+     * List of NFT allowances
+     */
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowances;
 
@@ -175,7 +194,7 @@ public final class AccountInfo {
      * @param autoRenewPeriod           the auto renew period
      * @param liveHashes                the live hashes
      * @param tokenRelationships        list of token id and token relationship records
-     * @param accountMemo               the account melo
+     * @param accountMemo               the account memo
      * @param ownedNfts                 number of nft's
      * @param maxAutomaticTokenAssociations     max number of token associations
      * @param aliasKey                  public alias key
