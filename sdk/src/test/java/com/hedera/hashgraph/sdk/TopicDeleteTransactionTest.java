@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.ConsensusDeleteTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,5 +70,16 @@ public class TopicDeleteTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = TopicDeleteTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setConsensusDeleteTopic(ConsensusDeleteTopicTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TopicDeleteTransaction.class);
     }
 }

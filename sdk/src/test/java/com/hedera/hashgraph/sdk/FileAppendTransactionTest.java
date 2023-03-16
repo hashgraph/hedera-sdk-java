@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
@@ -218,5 +221,16 @@ public class FileAppendTransactionTest {
 
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHash());
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHashPerNode());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setFileAppend(FileAppendTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(FileAppendTransaction.class);
     }
 }

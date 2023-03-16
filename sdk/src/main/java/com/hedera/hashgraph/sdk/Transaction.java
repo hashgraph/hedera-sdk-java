@@ -447,10 +447,10 @@ public abstract class Transaction<T extends Transaction<T>>
                 return new FileUpdateTransaction(body.setFileUpdate(scheduled.getFileUpdate()).build());
 
             case SYSTEMDELETE:
-                return new SystemUndeleteTransaction(body.setSystemDelete(scheduled.getSystemDelete()).build());
+                return new SystemDeleteTransaction(body.setSystemDelete(scheduled.getSystemDelete()).build());
 
             case SYSTEMUNDELETE:
-                return new SystemDeleteTransaction(body.setSystemUndelete(scheduled.getSystemUndelete()).build());
+                return new SystemUndeleteTransaction(body.setSystemUndelete(scheduled.getSystemUndelete()).build());
 
             case FREEZE:
                 return new FreezeTransaction(body.setFreeze(scheduled.getFreeze()).build());

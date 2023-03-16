@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -157,5 +160,16 @@ public class TokenCreateTransactionTest {
         assertThat(tx.getTokenType()).isEqualTo(TokenType.FUNGIBLE_COMMON);
         assertThat(tx.getSupplyType()).isEqualTo(TokenSupplyType.INFINITE);
         assertThat(tx.getMaxSupply()).isZero();
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setTokenCreation(TokenCreateTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TokenCreateTransaction.class);
     }
 }

@@ -20,6 +20,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
@@ -144,5 +147,16 @@ public class CryptoTransferTransactionTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
             Transaction.fromBytes(brokenTxBytes);
         });
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setCryptoTransfer(CryptoTransferTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TransferTransaction.class);
     }
 }

@@ -20,6 +20,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
+import com.hedera.hashgraph.sdk.proto.ContractCallTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,5 +74,16 @@ public class ContractExecuteTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = ContractExecuteTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setContractCall(ContractCallTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(ContractExecuteTransaction.class);
     }
 }
