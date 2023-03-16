@@ -52,6 +52,12 @@ abstract class CustomFeeBase <F extends CustomFeeBase<F>> extends CustomFee {
 
     abstract F deepCloneSubclass();
 
+    /**
+     * Finishes the deep clone by setting the fields of the {@link CustomFeeBase} class
+     *
+     * @param source    the source object
+     * @return the cloned object
+     */
     protected F finishDeepClone(CustomFeeBase<F> source) {
         feeCollectorAccountId = source.feeCollectorAccountId;
         allCollectorsAreExempt = source.getAllCollectorsAreExempt();

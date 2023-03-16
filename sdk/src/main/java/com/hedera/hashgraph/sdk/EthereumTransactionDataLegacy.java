@@ -13,15 +13,55 @@ import java.util.List;
  * The ethereum transaction data, in the legacy format
  */
 public class EthereumTransactionDataLegacy extends EthereumTransactionData {
+
+    /**
+     * ID of the chain
+     */
     public byte[] chainId = new byte[]{};
+
+    /**
+     * Transaction's nonce
+     */
     public byte[] nonce;
+
+    /**
+     * The price for 1 gas
+     */
     public byte[] gasPrice;
+
+    /**
+     * The amount of gas available for the transaction
+     */
     public byte[] gasLimit;
+
+    /**
+     * The receiver of the transaction
+     */
     public byte[] to;
+
+    /**
+     * The transaction value
+     */
     public byte[] value;
+
+    /**
+     * The V value of the signature
+     */
     public byte[] v;
+
+    /**
+     * recovery parameter used to ease the signature verification
+     */
     public int recoveryId;
+
+    /**
+     * The R value of the signature
+     */
     public byte[] r;
+
+    /**
+     * The S value of the signature
+     */
     public byte[] s;
 
     EthereumTransactionDataLegacy(
@@ -54,6 +94,12 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
         }
     }
 
+    /**
+     * Convert a byte array to an ethereum transaction data.
+     *
+     * @param bytes                     the byte array
+     * @return                          the ethereum transaction data
+     */
     public static EthereumTransactionDataLegacy fromBytes(byte[] bytes) {
         var decoder = RLPDecoder.RLP_STRICT.sequenceIterator(bytes);
         var rlpItem = decoder.next();

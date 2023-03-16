@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * The ID for a crypto-currency account on Hedera.
+ * The ID for a cryptocurrency account on Hedera.
  */
 public final class AccountId implements Comparable<AccountId> {
     private static final Pattern ALIAS_ID_REGEX = Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.((?:[0-9a-fA-F][0-9a-fA-F])+)$");
@@ -54,9 +54,15 @@ public final class AccountId implements Comparable<AccountId> {
     @Nonnegative
     public final long num;
 
+    /**
+     * The public key bytes to be used as the account's alias
+     */
     @Nullable
     public final PublicKey aliasKey;
 
+    /**
+     * The ethereum account 20-byte EVM address to be used initially in place of the public key bytes
+     */
     @Nullable
     public final EvmAddress evmAddress;
 

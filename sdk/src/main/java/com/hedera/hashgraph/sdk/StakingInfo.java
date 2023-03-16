@@ -6,6 +6,9 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 
+/**
+ * Staking metadata for an account or a contract returned in CryptoGetInfo or ContractGetInfo queries
+ */
 public class StakingInfo {
     /**
      * If true, the contract declines receiving a staking reward. The default value is false.
@@ -38,6 +41,16 @@ public class StakingInfo {
     @Nullable
     public final Long stakedNodeId;
 
+    /**
+     * Constructor
+     *
+     * @param declineStakingReward  the declineStakingReward
+     * @param stakePeriodStart      the stakePeriodStart
+     * @param pendingReward         the amount in Hbar that will be received in the next reward situation
+     * @param stakedToMe            the total of balance of all accounts staked to this account or contract
+     * @param stakedAccountId       the account to which this account or contract is staking
+     * @param stakedNodeId          the ID of the node this account or contract is staked to
+     */
     public StakingInfo(boolean declineStakingReward, Instant stakePeriodStart, Hbar pendingReward, Hbar stakedToMe, @Nullable AccountId stakedAccountId, @Nullable Long stakedNodeId) {
         this.declineStakingReward = declineStakingReward;
         this.stakePeriodStart = stakePeriodStart;
@@ -58,6 +71,13 @@ public class StakingInfo {
         );
     }
 
+    /**
+     * Convert a byte array to a staking info object.
+     *
+     * @param bytes                     the byte array
+     * @return                          the converted staking info object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     public static StakingInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(com.hedera.hashgraph.sdk.proto.StakingInfo.parseFrom(bytes));
     }
@@ -80,6 +100,11 @@ public class StakingInfo {
         return builder.build();
     }
 
+    /**
+     * Convert the staking info object to a byte array.
+     *
+     * @return                          the converted staking info object
+     */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();
     }

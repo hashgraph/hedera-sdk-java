@@ -52,8 +52,16 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     private final com.hedera.hashgraph.sdk.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;
+
+    /**
+     * The transaction ID
+     */
     @Nullable
     protected TransactionId paymentTransactionId = null;
+
+    /**
+     * List of payment transactions
+     */
     @Nullable
     protected List<Transaction> paymentTransactions = null;
     @Nullable

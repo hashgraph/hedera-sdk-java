@@ -23,8 +23,20 @@ package com.hedera.hashgraph.sdk;
  * Enum for the execution states.
  */
 public enum ExecutionState {
-    Success,
-    Retry,          // call successful but operation not complete, retry with same/new node
-    ServerError,    // bad node, retry with new node
-    RequestError    // user error
+    /**
+     * Indicates that the execution was successful
+     */
+    SUCCESS,
+    /**
+     * Indicates that the call was successful but the operation did not complete. Retry with same/new node
+     */
+    RETRY,
+    /**
+     * Indicates that the receiver was bad node. Retry with new node
+     */
+    SERVER_ERROR,
+    /**
+     * Indicates that the request was incorrect
+     */
+    REQUEST_ERROR
 }

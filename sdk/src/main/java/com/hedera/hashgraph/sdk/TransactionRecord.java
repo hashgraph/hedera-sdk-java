@@ -156,12 +156,21 @@ public final class TransactionRecord {
      */
     public final ByteString ethereumHash;
 
+    /**
+     * An approved allowance of hbar transfers for a spender
+     */
     @Deprecated
     public final List<HbarAllowance> hbarAllowanceAdjustments;
 
+    /**
+     * An approved allowance of token transfers for a spender
+     */
     @Deprecated
     public final List<TokenAllowance> tokenAllowanceAdjustments;
 
+    /**
+     * An approved allowance of NFT transfers for a spender
+     */
     @Deprecated
     public final List<TokenNftAllowance> tokenNftAllowanceAdjustments;
 

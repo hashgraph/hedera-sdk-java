@@ -1,7 +1,13 @@
 package com.hedera.hashgraph.sdk.utils;
 
+/**
+ * Utility class for BIP32 functionalities
+ */
 public class Bip32Utils {
 
+    /**
+     * Indicates if the index is hardened
+     */
     public static final int HARDENED_BIT = 0x80000000;
 
     private Bip32Utils() {

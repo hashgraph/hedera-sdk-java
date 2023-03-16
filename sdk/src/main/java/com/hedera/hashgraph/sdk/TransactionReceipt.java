@@ -35,6 +35,10 @@ import java.util.List;
  * known, or may succeed or fail.
  */
 public final class TransactionReceipt {
+
+    /**
+     * The transaction's ID
+     */
     @Nullable
     public final TransactionId transactionId;
     /**

@@ -60,20 +60,43 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, ResponseT extends MessageLite, O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+    /**
+     * Used for logging
+     */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
+    /**
+     * The maximum times execution will be attempted
+     */
     @Nullable
     protected Integer maxAttempts = null;
 
+    /**
+     * The maximum amount of time to wait between retries
+     */
     @Nullable
     protected Duration maxBackoff = null;
 
+    /**
+     * The minimum amount of time to wait between retries
+     */
     @Nullable
     protected Duration minBackoff = null;
 
+    /**
+     * List of account IDs for nodes with which execution will be attempted.
+     */
     protected LockableList<AccountId> nodeAccountIds = new LockableList<>();
+
+    /**
+     * List of healthy and unhealthy nodes with which execution will be attempted.
+     */
     protected List<Node> nodes = new ArrayList<>();
 
+    /**
+     * Indicates if the request has been attempted to be sent to all nodes
+     */
     protected boolean attemptedAllNodes = false;
 
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
@@ -81,6 +104,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     Function<GrpcRequest, ResponseT> blockingUnaryCall =
         (grpcRequest) -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
 
+    /**
+     * The timeout for each execution attempt
+     */
     protected Duration grpcDeadline;
     private java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
     private java8.util.function.Function<ResponseT, ResponseT> responseListener;
@@ -101,7 +127,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     }
 
     /**
-     * When execution is attempted, a single attempt will timeout when this deadline is reached.
+     * When execution is attempted, a single attempt will time out when this deadline is reached.
      * (The SDK may subsequently retry the execution.)
      *
      * @return The timeout for each execution attempt
@@ -180,6 +206,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     /**
      * @deprecated Use {@link #getMaxAttempts()} instead.
+     *
+     * @return Number of errors before execution will fail.
      */
     @java.lang.Deprecated
     public final int getMaxRetry() {
@@ -188,6 +216,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     /**
      * @deprecated Use {@link #setMaxAttempts(int)} instead.
+     *
+     * @param count Number of errors before execution will fail
+     * @return {@code this}
      */
     @java.lang.Deprecated
     public final SdkRequestT setMaxRetry(int count) {
@@ -220,7 +251,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     /**
      * Get the list of account IDs for nodes with which execution will be attempted.
-     * @return
+     * @return the list of account IDs
      */
     @Nullable
     public final List<AccountId> getNodeAccountIds() {
@@ -396,19 +427,19 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             grpcRequest.handleResponse(response, status, executionState);
 
             switch (executionState) {
-                case ServerError:
+                case SERVER_ERROR:
                     lastException = grpcRequest.mapStatusException();
                     continue;
-                case Retry:
+                case RETRY:
                     // Response is not ready yet from server, need to wait.
                     lastException = grpcRequest.mapStatusException();
                     if (attempt < maxAttempts) {
                         delay(grpcRequest.getDelay());
                     }
                     continue;
-                case RequestError:
+                case REQUEST_ERROR:
                     throw grpcRequest.mapStatusException();
-                case Success:
+                case SUCCESS:
                 default:
                     return grpcRequest.mapResponse();
             }
@@ -493,6 +524,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         ConsumerHelper.twoConsumers(executeAsync(client, timeout), onSuccess, onFailure);
     }
 
+    /**
+     * Logs the transaction's parameters
+     *
+     * @param transactionId the transaction's id
+     * @param client        the client that executed the transaction
+     * @param node          the node the transaction was sent to
+     * @param isAsync       whether the transaction was executed asynchronously
+     * @param attempt       the attempt number
+     * @param response      the transaction response if the transaction was successful
+     * @param error         the error if the transaction was not successful
+     */
     protected void logTransaction(
         TransactionId transactionId,
         Client client,
@@ -647,18 +689,18 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     grpcRequest.handleResponse(response, status, executionState);
 
                     switch (executionState) {
-                        case ServerError:
+                        case SERVER_ERROR:
                             executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             break;
-                        case Retry:
+                        case RETRY:
                             Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor).thenRun(() -> {
                                 executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(), returnFuture, Duration.between(Instant.now(), timeoutTime));
                             });
                             break;
-                        case RequestError:
+                        case REQUEST_ERROR:
                             returnFuture.completeExceptionally(new CompletionException(grpcRequest.mapStatusException()));
                             break;
-                        case Success:
+                        case SUCCESS:
                         default:
                             returnFuture.complete(grpcRequest.mapResponse());
                     }
@@ -728,11 +770,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             case PLATFORM_TRANSACTION_NOT_CREATED:
             case PLATFORM_NOT_ACTIVE:
             case BUSY:
-                return ExecutionState.ServerError;
+                return ExecutionState.SERVER_ERROR;
             case OK:
-                return ExecutionState.Success;
+                return ExecutionState.SUCCESS;
             default:
-                return ExecutionState.RequestError;     // user error
+                return ExecutionState.REQUEST_ERROR;     // user error
         }
     }
 
@@ -831,17 +873,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace("Received {} response in {} s from node {} during attempt #{}: {}",
                 responseStatus, latency, node.getAccountId(), attempt, response);
 
-            if (executionState == ExecutionState.ServerError && attemptedAllNodes) {
-                executionState = ExecutionState.Retry;
+            if (executionState == ExecutionState.SERVER_ERROR && attemptedAllNodes) {
+                executionState = ExecutionState.RETRY;
                 attemptedAllNodes = false;
             }
             switch (executionState) {
-                case Retry:
+                case RETRY:
                     logger.warn("Retrying in {} ms after failure with node {} during attempt #{}: {}",
                         delay, node.getAccountId(), attempt, responseStatus);
                     verboseLog(node);
                     break;
-                case ServerError:
+                case SERVER_ERROR:
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
                     break;

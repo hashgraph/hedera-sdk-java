@@ -100,6 +100,13 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
         return transfers;
     }
 
+    /**
+     * Convert a byte array to a token NFT transfer object.
+     *
+     * @param bytes                     the byte array
+     * @return                          the converted token nft transfer object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     */
     @Deprecated
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(
@@ -137,6 +144,11 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
             .toString();
     }
 
+    /**
+     * Convert the token NFT transfer object to a byte array.
+     *
+     * @return                          the converted token NFT transfer object
+     */
     @Deprecated
     public byte[] toBytes() {
         return toProtobuf().toByteArray();

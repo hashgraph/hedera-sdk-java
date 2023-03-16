@@ -29,6 +29,9 @@ public class EthereumFlow {
     private Hbar maxGasAllowance;
 
 
+    /**
+     * Constructor
+     */
     public EthereumFlow() {
     }
 
@@ -68,7 +71,7 @@ public class EthereumFlow {
     /**
      * Sets the maximum amount that the payer of the hedera transaction
      * is willing to pay to complete the transaction.
-     *
+     * <br>
      * Ordinarily the account with the ECDSA alias corresponding to the public
      * key that is extracted from the ethereum_data signature is responsible for
      * fees that result from the execution of the transaction. If that amount of
@@ -80,6 +83,7 @@ public class EthereumFlow {
      * the entire fee.
      *
      * @param maxGasAllowance the maximum gas allowance
+     * @return {@code this}
      */
     public EthereumFlow setMaxGasAllowance(Hbar maxGasAllowance) {
         this.maxGasAllowance = maxGasAllowance;

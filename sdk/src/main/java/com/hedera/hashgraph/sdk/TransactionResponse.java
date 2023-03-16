@@ -41,12 +41,25 @@ import java.util.concurrent.TimeoutException;
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse">Hedera Documentation</a>
  */
 public final class TransactionResponse {
+
+    /**
+     * The node ID
+     */
     public final AccountId nodeId;
 
+    /**
+     * The transaction hash
+     */
     public final byte[] transactionHash;
 
+    /**
+     * The transaction ID
+     */
     public final TransactionId transactionId;
 
+    /**
+     * The scheduled transaction ID
+     */
     @Nullable
     @Deprecated
     public final TransactionId scheduledTransactionId;
@@ -122,6 +135,11 @@ public final class TransactionResponse {
         return receipt;
     }
 
+    /**
+     * Create receipt query from the {@link #transactionId} and {@link #transactionHash}
+     *
+     * @return {@link com.hedera.hashgraph.sdk.TransactionReceiptQuery}
+     */
     public TransactionReceiptQuery getReceiptQuery() {
         return new TransactionReceiptQuery()
             .setTransactionId(transactionId)
@@ -229,6 +247,11 @@ public final class TransactionResponse {
         return getRecordQuery().execute(client, timeout);
     }
 
+    /**
+     * Create record query from the {@link #transactionId} and {@link #transactionHash}
+     *
+     * @return {@link com.hedera.hashgraph.sdk.TransactionRecordQuery}
+     */
     public TransactionRecordQuery getRecordQuery() {
         return new TransactionRecordQuery()
             .setTransactionId(transactionId)

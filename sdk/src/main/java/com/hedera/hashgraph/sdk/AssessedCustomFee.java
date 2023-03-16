@@ -30,11 +30,26 @@ import java.util.List;
  * A custom transfer fee that was assessed during the handling of a CryptoTransfer.
  */
 public class AssessedCustomFee {
+    /**
+     * The number of units assessed for the fee
+     */
     public final long amount;
+
+    /**
+     * The denomination of the fee; taken as hbar if left unset
+     */
     @Nullable
     public final TokenId tokenId;
+
+    /**
+     * The account to receive the assessed fee
+     */
     @Nullable
     public final AccountId feeCollectorAccountId;
+
+    /**
+     * The account(s) whose final balances would have been higher in the absence of this assessed fee
+     */
     public final List<AccountId> payerAccountIdList;
 
     AssessedCustomFee(

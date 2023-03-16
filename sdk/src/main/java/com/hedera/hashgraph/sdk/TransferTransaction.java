@@ -312,6 +312,10 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     /**
      * @deprecated - Use {@link #addApprovedTokenTransfer(TokenId, AccountId, long)} instead
+     * @param tokenId       the token id
+     * @param accountId     the account id
+     * @param isApproved    whether the transfer is approved
+     * @return {@code this}
      */
     @Deprecated
     public TransferTransaction setTokenTransferApproval(TokenId tokenId, AccountId accountId, boolean isApproved) {
@@ -377,6 +381,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     /**
      * @deprecated - Use {@link #addApprovedNftTransfer(NftId, AccountId, AccountId)} instead
+     * @param nftId         the NFT id
+     * @param isApproved    whether the transfer is approved
+     * @return {@code this}
      */
     @Deprecated
     public TransferTransaction setNftTransferApproval(NftId nftId, boolean isApproved) {
@@ -457,6 +464,9 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     /**
      * @deprecated - Use {@link #addApprovedHbarTransfer(AccountId, Hbar)} instead
+     * @param accountId     the account id
+     * @param isApproved    whether the transfer is approved
+     * @return {@code this}
      */
     @Deprecated
     public TransferTransaction setHbarTransferApproval(AccountId accountId, boolean isApproved) {

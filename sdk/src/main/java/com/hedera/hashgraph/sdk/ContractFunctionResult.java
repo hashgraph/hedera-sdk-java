@@ -50,18 +50,40 @@ public final class ContractFunctionResult {
      */
     public final ContractId contractId;
 
+    /**
+     * The contract's 20-byte EVM address
+     */
     @Nullable
     public final ContractId evmAddress;
 
+    /**
+     * message in case there was an error during smart contract execution
+     */
     @Nullable
     public final String errorMessage;
 
+    /**
+     * bloom filter for record
+     */
     public final ByteString bloom;
 
+    /**
+     * units of gas used to execute contract
+     */
     public final long gasUsed;
 
+    /**
+     * the log info for events returned by the function
+     */
     public final List<ContractLogInfo> logs;
 
+    /**
+     * The created ids will now _also_ be externalized through internal transaction
+     * records, where each record has its alias field populated with the new contract's
+     * EVM address. (This is needed for contracts created with CREATE2, since
+     * there is no longer a simple relationship between the new contract's 0.0.X id
+     * and its Solidity address.)
+     */
     @Deprecated
     public final List<ContractId> createdContractIds;
 
@@ -71,14 +93,29 @@ public final class ContractFunctionResult {
     @Deprecated
     public final List<ContractStateChange> stateChanges;
 
+    /**
+     * The amount of gas available for the call, aka the gasLimit
+     */
     public final long gas;
 
+    /**
+     * Number of tinybars sent (the function must be payable if this is nonzero).
+     */
     public final Hbar hbarAmount;
 
+    /**
+     * The parameters passed into the contract call.
+     * <br>
+     * This field should only be populated when the paired TransactionBody in the record stream is not a
+     * ContractCreateTransactionBody or a ContractCallTransactionBody.
+     */
     public final byte[] contractFunctionParametersBytes;
 
     private final ByteString rawResult;
 
+    /**
+     * The account that is the "sender." If not present it is the accountId from the transactionId.
+     */
     @Nullable
     public final AccountId senderAccountId;
 

@@ -95,12 +95,23 @@ public class TransactionFeeSchedule implements Cloneable {
         return this;
     }
 
+    /**
+     * Get the total fee charged for a transaction
+     *
+     * @return the feeData
+     */
     @Deprecated
     @Nullable
     public FeeData getFeeData() {
         return feeData;
     }
 
+    /**
+     * Set the total fee charged for a transaction
+     *
+     * @param feeData the feeData to set
+     * @return {@code this}
+     */
     @Deprecated
     public TransactionFeeSchedule setFeeData(@Nullable FeeData feeData) {
         this.feeData = feeData;

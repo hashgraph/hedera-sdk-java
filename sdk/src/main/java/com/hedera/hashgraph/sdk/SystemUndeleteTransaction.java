@@ -97,8 +97,13 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
         return this;
     }
 
+    /**
+     * The contract ID instance to undelete, in the format used in transactions
+     *
+     * @return the contractId
+     */
     @Nullable
-    public final ContractId getContractId() {
+    public ContractId getContractId() {
         return contractId;
     }
 

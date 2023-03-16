@@ -31,15 +31,26 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * The ID for a crypto-currency account on Hedera.
+ * The ID for a cryptocurrency account on Hedera.
  */
 public final class EvmAddress extends Key {
     private final byte[] bytes;
 
+    /**
+     * Constructor
+     *
+     * @param bytes the byte array representation of the address
+     */
     public EvmAddress(byte[] bytes) {
         this.bytes = Arrays.copyOf(bytes, bytes.length);
     }
 
+    /**
+     * Convert a string to an ethereum address.
+     *
+     * @param text                      the string
+     * @return                          the ethereum address
+     */
     public static EvmAddress fromString(String text) {
         String address = text.startsWith("0x") ? text.substring(2) : text;
         return new EvmAddress(Hex.decode(address));
@@ -53,6 +64,12 @@ public final class EvmAddress extends Key {
         return null;
     }
 
+    /**
+     * Convert a byte array to an ethereum address.
+     *
+     * @param bytes                     the byte array
+     * @return                          the ethereum address
+     */
     public static EvmAddress fromBytes(byte[] bytes) {
         return new EvmAddress(bytes);
     }

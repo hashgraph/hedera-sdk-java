@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+/**
+ * Enum for the freeze types.
+ */
 public enum FreezeType {
     /**
      * An (invalid) default value for this enum, to ensure the client explicitly sets

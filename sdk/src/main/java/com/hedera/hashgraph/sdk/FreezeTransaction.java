@@ -107,6 +107,9 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated Use {@link #setStartTime(Instant)} instead.
+     * @param hour   The hour to be set
+     * @param minute The minute to be set
+     * @return {@code this}
      */
     @Deprecated
     public FreezeTransaction setStartTime(int hour, int minute) {
@@ -115,6 +118,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated with no replacement
+     * @return the end time
      */
     @Deprecated
     @SuppressWarnings("FromTemporalAccessor")
@@ -142,6 +146,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated Use {@link #getFileId()} instead.
+     * @return the fileId
      */
     @Deprecated
     @Nullable
@@ -151,6 +156,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated Use {@link #setFileId(FileId)} instead.
+     * @param updateFileId the new fileId
+     * @return {@code this}
      */
     @Deprecated
     public FreezeTransaction setUpdateFileId(FileId updateFileId) {
@@ -159,6 +166,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated Use {@link #getFileHash()} instead.
+     * @return the fileHash
      */
     @Deprecated
     public byte[] getUpdateFileHash() {
@@ -167,6 +175,8 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
 
     /**
      * @deprecated Use {@link #setFileHash(byte[])} instead.
+     * @param updateFileHash fileHash to set
+     * @return {@code this}
      */
     @Deprecated
     public FreezeTransaction setUpdateFileHash(byte[] updateFileHash) {
@@ -197,7 +207,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
     }
 
     /**
-     * Extract the file's hash.
+     * The expected hash of the contents of the update file (used to verify the update)
      *
      * @return                          the file's hash
      */
@@ -205,6 +215,12 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
         return Arrays.copyOf(fileHash, fileHash.length);
     }
 
+    /**
+     * The expected hash of the contents of the update file (used to verify the update)
+     *
+     * @param fileHash the fileHash to set
+     * @return {@code this}
+     */
     public FreezeTransaction setFileHash(byte[] fileHash) {
         requireNotFrozen();
         Objects.requireNonNull(fileHash);

@@ -91,6 +91,11 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
         return this;
     }
 
+    /**
+     * Clears the schedule id
+     *
+     * @return {@code this}
+     */
     @Deprecated
     public ScheduleSignTransaction clearScheduleId() {
         requireNotFrozen();

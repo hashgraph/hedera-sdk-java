@@ -38,9 +38,11 @@ import java.util.Arrays;
  * A private key on the Hedera™ network.
  */
 public abstract class PrivateKey extends Key {
-    // Cache the derivation of the public key
+    /**
+     * The public key derived from the private key
+     */
     @Nullable
-    protected PublicKey publicKey = null;
+    protected PublicKey publicKey = null; // Cache the derivation of the public key
 
     /**
      * Generates a new <a href="https://ed25519.cr.yp.to/">Ed25519</a> private key.
@@ -465,5 +467,10 @@ public abstract class PrivateKey extends Key {
      */
     public abstract boolean isECDSA();
 
+    /**
+     * Get the chain code of the key
+     *
+     * @return the chainCode
+     */
     public abstract KeyParameter getChainCode();
 }

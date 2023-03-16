@@ -55,50 +55,86 @@ import java.util.Set;
 public abstract class Transaction<T extends Transaction<T>>
     extends Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, TransactionResponse> {
 
-    // Default auto renew duration for accounts, contracts, topics, and files (entities)
+    /**
+     * Default auto renew duration for accounts, contracts, topics, and files (entities)
+     */
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
 
-    // Default transaction duration
+    /**
+     * Default transaction duration
+     */
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
-    // Transaction constructors end their work by setting sourceTransactionBody.
-    // The expectation is that the Transaction subclass constructor
-    // will pick up where the Transaction superclass constructor left off,
-    // and will unpack the data in the transaction body.
+
+    /**
+     * Transaction constructors end their work by setting sourceTransactionBody.
+     * The expectation is that the Transaction subclass constructor
+     * will pick up where the Transaction superclass constructor left off,
+     * and will unpack the data in the transaction body.
+     */
     protected final TransactionBody sourceTransactionBody;
-    // The builder that gets re-used to build each outer transaction.
-    // freezeWith() will create the frozenBodyBuilder.
-    // The presence of frozenBodyBuilder indicates that this transaction is frozen.
+    /**
+     * The builder that gets re-used to build each outer transaction.
+     * freezeWith() will create the frozenBodyBuilder.
+     * The presence of frozenBodyBuilder indicates that this transaction is frozen.
+     */
     @Nullable
     protected TransactionBody.Builder frozenBodyBuilder = null;
-    // A SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
-    // functionally identical, with the exception of pointing to different nodes. When retrying a
-    // transaction after a network error or retry-able status response, we try a
-    // different transaction and thus a different node.
+
+    /**
+     * An SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
+     * functionally identical, except pointing to different nodes. When retrying a
+     * transaction after a network error or retry-able status response, we try a
+     * different transaction and thus a different node.
+     */
     protected List<com.hedera.hashgraph.sdk.proto.Transaction> outerTransactions = Collections.emptyList();
+
+    /**
+     * An SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
+     * functionally identical, except pointing to different nodes. When retrying a
+     * transaction after a network error or retry-able status response, we try a
+     * different transaction and thus a different node.
+     */
     protected List<com.hedera.hashgraph.sdk.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
+
+    /**
+     *  A set of signatures corresponding to every unique public key used to sign the transaction.
+     */
     protected List<SignatureMap.Builder> sigPairLists = Collections.emptyList();
+
+    /**
+     * List of IDs for the transaction based on the operator because the transaction ID includes the operator's account
+     */
     protected LockableList<TransactionId> transactionIds = new LockableList<>();
-    // publicKeys and signers are parallel arrays.
-    // If the signer associated with a public key is null, that means that the private key
-    // associated with that public key has already contributed a signature to sigPairListBuilders, but
-    // the signer is not available (likely because this came from fromBytes())
+
+    /**
+     * publicKeys and signers are parallel arrays.
+     * If the signer associated with a public key is null, that means that the private key
+     * associated with that public key has already contributed a signature to sigPairListBuilders, but
+     * the signer is not available (likely because this came from fromBytes())
+     */
     protected List<PublicKey> publicKeys = new ArrayList<>();
+
+    /**
+     * publicKeys and signers are parallel arrays.
+     * If the signer associated with a public key is null, that means that the private key
+     * associated with that public key has already contributed a signature to sigPairListBuilders, but
+     * the signer is not available (likely because this came from fromBytes())
+     */
     protected List<Function<byte[], byte[]>> signers = new ArrayList<>();
+
+    /**
+     * The maximum transaction fee the client is willing to pay
+     */
     protected Hbar defaultMaxTransactionFee = new Hbar(2);
-    // For SDK Transactions that require multiple protobuf transaction ID's this variable keeps track of the current
-    // execution group.
-    // Example:
-    // NodeIds: [ 3, 4 ]
-    // Transactions: [
-    //      { ID: 1, NodeAccountID: 3 }, // group = 0
-    //      { ID: 1, NodeAccountID: 4 }, // group = 0
-    //      { ID: 2, NodeAccountID: 3 }, // group = 1
-    //      { ID: 2, NodeAccountID: 4 }  // group = 1
-    // ]
+
     private Duration transactionValidDuration;
     @Nullable
     private Hbar maxTransactionFee = null;
     private String memo = "";
+
+    /**
+     * Should the transaction id be regenerated
+     */
     protected Boolean regenerateTransactionId = null;
 
     /**
@@ -632,6 +668,12 @@ public abstract class Transaction<T extends Transaction<T>>
         return hash;
     }
 
+    /**
+     * Converts transaction into a scheduled version
+     *
+     * @param bodyBuilder   the transaction's body builder
+     * @return the scheduled transaction
+     */
     protected ScheduleCreateTransaction doSchedule(TransactionBody.Builder bodyBuilder) {
         var schedulable = SchedulableTransactionBody.newBuilder()
             .setTransactionFee(bodyBuilder.getTransactionFee())
@@ -960,6 +1002,12 @@ public abstract class Transaction<T extends Transaction<T>>
         return signWith(operator.publicKey, operator.transactionSigner);
     }
 
+    /**
+     * Checks if a public key is already added to the transaction
+     *
+     * @param key   the public key
+     * @return if the public key is already added
+     */
     protected boolean keyAlreadySigned(PublicKey key) {
         return publicKeys.contains(key);
     }
@@ -1091,6 +1139,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * Will use the `Client`, if available, to generate a default Transaction ID and select 1/3
      * nodes to prepare this transaction for.
      *
+     * @param client                    the configured client
      * @return {@code this}
      */
     public T freezeWith(@Nullable Client client) {
@@ -1362,13 +1411,13 @@ public abstract class Transaction<T extends Transaction<T>>
         switch (status) {
             case TRANSACTION_EXPIRED:
                 if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
-                    return ExecutionState.RequestError;
+                    return ExecutionState.REQUEST_ERROR;
                 } else {
                     var firstTransactionId = Objects.requireNonNull(transactionIds.get(0));
                     var accountId = Objects.requireNonNull(firstTransactionId.accountId);
                     generateTransactionIds(TransactionId.generate(accountId), transactionIds.size());
                     wipeTransactionLists(transactionIds.size());
-                    return ExecutionState.Retry;
+                    return ExecutionState.RETRY;
                 }
             default:
                 return super.getExecutionState(status, response);

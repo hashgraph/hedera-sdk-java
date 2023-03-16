@@ -33,7 +33,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/associate-tokens-to-an-account">Hedera Documentation</a>
  */
 public class TokenAssociation {
+
+    /**
+     * The token involved in the association
+     */
     public final TokenId tokenId;
+
+    /**
+     * The account involved in the association
+     */
     public final AccountId accountId;
 
     /**
