@@ -33,7 +33,7 @@ jobs:
             - name: Compile SDK
               run: ./gradlew compileJava
             - name: Generate Javadoc
-              run: gradle sdk:javadoc
+              run: ./gradlew sdk:javadoc
             - name: Pages
               uses: actions/upload-pages-artifact@v1
               with:
