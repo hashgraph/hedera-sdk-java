@@ -61,16 +61,6 @@ class MirrorNode extends BaseNode<MirrorNode, BaseNodeAddress> {
     }
 
     @Override
-    MirrorNode toInsecure() {
-        return new MirrorNode(this, address.toInsecure());
-    }
-
-    @Override
-    MirrorNode toSecure() {
-        return new MirrorNode(this, address.toSecure());
-    }
-
-    @Override
     BaseNodeAddress getKey() {
         return address;
     }

@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk;
 
 import org.junit.jupiter.api.Test;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_MIRROR_PLAIN;
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_MIRROR_TLS;
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
@@ -85,23 +84,17 @@ public class BaseNodeAddressTest {
         assertThat(processAddressInsecure.getPort()).isEqualTo(0);
         assertThat(processAddressInsecure.toString()).isEqualTo("testingProcess");
 
-        var mirrorNodeAddress = BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:5600");
+        var mirrorNodeAddress = BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:443");
         assertThat(mirrorNodeAddress.getName()).isNull();
         assertThat(mirrorNodeAddress.getAddress()).isEqualTo("mainnet-public.mirrornode.hedera.com");
-        assertThat(mirrorNodeAddress.getPort()).isEqualTo(PORT_MIRROR_PLAIN);
-        assertThat(mirrorNodeAddress.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:5600");
+        assertThat(mirrorNodeAddress.getPort()).isEqualTo(PORT_MIRROR_TLS);
+        assertThat(mirrorNodeAddress.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:443");
 
         var mirrorNodeAddressSecure = mirrorNodeAddress.toSecure();
         assertThat(mirrorNodeAddressSecure.getName()).isNull();
         assertThat(mirrorNodeAddressSecure.getAddress()).isEqualTo("mainnet-public.mirrornode.hedera.com");
         assertThat(mirrorNodeAddressSecure.getPort()).isEqualTo(PORT_MIRROR_TLS);
         assertThat(mirrorNodeAddressSecure.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:443");
-
-        var mirrorNodeAddressInsecure = mirrorNodeAddressSecure.toInsecure();
-        assertThat(mirrorNodeAddressInsecure.getName()).isNull();
-        assertThat(mirrorNodeAddressInsecure.getAddress()).isEqualTo("mainnet-public.mirrornode.hedera.com");
-        assertThat(mirrorNodeAddressInsecure.getPort()).isEqualTo(PORT_MIRROR_PLAIN);
-        assertThat(mirrorNodeAddressInsecure.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:5600");
 
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("this is a random string with spaces:443"));
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:notarealport"));
