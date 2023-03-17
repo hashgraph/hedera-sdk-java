@@ -4,10 +4,6 @@ on:
     push:
         branches:
             - main
-            - chore/add-api-docs
-    pull_request:
-        branches:
-            - chore/add-api-docs
 jobs:
     upload-pages:
         runs-on: ubuntu-latest
