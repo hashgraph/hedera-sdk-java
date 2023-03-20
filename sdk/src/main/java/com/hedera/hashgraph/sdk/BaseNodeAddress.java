@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 class BaseNodeAddress {
     private static final Pattern HOST_AND_PORT = Pattern.compile("^(\\S+):(\\d+)$");
     private static final Pattern IN_PROCESS = Pattern.compile("^in-process:(\\S+)$");
-    static final int PORT_MIRROR_PLAIN = 5600;
     static final int PORT_MIRROR_TLS = 443;
     static final int PORT_NODE_PLAIN = 50211;
     static final int PORT_NODE_TLS = 50212;
@@ -128,13 +127,8 @@ class BaseNodeAddress {
      * @return                          the insecure managed node address
      */
     public BaseNodeAddress toInsecure() {
-        var port = switch (this.port) {
-            case PORT_NODE_TLS -> PORT_NODE_PLAIN;
-            case PORT_MIRROR_TLS -> PORT_MIRROR_PLAIN;
-            default -> this.port;
-        };
-
-        return new BaseNodeAddress(name, address, port);
+        var newPort = (this.port == PORT_NODE_TLS) ? PORT_NODE_PLAIN : this.port;
+        return new BaseNodeAddress(name, address, newPort);
     }
 
     /**
@@ -143,13 +137,8 @@ class BaseNodeAddress {
      * @return                          the secure managed node address
      */
     public BaseNodeAddress toSecure() {
-        var port = switch (this.port) {
-            case PORT_NODE_PLAIN -> PORT_NODE_TLS;
-            case PORT_MIRROR_PLAIN -> PORT_MIRROR_TLS;
-            default -> this.port;
-        };
-
-        return new BaseNodeAddress(name, address, port);
+        var newPort = (this.port == PORT_NODE_PLAIN) ? PORT_NODE_TLS : this.port;
+        return new BaseNodeAddress(name, address, newPort);
     }
 
     @Override

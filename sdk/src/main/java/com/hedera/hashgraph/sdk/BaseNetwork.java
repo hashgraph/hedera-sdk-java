@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
@@ -271,36 +270,6 @@ abstract class BaseNetwork<
     }
 
     /**
-     * Enable or disable transport security (TLS).
-     *
-     * @param transportSecurity         should transport security be enabled
-     * @return {@code this}
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    synchronized BaseNetworkT setTransportSecurity(boolean transportSecurity) throws InterruptedException {
-        if (this.transportSecurity != transportSecurity) {
-            network.clear();
-
-            for (int i = 0; i < nodes.size(); i++) {
-                @Var var node = nodes.get(i);
-                node.close(closeTimeout);
-
-                node = transportSecurity ? node.toSecure() : node.toInsecure();
-
-                nodes.set(i, node);
-                getNodesForKey(node.getKey()).add(node);
-            }
-        }
-
-        healthyNodes = new ArrayList<>(nodes);
-
-        this.transportSecurity = transportSecurity;
-
-        // noinspection unchecked
-        return (BaseNetworkT) this;
-    }
-
-    /**
      * Extract the close timeout.
      *
      * @return                          the close timeout
@@ -445,16 +414,6 @@ abstract class BaseNetwork<
         nodesForKey.remove(node);
         if (nodesForKey.isEmpty()) {
             this.network.remove(node.getKey());
-        }
-    }
-
-    private List<BaseNodeT> getNodesForKey(KeyT key) {
-        if (network.containsKey(key)) {
-            return network.get(key);
-        } else {
-            var newList = new ArrayList<BaseNodeT>();
-            network.put(key, newList);
-            return newList;
         }
     }
 

@@ -75,12 +75,20 @@ class Node extends BaseNode<Node, AccountId> {
         this.addressBookEntry = node.addressBookEntry;
     }
 
-    @Override
+    /**
+     * Create an insecure version of this node
+     *
+     * @return                          the insecure version of the node
+     */
     Node toInsecure() {
         return new Node(this, address.toInsecure());
     }
 
-    @Override
+    /**
+     * Create a secure version of this node
+     *
+     * @return                          the secure version of the node
+     */
     Node toSecure() {
         return new Node(this, address.toSecure());
     }

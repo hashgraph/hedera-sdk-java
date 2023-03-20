@@ -467,16 +467,17 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     *
      * Set if transport security should be used to connect to mirror nodes.
      * <br>
      * If transport security is enabled all connections to mirror nodes will use TLS.
      *
+     * @deprecated Mirror nodes can only be accessed using TLS
      * @param transportSecurity - enable or disable transport security for mirror nodes
      * @return {@code this} for fluent API usage.
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
-    public Client setMirrorTransportSecurity(boolean transportSecurity) throws InterruptedException {
-        mirrorNetwork.setTransportSecurity(transportSecurity);
+    @Deprecated
+    public Client setMirrorTransportSecurity(boolean transportSecurity) {
         return this;
     }
 
