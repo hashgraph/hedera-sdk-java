@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.errorprone.annotations.Var;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;

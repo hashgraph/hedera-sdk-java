@@ -127,8 +127,8 @@ class BaseNodeAddress {
      * @return                          the insecure managed node address
      */
     public BaseNodeAddress toInsecure() {
-        var port = (this.port == PORT_NODE_TLS) ? PORT_NODE_PLAIN : this.port;
-        return new BaseNodeAddress(name, address, port);
+        var newPort = (this.port == PORT_NODE_TLS) ? PORT_NODE_PLAIN : this.port;
+        return new BaseNodeAddress(name, address, newPort);
     }
 
     /**
@@ -137,8 +137,8 @@ class BaseNodeAddress {
      * @return                          the secure managed node address
      */
     public BaseNodeAddress toSecure() {
-        var port = (this.port == PORT_NODE_PLAIN) ? PORT_NODE_TLS : this.port;
-        return new BaseNodeAddress(name, address, port);
+        var newPort = (this.port == PORT_NODE_PLAIN) ? PORT_NODE_TLS : this.port;
+        return new BaseNodeAddress(name, address, newPort);
     }
 
     @Override

@@ -34,67 +34,67 @@ public class BaseNodeAddressTest {
         assertThat(ipAddress.getName()).isNull();
         assertThat(ipAddress.getAddress()).isEqualTo("35.237.200.180");
         assertThat(ipAddress.getPort()).isEqualTo(PORT_NODE_PLAIN);
-        assertThat(ipAddress.toString()).isEqualTo("35.237.200.180:50211");
+        assertThat(ipAddress).hasToString("35.237.200.180:50211");
 
         var ipAddressSecure = ipAddress.toSecure();
         assertThat(ipAddressSecure.getName()).isNull();
         assertThat(ipAddressSecure.getAddress()).isEqualTo("35.237.200.180");
         assertThat(ipAddressSecure.getPort()).isEqualTo(PORT_NODE_TLS);
-        assertThat(ipAddressSecure.toString()).isEqualTo("35.237.200.180:50212");
+        assertThat(ipAddressSecure).hasToString("35.237.200.180:50212");
 
         var ipAddressInsecure = ipAddressSecure.toInsecure();
         assertThat(ipAddressInsecure.getName()).isNull();
         assertThat(ipAddressInsecure.getAddress()).isEqualTo("35.237.200.180");
         assertThat(ipAddressInsecure.getPort()).isEqualTo(PORT_NODE_PLAIN);
-        assertThat(ipAddressInsecure.toString()).isEqualTo("35.237.200.180:50211");
+        assertThat(ipAddressInsecure).hasToString("35.237.200.180:50211");
 
         var urlAddress = BaseNodeAddress.fromString("0.testnet.hedera.com:50211");
         assertThat(urlAddress.getName()).isNull();
         assertThat(urlAddress.getAddress()).isEqualTo("0.testnet.hedera.com");
         assertThat(urlAddress.getPort()).isEqualTo(PORT_NODE_PLAIN);
-        assertThat(urlAddress.toString()).isEqualTo("0.testnet.hedera.com:50211");
+        assertThat(urlAddress).hasToString("0.testnet.hedera.com:50211");
 
         var urlAddressSecure = urlAddress.toSecure();
         assertThat(urlAddressSecure.getName()).isNull();
         assertThat(urlAddressSecure.getAddress()).isEqualTo("0.testnet.hedera.com");
         assertThat(urlAddressSecure.getPort()).isEqualTo(PORT_NODE_TLS);
-        assertThat(urlAddressSecure.toString()).isEqualTo("0.testnet.hedera.com:50212");
+        assertThat(urlAddressSecure).hasToString("0.testnet.hedera.com:50212");
 
         var urlAddressInsecure = urlAddressSecure.toInsecure();
         assertThat(urlAddressInsecure.getName()).isNull();
         assertThat(urlAddressInsecure.getAddress()).isEqualTo("0.testnet.hedera.com");
         assertThat(urlAddressInsecure.getPort()).isEqualTo(PORT_NODE_PLAIN);
-        assertThat(urlAddressInsecure.toString()).isEqualTo("0.testnet.hedera.com:50211");
+        assertThat(urlAddressInsecure).hasToString("0.testnet.hedera.com:50211");
 
         var processAddress = BaseNodeAddress.fromString("in-process:testingProcess");
         assertThat(processAddress.getName()).isEqualTo("testingProcess");
         assertThat(processAddress.getAddress()).isNull();
         assertThat(processAddress.getPort()).isEqualTo(0);
-        assertThat(processAddress.toString()).isEqualTo("testingProcess");
+        assertThat(processAddress).hasToString("testingProcess");
 
         var processAddressSecure = processAddress.toSecure();
         assertThat(processAddressSecure.getName()).isEqualTo("testingProcess");
         assertThat(processAddressSecure.getAddress()).isNull();
         assertThat(processAddressSecure.getPort()).isEqualTo(0);
-        assertThat(processAddressSecure.toString()).isEqualTo("testingProcess");
+        assertThat(processAddressSecure).hasToString("testingProcess");
 
         var processAddressInsecure = processAddressSecure.toInsecure();
         assertThat(processAddressInsecure.getName()).isEqualTo("testingProcess");
         assertThat(processAddressInsecure.getAddress()).isNull();
         assertThat(processAddressInsecure.getPort()).isEqualTo(0);
-        assertThat(processAddressInsecure.toString()).isEqualTo("testingProcess");
+        assertThat(processAddressInsecure).hasToString("testingProcess");
 
         var mirrorNodeAddress = BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:443");
         assertThat(mirrorNodeAddress.getName()).isNull();
         assertThat(mirrorNodeAddress.getAddress()).isEqualTo("mainnet-public.mirrornode.hedera.com");
         assertThat(mirrorNodeAddress.getPort()).isEqualTo(PORT_MIRROR_TLS);
-        assertThat(mirrorNodeAddress.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:443");
+        assertThat(mirrorNodeAddress).hasToString("mainnet-public.mirrornode.hedera.com:443");
 
         var mirrorNodeAddressSecure = mirrorNodeAddress.toSecure();
         assertThat(mirrorNodeAddressSecure.getName()).isNull();
         assertThat(mirrorNodeAddressSecure.getAddress()).isEqualTo("mainnet-public.mirrornode.hedera.com");
         assertThat(mirrorNodeAddressSecure.getPort()).isEqualTo(PORT_MIRROR_TLS);
-        assertThat(mirrorNodeAddressSecure.toString()).isEqualTo("mainnet-public.mirrornode.hedera.com:443");
+        assertThat(mirrorNodeAddressSecure).hasToString("mainnet-public.mirrornode.hedera.com:443");
 
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("this is a random string with spaces:443"));
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:notarealport"));
