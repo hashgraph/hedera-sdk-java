@@ -20,6 +20,9 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenDissociateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenFeeScheduleUpdateTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -75,5 +78,16 @@ public class TokenFeeScheduleUpdateTransactionTest {
         var copyUpdate = TokenFeeScheduleUpdateTransaction.fromBytes(updateBytes);
         assertThat(copyUpdate.toString()).isEqualTo(originalUpdate.toString());
         SnapshotMatcher.expect(originalUpdate.toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setTokenFeeScheduleUpdate(TokenFeeScheduleUpdateTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TokenFeeScheduleUpdateTransaction.class);
     }
 }
