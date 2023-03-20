@@ -59,6 +59,9 @@ public final class FileInfo {
     @Nullable
     public final KeyList keys;
 
+    /**
+     * The memo associated with the file
+     */
     public final String fileMemo;
 
     /**

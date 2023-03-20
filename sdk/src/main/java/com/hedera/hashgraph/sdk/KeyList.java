@@ -41,10 +41,11 @@ public final class KeyList extends Key implements Collection<Key> {
      * The list of keys.
      */
     private final List<Key> keys = new ArrayList<>();
-    @Nullable
+
     /**
      * The minimum number of keys that must sign.
      */
+    @Nullable
     public Integer threshold;
 
     /**

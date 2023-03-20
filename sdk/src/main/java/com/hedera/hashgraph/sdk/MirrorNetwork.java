@@ -34,7 +34,7 @@ import java.util.concurrent.TimeoutException;
 class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNode> {
     private MirrorNetwork(ExecutorService executor, List<String> addresses) {
         super(executor);
-
+        this.transportSecurity = true;
         try {
             setNetwork(addresses);
         } catch (InterruptedException | TimeoutException e) {
@@ -60,13 +60,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for mainnet
      */
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        try {
-            return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:443"))
-                .setTransportSecurity(true);
-        } catch (InterruptedException e) {
-            // should never happen
-            throw new RuntimeException(e);
-        }
+        return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:443"));
     }
 
     /**

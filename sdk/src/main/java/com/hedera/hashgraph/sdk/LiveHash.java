@@ -34,9 +34,25 @@ import org.threeten.bp.Duration;
  * See <a href="https://docs.hedera.com/guides/core-concepts/accounts#livehash">Hedera Documentation</a>
  */
 public class LiveHash {
+
+    /**
+     * The account to which the livehash is attached
+     */
     public final AccountId accountId;
+
+    /**
+     * The SHA-384 hash of a credential or certificate
+     */
     public final ByteString hash;
+
+    /**
+     * A list of keys (primitive or threshold), all of which must sign to attach the livehash to an account, and any one of which can later delete it.
+     */
     public final KeyList keys;
+
+    /**
+     * The duration for which the livehash will remain valid
+     */
     public final Duration duration;
 
     /**

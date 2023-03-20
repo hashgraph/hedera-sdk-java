@@ -23,6 +23,9 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
     private FileId callDataFileId = null;
     private Hbar maxGasAllowanceHbar = Hbar.ZERO;
 
+    /**
+     * Constructor
+     */
     public EthereumTransaction() {
     }
 
@@ -102,7 +105,7 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
     /**
      * Sets the maximum amount that the payer of the hedera transaction
      * is willing to pay to complete the transaction.
-     *
+     * <br>
      * Ordinarily the account with the ECDSA alias corresponding to the public
      * key that is extracted from the ethereum_data signature is responsible for
      * fees that result from the execution of the transaction. If that amount of
@@ -114,8 +117,8 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
      * the entire fee.
      *
      * @param maxGasAllowanceHbar the maximum gas allowance
+     * @return {@code this}
      */
-
     public EthereumTransaction setMaxGasAllowanceHbar(Hbar maxGasAllowanceHbar) {
         Objects.requireNonNull(maxGasAllowanceHbar);
         requireNotFrozen();

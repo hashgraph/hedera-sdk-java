@@ -127,6 +127,9 @@ public class ContractCreateFlow {
     @Nullable
     private Function<byte[], byte[]> transactionSigner = null;
 
+    /**
+     * Constructor
+     */
     public ContractCreateFlow() {
     }
 
@@ -174,11 +177,21 @@ public class ContractCreateFlow {
         return setBytecode(bytecode.toByteArray());
     }
 
+    /**
+     * Get the maximum number of chunks
+     * @return the maxChunks
+     */
     @Nullable
     public Integer getMaxChunks() {
         return maxChunks;
     }
 
+    /**
+     * Set the maximal number of chunks
+     *
+     * @param maxChunks the maximum number of chunks
+     * @return {@code this}
+     */
     public ContractCreateFlow setMaxChunks(int maxChunks) {
         this.maxChunks = maxChunks;
         return this;
@@ -286,10 +299,23 @@ public class ContractCreateFlow {
         return this;
     }
 
+    /**
+     * The maximum number of tokens that an Account can be implicitly associated with. Defaults to 0
+     * and up to a maximum value of 1000.
+     *
+     * @return The maxAutomaticTokenAssociations.
+     */
     public int getMaxAutomaticTokenAssociations() {
         return maxAutomaticTokenAssociations;
     }
 
+    /**
+     * The maximum number of tokens that an Account can be implicitly associated with. Defaults to 0
+     * and up to a maximum value of 1000.
+     *
+     * @param maxAutomaticTokenAssociations The maxAutomaticTokenAssociations to set
+     * @return {@code this}
+     */
     public ContractCreateFlow setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
         return this;
@@ -325,11 +351,22 @@ public class ContractCreateFlow {
         return this;
     }
 
+    /**
+     * Get the account ID which will be charged for renewing this account
+     *
+     * @return the auto-renewal account id
+     */
     @Nullable
     public AccountId getAutoRenewAccountId() {
         return autoRenewAccountId;
     }
 
+    /**
+     * Set the account ID which will be charged for renewing this account
+     *
+     * @param autoRenewAccountId the autoRenewAccountId to set
+     * @return {@code this}
+     */
     public ContractCreateFlow setAutoRenewAccountId(AccountId autoRenewAccountId) {
         Objects.requireNonNull(autoRenewAccountId);
         this.autoRenewAccountId = autoRenewAccountId;
@@ -485,6 +522,7 @@ public class ContractCreateFlow {
     /**
      * Set the client that this transaction will be frozen with.
      *
+     * @param client        the client with the transaction to execute
      * @return {@code this}
      */
     public ContractCreateFlow freezeWith(Client client) {
@@ -495,6 +533,7 @@ public class ContractCreateFlow {
     /**
      * Set the private key that this transaction will be signed with.
      *
+     * @param privateKey    the private key used for signing
      * @return {@code this}
      */
     public ContractCreateFlow sign(PrivateKey privateKey) {
@@ -507,6 +546,8 @@ public class ContractCreateFlow {
     /**
      * Set the public key and key list that this transaction will be signed with.
      *
+     * @param publicKey             the public key
+     * @param transactionSigner     the key list
      * @return {@code this}
      */
     public ContractCreateFlow signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
@@ -519,6 +560,7 @@ public class ContractCreateFlow {
     /**
      * Set the operator that this transaction will be signed with.
      *
+     * @param client        the client with the transaction to execute
      * @return {@code this}
      */
     public ContractCreateFlow signWithOperator(Client client) {

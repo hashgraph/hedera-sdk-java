@@ -31,8 +31,19 @@ import java.util.Arrays;
 public class LedgerId {
     final private byte[] idBytes;
 
+    /**
+     * The mainnet ledger id
+     */
     public final static LedgerId MAINNET = new LedgerId(new byte[]{0});
+
+    /**
+     * The testnet ledger id
+     */
     public final static LedgerId TESTNET = new LedgerId(new byte[]{1});
+
+    /**
+     * The previewnet ledger id
+     */
     public final static LedgerId PREVIEWNET = new LedgerId(new byte[]{2});
 
     /**
@@ -83,6 +94,12 @@ public class LedgerId {
         return fromBytes(byteString.toByteArray());
     }
 
+    /**
+     * Create a ledger id from a network name.
+     *
+     * @param networkName               the network name
+     * @return                          the ledger id
+     */
     @Deprecated
     public static LedgerId fromNetworkName(NetworkName networkName) {
         switch (networkName) {
@@ -168,6 +185,11 @@ public class LedgerId {
         return ByteString.copyFrom(idBytes);
     }
 
+    /**
+     * Extract the network name.
+     *
+     * @return                          the network name
+     */
     @Deprecated
     public NetworkName toNetworkName() {
         if (isMainnet()) {

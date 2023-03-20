@@ -33,10 +33,22 @@ import java.util.Objects;
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/cryptoallowance">Hedera Documentation</a>
  */
 public class HbarAllowance {
+
+    /**
+     * The account ID of the hbar owner (ie. the grantor of the allowance)
+     */
     @Nullable
     public final AccountId ownerAccountId;
+
+    /**
+     * The account ID of the spender of the hbar allowance
+     */
     @Nullable
     public final AccountId spenderAccountId;
+
+    /**
+     * The amount of the spender's allowance in tinybars
+     */
     @Nullable
     public final Hbar amount;
 

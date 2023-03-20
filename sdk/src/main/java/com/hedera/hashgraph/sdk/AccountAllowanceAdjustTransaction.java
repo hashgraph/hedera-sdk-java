@@ -48,6 +48,9 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     // key is "{ownerId}:{spenderId}".  OwnerId may be "FEE_PAYER"
     private final Map<String, Map<TokenId, Integer>> nftMap = new HashMap<>();
 
+    /**
+     * Constructor.
+     */
     public AccountAllowanceAdjustTransaction() {
     }
 
@@ -80,12 +83,24 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     /**
      * @deprecated - Use {@link #grantHbarAllowance(AccountId, AccountId, Hbar)} or
      * {@link #revokeHbarAllowance(AccountId, AccountId, Hbar)} instead
+     *
+     * @param spenderAccountId          the spender account id
+     * @param amount                    the amount of hbar
+     * @return                          an account allowance adjust transaction
      */
     @Deprecated
     public AccountAllowanceAdjustTransaction addHbarAllowance(AccountId spenderAccountId, Hbar amount) {
         return adjustHbarAllowance(null, spenderAccountId, Objects.requireNonNull(amount));
     }
 
+    /**
+     *  Grants Hbar allowance.
+     *
+     * @param ownerAccountId    the owner's account id
+     * @param spenderAccountId  the spender's account id
+     * @param amount            the amount of Hbar
+     * @return {@code this}
+     */
     public AccountAllowanceAdjustTransaction grantHbarAllowance(
         AccountId ownerAccountId,
         AccountId spenderAccountId,
@@ -98,6 +113,14 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
+    /**
+     * Revokes Hbar allowance
+     *
+     * @param ownerAccountId    the owner's account id
+     * @param spenderAccountId  the spender's account id
+     * @param amount            the amount of Hbar
+     * @return {@code this}
+     */
     public AccountAllowanceAdjustTransaction revokeHbarAllowance(
         AccountId ownerAccountId,
         AccountId spenderAccountId,
@@ -110,6 +133,11 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustHbarAllowance(Objects.requireNonNull(ownerAccountId), spenderAccountId, amount.negated());
     }
 
+    /**
+     * Get the Hbar allowances
+     *
+     * @return the Hbar allowances
+     */
     public List<HbarAllowance> getHbarAllowances() {
         return new ArrayList<>(hbarAllowances);
     }
@@ -133,36 +161,58 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     /**
      * @deprecated - Use {@link #grantTokenAllowance(TokenId, AccountId, AccountId, long)} or
      * {@link #revokeTokenAllowance(TokenId, AccountId, AccountId, long)} instead
+     *
+     * @param tokenId                   the token's id
+     * @param spenderAccountId          the spender's account id
+     * @param amount                    the amount of hbar
+     * @return                          an account allowance adjust transaction
      */
     @Deprecated
     public AccountAllowanceAdjustTransaction addTokenAllowance(TokenId tokenId, AccountId spenderAccountId, long amount) {
         return adjustTokenAllowance(tokenId, null, spenderAccountId, amount);
     }
 
+    /**
+     * Grants token allowance.
+     *
+     * @param tokenId           the token's id
+     * @param ownerAccountId    the owner's id
+     * @param spenderAccountId  the spender's id
+     * @param amount            the amount of tokens
+     * @return {@code this}
+     */
     public AccountAllowanceAdjustTransaction grantTokenAllowance(
         TokenId tokenId,
         AccountId ownerAccountId,
         AccountId spenderAccountId,
         @Nonnegative long amount
     ) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("amount passed to grantTokenAllowance must be positive");
-        }
         return adjustTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, amount);
     }
 
+    /**
+     * Revokes token allowance.
+     *
+     * @param tokenId           the token's id
+     * @param ownerAccountId    the owner's id
+     * @param spenderAccountId  the spender's id
+     * @param amount            the amount of tokens
+     * @return {@code this}
+     */
     public AccountAllowanceAdjustTransaction revokeTokenAllowance(
         TokenId tokenId,
         AccountId ownerAccountId,
         AccountId spenderAccountId,
         @Nonnegative long amount
     ) {
-        if (amount < 0) {
-            throw new IllegalArgumentException("amount passed to revokeTokenAllowance must be positive");
-        }
         return adjustTokenAllowance(tokenId, Objects.requireNonNull(ownerAccountId), spenderAccountId, -amount);
     }
 
+    /**
+     * Get the token allowances
+     *
+     * @return the token allowances
+     */
     public List<TokenAllowance> getTokenAllowances() {
         return new ArrayList<>(tokenAllowances);
     }
@@ -231,6 +281,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     /**
      * @deprecated - Use {@link #grantTokenNftAllowance(NftId, AccountId, AccountId)} or
      * {@link #revokeTokenNftAllowance(NftId, AccountId, AccountId)} instead
+     *
+     * @param nftId                 the NFT's id
+     * @param spenderAccountId      the spender's account id
+     * @return                      an account allowance adjust transaction
      */
     @Deprecated
     public AccountAllowanceAdjustTransaction addTokenNftAllowance(NftId nftId, AccountId spenderAccountId) {
@@ -241,12 +295,23 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
     /**
      * @deprecated - Use {@link #grantTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} or
      * {@link #revokeTokenNftAllowanceAllSerials(TokenId, AccountId, AccountId)} instead
+     * @param tokenId               the token's id
+     * @param spenderAccountId      the spender's account id
+     * @return                      an account allowance adjust transaction
      */
     @Deprecated
     public AccountAllowanceAdjustTransaction addAllTokenNftAllowance(TokenId tokenId, AccountId spenderAccountId) {
         return adjustNftAllowanceAllSerials(tokenId, true, null, spenderAccountId);
     }
 
+    /**
+     * Grants NFT allowance.
+     *
+     * @param nftId             the NFT's id
+     * @param ownerAccountId    the owner's id
+     * @param spenderAccountId  the spender's id
+     * @return {@code this}
+     */
     public AccountAllowanceAdjustTransaction grantTokenNftAllowance(
         NftId nftId,
         AccountId ownerAccountId,
@@ -257,6 +322,14 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustNftAllowance(nftId.tokenId, nftId.serial, ownerAccountId, spenderAccountId);
     }
 
+    /**
+     * Grants allowance for all NFT serials of a token
+     *
+     * @param tokenId               the token's id
+     * @param ownerAccountId        the owner's account id
+     * @param spenderAccountId      the spender's account id
+     * @return                      an account allowance adjust transaction
+     */
     public AccountAllowanceAdjustTransaction grantTokenNftAllowanceAllSerials(
         TokenId tokenId,
         AccountId ownerAccountId,
@@ -268,6 +341,10 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
 
     /**
      * @deprecated with no replacement
+     * @param nftId                 the NFT's id
+     * @param ownerAccountId        the owner's account id
+     * @param spenderAccountId      the spender's account id
+     * @return                      an account allowance adjust transaction
      */
     @Deprecated
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowance(
@@ -280,6 +357,14 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustNftAllowance(nftId.tokenId, -nftId.serial, ownerAccountId, spenderAccountId);
     }
 
+    /**
+     * Revokes allowance for all NFT serials of a token
+     *
+     * @param tokenId               the token's id
+     * @param ownerAccountId        the owner's account id
+     * @param spenderAccountId      the spender's account id
+     * @return                      an account allowance adjust transaction
+     */
     public AccountAllowanceAdjustTransaction revokeTokenNftAllowanceAllSerials(
         TokenId tokenId,
         AccountId ownerAccountId,
@@ -289,6 +374,11 @@ public class AccountAllowanceAdjustTransaction extends Transaction<AccountAllowa
         return adjustNftAllowanceAllSerials(tokenId, false, ownerAccountId, spenderAccountId);
     }
 
+    /**
+     * Get the NFT allowances
+     *
+     * @return a copy of {@link #nftAllowances}
+     */
     public List<TokenNftAllowance> getTokenNftAllowances() {
         List<TokenNftAllowance> retval = new ArrayList<>(nftAllowances.size());
         for (var allowance : nftAllowances) {

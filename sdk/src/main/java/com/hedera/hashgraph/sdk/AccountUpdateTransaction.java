@@ -157,6 +157,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
 
     /**
      * @deprecated with no replacement
+     * @return the alias key
      */
     @Deprecated
     @Nullable

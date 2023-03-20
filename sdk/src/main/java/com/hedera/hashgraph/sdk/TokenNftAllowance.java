@@ -37,14 +37,40 @@ import java.util.Objects;
  * Class to encapsulate the nft methods for token allowance's.
  */
 public class TokenNftAllowance {
+
+    /**
+     * The NFT token type that the allowance pertains to
+     */
     @Nullable
     public final TokenId tokenId;
+
+    /**
+     * The account ID of the token owner (ie. the grantor of the allowance)
+     */
     @Nullable
     public final AccountId ownerAccountId;
+
+    /**
+     * The account ID of the token allowance spender
+     */
     @Nullable
     public final AccountId spenderAccountId;
+
+    /**
+     * The account ID of the spender who is granted approvedForAll allowance and granting
+     * approval on an NFT serial to another spender.
+     */
     @Nullable AccountId delegatingSpender;
+
+    /**
+     * The list of serial numbers that the spender is permitted to transfer.
+     */
     public final List<Long> serialNumbers;
+
+    /**
+     * If true, the spender has access to all of the owner's NFT units of type tokenId (currently
+     * owned and any in the future).
+     */
     @Nullable
     public final Boolean allSerials;
 

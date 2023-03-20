@@ -309,6 +309,12 @@ public final class ContractFunctionParameters {
         return this;
     }
 
+    /**
+     * Add a boolean parameter
+     *
+     * @param bool The bool to be added
+     * @return {@code this}
+     */
     public ContractFunctionParameters addBool(boolean bool) {
         // boolean encodes to `uint8` of values [0, 1]
         args.add(new Argument("bool", int256(bool ? 1 : 0, 8), false));
@@ -329,7 +335,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 16-bit integer.
      *
      * @param value The integer to be added
@@ -341,7 +347,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 24-bit integer.
      *
      * @param value The integer to be added
@@ -353,7 +359,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 32-bit integer.
      *
      * @param value The integer to be added
@@ -365,7 +371,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 40-bit integer.
      *
      * @param value The integer to be added
@@ -377,7 +383,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 48-bit integer.
      *
      * @param value The integer to be added
@@ -389,7 +395,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 56-bit integer.
      *
      * @param value The integer to be added
@@ -401,7 +407,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 64-bit integer.
      *
      * @param value The integer to be added
@@ -413,7 +419,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 72-bit integer.
      *
      * @param value The integer to be added
@@ -425,7 +431,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 80-bit integer.
      *
      * @param value The integer to be added
@@ -437,7 +443,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 88-bit integer.
      *
      * @param value The integer to be added
@@ -449,7 +455,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 96-bit integer.
      *
      * @param value The integer to be added
@@ -461,7 +467,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 104-bit integer.
      *
      * @param value The integer to be added
@@ -473,7 +479,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 112-bit integer.
      *
      * @param value The integer to be added
@@ -485,7 +491,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 120-bit integer.
      *
      * @param value The integer to be added
@@ -497,7 +503,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 128-bit integer.
      *
      * @param value The integer to be added
@@ -509,7 +515,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 136-bit integer.
      *
      * @param value The integer to be added
@@ -521,7 +527,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 144-bit integer.
      *
      * @param value The integer to be added
@@ -533,7 +539,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 152-bit integer.
      *
      * @param value The integer to be added
@@ -545,7 +551,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 160-bit integer.
      *
      * @param value The integer to be added
@@ -557,7 +563,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 168-bit integer.
      *
      * @param value The integer to be added
@@ -569,7 +575,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 176-bit integer.
      *
      * @param value The integer to be added
@@ -581,7 +587,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 184-bit integer.
      *
      * @param value The integer to be added
@@ -593,7 +599,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 192-bit integer.
      *
      * @param value The integer to be added
@@ -605,7 +611,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 200-bit integer.
      *
      * @param value The integer to be added
@@ -617,7 +623,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 208-bit integer.
      *
      * @param value The integer to be added
@@ -629,7 +635,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 216-bit integer.
      *
      * @param value The integer to be added
@@ -641,7 +647,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 224-bit integer.
      *
      * @param value The integer to be added
@@ -653,7 +659,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 232-bit integer.
      *
      * @param value The integer to be added
@@ -665,7 +671,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 240-bit integer.
      *
      * @param value The integer to be added
@@ -677,7 +683,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 248-bit integer.
      *
      * @param value The integer to be added
@@ -689,7 +695,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 256-bit integer.
      *
      * @param value The integer to be added
@@ -1295,7 +1301,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 16-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1310,7 +1316,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 24-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1325,7 +1331,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 32-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1340,7 +1346,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 40-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1355,7 +1361,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 48-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1370,7 +1376,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 56-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1385,7 +1391,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 64-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1400,7 +1406,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 72-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1416,7 +1422,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 80-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1432,7 +1438,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 88-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1448,7 +1454,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 96-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1464,7 +1470,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 104-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1480,7 +1486,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 112-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1496,7 +1502,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 120-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1512,7 +1518,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 128-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1528,7 +1534,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 136-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1544,7 +1550,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 144-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1560,7 +1566,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 152-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1576,7 +1582,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 160-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1592,7 +1598,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 168-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1608,7 +1614,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 176-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1624,7 +1630,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 184-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1640,7 +1646,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 192-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1656,7 +1662,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 200-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1672,7 +1678,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 208-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1688,7 +1694,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 216-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1704,7 +1710,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 224-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1720,7 +1726,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 232-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1736,7 +1742,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 240-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1752,7 +1758,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 248-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of
@@ -1768,7 +1774,7 @@ public final class ContractFunctionParameters {
         return this;
     }
 
-    /*
+    /**
      * Add a 256-bit unsigned integer.
 
      * The value will be treated as unsigned during encoding (it will be zero-padded instead of

@@ -67,7 +67,10 @@ public final class Client implements AutoCloseable {
     // so that this doesn't happen in unit tests.
     static final Duration NETWORK_UPDATE_INITIAL_DELAY = Duration.ofSeconds(10);
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+    /**
+     * The logger
+     */
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
 
@@ -260,6 +263,7 @@ public final class Client implements AutoCloseable {
      *
      * @param json The json string containing the client configuration
      * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @throws Exception if the config is incorrect
      */
     public static Client fromConfig(String json) throws Exception {
         return fromConfig(new StringReader(json));
@@ -270,6 +274,7 @@ public final class Client implements AutoCloseable {
      *
      * @param json The Reader containing the client configuration
      * @return {@link com.hedera.hashgraph.sdk.Client}
+     * @throws Exception if the config is incorrect
      */
     public static Client fromConfig(Reader json) throws Exception {
         Config config = new Gson().fromJson(json, Config.class);
@@ -404,6 +409,14 @@ public final class Client implements AutoCloseable {
         subscriptions.remove(subscriptionHandle);
     }
 
+    /**
+     * Replace all nodes in this Client with the nodes in the Address Book
+     *
+     * @param addressBook               A list of nodes and their metadata
+     * @return {@code this}
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     * @throws TimeoutException         when shutting down nodes
+     */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
         network.setNetwork(Network.addressBookToNetwork(
             addressBook.nodeAddresses,
@@ -414,10 +427,11 @@ public final class Client implements AutoCloseable {
 
     /**
      * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
-     * <p>
      *
-     * @param network a map of node account ID to node URL.
+     * @param network                   a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
+     * @throws TimeoutException         when shutting down nodes
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
         this.network.setNetwork(network);
@@ -435,16 +449,17 @@ public final class Client implements AutoCloseable {
 
     /**
      * Set if transport security should be used to connect to consensus nodes.
-     *
+     * <br>
      * If transport security is enabled all connections to consensus nodes will use TLS, and
      * the server's certificate hash will be compared to the hash stored in the {@link NodeAddressBook}
      * for the given network.
-     *
+     * <br>
      * *Note*: If transport security is enabled, but {@link Client#isVerifyCertificates()} is disabled then server certificates
      * will not be verified.
      *
-     * @param transportSecurity - enable or disable transport security for consensus nodes
+     * @param transportSecurity         enable or disable transport security for consensus nodes
      * @return {@code this} for fluent API usage.
+     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
         network.setTransportSecurity(transportSecurity);
@@ -452,15 +467,17 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Set if transport security should be used to connect to mirror nodes.
      *
+     * Set if transport security should be used to connect to mirror nodes.
+     * <br>
      * If transport security is enabled all connections to mirror nodes will use TLS.
      *
+     * @deprecated Mirror nodes can only be accessed using TLS
      * @param transportSecurity - enable or disable transport security for mirror nodes
      * @return {@code this} for fluent API usage.
      */
-    public Client setMirrorTransportSecurity(boolean transportSecurity) throws InterruptedException {
-        mirrorNetwork.setTransportSecurity(transportSecurity);
+    @Deprecated
+    public Client setMirrorTransportSecurity(boolean transportSecurity) {
         return this;
     }
 
@@ -505,7 +522,9 @@ public final class Client implements AutoCloseable {
     /**
      * Send a ping to the given node.
      *
-     * @param nodeAccountId Account ID of the node to ping
+     * @param nodeAccountId             Account ID of the node to ping
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public Void ping(AccountId nodeAccountId) throws PrecheckStatusException, TimeoutException {
         return ping(nodeAccountId, getRequestTimeout());
@@ -514,8 +533,10 @@ public final class Client implements AutoCloseable {
     /**
      * Send a ping to the given node.
      *
-     * @param nodeAccountId Account ID of the node to ping
-     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param nodeAccountId             Account ID of the node to ping
+     * @param timeout                   The timeout after which the execution attempt will be cancelled.
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public Void ping(AccountId nodeAccountId, Duration timeout) throws PrecheckStatusException, TimeoutException {
         new AccountBalanceQuery()
@@ -530,6 +551,7 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
+     * @return an empty future that throws exception if there was an error
      */
     public CompletableFuture<Void> pingAsync(AccountId nodeAccountId) {
         return pingAsync(nodeAccountId, getRequestTimeout());
@@ -540,6 +562,7 @@ public final class Client implements AutoCloseable {
      *
      * @param nodeAccountId Account ID of the node to ping
      * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @return an empty future that throws exception if there was an error
      */
     public CompletableFuture<Void> pingAsync(AccountId nodeAccountId, Duration timeout) {
         var result = new CompletableFuture<Void>();
@@ -604,6 +627,9 @@ public final class Client implements AutoCloseable {
     /**
      * Sends pings to all nodes in the client's network.
      * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public synchronized Void pingAll() throws PrecheckStatusException, TimeoutException {
         return pingAll(getRequestTimeout());
@@ -613,7 +639,9 @@ public final class Client implements AutoCloseable {
      * Sends pings to all nodes in the client's network.
      * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
      *
-     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     * @param timeoutPerPing            The timeout after which each execution attempt will be cancelled.
+     * @throws TimeoutException         when the transaction times out
+     * @throws PrecheckStatusException  when the precheck fails
      */
     public synchronized Void pingAll(Duration timeoutPerPing) throws PrecheckStatusException, TimeoutException {
         for (var nodeAccountId : network.getNetwork().values()) {
@@ -626,6 +654,8 @@ public final class Client implements AutoCloseable {
     /**
      * Sends pings to all nodes in the client's network asynchronously.
      * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     *
+     * @return an empty future that throws exception if there was an error
      */
     public synchronized CompletableFuture<Void> pingAllAsync() {
         return pingAllAsync(getRequestTimeout());
@@ -636,6 +666,7 @@ public final class Client implements AutoCloseable {
      * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
      *
      * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     * @return an empty future that throws exception if there was an error
      */
     public synchronized CompletableFuture<Void> pingAllAsync(Duration timeoutPerPing) {
         var network = this.network.getNetwork();
@@ -1102,6 +1133,8 @@ public final class Client implements AutoCloseable {
      * fee assessed for a given transaction may be less than this value, but never greater.
      *
      * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
+     * @param maxTransactionFee The Hbar to be set
+     * @return {@code this}
      */
     @Deprecated
     public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
@@ -1147,6 +1180,8 @@ public final class Client implements AutoCloseable {
 
     /**
      * @deprecated Use {@link #setDefaultMaxQueryPayment(Hbar)} instead.
+     * @param maxQueryPayment The Hbar to be set
+     * @return {@code this}
      */
     @Deprecated
     public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
@@ -1269,6 +1304,11 @@ public final class Client implements AutoCloseable {
         return this.operator;
     }
 
+    /**
+     * Get the period for updating the Address Book
+     *
+     * @return the networkUpdatePeriod
+     */
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
         justification = "A Duration can't actually be mutated"
@@ -1278,6 +1318,12 @@ public final class Client implements AutoCloseable {
         return this.networkUpdatePeriod;
     }
 
+    /**
+     * Set the period for updating the Address Book
+     *
+     * @param networkUpdatePeriod   the period for updating the Address Book
+     * @return {@code this}
+     */
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP2",
         justification = "A Duration can't actually be mutated"
@@ -1295,6 +1341,8 @@ public final class Client implements AutoCloseable {
      *
      * <p>After this method returns, this client can be re-used. Channels will be re-established as
      * needed.
+     *
+     * @throws TimeoutException if the mirror network doesn't close in time
      */
     @Override
     public synchronized void close() throws TimeoutException {
@@ -1309,6 +1357,7 @@ public final class Client implements AutoCloseable {
      * needed.
      *
      * @param timeout The Duration to be set
+     * @throws TimeoutException if the mirror network doesn't close in time
      */
     public synchronized void close(Duration timeout) throws TimeoutException {
         var closeDeadline = Instant.now().plus(timeout);

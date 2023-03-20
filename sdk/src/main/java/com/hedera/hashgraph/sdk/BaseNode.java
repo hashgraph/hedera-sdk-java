@@ -125,20 +125,6 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
     }
 
     /**
-     * Create an insecure version of this node
-     *
-     * @return                          the insecure version of the node
-     */
-    abstract N toInsecure();
-
-    /**
-     * Create a secure version of this node
-     *
-     * @return                          the secure version of the node
-     */
-    abstract N toSecure();
-
-    /**
      * Extract the key list
      *
      * @return                          the key list

@@ -31,9 +31,15 @@ import java.util.Objects;
  * Base class for custom fees.
  */
 abstract public class CustomFee {
+    /**
+     * The account to receive the custom fee
+     */
     @Nullable
     protected AccountId feeCollectorAccountId = null;
 
+    /**
+     * If true, exempts all the token's fee collection accounts from this fee
+     */
     protected boolean allCollectorsAreExempt = false;
 
     /**
@@ -166,6 +172,11 @@ abstract public class CustomFee {
         return toProtobuf().toByteArray();
     }
 
+    /**
+     * Serializes the class to ToStringHelper
+     *
+     * @return the {@link com.google.common.base.MoreObjects.ToStringHelper}
+     */
     protected MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(this)
             .add("feeCollectorAccountId", feeCollectorAccountId)

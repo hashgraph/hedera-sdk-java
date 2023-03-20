@@ -19,14 +19,29 @@
  */
 package com.hedera.hashgraph.sdk;
 
+/**
+ * Enum for the network names.
+ */
 @Deprecated
 public enum NetworkName {
+    /**
+     * The mainnet network
+     */
     @Deprecated
     MAINNET(0),
+    /**
+     * The testnet network
+     */
     @Deprecated
     TESTNET(1),
+    /**
+     * The previewnet network
+     */
     @Deprecated
     PREVIEWNET(2),
+    /**
+     * Other network
+     */
     @Deprecated
     OTHER(Integer.MAX_VALUE);
 
@@ -36,6 +51,12 @@ public enum NetworkName {
         this.id = id;
     }
 
+    /**
+     * Assign the network name via a string name.
+     *
+     * @param networkName               the string containing the network name
+     * @return                          the ledger id
+     */
     public static NetworkName fromString(String networkName) {
         switch (networkName) {
             case "mainnet":

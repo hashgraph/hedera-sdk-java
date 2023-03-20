@@ -34,6 +34,9 @@ import java.util.Objects;
  * This class represents the account balance object
  */
 public class AccountBalance {
+    /**
+     * The Hbar balance of the account
+     */
     @Nonnegative
     public final Hbar hbars;
 

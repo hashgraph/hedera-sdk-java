@@ -45,29 +45,9 @@ class MirrorNode extends BaseNode<MirrorNode, BaseNodeAddress> {
         this(BaseNodeAddress.fromString(address), executor);
     }
 
-    /**
-     * Constructor.
-     *
-     * @param node                      the mirror node
-     * @param address                   the address as a managed node address
-     */
-    private MirrorNode(MirrorNode node, BaseNodeAddress address) {
-        super(node, address);
-    }
-
     @Override
     protected String getAuthority() {
         return null;
-    }
-
-    @Override
-    MirrorNode toInsecure() {
-        return new MirrorNode(this, address.toInsecure());
-    }
-
-    @Override
-    MirrorNode toSecure() {
-        return new MirrorNode(this, address.toSecure());
     }
 
     @Override

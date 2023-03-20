@@ -249,6 +249,11 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         return this;
     }
 
+    /**
+     * Extract the duration for the auto renew period.
+     *
+     * @return                          the duration for auto-renew
+     */
     @Nullable
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
@@ -277,6 +282,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
 
     /**
      * @deprecated with no replacement
+     * @return the bytecodeFileId
      */
     @Nullable
     @Deprecated
