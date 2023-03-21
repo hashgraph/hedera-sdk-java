@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenRevokeKycTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,5 +70,16 @@ public class TokenDeleteTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = TokenDeleteTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setTokenDeletion(TokenDeleteTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TokenDeleteTransaction.class);
     }
 }

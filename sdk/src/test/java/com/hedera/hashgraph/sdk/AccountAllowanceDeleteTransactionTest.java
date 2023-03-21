@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteAllowanceTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -71,5 +74,16 @@ public class AccountAllowanceDeleteTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setCryptoDeleteAllowance(CryptoDeleteAllowanceTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(AccountAllowanceDeleteTransaction.class);
     }
 }

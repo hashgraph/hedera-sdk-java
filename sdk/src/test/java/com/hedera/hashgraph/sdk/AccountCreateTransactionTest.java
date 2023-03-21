@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteAllowanceTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -103,5 +106,34 @@ public class AccountCreateTransactionTest {
         var tx = spawnTestTransaction2();
         var tx2 = AccountCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void propertiesTest() {
+        var tx = spawnTestTransaction();
+
+        assertThat(tx.getKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getInitialBalance()).isEqualTo(Hbar.fromTinybars(450));
+        assertThat(tx.getReceiverSignatureRequired()).isTrue();
+        assertThat(tx.getProxyAccountId()).hasToString("0.0.1001");
+        assertThat(tx.getAutoRenewPeriod().toHours()).isEqualTo(10);
+        assertThat(tx.getMaxAutomaticTokenAssociations()).isEqualTo(100);
+        assertThat(tx.getAccountMemo()).isEqualTo("some dumb memo");
+        assertThat(tx.getStakedAccountId()).hasToString("0.0.3");
+        assertThat(tx.getStakedNodeId()).isNull();
+        assertThat(tx.getDeclineStakingReward()).isFalse();
+        assertThat(tx.getAliasKey()).isEqualTo(PublicKey.fromString("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048"));
+        assertThat(tx.getAliasEvmAddress()).isNull();
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setCryptoCreateAccount(CryptoCreateTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(AccountCreateTransaction.class);
     }
 }

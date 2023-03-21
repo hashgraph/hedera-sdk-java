@@ -40,8 +40,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -273,7 +272,8 @@ class ExecutableTest {
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
                     new byte[]{1, 2, 3},
-                    null);
+                    null)
+                    .setValidateStatus(true);
             }
         };
 
@@ -294,6 +294,8 @@ class ExecutableTest {
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
 
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
+        assertThat(resp.getValidateStatus()).isTrue();
+        assertThat(resp.toString()).isNotNull();
     }
 
     @Test
@@ -530,6 +532,17 @@ class ExecutableTest {
         assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.SUCCESS);
         assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.REQUEST_ERROR);
+    }
+
+    @Test
+    void shouldSetMaxRetry() {
+        var tx = new DummyTransaction();
+
+        tx.setMaxRetry(1);
+
+        assertThat(tx.getMaxRetry()).isEqualTo(1);
+
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> tx.setMaxRetry(0));
     }
 
     static class DummyTransaction<T extends Transaction<T>>

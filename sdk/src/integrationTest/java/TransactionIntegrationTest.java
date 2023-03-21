@@ -52,6 +52,12 @@ public class TransactionIntegrationTest {
         var accountId = record.receipt.accountId;
         assertThat(accountId).isNotNull();
 
+        var transactionId = transaction.getTransactionId();
+        assertThat(transactionId.getReceipt(testEnv.client)).isNotNull();
+        assertThat(transactionId.getReceiptAsync(testEnv.client).get()).isNotNull();
+        assertThat(transactionId.getRecord(testEnv.client)).isNotNull();
+        assertThat(transactionId.getRecordAsync(testEnv.client).get()).isNotNull();
+
         testEnv.close(accountId, key);
     }
 

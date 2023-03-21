@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -68,5 +70,18 @@ public class AccountDeleteTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = AccountDeleteTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setCryptoDelete(
+                CryptoDeleteTransactionBody.newBuilder()
+                    .setDeleteAccountID(AccountId.fromString("6.6.6").toProtobuf()).build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(AccountDeleteTransaction.class);
     }
 }

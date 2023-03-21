@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.ContractDeleteTransactionBody;
+import com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -79,5 +82,28 @@ public class AccountAllowanceApproveTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void propertiesTest() {
+        var tx = spawnTestTransaction();
+
+        assertThat(tx.getHbarAllowances()).isNotEmpty();
+        assertThat(tx.getHbarApprovals()).isNotEmpty();
+        assertThat(tx.getTokenAllowances()).isNotEmpty();
+        assertThat(tx.getTokenApprovals()).isNotEmpty();
+        assertThat(tx.getTokenNftAllowances()).isNotEmpty();
+        assertThat(tx.getTokenNftApprovals()).isNotEmpty();
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setCryptoApproveAllowance(CryptoApproveAllowanceTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(AccountAllowanceApproveTransaction.class);
     }
 }

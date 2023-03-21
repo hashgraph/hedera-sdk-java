@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenPauseTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenUnpauseTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -67,5 +70,16 @@ public class TokenUnpauseTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void fromScheduledTransaction() {
+        var transactionBody = SchedulableTransactionBody.newBuilder()
+            .setTokenUnpause(TokenUnpauseTransactionBody.newBuilder().build())
+            .build();
+
+        var tx = Transaction.fromScheduledTransaction(transactionBody);
+
+        assertThat(tx).isInstanceOf(TokenUnpauseTransaction.class);
     }
 }

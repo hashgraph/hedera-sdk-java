@@ -161,4 +161,40 @@ public class ClientIntegrationTest {
 
         testEnv.close();
     }
+
+    @Test
+    void pingAsync() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+        var network = testEnv.client.getNetwork();
+        var nodes = new ArrayList<>(network.values());
+
+        assertThat(nodes.isEmpty()).isFalse();
+
+        var node = nodes.get(0);
+
+        testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.pingAsync(node).get();
+        testEnv.close();
+    }
+
+    @Test
+    void pingAllAsync() throws Exception {
+        var testEnv = new IntegrationTestEnv();
+
+        testEnv.client.setMaxNodeAttempts(1);
+        testEnv.client.pingAllAsync().get();
+
+        var network = testEnv.client.getNetwork();
+        var nodes = new ArrayList<>(network.values());
+
+        assertThat(nodes.isEmpty()).isFalse();
+
+        var node = nodes.get(0);
+
+        new AccountBalanceQuery()
+            .setAccountId(node)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
 }
