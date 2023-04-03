@@ -19,8 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
-import org.bouncycastle.asn1.ASN1InputStream;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
@@ -32,26 +30,23 @@ import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.jcajce.interfaces.EdDSAPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
-import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemReader;
 import org.bouncycastle.util.io.pem.PemWriter;
 
 import javax.annotation.Nullable;
 import javax.crypto.Cipher;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.security.AlgorithmParameters;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Internal utility class for handling PEM objects.
@@ -122,18 +117,27 @@ final class Pem {
      */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
         try {
-            var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
-                .setProvider(new BouncyCastleProvider())
-                .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
             try (final var parser = new PEMParser(input)) {
                 Object parsedObject = parser.readObject();
                 if (parsedObject == null) {
                     throw new BadKeyException("PEM file did not contain a private key");
                 } else if (parsedObject instanceof PKCS8EncryptedPrivateKeyInfo) {
+                    var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
+                        .setProvider(new BouncyCastleProvider())
+                        .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
                     var encryptedPrivateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parsedObject;
                     return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptProvider);
                 } else if (parsedObject instanceof PrivateKeyInfo){
                     return (PrivateKeyInfo) parsedObject;
+                } else if (parsedObject instanceof PEMEncryptedKeyPair) {
+                    var decryptProvider = new JcePEMDecryptorProviderBuilder()
+                        .setProvider(new BouncyCastleProvider())
+                        .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
+                    var encryptedKeyPair = (PEMEncryptedKeyPair) parsedObject;
+                    return encryptedKeyPair.decryptKeyPair(decryptProvider).getPrivateKeyInfo();
+                } else if (parsedObject instanceof PEMKeyPair) {
+                    var keyPair = (PEMKeyPair) parsedObject;
+                    return keyPair.getPrivateKeyInfo();
                 } else {
                     throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: " + parsedObject.getClass().getName());
                 }

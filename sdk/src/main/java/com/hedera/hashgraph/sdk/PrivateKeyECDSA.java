@@ -20,10 +20,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.utils.Bip32Utils;
-import org.bouncycastle.asn1.ASN1OctetString;
-import org.bouncycastle.asn1.DEROctetString;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
+import org.bouncycastle.asn1.sec.ECPrivateKey;
+import org.bouncycastle.asn1.x9.X962Parameters;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
 import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
@@ -35,6 +35,7 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.util.Arrays;
+import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -82,14 +83,23 @@ public class PrivateKeyECDSA extends PrivateKey {
      * @param privateKeyInfo            the private key info object
      * @return                          the new key
      */
-    static PrivateKeyECDSA fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
+    static PrivateKey fromPrivateKeyInfoInternal(PrivateKeyInfo privateKeyInfo) {
         try {
-            var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
-
-            return new PrivateKeyECDSA(new BigInteger(1, privateKey.getOctets()), null);
+            var privateKey = ECPrivateKey.getInstance(privateKeyInfo.parsePrivateKey());
+            return fromECPrivateKeyInternal(privateKey);
         } catch (IOException e) {
             throw new BadKeyException(e);
         }
+    }
+
+    /**
+     * Create a new private key from a ECPrivateKey object.
+     *
+     * @param privateKey                the ECPrivateKey object
+     * @return                          the new key
+     */
+    static PrivateKey fromECPrivateKeyInternal(ECPrivateKey privateKey) {
+        return new PrivateKeyECDSA(privateKey.getKey(), null);
     }
 
     /**
@@ -98,13 +108,13 @@ public class PrivateKeyECDSA extends PrivateKey {
      * @param privateKey                the byte array
      * @return                          the new key
      */
-    public static PrivateKey fromBytesInternal(byte[] privateKey) {
+    static PrivateKey fromBytesInternal(byte[] privateKey) {
         if (privateKey.length == 32) {
             return new PrivateKeyECDSA(new BigInteger(1, privateKey), null);
         }
 
         // Assume a DER-encoded private key descriptor
-        return fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
+        return fromECPrivateKeyInternal(ECPrivateKey.getInstance(privateKey));
     }
 
     /**
@@ -253,9 +263,11 @@ public class PrivateKeyECDSA extends PrivateKey {
     @Override
     public byte[] toBytesDER() {
         try {
-            return new PrivateKeyInfo(
-                new AlgorithmIdentifier(ID_ECDSA_SECP256K1),
-                new DEROctetString(toBytesRaw())
+            return new ECPrivateKey(
+                256,
+                keyData,
+                new DERBitString(getPublicKey().toBytesRaw()),
+                new X962Parameters(ID_ECDSA_SECP256K1)
             ).getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
