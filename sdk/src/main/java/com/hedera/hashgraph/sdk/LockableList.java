@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -102,6 +103,20 @@ class LockableList<T> implements Iterable<T> {
         for (var e : elements) {
             list.add(e);
         }
+
+        return this;
+    }
+
+    /**
+     * Add all items to this list instance.
+     *
+     * @param elements                  the list of items to add
+     * @return                          the updated list
+     */
+    LockableList<T> addAll(Collection<? extends T> elements) {
+        requireNotLocked();
+
+        list.addAll(elements);
 
         return this;
     }

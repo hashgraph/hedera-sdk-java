@@ -65,9 +65,9 @@ class ExecutableTest {
         when(node3.getAccountId()).thenReturn(new AccountId(3));
         when(node4.getAccountId()).thenReturn(new AccountId(4));
         when(node5.getAccountId()).thenReturn(new AccountId(5));
-        when(network.getNode(new AccountId(3))).thenReturn(node3);
-        when(network.getNode(new AccountId(4))).thenReturn(node4);
-        when(network.getNode(new AccountId(5))).thenReturn(node5);
+        when(network.getNodeProxies(new AccountId(3))).thenReturn(List.of(node3));
+        when(network.getNodeProxies(new AccountId(4))).thenReturn(List.of(node4));
+        when(network.getNodeProxies(new AccountId(5))).thenReturn(List.of(node5));
 
         nodeAccountIds = Arrays.asList(
             new AccountId(3),
@@ -220,6 +220,7 @@ class ExecutableTest {
         var node = tx.getNodeForExecute(1);
         assertThat(node).isEqualTo(node3);
         tx.nodeAccountIds.advance();
+        tx.nodes.advance();
 
         node = tx.getNodeForExecute(2);
         assertThat(node).isEqualTo(node3);

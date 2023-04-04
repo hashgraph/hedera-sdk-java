@@ -488,27 +488,36 @@ abstract class BaseNetwork<
     }
 
     /**
-     * Get a random node by key, or if null get a random healthy node.
+     * Get a random healthy node.
      *
-     * @param key                       the desired key
      * @return                          the node
      */
-    synchronized BaseNodeT getNode(@Nullable KeyT key) {
+    synchronized BaseNodeT getRandomNode() {
         // Attempt to readmit nodes each time a node is fetched.
         // Note: Readmitting nodes will only happen periodically so calling it each time should not harm
         // performance.
         readmitNodes();
 
-        if (key == null) {
-            if (healthyNodes.isEmpty()) {
-                throw new IllegalStateException("No healthy node was found");
-            }
-
-            return healthyNodes.get(random.nextInt(healthyNodes.size()));
+        if (healthyNodes.isEmpty()) {
+            throw new IllegalStateException("No healthy node was found");
         }
 
-        var list = network.get(key);
-        return list.get(random.nextInt(list.size()));
+        return healthyNodes.get(random.nextInt(healthyNodes.size()));
+    }
+
+    /**
+     * Get all node proxies by key
+     *
+     * @param key                       the desired key
+     * @return                          the list of node proxies
+     */
+    synchronized List<BaseNodeT> getNodeProxies(KeyT key) {
+        // Attempt to readmit nodes each time a node is fetched.
+        // Note: Readmitting nodes will only happen periodically so calling it each time should not harm
+        // performance.
+        readmitNodes();
+
+        return network.get(key);
     }
 
     /**
@@ -528,7 +537,7 @@ abstract class BaseNetwork<
         var returnNodes = new HashMap<KeyT, BaseNodeT>(count);
 
         for (var i = 0; i < count; i++ ) {
-            var node = getNode(null);
+            var node = getRandomNode();
 
             if (!returnNodes.containsKey(node.getKey())) {
                 returnNodes.put(node.getKey(), node);
