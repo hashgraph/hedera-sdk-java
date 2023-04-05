@@ -573,14 +573,14 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new IllegalStateException("Account ID did not map to valid node in the client's network");
             }
 
-            nodes.addAll(nodeProxies);
-            nodes.shuffle();
+            nodes.addAll(nodeProxies).shuffle();
 
             return;
         }
 
         // When multiple nodes are available the system retries with different node on each attempt
         // instead of different proxy of the same node
+        var random = new Random();
         for (var accountId : nodeAccountIds) {
             @Nullable
             var nodeProxies = client.network.getNodeProxies(accountId);
@@ -588,7 +588,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
 
-            var node = nodeProxies.get(new Random().nextInt(nodeProxies.size()));
+            var node = nodeProxies.get(random.nextInt(nodeProxies.size()));
 
             nodes.add(Objects.requireNonNull(node));
         }
