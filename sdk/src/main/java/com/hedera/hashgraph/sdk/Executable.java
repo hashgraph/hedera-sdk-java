@@ -560,6 +560,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace(" - Error: {}", error.getMessage());
     }
 
+    @SuppressWarnings("java:S2245")
     @VisibleForTesting
     void setNodesFromNodeAccountIds(Client client) {
         nodes.clear();
