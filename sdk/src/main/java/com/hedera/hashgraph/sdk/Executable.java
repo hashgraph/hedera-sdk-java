@@ -59,6 +59,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
+    @SuppressWarnings("java:S2245")
+    protected static final Random random = new Random();
 
     /**
      * Used for logging
@@ -580,7 +582,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         // When multiple nodes are available the system retries with different node on each attempt
         // instead of different proxy of the same node
-        var random = new Random();
         for (var accountId : nodeAccountIds) {
             @Nullable
             var nodeProxies = client.network.getNodeProxies(accountId);
