@@ -19,10 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Internal utility class for a new lockable list type.
@@ -117,6 +114,19 @@ class LockableList<T> implements Iterable<T> {
         requireNotLocked();
 
         list.addAll(elements);
+
+        return this;
+    }
+
+    /**
+     * Shuffle the list items.
+     *
+     * @return                          the updated list
+     */
+    public LockableList<T> shuffle() {
+        requireNotLocked();
+
+        Collections.shuffle(list);
 
         return this;
     }

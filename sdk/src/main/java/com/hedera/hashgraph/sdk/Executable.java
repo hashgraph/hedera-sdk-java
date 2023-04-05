@@ -37,10 +37,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -62,7 +59,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
 
-    protected static final Random random = new Random();
 
     /**
      * Used for logging
@@ -577,6 +573,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             }
 
             nodes.addAll(nodeProxies);
+            nodes.shuffle();
 
             return;
         }
@@ -590,7 +587,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
 
-            var node = nodeProxies.get(random.nextInt(nodeProxies.size()));
+            var node = nodeProxies.get(new Random().nextInt(nodeProxies.size()));
 
             nodes.add(Objects.requireNonNull(node));
         }
