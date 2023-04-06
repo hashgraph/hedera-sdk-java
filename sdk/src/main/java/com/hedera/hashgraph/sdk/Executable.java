@@ -37,9 +37,7 @@ import org.threeten.bp.Duration;
 import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -60,6 +58,9 @@ import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, ResponseT extends MessageLite, O> {
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
+
+    @SuppressWarnings("java:S2245")
+    protected static final Random random = new Random();
 
     /**
      * Used for logging
@@ -92,7 +93,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     /**
      * List of healthy and unhealthy nodes with which execution will be attempted.
      */
-    protected List<Node> nodes = new ArrayList<>();
+    protected LockableList<Node> nodes = new LockableList<>();
 
     /**
      * Indicates if the request has been attempted to be sent to all nodes
@@ -561,15 +562,35 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             logger.trace(" - Error: {}", error.getMessage());
     }
 
+    @SuppressWarnings("java:S2245")
     @VisibleForTesting
     void setNodesFromNodeAccountIds(Client client) {
         nodes.clear();
+
+        // When a single node is explicitly set we get all of its proxies so in case of
+        // failure the system can retry with different proxy on each attempt
+        if (nodeAccountIds.size() == 1) {
+            var nodeProxies = client.network.getNodeProxies(nodeAccountIds.get(0));
+            if (nodeProxies == null || nodeProxies.size() == 0) {
+                throw new IllegalStateException("Account ID did not map to valid node in the client's network");
+            }
+
+            nodes.addAll(nodeProxies).shuffle();
+
+            return;
+        }
+
+        // When multiple nodes are available the system retries with different node on each attempt
+        // instead of different proxy of the same node
         for (var accountId : nodeAccountIds) {
             @Nullable
-            var node = client.network.getNode(accountId);
-            if (node == null) {
+            var nodeProxies = client.network.getNodeProxies(accountId);
+            if (nodeProxies == null || nodeProxies.size() == 0) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
+
+            var node = nodeProxies.get(random.nextInt(nodeProxies.size()));
+
             nodes.add(Objects.requireNonNull(node));
         }
     }
@@ -588,9 +609,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         for (int _i = 0; _i < nodes.size(); _i++) {
             // NOTE: _i is NOT the index into this.nodes, it is just keeping track of how many times we've iterated.
-            // In the event of ServerErrors, this method depends on nodeAccountIds.getIndex() to have advanced to
-            // the next node.  nodeAccountIds gets advanced in advanceRequest().
-            node = nodes.get(nodeAccountIds.getIndex());
+            // In the event of ServerErrors, this method depends on the nodes list to have advanced to
+            // the next node.
+            node = nodes.getCurrent();
 
             if (!node.isHealthy()) {
                 // Keep track of the node with the smallest delay seen thus far. If we go through the entire list
@@ -727,7 +748,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             attemptedAllNodes = true;
         }
 
-        nodeAccountIds.advance();
+        nodes.advance();
+        if (nodeAccountIds.size() > 1) {
+            nodeAccountIds.advance();
+        }
     }
 
     /**
