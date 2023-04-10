@@ -114,4 +114,14 @@ public class ClientCloseTest {
         client.close(duration);
         verify(executor, times(1)).shutdownNow();
     }
+
+    @Test
+    void noHealthyNodesNetwork() {
+        var executor = Client.createExecutor();
+        var network = Network.forNetwork(executor, Collections.emptyMap());
+
+        assertThatExceptionOfType(IllegalStateException.class)
+            .isThrownBy(network::getRandomNode)
+            .withMessage("No healthy node was found");
+    }
 }
