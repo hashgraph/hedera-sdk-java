@@ -400,7 +400,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     /**
      * Build the transaction body.
      *
-     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody}
      */
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder()
