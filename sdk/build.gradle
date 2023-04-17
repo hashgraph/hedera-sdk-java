@@ -38,7 +38,7 @@ dependencies {
     implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.72'
 
     // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15to18
-    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.72'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.73'
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:2.0.7'
