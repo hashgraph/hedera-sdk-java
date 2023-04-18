@@ -17,14 +17,14 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
 
     /*
     ## Example 1:
-    - Create a ECSDA private key
+    - Create an ED25519 admin private key and ECSDA private key
     - Extract the ECDSA public key
     - Extract the Ethereum public address
     - Use the `AccountCreateTransaction` and populate `setAlias(evmAddress)` field with the Ethereum public address and the `setReceiverSignatureRequired` to true
     - Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
     - Get the `AccountInfo` and show that the account has contractAccountId
     */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException, ReceiptStatusException {
         Client client = Client.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -33,8 +33,9 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
 
         /*
          * Step 1
-         * Create an ECSDA private key
+         * Create an ED25519 admin private key and ECSDA private key
          */
+        PrivateKey adminKey = PrivateKey.generateED25519();
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
@@ -58,7 +59,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setInitialBalance(Hbar.fromTinybars(100))
-            .setKey(OPERATOR_KEY)
+            .setKey(adminKey)
             .setAlias(evmAddress)
             .freezeWith(client);
 
@@ -66,13 +67,8 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Step 5
          * Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
          */
-        accountCreateTransaction.sign(privateKey);
-        TransactionResponse response = accountCreateTransaction.execute(client);
-
-        AccountId newAccountId = new TransactionReceiptQuery()
-            .setTransactionId(response.transactionId)
-            .execute(client)
-            .accountId;
+        accountCreateTransaction.sign(adminKey).sign(privateKey);
+        AccountId newAccountId = accountCreateTransaction.execute(client).getReceipt(client).accountId;
 
         System.out.println("New account ID: " + newAccountId);
 
