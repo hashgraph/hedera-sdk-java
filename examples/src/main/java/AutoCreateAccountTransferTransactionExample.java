@@ -23,8 +23,6 @@ public class AutoCreateAccountTransferTransactionExample {
     - Create an ECSDA private key
     - Extract the ECDSA public key
     - Extract the Ethereum public address
-      - Add function to calculate the Ethereum Address to in SDK
-      - Ethereum account address / public-address - This is the rightmost 20 bytes of the 32 byte Keccak-256 hash of the ECDSA public key of the account. This calculation is in the manner described by the Ethereum Yellow Paper.
     - Use the `TransferTransaction`
        - Populate the `FromAddress` with the sender Hedera AccountID
        - Populate the `ToAddress` with Ethereum public address
@@ -71,7 +69,7 @@ public class AutoCreateAccountTransferTransactionExample {
 
         /*
          * Step 4
-         * Use the `AccountCreateTransaction` and set the EVM address field to the Ethereum public address
+         * Use the `TransferTransaction` and set the EVM address field to the Ethereum public address
          */
         TransferTransaction transferTransaction = new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())

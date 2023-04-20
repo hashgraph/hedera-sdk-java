@@ -60,7 +60,7 @@ public class AccountCreateTransactionTest {
             .setReceiverSignatureRequired(true)
             .setAutoRenewPeriod(Duration.ofHours(10))
             .setStakedAccountId(AccountId.fromString("0.0.3"))
-            .setAliasKey(PublicKey.fromString("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048"))
+            .setAlias("0x5c562e90feaf0eebd33ea75d21024f249d451417")
             .setMaxAutomaticTokenAssociations(100)
             .setMaxTransactionFee(Hbar.fromTinybars(100_000))
             .freeze()
@@ -122,8 +122,7 @@ public class AccountCreateTransactionTest {
         assertThat(tx.getStakedAccountId()).hasToString("0.0.3");
         assertThat(tx.getStakedNodeId()).isNull();
         assertThat(tx.getDeclineStakingReward()).isFalse();
-        assertThat(tx.getAliasKey()).isEqualTo(PublicKey.fromString("8776c6b831a1b61ac10dac0304a2843de4716f54b1919bb91a2685d0fe3f3048"));
-        assertThat(tx.getAliasEvmAddress()).isNull();
+        assertThat(tx.getAlias()).isEqualTo(EvmAddress.fromString("0x5c562e90feaf0eebd33ea75d21024f249d451417"));
     }
 
     @Test

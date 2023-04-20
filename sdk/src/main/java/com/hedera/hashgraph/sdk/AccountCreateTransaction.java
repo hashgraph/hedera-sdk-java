@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.annotations.Beta;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody;
@@ -58,10 +57,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     private boolean declineStakingReward = false;
 
     @Nullable
-    private PublicKey aliasKey = null;
-
-    @Nullable
-    private EvmAddress aliasEvmAddress = null;
+    private EvmAddress alias = null;
 
     /**
      * Constructor.
@@ -340,66 +336,38 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * The key to be used as the account's alias.
+     * The bytes to be used as the account's alias.
+     * <p>
+     * The bytes must be formatted as the calcluated last 20 bytes of the
+     * keccak-256 of the ECDSA primitive key.</li>
      *
-     * @return the key
+     * All other types of keys, including but not limited to ED25519, ThresholdKey, KeyList, ContractID, and
+     * delegatable_contract_id, are not supported.
+     * <p>
+     * At most only one account can ever have a given alias on the network.
      */
     @Nullable
-    public PublicKey getAliasKey() {
-        return aliasKey;
+    public EvmAddress getAlias() {
+        return alias;
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
+     * The bytes to be used as the account's alias.
      * <p>
-     * The key to be used as the account's alias. Currently only primitive key bytes are
-     * supported as the key for an account with an alias. ThresholdKey, KeyList, ContractID, and
-     * delegatable_contract_id are not supported.
-     * <p>
-     * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
-     * relative to aliases currently on the network at alias assignment.
-     * <p>
-     * If a transaction creates an account using an alias, any further crypto transfers to that alias will
-     * simply be deposited in that account, without creating anything, and with no creation fee being charged.
+     * The bytes must be formatted as the calcluated last 20 bytes of the
+     * keccak-256 of the ECDSA primitive key.</li>
      *
-     * @param aliasKey The key to be used as the account's alias.
+     * All other types of keys, including but not limited to ED25519, ThresholdKey, KeyList, ContractID, and
+     * delegatable_contract_id, are not supported.
+     * <p>
+     * At most only one account can ever have a given alias on the network.
+     *
+     * @param alias The ethereum account 20-byte EVM address
      * @return {@code this}
      */
-    @Beta
-    public AccountCreateTransaction setAliasKey(PublicKey aliasKey) {
+    public AccountCreateTransaction setAlias(EvmAddress alias) {
         requireNotFrozen();
-        this.aliasKey = aliasKey;
-        return this;
-    }
-
-    /**
-     * The ethereum account 20-byte EVM address to be used as the account's alias.
-     * @return the EvmAddress
-     */
-    @Nullable
-    public EvmAddress getAliasEvmAddress() {
-        return aliasEvmAddress;
-    }
-
-    /**
-     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
-     * <p>
-     * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
-     * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
-     * <p>
-     * A given alias can map to at most one account on the network at a time. This uniqueness will be enforced
-     * relative to aliases currently on the network at alias assignment.
-     * <p>
-     * If a transaction creates an account using an alias, any further crypto transfers to that alias will
-     * simply be deposited in that account, without creating anything, and with no creation fee being charged.
-     *
-     * @param aliasEvmAddress The ethereum account 20-byte EVM address
-     * @return {@code this}
-     */
-    @Beta
-    public AccountCreateTransaction setAliasEvmAddress(EvmAddress aliasEvmAddress) {
-        requireNotFrozen();
-        this.aliasEvmAddress = aliasEvmAddress;
+        this.alias = alias;
         return this;
     }
 
@@ -417,13 +385,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      *
      * @param aliasEvmAddress The ethereum account 20-byte EVM address
      * @return {@code this}
-     * @throws IllegalArgumentException when evmAddress is invalid or doesn't have "0x" prefix
+     * @throws IllegalArgumentException when evmAddress is invalid
      */
-    @Beta
-    public AccountCreateTransaction setAliasEvmAddress(String aliasEvmAddress) {
+    public AccountCreateTransaction setAlias(String aliasEvmAddress) {
         if ((aliasEvmAddress.startsWith("0x") && aliasEvmAddress.length() == 42) || aliasEvmAddress.length() == 40) {
             EvmAddress address = EvmAddress.fromString(aliasEvmAddress);
-            return this.setAliasEvmAddress(address);
+            return this.setAlias(address);
         } else {
             throw new IllegalArgumentException("evmAddress must be an a valid EVM address with \"0x\" prefix");
         }
@@ -432,7 +399,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     /**
      * Build the transaction body.
      *
-     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody}
+     * @return {@link com.hedera.hashgraph.sdk.proto.CryptoCreateTransactionBody}
      */
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder()
@@ -451,10 +418,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             builder.setKey(key.toProtobufKey());
         }
 
-        if (aliasKey != null) {
-            builder.setAlias(aliasKey.toProtobufKey().toByteString());
-        } else if (aliasEvmAddress != null) {
-            builder.setAlias(ByteString.copyFrom(aliasEvmAddress.toBytes()));
+        if (alias != null) {
+            builder.setAlias(ByteString.copyFrom(alias.toBytes()));
         }
 
         if (stakedAccountId != null) {
@@ -506,8 +471,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             stakedNodeId = body.getStakedNodeId();
         }
 
-        aliasKey = PublicKey.fromAliasBytes(body.getAlias());
-        aliasEvmAddress = EvmAddress.fromAliasBytes(body.getAlias());
+        alias = EvmAddress.fromAliasBytes(body.getAlias());
     }
 
     @Override
