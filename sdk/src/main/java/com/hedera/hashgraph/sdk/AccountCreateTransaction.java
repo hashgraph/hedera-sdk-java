@@ -339,8 +339,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * The bytes to be used as the account's alias.
      * <p>
      * The bytes must be formatted as the calcluated last 20 bytes of the
-     * keccak-256 of the ECDSA primitive key.</li>
-     *
+     * keccak-256 of the ECDSA primitive key.
+     * <p>
      * All other types of keys, including but not limited to ED25519, ThresholdKey, KeyList, ContractID, and
      * delegatable_contract_id, are not supported.
      * <p>
@@ -355,8 +355,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * The bytes to be used as the account's alias.
      * <p>
      * The bytes must be formatted as the calcluated last 20 bytes of the
-     * keccak-256 of the ECDSA primitive key.</li>
-     *
+     * keccak-256 of the ECDSA primitive key.
+     * <p>
      * All other types of keys, including but not limited to ED25519, ThresholdKey, KeyList, ContractID, and
      * delegatable_contract_id, are not supported.
      * <p>
@@ -372,8 +372,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
     }
 
     /**
-     * NOT YET SUPPORTED ON MAINNET AS OF FEB/23/2023
-     * <p>
      * The ethereum account 20-byte EVM address to be used as the account's alias. This EVM address may be either
      * the encoded form of the shard.realm.num or the keccak-256 hash of a ECDSA_SECP256K1 primitive key.
      * <p>

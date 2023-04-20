@@ -206,15 +206,23 @@ def generate_modified_protos():
     do_generate_modified_protos(PROTO_MIRROR_IN_PATH, PROTO_MIRROR_OUT_PATH)
 
 
+# def do_generate_modified_protos(in_path, out_path):
+#     for name in os.listdir(in_path):
+#         in_file = open(os.path.join(in_path, name), "r")
+#         out_file = open(os.path.join(out_path, name), "w")
+#         out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
+#         in_file.close()
+#         out_file.close()
+
 def do_generate_modified_protos(in_path, out_path):
-    for name in os.listdir(in_path):
-        in_file = open(os.path.join(in_path, name), "r")
-        out_file = open(os.path.join(out_path, name), "w")
-        out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
-        in_file.close()
-        out_file.close()
-
-
+    for root, dirs, files in os.walk(in_path):
+        for name in files:
+            # for name in os.listdir(in_path):
+            in_file = open(os.path.join(root, name), "r")
+            out_file = open(os.path.join(out_path, name), "w")
+            out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
+            in_file.close()
+            out_file.close()
 
 
 
