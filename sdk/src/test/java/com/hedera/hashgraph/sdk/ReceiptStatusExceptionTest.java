@@ -23,7 +23,7 @@ class ReceiptStatusExceptionTest {
         );
 
         assertThat(e.getMessage()).isEqualTo(
-            "receipt for transaction 0.0.100@1554158542.0 raised status INSUFFICIENT_TX_FEE"
+            "receipt for transaction 0.0.100@1554158542.000000000 raised status INSUFFICIENT_TX_FEE"
         );
     }
 }

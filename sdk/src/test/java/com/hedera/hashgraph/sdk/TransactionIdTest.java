@@ -187,4 +187,13 @@ class TransactionIdTest {
             () -> TransactionId.fromString("0.0.23847@1588539964/4")
         );
     }
+
+    @Test
+    void shouldAddTrailingZeroesToNanoseconds() {
+        var txIdString = "0.0.4163533@1681876267.054802581";
+        var txId = TransactionId.fromString(txIdString);
+        var txIdString2 = txId.toString();
+
+        assertThat(txIdString2).isEqualTo(txIdString);
+    }
 }
