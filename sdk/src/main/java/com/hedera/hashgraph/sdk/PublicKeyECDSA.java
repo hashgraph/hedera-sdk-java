@@ -76,7 +76,7 @@ public class PublicKeyECDSA extends PublicKey {
      * @return                          the new public key
      */
     static PublicKeyECDSA fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        return new PublicKeyECDSA(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+        return fromBytesInternal(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }
 
     @Override

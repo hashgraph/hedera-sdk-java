@@ -30,7 +30,7 @@ public final class MaxQueryPaymentExceededException extends RuntimeException {
 
     /**
      * The limit for a single automatic query payment, set by
-     * {@link Client#setMaxQueryPayment(Hbar)} or {@link Query#setMaxQueryPayment(Hbar)}.
+     * {@link Client#setDefaultMaxQueryPayment(Hbar)} (Hbar)} or {@link Query#setMaxQueryPayment(Hbar)}.
      */
     public final Hbar maxQueryPayment;
 

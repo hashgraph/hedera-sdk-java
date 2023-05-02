@@ -296,136 +296,51 @@ public abstract class Transaction<T extends Transaction<T>>
             }
         }
 
-        switch (dataCase) {
-            case CONTRACTCALL:
-                return new ContractExecuteTransaction(txs);
-
-            case CONTRACTCREATEINSTANCE:
-                return new ContractCreateTransaction(txs);
-
-            case CONTRACTUPDATEINSTANCE:
-                return new ContractUpdateTransaction(txs);
-
-            case CONTRACTDELETEINSTANCE:
-                return new ContractDeleteTransaction(txs);
-
-            case ETHEREUMTRANSACTION:
-                return new EthereumTransaction(txs);
-
-            case CRYPTOADDLIVEHASH:
-                return new LiveHashAddTransaction(txs);
-
-            case CRYPTOCREATEACCOUNT:
-                return new AccountCreateTransaction(txs);
-
-            case CRYPTODELETE:
-                return new AccountDeleteTransaction(txs);
-
-            case CRYPTODELETELIVEHASH:
-                return new LiveHashDeleteTransaction(txs);
-
-            case CRYPTOTRANSFER:
-                return new TransferTransaction(txs);
-
-            case CRYPTOUPDATEACCOUNT:
-                return new AccountUpdateTransaction(txs);
-
-            case FILEAPPEND:
-                return new FileAppendTransaction(txs);
-
-            case FILECREATE:
-                return new FileCreateTransaction(txs);
-
-            case FILEDELETE:
-                return new FileDeleteTransaction(txs);
-
-            case FILEUPDATE:
-                return new FileUpdateTransaction(txs);
-
-            case SYSTEMDELETE:
-                return new SystemDeleteTransaction(txs);
-
-            case SYSTEMUNDELETE:
-                return new SystemUndeleteTransaction(txs);
-
-            case FREEZE:
-                return new FreezeTransaction(txs);
-
-            case CONSENSUSCREATETOPIC:
-                return new TopicCreateTransaction(txs);
-
-            case CONSENSUSUPDATETOPIC:
-                return new TopicUpdateTransaction(txs);
-
-            case CONSENSUSDELETETOPIC:
-                return new TopicDeleteTransaction(txs);
-
-            case CONSENSUSSUBMITMESSAGE:
-                return new TopicMessageSubmitTransaction(txs);
-
-            case TOKENASSOCIATE:
-                return new TokenAssociateTransaction(txs);
-
-            case TOKENBURN:
-                return new TokenBurnTransaction(txs);
-
-            case TOKENCREATION:
-                return new TokenCreateTransaction(txs);
-
-            case TOKENDELETION:
-                return new TokenDeleteTransaction(txs);
-
-            case TOKENDISSOCIATE:
-                return new TokenDissociateTransaction(txs);
-
-            case TOKENFREEZE:
-                return new TokenFreezeTransaction(txs);
-
-            case TOKENGRANTKYC:
-                return new TokenGrantKycTransaction(txs);
-
-            case TOKENMINT:
-                return new TokenMintTransaction(txs);
-
-            case TOKENREVOKEKYC:
-                return new TokenRevokeKycTransaction(txs);
-
-            case TOKENUNFREEZE:
-                return new TokenUnfreezeTransaction(txs);
-
-            case TOKENUPDATE:
-                return new TokenUpdateTransaction(txs);
-
-            case TOKENWIPE:
-                return new TokenWipeTransaction(txs);
-
-            case TOKEN_FEE_SCHEDULE_UPDATE:
-                return new TokenFeeScheduleUpdateTransaction(txs);
-
-            case SCHEDULECREATE:
-                return new ScheduleCreateTransaction(txs);
-
-            case SCHEDULEDELETE:
-                return new ScheduleDeleteTransaction(txs);
-
-            case SCHEDULESIGN:
-                return new ScheduleSignTransaction(txs);
-
-            case TOKEN_PAUSE:
-                return new TokenPauseTransaction(txs);
-
-            case TOKEN_UNPAUSE:
-                return new TokenUnpauseTransaction(txs);
-
-            case CRYPTOAPPROVEALLOWANCE:
-                return new AccountAllowanceApproveTransaction(txs);
-
-            case CRYPTODELETEALLOWANCE:
-                return new AccountAllowanceDeleteTransaction(txs);
-
-            default:
-                throw new IllegalArgumentException("parsed transaction body has no data");
-        }
+        return switch (dataCase) {
+            case CONTRACTCALL -> new ContractExecuteTransaction(txs);
+            case CONTRACTCREATEINSTANCE -> new ContractCreateTransaction(txs);
+            case CONTRACTUPDATEINSTANCE -> new ContractUpdateTransaction(txs);
+            case CONTRACTDELETEINSTANCE -> new ContractDeleteTransaction(txs);
+            case ETHEREUMTRANSACTION -> new EthereumTransaction(txs);
+            case CRYPTOADDLIVEHASH -> new LiveHashAddTransaction(txs);
+            case CRYPTOCREATEACCOUNT -> new AccountCreateTransaction(txs);
+            case CRYPTODELETE -> new AccountDeleteTransaction(txs);
+            case CRYPTODELETELIVEHASH -> new LiveHashDeleteTransaction(txs);
+            case CRYPTOTRANSFER -> new TransferTransaction(txs);
+            case CRYPTOUPDATEACCOUNT -> new AccountUpdateTransaction(txs);
+            case FILEAPPEND -> new FileAppendTransaction(txs);
+            case FILECREATE -> new FileCreateTransaction(txs);
+            case FILEDELETE -> new FileDeleteTransaction(txs);
+            case FILEUPDATE -> new FileUpdateTransaction(txs);
+            case SYSTEMDELETE -> new SystemDeleteTransaction(txs);
+            case SYSTEMUNDELETE -> new SystemUndeleteTransaction(txs);
+            case FREEZE -> new FreezeTransaction(txs);
+            case CONSENSUSCREATETOPIC -> new TopicCreateTransaction(txs);
+            case CONSENSUSUPDATETOPIC -> new TopicUpdateTransaction(txs);
+            case CONSENSUSDELETETOPIC -> new TopicDeleteTransaction(txs);
+            case CONSENSUSSUBMITMESSAGE -> new TopicMessageSubmitTransaction(txs);
+            case TOKENASSOCIATE -> new TokenAssociateTransaction(txs);
+            case TOKENBURN -> new TokenBurnTransaction(txs);
+            case TOKENCREATION -> new TokenCreateTransaction(txs);
+            case TOKENDELETION -> new TokenDeleteTransaction(txs);
+            case TOKENDISSOCIATE -> new TokenDissociateTransaction(txs);
+            case TOKENFREEZE -> new TokenFreezeTransaction(txs);
+            case TOKENGRANTKYC -> new TokenGrantKycTransaction(txs);
+            case TOKENMINT -> new TokenMintTransaction(txs);
+            case TOKENREVOKEKYC -> new TokenRevokeKycTransaction(txs);
+            case TOKENUNFREEZE -> new TokenUnfreezeTransaction(txs);
+            case TOKENUPDATE -> new TokenUpdateTransaction(txs);
+            case TOKENWIPE -> new TokenWipeTransaction(txs);
+            case TOKEN_FEE_SCHEDULE_UPDATE -> new TokenFeeScheduleUpdateTransaction(txs);
+            case SCHEDULECREATE -> new ScheduleCreateTransaction(txs);
+            case SCHEDULEDELETE -> new ScheduleDeleteTransaction(txs);
+            case SCHEDULESIGN -> new ScheduleSignTransaction(txs);
+            case TOKEN_PAUSE -> new TokenPauseTransaction(txs);
+            case TOKEN_UNPAUSE -> new TokenUnpauseTransaction(txs);
+            case CRYPTOAPPROVEALLOWANCE -> new AccountAllowanceApproveTransaction(txs);
+            case CRYPTODELETEALLOWANCE -> new AccountAllowanceDeleteTransaction(txs);
+            default -> throw new IllegalArgumentException("parsed transaction body has no data");
+        };
     }
 
     /**

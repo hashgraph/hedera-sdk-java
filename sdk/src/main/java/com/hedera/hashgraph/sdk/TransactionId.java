@@ -31,7 +31,6 @@ import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java8.util.concurrent.CompletableFuture.completedFuture;
