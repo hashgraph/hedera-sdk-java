@@ -53,7 +53,10 @@ public final class EvmAddress extends Key {
      */
     public static EvmAddress fromString(String text) {
         String address = text.startsWith("0x") ? text.substring(2) : text;
-        return new EvmAddress(Hex.decode(address));
+        if (address.length() == 40) {
+            return new EvmAddress(Hex.decode(address));
+        }
+        return null;
     }
 
     @Nullable

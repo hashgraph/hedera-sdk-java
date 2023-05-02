@@ -436,7 +436,7 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private String toStringPostfix() {
         Objects.requireNonNull(validStart);
-        return "@" + validStart.getEpochSecond() + "." + validStart.getNano() +
+        return "@" + validStart.getEpochSecond() + "." + String.format("%09d", validStart.getNano()) +
             (scheduled ? "?scheduled" : "") + ((nonce != null) ? "/" + nonce : "");
     }
 
