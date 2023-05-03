@@ -226,8 +226,8 @@ public abstract class PrivateKey extends Key {
      */
     public static PrivateKey fromBytesDER(byte[] privateKey) {
         try {
-            return PrivateKeyED25519.fromPrivateKeyInfoInternal(PrivateKeyInfo.getInstance(privateKey));
-        } catch (Exception e) {
+            return fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
+        } catch (ClassCastException | IllegalArgumentException e) {
             return PrivateKeyECDSA.fromECPrivateKeyInternal(ECPrivateKey.getInstance(privateKey));
         }
     }

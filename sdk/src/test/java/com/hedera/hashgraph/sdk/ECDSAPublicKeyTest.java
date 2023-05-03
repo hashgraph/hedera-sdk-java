@@ -167,8 +167,8 @@ public class ECDSAPublicKeyTest {
         var PUBLIC_KEY_DER3 = "3056301006072a8648ce3d020106052b8104000a03420004aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a6597795f855ddcad2377e22259d1fcb4e0f1d35e8f2056300c15070bcbfce3759cc9d";
         var PUBLIC_KEY3 = "03aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a65977";
 
-//        var ecdsaPublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);
-//        assertThat(ecdsaPublicKey1.toStringRaw()).isEqualTo(PUBLIC_KEY1);
+        var ecdsaPublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);
+        assertThat(ecdsaPublicKey1.toStringRaw()).isEqualTo(PUBLIC_KEY1);
 
         var ecdsaPublicKey2 = PublicKey.fromStringDER(PUBLIC_KEY_DER2);
         assertThat(ecdsaPublicKey2.toStringRaw()).isEqualTo(PUBLIC_KEY2);

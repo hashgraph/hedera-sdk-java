@@ -86,6 +86,14 @@ public class PrivateKeyECDSA extends PrivateKey {
         try {
             var privateKey = ECPrivateKey.getInstance(privateKeyInfo.parsePrivateKey());
             return fromECPrivateKeyInternal(privateKey);
+        } catch (IllegalArgumentException e) {
+            // Try legacy import
+            try {
+                var privateKey = (ASN1OctetString) privateKeyInfo.parsePrivateKey();
+                return new PrivateKeyECDSA(new BigInteger(1, privateKey.getOctets()), null);
+            } catch (IOException ex) {
+                throw new BadKeyException(ex);
+            }
         } catch (IOException e) {
             throw new BadKeyException(e);
         }

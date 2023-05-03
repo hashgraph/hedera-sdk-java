@@ -356,9 +356,9 @@ public class ECDSAPrivateKeyTest {
         var PRIVATE_KEY4 = "a6170a6aa6389a5bd3a3a8f9375f57bd91aa7f7d8b8b46ce0b702e000a21a5fe";
         var PUBLIC_KEY4 = "03b69a75a5ddb1c0747e995d47555019e5d8a28003ab5202bd92f534361fb4ec8a";
 
-//        var ecdsaPrivateKey1 = PrivateKey.fromStringDER(PRIVATE_KEY_DER1);
-//        assertThat(ecdsaPrivateKey1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
-//        assertThat(ecdsaPrivateKey1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
+        var ecdsaPrivateKey1 = PrivateKey.fromStringDER(PRIVATE_KEY_DER1);
+        assertThat(ecdsaPrivateKey1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(ecdsaPrivateKey1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
 
         var ecdsaPrivateKey2 = PrivateKey.fromStringDER(PRIVATE_KEY_DER2);
         assertThat(ecdsaPrivateKey2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
