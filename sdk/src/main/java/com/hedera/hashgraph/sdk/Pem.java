@@ -50,7 +50,7 @@ import java.io.Writer;
 
 /**
  * Internal utility class for handling PEM objects.
- *
+ * <br>
  * Privacy-Enhanced Mail (PEM) is a de facto file format for storing and
  * sending cryptographic keys, certificates, and other data, based on a set of
  * 1993 IETF standards defining "privacy-enhanced mail."
@@ -116,31 +116,30 @@ final class Pem {
      * @throws IOException              if IO operations fail
      */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
-        try {
-            try (final var parser = new PEMParser(input)) {
-                Object parsedObject = parser.readObject();
-                if (parsedObject == null) {
-                    throw new BadKeyException("PEM file did not contain a private key");
-                } else if (parsedObject instanceof PKCS8EncryptedPrivateKeyInfo) {
-                    var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
-                        .setProvider(new BouncyCastleProvider())
-                        .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
-                    var encryptedPrivateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parsedObject;
-                    return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptProvider);
-                } else if (parsedObject instanceof PrivateKeyInfo){
-                    return (PrivateKeyInfo) parsedObject;
-                } else if (parsedObject instanceof PEMEncryptedKeyPair) {
-                    var decryptProvider = new JcePEMDecryptorProviderBuilder()
-                        .setProvider(new BouncyCastleProvider())
-                        .build(passphrase != null ? passphrase.toCharArray() : "".toCharArray());
-                    var encryptedKeyPair = (PEMEncryptedKeyPair) parsedObject;
-                    return encryptedKeyPair.decryptKeyPair(decryptProvider).getPrivateKeyInfo();
-                } else if (parsedObject instanceof PEMKeyPair) {
-                    var keyPair = (PEMKeyPair) parsedObject;
-                    return keyPair.getPrivateKeyInfo();
-                } else {
-                    throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: " + parsedObject.getClass().getName());
-                }
+        try (final var parser = new PEMParser(input)){
+            Object parsedObject = parser.readObject();
+            var password = (passphrase != null) ? passphrase.toCharArray() : "".toCharArray();
+            if (parsedObject == null) {
+                throw new BadKeyException("PEM file did not contain a private key");
+            } else if (parsedObject instanceof PKCS8EncryptedPrivateKeyInfo) {
+                var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
+                    .setProvider(new BouncyCastleProvider())
+                    .build(password);
+                var encryptedPrivateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parsedObject;
+                return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptProvider);
+            } else if (parsedObject instanceof PrivateKeyInfo){
+                return (PrivateKeyInfo) parsedObject;
+            } else if (parsedObject instanceof PEMEncryptedKeyPair) {
+                var decryptProvider = new JcePEMDecryptorProviderBuilder()
+                    .setProvider(new BouncyCastleProvider())
+                    .build(password);
+                var encryptedKeyPair = (PEMEncryptedKeyPair) parsedObject;
+                return encryptedKeyPair.decryptKeyPair(decryptProvider).getPrivateKeyInfo();
+            } else if (parsedObject instanceof PEMKeyPair) {
+                var keyPair = (PEMKeyPair) parsedObject;
+                return keyPair.getPrivateKeyInfo();
+            } else {
+                throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: " + parsedObject.getClass().getName());
             }
         } catch (PKCSException e) {
             if (e.getMessage().contains("password empty")) {
