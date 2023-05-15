@@ -56,10 +56,10 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-params:5.9.3"
 
     testRuntimeOnly "org.slf4j:slf4j-simple:2.0.7"
-    testRuntimeOnly "io.grpc:grpc-netty-shaded:1.54.1"
+    testRuntimeOnly "io.grpc:grpc-netty-shaded:1.55.1"
     testRuntimeOnly 'org.slf4j:slf4j-nop:2.0.7'
 
-    integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.54.1'
+    integrationTestRuntimeOnly 'io.grpc:grpc-netty-shaded:1.55.1'
     integrationTestRuntimeOnly 'org.slf4j:slf4j-nop:2.0.7'
 }
 
