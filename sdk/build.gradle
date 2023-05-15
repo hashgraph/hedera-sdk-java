@@ -43,7 +43,7 @@ dependencies {
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
     implementation 'org.slf4j:slf4j-api:2.0.7'
 
-    implementation "io.grpc:grpc-core:1.54.1"
+    implementation "io.grpc:grpc-core:1.55.1"
     implementation "io.grpc:grpc-stub:1.55.1"
 
     implementation "com.google.code.gson:gson:2.10.1"
