@@ -8,7 +8,7 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import java.util.Objects;
 

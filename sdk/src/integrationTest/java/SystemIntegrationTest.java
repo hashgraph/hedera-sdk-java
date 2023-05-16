@@ -8,11 +8,10 @@ import com.hedera.hashgraph.sdk.SystemDeleteTransaction;
 import com.hedera.hashgraph.sdk.SystemUndeleteTransaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import java.util.Objects;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class SystemIntegrationTest {
