@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java8.util.Lists;
+import java.util.List;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,7 +60,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for mainnet
      */
     static MirrorNetwork forMainnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("mainnet-public.mirrornode.hedera.com:443"));
+        return new MirrorNetwork(executor, List.of("mainnet-public.mirrornode.hedera.com:443"));
     }
 
     /**
@@ -70,7 +70,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for testnet
      */
     static MirrorNetwork forTestnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("testnet.mirrornode.hedera.com:443"));
+        return new MirrorNetwork(executor, List.of("testnet.mirrornode.hedera.com:443"));
     }
 
     /**
@@ -80,7 +80,7 @@ class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNo
      * @return                          the new mirror network for previewnet
      */
     static MirrorNetwork forPreviewnet(ExecutorService executor) {
-        return new MirrorNetwork(executor, Lists.of("previewnet.mirrornode.hedera.com:443"));
+        return new MirrorNetwork(executor, List.of("previewnet.mirrornode.hedera.com:443"));
     }
 
     /**

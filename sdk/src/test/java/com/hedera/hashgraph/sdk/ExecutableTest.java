@@ -26,11 +26,11 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
@@ -264,7 +264,7 @@ class ExecutableTest {
 
     @Test
     void successfulExecute() throws PrecheckStatusException, TimeoutException {
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override
@@ -307,7 +307,7 @@ class ExecutableTest {
         when(node3.channelFailedToConnect()).thenReturn(true);
         when(node4.channelFailedToConnect()).thenReturn(false);
 
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override
@@ -361,7 +361,7 @@ class ExecutableTest {
         when(node4.getRemainingTimeForBackoff()).thenReturn(600L);
         when(node5.getRemainingTimeForBackoff()).thenReturn(700L);
 
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override

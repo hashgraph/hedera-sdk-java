@@ -23,8 +23,8 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import org.bouncycastle.util.encoders.Hex;
 
 import javax.annotation.Nullable;
@@ -149,9 +149,9 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
 
-        createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
+        createdContractIds = inner.getCreatedContractIDsList().stream().map(ContractId::fromProtobuf).collect(Collectors.toList());
 
         stateChanges = new ArrayList<ContractStateChange>();
         // for (var stateChangeProto : inner.getStateChangesList()) {

@@ -10,8 +10,8 @@ dependencies {
 }
 
 java {
-    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
-    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    sourceCompatibility = 17
+    targetCompatibility = 17
 }
 
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->

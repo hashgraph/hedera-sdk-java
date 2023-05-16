@@ -27,7 +27,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;

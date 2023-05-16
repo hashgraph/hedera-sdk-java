@@ -27,14 +27,14 @@ import io.grpc.MethodDescriptor;
 import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+import java.time.Duration;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -45,7 +45,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;
+import net.javacrumbs.futureconverter.java8common.Java8FutureUtils;
 
 /**
  * Abstract base utility class.
@@ -109,8 +110,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * The timeout for each execution attempt
      */
     protected Duration grpcDeadline;
-    private java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
-    private java8.util.function.Function<ResponseT, ResponseT> responseListener;
+    private java.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
+    private java.util.function.Function<ResponseT, ResponseT> responseListener;
 
     Executable() {
         requestListener = request -> {
@@ -290,7 +291,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * @param requestListener The callback to use
      * @return {@code this}
      */
-    public final SdkRequestT setRequestListener(java8.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener) {
+    public final SdkRequestT setRequestListener(java.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener) {
         this.requestListener = Objects.requireNonNull(requestListener);
         return (SdkRequestT) this;
     }
@@ -304,7 +305,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * @param responseListener The callback to use
      * @return {@code this}
      */
-    public final SdkRequestT setResponseListener(java8.util.function.Function<ResponseT, ResponseT> responseListener) {
+    public final SdkRequestT setResponseListener(java.util.function.Function<ResponseT, ResponseT> responseListener) {
         this.responseListener = Objects.requireNonNull(responseListener);
         return (SdkRequestT) this;
     }
@@ -690,7 +691,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     return;
                 }
 
-                toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
+                Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest()))).handle((response, error) -> {
                     logTransaction(this.getTransactionIdInternal(), client, grpcRequest.getNode(), true, attempt, response, error);
 
                     if (grpcRequest.shouldRetryExceptionally(error)) {

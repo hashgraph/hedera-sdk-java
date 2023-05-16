@@ -2,10 +2,10 @@ package com.hedera.hashgraph.sdk;
 
 import java.util.Arrays;
 
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
-import org.threeten.bp.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.time.Duration;
 
 import java.util.concurrent.TimeoutException;
 import javax.annotation.Nullable;

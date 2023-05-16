@@ -20,7 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
-import java8.lang.FunctionalInterface;
+import java.lang.FunctionalInterface;
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 

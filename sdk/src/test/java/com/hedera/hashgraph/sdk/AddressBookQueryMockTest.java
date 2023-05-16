@@ -10,7 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import java.util.ArrayDeque;
 import java.util.Collections;

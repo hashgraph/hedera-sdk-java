@@ -21,12 +21,12 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
-import java8.util.function.Function;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import org.bouncycastle.util.encoders.Hex;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;

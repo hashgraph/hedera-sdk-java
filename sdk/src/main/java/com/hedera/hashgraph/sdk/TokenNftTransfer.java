@@ -24,7 +24,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.TokenID;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
-import java8.util.Lists;
+import java.util.List;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -110,7 +110,7 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     @Deprecated
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(
-            Lists.of(
+            List.of(
                 TokenTransferList.newBuilder()
                     .setToken(TokenID.newBuilder().build())
                     .addNftTransfers(NftTransfer.parseFrom(bytes))
