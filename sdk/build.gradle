@@ -28,9 +28,6 @@ task javadocJar(type: Jar) {
 }
 
 dependencies {
-    // https://github.com/bsideup/jabel
-    annotationProcessor 'com.github.bsideup.jabel:jabel-javac-plugin:1.0.0'
-
     // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
     implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.3'
 

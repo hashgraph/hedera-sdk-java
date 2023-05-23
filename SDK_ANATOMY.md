@@ -14,10 +14,6 @@ Used to perform remote procedure calls.  Tightly coupled to Protobufs.  Protobuf
 
 Encryption stuff.
 
-### Jabel:
-
-Can compile Java 9+ code (our code) into Java 8 executables.
-
 ### Jupiter (Junit):
 
 Unit testing framework.

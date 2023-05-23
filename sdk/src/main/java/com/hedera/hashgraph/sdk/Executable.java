@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.MessageLite;
 import io.grpc.CallOptions;
@@ -44,9 +46,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-
-import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;
-import net.javacrumbs.futureconverter.java8common.Java8FutureUtils;
 
 /**
  * Abstract base utility class.
@@ -691,7 +690,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     return;
                 }
 
-                Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest()))).handle((response, error) -> {
+                toCompletableFuture(ClientCalls.futureUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest())).handle((response, error) -> {
                     logTransaction(this.getTransactionIdInternal(), client, grpcRequest.getNode(), true, attempt, response, error);
 
                     if (grpcRequest.shouldRetryExceptionally(error)) {

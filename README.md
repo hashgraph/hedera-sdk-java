@@ -1,8 +1,8 @@
 # Hedera™ Hashgraph Java SDK
 
-![](https://img.shields.io/badge/java-9%2B-blue?style=flat-square)
+![](https://img.shields.io/badge/java-17%2B-blue?style=flat-square)
 ![](https://img.shields.io/badge/android-24%2B-blue?style=flat-square)
-[![](https://img.shields.io/github/workflow/status/hashgraph/hedera-sdk-java/Java/develop?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
+[![](https://img.shields.io/github/actions/workflow/status/hashgraph/hedera-sdk-java/build.yml?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
 [![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
 > The Java SDK for interacting with Hedera Hashgraph: the official distributed
@@ -100,7 +100,7 @@ within the repository in [`examples/`](./examples/src/main/java).
 
 ### Dependencies
 
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v14+ (note this is to _build_, not run)
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v17+ (note this is to _build_, not run)
 
 ### Compile
 
