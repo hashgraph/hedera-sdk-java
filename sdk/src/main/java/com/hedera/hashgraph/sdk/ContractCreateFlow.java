@@ -121,7 +121,7 @@ public class ContractCreateFlow {
     private PublicKey signPublicKey = null;
 
     @Nullable
-    private Function<byte[], byte[]> transactionSigner = null;
+    private UnaryOperator<byte[]> transactionSigner = null;
 
     /**
      * Constructor
