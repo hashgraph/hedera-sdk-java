@@ -31,7 +31,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.Hex;
@@ -718,17 +717,15 @@ public class ContractCreateFlow {
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
         splitBytecode();
         return createFileCreateTransaction(client).executeAsync(client, timeoutPerTransaction)
-            .thenCompose(fileCreateResponse -> {
-                return createTransactionReceiptQuery(fileCreateResponse)
-                    .executeAsync(client, timeoutPerTransaction)
-                    .thenApply(receipt -> receipt.fileId);
-            }).thenCompose(fileId -> {
+            .thenCompose(fileCreateResponse -> createTransactionReceiptQuery(fileCreateResponse)
+                .executeAsync(client, timeoutPerTransaction)
+                .thenApply(receipt -> receipt.fileId)).thenCompose(fileId -> {
                 CompletableFuture<Void> appendFuture =
                     appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
                         createFileAppendTransaction(fileId).executeAsync(client, timeoutPerTransaction)
                             .thenApply(ignored -> null);
-                return appendFuture.thenCompose(ignored -> {
-                    return createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction)
+                return appendFuture.thenCompose(
+                    ignored -> createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction)
                         .thenApply(contractCreateResponse -> {
                             createTransactionReceiptQuery(contractCreateResponse).executeAsync(client,
                                 timeoutPerTransaction).thenRun(() -> {
@@ -737,8 +734,7 @@ public class ContractCreateFlow {
                                     .executeAsync(client, timeoutPerTransaction);
                             });
                             return contractCreateResponse;
-                        });
-                });
+                        }));
             });
     }
 

@@ -723,10 +723,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                                 break;
                             case RETRY:
                                 Delayer.delayFor((attempt < maxAttempts) ? grpcRequest.getDelay() : 0, client.executor)
-                                    .thenRun(() -> {
-                                        executeAsyncInternal(client, attempt + 1, grpcRequest.mapStatusException(),
-                                            returnFuture, Duration.between(Instant.now(), timeoutTime));
-                                    });
+                                    .thenRun(() -> executeAsyncInternal(client, attempt + 1,
+                                        grpcRequest.mapStatusException(),
+                                        returnFuture, Duration.between(Instant.now(), timeoutTime)));
                                 break;
                             case REQUEST_ERROR:
                                 returnFuture.completeExceptionally(
@@ -835,7 +834,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             this.startAt = System.nanoTime();
 
             // Exponential back-off for Delayer: 250ms, 500ms, 1s, 2s, 4s, 8s, ... 8s
-            delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1),
+            delay = (long) Math.min(Objects.requireNonNull(minBackoff).toMillis() * Math.pow(2, attempt - 1.0),
                 Objects.requireNonNull(maxBackoff).toMillis());
         }
 
