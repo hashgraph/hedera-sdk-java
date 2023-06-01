@@ -21,20 +21,15 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-import org.bouncycastle.util.encoders.DecoderException;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.DecoderException;
+import org.bouncycastle.util.encoders.Hex;
 
 // an implementation of function selector and parameter encoding as specified here:
 // https://solidity.readthedocs.io/en/v0.5.7/abi-spec.html#
@@ -99,7 +94,7 @@ public final class ContractFunctionParameters {
     }
 
     private static ByteString encodeArray(Stream<ByteString> elements) {
-        List<ByteString> list = elements.collect(Collectors.toList());
+        List<ByteString> list = elements.toList();
 
         return int256(list.size(), 32)
             .concat(ByteString.copyFrom(list));
@@ -155,7 +150,7 @@ public final class ContractFunctionParameters {
 
     static byte[] getTruncatedBytes(BigInteger bigInt, int bitWidth) {
         byte[] bytes = bigInt.toByteArray();
-        int expectedBytes = bitWidth/8;
+        int expectedBytes = bitWidth / 8;
         return bytes.length <= expectedBytes ?
             bytes :
             Arrays.copyOfRange(bytes, bytes.length - expectedBytes, bytes.length);
@@ -187,7 +182,7 @@ public final class ContractFunctionParameters {
         return rem == 32
             ? input
             : (negative ? negativePadding : padding).substring(0, rem)
-            .concat(input);
+                .concat(input);
     }
 
     static ByteString leftPad32(byte[] input, boolean negative) {
@@ -238,7 +233,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addStringArray(String[] strings) {
         List<ByteString> byteStrings = Arrays.stream(strings)
             .map(ContractFunctionParameters::encodeString)
-            .collect(Collectors.toList());
+            .toList();
 
         ByteString argBytes = encodeDynArr(byteStrings);
 
@@ -268,7 +263,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addBytesArray(byte[][] param) {
         List<ByteString> byteArrays = Arrays.stream(param)
             .map(ContractFunctionParameters::encodeBytes)
-            .collect(Collectors.toList());
+            .toList();
 
         args.add(new Argument("bytes[]", encodeDynArr(byteArrays), true));
 
@@ -720,7 +715,7 @@ public final class ContractFunctionParameters {
 
         @Var ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> int256(i, 8))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -738,7 +733,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt16Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 16))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -756,7 +751,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt24Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 24))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -774,7 +769,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt32Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -792,7 +787,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt40Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 40))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -810,7 +805,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt48Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 48))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -828,7 +823,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt56Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 56))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -846,7 +841,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt64Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -864,7 +859,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt72Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 72))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -882,7 +877,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt80Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 80))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -900,7 +895,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt88Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 88))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -918,7 +913,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt96Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 96))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -936,7 +931,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt104Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 104))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -954,7 +949,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt112Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 112))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -972,7 +967,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt120Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 120))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -990,7 +985,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt128Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 128))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1008,7 +1003,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt136Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 136))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1026,7 +1021,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt144Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 144))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1044,7 +1039,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt152Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 152))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1062,7 +1057,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt160Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 160))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1080,7 +1075,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt168Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 168))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1098,7 +1093,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt176Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 176))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1116,7 +1111,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt184Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 184))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1134,7 +1129,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt192Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 192))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1152,7 +1147,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt200Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 200))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1170,7 +1165,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt208Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 208))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1188,7 +1183,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt216Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 216))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1206,7 +1201,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt224Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 224))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1224,7 +1219,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt232Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 232))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1242,7 +1237,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt240Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 240))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1260,7 +1255,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt248Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 248))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1278,7 +1273,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 256))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1303,9 +1298,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 16-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1318,9 +1313,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 24-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1333,9 +1328,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 32-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1348,9 +1343,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 40-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1363,9 +1358,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 48-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1378,9 +1373,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 56-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1393,9 +1388,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 64-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1408,9 +1403,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 72-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1424,9 +1419,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 80-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1440,9 +1435,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 88-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1456,9 +1451,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 96-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1472,9 +1467,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 104-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1488,9 +1483,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 112-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1504,9 +1499,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 120-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1520,9 +1515,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 128-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1536,9 +1531,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 136-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1552,9 +1547,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 144-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1568,9 +1563,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 152-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1584,9 +1579,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 160-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1600,9 +1595,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 168-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1616,9 +1611,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 176-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1632,9 +1627,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 184-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1648,9 +1643,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 192-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1664,9 +1659,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 200-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1680,9 +1675,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 208-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1696,9 +1691,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 216-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1712,9 +1707,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 224-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1728,9 +1723,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 232-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1744,9 +1739,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 240-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1760,9 +1755,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 248-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1776,9 +1771,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a 256-bit unsigned integer.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param value The integer to be added
      * @return {@code this}
@@ -1803,7 +1798,7 @@ public final class ContractFunctionParameters {
 
         @Var ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> uint256(i, 8))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1814,9 +1809,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 16-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1824,7 +1819,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint16Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 16))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1835,9 +1830,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 24-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1845,7 +1840,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint24Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 24))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1856,9 +1851,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 32-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1866,7 +1861,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint32Array(int[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1877,9 +1872,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 40-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1887,7 +1882,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint40Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 40))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1898,9 +1893,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 48-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1908,7 +1903,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint48Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 48))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1919,9 +1914,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 56-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1929,7 +1924,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint56Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 56))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1940,9 +1935,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 64-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1950,7 +1945,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint64Array(long[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1961,9 +1956,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 72-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1972,7 +1967,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint72Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 72))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -1983,9 +1978,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 80-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -1994,7 +1989,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint80Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 80))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2005,9 +2000,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 88-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2016,7 +2011,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint88Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 88))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2027,9 +2022,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 96-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2038,7 +2033,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint96Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 96))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2049,9 +2044,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 104-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2060,7 +2055,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint104Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 104))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2071,9 +2066,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 112-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2082,7 +2077,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint112Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 112))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2093,9 +2088,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 120-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2104,7 +2099,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint120Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 120))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2115,9 +2110,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 128-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2126,7 +2121,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint128Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 128))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2137,9 +2132,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 136-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2148,7 +2143,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint136Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 136))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2159,9 +2154,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 144-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2170,7 +2165,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint144Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 144))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2181,9 +2176,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 152-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2192,7 +2187,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint152Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 152))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2203,9 +2198,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 160-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2214,7 +2209,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint160Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 160))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2225,9 +2220,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 168-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2236,7 +2231,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint168Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 168))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2247,9 +2242,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 176-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2258,7 +2253,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint176Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 176))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2269,9 +2264,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 184-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2280,7 +2275,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint184Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 184))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2291,9 +2286,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 192-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2302,7 +2297,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint192Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 192))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2313,9 +2308,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 200-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2324,7 +2319,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint200Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 200))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2335,9 +2330,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 208-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2346,7 +2341,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint208Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 208))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2357,9 +2352,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 216-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2368,7 +2363,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint216Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 216))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2379,9 +2374,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 224-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2390,7 +2385,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint224Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 224))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2401,9 +2396,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 232-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2412,7 +2407,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint232Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 232))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2423,9 +2418,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 240-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2434,7 +2429,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint240Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 240))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2445,9 +2440,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 248-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2456,7 +2451,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint248Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 248))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2467,9 +2462,9 @@ public final class ContractFunctionParameters {
 
     /**
      * Add a dynamic array of 256-bit unsigned integers.
-
-     * The value will be treated as unsigned during encoding (it will be zero-padded instead of
-     * sign-extended to 32 bytes).
+     * <p>
+     * The value will be treated as unsigned during encoding (it will be zero-padded instead of sign-extended to 32
+     * bytes).
      *
      * @param intArray The array of integers to be added
      * @return {@code this}
@@ -2478,7 +2473,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
         @Var ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 256))
-                .collect(Collectors.toList()));
+                .toList());
 
         arrayBytes = uint256(intArray.length, 32).concat(arrayBytes);
 
@@ -2488,16 +2483,15 @@ public final class ContractFunctionParameters {
     }
 
     /**
-     * Add a {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity address parameter with the type
-     * {@code address}.
+     * Add a {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity address parameter with the type {@code address}.
      * <p>
-     * Note: adding a {@code address payable} or {@code contract} parameter must also use
-     * this function as the ABI does not support those types directly.
+     * Note: adding a {@code address payable} or {@code contract} parameter must also use this function as the ABI does
+     * not support those types directly.
      *
      * @param address The address to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX}
-     *                                  characters long or fails to decode as hexadecimal.
+     * @throws IllegalArgumentException if the address is not exactly {@value ADDRESS_LEN_HEX} characters long or fails
+     *                                  to decode as hexadecimal.
      */
     public ContractFunctionParameters addAddress(String address) {
         byte[] addressBytes = decodeAddress(address);
@@ -2508,13 +2502,12 @@ public final class ContractFunctionParameters {
     }
 
     /**
-     * Add an array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses as a
-     * {@code address[]} param.
+     * Add an array of {@value ADDRESS_LEN_HEX}-character hex-encoded Solidity addresses as a {@code address[]} param.
      *
      * @param addresses The array of addresses to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX}
-     *                                  characters long or fails to decode as hexadecimal.
+     * @throws IllegalArgumentException if any value is not exactly {@value ADDRESS_LEN_HEX} characters long or fails to
+     *                                  decode as hexadecimal.
      * @throws NullPointerException     if any value in the array is null.
      */
     public ContractFunctionParameters addAddressArray(String[] addresses) {
@@ -2536,24 +2529,21 @@ public final class ContractFunctionParameters {
      * @param address  a hex-encoded {@value ADDRESS_LEN_HEX}-character Solidity address.
      * @param selector a
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
-     *                                  characters or {@code selector} is not
-     *                                  {@value SELECTOR_LEN} bytes.
+     * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX} characters or
+     *                                  {@code selector} is not {@value SELECTOR_LEN} bytes.
      */
     public ContractFunctionParameters addFunction(String address, byte[] selector) {
         return addFunction(decodeAddress(address), selector);
     }
 
     /**
-     * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a
-     * constructed {@link ContractFunctionSelector}. The {@link ContractFunctionSelector}
-     * may not be modified after this call.
+     * Add a Solidity function reference as a {@value ADDRESS_LEN}-byte contract address and a constructed
+     * {@link ContractFunctionSelector}. The {@link ContractFunctionSelector} may not be modified after this call.
      *
      * @param address  The address used in the function to be added
      * @param selector The selector used in the function to be added
      * @return {@code this}
-     * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX}
-     *                                  characters.
+     * @throws IllegalArgumentException if {@code address} is not {@value ADDRESS_LEN_HEX} characters.
      */
     public ContractFunctionParameters addFunction(String address, ContractFunctionSelector selector) {
         // allow the `FunctionSelector` to be reused multiple times

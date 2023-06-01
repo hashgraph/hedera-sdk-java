@@ -41,8 +41,8 @@ public class AccountInfoFlow {
     }
 
     private static PublicKey requirePublicKey(AccountId accountId, Key key) {
-        if (key instanceof PublicKey) {
-            return (PublicKey) key;
+        if (key instanceof PublicKey k) {
+            return k;
         }
         throw new UnsupportedOperationException("Account " + accountId + " has a KeyList key, which is not supported");
     }
@@ -50,13 +50,13 @@ public class AccountInfoFlow {
     /**
      * Is the signature valid.
      *
-     * @param client                    the client
-     * @param accountId                 the account id
-     * @param message                   the message
-     * @param signature                 the signature
-     * @return                          is the signature valid
-     * @throws PrecheckStatusException  when the precheck fails
-     * @throws TimeoutException         when the transaction times out
+     * @param client    the client
+     * @param accountId the account id
+     * @param message   the message
+     * @param signature the signature
+     * @return is the signature valid
+     * @throws PrecheckStatusException when the precheck fails
+     * @throws TimeoutException        when the transaction times out
      */
     public static boolean verifySignature(
         Client client,
@@ -70,12 +70,12 @@ public class AccountInfoFlow {
     /**
      * Is the transaction signature valid.
      *
-     * @param client                    the client
-     * @param accountId                 the account id
-     * @param transaction               the signed transaction
-     * @return                          is the transaction signature valid
-     * @throws PrecheckStatusException  when the precheck fails
-     * @throws TimeoutException         when the transaction times out
+     * @param client      the client
+     * @param accountId   the account id
+     * @param transaction the signed transaction
+     * @return is the transaction signature valid
+     * @throws PrecheckStatusException when the precheck fails
+     * @throws TimeoutException        when the transaction times out
      */
     public static boolean verifyTransactionSignature(
         Client client,
@@ -88,11 +88,11 @@ public class AccountInfoFlow {
     /**
      * Asynchronously determine if the signature is valid.
      *
-     * @param client                    the client
-     * @param accountId                 the account id
-     * @param message                   the message
-     * @param signature                 the signature
-     * @return                          is the signature valid
+     * @param client    the client
+     * @param accountId the account id
+     * @param message   the message
+     * @param signature the signature
+     * @return is the signature valid
      */
     public static CompletableFuture<Boolean> verifySignatureAsync(
         Client client,
@@ -106,10 +106,10 @@ public class AccountInfoFlow {
     /**
      * Asynchronously determine if the signature is valid.
      *
-     * @param client                    the client
-     * @param accountId                 the account id
-     * @param transaction               the signed transaction
-     * @return                          is the signature valid
+     * @param client      the client
+     * @param accountId   the account id
+     * @param transaction the signed transaction
+     * @return is the signature valid
      */
     public static CompletableFuture<Boolean> verifyTransactionSignatureAsync(
         Client client,

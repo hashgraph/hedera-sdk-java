@@ -28,17 +28,16 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
-import java.util.concurrent.CompletableFuture;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import java.time.Duration;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Query the mirror node for the address book.
@@ -59,10 +58,34 @@ public class AddressBookQuery {
     public AddressBookQuery() {
     }
 
+    private static boolean shouldRetry(Throwable throwable) {
+        if (throwable instanceof StatusRuntimeException statusRuntimeException) {
+            var code = statusRuntimeException.getStatus().getCode();
+            var description = statusRuntimeException.getStatus().getDescription();
+
+            return (code == io.grpc.Status.Code.UNAVAILABLE) ||
+                (code == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
+                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description)
+                    .matches());
+        }
+
+        return false;
+    }
+
+    /**
+     * Extract the file id.
+     *
+     * @return the file id that was assigned
+     */
+    @Nullable
+    public FileId getFileId() {
+        return fileId;
+    }
+
     /**
      * Assign the file id of address book to retrieve.
      *
-     * @param fileId                    the file id of the address book
+     * @param fileId the file id of the address book
      * @return {@code this}
      */
     public AddressBookQuery setFileId(FileId fileId) {
@@ -71,19 +94,19 @@ public class AddressBookQuery {
     }
 
     /**
-     * Extract the file id.
+     * Extract the limit number.
      *
-     * @return                          the file id that was assigned
+     * @return the limit number that was assigned
      */
     @Nullable
-    public FileId getFileId() {
-        return fileId;
+    public Integer getLimit() {
+        return limit;
     }
 
     /**
      * Assign the number of node addresses to retrieve or all nodes set to 0.
      *
-     * @param limit                     number of node addresses to get
+     * @param limit number of node addresses to get
      * @return {@code this}
      */
     public AddressBookQuery setLimit(@Nullable @Nonnegative Integer limit) {
@@ -92,19 +115,18 @@ public class AddressBookQuery {
     }
 
     /**
-     * Extract the limit number.
+     * Extract the maximum number of attempts.
      *
-     * @return                          the limit number that was assigned
+     * @return the maximum number of attempts
      */
-    @Nullable
-    public Integer getLimit() {
-        return limit;
+    public int getMaxAttempts() {
+        return maxAttempts;
     }
 
     /**
      * Assign the maximum number of attempts.
      *
-     * @param maxAttempts               the maximum number of attempts
+     * @param maxAttempts the maximum number of attempts
      * @return {@code this}
      */
     public AddressBookQuery setMaxAttempts(@Nonnegative int maxAttempts) {
@@ -113,18 +135,9 @@ public class AddressBookQuery {
     }
 
     /**
-     * Extract the maximum number of attempts.
-     *
-     * @return                          the maximum number of attempts
-     */
-    public int getMaxAttempts() {
-        return maxAttempts;
-    }
-
-    /**
      * Assign the maximum backoff duration.
      *
-     * @param maxBackoff                the maximum backoff duration
+     * @param maxBackoff the maximum backoff duration
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -143,8 +156,8 @@ public class AddressBookQuery {
     /**
      * Execute the query with preset timeout.
      *
-     * @param client                    the client object
-     * @return                          the node address book
+     * @param client the client object
+     * @return the node address book
      */
     public NodeAddressBook execute(Client client) {
         return execute(client, client.getRequestTimeout());
@@ -153,9 +166,9 @@ public class AddressBookQuery {
     /**
      * Execute the query with user supplied timeout.
      *
-     * @param client                    the client object
-     * @param timeout                   the user supplied timeout
-     * @return                          the node address book
+     * @param client  the client object
+     * @param timeout the user supplied timeout
+     * @return the node address book
      */
     public NodeAddressBook execute(Client client, Duration timeout) {
         var deadline = Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -183,8 +196,8 @@ public class AddressBookQuery {
     /**
      * Execute the query with preset timeout asynchronously.
      *
-     * @param client                    the client object
-     * @return                          the node address book
+     * @param client the client object
+     * @return the node address book
      */
     public CompletableFuture<NodeAddressBook> executeAsync(Client client) {
         return executeAsync(client, client.getRequestTimeout());
@@ -193,9 +206,9 @@ public class AddressBookQuery {
     /**
      * Execute the query with user supplied timeout.
      *
-     * @param client                    the client object
-     * @param timeout                   the user supplied timeout
-     * @return                          the node address book
+     * @param client  the client object
+     * @param timeout the user supplied timeout
+     * @return the node address book
      */
     public CompletableFuture<NodeAddressBook> executeAsync(Client client, Duration timeout) {
         var deadline = Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS);
@@ -207,10 +220,10 @@ public class AddressBookQuery {
     /**
      * Execute the query.
      *
-     * @param client                    the client object
-     * @param deadline                  the user supplied timeout
-     * @param returnFuture              returned promise callback
-     * @param attempt                   maximum number of attempts
+     * @param client       the client object
+     * @param deadline     the user supplied timeout
+     * @param returnFuture returned promise callback
+     * @param attempt      maximum number of attempts
      */
     void executeAsync(Client client, Deadline deadline, CompletableFuture<NodeAddressBook> returnFuture, int attempt) {
         List<NodeAddress> addresses = new ArrayList<>();
@@ -270,23 +283,10 @@ public class AddressBookQuery {
         }
     }
 
-    private static boolean shouldRetry(Throwable throwable) {
-        if (throwable instanceof StatusRuntimeException) {
-            var statusRuntimeException = (StatusRuntimeException) throwable;
-            var code = statusRuntimeException.getStatus().getCode();
-            var description = statusRuntimeException.getStatus().getDescription();
-
-            return (code == io.grpc.Status.Code.UNAVAILABLE) ||
-                (code == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
-                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description).matches());
-        }
-
-        return false;
-    }
-
     private void warnAndDelay(int attempt, Throwable error) {
         var delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
-        LOGGER.warn("Error fetching address book at FileId {} during attempt #{}. Waiting {} ms before next attempt: {}",
+        LOGGER.warn(
+            "Error fetching address book at FileId {} during attempt #{}. Waiting {} ms before next attempt: {}",
             fileId, attempt, delay, error.getMessage());
 
         try {

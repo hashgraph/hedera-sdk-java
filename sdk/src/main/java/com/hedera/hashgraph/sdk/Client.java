@@ -19,36 +19,46 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.time.Duration;
-import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
-import java.util.concurrent.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
+import java.util.function.UnaryOperator;
+import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -66,59 +76,43 @@ public final class Client implements AutoCloseable {
     // Initial delay of 10 seconds before we update the network for the first time,
     // so that this doesn't happen in unit tests.
     static final Duration NETWORK_UPDATE_INITIAL_DELAY = Duration.ofSeconds(10);
-
+    private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
+    private static final String MAINNET = "mainnet";
+    private static final String TESTNET = "testnet";
+    private static final String PREVIEWNET = "previewnet";
+    final ExecutorService executor;
     /**
      * The logger
      */
     private final Logger logger = LoggerFactory.getLogger(getClass());
-
-    private static final Hbar DEFAULT_MAX_QUERY_PAYMENT = new Hbar(1);
-
-    private static final String MAINNET = "mainnet";
-    private static final String TESTNET = "testnet";
-    private static final String PREVIEWNET = "previewnet";
-
-    final ExecutorService executor;
-
+    private final AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
+    private final Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
     @Nullable
     Hbar defaultMaxTransactionFee = null;
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
-
     Network network;
     MirrorNetwork mirrorNetwork;
-
     @Nullable
     private Operator operator;
-
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
-    private final AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
-
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
-
     private volatile Duration maxBackoff = DEFAULT_MAX_BACKOFF;
-
     private volatile Duration minBackoff = DEFAULT_MIN_BACKOFF;
-
     private boolean autoValidateChecksums = false;
-
     private boolean defaultRegenerateTransactionId = true;
-
     // If networkUpdatePeriod is null, any network updates in progress will not complete
     @Nullable
     private Duration networkUpdatePeriod;
-
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
-
-    private Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructor.
      *
-     * @param executor                   the executor
-     * @param network                    the network
-     * @param mirrorNetwork              the mirror network
+     * @param executor      the executor
+     * @param network       the network
+     * @param mirrorNetwork the mirror network
      */
     @VisibleForTesting
     Client(
@@ -138,7 +132,7 @@ public final class Client implements AutoCloseable {
     /**
      * Extract the executor.
      *
-     * @return                          the executor service
+     * @return the executor service
      */
     static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
@@ -148,35 +142,9 @@ public final class Client implements AutoCloseable {
 
         int nThreads = Runtime.getRuntime().availableProcessors();
         return new ThreadPoolExecutor(nThreads, nThreads,
-                        0L, TimeUnit.MILLISECONDS,
-                        new LinkedBlockingQueue<>(),
-                        threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
-    }
-
-    /**
-     * Set the mirror network nodes.
-     *
-     * @param network                   list of network nodes
-     * @return                          {@code this}
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
-        try {
-            this.mirrorNetwork.setNetwork(network);
-        } catch (TimeoutException e) {
-            throw new RuntimeException(e);
-        }
-
-        return this;
-    }
-
-    /**
-     * Extract the mirror network node list.
-     *
-     * @return                          the list of mirror nodes
-     */
-    synchronized public List<String> getMirrorNetwork() {
-        return mirrorNetwork.getNetwork();
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(),
+            threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     /**
@@ -186,8 +154,7 @@ public final class Client implements AutoCloseable {
      * same Hedera network. Failure to do so will result in undefined behavior.
      *
      * <p>The client will load balance all requests to Hedera using a simple round-robin scheme to
-     * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be
-     * tried.
+     * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be tried.
      *
      * @param networkMap the map of node IDs to node addresses that make up the network.
      * @return {@link com.hedera.hashgraph.sdk.Client}
@@ -203,8 +170,8 @@ public final class Client implements AutoCloseable {
     /**
      * Set up the client for the selected network.
      *
-     * @param name                      the selected network
-     * @return                          the configured client
+     * @param name the selected network
+     * @return the configured client
      */
     public static Client forName(String name) {
         return switch (name) {
@@ -217,8 +184,7 @@ public final class Client implements AutoCloseable {
 
     /**
      * Construct a Hedera client pre-configured for <a
-     * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet
-     * access</a>.
+     * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
      *
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
@@ -227,12 +193,13 @@ public final class Client implements AutoCloseable {
         var network = Network.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
-     * Construct a Hedera client pre-configured for <a
-     * href="https://docs.hedera.com/guides/testnet/nodes">Testnet access</a>.
+     * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
+     * access</a>.
      *
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
@@ -241,12 +208,14 @@ public final class Client implements AutoCloseable {
         var network = Network.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
      * Construct a Hedera client pre-configured for <a
-     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet nodes</a>.
+     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
+     * nodes</a>.
      *
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
@@ -255,7 +224,8 @@ public final class Client implements AutoCloseable {
         var network = Network.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -286,7 +256,8 @@ public final class Client implements AutoCloseable {
             var networks = config.network.getAsJsonObject();
             Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
-                nodes.put(entry.getValue().toString().replace("\"", ""), AccountId.fromString(entry.getKey().replace("\"", "")));
+                nodes.put(entry.getValue().toString().replace("\"", ""),
+                    AccountId.fromString(entry.getKey().replace("\"", "")));
             }
             client = Client.forNetwork(nodes);
             if (config.networkName != null) {
@@ -294,7 +265,8 @@ public final class Client implements AutoCloseable {
                 try {
                     client.setNetworkName(NetworkName.fromString(networkNameString));
                 } catch (Exception ignored) {
-                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
+                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString
+                        + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
                 }
             }
         } else {
@@ -359,6 +331,32 @@ public final class Client implements AutoCloseable {
         return fromConfig(Files.newBufferedReader(file.toPath(), StandardCharsets.UTF_8));
     }
 
+    /**
+     * Extract the mirror network node list.
+     *
+     * @return the list of mirror nodes
+     */
+    synchronized public List<String> getMirrorNetwork() {
+        return mirrorNetwork.getNetwork();
+    }
+
+    /**
+     * Set the mirror network nodes.
+     *
+     * @param network list of network nodes
+     * @return {@code this}
+     * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     */
+    public synchronized Client setMirrorNetwork(List<String> network) throws InterruptedException {
+        try {
+            this.mirrorNetwork.setNetwork(network);
+        } catch (TimeoutException e) {
+            throw new RuntimeException(e);
+        }
+
+        return this;
+    }
+
     private synchronized void scheduleNetworkUpdate(@Nullable Duration delay) {
         if (delay == null) {
             networkUpdateFuture = null;
@@ -412,12 +410,13 @@ public final class Client implements AutoCloseable {
     /**
      * Replace all nodes in this Client with the nodes in the Address Book
      *
-     * @param addressBook               A list of nodes and their metadata
+     * @param addressBook A list of nodes and their metadata
      * @return {@code this}
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     * @throws TimeoutException         when shutting down nodes
+     * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     * @throws TimeoutException     when shutting down nodes
      */
-    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook) throws InterruptedException, TimeoutException {
+    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook)
+        throws InterruptedException, TimeoutException {
         network.setNetwork(Network.addressBookToNetwork(
             addressBook.nodeAddresses,
             isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
@@ -426,55 +425,36 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
-     *
-     * @param network                   a map of node account ID to node URL.
-     * @return {@code this} for fluent API usage.
-     * @throws TimeoutException         when shutting down nodes
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     */
-    public synchronized Client setNetwork(Map<String, AccountId> network) throws InterruptedException, TimeoutException {
-        this.network.setNetwork(network);
-        return this;
-    }
-
-    /**
      * Extract the network.
      *
-     * @return                          the client's network
+     * @return the client's network
      */
     synchronized public Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
 
     /**
-     * Set if transport security should be used to connect to consensus nodes.
-     * <br>
-     * If transport security is enabled all connections to consensus nodes will use TLS, and
-     * the server's certificate hash will be compared to the hash stored in the {@link NodeAddressBook}
-     * for the given network.
-     * <br>
-     * *Note*: If transport security is enabled, but {@link Client#isVerifyCertificates()} is disabled then server certificates
-     * will not be verified.
+     * Replace all nodes in this Client with a new set of nodes (e.g. for an Address Book update).
      *
-     * @param transportSecurity         enable or disable transport security for consensus nodes
+     * @param network a map of node account ID to node URL.
      * @return {@code this} for fluent API usage.
-     * @throws InterruptedException     when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     * @throws TimeoutException     when shutting down nodes
+     * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
-    public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
-        network.setTransportSecurity(transportSecurity);
+    public synchronized Client setNetwork(Map<String, AccountId> network)
+        throws InterruptedException, TimeoutException {
+        this.network.setNetwork(network);
         return this;
     }
 
     /**
-     *
      * Set if transport security should be used to connect to mirror nodes.
      * <br>
      * If transport security is enabled all connections to mirror nodes will use TLS.
      *
-     * @deprecated Mirror nodes can only be accessed using TLS
      * @param transportSecurity - enable or disable transport security for mirror nodes
      * @return {@code this} for fluent API usage.
+     * @deprecated Mirror nodes can only be accessed using TLS
      */
     @Deprecated
     public Client setMirrorTransportSecurity(boolean transportSecurity) {
@@ -484,19 +464,46 @@ public final class Client implements AutoCloseable {
     /**
      * Is tls enabled for consensus nodes.
      *
-     * @return                          is tls enabled
+     * @return is tls enabled
      */
     public boolean isTransportSecurity() {
         return network.isTransportSecurity();
     }
 
     /**
+     * Set if transport security should be used to connect to consensus nodes.
+     * <br>
+     * If transport security is enabled all connections to consensus nodes will use TLS, and the server's certificate
+     * hash will be compared to the hash stored in the {@link NodeAddressBook} for the given network.
+     * <br>
+     * *Note*: If transport security is enabled, but {@link Client#isVerifyCertificates()} is disabled then server
+     * certificates will not be verified.
+     *
+     * @param transportSecurity enable or disable transport security for consensus nodes
+     * @return {@code this} for fluent API usage.
+     * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
+     */
+    public Client setTransportSecurity(boolean transportSecurity) throws InterruptedException {
+        network.setTransportSecurity(transportSecurity);
+        return this;
+    }
+
+    /**
      * Is tls enabled for mirror nodes.
      *
-     * @return                          is tls enabled
+     * @return is tls enabled
      */
     public boolean mirrorIsTransportSecurity() {
         return mirrorNetwork.isTransportSecurity();
+    }
+
+    /**
+     * Is certificate verification enabled.
+     *
+     * @return is certificate verification enabled
+     */
+    public boolean isVerifyCertificates() {
+        return network.isVerifyCertificates();
     }
 
     /**
@@ -511,20 +518,11 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Is certificate verification enabled.
-     *
-     * @return                          is certificate verification enabled
-     */
-    public boolean isVerifyCertificates() {
-        return network.isVerifyCertificates();
-    }
-
-    /**
      * Send a ping to the given node.
      *
-     * @param nodeAccountId             Account ID of the node to ping
-     * @throws TimeoutException         when the transaction times out
-     * @throws PrecheckStatusException  when the precheck fails
+     * @param nodeAccountId Account ID of the node to ping
+     * @throws TimeoutException        when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
     public Void ping(AccountId nodeAccountId) throws PrecheckStatusException, TimeoutException {
         return ping(nodeAccountId, getRequestTimeout());
@@ -533,10 +531,10 @@ public final class Client implements AutoCloseable {
     /**
      * Send a ping to the given node.
      *
-     * @param nodeAccountId             Account ID of the node to ping
-     * @param timeout                   The timeout after which the execution attempt will be cancelled.
-     * @throws TimeoutException         when the transaction times out
-     * @throws PrecheckStatusException  when the precheck fails
+     * @param nodeAccountId Account ID of the node to ping
+     * @param timeout       The timeout after which the execution attempt will be cancelled.
+     * @throws TimeoutException        when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
     public Void ping(AccountId nodeAccountId, Duration timeout) throws PrecheckStatusException, TimeoutException {
         new AccountBalanceQuery()
@@ -561,7 +559,7 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
-     * @param timeout The timeout after which the execution attempt will be cancelled.
+     * @param timeout       The timeout after which the execution attempt will be cancelled.
      * @return an empty future that throws exception if there was an error
      */
     public CompletableFuture<Void> pingAsync(AccountId nodeAccountId, Duration timeout) {
@@ -571,12 +569,12 @@ public final class Client implements AutoCloseable {
             .setNodeAccountIds(Collections.singletonList(nodeAccountId))
             .executeAsync(this, timeout)
             .whenComplete((balance, error) -> {
-                if (error == null){
+                if (error == null) {
                     result.complete(null);
                 } else {
                     result.completeExceptionally(error);
                 }
-        });
+            });
         return result;
     }
 
@@ -584,7 +582,7 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
-     * @param callback a BiConsumer which handles the result or error.
+     * @param callback      a BiConsumer which handles the result or error.
      */
     public void pingAsync(AccountId nodeAccountId, BiConsumer<Void, Throwable> callback) {
         ConsumerHelper.biConsumer(pingAsync(nodeAccountId), callback);
@@ -594,8 +592,8 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
-     * @param timeout The timeout after which the execution attempt will be cancelled.
-     * @param callback a BiConsumer which handles the result or error.
+     * @param timeout       The timeout after which the execution attempt will be cancelled.
+     * @param callback      a BiConsumer which handles the result or error.
      */
     public void pingAsync(AccountId nodeAccountId, Duration timeout, BiConsumer<Void, Throwable> callback) {
         ConsumerHelper.biConsumer(pingAsync(nodeAccountId, timeout), callback);
@@ -605,8 +603,8 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
-     * @param onSuccess a Consumer which consumes the result on success.
-     * @param onFailure a Consumer which consumes the error on failure.
+     * @param onSuccess     a Consumer which consumes the result on success.
+     * @param onFailure     a Consumer which consumes the error on failure.
      */
     public void pingAsync(AccountId nodeAccountId, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId), onSuccess, onFailure);
@@ -616,32 +614,33 @@ public final class Client implements AutoCloseable {
      * Send a ping to the given node asynchronously.
      *
      * @param nodeAccountId Account ID of the node to ping
-     * @param timeout The timeout after which the execution attempt will be cancelled.
-     * @param onSuccess a Consumer which consumes the result on success.
-     * @param onFailure a Consumer which consumes the error on failure.
+     * @param timeout       The timeout after which the execution attempt will be cancelled.
+     * @param onSuccess     a Consumer which consumes the result on success.
+     * @param onFailure     a Consumer which consumes the error on failure.
      */
-    public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
+    public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess,
+        Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
     }
 
     /**
-     * Sends pings to all nodes in the client's network.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network. Combines well with setMaxAttempts(1) to remove all dead nodes
+     * from the network.
      *
-     * @throws TimeoutException         when the transaction times out
-     * @throws PrecheckStatusException  when the precheck fails
+     * @throws TimeoutException        when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
     public synchronized Void pingAll() throws PrecheckStatusException, TimeoutException {
         return pingAll(getRequestTimeout());
     }
 
     /**
-     * Sends pings to all nodes in the client's network.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network. Combines well with setMaxAttempts(1) to remove all dead nodes
+     * from the network.
      *
-     * @param timeoutPerPing            The timeout after which each execution attempt will be cancelled.
-     * @throws TimeoutException         when the transaction times out
-     * @throws PrecheckStatusException  when the precheck fails
+     * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
+     * @throws TimeoutException        when the transaction times out
+     * @throws PrecheckStatusException when the precheck fails
      */
     public synchronized Void pingAll(Duration timeoutPerPing) throws PrecheckStatusException, TimeoutException {
         for (var nodeAccountId : network.getNetwork().values()) {
@@ -652,8 +651,8 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @return an empty future that throws exception if there was an error
      */
@@ -662,8 +661,8 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
      * @return an empty future that throws exception if there was an error
@@ -680,8 +679,8 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @param callback a BiConsumer which handles the result or error.
      */
@@ -690,19 +689,19 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
-     * @param callback a BiConsumer which handles the result or error.
+     * @param callback       a BiConsumer which handles the result or error.
      */
     public void pingAllAsync(Duration timeoutPerPing, BiConsumer<Void, Throwable> callback) {
         ConsumerHelper.biConsumer(pingAllAsync(timeoutPerPing), callback);
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
@@ -712,23 +711,22 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sends pings to all nodes in the client's network asynchronously.
-     * Combines well with setMaxAttempts(1) to remove all dead nodes from the network.
+     * Sends pings to all nodes in the client's network asynchronously. Combines well with setMaxAttempts(1) to remove
+     * all dead nodes from the network.
      *
      * @param timeoutPerPing The timeout after which each execution attempt will be cancelled.
-     * @param onSuccess a Consumer which consumes the result on success.
-     * @param onFailure a Consumer which consumes the error on failure.
+     * @param onSuccess      a Consumer which consumes the result on success.
+     * @param onFailure      a Consumer which consumes the error on failure.
      */
     public void pingAllAsync(Duration timeoutPerPing, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAllAsync(timeoutPerPing), onSuccess, onFailure);
     }
 
     /**
-     * Set the account that will, by default, be paying for transactions and queries built with
-     * this client.
+     * Set the account that will, by default, be paying for transactions and queries built with this client.
      * <p>
-     * The operator account ID is used to generate the default transaction ID for all transactions executed with
-     * this client.
+     * The operator account ID is used to generate the default transaction ID for all transactions executed with this
+     * client.
      * <p>
      * The operator private key is used to sign all transactions executed by this client.
      *
@@ -741,11 +739,10 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Sets the account that will, by default, by paying for transactions and queries built with
-     * this client.
+     * Sets the account that will, by default, by paying for transactions and queries built with this client.
      * <p>
-     * The operator account ID is used to generate a default transaction ID for all transactions
-     * executed with this client.
+     * The operator account ID is used to generate a default transaction ID for all transactions executed with this
+     * client.
      * <p>
      * The `transactionSigner` is invoked to sign all transactions executed by this client.
      *
@@ -754,13 +751,15 @@ public final class Client implements AutoCloseable {
      * @param transactionSigner The signer for the operator
      * @return {@code this}
      */
-    public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+    public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
+        UnaryOperator<byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
             } catch (BadEntityIdException exc) {
                 throw new IllegalArgumentException(
-                    "Tried to set the client operator account ID to an account ID with an invalid checksum: " + exc.getMessage()
+                    "Tried to set the client operator account ID to an account ID with an invalid checksum: "
+                        + exc.getMessage()
                 );
             }
         }
@@ -772,9 +771,8 @@ public final class Client implements AutoCloseable {
     /**
      * Current name of the network; corresponds to ledger ID in entity ID checksum calculations.
      *
+     * @return the network name
      * @deprecated use {@link #getLedgerId()} instead
-     *
-     * @return                          the network name
      */
     @Nullable
     @Deprecated
@@ -787,10 +785,9 @@ public final class Client implements AutoCloseable {
      * Set the network name to a particular value. Useful when constructing a network which is a subset of an existing
      * known network.
      *
-     * @deprecated use {@link #setLedgerId(LedgerId)} instead
-     *
-     * @param networkName               the desired network
+     * @param networkName the desired network
      * @return {@code this}
+     * @deprecated use {@link #setLedgerId(LedgerId)} instead
      */
     @Deprecated
     public synchronized Client setNetworkName(@Nullable NetworkName networkName) {
@@ -801,7 +798,7 @@ public final class Client implements AutoCloseable {
     /**
      * Current LedgerId of the network; corresponds to ledger ID in entity ID checksum calculations.
      *
-     * @return                          the ledger id
+     * @return the ledger id
      */
     @Nullable
     public synchronized LedgerId getLedgerId() {
@@ -809,10 +806,10 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Set the LedgerId to a particular value. Useful when constructing a network which is a subset of an existing
-     * known network.
+     * Set the LedgerId to a particular value. Useful when constructing a network which is a subset of an existing known
+     * network.
      *
-     * @param ledgerId                  the desired ledger id
+     * @param ledgerId the desired ledger id
      * @return {@code this}
      */
     public synchronized Client setLedgerId(@Nullable LedgerId ledgerId) {
@@ -823,7 +820,7 @@ public final class Client implements AutoCloseable {
     /**
      * Max number of attempts a request executed with this client will do.
      *
-     * @return                          the maximus attempts
+     * @return the maximus attempts
      */
     public synchronized int getMaxAttempts() {
         return maxAttempts;
@@ -832,7 +829,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the max number of attempts a request executed with this client will do.
      *
-     * @param maxAttempts               the desired max attempts
+     * @param maxAttempts the desired max attempts
      * @return {@code this}
      */
     public synchronized Client setMaxAttempts(int maxAttempts) {
@@ -914,7 +911,7 @@ public final class Client implements AutoCloseable {
     /**
      * Max number of times any node in the network can receive a bad gRPC status before being removed from the network.
      *
-     * @return                          the maximum node attempts
+     * @return the maximum node attempts
      */
     public synchronized int getMaxNodeAttempts() {
         return network.getMaxNodeAttempts();
@@ -924,7 +921,7 @@ public final class Client implements AutoCloseable {
      * Set the max number of times any node in the network can receive a bad gRPC status before being removed from the
      * network.
      *
-     * @param maxNodeAttempts           the desired minimum attempts
+     * @param maxNodeAttempts the desired minimum attempts
      * @return {@code this}
      */
     public synchronized Client setMaxNodeAttempts(int maxNodeAttempts) {
@@ -935,8 +932,8 @@ public final class Client implements AutoCloseable {
     /**
      * The minimum backoff time for any node in the network.
      *
+     * @return the wait time
      * @deprecated - Use {@link Client#getNodeMaxBackoff()} instead
-     * @return                          the wait time
      */
     @Deprecated
     public synchronized Duration getNodeWaitTime() {
@@ -946,9 +943,9 @@ public final class Client implements AutoCloseable {
     /**
      * Set the minimum backoff time for any node in the network.
      *
+     * @param nodeWaitTime the wait time
+     * @return the updated client
      * @deprecated - Use {@link Client#setNodeMinBackoff(Duration)} ()} instead
-     * @param nodeWaitTime              the wait time
-     * @return                          the updated client
      */
     @Deprecated
     public synchronized Client setNodeWaitTime(Duration nodeWaitTime) {
@@ -958,7 +955,7 @@ public final class Client implements AutoCloseable {
     /**
      * The minimum backoff time for any node in the network.
      *
-     * @return                          the minimum backoff time
+     * @return the minimum backoff time
      */
     public synchronized Duration getNodeMinBackoff() {
         return network.getMinNodeBackoff();
@@ -967,7 +964,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the minimum backoff time for any node in the network.
      *
-     * @param minBackoff                the desired minimum backoff time
+     * @param minBackoff the desired minimum backoff time
      * @return {@code this}
      */
     public synchronized Client setNodeMinBackoff(Duration minBackoff) {
@@ -978,7 +975,7 @@ public final class Client implements AutoCloseable {
     /**
      * The maximum backoff time for any node in the network.
      *
-     * @return                          the maximum node backoff time
+     * @return the maximum node backoff time
      */
     public synchronized Duration getNodeMaxBackoff() {
         return network.getMaxNodeBackoff();
@@ -987,7 +984,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum backoff time for any node in the network.
      *
-     * @param maxBackoff                the desired max backoff time
+     * @param maxBackoff the desired max backoff time
      * @return {@code this}
      */
     public synchronized Client setNodeMaxBackoff(Duration maxBackoff) {
@@ -998,7 +995,7 @@ public final class Client implements AutoCloseable {
     /**
      * Extract the minimum node readmit time.
      *
-     * @return                          the minimum node readmit time
+     * @return the minimum node readmit time
      */
     public Duration getMinNodeReadmitTime() {
         return network.getMinNodeReadmitTime();
@@ -1007,8 +1004,8 @@ public final class Client implements AutoCloseable {
     /**
      * Assign the minimum node readmit time.
      *
-     * @param minNodeReadmitTime        the requested duration
-     * @return  {@code this}
+     * @param minNodeReadmitTime the requested duration
+     * @return {@code this}
      */
     public Client setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         network.setMinNodeReadmitTime(minNodeReadmitTime);
@@ -1018,7 +1015,7 @@ public final class Client implements AutoCloseable {
     /**
      * Extract the node readmit time.
      *
-     * @return                          the maximum node readmit time
+     * @return the maximum node readmit time
      */
     public Duration getMaxNodeReadmitTime() {
         return network.getMaxNodeReadmitTime();
@@ -1027,7 +1024,7 @@ public final class Client implements AutoCloseable {
     /**
      * Assign the maximum node readmit time.
      *
-     * @param maxNodeReadmitTime        the maximum node readmit time
+     * @param maxNodeReadmitTime the maximum node readmit time
      * @return {@code this}
      */
     public Client setMaxNodeReadmitTime(Duration maxNodeReadmitTime) {
@@ -1039,7 +1036,7 @@ public final class Client implements AutoCloseable {
      * Set the max amount of nodes that will be chosen per request. By default, the request will use 1/3rd the network
      * nodes per request.
      *
-     * @param maxNodesPerTransaction    the desired number of nodes
+     * @param maxNodesPerTransaction the desired number of nodes
      * @return {@code this}
      */
     public synchronized Client setMaxNodesPerTransaction(int maxNodesPerTransaction) {
@@ -1050,7 +1047,7 @@ public final class Client implements AutoCloseable {
     /**
      * Enable or disable automatic entity ID checksum validation.
      *
-     * @param value                     the desired value
+     * @param value the desired value
      * @return {@code this}
      */
     public synchronized Client setAutoValidateChecksums(boolean value) {
@@ -1061,7 +1058,7 @@ public final class Client implements AutoCloseable {
     /**
      * Is automatic entity ID checksum validation enabled.
      *
-     * @return                          is validation enabled
+     * @return is validation enabled
      */
     public synchronized boolean isAutoValidateChecksumsEnabled() {
         return autoValidateChecksums;
@@ -1098,7 +1095,7 @@ public final class Client implements AutoCloseable {
     /**
      * The default maximum fee used for transactions.
      *
-     * @return                          the max transaction fee
+     * @return the max transaction fee
      */
     @Nullable
     public synchronized Hbar getDefaultMaxTransactionFee() {
@@ -1109,8 +1106,8 @@ public final class Client implements AutoCloseable {
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
      * Because transaction fees are always maximums, this will simply add a call to
-     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
-     * fee assessed for a given transaction may be less than this value, but never greater.
+     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual fee assessed for a given
+     * transaction may be less than this value, but never greater.
      *
      * @param defaultMaxTransactionFee The Hbar to be set
      * @return {@code this}
@@ -1129,12 +1126,12 @@ public final class Client implements AutoCloseable {
      * Set the maximum fee to be paid for transactions executed by this client.
      * <p>
      * Because transaction fees are always maximums, this will simply add a call to
-     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual
-     * fee assessed for a given transaction may be less than this value, but never greater.
+     * {@link Transaction#setMaxTransactionFee(Hbar)} on every new transaction. The actual fee assessed for a given
+     * transaction may be less than this value, but never greater.
      *
-     * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
      * @param maxTransactionFee The Hbar to be set
      * @return {@code this}
+     * @deprecated Use {@link #setDefaultMaxTransactionFee(Hbar)} instead.
      */
     @Deprecated
     public synchronized Client setMaxTransactionFee(Hbar maxTransactionFee) {
@@ -1144,7 +1141,7 @@ public final class Client implements AutoCloseable {
     /**
      * Extract the maximum query payment.
      *
-     * @return                          the default maximum query payment
+     * @return the default maximum query payment
      */
     public synchronized Hbar getDefaultMaxQueryPayment() {
         return defaultMaxQueryPayment;
@@ -1153,13 +1150,11 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum default payment allowable for queries.
      * <p>
-     * When a query is executed without an explicit {@link Query#setQueryPayment(Hbar)} call,
-     * the client will first request the cost
-     * of the given query from the node it will be submitted to and attach a payment for that amount
+     * When a query is executed without an explicit {@link Query#setQueryPayment(Hbar)} call, the client will first
+     * request the cost of the given query from the node it will be submitted to and attach a payment for that amount
      * from the operator account on the client.
      * <p>
-     * If the returned value is greater than this value, a
-     * {@link MaxQueryPaymentExceededException} will be thrown from
+     * If the returned value is greater than this value, a {@link MaxQueryPaymentExceededException} will be thrown from
      * {@link Query#execute(Client)} or returned in the second callback of
      * {@link Query#executeAsync(Client, Consumer, Consumer)}.
      * <p>
@@ -1179,9 +1174,9 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * @deprecated Use {@link #setDefaultMaxQueryPayment(Hbar)} instead.
      * @param maxQueryPayment The Hbar to be set
      * @return {@code this}
+     * @deprecated Use {@link #setDefaultMaxQueryPayment(Hbar)} instead.
      */
     @Deprecated
     public synchronized Client setMaxQueryPayment(Hbar maxQueryPayment) {
@@ -1191,7 +1186,7 @@ public final class Client implements AutoCloseable {
     /**
      * Should the transaction id be regenerated?
      *
-     * @return                          the default regenerate transaction id
+     * @return the default regenerate transaction id
      */
     public synchronized boolean getDefaultRegenerateTransactionId() {
         return defaultRegenerateTransactionId;
@@ -1200,7 +1195,7 @@ public final class Client implements AutoCloseable {
     /**
      * Assign the default regenerate transaction id.
      *
-     * @param regenerateTransactionId   should there be a regenerated transaction id
+     * @param regenerateTransactionId should there be a regenerated transaction id
      * @return {@code this}
      */
     public synchronized Client setDefaultRegenerateTransactionId(boolean regenerateTransactionId) {
@@ -1211,7 +1206,7 @@ public final class Client implements AutoCloseable {
     /**
      * Maximum amount of time a request can run
      *
-     * @return                          the timeout value
+     * @return the timeout value
      */
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
@@ -1224,7 +1219,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum amount of time a request can run. Used only in async variants of methods.
      *
-     * @param requestTimeout            the timeout value
+     * @param requestTimeout the timeout value
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -1239,7 +1234,7 @@ public final class Client implements AutoCloseable {
     /**
      * Maximum amount of time closing a network can take.
      *
-     * @return                          the timeout value
+     * @return the timeout value
      */
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
@@ -1252,7 +1247,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum amount of time closing a network can take.
      *
-     * @param closeTimeout              the timeout value
+     * @param closeTimeout the timeout value
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -1269,7 +1264,7 @@ public final class Client implements AutoCloseable {
     /**
      * Maximum amount of time a gRPC request can run
      *
-     * @return                          the gRPC deadline value
+     * @return the gRPC deadline value
      */
     @SuppressFBWarnings(
         value = "EI_EXPOSE_REP",
@@ -1282,7 +1277,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the maximum amount of time a gRPC request can run.
      *
-     * @param grpcDeadline            the gRPC deadline value
+     * @param grpcDeadline the gRPC deadline value
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -1297,7 +1292,7 @@ public final class Client implements AutoCloseable {
     /**
      * Extract the operator.
      *
-     * @return                          the operator
+     * @return the operator
      */
     @Nullable
     synchronized Operator getOperator() {
@@ -1321,7 +1316,7 @@ public final class Client implements AutoCloseable {
     /**
      * Set the period for updating the Address Book
      *
-     * @param networkUpdatePeriod   the period for updating the Address Book
+     * @param networkUpdatePeriod the period for updating the Address Book
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -1336,8 +1331,8 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting
-     * transactions or queries continue but more would be immediately cancelled.
+     * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting transactions or
+     * queries continue but more would be immediately cancelled.
      *
      * <p>After this method returns, this client can be re-used. Channels will be re-established as
      * needed.
@@ -1350,8 +1345,8 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting
-     * transactions or queries continue but more would be immediately cancelled.
+     * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting transactions or
+     * queries continue but more would be immediately cancelled.
      *
      * <p>After this method returns, this client can be re-used. Channels will be re-established as
      * needed.
@@ -1387,8 +1382,8 @@ public final class Client implements AutoCloseable {
         }
 
         if (mirrorNetworkError != null) {
-            if (mirrorNetworkError instanceof TimeoutException) {
-                throw (TimeoutException) mirrorNetworkError;
+            if (mirrorNetworkError instanceof TimeoutException ex) {
+                throw ex;
             } else {
                 throw new RuntimeException(mirrorNetworkError);
             }
@@ -1398,9 +1393,9 @@ public final class Client implements AutoCloseable {
     static class Operator {
         final AccountId accountId;
         final PublicKey publicKey;
-        final Function<byte[], byte[]> transactionSigner;
+        final UnaryOperator<byte[]> transactionSigner;
 
-        Operator(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
+        Operator(AccountId accountId, PublicKey publicKey, UnaryOperator<byte[]> transactionSigner) {
             this.accountId = accountId;
             this.publicKey = publicKey;
             this.transactionSigner = transactionSigner;
@@ -1421,8 +1416,8 @@ public final class Client implements AutoCloseable {
         private JsonElement mirrorNetwork;
 
         private static class ConfigOperator {
-            private String accountId = "";
-            private String privateKey = "";
+            private final String accountId = "";
+            private final String privateKey = "";
         }
     }
 }
