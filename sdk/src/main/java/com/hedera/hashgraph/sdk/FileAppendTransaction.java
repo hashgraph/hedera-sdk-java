@@ -43,7 +43,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     static int DEFAULT_CHUNK_SIZE = 4096;
 
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
 
     /**
      * Constructor.

@@ -36,7 +36,7 @@ import java.util.Objects;
  */
 public final class TopicInfoQuery extends Query<TopicInfo, TopicInfoQuery> {
     @Nullable
-    TopicId topicId = null;
+    TopicId topicId;
 
     /**
      * Constructor.

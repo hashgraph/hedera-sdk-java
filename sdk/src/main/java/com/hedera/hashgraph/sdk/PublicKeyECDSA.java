@@ -37,7 +37,7 @@ import static com.hedera.hashgraph.sdk.Crypto.calcKeccak256;
  */
 public class PublicKeyECDSA extends PublicKey {
     // Compressed 33 byte form
-    private byte[] keyData;
+    private final byte[] keyData;
 
     /**
      * Constructor.

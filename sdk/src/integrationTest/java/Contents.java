@@ -1,4 +1,4 @@
-public class Contents {
+public final class Contents {
     private Contents() {
     }
 

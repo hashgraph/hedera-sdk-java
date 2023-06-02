@@ -27,7 +27,7 @@ When this example spits out a raw response code,
 you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
 
-public class SolidityPrecompileExample {
+public final class SolidityPrecompileExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -78,21 +78,17 @@ public class SolidityPrecompileExample {
                 // step 3 associates Alice with the token, which requires Alice's signature
                 .addSignerForStep(3, alicePrivateKey)
                 .addSignerForStep(5, alicePrivateKey)
-                .setParameterSupplierForStep(11, () -> {
-                    return new ContractFunctionParameters()
+                .setParameterSupplierForStep(11, () -> new ContractFunctionParameters()
                         // when contracts work with a public key, they handle the raw bytes of the public key
-                        .addBytes(alicePublicKey.toBytesRaw());
-                }).setPayableAmountForStep(11, Hbar.from(40))
+                        .addBytes(alicePublicKey.toBytesRaw())).setPayableAmountForStep(11, Hbar.from(40))
                 // Because we're setting the adminKey for the created NFT token to Alice's key,
                 // Alice must sign the ContractExecuteTransaction.
                 .addSignerForStep(11, alicePrivateKey)
                 // and Alice must sign for minting because her key is the supply key.
                 .addSignerForStep(12, alicePrivateKey)
-                .setParameterSupplierForStep(12, () -> {
-                    return new ContractFunctionParameters()
+                .setParameterSupplierForStep(12, () -> new ContractFunctionParameters()
                         // add three metadatas
-                        .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}});
-                }) // and alice must sign to become associated with the token.
+                        .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}})) // and alice must sign to become associated with the token.
                 .addSignerForStep(13, alicePrivateKey)
                 // Alice must sign to burn the token because her key is the supply key
                 .addSignerForStep(16, alicePrivateKey);

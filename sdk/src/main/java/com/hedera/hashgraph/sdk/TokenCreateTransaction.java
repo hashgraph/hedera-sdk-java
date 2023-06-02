@@ -59,14 +59,14 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * from the treasury account.
      */
     @Nullable
-    private AccountId treasuryAccountId = null;
+    private AccountId treasuryAccountId;
     /**
      * An account which will be automatically charged to renew the token's
      * expiration, at autoRenewPeriod interval. This key is required to
      * sign the transaction if present. This is not currently enabled.
      */
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
     /**
      * Set the publicly visible name of the token. The token name is specified
      * as a string of UTF-8 characters in Unicode. UTF-8 encoding of this
@@ -85,7 +85,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * The number of decimal places a token is divisible by. This field can
      * never be changed.
      */
-    private int decimals = 0;
+    private int decimals;
     /**
      * Specifies the initial supply of fungible tokens to be put in
      * circulation. The initial supply is sent to the Treasury Account.
@@ -93,7 +93,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * tokens and is in the lowest denomination possible. For creating an
      * NFT, you must set the initial supply to 0.
      */
-    private long initialSupply = 0;
+    private long initialSupply;
     /**
      * The key which can perform token update and token delete operations on
      * the token.The admin key has the authority to change the freeze key,
@@ -102,51 +102,51 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * able to be updated/deleted). (KYC - Know Your Customer)
      */
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     /**
      * The key which can grant or revoke KYC of an account for the token's
      * transactions. If empty, KYC is not required, and KYC grant or revoke
      * operations are not possible.
      */
     @Nullable
-    private Key kycKey = null;
+    private Key kycKey;
     /**
      * The key which can sign to freeze or unfreeze an account for token
      * transactions. If empty, freezing is not possible.
      */
     @Nullable
-    private Key freezeKey = null;
+    private Key freezeKey;
     /**
      * The key which can wipe the token balance of an account. If empty,
      * wipe is not possible.
      */
     @Nullable
-    private Key wipeKey = null;
+    private Key wipeKey;
     /**
      * The key which can change the total supply of a token. This key is
      * used to authorize token mint and burn transactions. If this is left
      * empty, minting/burning tokens is not possible.
      */
     @Nullable
-    private Key supplyKey = null;
+    private Key supplyKey;
     /**
      * The key that can change the token's  schedule. A custom fee schedule
      * token without a fee schedule key is immutable.
      */
     @Nullable
-    private Key feeScheduleKey = null;
+    private Key feeScheduleKey;
     /**
      * The key that has the authority to pause or unpause a token. Pausing
      * a token prevents the token from participating in all transactions.
      */
     @Nullable
-    private Key pauseKey = null;
+    private Key pauseKey;
     /**
      * The default Freeze status (frozen or unfrozen) of Hedera accounts
      * relative to this token. If true, an account must be unfrozen before
      * it can receive the token.
      */
-    private boolean freezeDefault = false;
+    private boolean freezeDefault;
     /**
      * The epoch second at which the token should expire; if an auto-renew
      * account and period are specified, this is coerced to the current
@@ -154,14 +154,14 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * is 90 days.
      */
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     /**
      * The interval at which the auto-renew account will be charged to
      * extend the token's expiry. The default auto-renew period is
      * 131,500 minutes. This is not currently enabled.
      */
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     /**
      * A short publicly visible memo about the token.
      */
@@ -183,7 +183,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      *
      * You must set the token supply type to FINITE if you set this field.
      */
-    private long maxSupply = 0;
+    private long maxSupply;
 
     /**
      * Constructor.

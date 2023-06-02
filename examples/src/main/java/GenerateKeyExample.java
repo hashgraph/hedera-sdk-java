@@ -20,7 +20,7 @@
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
-class GenerateKeyExample {
+final class GenerateKeyExample {
     private GenerateKeyExample() {
     }
 

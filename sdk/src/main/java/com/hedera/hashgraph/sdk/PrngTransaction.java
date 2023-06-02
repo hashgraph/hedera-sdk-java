@@ -35,7 +35,7 @@ public class PrngTransaction extends Transaction<PrngTransaction> {
      * If not set or set to zero, will return a 384-bit pseudorandom data in the record.
      */
     @Nullable
-    private Integer range = null;
+    private Integer range;
 
     /**
      * Constructor.

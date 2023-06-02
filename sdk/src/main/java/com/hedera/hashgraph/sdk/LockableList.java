@@ -28,8 +28,8 @@ import java.util.*;
  */
 class LockableList<T> implements Iterable<T> {
     private ArrayList<T> list = new ArrayList<>();
-    private int index = 0;
-    private boolean locked = false;
+    private int index;
+    private boolean locked;
 
     /**
      * Constructor.

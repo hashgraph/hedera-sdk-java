@@ -2628,7 +2628,7 @@ public final class ContractFunctionParameters {
         return ByteString.copyFrom(paramsBytes);
     }
 
-    private final static class Argument {
+    private static final class Argument {
         private final String type;
 
         private final ByteString value;

@@ -4,7 +4,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class CreateAccountWithAliasExample {
+public final class CreateAccountWithAliasExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));

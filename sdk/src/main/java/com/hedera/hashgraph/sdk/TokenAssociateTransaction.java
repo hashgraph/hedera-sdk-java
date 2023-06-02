@@ -38,7 +38,7 @@ import java.util.Objects;
  */
 public class TokenAssociateTransaction extends Transaction<TokenAssociateTransaction> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     private List<TokenId> tokenIds = new ArrayList<>();
 
     /**

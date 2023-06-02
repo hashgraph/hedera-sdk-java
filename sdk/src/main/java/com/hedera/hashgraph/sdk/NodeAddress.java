@@ -63,7 +63,7 @@ public class NodeAddress implements Cloneable {
      * A description of the node, with UTF-8 encoding up to 100 bytes.
      */
     @Nullable
-    String description = null;
+    String description;
     /**
      * The amount of tinybars staked to the node.
      */

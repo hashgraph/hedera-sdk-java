@@ -98,7 +98,7 @@ public final class KeyList extends Key implements Collection<Key> {
      * @return                          the key list
      */
     static KeyList fromProtobuf(com.hedera.hashgraph.sdk.proto.KeyList keyList, @Nullable Integer threshold) {
-        var keys = (threshold != null ? new KeyList(threshold) : new KeyList());
+        var keys = threshold != null ? new KeyList(threshold) : new KeyList();
         for (var i = 0; i < keyList.getKeysCount(); ++i) {
             keys.add(Key.fromProtobufKey(keyList.getKeys(i)));
         }

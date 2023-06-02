@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class NftMetadataGenerator {
+public final class NftMetadataGenerator {
     private NftMetadataGenerator() {
     }
 

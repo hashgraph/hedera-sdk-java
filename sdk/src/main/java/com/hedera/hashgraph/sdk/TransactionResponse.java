@@ -128,11 +128,10 @@ public final class TransactionResponse {
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
     public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        var receipt = getReceiptQuery()
+
+        return getReceiptQuery()
             .execute(client, timeout)
             .validateStatus(validateStatus);
-
-        return receipt;
     }
 
     /**
@@ -276,7 +275,7 @@ public final class TransactionResponse {
      * @return                          future result of the transaction record
      */
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client, Duration timeout) {
-        return getReceiptAsync(client, timeout).thenCompose((receipt) -> getRecordQuery().executeAsync(client, timeout));
+        return getReceiptAsync(client, timeout).thenCompose(receipt -> getRecordQuery().executeAsync(client, timeout));
     }
 
     /**

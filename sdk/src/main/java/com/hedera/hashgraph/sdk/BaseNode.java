@@ -46,7 +46,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
     private static final int GET_STATE_INTERVAL_MILLIS = 50;
     private static final int GET_STATE_TIMEOUT_MILLIS = 10000;
     private static final int GET_STATE_MAX_ATTEMPTS = GET_STATE_TIMEOUT_MILLIS / GET_STATE_INTERVAL_MILLIS;
-    private boolean hasConnected = false;
+    private boolean hasConnected;
 
     protected final ExecutorService executor;
 
@@ -81,7 +81,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
     protected long badGrpcStatusCount;
 
     @Nullable
-    protected ManagedChannel channel = null;
+    protected ManagedChannel channel;
 
     /**
      * Constructor.
@@ -299,11 +299,11 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         if (hasConnected) {
             return false;
         }
-        hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
+        hasConnected = getChannel().getState(true) == ConnectivityState.READY;
         try {
             for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
                 TimeUnit.MILLISECONDS.sleep(GET_STATE_INTERVAL_MILLIS);
-                hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
+                hasConnected = getChannel().getState(true) == ConnectivityState.READY;
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -312,13 +312,11 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
     }
 
     private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
-        hasConnected = (state == ConnectivityState.READY);
+        hasConnected = state == ConnectivityState.READY;
         if (i >= GET_STATE_MAX_ATTEMPTS || hasConnected) {
             return CompletableFuture.completedFuture(!hasConnected);
         }
-        return Delayer.delayFor(GET_STATE_INTERVAL_MILLIS, executor).thenCompose(ignored -> {
-            return channelFailedToConnectAsync(i + 1, getChannel().getState(true));
-        });
+        return Delayer.delayFor(GET_STATE_INTERVAL_MILLIS, executor).thenCompose(ignored -> channelFailedToConnectAsync(i + 1, getChannel().getState(true)));
     }
 
     /**

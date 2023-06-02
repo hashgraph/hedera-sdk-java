@@ -78,7 +78,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * The presence of frozenBodyBuilder indicates that this transaction is frozen.
      */
     @Nullable
-    protected TransactionBody.Builder frozenBodyBuilder = null;
+    protected TransactionBody.Builder frozenBodyBuilder;
 
     /**
      * An SDK [Transaction] is composed of multiple, raw protobuf transactions. These should be
@@ -129,13 +129,13 @@ public abstract class Transaction<T extends Transaction<T>>
 
     private Duration transactionValidDuration;
     @Nullable
-    private Hbar maxTransactionFee = null;
+    private Hbar maxTransactionFee;
     private String memo = "";
 
     /**
      * Should the transaction id be regenerated
      */
-    protected Boolean regenerateTransactionId = null;
+    protected Boolean regenerateTransactionId;
 
     /**
      * Constructor.
@@ -605,7 +605,7 @@ public abstract class Transaction<T extends Transaction<T>>
             }
             var isList = methodName.endsWith("List") && List.class.isAssignableFrom(method.getReturnType());
             var methodFieldName = methodName.substring(3, methodName.length() - (isList ? 4 : 0));
-            if (ignoreSet.contains(methodFieldName) || methodFieldName.equals("DefaultInstance")) {
+            if (ignoreSet.contains(methodFieldName) || "DefaultInstance".equals(methodFieldName)) {
                 continue;
             }
             if (!isList) {

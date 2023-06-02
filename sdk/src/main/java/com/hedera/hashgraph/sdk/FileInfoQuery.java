@@ -43,7 +43,7 @@ import java.util.Objects;
 public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
 
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
 
     /**
      * Constructor.
@@ -115,6 +115,6 @@ public final class FileInfoQuery extends Query<FileInfo, FileInfoQuery> {
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `FILE_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
     }
 }

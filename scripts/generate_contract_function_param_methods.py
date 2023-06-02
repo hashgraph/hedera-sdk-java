@@ -97,20 +97,16 @@ f.write("// XXXXXXXXXXXXXXXXXXXX INT VERSIONS XXXXXXXXXXXXXXXXXXXX\n\n")
 
 for v in int_versions:
     f.write(v + "\n");
-
 f.write("// XXXXXXXXXXXXXXXXXXXX INT ARRAY VERSIONS XXXXXXXXXXXXXXXXXXXX\n\n")
 
 for v in int_array_versions:
     f.write(v + "\n");
-
 f.write("// XXXXXXXXXXXXXXXXXXXX UINT VERSIONS XXXXXXXXXXXXXXXXXXXX\n\n")
 
 for v in uint_versions:
     f.write(v + "\n");
-
 f.write("// XXXXXXXXXXXXXXXXXXXX UINT ARRAY VERSIONS XXXXXXXXXXXXXXXXXXXX\n\n")
 
 for v in uint_array_versions:
     f.write(v + "\n");
-
 f.close()

@@ -39,7 +39,7 @@ import java.util.Objects;
 public final class ScheduleDeleteTransaction extends Transaction<ScheduleDeleteTransaction> {
 
     @Nullable
-    private ScheduleId scheduleId = null;
+    private ScheduleId scheduleId;
 
     /**
      * Constructor.

@@ -22,7 +22,7 @@ import com.hedera.hashgraph.sdk.Mnemonic;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
-class GenerateKeyWithMnemonicExample {
+final class GenerateKeyWithMnemonicExample {
     private GenerateKeyWithMnemonicExample() {
     }
 

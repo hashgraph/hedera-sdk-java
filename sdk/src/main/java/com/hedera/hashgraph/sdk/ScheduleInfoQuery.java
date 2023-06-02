@@ -39,7 +39,7 @@ import java.util.Objects;
  */
 public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleInfo, ScheduleInfoQuery> {
     @Nullable
-    private ScheduleId scheduleId = null;
+    private ScheduleId scheduleId;
 
     /**
      * Constructor.
@@ -111,6 +111,6 @@ public class ScheduleInfoQuery extends com.hedera.hashgraph.sdk.Query<ScheduleIn
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `Token_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
     }
 }

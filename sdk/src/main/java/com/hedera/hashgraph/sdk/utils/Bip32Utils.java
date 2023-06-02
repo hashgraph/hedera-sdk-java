@@ -3,7 +3,7 @@ package com.hedera.hashgraph.sdk.utils;
 /**
  * Utility class for BIP32 functionalities
  */
-public class Bip32Utils {
+public final class Bip32Utils {
 
     /**
      * Indicates if the index is hardened

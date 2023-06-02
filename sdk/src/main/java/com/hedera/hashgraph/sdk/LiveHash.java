@@ -33,7 +33,7 @@ import org.threeten.bp.Duration;
  *
  * See <a href="https://docs.hedera.com/guides/core-concepts/accounts#livehash">Hedera Documentation</a>
  */
-public class LiveHash {
+public final class LiveHash {
 
     /**
      * The account to which the livehash is attached

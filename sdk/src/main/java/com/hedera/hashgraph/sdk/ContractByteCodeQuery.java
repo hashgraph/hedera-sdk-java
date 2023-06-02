@@ -35,7 +35,7 @@ import java.util.Objects;
  */
 public final class ContractByteCodeQuery extends Query<ByteString, ContractByteCodeQuery> {
     @Nullable
-    private ContractId contractId = null;
+    private ContractId contractId;
 
     /**
      * Constructor.

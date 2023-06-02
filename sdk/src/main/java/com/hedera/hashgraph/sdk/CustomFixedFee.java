@@ -29,12 +29,12 @@ import javax.annotation.Nullable;
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fixed-fee">Hedera Documentation</a>
  */
 public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
-    private long amount = 0;
+    private long amount;
     /**
      * The shard, realm, number of the tokens.
      */
     @Nullable
-    private TokenId denominatingTokenId = null;
+    private TokenId denominatingTokenId;
 
     /**
      * Constructor.

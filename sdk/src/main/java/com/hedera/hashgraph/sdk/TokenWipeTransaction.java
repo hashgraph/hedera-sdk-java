@@ -47,20 +47,20 @@ public class TokenWipeTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      * The ID of the token to wipe from the account
      */
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.
      * The account ID to wipe the NFT from.
      */
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     /**
      * Applicable to tokens of type  FUNGIBLE_COMMON.The amount of token
      * to wipe from the specified account. The amount must be a positive
      * non-zero number in the lowest denomination possible, not bigger
      * than the token balance of the account.
      */
-    private long amount = 0;
+    private long amount;
     /**
      * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.
      * The list of NFTs to wipe.

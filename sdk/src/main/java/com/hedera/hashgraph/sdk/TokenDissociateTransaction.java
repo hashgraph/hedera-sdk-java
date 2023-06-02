@@ -44,7 +44,7 @@ import java.util.Objects;
  */
 public class TokenDissociateTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDissociateTransaction> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     private List<TokenId> tokenIds = new ArrayList<>();
 
     /**

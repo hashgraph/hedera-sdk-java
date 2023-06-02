@@ -19,7 +19,7 @@ class RequestTypeTest {
             .mapToObj(i -> Map.entry(codeValues[i], requestTypeValues[i]))
             .collect(Collectors.toList());
 
-        pair.forEach((a) -> {
+        pair.forEach(a -> {
             var code = a.getKey();
             var requestType = a.getValue();
             assertThat(RequestType.valueOf(code)).hasToString(requestType.toString());

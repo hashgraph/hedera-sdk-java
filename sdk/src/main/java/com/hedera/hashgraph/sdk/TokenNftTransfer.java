@@ -169,8 +169,12 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         TokenNftTransfer that = (TokenNftTransfer) o;
         return serial == that.serial && isApproved == that.isApproved && tokenId.equals(that.tokenId) && sender.equals(that.sender) && receiver.equals(that.receiver);
     }

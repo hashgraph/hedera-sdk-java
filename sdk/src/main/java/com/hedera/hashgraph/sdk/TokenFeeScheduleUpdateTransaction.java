@@ -45,7 +45,7 @@ import java.util.Objects;
  */
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     private List<CustomFee> customFees = new ArrayList<>();
 
     /**

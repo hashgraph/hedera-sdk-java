@@ -37,7 +37,7 @@ import java.util.Objects;
  */
 public final class AccountRecordsQuery extends Query<List<TransactionRecord>, AccountRecordsQuery> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Constructor.

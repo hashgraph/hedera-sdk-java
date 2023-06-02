@@ -53,7 +53,7 @@ public final class AccountCreateWithHtsExample {
         // Step 1 - Create an NFT using the Hedera Token Service
 
         // IPFS content identifiers for the NFT metadata
-        String[] CIDs = new String[] {
+        String[] cIDs = new String[] {
             "QmNPCiNA3Dsu3K5FxDPMG5Q3fZRwVTg14EXA92uqEeSRXn",
             "QmZ4dgAgt8owvnULxnKxNe8YqpavtVCXmc1Lt2XajFpJs9",
             "QmPzY5GxevjyfMUF5vEAjtyRoigzWp47MiKAtLBduLMC1T",
@@ -67,7 +67,7 @@ public final class AccountCreateWithHtsExample {
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
-            .setMaxSupply(CIDs.length)
+            .setMaxSupply(cIDs.length)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(OPERATOR_KEY)
@@ -88,9 +88,9 @@ public final class AccountCreateWithHtsExample {
         System.out.println("Created NFT with token id: " + nftTokenId);
 
         // Step 2 -  Mint the NFT
-        TransactionReceipt[] nftCollection = new TransactionReceipt[CIDs.length];
-        for (int i = 0; i < CIDs.length; i++) {
-            byte[] nftMetadata = CIDs[i].getBytes();
+        TransactionReceipt[] nftCollection = new TransactionReceipt[cIDs.length];
+        for (int i = 0; i < cIDs.length; i++) {
+            byte[] nftMetadata = cIDs[i].getBytes();
             TokenMintTransaction mintTx = new TokenMintTransaction()
                 .setTokenId(nftTokenId)
                 .setMetadata(List.of(nftMetadata))
@@ -149,10 +149,11 @@ public final class AccountCreateWithHtsExample {
 
         System.out.println("The normal account ID of the given alias: " + accountId);
 
-        if (nftOwnerAccountId.equals(accountId))
+        if (nftOwnerAccountId.equals(accountId)) {
             System.out.println("The NFT owner accountId matches the accountId created with the HTS");
-        else
+        } else {
             System.out.println("The two account IDs does not match");
+        }
 
 
         System.out.println("Example 2");
@@ -221,10 +222,11 @@ public final class AccountCreateWithHtsExample {
             .execute(client);
 
         int tokenBalanceAccountId2 = accountBalances.tokens.get(tokenId).intValue();
-        if (tokenBalanceAccountId2 == 10)
+        if (tokenBalanceAccountId2 == 10) {
             System.out.println("Account is created successfully using HTS 'TransferTransaction'");
-        else
+        } else {
             System.out.println("Creating account with HTS using public key alias failed");
+        }
 
         client.close();
     }

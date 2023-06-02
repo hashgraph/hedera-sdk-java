@@ -87,45 +87,45 @@ public class ContractCreateFlow {
 
     private String bytecode = "";
     @Nullable
-    private Integer maxChunks = null;
+    private Integer maxChunks;
     @Nullable
-    private Key adminKey = null;
-    private long gas = 0;
+    private Key adminKey;
+    private long gas;
     private Hbar initialBalance = Hbar.ZERO;
     @Nullable
-    private AccountId proxyAccountId = null;
-    private int maxAutomaticTokenAssociations = 0;
+    private AccountId proxyAccountId;
+    private int maxAutomaticTokenAssociations;
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
     private byte[] constructorParameters = {};
     @Nullable
-    private String contractMemo = null;
+    private String contractMemo;
     @Nullable
-    private List<AccountId> nodeAccountIds = null;
+    private List<AccountId> nodeAccountIds;
     private String createBytecode = "";
     private String appendBytecode = "";
 
     @Nullable
-    private AccountId stakedAccountId = null;
+    private AccountId stakedAccountId;
 
     @Nullable
-    private Long stakedNodeId = null;
+    private Long stakedNodeId;
 
-    private boolean declineStakingReward = false;
-
-    @Nullable
-    private Client freezeWithClient = null;
+    private boolean declineStakingReward;
 
     @Nullable
-    private PrivateKey signPrivateKey = null;
+    private Client freezeWithClient;
 
     @Nullable
-    private PublicKey signPublicKey = null;
+    private PrivateKey signPrivateKey;
 
     @Nullable
-    private Function<byte[], byte[]> transactionSigner = null;
+    private PublicKey signPublicKey;
+
+    @Nullable
+    private Function<byte[], byte[]> transactionSigner;
 
     /**
      * Constructor
@@ -721,23 +721,19 @@ public class ContractCreateFlow {
      */
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
         splitBytecode();
-        return createFileCreateTransaction(client).executeAsync(client, timeoutPerTransaction).thenCompose(fileCreateResponse -> {
-            return createTransactionReceiptQuery(fileCreateResponse)
+        return createFileCreateTransaction(client).executeAsync(client, timeoutPerTransaction).thenCompose(fileCreateResponse -> createTransactionReceiptQuery(fileCreateResponse)
                 .executeAsync(client, timeoutPerTransaction)
-                .thenApply(receipt -> receipt.fileId);
-        }).thenCompose(fileId -> {
+                .thenApply(receipt -> receipt.fileId)).thenCompose(fileId -> {
             CompletableFuture<Void> appendFuture =  appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
                 createFileAppendTransaction(fileId).executeAsync(client, timeoutPerTransaction).thenApply(ignored -> null);
-            return appendFuture.thenCompose(ignored -> {
-                return createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction).thenApply(contractCreateResponse -> {
+            return appendFuture.thenCompose(ignored -> createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction).thenApply(contractCreateResponse -> {
                     createTransactionReceiptQuery(contractCreateResponse).executeAsync(client, timeoutPerTransaction).thenRun(() -> {
                         new FileDeleteTransaction()
                             .setFileId(fileId)
                             .executeAsync(client, timeoutPerTransaction);
                     });
                     return contractCreateResponse;
-                });
-            });
+                }));
         });
     }
 

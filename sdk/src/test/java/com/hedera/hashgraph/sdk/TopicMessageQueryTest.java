@@ -68,10 +68,10 @@ class TopicMessageQueryTest {
     private static final Instant START_TIME = Instant.now();
 
     private Client client;
-    final private AtomicBoolean complete = new AtomicBoolean(false);
-    final private List<Throwable> errors = new ArrayList<>();
-    final private List<TopicMessage> received = new ArrayList<>();
-    final private ConsensusServiceStub consensusServiceStub = new ConsensusServiceStub();
+    private final AtomicBoolean complete = new AtomicBoolean(false);
+    private final List<Throwable> errors = new ArrayList<>();
+    private final List<TopicMessage> received = new ArrayList<>();
+    private final ConsensusServiceStub consensusServiceStub = new ConsensusServiceStub();
     private Server server;
     private TopicMessageQuery topicMessageQuery;
 
@@ -383,18 +383,18 @@ class TopicMessageQueryTest {
         subscriptionHandle.unsubscribe();
     }
 
-    static private ConsensusTopicQuery.Builder request() {
+    private static ConsensusTopicQuery.Builder request() {
         return ConsensusTopicQuery.newBuilder()
             .setConsensusEndTime(toTimestamp(START_TIME.plusSeconds(100L)))
             .setConsensusStartTime(toTimestamp(START_TIME))
             .setTopicID(TopicID.newBuilder().setTopicNum(1000).build());
     }
 
-    static private ConsensusTopicResponse response(long sequenceNumber) {
+    private static ConsensusTopicResponse response(long sequenceNumber) {
         return response(sequenceNumber, 0);
     }
 
-    static private ConsensusTopicResponse response(long sequenceNumber, int total) {
+    private static ConsensusTopicResponse response(long sequenceNumber, int total) {
         ConsensusTopicResponse.Builder consensusTopicResponseBuilder = ConsensusTopicResponse.newBuilder();
 
         if (total > 0) {
@@ -419,11 +419,11 @@ class TopicMessageQueryTest {
             .build();
     }
 
-    static private Instant toInstant(Timestamp timestamp) {
+    private static Instant toInstant(Timestamp timestamp) {
         return Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
     }
 
-    static private Timestamp toTimestamp(Instant instant) {
+    private static Timestamp toTimestamp(Instant instant) {
         return Timestamp.newBuilder()
             .setSeconds(instant.getEpochSecond())
             .setNanos(instant.getNano())

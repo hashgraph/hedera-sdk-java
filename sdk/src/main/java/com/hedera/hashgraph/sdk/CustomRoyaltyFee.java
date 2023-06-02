@@ -31,10 +31,10 @@ import java.util.Objects;
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#royalty-fee">Hedera Documentation</a>
  */
 public class CustomRoyaltyFee extends CustomFeeBase<CustomRoyaltyFee> {
-    private long numerator = 0;
+    private long numerator;
     private long denominator = 1;
     @Nullable
-    private CustomFixedFee fallbackFee = null;
+    private CustomFixedFee fallbackFee;
 
     /**
      * Constructor.

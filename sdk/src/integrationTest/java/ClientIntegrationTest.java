@@ -144,9 +144,7 @@ public class ClientIntegrationTest {
         testEnv.client.setNetwork(network);
 
 
-        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> {
-            testEnv.client.pingAll();
-        }).withMessageContaining("exceeded maximum attempts");
+        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(testEnv.client::pingAll).withMessageContaining("exceeded maximum attempts");
 
         var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
         assertThat(nodes.isEmpty()).isFalse();

@@ -47,7 +47,7 @@ import java.util.Objects;
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
 
     @Nullable
-    private ScheduleId scheduleId = null;
+    private ScheduleId scheduleId;
 
     /**
      * Constructor.

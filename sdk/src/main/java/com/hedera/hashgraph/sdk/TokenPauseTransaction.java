@@ -43,7 +43,7 @@ import java.util.Objects;
  */
 public class TokenPauseTransaction extends Transaction<TokenPauseTransaction>{
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
 
     /**
      * Constructor.

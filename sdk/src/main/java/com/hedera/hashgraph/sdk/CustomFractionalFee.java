@@ -30,10 +30,10 @@ import java.util.Objects;
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee">Hedera Documentation</a>
  */
 public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
-    private long numerator = 0;
+    private long numerator;
     private long denominator = 1;
-    private long min = 0;
-    private long max = 0;
+    private long min;
+    private long max;
     private FeeAssessmentMethod assessmentMethod = FeeAssessmentMethod.INCLUSIVE;
 
     /**

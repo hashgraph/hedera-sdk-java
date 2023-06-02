@@ -39,7 +39,7 @@ import java.util.Objects;
  */
 public final class AccountStakersQuery extends Query<List<ProxyStaker>, AccountStakersQuery> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Constructor.

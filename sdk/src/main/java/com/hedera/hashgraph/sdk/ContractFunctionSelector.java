@@ -34,10 +34,10 @@ public final class ContractFunctionSelector {
     @Nullable
     private Keccak.Digest256 digest;
 
-    private boolean needsComma = false;
+    private boolean needsComma;
 
     @Nullable
-    private byte[] finished = null;
+    private byte[] finished;
 
     /**
      * Start building a selector for a function with a given name.

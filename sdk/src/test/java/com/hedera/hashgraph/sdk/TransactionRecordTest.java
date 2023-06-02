@@ -39,7 +39,7 @@ import static com.hedera.hashgraph.sdk.TransactionReceiptTest.spawnReceiptExampl
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionRecordTest {
-    final static Instant time = Instant.ofEpochSecond(1554158542);
+    static final Instant time = Instant.ofEpochSecond(1554158542);
     private static final byte[] callResult = Hex.decode(CALL_RESULT_HEX);
 
     @BeforeAll

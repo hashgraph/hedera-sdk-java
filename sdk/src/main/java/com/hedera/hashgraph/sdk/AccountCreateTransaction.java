@@ -39,25 +39,25 @@ import java.util.Objects;
  */
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     @Nullable
-    private AccountId proxyAccountId = null;
+    private AccountId proxyAccountId;
     @Nullable
-    private Key key = null;
+    private Key key;
     private String accountMemo = "";
     private Hbar initialBalance = new Hbar(0);
-    private boolean receiverSigRequired = false;
+    private boolean receiverSigRequired;
     private Duration autoRenewPeriod = DEFAULT_AUTO_RENEW_PERIOD;
-    private int maxAutomaticTokenAssociations = 0;
+    private int maxAutomaticTokenAssociations;
 
     @Nullable
-    private AccountId stakedAccountId = null;
+    private AccountId stakedAccountId;
 
     @Nullable
-    private Long stakedNodeId = null;
+    private Long stakedNodeId;
 
-    private boolean declineStakingReward = false;
+    private boolean declineStakingReward;
 
     @Nullable
-    private EvmAddress alias = null;
+    private EvmAddress alias;
 
     /**
      * Constructor.

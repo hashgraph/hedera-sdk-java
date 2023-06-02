@@ -44,12 +44,12 @@ public class TokenRevokeKycTransaction extends com.hedera.hashgraph.sdk.Transact
      * The token ID that is associated with the account to remove the KYC flag for
      */
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * The account ID that is associated with the account to remove the KYC flag
      */
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Constructor.

@@ -40,9 +40,9 @@ import java.util.Objects;
  */
 public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenFreezeTransaction> {
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Constructor.

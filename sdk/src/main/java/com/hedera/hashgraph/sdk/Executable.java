@@ -71,19 +71,19 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * The maximum times execution will be attempted
      */
     @Nullable
-    protected Integer maxAttempts = null;
+    protected Integer maxAttempts;
 
     /**
      * The maximum amount of time to wait between retries
      */
     @Nullable
-    protected Duration maxBackoff = null;
+    protected Duration maxBackoff;
 
     /**
      * The minimum amount of time to wait between retries
      */
     @Nullable
-    protected Duration minBackoff = null;
+    protected Duration minBackoff;
 
     /**
      * List of account IDs for nodes with which execution will be attempted.
@@ -98,12 +98,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     /**
      * Indicates if the request has been attempted to be sent to all nodes
      */
-    protected boolean attemptedAllNodes = false;
+    protected boolean attemptedAllNodes;
 
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
     @VisibleForTesting
     Function<GrpcRequest, ResponseT> blockingUnaryCall =
-        (grpcRequest) -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
+        grpcRequest -> ClientCalls.blockingUnaryCall(grpcRequest.createCall(), grpcRequest.getRequest());
 
     /**
      * The timeout for each execution attempt
@@ -545,8 +545,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         @Nullable ResponseT response,
         @Nullable Throwable error) {
 
-        if (!logger.isTraceEnabled())
+        if (!logger.isTraceEnabled()) {
             return;
+        }
 
         logger.trace("Execute{} Transaction ID: {}, submit to {}, node: {}, attempt: {}",
             isAsync ? "Async" : "",
@@ -555,11 +556,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             node.getAccountId(),
             attempt);
 
-        if (response != null)
+        if (response != null) {
             logger.trace(" - Response: {}", response);
+        }
 
-        if (error != null)
+        if (error != null) {
             logger.trace(" - Error: {}", error.getMessage());
+        }
     }
 
     @SuppressWarnings("java:S2245")
@@ -571,7 +574,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         // failure the system can retry with different proxy on each attempt
         if (nodeAccountIds.size() == 1) {
             var nodeProxies = client.network.getNodeProxies(nodeAccountIds.get(0));
-            if (nodeProxies == null || nodeProxies.size() == 0) {
+            if (nodeProxies == null || nodeProxies.isEmpty()) {
                 throw new IllegalStateException("Account ID did not map to valid node in the client's network");
             }
 
@@ -585,7 +588,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         for (var accountId : nodeAccountIds) {
             @Nullable
             var nodeProxies = client.network.getNodeProxies(accountId);
-            if (nodeProxies == null || nodeProxies.size() == 0) {
+            if (nodeProxies == null || nodeProxies.isEmpty()) {
                 throw new IllegalStateException("Some node account IDs did not map to valid nodes in the client's network");
             }
 
@@ -639,8 +642,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         // node won't be null at this point because execute() validates before this method is called.
         // Add null check here to work around sonar NPE detection.
-        if (node != null)
+        if (node != null) {
             logger.trace("Using node {} for request #{}: {}", node.getAccountId(), attempt, this);
+        }
 
         return node;
     }
@@ -676,11 +680,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, Duration.between(Instant.now(), timeoutTime));
 
-        Supplier<CompletableFuture<Void>> afterUnhealthyDelay = () -> {
-            return grpcRequest.getNode().isHealthy() ?
+        Supplier<CompletableFuture<Void>> afterUnhealthyDelay = () -> grpcRequest.getNode().isHealthy() ?
                 CompletableFuture.completedFuture((Void) null) :
                 Delayer.delayFor(grpcRequest.getNode().getRemainingTimeForBackoff(), client.executor);
-        };
 
         afterUnhealthyDelay.get().thenRun(() -> {
             grpcRequest.getNode().channelFailedToConnectAsync().thenAccept(connectionFailed -> {

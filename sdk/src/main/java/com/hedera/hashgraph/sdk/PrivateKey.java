@@ -42,7 +42,7 @@ public abstract class PrivateKey extends Key {
      * The public key derived from the private key
      */
     @Nullable
-    protected PublicKey publicKey = null; // Cache the derivation of the public key
+    protected PublicKey publicKey; // Cache the derivation of the public key
 
     /**
      * Generates a new <a href="https://ed25519.cr.yp.to/">Ed25519</a> private key.

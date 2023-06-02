@@ -296,7 +296,7 @@ class ClientTest {
         Instant start = Instant.now();
 
         try {
-            if (timeoutSite.equals("onClient")) {
+            if ("onClient".equals(timeoutSite)) {
                 client.setRequestTimeout(timeout);
                 query.executeAsync(client).get();
             } else {
@@ -342,7 +342,7 @@ class ClientTest {
         Instant start = Instant.now();
 
         try {
-            if (timeoutSite.equals("onClient")) {
+            if ("onClient".equals(timeoutSite)) {
                 client.setRequestTimeout(timeout);
                 query.execute(client);
             } else {

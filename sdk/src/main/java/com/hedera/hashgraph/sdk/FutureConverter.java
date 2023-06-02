@@ -135,7 +135,7 @@ final class FutureConverter {
             }
         }
 
-        private static class ListenableFutureBackedValueSourceFuture<T>
+        private static final class ListenableFutureBackedValueSourceFuture<T>
             extends ValueSourceFuture<T> {
             private ListenableFutureBackedValueSourceFuture(ListenableFuture<T> wrappedFuture) {
                 super(wrappedFuture);
@@ -173,7 +173,7 @@ final class FutureConverter {
             if (valueSource instanceof CompletableFutureBackedValueSource) {
                 return ((CompletableFutureBackedValueSource<T>) valueSource).getWrappedFuture();
             } else {
-                return new ValueSourceBackedCompletableFuture<T>(valueSource);
+                return new ValueSourceBackedCompletableFuture<>(valueSource);
             }
         }
 

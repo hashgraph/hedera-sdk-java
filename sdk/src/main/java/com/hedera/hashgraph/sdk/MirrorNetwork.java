@@ -31,7 +31,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Utility class.
  */
-class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNode> {
+final class MirrorNetwork extends BaseNetwork<MirrorNetwork, BaseNodeAddress, MirrorNode> {
     private MirrorNetwork(ExecutorService executor, List<String> addresses) {
         super(executor);
         this.transportSecurity = true;

@@ -30,11 +30,11 @@ import javax.annotation.Nullable;
  */
 public class FeeData implements Cloneable {
     @Nullable
-    private FeeComponents nodeData = null;
+    private FeeComponents nodeData;
     @Nullable
-    private FeeComponents networkData = null;
+    private FeeComponents networkData;
     @Nullable
-    private FeeComponents serviceData = null;
+    private FeeComponents serviceData;
     private FeeDataType type = FeeDataType.DEFAULT;
 
     /**

@@ -42,12 +42,12 @@ import java.util.Objects;
  * This is used before safely shut down the platform for maintenance.
  */
 public final class FreezeTransaction extends Transaction<FreezeTransaction> {
-    private int endHour = 0;
-    private int endMinute = 0;
+    private int endHour;
+    private int endMinute;
     @Nullable
-    private Instant startTime = null;
+    private Instant startTime;
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
     private byte[] fileHash = {};
     private FreezeType freezeType = FreezeType.UNKNOWN_FREEZE_TYPE;
 

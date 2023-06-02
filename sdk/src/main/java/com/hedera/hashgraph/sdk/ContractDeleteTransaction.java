@@ -37,11 +37,11 @@ import java.util.Objects;
 public final class ContractDeleteTransaction extends Transaction<ContractDeleteTransaction> {
 
     @Nullable
-    private ContractId contractId = null;
+    private ContractId contractId;
     @Nullable
-    private ContractId transferContractId = null;
+    private ContractId transferContractId;
     @Nullable
-    private AccountId transferAccountId = null;
+    private AccountId transferAccountId;
 
     /**
      * Constructor.

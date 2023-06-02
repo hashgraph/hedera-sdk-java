@@ -46,7 +46,7 @@ import java.util.Objects;
  */
 public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenMintTransaction> {
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * The metadata field is specific to NFTs.
      *
@@ -67,7 +67,7 @@ public class TokenMintTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      *
      * In order to mint 100.55 tokens, one must provide an amount of 10055.
      */
-    private long amount = 0;
+    private long amount;
 
     /**
      * Constructor.

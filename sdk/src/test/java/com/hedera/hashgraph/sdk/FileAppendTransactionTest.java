@@ -219,8 +219,8 @@ public class FileAppendTransactionTest {
         var tx2 = FileAppendTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHash());
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> tx2.getTransactionHashPerNode());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(tx2::getTransactionHash);
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(tx2::getTransactionHashPerNode);
     }
 
     @Test

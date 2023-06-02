@@ -45,7 +45,7 @@ import java.util.concurrent.TimeoutException;
  * Creates a new HCS topic with a 2-of-3 threshold key for the adminKey.
  * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
-class TopicWithAdminKeyExample {
+final class TopicWithAdminKeyExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names

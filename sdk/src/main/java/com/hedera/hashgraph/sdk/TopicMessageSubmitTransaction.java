@@ -47,7 +47,7 @@ import java.util.Objects;
  */
 public final class TopicMessageSubmitTransaction extends ChunkedTransaction<TopicMessageSubmitTransaction> {
     @Nullable
-    private TopicId topicId = null;
+    private TopicId topicId;
 
     /**
      * Constructor.

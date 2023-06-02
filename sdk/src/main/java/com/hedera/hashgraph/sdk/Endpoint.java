@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 public class Endpoint implements Cloneable {
     @Nullable
-    IPv4Address address = null;
+    IPv4Address address;
 
     int port;
 

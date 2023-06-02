@@ -40,8 +40,8 @@ public class TopicMessageIntegrationTest {
         var handle = new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.EPOCH)
-            .subscribe(testEnv.client, (message) -> {
-                receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals("Hello, from HCS!");
+            .subscribe(testEnv.client, message -> {
+                receivedMessage[0] = "Hello, from HCS!".equals(new String(message.contents, StandardCharsets.UTF_8));
             });
 
         Thread.sleep(3000);
@@ -101,7 +101,7 @@ public class TopicMessageIntegrationTest {
         var handle = new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.EPOCH)
-            .subscribe(testEnv.client, (message) -> {
+            .subscribe(testEnv.client, message -> {
                 receivedMessage[0] = new String(message.contents, StandardCharsets.UTF_8).equals(Contents.BIG_CONTENTS);
             });
 

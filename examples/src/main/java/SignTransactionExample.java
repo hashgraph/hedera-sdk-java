@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class SignTransactionExample {
+public final class SignTransactionExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names

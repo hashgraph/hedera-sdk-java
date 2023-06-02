@@ -114,7 +114,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
         new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
-            .subscribe(client, (resp) -> {
+            .subscribe(client, resp -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
 
                 System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);

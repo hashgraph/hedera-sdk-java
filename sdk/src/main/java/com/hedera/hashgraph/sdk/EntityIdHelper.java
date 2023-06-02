@@ -33,7 +33,7 @@ import java.util.regex.Pattern;
 /**
  * Utility class used internally by the sdk.
  */
-class EntityIdHelper {
+final class EntityIdHelper {
     /**
      * The length of a Solidity address in bytes.
      */

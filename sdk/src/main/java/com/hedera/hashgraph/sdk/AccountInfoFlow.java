@@ -35,9 +35,7 @@ public class AccountInfoFlow {
     }
 
     private static CompletableFuture<PublicKey> getAccountPublicKeyAsync(Client client, AccountId accountId) {
-        return new AccountInfoQuery().setAccountId(accountId).executeAsync(client).thenApply(accountInfo -> {
-            return requirePublicKey(accountId, accountInfo.key);
-        });
+        return new AccountInfoQuery().setAccountId(accountId).executeAsync(client).thenApply(accountInfo -> requirePublicKey(accountId, accountInfo.key));
     }
 
     private static PublicKey requirePublicKey(AccountId accountId, Key key) {

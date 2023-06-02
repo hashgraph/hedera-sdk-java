@@ -108,7 +108,7 @@ class EthereumFlowMockTest {
             var ethereumData = EthereumTransactionData.fromBytes(ETHEREUM_DATA.toByteArray());
             ethereumData.callData = LONG_CALL_DATA.toByteArray();
 
-            if (versionToTest.equals("sync")) {
+            if ("sync".equals(versionToTest)) {
                 ethereumFlow = new EthereumFlow()
                     .setMaxGasAllowance(Hbar.fromTinybars(25))
                     .setEthereumData(ethereumData.toBytes());

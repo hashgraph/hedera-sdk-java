@@ -36,7 +36,7 @@ import java.util.Objects;
  */
 public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, TokenInfoQuery> {
     @Nullable
-    TokenId tokenId = null;
+    TokenId tokenId;
 
     /**
      * Constructor.
@@ -108,6 +108,6 @@ public class TokenInfoQuery extends com.hedera.hashgraph.sdk.Query<TokenInfo, To
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `Token_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
     }
 }

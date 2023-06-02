@@ -29,22 +29,22 @@ import java.util.Arrays;
  * Internal utility class for ledger id manipulation.
  */
 public class LedgerId {
-    final private byte[] idBytes;
+    private final byte[] idBytes;
 
     /**
      * The mainnet ledger id
      */
-    public final static LedgerId MAINNET = new LedgerId(new byte[]{0});
+    public static final LedgerId MAINNET = new LedgerId(new byte[]{0});
 
     /**
      * The testnet ledger id
      */
-    public final static LedgerId TESTNET = new LedgerId(new byte[]{1});
+    public static final LedgerId TESTNET = new LedgerId(new byte[]{1});
 
     /**
      * The previewnet ledger id
      */
-    public final static LedgerId PREVIEWNET = new LedgerId(new byte[]{2});
+    public static final LedgerId PREVIEWNET = new LedgerId(new byte[]{2});
 
     /**
      * Constructor.

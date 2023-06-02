@@ -40,9 +40,9 @@ import java.util.Objects;
  */
 public class TokenGrantKycTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenGrantKycTransaction> {
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Configure.

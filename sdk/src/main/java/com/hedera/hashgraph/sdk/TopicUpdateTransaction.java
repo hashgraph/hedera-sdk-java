@@ -50,40 +50,40 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * Update the topic ID
      */
     @Nullable
-    private TopicId topicId = null;
+    private TopicId topicId;
     /**
      * Set a new auto-renew account ID for this topic (once autoRenew
      * functionality is supported by HAPI).
      */
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
     /**
      * Set a new short publicly visible memo on the new topic and is stored
      * with the topic. (100 bytes)
      */
     @Nullable
-    private String topicMemo = null;
+    private String topicMemo;
     /**
      * Set a new admin key that authorizes update topic and delete topic
      * transactions.
      */
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     /**
      * Set a new submit key for a topic that authorizes sending messages
      * to this topic.
      */
     @Nullable
-    private Key submitKey = null;
+    private Key submitKey;
     /**
      * Set a new auto -enew period for this topic (once autoRenew
      * functionality is supported by HAPI).
      */
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
 
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
 
     /**
      * Constructor.

@@ -60,10 +60,10 @@ public final class TransactionId implements Comparable<TransactionId> {
     @Nullable
     public final Instant validStart;
 
-    private boolean scheduled = false;
+    private boolean scheduled;
 
     @Nullable
-    private Integer nonce = null;
+    private Integer nonce;
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -131,7 +131,7 @@ public final class TransactionId implements Comparable<TransactionId> {
 
         parts = parts[0].split("\\?", 2);
 
-        var scheduled = parts.length == 2 && parts[1].equals("scheduled");
+        var scheduled = parts.length == 2 && "scheduled".equals(parts[1]);
 
         parts = parts[0].split("@", 2);
 
@@ -499,8 +499,8 @@ public final class TransactionId implements Comparable<TransactionId> {
         if (scheduled != o.scheduled) {
             return scheduled ? 1 : -1;
         }
-        var thisAccountIdIsNull = (accountId == null);
-        var otherAccountIdIsNull = (o.accountId == null);
+        var thisAccountIdIsNull = accountId == null;
+        var otherAccountIdIsNull = o.accountId == null;
         if (thisAccountIdIsNull != otherAccountIdIsNull) {
             return thisAccountIdIsNull ? -1 : 1;
         }
@@ -510,8 +510,8 @@ public final class TransactionId implements Comparable<TransactionId> {
                 return accountIdComparison;
             }
         }
-        var thisStartIsNull = (validStart == null);
-        var otherStartIsNull = (o.validStart == null);
+        var thisStartIsNull = validStart == null;
+        var otherStartIsNull = o.validStart == null;
         if (thisStartIsNull != otherStartIsNull) {
             return thisAccountIdIsNull ? -1 : 1;
         }

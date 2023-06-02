@@ -47,14 +47,14 @@ import java.util.Objects;
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {
 
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
     @Nullable
-    private KeyList keys = null;
+    private KeyList keys;
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     private byte[] contents = {};
     @Nullable
-    private String fileMemo = null;
+    private String fileMemo;
 
     /**
      * Constructor.

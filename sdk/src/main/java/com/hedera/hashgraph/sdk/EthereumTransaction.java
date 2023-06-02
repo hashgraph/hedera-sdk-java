@@ -20,7 +20,7 @@ import java.util.Objects;
  */
 public class EthereumTransaction extends Transaction<EthereumTransaction> {
     private byte[] ethereumData = new byte[0];
-    private FileId callDataFileId = null;
+    private FileId callDataFileId;
     private Hbar maxGasAllowanceHbar = Hbar.ZERO;
 
     /**

@@ -82,37 +82,37 @@ import java.util.Objects;
 public final class ContractCreateTransaction extends Transaction<ContractCreateTransaction> {
 
     @Nullable
-    private FileId bytecodeFileId = null;
+    private FileId bytecodeFileId;
     @Nullable
-    private byte[] bytecode = null;
+    private byte[] bytecode;
 
     /**
      * @deprecated with no replacement
      */
     @Nullable
     @Deprecated
-    private AccountId proxyAccountId = null;
+    private AccountId proxyAccountId;
 
     @Nullable
-    private Key adminKey = null;
-    private long gas = 0;
+    private Key adminKey;
+    private long gas;
     private Hbar initialBalance = new Hbar(0);
-    private int maxAutomaticTokenAssociations = 0;
+    private int maxAutomaticTokenAssociations;
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
     @Nullable
-    private AccountId stakedAccountId = null;
+    private AccountId stakedAccountId;
 
     @Nullable
-    private Long stakedNodeId = null;
+    private Long stakedNodeId;
 
-    private boolean declineStakingReward = false;
+    private boolean declineStakingReward;
 
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
 
     /**
      * Constructor.

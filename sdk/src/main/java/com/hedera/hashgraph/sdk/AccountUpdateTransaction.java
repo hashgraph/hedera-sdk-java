@@ -55,32 +55,32 @@ import java.util.Objects;
  */
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     @Nullable
-    private AccountId proxyAccountId = null;
+    private AccountId proxyAccountId;
     @Nullable
-    private Key key = null;
+    private Key key;
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     @Nullable
-    private Boolean receiverSigRequired = null;
+    private Boolean receiverSigRequired;
     @Nullable
-    private String accountMemo = null;
+    private String accountMemo;
     @Nullable
-    private Integer maxAutomaticTokenAssociations = null;
+    private Integer maxAutomaticTokenAssociations;
     @Nullable
     private Key aliasKey;
 
     @Nullable
-    private AccountId stakedAccountId = null;
+    private AccountId stakedAccountId;
 
     @Nullable
-    private Long stakedNodeId = null;
+    private Long stakedNodeId;
 
     @Nullable
-    private Boolean declineStakingReward = null;
+    private Boolean declineStakingReward;
 
     /**
      * Constructor.

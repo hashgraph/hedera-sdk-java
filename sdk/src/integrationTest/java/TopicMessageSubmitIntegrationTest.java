@@ -66,7 +66,7 @@ public class TopicMessageSubmitIntegrationTest {
     @DisplayName("Can submit a large topic message")
     void canSubmitALargeTopicMessage() {
         // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+        Assumptions.assumeTrue(!"previewnet".equals(System.getProperty("HEDERA_NETWORK")));
 
         assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(2);
@@ -121,7 +121,7 @@ public class TopicMessageSubmitIntegrationTest {
     @DisplayName("Cannot submit message when topic ID is not set")
     void cannotSubmitMessageWhenTopicIDIsNotSet() {
         // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+        Assumptions.assumeTrue(!"previewnet".equals(System.getProperty("HEDERA_NETWORK")));
 
         assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(1);
@@ -154,7 +154,7 @@ public class TopicMessageSubmitIntegrationTest {
     @DisplayName("Cannot submit message when message is not set")
     void cannotSubmitMessageWhenMessageIsNotSet() {
         // Skip if using PreviewNet
-        Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
+        Assumptions.assumeTrue(!"previewnet".equals(System.getProperty("HEDERA_NETWORK")));
 
         assertThatNoException().isThrownBy(() -> {
             var testEnv = new IntegrationTestEnv(1);

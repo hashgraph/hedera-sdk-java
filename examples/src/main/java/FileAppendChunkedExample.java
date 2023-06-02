@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class FileAppendChunkedExample {
+public final class FileAppendChunkedExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names

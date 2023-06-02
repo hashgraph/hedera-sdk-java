@@ -47,9 +47,9 @@ public class AddressBookQuery {
     private static final Logger LOGGER = LoggerFactory.getLogger(AddressBookQuery.class);
 
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
     @Nullable
-    private Integer limit = null;
+    private Integer limit;
     private int maxAttempts = 10;
     private Duration maxBackoff = Duration.ofSeconds(8L);
 

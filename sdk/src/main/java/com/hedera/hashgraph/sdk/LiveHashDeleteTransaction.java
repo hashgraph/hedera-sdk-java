@@ -39,7 +39,7 @@ import java.util.Objects;
  */
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     private byte[] hash = {};
 
     /**

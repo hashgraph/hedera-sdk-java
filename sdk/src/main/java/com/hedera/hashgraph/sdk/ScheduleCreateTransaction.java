@@ -40,17 +40,17 @@ import java.util.Objects;
  */
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     @Nullable
-    private AccountId payerAccountId = null;
+    private AccountId payerAccountId;
     @Nullable
-    private SchedulableTransactionBody transactionToSchedule = null;
+    private SchedulableTransactionBody transactionToSchedule;
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     private String scheduleMemo = "";
 
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
 
-    private boolean waitForExpiry = false;
+    private boolean waitForExpiry;
 
     /**
      * Constructor.

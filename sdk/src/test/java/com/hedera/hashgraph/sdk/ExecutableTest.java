@@ -49,7 +49,9 @@ import static org.mockito.Mockito.when;
 class ExecutableTest {
     Client client;
     Network network;
-    Node node3, node4, node5;
+    Node node3;
+    Node node4;
+    Node node5;
     List<AccountId> nodeAccountIds;
 
     @BeforeEach
@@ -128,7 +130,7 @@ class ExecutableTest {
         // later on when the transaction is executed its grpc deadline should not be modified...
         tx.setGrpcDeadline(Duration.ofMillis(defaultDeadlineMs));
 
-        tx.blockingUnaryCall = (grpcRequest) -> {
+        tx.blockingUnaryCall = grpcRequest -> {
             var grpc = (Executable.GrpcRequest)grpcRequest;
 
             var grpcTimeRemaining = grpc.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
@@ -291,7 +293,7 @@ class ExecutableTest {
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
-        tx.blockingUnaryCall = (grpcRequest) -> txResp;
+        tx.blockingUnaryCall = grpcRequest -> txResp;
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
 
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
@@ -333,7 +335,7 @@ class ExecutableTest {
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
-        tx.blockingUnaryCall = (grpcRequest) -> txResp;
+        tx.blockingUnaryCall = grpcRequest -> txResp;
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
 
         verify(node3).channelFailedToConnect();
@@ -387,7 +389,7 @@ class ExecutableTest {
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
-        tx.blockingUnaryCall = (grpcRequest) -> txResp;
+        tx.blockingUnaryCall = grpcRequest -> txResp;
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
 
         verify(node3, times(2)).channelFailedToConnect();
@@ -434,11 +436,12 @@ class ExecutableTest {
         );
         tx.setNodeAccountIds(nodeAccountIds);
 
-        tx.blockingUnaryCall = (grpcRequest) -> {
-            if (i.getAndIncrement() == 0)
+        tx.blockingUnaryCall = grpcRequest -> {
+            if (i.getAndIncrement() == 0) {
                 throw new StatusRuntimeException(io.grpc.Status.UNAVAILABLE);
-            else
+            } else {
                 throw new StatusRuntimeException(io.grpc.Status.ABORTED);
+            }
         };
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> tx.execute(client));
@@ -482,7 +485,7 @@ class ExecutableTest {
             .build();
 
         var resp = Response.newBuilder().setTransactionGetReceipt(receiptResp).build();
-        tx.blockingUnaryCall = (grpcRequest) -> resp;
+        tx.blockingUnaryCall = grpcRequest -> resp;
         tx.execute(client);
 
         verify(node3).channelFailedToConnect();
@@ -514,7 +517,7 @@ class ExecutableTest {
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.ACCOUNT_DELETED)
                 .build();
 
-        tx.blockingUnaryCall = (grpcRequest) -> txResp;
+        tx.blockingUnaryCall = grpcRequest -> txResp;
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> tx.execute(client));
 
         verify(node3).channelFailedToConnect();

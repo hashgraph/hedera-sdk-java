@@ -27,7 +27,7 @@ import io.grpc.StatusRuntimeException;
 
 import javax.annotation.Nullable;
 
-public class TestResponse {
+public final class TestResponse {
     @Nullable
     public final TransactionResponse transactionResponse;
     @Nullable

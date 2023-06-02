@@ -47,12 +47,12 @@ import java.util.Objects;
  */
 public final class ContractCallQuery extends Query<ContractFunctionResult, ContractCallQuery> {
     @Nullable
-    private ContractId contractId = null;
-    private long gas = 0;
+    private ContractId contractId;
+    private long gas;
     private byte[] functionParameters = {};
-    private long maxResultSize = 0;
+    private long maxResultSize;
     @Nullable
-    private AccountId senderAccountId = null;
+    private AccountId senderAccountId;
 
     /**
      * Constructor.

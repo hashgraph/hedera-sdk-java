@@ -30,17 +30,17 @@ import java.util.Objects;
 /**
  * Base class for custom fees.
  */
-abstract public class CustomFee {
+public abstract class CustomFee {
     /**
      * The account to receive the custom fee
      */
     @Nullable
-    protected AccountId feeCollectorAccountId = null;
+    protected AccountId feeCollectorAccountId;
 
     /**
      * If true, exempts all the token's fee collection accounts from this fee
      */
-    protected boolean allCollectorsAreExempt = false;
+    protected boolean allCollectorsAreExempt;
 
     /**
      * Constructor.

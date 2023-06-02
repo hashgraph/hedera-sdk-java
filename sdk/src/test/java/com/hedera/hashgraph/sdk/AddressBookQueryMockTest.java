@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatException;
 class AddressBookQueryMockTest {
 
     private Client client;
-    final private AddressBookQueryStub addressBookServiceStub = new AddressBookQueryStub();
+    private final AddressBookQueryStub addressBookServiceStub = new AddressBookQueryStub();
     private Server server;
     private AddressBookQuery addressBookQuery;
 
@@ -70,7 +70,7 @@ class AddressBookQueryMockTest {
 
         addressBookQuery.setLimit(3);
 
-        var nodes = executeVersion.equals("sync") ?
+        var nodes = "sync".equals(executeVersion) ?
             addressBookQuery.execute(client) :
             addressBookQuery.executeAsync(client).get();
         assertThat(nodes.nodeAddresses).hasSize(1);
@@ -144,7 +144,7 @@ class AddressBookQueryMockTest {
                 .toProtobuf()
         );
 
-        var nodes = executeVersion.equals("sync") ?
+        var nodes = "sync".equals(executeVersion) ?
             addressBookQuery.execute(client) :
             addressBookQuery.executeAsync(client).get();
         assertThat(nodes.nodeAddresses).hasSize(1);
@@ -170,7 +170,7 @@ class AddressBookQueryMockTest {
         addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
 
         assertThatException().isThrownBy(() -> {
-            var result = executeVersion.equals("sync") ?
+            var result = "sync".equals(executeVersion) ?
                 addressBookQuery.execute(client) :
                 addressBookQuery.executeAsync(client).get();
         });
@@ -204,7 +204,7 @@ class AddressBookQueryMockTest {
         addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
 
         assertThatException().isThrownBy(() -> {
-            var result = executeVersion.equals("sync") ?
+            var result = "sync".equals(executeVersion) ?
                 addressBookQuery.execute(client) :
                 addressBookQuery.executeAsync(client).get();
         });

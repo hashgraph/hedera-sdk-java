@@ -1,6 +1,6 @@
 import com.hedera.hashgraph.sdk.*;
 
-public class AccountCreationWaysExample {
+public final class AccountCreationWaysExample {
 
     private AccountCreationWaysExample() {
     }

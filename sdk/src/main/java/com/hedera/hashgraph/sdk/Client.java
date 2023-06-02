@@ -81,7 +81,7 @@ public final class Client implements AutoCloseable {
     final ExecutorService executor;
 
     @Nullable
-    Hbar defaultMaxTransactionFee = null;
+    Hbar defaultMaxTransactionFee;
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
 
     Network network;
@@ -100,7 +100,7 @@ public final class Client implements AutoCloseable {
 
     private volatile Duration minBackoff = DEFAULT_MIN_BACKOFF;
 
-    private boolean autoValidateChecksums = false;
+    private boolean autoValidateChecksums;
 
     private boolean defaultRegenerateTransactionId = true;
 
@@ -111,7 +111,7 @@ public final class Client implements AutoCloseable {
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
 
-    private Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
+    private final Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
 
     /**
      * Constructor.
@@ -175,7 +175,7 @@ public final class Client implements AutoCloseable {
      *
      * @return                          the list of mirror nodes
      */
-    synchronized public List<String> getMirrorNetwork() {
+    public synchronized List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
 
@@ -368,16 +368,14 @@ public final class Client implements AutoCloseable {
         networkUpdateFuture.thenRun(() -> {
             // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
             requireNetworkUpdatePeriodNotNull(() -> {
-                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> {
-                    return requireNetworkUpdatePeriodNotNull(() -> {
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
                         try {
                             this.setNetworkFromAddressBook(addressBook);
                         } catch (Throwable error) {
                             return CompletableFuture.failedFuture(error);
                         }
                         return CompletableFuture.completedFuture(null);
-                    });
-                }).exceptionally(error -> {
+                    })).exceptionally(error -> {
                     logger.warn("Failed to update address book via mirror node query", error);
                     return null;
                 });
@@ -443,7 +441,7 @@ public final class Client implements AutoCloseable {
      *
      * @return                          the client's network
      */
-    synchronized public Map<String, AccountId> getNetwork() {
+    public synchronized Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
 
@@ -676,7 +674,7 @@ public final class Client implements AutoCloseable {
             list.add(pingAsync(nodeAccountId, timeoutPerPing));
         }
 
-        return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply((v) -> null);
+        return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply(v -> null);
     }
 
     /**

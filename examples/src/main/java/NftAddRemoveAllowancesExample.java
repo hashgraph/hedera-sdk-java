@@ -61,7 +61,7 @@ public final class NftAddRemoveAllowancesExample {
         // Example 1
         System.out.println("Example 1: Approve/delete allowances for single serial numbers");
 
-        String[] CIDs = {
+        String[] cIDs = {
             "QmNPCiNA3Dsu3K5FxDPMG5Q3fZRwVTg14EXA92uqEeSRXn",
             "QmZ4dgAgt8owvnULxnKxNe8YqpavtVCXmc1Lt2XajFpJs9",
             "QmPzY5GxevjyfMUF5vEAjtyRoigzWp47MiKAtLBduLMC1T",
@@ -73,7 +73,7 @@ public final class NftAddRemoveAllowancesExample {
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
-            .setMaxSupply(CIDs.length)
+            .setMaxSupply(cIDs.length)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(OPERATOR_KEY)
@@ -86,10 +86,10 @@ public final class NftAddRemoveAllowancesExample {
         System.out.println("Created NFT with token id: " + nftTokenId);
 
         List<TransactionReceipt> nftCollection = new ArrayList<>();
-        for (int i = 0; i < CIDs.length; i++) {
+        for (int i = 0; i < cIDs.length; i++) {
             nftCollection.add(new TokenMintTransaction()
                 .setTokenId(nftTokenId)
-                .setMetadata(Lists.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
+                .setMetadata(Lists.of(cIDs[i].getBytes(StandardCharsets.UTF_8)))
                 .freezeWith(client)
                 .execute(client)
                 .getReceipt(client));
@@ -188,7 +188,7 @@ public final class NftAddRemoveAllowancesExample {
         // Example 2
         System.out.println("Example 2: Approve/delete allowances for ALL serial numbers at once");
 
-        String[] CIDs2 = {
+        String[] cIDs2 = {
             "QmNPCiNA3Dsu3K5FxDPMG5Q3fZRwVTg14EXA92uqEeSRXn",
             "QmZ4dgAgt8owvnULxnKxNe8YqpavtVCXmc1Lt2XajFpJs9",
             "QmPzY5GxevjyfMUF5vEAjtyRoigzWp47MiKAtLBduLMC1T",
@@ -200,7 +200,7 @@ public final class NftAddRemoveAllowancesExample {
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
-            .setMaxSupply(CIDs2.length)
+            .setMaxSupply(cIDs2.length)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(OPERATOR_KEY)
@@ -213,10 +213,10 @@ public final class NftAddRemoveAllowancesExample {
         System.out.println("Created NFT with token id: " + nftTokenId2);
 
         List<TransactionReceipt> nftCollection2 = new ArrayList<>();
-        for (int i = 0; i < CIDs2.length; i++) {
+        for (int i = 0; i < cIDs2.length; i++) {
             nftCollection2.add(new TokenMintTransaction()
                 .setTokenId(nftTokenId2)
-                .setMetadata(Lists.of(CIDs2[i].getBytes(StandardCharsets.UTF_8)))
+                .setMetadata(Lists.of(cIDs2[i].getBytes(StandardCharsets.UTF_8)))
                 .freezeWith(client)
                 .execute(client)
                 .getReceipt(client));

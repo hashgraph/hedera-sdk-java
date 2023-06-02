@@ -44,12 +44,12 @@ import java.util.Objects;
  */
 public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransaction> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     private byte[] hash = {};
     @Nullable
-    private KeyList keys = null;
+    private KeyList keys;
     @Nullable
-    private Duration duration = null;
+    private Duration duration;
 
     /**
      * Constructor.

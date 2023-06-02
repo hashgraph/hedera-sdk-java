@@ -143,67 +143,67 @@ public class ECDSAPrivateKeyTest {
     @DisplayName("SLIP10 test vector 1")
     void slip10TestVector1() {
         // https://github.com/satoshilabs/slips/blob/master/slip-0010.md#test-vector-1-for-secp256k1
-        final String CHAIN_CODE1 = "873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508";
-        final String PRIVATE_KEY1 = "e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35";
-        final String PUBLIC_KEY1 = "0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2";
+        final String chainCode1 = "873dff81c02f525623fd1fe5167eac3a55a049de3d314bb42ee227ffed37d508";
+        final String privateKey1 = "e8f32e723decf4051aefac8e2c93c9c5b214313817cdb01a1494b917c8436b35";
+        final String publicKey1 = "0339a36013301597daef41fbe593a02cc513d0b55527ec2df1050e2e8ff49c85c2";
 
-        final String CHAIN_CODE2 = "47fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141";
-        final String PRIVATE_KEY2 = "edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea";
-        final String PUBLIC_KEY2 = "035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56";
+        final String chainCode2 = "47fdacbd0f1097043b78c63c20c34ef4ed9a111d980047ad16282c7ae6236141";
+        final String privateKey2 = "edb2e14f9ee77d26dd93b4ecede8d16ed408ce149b6cd80b0715a2d911a0afea";
+        final String publicKey2 = "035a784662a4a20a65bf6aab9ae98a6c068a81c52e4b032c0fb5400c706cfccc56";
 
-        final String CHAIN_CODE3 = "2a7857631386ba23dacac34180dd1983734e444fdbf774041578e9b6adb37c19";
-        final String PRIVATE_KEY3 = "3c6cb8d0f6a264c91ea8b5030fadaa8e538b020f0a387421a12de9319dc93368";
-        final String PUBLIC_KEY3 = "03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c";
+        final String chainCode3 = "2a7857631386ba23dacac34180dd1983734e444fdbf774041578e9b6adb37c19";
+        final String privateKey3 = "3c6cb8d0f6a264c91ea8b5030fadaa8e538b020f0a387421a12de9319dc93368";
+        final String publicKey3 = "03501e454bf00751f24b1b489aa925215d66af2234e3891c3b21a52bedb3cd711c";
 
-        final String CHAIN_CODE4 = "04466b9cc8e161e966409ca52986c584f07e9dc81f735db683c3ff6ec7b1503f";
-        final String PRIVATE_KEY4 = "cbce0d719ecf7431d88e6a89fa1483e02e35092af60c042b1df2ff59fa424dca";
-        final String PUBLIC_KEY4 = "0357bfe1e341d01c69fe5654309956cbea516822fba8a601743a012a7896ee8dc2";
+        final String chainCode4 = "04466b9cc8e161e966409ca52986c584f07e9dc81f735db683c3ff6ec7b1503f";
+        final String privateKey4 = "cbce0d719ecf7431d88e6a89fa1483e02e35092af60c042b1df2ff59fa424dca";
+        final String publicKey4 = "0357bfe1e341d01c69fe5654309956cbea516822fba8a601743a012a7896ee8dc2";
 
-        final String CHAIN_CODE5 = "cfb71883f01676f587d023cc53a35bc7f88f724b1f8c2892ac1275ac822a3edd";
-        final String PRIVATE_KEY5 = "0f479245fb19a38a1954c5c7c0ebab2f9bdfd96a17563ef28a6a4b1a2a764ef4";
-        final String PUBLIC_KEY5 = "02e8445082a72f29b75ca48748a914df60622a609cacfce8ed0e35804560741d29";
+        final String chainCode5 = "cfb71883f01676f587d023cc53a35bc7f88f724b1f8c2892ac1275ac822a3edd";
+        final String privateKey5 = "0f479245fb19a38a1954c5c7c0ebab2f9bdfd96a17563ef28a6a4b1a2a764ef4";
+        final String publicKey5 = "02e8445082a72f29b75ca48748a914df60622a609cacfce8ed0e35804560741d29";
 
-        final String CHAIN_CODE6 = "c783e67b921d2beb8f6b389cc646d7263b4145701dadd2161548a8b078e65e9e";
-        final String PRIVATE_KEY6 = "471b76e389e528d6de6d816857e012c5455051cad6660850e58372a6c3e6e7c8";
-        final String PUBLIC_KEY6 = "022a471424da5e657499d1ff51cb43c47481a03b1e77f951fe64cec9f5a48f7011";
+        final String chainCode6 = "c783e67b921d2beb8f6b389cc646d7263b4145701dadd2161548a8b078e65e9e";
+        final String privateKey6 = "471b76e389e528d6de6d816857e012c5455051cad6660850e58372a6c3e6e7c8";
+        final String publicKey6 = "022a471424da5e657499d1ff51cb43c47481a03b1e77f951fe64cec9f5a48f7011";
 
         var seed = hexStringToByteArray("000102030405060708090a0b0c0d0e0f");
 
         // Chain m
         PrivateKey key1 = PrivateKey.fromSeedECDSAsecp256k1(seed);
-        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
-        assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
-        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);
+        assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(chainCode1);
+        assertThat(key1.toStringRaw()).isEqualTo(privateKey1);
+        assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(publicKey1);
 
         // Chain m/0'
         PrivateKey key2 = key1.derive(Bip32Utils.toHardenedIndex(0));
-        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(CHAIN_CODE2);
-        assertThat(key2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
-        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY2);
+        assertThat(Hex.toHexString(key2.getChainCode().getKey())).isEqualTo(chainCode2);
+        assertThat(key2.toStringRaw()).isEqualTo(privateKey2);
+        assertThat(key2.getPublicKey().toStringRaw()).isSubstringOf(publicKey2);
 
         // Chain m/0'/1
         PrivateKey key3 = key2.derive(1);
-        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(CHAIN_CODE3);
-        assertThat(key3.toStringRaw()).isEqualTo(PRIVATE_KEY3);
-        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY3);
+        assertThat(Hex.toHexString(key3.getChainCode().getKey())).isEqualTo(chainCode3);
+        assertThat(key3.toStringRaw()).isEqualTo(privateKey3);
+        assertThat(key3.getPublicKey().toStringRaw()).isSubstringOf(publicKey3);
 
         // Chain m/0'/1/2'
         PrivateKey key4 = key3.derive(Bip32Utils.toHardenedIndex(2));
-        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(CHAIN_CODE4);
-        assertThat(key4.toStringRaw()).isEqualTo(PRIVATE_KEY4);
-        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY4);
+        assertThat(Hex.toHexString(key4.getChainCode().getKey())).isEqualTo(chainCode4);
+        assertThat(key4.toStringRaw()).isEqualTo(privateKey4);
+        assertThat(key4.getPublicKey().toStringRaw()).isSubstringOf(publicKey4);
 
         // Chain m/0'/1/2'/2
         PrivateKey key5 = key4.derive(2);
-        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(CHAIN_CODE5);
-        assertThat(key5.toStringRaw()).isEqualTo(PRIVATE_KEY5);
-        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY5);
+        assertThat(Hex.toHexString(key5.getChainCode().getKey())).isEqualTo(chainCode5);
+        assertThat(key5.toStringRaw()).isEqualTo(privateKey5);
+        assertThat(key5.getPublicKey().toStringRaw()).isSubstringOf(publicKey5);
 
         // Chain m/0'/1/2'/2/1000000000
         PrivateKey key6 = key5.derive(1000000000);
-        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
-        assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
-        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
+        assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(chainCode6);
+        assertThat(key6.toStringRaw()).isEqualTo(privateKey6);
+        assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(publicKey6);
     }
 
     @Test
@@ -237,7 +237,7 @@ public class ECDSAPrivateKeyTest {
         var seed = hexStringToByteArray("fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542");
 
         // Chain m
-        PrivateKey key1 = PrivateKey.fromSeedECDSAsecp256k1(seed);;
+        PrivateKey key1 = PrivateKey.fromSeedECDSAsecp256k1(seed);
         assertThat(Hex.toHexString(key1.getChainCode().getKey())).isEqualTo(CHAIN_CODE1);
         assertThat(key1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
         assertThat(key1.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY1);

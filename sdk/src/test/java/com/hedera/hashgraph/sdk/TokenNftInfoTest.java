@@ -12,7 +12,7 @@ import javax.annotation.Nullable;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenNftInfoTest {
-    final static Instant creationTime = Instant.ofEpochSecond(1554158542);
+    static final Instant creationTime = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {

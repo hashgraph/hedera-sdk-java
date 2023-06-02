@@ -46,9 +46,9 @@ import java.util.Objects;
 public final class FileCreateTransaction extends Transaction<FileCreateTransaction> {
 
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     @Nullable
-    private KeyList keys = null;
+    private KeyList keys;
     private byte[] contents = {};
     private String fileMemo = "";
 

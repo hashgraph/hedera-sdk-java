@@ -53,7 +53,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * The token's id
      */
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * The new treasury account of the token. If the provided treasury
      * account is not existing or deleted, the response will be
@@ -61,13 +61,13 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * held in the previous Treasury Account is transferred to the new one.
      */
     @Nullable
-    private AccountId treasuryAccountId = null;
+    private AccountId treasuryAccountId;
     /**
      * The new account which will be automatically charged to renew the
      * token's expiration, at autoRenewPeriod interval.
      */
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
     /**
      * The new name of the token. The token name is specified as a string of
      * UTF-8 characters in Unicode. UTF-8 encoding of this Unicode cannot
@@ -87,44 +87,44 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * were not specified during the creation of the token.
      */
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     /**
      * The new KYC key of the token. If the token does not have currently
      * a KYC key, the transaction will resolve to TOKEN_HAS_NO_KYC_KEY.
      */
     @Nullable
-    private Key kycKey = null;
+    private Key kycKey;
     /**
      * The new freeze key of the token. If the token does not have currently
      * a freeze key, the transaction will resolve to TOKEN_HAS_NO_FREEZE_KEY.
      */
     @Nullable
-    private Key freezeKey = null;
+    private Key freezeKey;
     /**
      * The new wipe key of the token. If the token does not have currently
      * a wipe key, the transaction will resolve to TOKEN_HAS_NO_WIPE_KEY.
      */
     @Nullable
-    private Key wipeKey = null;
+    private Key wipeKey;
     /**
      * The new supply key of the token. If the token does not have currently
      * a supply key, the transaction will resolve to TOKEN_HAS_NO_SUPPLY_KEY.
      */
     @Nullable
-    private Key supplyKey = null;
+    private Key supplyKey;
     /**
      * If set, the new key to use to update the token's custom fee schedule;
      * if the token does not currently have this key, transaction will
      * resolve to TOKEN_HAS_NO_FEE_SCHEDULE_KEY
      */
     @Nullable
-    private Key feeScheduleKey = null;
+    private Key feeScheduleKey;
     /**
      * Update the token's existing pause key. The pause key has the ability
      * to pause or unpause a token.
      */
     @Nullable
-    private Key pauseKey = null;
+    private Key pauseKey;
     /**
      * The new expiry time of the token. Expiry can be updated even if the
      * admin key is not set. If the provided expiry is earlier than the
@@ -132,7 +132,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * INVALID_EXPIRATION_TIME.
      */
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     /**
      * The new interval at which the auto-renew account will be charged to
      * extend the token's expiry.
@@ -140,13 +140,13 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      * The default auto-renew period is 131,500 minutes.
      */
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     /**
      * Short publicly visible memo about the token. No guarantee of
      * uniqueness. (100 characters max)
      */
     @Nullable
-    private String tokenMemo = null;
+    private String tokenMemo;
 
     /**
      * Constructor.

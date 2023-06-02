@@ -65,23 +65,19 @@ ENUM_OVERRIDE = {
 
 
 
-COMMENT_REPLACEMENTS = (
-    ("&", "and"),
+COMMENT_REPLACEMENTS = (("&", "and"),
     ("<tt>", ""),
-    ("</tt>", "")
-)
+    ("</tt>", ""))
 
 
-PROTO_REPLACEMENTS = (
-    ("option java_package = \"com.hederahashgraph.api.proto.java\";",
+PROTO_REPLACEMENTS = (("option java_package = \"com.hederahashgraph.api.proto.java\";",
      "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
 
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
      "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
 
     ("option java_package = \"com.hedera.mirror.api.proto\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
-)
+     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";"))
 
 
 def do_replacements(s, replacements):
@@ -131,7 +127,7 @@ def run_command(*command):
 def cmd_to_str(command):
     s = ""
     for c in command:
-        s += (c + " ")
+        s += c + " "
     return s[0:-1]
 
 
@@ -246,8 +242,7 @@ Status_sections = [
     "",
     premade("Status", 2),
     "",
-    premade("Status", 4),
-]
+    premade("Status", 4)]
 
 
 FeeDataType_sections = [
@@ -336,7 +331,7 @@ def tabs(n):
 
 
 def generate_comment(comment_lines, tab_count):
-    if(len(comment_lines) > 0):
+    iflen(comment_lines) > 0:
         retval = tabs(tab_count) + "/**\n"
         for line in comment_lines:
             retval += tabs(tab_count) + " * " + \

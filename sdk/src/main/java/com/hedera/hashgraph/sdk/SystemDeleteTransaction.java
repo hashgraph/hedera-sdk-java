@@ -48,11 +48,11 @@ import java.util.Objects;
  */
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
     @Nullable
-    private ContractId contractId = null;
+    private ContractId contractId;
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
 
     /**
      * Constructor.

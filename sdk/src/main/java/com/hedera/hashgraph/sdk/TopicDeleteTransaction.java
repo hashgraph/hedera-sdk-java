@@ -41,7 +41,7 @@ import java.util.Objects;
  */
 public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransaction> {
     @Nullable
-    private TopicId topicId = null;
+    private TopicId topicId;
 
     /**
      * Constructor.

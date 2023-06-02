@@ -44,8 +44,8 @@ import java.util.Objects;
 public final class ContractExecuteTransaction extends Transaction<ContractExecuteTransaction> {
 
     @Nullable
-    private ContractId contractId = null;
-    private long gas = 0;
+    private ContractId contractId;
+    private long gas;
     private Hbar payableAmount = new Hbar(0);
     private byte[] functionParameters = {};
 

@@ -54,9 +54,9 @@ public final class Mnemonic {
     // by storing our word list in a SoftReference, the GC is free to evict it at its discretion
     // but the implementation is meant to wait until free space is needed
     @Nullable
-    private static SoftReference<List<String>> bip39WordList = null;
+    private static SoftReference<List<String>> bip39WordList;
     @Nullable
-    private static SoftReference<List<String>> legacyWordList = null;
+    private static SoftReference<List<String>> legacyWordList;
 
     /**
      * The list of words in this mnemonic.
@@ -207,13 +207,13 @@ public final class Mnemonic {
             return getSpecificWordList(
                 () -> legacyWordList,
                 () -> readWordList(true),
-                (newWordList) -> legacyWordList = newWordList
+                newWordList -> legacyWordList = newWordList
             );
         } else {
             return getSpecificWordList(
                 () -> bip39WordList,
                 () -> readWordList(false),
-                (newWordList) -> bip39WordList = newWordList
+                newWordList -> bip39WordList = newWordList
             );
         }
     }

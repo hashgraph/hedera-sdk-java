@@ -44,7 +44,7 @@ import java.util.Objects;
 public final class FileDeleteTransaction extends Transaction<FileDeleteTransaction> {
 
     @Nullable
-    private FileId fileId = null;
+    private FileId fileId;
 
     /**
      * Constructor.

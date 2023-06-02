@@ -82,7 +82,7 @@ public class ConstructClientExample {
         );
 
         // Let's create a client with a custom network.
-        Map<String, AccountId> customNetwork = new HashMap<String, AccountId>();
+        Map<String, AccountId> customNetwork = new HashMap<>();
         customNetwork.put("2.testnet.hedera.com:50211", new AccountId(5));
         customNetwork.put("3.testnet.hedera.com:50211", new AccountId(6));
         Client customClient = Client.forNetwork(customNetwork);

@@ -95,11 +95,11 @@ final class Keystore {
         JsonObject kdfParams = expectObject(crypto, "kdfparams");
         String macString = expectString(crypto, "mac");
 
-        if (!cipher.equals("aes-128-ctr")) {
+        if (!"aes-128-ctr".equals(cipher)) {
             throw new BadKeyException("unsupported keystore cipher: " + cipher);
         }
 
-        if (!kdf.equals("pbkdf2")) {
+        if (!"pbkdf2".equals(kdf)) {
             throw new BadKeyException("unsuppported KDF: " + kdf);
         }
 
@@ -108,7 +108,7 @@ final class Keystore {
         int count = expectInt(kdfParams, "c");
         String prf = expectString(kdfParams, "prf");
 
-        if (!prf.equals("hmac-sha256")) {
+        if (!"hmac-sha256".equals(prf)) {
             throw new BadKeyException("unsupported KDF hash function: " + prf);
         }
 
@@ -136,11 +136,11 @@ final class Keystore {
         JsonObject kdfParams = expectObject(crypto, "kdfparams");
         String macString = expectString(crypto, "mac");
 
-        if (!cipher.equals("aes-128-ctr")) {
+        if (!"aes-128-ctr".equals(cipher)) {
             throw new BadKeyException("unsupported keystore cipher: " + cipher);
         }
 
-        if (!kdf.equals("pbkdf2")) {
+        if (!"pbkdf2".equals(kdf)) {
             throw new BadKeyException("unsuppported KDF: " + kdf);
         }
 
@@ -149,7 +149,7 @@ final class Keystore {
         int count = expectInt(kdfParams, "c");
         String prf = expectString(kdfParams, "prf");
 
-        if (!prf.equals("hmac-sha256")) {
+        if (!"hmac-sha256".equals(prf)) {
             throw new BadKeyException("unsupported KDF hash function: " + prf);
         }
 

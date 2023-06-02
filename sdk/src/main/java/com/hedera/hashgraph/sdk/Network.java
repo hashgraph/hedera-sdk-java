@@ -38,7 +38,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Internal utility class.
  */
-class Network extends BaseNetwork<Network, AccountId, Node> {
+final class Network extends BaseNetwork<Network, AccountId, Node> {
     @Nullable
     private Integer maxNodesPerRequest;
 

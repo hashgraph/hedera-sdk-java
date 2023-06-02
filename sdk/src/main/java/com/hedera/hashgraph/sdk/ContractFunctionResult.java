@@ -153,7 +153,7 @@ public final class ContractFunctionResult {
 
         createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
 
-        stateChanges = new ArrayList<ContractStateChange>();
+        stateChanges = new ArrayList<>();
         // for (var stateChangeProto : inner.getStateChangesList()) {
         //     stateChanges.add(ContractStateChange.fromProtobuf(stateChangeProto));
         // }

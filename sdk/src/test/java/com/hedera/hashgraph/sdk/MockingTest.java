@@ -96,7 +96,7 @@ public class MockingTest {
         "async, stakedAccount",
     })
     void contractCreateFlowFunctions(String versionToTest, String stakeType) throws Throwable {
-        var BIG_BYTECODE = makeBigString(ContractCreateFlow.FILE_CREATE_MAX_BYTES + 1000);
+        var bigBytecode = makeBigString(ContractCreateFlow.FILE_CREATE_MAX_BYTES + 1000);
         var adminKey = PrivateKey.generateED25519().getPublicKey();
 
         var cryptoService = new TestCryptoService();
@@ -126,7 +126,7 @@ public class MockingTest {
         contractService.buffer.enqueueResponse(TestResponse.transactionOk());
 
         var flow = new ContractCreateFlow()
-            .setBytecode(BIG_BYTECODE)
+            .setBytecode(bigBytecode)
             .setContractMemo("memo goes here")
             .setConstructorParameters(new byte[]{1, 2, 3})
             .setAutoRenewPeriod(Duration.ofMinutes(1))
@@ -136,13 +136,13 @@ public class MockingTest {
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
             .setDeclineStakingReward(declineStakingReward);
 
-        if (stakeType.equals("stakedAccount")) {
+        if ("stakedAccount".equals(stakeType)) {
             flow.setStakedAccountId(stakedAccountId);
         } else {
             flow.setStakedNodeId(stakedNode);
         }
 
-        if (versionToTest.equals("sync")) {
+        if ("sync".equals(versionToTest)) {
             flow.execute(server.client);
         } else {
             flow.executeAsync(server.client).get();
@@ -173,7 +173,7 @@ public class MockingTest {
         var fileAppendTx = (FileAppendTransaction) transactions.get(1);
         Assertions.assertEquals(fileId, fileAppendTx.getFileId());
         Assertions.assertEquals(
-            BIG_BYTECODE.length() - ContractCreateFlow.FILE_CREATE_MAX_BYTES,
+            bigBytecode.length() - ContractCreateFlow.FILE_CREATE_MAX_BYTES,
             fileAppendTx.getContents().size()
         );
 
@@ -189,7 +189,7 @@ public class MockingTest {
         Assertions.assertEquals(maxAutomaticTokenAssociations, contractCreateTx.getMaxAutomaticTokenAssociations());
         Assertions.assertEquals(declineStakingReward, contractCreateTx.getDeclineStakingReward());
 
-        if (stakeType.equals("stakedAccount")) {
+        if ("stakedAccount".equals(stakeType)) {
             Assertions.assertEquals(stakedAccountId, contractCreateTx.getStakedAccountId());
         } else {
             Assertions.assertEquals(stakedNode, contractCreateTx.getStakedNodeId());
@@ -203,7 +203,7 @@ public class MockingTest {
 
     @Test
     void accountInfoFlowFunctions() throws Throwable {
-        var BIG_BYTES = makeBigString(1000).getBytes(StandardCharsets.UTF_8);
+        var bigBytes = makeBigString(1000).getBytes(StandardCharsets.UTF_8);
         var privateKey = PrivateKey.generateED25519();
         var otherPrivateKey = PrivateKey.generateED25519();
         var accountId = AccountId.fromString("1.2.3");
@@ -218,8 +218,8 @@ public class MockingTest {
 
         var properlySignedTx = makeTx.get().sign(privateKey);
         var improperlySignedTx = makeTx.get().sign(otherPrivateKey);
-        var properBigBytesSignature = privateKey.sign(BIG_BYTES);
-        var improperBigBytesSignature = otherPrivateKey.sign(BIG_BYTES);
+        var properBigBytesSignature = privateKey.sign(bigBytes);
+        var improperBigBytesSignature = otherPrivateKey.sign(bigBytes);
 
         var cryptoService = new TestCryptoService();
         var server = new TestServer("accountInfoFlow", cryptoService);
@@ -258,10 +258,10 @@ public class MockingTest {
             AccountInfoFlow.verifyTransactionSignature(server.client, accountId, improperlySignedTx)
         );
         Assertions.assertTrue(
-            AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, properBigBytesSignature)
+            AccountInfoFlow.verifySignature(server.client, accountId, bigBytes, properBigBytesSignature)
         );
         Assertions.assertFalse(
-            AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, improperBigBytesSignature)
+            AccountInfoFlow.verifySignature(server.client, accountId, bigBytes, improperBigBytesSignature)
         );
         Assertions.assertTrue(
             AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, properlySignedTx).get()
@@ -270,10 +270,10 @@ public class MockingTest {
             AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, improperlySignedTx).get()
         );
         Assertions.assertTrue(
-            AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, properBigBytesSignature).get()
+            AccountInfoFlow.verifySignatureAsync(server.client, accountId, bigBytes, properBigBytesSignature).get()
         );
         Assertions.assertFalse(
-            AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, improperBigBytesSignature).get()
+            AccountInfoFlow.verifySignatureAsync(server.client, accountId, bigBytes, improperBigBytesSignature).get()
         );
 
         Assertions.assertEquals(16, cryptoService.buffer.queryRequestsReceived.size());
@@ -326,7 +326,7 @@ public class MockingTest {
             .enqueueResponse(TestResponse.error(exception))
             .enqueueResponse(TestResponse.transactionOk());
 
-        if (sync.equals("sync")) {
+        if ("sync".equals(sync)) {
             new AccountCreateTransaction()
                 .setNodeAccountIds(Lists.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
                 .execute(server.client);
@@ -361,7 +361,7 @@ public class MockingTest {
 
         service.buffer.enqueueResponse(TestResponse.transactionOk());
 
-        if (sync.equals("sync")) {
+        if ("sync".equals(sync)) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
                     .setMaxAttempts(maxAttempts)
@@ -415,7 +415,7 @@ public class MockingTest {
 
         server.client.setMaxAttempts(4);
 
-        if (sync.equals("sync")) {
+        if ("sync".equals(sync)) {
             new AccountCreateTransaction()
                 .setNodeAccountIds(Lists.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
                 .execute(server.client);
@@ -451,7 +451,7 @@ public class MockingTest {
 
         server.client.setMaxAttempts(2);
 
-        if (sync.equals("sync")) {
+        if ("sync".equals(sync)) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
                     .setNodeAccountIds(Lists.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))

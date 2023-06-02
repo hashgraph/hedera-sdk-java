@@ -43,9 +43,9 @@ import java.util.Objects;
  */
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     @Nullable
-    private TransactionId transactionId = null;
-    private boolean includeChildren = false;
-    private boolean includeDuplicates = false;
+    private TransactionId transactionId;
+    private boolean includeChildren;
+    private boolean includeDuplicates;
 
     /**
      * Constructor.

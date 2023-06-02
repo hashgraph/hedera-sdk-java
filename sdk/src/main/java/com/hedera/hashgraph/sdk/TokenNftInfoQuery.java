@@ -46,16 +46,16 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
      * The ID of the non-fungible token in x.y.z format.
      */
     @Nullable
-    private NftId nftId = null;
+    private NftId nftId;
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * The account ID of the current owner of the NFT
      */
     @Nullable
-    private AccountId accountId = null;
-    private long start = 0;
-    private long end = 0;
+    private AccountId accountId;
+    private long start;
+    private long end;
 
     /**
      * Constructor.
@@ -245,6 +245,6 @@ public class TokenNftInfoQuery extends com.hedera.hashgraph.sdk.Query<List<Token
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `Token_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
     }
 }

@@ -44,7 +44,7 @@ import java.util.Objects;
  */
 public class TokenDeleteTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenDeleteTransaction> {
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
 
     /**
      * Constructor.

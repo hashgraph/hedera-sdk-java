@@ -59,7 +59,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * must sign this transaction.
      */
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
     /**
      * The initial lifetime of the topic and the amount of time to attempt
      * to extend the topic's lifetime by,automatically at the topic's
@@ -69,7 +69,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * Required.
      */
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     /**
      * Short publicly visible memo about the topic.
      *
@@ -85,14 +85,14 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * used to extend the topic's expirationTime, and deleteTopic is disallowed.
      */
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     /**
      * Access control for submitMessage. If unspecified, no access control
      * is performed on ConsensusService.submitMessage (all submissions are
      * allowed).
      */
     @Nullable
-    private Key submitKey = null;
+    private Key submitKey;
 
     /**
      * Constructor.

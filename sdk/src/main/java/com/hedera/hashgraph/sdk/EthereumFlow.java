@@ -114,14 +114,14 @@ public class EthereumFlow {
         return new FileCreateTransaction()
                 .setContents(Arrays.copyOfRange(callData, 0, Math.min(FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length)))
                 .executeAsync(client, timeoutPerTransaction)
-                .thenCompose((response) -> response.getReceiptAsync(client, timeoutPerTransaction))
-                .thenCompose((receipt) -> {
+                .thenCompose(response -> response.getReceiptAsync(client, timeoutPerTransaction))
+                .thenCompose(receipt -> {
                     if (callData.length > FileAppendTransaction.DEFAULT_CHUNK_SIZE) {
                         return new FileAppendTransaction()
                                 .setFileId(receipt.fileId)
                                 .setContents(Arrays.copyOfRange(callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
                                 .executeAsync(client, timeoutPerTransaction)
-                                .thenApply((r) -> receipt.fileId);
+                                .thenApply(r -> receipt.fileId);
                     } else {
                         return CompletableFuture.completedFuture(receipt.fileId);
                     }
@@ -205,7 +205,7 @@ public class EthereumFlow {
             return ethereumTransaction.setEthereumData(ethereumDataBytes).executeAsync(client);
         } else {
             return createFileAsync(ethereumData.callData, client, timeoutPerTransaction)
-                    .thenCompose((callDataFileId) -> {
+                    .thenCompose(callDataFileId -> {
                         ethereumData.callData = new byte[]{};
                         return ethereumTransaction
                                 .setEthereumData(ethereumData.toBytes())

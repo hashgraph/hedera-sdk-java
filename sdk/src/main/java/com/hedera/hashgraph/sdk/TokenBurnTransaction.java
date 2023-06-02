@@ -47,11 +47,11 @@ public class TokenBurnTransaction extends com.hedera.hashgraph.sdk.Transaction<T
      * The ID of the token to burn supply
      */
     @Nullable
-    private TokenId tokenId = null;
+    private TokenId tokenId;
     /**
      * The ID of the token to burn supply
      */
-    private long amount = 0;
+    private long amount;
     /**
      * Applicable to tokens of type NON_FUNGIBLE_UNIQUE.The  list of NFT serial IDs to burn.
      */

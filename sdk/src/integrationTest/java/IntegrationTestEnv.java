@@ -30,7 +30,7 @@ public class IntegrationTestEnv {
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
-    public boolean isLocalNode = false;
+    public boolean isLocalNode;
     private Client originalClient;
 
     private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
@@ -82,18 +82,18 @@ public class IntegrationTestEnv {
 
     @SuppressWarnings("EmptyCatch")
     private static Client createTestEnvClient() throws Exception {
-        if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
+        if ("previewnet".equals(System.getProperty("HEDERA_NETWORK"))) {
             return Client.forPreviewnet();
-        } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
+        } else if ("testnet".equals(System.getProperty("HEDERA_NETWORK"))) {
             return Client.forTestnet();
-        } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
+        } else if ("localhost".equals(System.getProperty("HEDERA_NETWORK"))) {
             var network = new HashMap<String, AccountId>();
             network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
 
             return Client
                 .forNetwork(network)
                 .setMirrorNetwork(List.of(DEFAULT_LOCAL_MIRROR_NODE_ADDRESS));
-        } else if (!System.getProperty("CONFIG_FILE").equals("")) {
+        } else if (!"".equals(System.getProperty("CONFIG_FILE"))) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
             } catch (Exception configFileException) {
@@ -189,7 +189,7 @@ public class IntegrationTestEnv {
     private static class TestEnvNodeGetter {
         private Client client;
         @Var
-        private int index = 0;
+        private int index;
         private List<Map.Entry<String, AccountId>> nodes;
 
         public TestEnvNodeGetter(Client client) {

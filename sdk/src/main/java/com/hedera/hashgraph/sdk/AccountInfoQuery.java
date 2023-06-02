@@ -37,7 +37,7 @@ import java.util.Objects;
 public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery> {
 
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
 
     /**
      * Constructor.
@@ -110,6 +110,6 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
         // deleted accounts return a COST_ANSWER of zero which triggers `INSUFFICIENT_TX_FEE`
         // if you set that as the query payment; 25 tinybar seems to be enough to get
         // `ACCOUNT_DELETED` back instead.
-        return super.getCostAsync(client).thenApply((cost) -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
+        return super.getCostAsync(client).thenApply(cost -> Hbar.fromTinybars(Math.max(cost.toTinybars(), 25)));
     }
 }

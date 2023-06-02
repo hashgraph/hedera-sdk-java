@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class TransactionReceiptTest {
-    final static Instant time = Instant.ofEpochSecond(1554158542);
+    static final Instant time = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {

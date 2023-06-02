@@ -57,23 +57,23 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      * The transaction ID
      */
     @Nullable
-    protected TransactionId paymentTransactionId = null;
+    protected TransactionId paymentTransactionId;
 
     /**
      * List of payment transactions
      */
     @Nullable
-    protected List<Transaction> paymentTransactions = null;
+    protected List<Transaction> paymentTransactions;
     @Nullable
-    private Client.Operator paymentOperator = null;
+    private Client.Operator paymentOperator;
     @Nullable
-    private Hbar queryPayment = null;
+    private Hbar queryPayment;
 
     @Nullable
-    private Hbar maxQueryPayment = null;
+    private Hbar maxQueryPayment;
 
     @Nullable
-    private Hbar chosenQueryPayment = null;
+    private Hbar chosenQueryPayment;
 
     /**
      * Constructor.
@@ -344,7 +344,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
                 return CompletableFuture.completedFuture(null);
             }, client.executor)
             .thenCompose(x -> x)
-            .thenAccept((paymentAmount) -> {
+            .thenAccept(paymentAmount -> {
                 grpcCostQuery.finish();
             });
     }

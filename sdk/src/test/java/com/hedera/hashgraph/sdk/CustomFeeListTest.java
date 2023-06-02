@@ -40,7 +40,7 @@ public class CustomFeeListTest {
         SnapshotMatcher.validateSnapshots();
     }
 
-    static private List<CustomFee> spawnCustomFeeListExample() {
+    private static List<CustomFee> spawnCustomFeeListExample() {
         var returnList = new ArrayList<CustomFee>();
         returnList.add(new CustomFixedFee()
             .setFeeCollectorAccountId(new AccountId(4322))

@@ -371,7 +371,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                         .thenApply(receipt -> response);
 
                 Function<TransactionResponse, List<TransactionResponse>> addToList =
-                    (response) -> {
+                    response -> {
                         list.add(response);
                         return list;
                     };

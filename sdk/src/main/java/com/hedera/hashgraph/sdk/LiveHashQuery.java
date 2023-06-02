@@ -36,7 +36,7 @@ import java.util.Objects;
  */
 public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     @Nullable
-    private AccountId accountId = null;
+    private AccountId accountId;
     private byte[] hash = {};
 
     /**

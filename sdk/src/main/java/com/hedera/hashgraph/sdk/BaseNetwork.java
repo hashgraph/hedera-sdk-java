@@ -115,7 +115,7 @@ abstract class BaseNetwork<
         value = "URF_UNREAD_FIELD",
         justification = "this field is used for testing"
     )
-    boolean hasShutDownNow = false;
+    boolean hasShutDownNow;
 
     protected BaseNetwork(ExecutorService executor) {
         this.executor = executor;
@@ -225,7 +225,7 @@ abstract class BaseNetwork<
      *
      * @return                          the minimum node readmit time
      */
-    synchronized public Duration getMinNodeReadmitTime() {
+    public synchronized Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
@@ -234,7 +234,7 @@ abstract class BaseNetwork<
      *
      * @param minNodeReadmitTime        the minimum node readmit time
      */
-    synchronized public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    public synchronized void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
         for (var node : nodes) {

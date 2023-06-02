@@ -33,7 +33,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class StakingWithUpdateExample {
+public final class StakingWithUpdateExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names

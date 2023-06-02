@@ -63,33 +63,33 @@ import java.util.Objects;
  */
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
     @Nullable
-    private ContractId contractId = null;
+    private ContractId contractId;
     @Nullable
-    private AccountId proxyAccountId = null;
+    private AccountId proxyAccountId;
     @Nullable
-    private FileId bytecodeFileId = null;
+    private FileId bytecodeFileId;
     @Nullable
-    private Instant expirationTime = null;
+    private Instant expirationTime;
     @Nullable
-    private Key adminKey = null;
+    private Key adminKey;
     @Nullable
-    private Integer maxAutomaticTokenAssociations = null;
+    private Integer maxAutomaticTokenAssociations;
     @Nullable
-    private Duration autoRenewPeriod = null;
+    private Duration autoRenewPeriod;
     @Nullable
-    private String contractMemo = null;
+    private String contractMemo;
 
     @Nullable
-    private AccountId stakedAccountId = null;
+    private AccountId stakedAccountId;
 
     @Nullable
-    private Long stakedNodeId = null;
+    private Long stakedNodeId;
 
     @Nullable
-    private Boolean declineStakingReward = null;
+    private Boolean declineStakingReward;
 
     @Nullable
-    private AccountId autoRenewAccountId = null;
+    private AccountId autoRenewAccountId;
 
     /**
      * Contract.
