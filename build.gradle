@@ -38,8 +38,7 @@ allprojects {
     }
 
     jacoco {
-        reportsDir = file("$buildDir/jacoco")
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.8"
     }
 
     sonarqube {

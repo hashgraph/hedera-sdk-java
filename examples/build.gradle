@@ -7,11 +7,6 @@ dependencies {
     implementation project(path: ':sdk')
 }
 
-java {
-    sourceCompatibility = 17
-    targetCompatibility = 17
-}
-
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->
     if (taskName.startsWith("run")) {
         task(taskName, type: JavaExec) {
