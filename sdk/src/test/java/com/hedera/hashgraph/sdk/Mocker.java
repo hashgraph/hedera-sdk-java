@@ -32,7 +32,7 @@ import io.grpc.ServiceDescriptor;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.ServerCalls;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import java.io.IOException;
 import java.util.ArrayList;

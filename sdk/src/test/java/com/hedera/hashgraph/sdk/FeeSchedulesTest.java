@@ -23,7 +23,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

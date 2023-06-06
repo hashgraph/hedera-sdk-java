@@ -23,21 +23,17 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import java8.util.stream.Collectors;
-import java8.util.stream.StreamSupport;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
- * Result of invoking a contract via {@link ContractCallQuery},
- * or {@link ContractExecuteTransaction}, or the result of a contract constructor being called
- * by {@link ContractCreateTransaction}.
+ * Result of invoking a contract via {@link ContractCallQuery}, or {@link ContractExecuteTransaction}, or the result of
+ * a contract constructor being called by {@link ContractCreateTransaction}.
  * <p>
  * If you require a type which is not supported here, please let us know on
  * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298">this Github issue</a>.
@@ -78,11 +74,9 @@ public final class ContractFunctionResult {
     public final List<ContractLogInfo> logs;
 
     /**
-     * The created ids will now _also_ be externalized through internal transaction
-     * records, where each record has its alias field populated with the new contract's
-     * EVM address. (This is needed for contracts created with CREATE2, since
-     * there is no longer a simple relationship between the new contract's 0.0.X id
-     * and its Solidity address.)
+     * The created ids will now _also_ be externalized through internal transaction records, where each record has its
+     * alias field populated with the new contract's EVM address. (This is needed for contracts created with CREATE2,
+     * since there is no longer a simple relationship between the new contract's 0.0.X id and its Solidity address.)
      */
     @Deprecated
     public final List<ContractId> createdContractIds;
@@ -110,19 +104,17 @@ public final class ContractFunctionResult {
      * ContractCreateTransactionBody or a ContractCallTransactionBody.
      */
     public final byte[] contractFunctionParametersBytes;
-
-    private final ByteString rawResult;
-
     /**
      * The account that is the "sender." If not present it is the accountId from the transactionId.
      */
     @Nullable
     public final AccountId senderAccountId;
+    private final ByteString rawResult;
 
     /**
      * Constructor.
      *
-     * @param inner                     the protobuf
+     * @param inner the protobuf
      */
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
@@ -149,9 +141,10 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = StreamSupport.stream(inner.getLogInfoList()).map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).toList();
 
-        createdContractIds = StreamSupport.stream(inner.getCreatedContractIDsList()).map(ContractId::fromProtobuf).collect(Collectors.toList());
+        createdContractIds = inner.getCreatedContractIDsList().stream().map(ContractId::fromProtobuf)
+            .toList();
 
         stateChanges = new ArrayList<ContractStateChange>();
         // for (var stateChangeProto : inner.getStateChangesList()) {
@@ -248,13 +241,12 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as an 8-bit integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last byte (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last byte (similar to Java's integer narrowing
+     * semantics).
      * <p>
-     * If you are developing a contract and intending to return more than one of these values from a
-     * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
-     * more compact representation which will save on gas. (Each individual {@code int8} value is
-     * padded to 32 bytes in the ABI.)
+     * If you are developing a contract and intending to return more than one of these values from a Solidity function,
+     * consider using the {@code bytes32} Solidity type instead as that will be a more compact representation which will
+     * save on gas. (Each individual {@code int8} value is padded to 32 bytes in the ABI.)
      *
      * @param valIndex The index of the value to be retrieved
      * @return byte
@@ -266,8 +258,8 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 32-bit integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's integer narrowing
+     * semantics).
      *
      * @param valIndex The index of the value to be retrieved
      * @return int
@@ -280,8 +272,8 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 64-bit integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's integer narrowing
+     * semantics).
      *
      * @param valIndex The index of the value to be retrieved
      * @return long
@@ -305,17 +297,16 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 8-bit unsigned integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last byte (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last byte (similar to Java's integer narrowing
+     * semantics).
      * <p>
-     * Because Java does not have native unsigned integers, this is semantically identical to
-     * {@link #getInt8(int)}. To treat the value as unsigned in the range {@code [0, 255]}, use
-     * {@link Byte#toUnsignedInt(byte)} to widen to {@code int} without sign-extension.
+     * Because Java does not have native unsigned integers, this is semantically identical to {@link #getInt8(int)}. To
+     * treat the value as unsigned in the range {@code [0, 255]}, use {@link Byte#toUnsignedInt(byte)} to widen to
+     * {@code int} without sign-extension.
      * <p>
-     * If you are developing a contract and intending to return more than one of these values from a
-     * Solidity function, consider using the {@code bytes32} Solidity type instead as that will be a
-     * more compact representation which will save on gas. (Each individual {@code uint8} value is
-     * padded to 32 bytes in the ABI.)
+     * If you are developing a contract and intending to return more than one of these values from a Solidity function,
+     * consider using the {@code bytes32} Solidity type instead as that will be a more compact representation which will
+     * save on gas. (Each individual {@code uint8} value is padded to 32 bytes in the ABI.)
      *
      * @param valIndex The index of the value to be retrieved
      * @return byte
@@ -327,13 +318,12 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 32-bit unsigned integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last 4 bytes (similar to Java's integer narrowing
+     * semantics).
      * <p>
-     * Because Java does not have native unsigned integers, this is semantically identical to
-     * {@link #getInt32(int)}. The {@link Integer} class has static methods for treating an
-     * {@code int} as unsigned where the difference between signed and unsigned actually matters
-     * (comparison, division, printing and widening to {@code long}).
+     * Because Java does not have native unsigned integers, this is semantically identical to {@link #getInt32(int)}.
+     * The {@link Integer} class has static methods for treating an {@code int} as unsigned where the difference between
+     * signed and unsigned actually matters (comparison, division, printing and widening to {@code long}).
      *
      * @param valIndex The index of the value to be retrieved
      * @return int
@@ -345,13 +335,12 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 64-bit integer.
      * <p>
-     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's
-     * integer narrowing semantics).
+     * If the actual value is wider it will be truncated to the last 8 bytes (similar to Java's integer narrowing
+     * semantics).
      * <p>
-     * Because Java does not have native unsigned integers, this is semantically identical to
-     * {@link #getInt64(int)}. The {@link Long} class has static methods for treating a
-     * {@code long} as unsigned where the difference between signed and unsigned actually matters
-     * (comparison, division and printing).
+     * Because Java does not have native unsigned integers, this is semantically identical to {@link #getInt64(int)}.
+     * The {@link Long} class has static methods for treating a {@code long} as unsigned where the difference between
+     * signed and unsigned actually matters (comparison, division and printing).
      *
      * @param valIndex The index of the value to be retrieved
      * @return long
@@ -363,9 +352,8 @@ public final class ContractFunctionResult {
     /**
      * Get the nth returned value as a 256-bit unsigned integer.
      * <p>
-     * The value will be padded with a leading zero-byte so that
-     * {@link BigInteger#BigInteger(byte[])} treats the value as positive regardless of
-     * whether the most significant bit is set or not.
+     * The value will be padded with a leading zero-byte so that {@link BigInteger#BigInteger(byte[])} treats the value
+     * as positive regardless of whether the most significant bit is set or not.
      * <p>
      * This type can represent the full width of Solidity integers.
      *

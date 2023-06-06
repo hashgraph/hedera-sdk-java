@@ -17,8 +17,8 @@ allprojects {
     apply plugin: "java"
     apply plugin: "net.ltgt.errorprone"
 
-    sourceCompatibility = 14
-    targetCompatibility = 14
+    sourceCompatibility = 17
+    targetCompatibility = 17
 
     repositories {
         mavenCentral()
@@ -38,8 +38,7 @@ allprojects {
     }
 
     jacoco {
-        reportsDir = file("$buildDir/jacoco")
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.8"
     }
 
     sonarqube {

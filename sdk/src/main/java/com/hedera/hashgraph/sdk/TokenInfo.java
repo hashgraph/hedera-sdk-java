@@ -25,8 +25,8 @@ import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.TokenKycStatus;
 import com.hedera.hashgraph.sdk.proto.TokenPauseStatus;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+import java.time.Duration;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

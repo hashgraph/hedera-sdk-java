@@ -22,7 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;

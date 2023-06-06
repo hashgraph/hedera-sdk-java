@@ -23,7 +23,7 @@ import com.google.common.base.MoreObjects;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.nio.ByteBuffer;

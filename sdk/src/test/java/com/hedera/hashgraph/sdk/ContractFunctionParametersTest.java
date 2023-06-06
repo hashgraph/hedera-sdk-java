@@ -21,7 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import java8.util.Lists;
+import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
@@ -55,7 +55,7 @@ public class ContractFunctionParametersTest {
 
     @SuppressWarnings("unused")
     private static List<Arguments> int256Arguments() {
-        return Lists.of(
+        return List.of(
             Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000"),
             Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002"),
             Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff"),
@@ -76,7 +76,7 @@ public class ContractFunctionParametersTest {
 
     @SuppressWarnings("unused")
     private static List<Arguments> uInt256Arguments() {
-        return Lists.of(
+        return List.of(
             Arguments.of(0, "0000000000000000000000000000000000000000000000000000000000000000", 8),
             Arguments.of(2, "0000000000000000000000000000000000000000000000000000000000000002", 8),
             Arguments.of(255, "00000000000000000000000000000000000000000000000000000000000000ff", 8),

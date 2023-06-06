@@ -22,17 +22,14 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import java8.util.J8Arrays;
-import java8.util.stream.Collectors;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * Current information about an account, including the balance.
@@ -44,23 +41,22 @@ public final class AccountInfo {
     public final AccountId accountId;
 
     /**
-     * The Contract Account ID comprising both the contract instance and the cryptocurrency
-     * account owned by the contract instance, in the format used by Solidity.
+     * The Contract Account ID comprising both the contract instance and the cryptocurrency account owned by the
+     * contract instance, in the format used by Solidity.
      */
     public final String contractAccountId;
 
     /**
-     * If true, then this account has been deleted, it will disappear when it expires, and
-     * all transactions for it will fail except the transaction to extend its expiration date.
+     * If true, then this account has been deleted, it will disappear when it expires, and all transactions for it will
+     * fail except the transaction to extend its expiration date.
      */
     public final boolean isDeleted;
 
     /**
-     * The Account ID of the account to which this is proxy staked. If proxyAccountID is null,
-     * or is an invalid account, or is an account that isn't a node, then this account is
-     * automatically proxy staked to a node chosen by the network, but without earning payments.
-     * If the proxyAccountID account refuses to accept proxy staking , or if it is not currently
-     * running a node, then it will behave as if proxyAccountID was null.
+     * The Account ID of the account to which this is proxy staked. If proxyAccountID is null, or is an invalid account,
+     * or is an account that isn't a node, then this account is automatically proxy staked to a node chosen by the
+     * network, but without earning payments. If the proxyAccountID account refuses to accept proxy staking , or if it
+     * is not currently running a node, then it will behave as if proxyAccountID was null.
      */
     @Nullable
     public final AccountId proxyAccountId;
@@ -71,8 +67,8 @@ public final class AccountInfo {
     public final Hbar proxyReceived;
 
     /**
-     * The key for the account, which must sign in order to transfer out, or to modify the account
-     * in any way other than extending its expiration date.
+     * The key for the account, which must sign in order to transfer out, or to modify the account in any way other than
+     * extending its expiration date.
      */
     public final Key key;
 
@@ -82,14 +78,14 @@ public final class AccountInfo {
     public final Hbar balance;
 
     /**
-     * The threshold amount for which an account record is created (and this account
-     * charged for them) for any send/withdraw transaction.
+     * The threshold amount for which an account record is created (and this account charged for them) for any
+     * send/withdraw transaction.
      */
     public final Hbar sendRecordThreshold;
 
     /**
-     * The threshold amount for which an account record is created
-     * (and this account charged for them) for any transaction above this amount.
+     * The threshold amount for which an account record is created (and this account charged for them) for any
+     * transaction above this amount.
      */
     public final Hbar receiveRecordThreshold;
 
@@ -104,15 +100,14 @@ public final class AccountInfo {
     public final Instant expirationTime;
 
     /**
-     * The duration for expiration time will extend every this many seconds. If there are
-     * insufficient funds, then it extends as long as possible. If it is empty when it
-     * expires, then it is deleted.
+     * The duration for expiration time will extend every this many seconds. If there are insufficient funds, then it
+     * extends as long as possible. If it is empty when it expires, then it is deleted.
      */
     public final Duration autoRenewPeriod;
 
     /**
-     * All the livehashes attached to the account (each of which is a hash along with the
-     * keys that authorized it and can delete it)
+     * All the livehashes attached to the account (each of which is a hash along with the keys that authorized it and
+     * can delete it)
      */
     public final List<LiveHash> liveHashes;
 
@@ -144,7 +139,9 @@ public final class AccountInfo {
     public final PublicKey aliasKey;
 
     /**
-     * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
+     * The ledger ID the response was returned from; please see <a
+     * href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the
+     * network-specific IDs.
      */
     public final LedgerId ledgerId;
 
@@ -180,25 +177,25 @@ public final class AccountInfo {
     /**
      * Constructor.
      *
-     * @param accountId                 the account id
-     * @param contractAccountId         the contracts account id
-     * @param isDeleted                 is it deleted
-     * @param proxyAccountId            the proxy account's id
-     * @param proxyReceived             amount of proxy received
-     * @param key                       signing key
-     * @param balance                   account balance
-     * @param sendRecordThreshold       @depreciated no replacement
-     * @param receiveRecordThreshold    @depreciated no replacement
-     * @param receiverSignatureRequired is the receiver's signature required
-     * @param expirationTime            the expiration time
-     * @param autoRenewPeriod           the auto renew period
-     * @param liveHashes                the live hashes
-     * @param tokenRelationships        list of token id and token relationship records
-     * @param accountMemo               the account memo
-     * @param ownedNfts                 number of nft's
-     * @param maxAutomaticTokenAssociations     max number of token associations
-     * @param aliasKey                  public alias key
-     * @param ledgerId                  the ledger id
+     * @param accountId                     the account id
+     * @param contractAccountId             the contracts account id
+     * @param isDeleted                     is it deleted
+     * @param proxyAccountId                the proxy account's id
+     * @param proxyReceived                 amount of proxy received
+     * @param key                           signing key
+     * @param balance                       account balance
+     * @param sendRecordThreshold           @depreciated no replacement
+     * @param receiveRecordThreshold        @depreciated no replacement
+     * @param receiverSignatureRequired     is the receiver's signature required
+     * @param expirationTime                the expiration time
+     * @param autoRenewPeriod               the auto renew period
+     * @param liveHashes                    the live hashes
+     * @param tokenRelationships            list of token id and token relationship records
+     * @param accountMemo                   the account memo
+     * @param ownedNfts                     number of nft's
+     * @param maxAutomaticTokenAssociations max number of token associations
+     * @param aliasKey                      public alias key
+     * @param ledgerId                      the ledger id
      */
     private AccountInfo(
         AccountId accountId,
@@ -252,8 +249,8 @@ public final class AccountInfo {
     /**
      * Retrieve the account info from a protobuf.
      *
-     * @param accountInfo               the account info protobuf
-     * @return                          the account info object
+     * @param accountInfo the account info protobuf
+     * @return the account info object
      */
     static AccountInfo fromProtobuf(CryptoGetInfoResponse.AccountInfo accountInfo) {
         var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
@@ -262,9 +259,9 @@ public final class AccountInfo {
             ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
             : null;
 
-        var liveHashes = J8Arrays.stream(accountInfo.getLiveHashesList().toArray())
+        var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
             .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash) liveHash))
-            .collect(Collectors.toList());
+            .toList();
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
 
@@ -304,9 +301,9 @@ public final class AccountInfo {
     /**
      * Retrieve the account info from a protobuf byte array.
      *
-     * @param bytes                     a byte array representing the protobuf
-     * @return                          the account info object
-     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
+     * @param bytes a byte array representing the protobuf
+     * @return the account info object
+     * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
@@ -315,12 +312,12 @@ public final class AccountInfo {
     /**
      * Convert an account info object into a protobuf.
      *
-     * @return                          the protobuf object
+     * @return the protobuf object
      */
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
-        var hashes = J8Arrays.stream(liveHashes.toArray())
+        var hashes = Arrays.stream(liveHashes.toArray())
             .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
-            .collect(Collectors.toList());
+            .toList();
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
@@ -389,7 +386,7 @@ public final class AccountInfo {
     /**
      * Extract a byte array representation.
      *
-     * @return                          a byte array representation
+     * @return a byte array representation
      */
     public byte[] toBytes() {
         return toProtobuf().toByteArray();

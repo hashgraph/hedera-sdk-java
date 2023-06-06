@@ -21,8 +21,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.threeten.bp.Duration;
-import org.threeten.bp.Instant;
+import java.time.Duration;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.*;

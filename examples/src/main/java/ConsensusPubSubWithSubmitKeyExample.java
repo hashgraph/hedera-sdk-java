@@ -29,7 +29,7 @@ import com.hedera.hashgraph.sdk.TopicMessageQuery;
 import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;

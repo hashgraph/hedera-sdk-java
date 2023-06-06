@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import org.junit.jupiter.api.Test;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import java.util.Collections;
 import java.util.concurrent.*;
