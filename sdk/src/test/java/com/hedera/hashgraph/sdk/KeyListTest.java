@@ -99,7 +99,7 @@ class KeyListTest {
 
         // Then
         assertThat(keyList).hasSize(3);
-        assertThat(emptyKeyList).hasSize(0);
+        assertThat(emptyKeyList).isEmpty();
     }
 
     @Test
