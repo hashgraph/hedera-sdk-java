@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-public class KeyListTest {
+class KeyListTest {
 
     private static final PublicKey mTestPublicKey1 = PrivateKey.fromStringED25519(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10")
@@ -98,8 +98,8 @@ public class KeyListTest {
         var emptyKeyList = new KeyList();
 
         // Then
-        assertThat(keyList.size()).isEqualTo(3);
-        assertThat(emptyKeyList.size()).isEqualTo(0);
+        assertThat(keyList).hasSize(3);
+        assertThat(emptyKeyList).hasSize(0);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class KeyListTest {
         keyList.remove(mTestPublicKey1);
 
         // Then
-        assertThat(keyList.size()).isEqualTo(2);
+        assertThat(keyList).hasSize(2);
         assertFalse(keyList.contains(mTestPublicKey1));
         assertTrue(keyList.contains(mTestPublicKey2));
         assertTrue(keyList.contains(mTestPublicKey3));
