@@ -120,6 +120,20 @@ class KeyListTest {
     }
 
     @Test
+    @DisplayName("add")
+    void add() {
+        // Given
+        var keyList = KeyList.of(mTestPublicKey1, mTestPublicKey2);
+
+        // When
+        keyList.add(mTestPublicKey3);
+
+        // Then
+        assertThat(keyList).hasSize(3);
+        assertTrue(keyList.contains(mTestPublicKey3));
+    }
+
+    @Test
     @DisplayName("remove")
     void remove() {
         // Given
