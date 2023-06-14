@@ -19,15 +19,15 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -36,29 +36,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import javax.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
 
 /**
  * Managed client for use on the Hedera Hashgraph network.
@@ -81,10 +68,6 @@ public final class Client implements AutoCloseable {
     private static final String TESTNET = "testnet";
     private static final String PREVIEWNET = "previewnet";
     final ExecutorService executor;
-    /**
-     * The logger
-     */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
     private final AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
     private final Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
     @Nullable
@@ -106,6 +89,8 @@ public final class Client implements AutoCloseable {
     private Duration networkUpdatePeriod;
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
+    @Nullable
+    private Logger logger;
 
     /**
      * Constructor.
@@ -366,17 +351,15 @@ public final class Client implements AutoCloseable {
         networkUpdateFuture.thenRun(() -> {
             // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
             requireNetworkUpdatePeriodNotNull(() -> {
-                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> {
-                    return requireNetworkUpdatePeriodNotNull(() -> {
-                        try {
-                            this.setNetworkFromAddressBook(addressBook);
-                        } catch (Throwable error) {
-                            return CompletableFuture.failedFuture(error);
-                        }
-                        return CompletableFuture.completedFuture(null);
-                    });
-                }).exceptionally(error -> {
-                    logger.warn("Failed to update address book via mirror node query", error);
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
+                    try {
+                        this.setNetworkFromAddressBook(addressBook);
+                    } catch (Throwable error) {
+                        return CompletableFuture.failedFuture(error);
+                    }
+                    return CompletableFuture.completedFuture(null);
+                })).exceptionally(error -> {
+                    logger.warn("Failed to update address book via mirror node query ", error);
                     return null;
                 });
                 scheduleNetworkUpdate(networkUpdatePeriod);
@@ -619,7 +602,7 @@ public final class Client implements AutoCloseable {
      * @param onFailure     a Consumer which consumes the error on failure.
      */
     public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess,
-        Consumer<Throwable> onFailure) {
+                          Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
     }
 
@@ -752,7 +735,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
-        UnaryOperator<byte[]> transactionSigner) {
+                                               UnaryOperator<byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
@@ -1327,6 +1310,16 @@ public final class Client implements AutoCloseable {
         cancelScheduledNetworkUpdate();
         this.networkUpdatePeriod = networkUpdatePeriod;
         scheduleNetworkUpdate(networkUpdatePeriod);
+        return this;
+    }
+
+    @Nullable
+    public Logger getLogger() {
+        return this.logger;
+    }
+
+    public Client setLogger(Logger logger) {
+        this.logger = logger;
         return this;
     }
 

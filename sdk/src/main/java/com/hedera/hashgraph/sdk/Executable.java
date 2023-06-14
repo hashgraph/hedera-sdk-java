@@ -19,16 +19,19 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.MessageLite;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.MethodDescriptor;
 import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
+import org.bouncycastle.util.encoders.Hex;
+
+import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -39,16 +42,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.regex.Pattern;
-import javax.annotation.Nullable;
-import org.bouncycastle.util.encoders.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
 
 /**
  * Abstract base utility class.
@@ -63,11 +60,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     protected static final Random random = new Random();
     static final Pattern RST_STREAM = Pattern
         .compile(".*\\brst[^0-9a-zA-Z]stream\\b.*", Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
-    /**
-     * Used for logging
-     */
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
-
     /**
      * The maximum times execution will be attempted
      */
@@ -104,6 +96,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * The timeout for each execution attempt
      */
     protected Duration grpcDeadline;
+
+    protected Logger logger;
     private java.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
     @VisibleForTesting
@@ -113,13 +107,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     Executable() {
         requestListener = request -> {
-            if (logger.isTraceEnabled()) {
+            if (logger.isEnabledForLevel(LogLevel.TRACE)) {
                 logger.trace("Sent protobuf {}", Hex.toHexString(request.toByteArray()));
             }
             return request;
         };
         responseListener = response -> {
-            if (logger.isTraceEnabled()) {
+            if (logger.isEnabledForLevel(LogLevel.TRACE)) {
                 logger.trace("Received protobuf {}", Hex.toHexString(response.toByteArray()));
             }
             return response;
@@ -304,6 +298,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         return (SdkRequestT) this;
     }
 
+    /**
+     * Set the logger
+     *
+     * @param logger the new logger
+     * @return {@code this}
+     */
+    public SdkRequestT setLogger(Logger logger) {
+        this.logger = logger;
+        return (SdkRequestT) this;
+    }
+
     void checkNodeAccountIds() {
         if (nodeAccountIds.isEmpty()) {
             throw new IllegalStateException("Request node account IDs were not set before executing");
@@ -368,6 +373,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      */
     public O execute(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         Throwable lastException = null;
+
+        // If the logger on the request is not set, use the logger in client
+        // (if set, otherwise do not use logger)
+        this.logger = (this.logger == null) ? ((client.getLogger() != null) ? client.getLogger() : null) : this.logger;
 
         mergeFromClient(client);
         onExecute(client);
@@ -540,7 +549,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         @Nullable ResponseT response,
         @Nullable Throwable error) {
 
-        if (!logger.isTraceEnabled()) {
+        if (!logger.isEnabledForLevel(LogLevel.TRACE)) {
             return;
         }
 
@@ -911,17 +920,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 attemptedAllNodes = false;
             }
             switch (executionState) {
-                case RETRY:
+                case RETRY -> {
                     logger.warn("Retrying in {} ms after failure with node {} during attempt #{}: {}",
                         delay, node.getAccountId(), attempt, responseStatus);
                     verboseLog(node);
-                    break;
-                case SERVER_ERROR:
+                }
+                case SERVER_ERROR ->
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
-                    break;
-                default:
-                    // Do nothing
+                default -> {
+                }
+                // Do nothing
             }
         }
 
