@@ -935,6 +935,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 case SERVER_ERROR ->
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
+                default -> {
+                }
             }
         }
 
