@@ -97,7 +97,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      */
     protected Duration grpcDeadline;
 
-    protected Logger logger;
+    protected Logger logger = new Logger(LogLevel.SILENT);
     private java.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
     @VisibleForTesting

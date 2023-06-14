@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -89,8 +90,7 @@ public final class Client implements AutoCloseable {
     private Duration networkUpdatePeriod;
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
-    @Nullable
-    private Logger logger;
+    private Logger logger = new Logger(LogLevel.SILENT);
 
     /**
      * Constructor.
@@ -1313,7 +1313,6 @@ public final class Client implements AutoCloseable {
         return this;
     }
 
-    @Nullable
     public Logger getLogger() {
         return this.logger;
     }
