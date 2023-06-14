@@ -26,11 +26,11 @@ public class LoggerFunctionalitiesExample {
         var publicKey = privateKey.getPublicKey();
         var aliasAccountId = publicKey.toAccountId(0, 0);
 
-//        new TransferTransaction()
-//            .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(-10))
-//            .addHbarTransfer(aliasAccountId, Hbar.fromTinybars(10))
-//            .setTransactionMemo("")
-//            .execute(client);
+        new TransferTransaction()
+            .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(-10))
+            .addHbarTransfer(aliasAccountId, Hbar.fromTinybars(10))
+            .setTransactionMemo("")
+            .execute(client);
 
         new TopicCreateTransaction()
             .setLogger(infoLogger)
