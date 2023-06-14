@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class Logger {
-    private org.slf4j.Logger logger;
+    private org.slf4j.Logger internalLogger;
     private LogLevel currentLevel;
     private LogLevel previousLevel;
 
@@ -16,7 +16,7 @@ public class Logger {
      * @param level the current log level
      */
     public Logger(LogLevel level) {
-        logger = LoggerFactory.getLogger(getClass());
+        internalLogger = LoggerFactory.getLogger(getClass());
         this.currentLevel = level;
         this.previousLevel = level;
     }
@@ -28,7 +28,7 @@ public class Logger {
      * @return {@code this}
      */
     public Logger setLogger(org.slf4j.Logger logger) {
-        this.logger = logger;
+        this.internalLogger = logger;
         return this;
     }
 
@@ -72,7 +72,7 @@ public class Logger {
      */
     public void trace(String message, Object... arguments) {
         if (isEnabledForLevel(LogLevel.TRACE)) {
-            this.logger.trace(message, arguments);
+            this.internalLogger.trace(message, arguments);
         }
     }
 
@@ -84,7 +84,7 @@ public class Logger {
      */
     public void debug(String message, Object... arguments) {
         if (isEnabledForLevel(LogLevel.DEBUG)) {
-            this.logger.debug(message, arguments);
+            this.internalLogger.debug(message, arguments);
         }
     }
 
@@ -96,7 +96,7 @@ public class Logger {
      */
     public void info(String message, Object... arguments) {
         if (isEnabledForLevel(LogLevel.INFO)) {
-            this.logger.info(message, arguments);
+            this.internalLogger.info(message, arguments);
         }
     }
 
@@ -108,7 +108,7 @@ public class Logger {
      */
     public void warn(String message, Object... arguments) {
         if (isEnabledForLevel(LogLevel.WARN)) {
-            this.logger.warn(message, arguments);
+            this.internalLogger.warn(message, arguments);
         }
     }
 
@@ -120,7 +120,7 @@ public class Logger {
      */
     public void error(String message, Object... arguments) {
         if (isEnabledForLevel(LogLevel.ERROR)) {
-            this.logger.error(message, arguments);
+            this.internalLogger.error(message, arguments);
         }
     }
 

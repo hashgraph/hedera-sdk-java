@@ -96,8 +96,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
      * The timeout for each execution attempt
      */
     protected Duration grpcDeadline;
-
-    protected Logger logger = new Logger(LogLevel.SILENT);
+    protected Logger logger;
     private java.util.function.Function<ProtoRequestT, ProtoRequestT> requestListener;
     // Lambda responsible for executing synchronous gRPC requests. Pluggable for unit testing.
     @VisibleForTesting
@@ -376,7 +375,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         // If the logger on the request is not set, use the logger in client
         // (if set, otherwise do not use logger)
-        this.logger = (this.logger == null) ? ((client.getLogger() != null) ? client.getLogger() : null) : this.logger;
+        if (this.logger == null) {
+            this.logger = client.getLogger();
+        }
 
         mergeFromClient(client);
         onExecute(client);
@@ -647,7 +648,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
         // node won't be null at this point because execute() validates before this method is called.
         // Add null check here to work around sonar NPE detection.
-        if (node != null) {
+        if (node != null && logger != null) {
             logger.trace("Using node {} for request #{}: {}", node.getAccountId(), attempt, this);
         }
 
@@ -672,6 +673,12 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         CompletableFuture<O> returnFuture,
         Duration timeout
     ) {
+        // If the logger on the request is not set, use the logger in client
+        // (if set, otherwise do not use logger)
+        if (this.logger == null && client.getLogger() != null) {
+            this.logger = client.getLogger();
+        }
+
         if (returnFuture.isCancelled() || returnFuture.isCompletedExceptionally() || returnFuture.isDone()) {
             return;
         }
@@ -928,9 +935,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 case SERVER_ERROR ->
                     logger.warn("Problem submitting request to node {} for attempt #{}, retry with new node: {}",
                         node.getAccountId(), attempt, responseStatus);
-                default -> {
-                }
-                // Do nothing
             }
         }
 
