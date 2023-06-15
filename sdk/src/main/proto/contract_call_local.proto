@@ -29,6 +29,7 @@ option java_multiple_files = true;
 import "basic_types.proto";
 import "query_header.proto";
 import "response_header.proto";
+import "contract_types.proto";
 
 import "google/protobuf/wrappers.proto";
 
@@ -162,6 +163,12 @@ message ContractFunctionResult {
      * ContractCreateTransactionBody or a ContractCallTransactionBody.     
      */
     AccountID sender_id = 13;
+
+    /**
+     * A list of updated contract account nonces containing the new nonce value for each contract account.
+     * This is always empty in a ContractCallLocalResponse#ContractFunctionResult message, since no internal creations can happen in a static EVM call.
+     */
+    repeated ContractNonceInfo contract_nonces = 14;
 }
 
 /**
