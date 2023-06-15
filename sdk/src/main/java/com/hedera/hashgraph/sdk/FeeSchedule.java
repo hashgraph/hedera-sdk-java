@@ -23,7 +23,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.checkerframework.checker.units.qual.A;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

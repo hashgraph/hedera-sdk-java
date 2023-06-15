@@ -19,10 +19,10 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadLocalRandom;

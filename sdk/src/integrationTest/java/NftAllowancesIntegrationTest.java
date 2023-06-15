@@ -1,12 +1,26 @@
-import com.hedera.hashgraph.sdk.*;
-import java8.util.Lists;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.nio.charset.StandardCharsets;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
+import com.hedera.hashgraph.sdk.AccountAllowanceDeleteTransaction;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.NftId;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenId;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
+import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TransactionId;
+import com.hedera.hashgraph.sdk.TransferTransaction;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class NftAllowancesIntegrationTest {
     @Test
@@ -43,7 +57,7 @@ public class NftAllowancesIntegrationTest {
 
         new TokenAssociateTransaction()
             .setAccountId(spenderAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(spenderKey)
             .execute(testEnv.client);
@@ -104,14 +118,14 @@ public class NftAllowancesIntegrationTest {
 
         new TokenAssociateTransaction()
             .setAccountId(spenderAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(spenderKey)
             .execute(testEnv.client);
 
         new TokenAssociateTransaction()
             .setAccountId(receiverAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(receiverKey)
             .execute(testEnv.client);
@@ -198,14 +212,14 @@ public class NftAllowancesIntegrationTest {
 
         new TokenAssociateTransaction()
             .setAccountId(spenderAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(spenderKey)
             .execute(testEnv.client);
 
         new TokenAssociateTransaction()
             .setAccountId(receiverAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(receiverKey)
             .execute(testEnv.client);
@@ -305,14 +319,14 @@ public class NftAllowancesIntegrationTest {
 
         new TokenAssociateTransaction()
             .setAccountId(delegatingSpenderAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(spenderKey)
             .execute(testEnv.client);
 
         new TokenAssociateTransaction()
             .setAccountId(receiverAccountId)
-            .setTokenIds(Lists.of(nftTokenId))
+            .setTokenIds(List.of(nftTokenId))
             .freezeWith(testEnv.client)
             .sign(receiverKey)
             .execute(testEnv.client);

@@ -27,7 +27,7 @@ import com.hedera.hashgraph.sdk.proto.SystemUndeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;

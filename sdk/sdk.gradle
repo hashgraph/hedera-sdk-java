@@ -1,4 +1,3 @@
-apply from: "./jdk9.gradle"
 apply from: "./protobuf-lite.gradle"
 
 publishing {
