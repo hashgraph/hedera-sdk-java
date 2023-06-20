@@ -10,7 +10,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
 import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
