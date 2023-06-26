@@ -32,7 +32,7 @@ dependencies {
     implementation group: 'com.github.spotbugs', name: 'spotbugs-annotations', version: '4.7.3'
 
     // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15to18
-    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.74'
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.75'
 
     // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15to18
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.74'
