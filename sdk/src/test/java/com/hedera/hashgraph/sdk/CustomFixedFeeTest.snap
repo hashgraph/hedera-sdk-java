@@ -4,78 +4,10 @@ com.hedera.hashgraph.sdk.CustomFixedFeeTest.fromProtobuf=[
 
 
 com.hedera.hashgraph.sdk.CustomFixedFeeTest.toFixedFeeProtobuf=[
-  {
-    "memoizedHashCode": 0,
-    "memoizedSerializedSize": 2147483647,
-    "unknownFields": {
-      "count": 0,
-      "tags": [ ],
-      "objects": [ ],
-      "memoizedSerializedSize": -1,
-      "isMutable": false
-    },
-    "amount_": 4,
-    "denominatingTokenId_": {
-      "memoizedHashCode": 0,
-      "memoizedSerializedSize": 2147483647,
-      "unknownFields": {
-        "count": 0,
-        "tags": [ ],
-        "objects": [ ],
-        "memoizedSerializedSize": -1,
-        "isMutable": false
-      },
-      "shardNum_": 5,
-      "realmNum_": 6,
-      "tokenNum_": 7,
-      "initialized": true
-    },
-    "initialized": true
-  }
+  "# com.hedera.hashgraph.sdk.proto.FixedFee@409d860\namount: 4\ndenominating_token_id {\n  realm_num: 6\n  shard_num: 5\n  token_num: 7\n}"
 ]
 
 
 com.hedera.hashgraph.sdk.CustomFixedFeeTest.toProtobuf=[
-  {
-    "memoizedHashCode": 0,
-    "memoizedSerializedSize": 2147483647,
-    "unknownFields": {
-      "count": 0,
-      "tags": [ ],
-      "objects": [ ],
-      "memoizedSerializedSize": -1,
-      "isMutable": false
-    },
-    "feeCase_": 1,
-    "fee_": {
-      "memoizedHashCode": 0,
-      "memoizedSerializedSize": 2147483647,
-      "unknownFields": {
-        "count": 0,
-        "tags": [ ],
-        "objects": [ ],
-        "memoizedSerializedSize": -1,
-        "isMutable": false
-      },
-      "amount_": 4,
-      "denominatingTokenId_": {
-        "memoizedHashCode": 0,
-        "memoizedSerializedSize": 2147483647,
-        "unknownFields": {
-          "count": 0,
-          "tags": [ ],
-          "objects": [ ],
-          "memoizedSerializedSize": -1,
-          "isMutable": false
-        },
-        "shardNum_": 5,
-        "realmNum_": 6,
-        "tokenNum_": 7,
-        "initialized": true
-      },
-      "initialized": true
-    },
-    "allCollectorsAreExempt_": false,
-    "initialized": true
-  }
+  "# com.hedera.hashgraph.sdk.proto.CustomFee@91885f65\nfixed_fee {\n  amount: 4\n  denominating_token_id {\n    realm_num: 6\n    shard_num: 5\n    token_num: 7\n  }\n}"
 ]

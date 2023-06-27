@@ -63,12 +63,12 @@ public class CustomFixedFeeTest {
 
     @Test
     void toProtobuf() {
-        SnapshotMatcher.expect(CustomFixedFee.fromProtobuf(fee).toProtobuf()).toMatchSnapshot();
+        SnapshotMatcher.expect(CustomFixedFee.fromProtobuf(fee).toProtobuf().toString()).toMatchSnapshot();
     }
 
     @Test
     void toFixedFeeProtobuf() {
-        SnapshotMatcher.expect(CustomFixedFee.fromProtobuf(fee).toFixedFeeProtobuf()).toMatchSnapshot();
+        SnapshotMatcher.expect(CustomFixedFee.fromProtobuf(fee).toFixedFeeProtobuf().toString()).toMatchSnapshot();
     }
 
     @Test
