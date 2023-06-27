@@ -28,8 +28,7 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomFixedFeeTest {
-
-    private final long amount = 4;
+    private static final long amount = 4;
     private final TokenId tokenId = new TokenId(5, 6, 7);
 
     private final FixedFee fee = FixedFee.newBuilder()
