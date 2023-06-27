@@ -1,0 +1,81 @@
+com.hedera.hashgraph.sdk.CustomFixedFeeTest.fromProtobuf=[
+  "CustomFixedFee{feeCollectorAccountId=null, allCollectorsAreExempt=false, amount=4, demoninatingTokenId=5.6.7}"
+]
+
+
+com.hedera.hashgraph.sdk.CustomFixedFeeTest.toFixedFeeProtobuf=[
+  {
+    "memoizedHashCode": 0,
+    "memoizedSerializedSize": 2147483647,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": -1,
+      "isMutable": false
+    },
+    "amount_": 4,
+    "denominatingTokenId_": {
+      "memoizedHashCode": 0,
+      "memoizedSerializedSize": 2147483647,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": -1,
+        "isMutable": false
+      },
+      "shardNum_": 5,
+      "realmNum_": 6,
+      "tokenNum_": 7,
+      "initialized": true
+    },
+    "initialized": true
+  }
+]
+
+
+com.hedera.hashgraph.sdk.CustomFixedFeeTest.toProtobuf=[
+  {
+    "memoizedHashCode": 0,
+    "memoizedSerializedSize": 2147483647,
+    "unknownFields": {
+      "count": 0,
+      "tags": [ ],
+      "objects": [ ],
+      "memoizedSerializedSize": -1,
+      "isMutable": false
+    },
+    "feeCase_": 1,
+    "fee_": {
+      "memoizedHashCode": 0,
+      "memoizedSerializedSize": 2147483647,
+      "unknownFields": {
+        "count": 0,
+        "tags": [ ],
+        "objects": [ ],
+        "memoizedSerializedSize": -1,
+        "isMutable": false
+      },
+      "amount_": 4,
+      "denominatingTokenId_": {
+        "memoizedHashCode": 0,
+        "memoizedSerializedSize": 2147483647,
+        "unknownFields": {
+          "count": 0,
+          "tags": [ ],
+          "objects": [ ],
+          "memoizedSerializedSize": -1,
+          "isMutable": false
+        },
+        "shardNum_": 5,
+        "realmNum_": 6,
+        "tokenNum_": 7,
+        "initialized": true
+      },
+      "initialized": true
+    },
+    "allCollectorsAreExempt_": false,
+    "initialized": true
+  }
+]
