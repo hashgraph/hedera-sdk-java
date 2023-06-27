@@ -56,6 +56,9 @@ public class CustomFixedFeeTest {
     void deepCloneSubclass() {
         var customFixedFee1 = CustomFixedFee.fromProtobuf(fee);
         var customFixedFee2 = customFixedFee1.deepCloneSubclass();
+
+        assertThat(customFixedFee1.getFeeCollectorAccountId()).isEqualTo(customFixedFee2.getFeeCollectorAccountId());
+        assertThat(customFixedFee1.getAllCollectorsAreExempt()).isEqualTo(customFixedFee2.getAllCollectorsAreExempt());
     }
 
     @Test
