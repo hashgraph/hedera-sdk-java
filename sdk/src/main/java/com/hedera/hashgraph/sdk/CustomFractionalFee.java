@@ -104,10 +104,6 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
      * @return {@code this}
      */
     public CustomFractionalFee setDenominator(long denominator) {
-        if (denominator == 0) {
-            throw new IllegalArgumentException("Denominator cannot be 0");
-        }
-
         this.denominator = denominator;
         return this;
     }

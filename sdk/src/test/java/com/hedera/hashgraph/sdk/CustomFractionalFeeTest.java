@@ -8,7 +8,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class CustomFractionalFeeTest {
     private static final boolean allCollectorsAreExempt = true;
@@ -67,11 +66,6 @@ public class CustomFractionalFeeTest {
     void getSetDenominator() {
         final var customFractionalFee = new CustomFractionalFee().setDenominator(denominator);
         assertThat(customFractionalFee.getDenominator()).isEqualTo(denominator);
-    }
-
-    @Test
-    void cannotSetDenominatorToZero() {
-        assertThrows(IllegalArgumentException.class, () -> new CustomFractionalFee().setDenominator(0).toProtobuf());
     }
 
     @Test
