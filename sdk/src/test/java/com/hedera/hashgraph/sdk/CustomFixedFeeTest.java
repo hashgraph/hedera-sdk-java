@@ -28,8 +28,10 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomFixedFeeTest {
+    private static final boolean allCollectorsAreExempt = true;
+    private static final AccountId feeCollectorAccountId = new AccountId(1, 2, 3);
     private static final long amount = 4;
-    private final TokenId tokenId = new TokenId(5, 6, 7);
+    private static final TokenId tokenId = new TokenId(5, 6, 7);
 
     private final FixedFee fee = FixedFee.newBuilder()
         .setAmount(amount)
@@ -53,11 +55,13 @@ public class CustomFixedFeeTest {
 
     @Test
     void deepCloneSubclass() {
-        var customFixedFee1 = CustomFixedFee.fromProtobuf(fee);
-        var customFixedFee2 = customFixedFee1.deepCloneSubclass();
+        var customFixedFee = new CustomFixedFee()
+            .setFeeCollectorAccountId(feeCollectorAccountId)
+            .setAllCollectorsAreExempt(allCollectorsAreExempt);
+        var clonedCustomFixedFee = customFixedFee.deepCloneSubclass();
 
-        assertThat(customFixedFee1.getFeeCollectorAccountId()).isEqualTo(customFixedFee2.getFeeCollectorAccountId());
-        assertThat(customFixedFee1.getAllCollectorsAreExempt()).isEqualTo(customFixedFee2.getAllCollectorsAreExempt());
+        assertThat(clonedCustomFixedFee.getFeeCollectorAccountId()).isEqualTo(feeCollectorAccountId);
+        assertThat(clonedCustomFixedFee.getAllCollectorsAreExempt()).isEqualTo(allCollectorsAreExempt);
     }
 
     @Test
