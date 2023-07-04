@@ -21,17 +21,19 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenWipeAccountTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TokenAssociateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -44,7 +46,7 @@ public class TokenAssociateTransactionTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
@@ -83,5 +85,58 @@ public class TokenAssociateTransactionTest {
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(TokenAssociateTransaction.class);
+    }
+
+    @Test
+    void ConstructTokenDeleteTransactionFromTransactionBodyProtobuf() {
+        var accountId = AccountId.fromString("1.2.3");
+        var tokenIds = List.of(TokenId.fromString("4.5.6"),
+            TokenId.fromString("7.8.9"),
+            TokenId.fromString("10.11.12"));
+
+        var transactionBody = TokenAssociateTransactionBody.newBuilder()
+            .addAllTokens(tokenIds.stream().map(TokenId::toProtobuf).toList())
+            .setAccount(accountId.toProtobuf()).build();
+        var txBody = TransactionBody.newBuilder().setTokenAssociate(transactionBody).build();
+        var tokenAssociateTransaction = new TokenAssociateTransaction(txBody);
+
+        assertThat(tokenAssociateTransaction.getAccountId()).isEqualTo(accountId);
+        assertThat(tokenAssociateTransaction.getTokenIds()).isEqualTo(tokenIds);
+    }
+
+    @Test
+    void getSetAccountId() {
+        var accountId = AccountId.fromString("1.2.3");
+
+        var transaction = new TokenAssociateTransaction().setAccountId(accountId);
+
+        assertThat(transaction.getAccountId()).isEqualTo(accountId);
+    }
+
+    @Test
+    void getSetAccountIdFrozen() {
+        var accountId = AccountId.fromString("1.2.3");
+
+        var transaction = spawnTestTransaction();
+
+        assertThrows(IllegalStateException.class, () -> transaction.setAccountId(accountId));
+    }
+
+    @Test
+    void getSetTokenIds() {
+        var tokenIds = List.of(TokenId.fromString("1.2.3"));
+
+        var transaction = new TokenAssociateTransaction().setTokenIds(tokenIds);
+
+        assertThat(transaction.getTokenIds()).isEqualTo(tokenIds);
+    }
+
+    @Test
+    void getSetTokenIdFrozen() {
+        var tokenIds = List.of(TokenId.fromString("1.2.3"));
+
+        var transaction = spawnTestTransaction();
+
+        assertThrows(IllegalStateException.class, () -> transaction.setTokenIds(tokenIds));
     }
 }
