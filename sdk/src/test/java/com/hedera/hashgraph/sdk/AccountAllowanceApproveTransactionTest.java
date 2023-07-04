@@ -19,22 +19,28 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ContractDeleteTransactionBody;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
+import java.util.Arrays;
 import org.junit.AfterClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
-
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class AccountAllowanceApproveTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+    private static final TokenId testTokenId = TokenId.fromString("1.2.3");
+    private static final AccountId testOwnerAccountId = AccountId.fromString("4.5.7");
+    private static final AccountId testSpenderAccountId = AccountId.fromString("8.9.0");
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
@@ -105,5 +111,28 @@ public class AccountAllowanceApproveTransactionTest {
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(AccountAllowanceApproveTransaction.class);
+    }
+
+    @Test
+    void deleteNftAllowanceAllSerials() {
+        var accountAllowanceApproveTransaction = new AccountAllowanceApproveTransaction()
+            .deleteTokenNftAllowanceAllSerials(testTokenId, testOwnerAccountId, testSpenderAccountId);
+
+        assertThat(accountAllowanceApproveTransaction.getTokenNftApprovals().size()).isEqualTo(1);
+        assertThat(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).tokenId).isEqualTo(testTokenId);
+        assertThat(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).ownerAccountId).isEqualTo(
+            testOwnerAccountId);
+        assertThat(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).spenderAccountId).isEqualTo(
+            testSpenderAccountId);
+        assertTrue(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).serialNumbers.isEmpty());
+        assertFalse(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).allSerials);
+        assertNull(accountAllowanceApproveTransaction.getTokenNftApprovals().get(0).delegatingSpender);
+    }
+
+    @Test
+    void deleteNftAllowanceAllSerialsFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class,
+            () -> tx.deleteTokenNftAllowanceAllSerials(testTokenId, testOwnerAccountId, testSpenderAccountId));
     }
 }
