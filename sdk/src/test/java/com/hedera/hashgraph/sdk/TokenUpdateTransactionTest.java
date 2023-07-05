@@ -39,21 +39,21 @@ import org.junit.jupiter.api.Test;
 public class TokenUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
-    private static final PublicKey testAdminKey = PrivateKey.fromSeedECDSAsecp256k1("test admin key".getBytes())
-        .getPublicKey();
-    private static final PublicKey testKycKey = PrivateKey.fromSeedECDSAsecp256k1("test kyc key".getBytes())
-        .getPublicKey();
-    private static final PublicKey testFreezeKey = PrivateKey.fromSeedECDSAsecp256k1("test freeze key".getBytes())
-        .getPublicKey();
-    private static final PublicKey testWipeKey = PrivateKey.fromSeedECDSAsecp256k1("test wipe key".getBytes())
-        .getPublicKey();
-    private static final PublicKey testSupplyKey = PrivateKey.fromSeedECDSAsecp256k1("test supply key".getBytes())
-        .getPublicKey();
+
+    private static final PublicKey testAdminKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{-27, -86, -105, -111, 49, 5, -89}).getPublicKey();
+    private static final PublicKey testKycKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{-40, 59, -37, 69, -9, 80, -108}).getPublicKey();
+    private static final PublicKey testFreezeKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{10, -26, -23, 30, 3, 23, -88, 94}).getPublicKey();
+    private static final PublicKey testWipeKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{114, 103, 101, -87, 76, 77, 69}).getPublicKey();
+    private static final PublicKey testSupplyKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{-95, -27, 54, -33, -43, 102, 71}).getPublicKey();
     private static final PublicKey testFeeScheduleKey = PrivateKey.fromSeedECDSAsecp256k1(
-            "test fee schedule key".getBytes())
-        .getPublicKey();
-    private static final PublicKey testPauseKey = PrivateKey.fromSeedECDSAsecp256k1("test fee pause key".getBytes())
-        .getPublicKey();
+        new byte[]{-63, -63, 84, 57, 37, 59, 42, 49}).getPublicKey();
+    private static final PublicKey testPauseKey = PrivateKey.fromSeedECDSAsecp256k1(
+        new byte[]{40, 121, -14, 1, -40, -62, -29, 65}).getPublicKey();
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.8.8");
     private static final String testTokenName = "test name";
