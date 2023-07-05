@@ -39,21 +39,27 @@ import org.junit.jupiter.api.Test;
 public class TokenUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
-
-    private static final PublicKey testAdminKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{-27, -86, -105, -111, 49, 5, -89}).getPublicKey();
-    private static final PublicKey testKycKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{-40, 59, -37, 69, -9, 80, -108}).getPublicKey();
-    private static final PublicKey testFreezeKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{10, -26, -23, 30, 3, 23, -88, 94}).getPublicKey();
-    private static final PublicKey testWipeKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{114, 103, 101, -87, 76, 77, 69}).getPublicKey();
-    private static final PublicKey testSupplyKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{-95, -27, 54, -33, -43, 102, 71}).getPublicKey();
-    private static final PublicKey testFeeScheduleKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{-63, -63, 84, 57, 37, 59, 42, 49}).getPublicKey();
-    private static final PublicKey testPauseKey = PrivateKey.fromSeedECDSAsecp256k1(
-        new byte[]{40, 121, -14, 1, -40, -62, -29, 65}).getPublicKey();
+    private static final PublicKey testAdminKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
+        .getPublicKey();
+    private static final PublicKey testKycKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
+        .getPublicKey();
+    private static final PublicKey testFreezeKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
+        .getPublicKey();
+    private static final PublicKey testWipeKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
+        .getPublicKey();
+    private static final PublicKey testSupplyKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
+        .getPublicKey();
+    private static final PublicKey testFeeScheduleKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
+        .getPublicKey();
+    private static final PublicKey testPauseKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
+        .getPublicKey();
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.8.8");
     private static final String testTokenName = "test name";
@@ -76,33 +82,19 @@ public class TokenUpdateTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(spawnTestTransaction()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     private TokenUpdateTransaction spawnTestTransaction() {
-        return new TokenUpdateTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+        return new TokenUpdateTransaction().setNodeAccountIds(
+                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId)
-            .setFeeScheduleKey(testFeeScheduleKey)
-            .setSupplyKey(testSupplyKey)
-            .setAdminKey(testAdminKey)
-            .setAutoRenewAccountId(testAutoRenewAccountId)
-            .setAutoRenewPeriod(testAutoRenewPeriod)
-            .setFreezeKey(testFreezeKey)
-            .setWipeKey(testWipeKey)
-            .setTokenSymbol(testTokenSymbol)
-            .setKycKey(unusedPrivateKey)
-            .setPauseKey(unusedPrivateKey)
-            .setExpirationTime(validStart)
-            .setTreasuryAccountId(testTreasuryAccountId)
-            .setTokenName(testTokenName)
-            .setTokenMemo(testTokenMemo)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+            .setTokenId(testTokenId).setFeeScheduleKey(testFeeScheduleKey).setSupplyKey(testSupplyKey)
+            .setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
+            .setAutoRenewPeriod(testAutoRenewPeriod).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
+            .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
+            .setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId).setTokenName(testTokenName)
+            .setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1)).freeze().sign(unusedPrivateKey);
     }
 
     @Test
@@ -115,8 +107,7 @@ public class TokenUpdateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenUpdate(TokenUpdateTransactionBody.newBuilder().build())
-            .build();
+            .setTokenUpdate(TokenUpdateTransactionBody.newBuilder().build()).build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -125,25 +116,16 @@ public class TokenUpdateTransactionTest {
 
     @Test
     void constructTokenUpdateTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = TokenUpdateTransactionBody.newBuilder()
-            .setToken(testTokenId.toProtobuf())
-            .setName(testTokenName)
-            .setSymbol(testTokenSymbol)
-            .setTreasury(testTreasuryAccountId.toProtobuf())
-            .setAdminKey(testAdminKey.toProtobufKey())
-            .setKycKey(testKycKey.toProtobufKey())
-            .setFreezeKey(testFreezeKey.toProtobufKey())
-            .setWipeKey(testWipeKey.toProtobufKey())
-            .setSupplyKey(testSupplyKey.toProtobufKey())
-            .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
+        var transactionBody = TokenUpdateTransactionBody.newBuilder().setToken(testTokenId.toProtobuf())
+            .setName(testTokenName).setSymbol(testTokenSymbol).setTreasury(testTreasuryAccountId.toProtobuf())
+            .setAdminKey(testAdminKey.toProtobufKey()).setKycKey(testKycKey.toProtobufKey())
+            .setFreezeKey(testFreezeKey.toProtobufKey()).setWipeKey(testWipeKey.toProtobufKey())
+            .setSupplyKey(testSupplyKey.toProtobufKey()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
             .setAutoRenewPeriod(
                 com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
-                    .build())
-            .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
+                    .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
-            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey())
-            .setPauseKey(testPauseKey.toProtobufKey())
-            .build();
+            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey()).build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);
