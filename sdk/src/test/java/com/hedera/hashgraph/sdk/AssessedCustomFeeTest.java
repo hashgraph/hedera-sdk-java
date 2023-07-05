@@ -1,7 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -10,12 +10,30 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AssessedCustomFeeTest {
+
+    private static final int amount = 1;
+    private static final TokenId tokenId = new TokenId(2, 3, 4);
+    private static final AccountId feeCollector = new AccountId(5, 6, 7);
+    private static final List<AccountId> payerAccountIds = List.of(
+        new AccountId(8, 9, 10),
+        new AccountId(11, 12, 13),
+        new AccountId(14, 15, 16)
+    );
+
+    private final com.hedera.hashgraph.sdk.proto.AssessedCustomFee fee =
+        com.hedera.hashgraph.sdk.proto.AssessedCustomFee.newBuilder()
+            .setAmount(amount)
+            .setTokenId(tokenId.toProtobuf())
+            .setFeeCollectorAccountId(feeCollector.toProtobuf())
+            .addAllEffectivePayerAccountId(payerAccountIds.stream().map(AccountId::toProtobuf).toList())
+            .build();
+
     @BeforeAll
     public static void beforeAll() {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
@@ -41,5 +59,22 @@ public class AssessedCustomFeeTest {
         assertThat(originalAssessedCustomFee.toString().replaceAll("@[A-Za-z0-9]+", ""))
             .isEqualTo(copyAssessedCustomFee.toString().replaceAll("@[A-Za-z0-9]+", ""));
         SnapshotMatcher.expect(originalAssessedCustomFee.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+    }
+
+    @Test
+    void fromProtobuf() {
+        SnapshotMatcher.expect(AssessedCustomFee.fromProtobuf(fee).toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void toProtobuf() {
+        SnapshotMatcher.expect(AssessedCustomFee.fromProtobuf(fee).toProtobuf().toString()).toMatchSnapshot();
+    }
+
+    @Test
+    void shouldBytes() throws Exception {
+        var assessedCustomFee = spawnAssessedCustomFeeExample();
+        var tx2 = AssessedCustomFee.fromBytes(assessedCustomFee.toBytes());
+        assertThat(tx2).hasToString(assessedCustomFee.toString());
     }
 }
