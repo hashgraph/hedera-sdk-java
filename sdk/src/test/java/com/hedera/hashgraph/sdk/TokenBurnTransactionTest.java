@@ -19,24 +19,26 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenMintTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import java.time.Instant;
-
 import java.util.Arrays;
 import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TokenBurnTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
-
+    private static final TokenId testTokenId = TokenId.fromString("4.2.0");
+    private static final long testAmount = 69L;
+    private static final List<Long> testSerial = Collections.singletonList(420L);
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -44,7 +46,7 @@ public class TokenBurnTransactionTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
@@ -60,8 +62,8 @@ public class TokenBurnTransactionTest {
         return new TokenBurnTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("0.0.111"))
-            .setAmount(30)
+            .setTokenId(testTokenId)
+            .setAmount(testAmount)
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
@@ -78,8 +80,8 @@ public class TokenBurnTransactionTest {
         return new TokenBurnTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("0.0.111"))
-            .setSerials(Collections.singletonList(444L))
+            .setTokenId(testTokenId)
+            .setSerials(testSerial)
             .setMaxTransactionFee(new Hbar(1))
             .freeze()
             .sign(unusedPrivateKey);
@@ -108,5 +110,41 @@ public class TokenBurnTransactionTest {
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(TokenBurnTransaction.class);
+    }
+
+    @Test
+    void getSetTokenId() {
+        var tokenBurnTransaction = new TokenBurnTransaction().setTokenId(testTokenId);
+        assertThat(tokenBurnTransaction.getTokenId()).isEqualTo(testTokenId);
+    }
+
+    @Test
+    void getSetTokenIdFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class, () -> tx.setTokenId(testTokenId));
+    }
+
+    @Test
+    void getSetAmount() {
+        var tokenBurnTransaction = new TokenBurnTransaction().setAmount(testAmount);
+        assertThat(tokenBurnTransaction.getAmount()).isEqualTo(testAmount);
+    }
+
+    @Test
+    void getSetAmountFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class, () -> tx.setAmount(testAmount));
+    }
+
+    @Test
+    void getSetSerials() {
+        var tokenBurnTransaction = new TokenBurnTransaction().setSerials(testSerial);
+        assertThat(tokenBurnTransaction.getSerials()).isEqualTo(testSerial);
+    }
+
+    @Test
+    void getSetSerialsFrozen() {
+        var tx = spawnTestTransactionNft();
+        assertThrows(IllegalStateException.class, () -> tx.setSerials(testSerial));
     }
 }
