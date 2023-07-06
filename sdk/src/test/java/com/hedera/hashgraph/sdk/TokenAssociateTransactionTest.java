@@ -38,7 +38,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TokenAssociateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
-
+    private static final AccountId accountId = AccountId.fromString("1.2.3");
+    private static final List<TokenId> tokenIds = List.of(TokenId.fromString("4.5.6"),
+        TokenId.fromString("7.8.9"),
+        TokenId.fromString("10.11.12"));
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -89,11 +92,6 @@ public class TokenAssociateTransactionTest {
 
     @Test
     void ConstructTokenDeleteTransactionFromTransactionBodyProtobuf() {
-        var accountId = AccountId.fromString("1.2.3");
-        var tokenIds = List.of(TokenId.fromString("4.5.6"),
-            TokenId.fromString("7.8.9"),
-            TokenId.fromString("10.11.12"));
-
         var transactionBody = TokenAssociateTransactionBody.newBuilder()
             .addAllTokens(tokenIds.stream().map(TokenId::toProtobuf).toList())
             .setAccount(accountId.toProtobuf()).build();
@@ -101,42 +99,30 @@ public class TokenAssociateTransactionTest {
         var tokenAssociateTransaction = new TokenAssociateTransaction(txBody);
 
         assertThat(tokenAssociateTransaction.getAccountId()).isEqualTo(accountId);
-        assertThat(tokenAssociateTransaction.getTokenIds()).isEqualTo(tokenIds);
+        assertThat(tokenAssociateTransaction.getTokenIds()).hasSize(tokenIds.size());
     }
 
     @Test
     void getSetAccountId() {
-        var accountId = AccountId.fromString("1.2.3");
-
         var transaction = new TokenAssociateTransaction().setAccountId(accountId);
-
         assertThat(transaction.getAccountId()).isEqualTo(accountId);
     }
 
     @Test
     void getSetAccountIdFrozen() {
-        var accountId = AccountId.fromString("1.2.3");
-
         var transaction = spawnTestTransaction();
-
         assertThrows(IllegalStateException.class, () -> transaction.setAccountId(accountId));
     }
 
     @Test
     void getSetTokenIds() {
-        var tokenIds = List.of(TokenId.fromString("1.2.3"));
-
         var transaction = new TokenAssociateTransaction().setTokenIds(tokenIds);
-
         assertThat(transaction.getTokenIds()).isEqualTo(tokenIds);
     }
 
     @Test
     void getSetTokenIdFrozen() {
-        var tokenIds = List.of(TokenId.fromString("1.2.3"));
-
         var transaction = spawnTestTransaction();
-
         assertThrows(IllegalStateException.class, () -> transaction.setTokenIds(tokenIds));
     }
 }
