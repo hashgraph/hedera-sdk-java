@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenBurnTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Instant;
 import java.util.Arrays;
@@ -38,7 +39,7 @@ public class TokenBurnTransactionTest {
         "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final long testAmount = 69L;
-    private static final List<Long> testSerial = Collections.singletonList(420L);
+    private static final List<Long> testSerials = Collections.singletonList(420L);
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -53,37 +54,27 @@ public class TokenBurnTransactionTest {
 
     @Test
     void shouldSerializeFungible() {
-        SnapshotMatcher.expect(spawnTestTransaction()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     private TokenBurnTransaction spawnTestTransaction() {
-        return new TokenBurnTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+        return new TokenBurnTransaction().setNodeAccountIds(
+                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId)
-            .setAmount(testAmount)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
+            .setTokenId(testTokenId).setAmount(testAmount).setMaxTransactionFee(new Hbar(1)).freeze()
             .sign(unusedPrivateKey);
     }
 
     @Test
     void shouldSerializeNft() {
-        SnapshotMatcher.expect(spawnTestTransactionNft()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransactionNft().toString()).toMatchSnapshot();
     }
 
     private TokenBurnTransaction spawnTestTransactionNft() {
-        return new TokenBurnTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+        return new TokenBurnTransaction().setNodeAccountIds(
+                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId)
-            .setSerials(testSerial)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
+            .setTokenId(testTokenId).setSerials(testSerials).setMaxTransactionFee(new Hbar(1)).freeze()
             .sign(unusedPrivateKey);
     }
 
@@ -104,12 +95,24 @@ public class TokenBurnTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenBurn(TokenBurnTransactionBody.newBuilder().build())
-            .build();
+            .setTokenBurn(TokenBurnTransactionBody.newBuilder().build()).build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(TokenBurnTransaction.class);
+    }
+
+    @Test
+    void constructTokenBurnTransactionFromTransactionBodyProtobuf() {
+        var transactionBody = TokenBurnTransactionBody.newBuilder().setToken(testTokenId.toProtobuf())
+            .setAmount(testAmount).addAllSerialNumbers(testSerials).build();
+
+        var tx = TransactionBody.newBuilder().setTokenBurn(transactionBody).build();
+        var tokenBurnTransaction = new TokenBurnTransaction(tx);
+
+        assertThat(tokenBurnTransaction.getTokenId()).isEqualTo(testTokenId);
+        assertThat(tokenBurnTransaction.getAmount()).isEqualTo(testAmount);
+        assertThat(tokenBurnTransaction.getSerials()).isEqualTo(testSerials);
     }
 
     @Test
@@ -138,13 +141,13 @@ public class TokenBurnTransactionTest {
 
     @Test
     void getSetSerials() {
-        var tokenBurnTransaction = new TokenBurnTransaction().setSerials(testSerial);
-        assertThat(tokenBurnTransaction.getSerials()).isEqualTo(testSerial);
+        var tokenBurnTransaction = new TokenBurnTransaction().setSerials(testSerials);
+        assertThat(tokenBurnTransaction.getSerials()).isEqualTo(testSerials);
     }
 
     @Test
     void getSetSerialsFrozen() {
         var tx = spawnTestTransactionNft();
-        assertThrows(IllegalStateException.class, () -> tx.setSerials(testSerial));
+        assertThrows(IllegalStateException.class, () -> tx.setSerials(testSerials));
     }
 }
