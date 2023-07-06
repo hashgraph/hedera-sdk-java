@@ -6,6 +6,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class TokenSupplyTypeTest {
     private final TokenSupplyType tokenSupplyTypeInfinite = TokenSupplyType.INFINITE;
     private final TokenSupplyType tokenSupplyTypeFinite = TokenSupplyType.FINITE;
@@ -34,5 +36,11 @@ public class TokenSupplyTypeTest {
                 com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeInfinite).toProtobuf(),
                 com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeFinite).toProtobuf())
             .toMatchSnapshot();
+    }
+
+    @Test
+    void tokenSupplyTestToString() {
+        assertThat(com.hedera.hashgraph.sdk.TokenSupplyType.INFINITE).hasToString("INFINITE");
+        assertThat(com.hedera.hashgraph.sdk.TokenSupplyType.FINITE).hasToString("FINITE");
     }
 }
