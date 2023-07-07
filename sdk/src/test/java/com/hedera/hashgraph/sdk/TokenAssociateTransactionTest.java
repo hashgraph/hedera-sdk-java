@@ -91,7 +91,7 @@ public class TokenAssociateTransactionTest {
     }
 
     @Test
-    void ConstructTokenDeleteTransactionFromTransactionBodyProtobuf() {
+    void constructTokenDeleteTransactionFromTransactionBodyProtobuf() {
         var transactionBody = TokenAssociateTransactionBody.newBuilder()
             .addAllTokens(tokenIds.stream().map(TokenId::toProtobuf).toList())
             .setAccount(accountId.toProtobuf()).build();
