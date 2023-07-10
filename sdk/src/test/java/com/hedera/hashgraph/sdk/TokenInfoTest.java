@@ -84,7 +84,7 @@ public class TokenInfoTest {
     private static final boolean testTokenPauseStatus = true;
     private static final LedgerId testTokenLedgerId = LedgerId.MAINNET;
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
-    private static final Instant testExpirationTime = Instant.now();
+    private static final Instant testExpirationTime = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
