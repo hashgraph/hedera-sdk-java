@@ -84,7 +84,7 @@ public class TokenDissociateTransactionTest {
     }
 
     @Test
-    void constructTokenMintTransactionFromTransactionBodyProtobuf() {
+    void constructTokenDissociateTransactionFromTransactionBodyProtobuf() {
         var transactionBody = TokenDissociateTransactionBody.newBuilder().setAccount(testAccountId.toProtobuf())
             .addAllTokens(testTokenIds.stream().map(TokenId::toProtobuf).toList()).build();
 
