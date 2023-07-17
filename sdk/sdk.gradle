@@ -1,4 +1,4 @@
-apply from: "./protobuf-lite.gradle"
+apply from: "./protobuf.gradle"
 
 publishing {
     publications {
