@@ -15,7 +15,7 @@
 
 - Make sure you don’t have any uncommitted changes (The publish task will remove them)
 - **Run** the [local node](https://github.com/hashgraph/hedera-local-node)
-- Run `task test:integration` !!!
+- Run `task test:integration`
 - **Stop** the local node
 - Run `task test:unit`
 - Create a new branch: `release/vX.Y.Z`
