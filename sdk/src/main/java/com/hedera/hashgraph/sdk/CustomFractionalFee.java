@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.base.MoreObjects;
 import com.hedera.hashgraph.sdk.proto.Fraction;
 import com.hedera.hashgraph.sdk.proto.FractionalFee;
 
@@ -45,8 +44,8 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Create a custom fractional fee from a fee protobuf.
      *
-     * @param fractionalFee             the fractional fee protobuf
-     * @return                           the new custom fractional fee object
+     * @param fractionalFee the fractional fee protobuf
+     * @return the new custom fractional fee object
      */
     static CustomFractionalFee fromProtobuf(FractionalFee fractionalFee) {
         var fraction = fractionalFee.getFractionalAmount();
@@ -72,7 +71,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Extract the numerator.
      *
-     * @return                          the numerator
+     * @return the numerator
      */
     public long getNumerator() {
         return numerator;
@@ -81,7 +80,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Assign the numerator.
      *
-     * @param numerator                 the numerator
+     * @param numerator the numerator
      * @return {@code this}
      */
     public CustomFractionalFee setNumerator(long numerator) {
@@ -92,7 +91,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Extract the denominator.
      *
-     * @return                          the denominator
+     * @return the denominator
      */
     public long getDenominator() {
         return denominator;
@@ -101,7 +100,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Assign the denominator can not be zero (0).
      *
-     * @param denominator               the denominator
+     * @param denominator the denominator
      * @return {@code this}
      */
     public CustomFractionalFee setDenominator(long denominator) {
@@ -112,7 +111,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Extract the minimum fee amount.
      *
-     * @return                          the minimum fee amount
+     * @return the minimum fee amount
      */
     public long getMin() {
         return min;
@@ -121,7 +120,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Assign the minimum fee amount.
      *
-     * @param min                       the fee amount
+     * @param min the fee amount
      * @return {@code this}
      */
     public CustomFractionalFee setMin(long min) {
@@ -132,7 +131,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Extract the fee amount.
      *
-     * @return                          the fee amount
+     * @return the fee amount
      */
     public long getMax() {
         return max;
@@ -141,7 +140,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Assign the maximum fee amount.
      *
-     * @param max                       the fee amount
+     * @param max the fee amount
      * @return {@code this}
      */
     public CustomFractionalFee setMax(long max) {
@@ -152,7 +151,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Extract the assessment method inclusive / exclusive.
      *
-     * @return                          the assessment method inclusive / exclusive
+     * @return the assessment method inclusive / exclusive
      */
     public FeeAssessmentMethod getAssessmentMethod() {
         return assessmentMethod;
@@ -160,16 +159,16 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
 
     /**
      * Assign the assessment method inclusive / exclusive.
-     *
+     * <p>
      * If the assessment method field is set, the token's custom fee is charged
      * to the sending account and the receiving account receives the full token
      * transfer amount. If this field is set to false, the receiver pays for
      * the token custom fees and gets the remaining token balance.
-     *     INCLUSIVE(false)
-     *     EXCLUSIVE(true)
+     * INCLUSIVE(false)
+     * EXCLUSIVE(true)
      * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/custom-token-fees#fractional-fee">Hedera Documentation</a>
      *
-     * @param assessmentMethod          inclusive / exclusive
+     * @param assessmentMethod inclusive / exclusive
      * @return {@code this}
      */
     public CustomFractionalFee setAssessmentMethod(FeeAssessmentMethod assessmentMethod) {
@@ -192,7 +191,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Convert the fractional fee object to a protobuf.
      *
-     * @return                          the protobuf object
+     * @return the protobuf object
      */
     FractionalFee toFractionalFeeProtobuf() {
         return FractionalFee.newBuilder()

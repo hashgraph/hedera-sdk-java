@@ -34,6 +34,7 @@ import org.bouncycastle.crypto.params.ECDomainParameters;
 public abstract class Key {
     static final ASN1ObjectIdentifier ID_ED25519 = new ASN1ObjectIdentifier("1.3.101.112");
     static final ASN1ObjectIdentifier ID_ECDSA_SECP256K1 = new ASN1ObjectIdentifier("1.3.132.0.10");
+    static final ASN1ObjectIdentifier ID_EC_PUBLIC_KEY = new ASN1ObjectIdentifier("1.2.840.10045.2.1");
 
     static final X9ECParameters ECDSA_SECP256K1_CURVE = SECNamedCurves.getByName("secp256k1");
     static final ECDomainParameters ECDSA_SECP256K1_DOMAIN =

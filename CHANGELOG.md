@@ -29,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
  - The `transactionId` nanoseconds are now left padded with 0s for 9 chars
+ - Importing and exporting ECDSA keys to DER format is now compatible with OpenSSL
 
 ## 2.24.0
 
