@@ -30,8 +30,7 @@ import java.math.BigInteger;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContractFunctionResultTest {
-    static final String CALL_RESULT_HEX = ""
-        + "00000000000000000000000000000000000000000000000000000000ffffffff"
+    static final String CALL_RESULT_HEX = "00000000000000000000000000000000000000000000000000000000ffffffff"
         + "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
         + "00000000000000000000000011223344556677889900aabbccddeeff00112233"
         + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
@@ -42,8 +41,7 @@ public class ContractFunctionResultTest {
         + "0000000000000000000000000000000000000000000000000000000000000014"
         + "48656c6c6f2c20776f726c642c20616761696e21000000000000000000000000";
 
-    private static final String STRING_ARRAY_RESULT_HEX = ""
-        + "0000000000000000000000000000000000000000000000000000000000000020"
+    private static final String STRING_ARRAY_RESULT_HEX = "0000000000000000000000000000000000000000000000000000000000000020"
         + "0000000000000000000000000000000000000000000000000000000000000002"
         + "0000000000000000000000000000000000000000000000000000000000000040"
         + "0000000000000000000000000000000000000000000000000000000000000080"
@@ -75,6 +73,9 @@ public class ContractFunctionResultTest {
                 //         )
                 //     ).toProtobuf())
                 .setSenderId(AccountId.fromString("1.2.3").toProtobuf())
+                .addContractNonces(
+                    new ContractNonceInfo(ContractId.fromString("1.2.3"), 10L)
+                        .toProtobuf())
         );
 
         // interpretation varies based on width
@@ -108,6 +109,7 @@ public class ContractFunctionResultTest {
         // assertThat(resultStorageChange.slot).isEqualTo(BigInteger.valueOf(555));
         // assertThat(resultStorageChange.valueRead).isEqualTo(BigInteger.valueOf(666));
         // assertThat(resultStorageChange.valueWritten).isEqualTo(BigInteger.valueOf(777));
+        assertThat(result.contractNonces).containsOnly(new ContractNonceInfo(ContractId.fromString("1.2.3"), 10L));
     }
 
     @Test
