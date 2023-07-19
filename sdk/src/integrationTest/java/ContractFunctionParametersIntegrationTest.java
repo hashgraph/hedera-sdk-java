@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 // Check Go & JS examples for workaround re not implemented funcs
+// Test int and uint arrays?
 // Revisit test func names
 public class ContractFunctionParametersIntegrationTest {
 
@@ -100,11 +101,67 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(uint8MaxFromResponse).isEqualTo(uint8Max);
     }
 
-    /*
-    ContractFunctionResult#getUint16 is not implemented
+    @Test
+    @DisplayName("Can receive uint16 min value from contract call")
+    void canCallContractFunctionUint16Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint16", new ContractFunctionParameters().addUint16(0))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint24 is not implemented
-    */
+        assertThat(response.getUint32(0)).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Can receive uint16 max value from contract call")
+    void canCallContractFunctionUint16Max() throws Exception {
+        var uint16Max = "65535";
+        int uint16MaxInt = Integer.parseUnsignedInt(uint16Max);
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint16", new ContractFunctionParameters().addUint16(uint16MaxInt))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        var uint16MaxIntFromResponse = Integer.toUnsignedString(response.getUint32(0));
+
+        assertThat(uint16MaxIntFromResponse).isEqualTo(uint16Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint24 min value from contract call")
+    void canCallContractFunctionUint24Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint24", new ContractFunctionParameters().addUint24(0))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint32(0)).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Can receive uint24 max value from contract call")
+    void canCallContractFunctionUint24Max() throws Exception {
+        var uint24Max = "16777215";
+        int uint24MaxInt = Integer.parseUnsignedInt(uint24Max);
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint24", new ContractFunctionParameters().addUint24(uint24MaxInt))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        var uint24MaxIntFromResponse = Integer.toUnsignedString(response.getUint32(0));
+
+        assertThat(uint24MaxIntFromResponse).isEqualTo(uint24Max);
+    }
 
     @Test
     @DisplayName("Can receive uint32 min value from contract call")
@@ -124,6 +181,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint32Max() throws Exception {
         var uint32Max = "4294967295";
         int uint32MaxInt = Integer.parseUnsignedInt(uint32Max);
+
         var response = new ContractCallQuery()
             .setContractId(contractId)
             .setGas(1500000)
@@ -136,13 +194,98 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(uint32MaxIntFromResponse).isEqualTo(uint32Max);
     }
 
-    /*
-    ContractFunctionResult#getUint40 is not implemented
+    @Test
+    @DisplayName("Can receive uint40 min value from contract call")
+    void canCallContractFunctionUint40Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint40", new ContractFunctionParameters().addUint40(0))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint48 is not implemented
+        assertThat(response.getUint64(0)).isEqualTo(0);
+    }
 
-    ContractFunctionResult#getUint56 is not implemented
-    */
+    @Test
+    @DisplayName("Can receive uint40 max value from contract call")
+    void canCallContractFunctionUint40Max() throws Exception {
+        var uint40Max = "109951162777";
+        long uint40MaxLong = Long.parseUnsignedLong(uint40Max);
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint40", new ContractFunctionParameters().addUint40(uint40MaxLong))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        var uint64MaxLongFromResponse = Long.toUnsignedString(response.getUint64(0));
+
+        assertThat(uint64MaxLongFromResponse).isEqualTo(uint40Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint48 min value from contract call")
+    void canCallContractFunctionUint48Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint48", new ContractFunctionParameters().addUint48(0))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint64(0)).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Can receive uint48 max value from contract call")
+    void canCallContractFunctionUint48Max() throws Exception {
+        var uint48Max = "281474976710655";
+        long uint48MaxLong = Long.parseUnsignedLong(uint48Max);
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint48", new ContractFunctionParameters().addUint48(uint48MaxLong))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        var uint64MaxLongFromResponse = Long.toUnsignedString(response.getUint64(0));
+
+        assertThat(uint64MaxLongFromResponse).isEqualTo(uint48Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint56 min value from contract call")
+    void canCallContractFunctionUint56Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint56", new ContractFunctionParameters().addUint56(0))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint64(0)).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("Can receive uint56 max value from contract call")
+    void canCallContractFunctionUint56Max() throws Exception {
+        var uint56Max = "72057594037927935";
+        long uint56MaxLong = Long.parseUnsignedLong(uint56Max);
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint56", new ContractFunctionParameters().addUint56(uint56MaxLong))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        var uint64MaxLongFromResponse = Long.toUnsignedString(response.getUint64(0));
+
+        assertThat(uint64MaxLongFromResponse).isEqualTo(uint56Max);
+    }
 
     @Test
     @DisplayName("Can receive uint64 min value from contract call")
@@ -162,6 +305,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint64Max() throws Exception {
         var uint64Max = "9223372036854775807";
         long uint64MaxLong = Long.parseUnsignedLong(uint64Max);
+
         var response = new ContractCallQuery()
             .setContractId(contractId)
             .setGas(1500000)
@@ -174,53 +318,672 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(uint64MaxLongFromResponse).isEqualTo(uint64Max);
     }
 
-    /*
-    ContractFunctionResult#getUint72 is not implemented
+    @Test
+    @DisplayName("Can receive uint72 min value from contract call")
+    void canCallContractFunctionUint72Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint72", new ContractFunctionParameters().addUint72(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint80 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
 
-    ContractFunctionResult#getUint88 is not implemented
+    @Test
+    @DisplayName("Can receive uint72 max value from contract call")
+    void canCallContractFunctionUint72Max() throws Exception {
+        BigInteger uint72Max = new BigInteger(
+            "4722366482869645213695");
 
-    ContractFunctionResult#getUint96 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint72", new ContractFunctionParameters().addUint72(uint72Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint104 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(uint72Max);
+    }
 
-    ContractFunctionResult#getUint112 is not implemented
+    @Test
+    @DisplayName("Can receive uint80 min value from contract call")
+    void canCallContractFunctionUint80Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint80", new ContractFunctionParameters().addUint80(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint120 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
 
-    ContractFunctionResult#getUint128 is not implemented
+    @Test
+    @DisplayName("Can receive uint80 max value from contract call")
+    void canCallContractFunctionUint80Max() throws Exception {
+        BigInteger uint80Max = new BigInteger(
+            "1208925819614629174706175");
 
-    ContractFunctionResult#getUint136 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint80", new ContractFunctionParameters().addUint80(uint80Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint144 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(uint80Max);
+    }
 
-    ContractFunctionResult#getUint152 is not implemented
+    @Test
+    @DisplayName("Can receive uint88 min value from contract call")
+    void canCallContractFunctionUint88Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint88", new ContractFunctionParameters().addUint88(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint160 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
 
-    ContractFunctionResult#getUint168 is not implemented
+    @Test
+    @DisplayName("Can receive uint88 max value from contract call")
+    void canCallContractFunctionUint88Max() throws Exception {
+        BigInteger uint88Max = new BigInteger(
+            "309485009821345068724781055");
 
-    ContractFunctionResult#getUint176 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint88", new ContractFunctionParameters().addUint88(uint88Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint184 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(uint88Max);
+    }
 
-    ContractFunctionResult#getUint192 is not implemented
+    @Test
+    @DisplayName("Can receive uint96 min value from contract call")
+    void canCallContractFunctionUint96Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint96", new ContractFunctionParameters().addUint96(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint200 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
 
-    ContractFunctionResult#getUint208 is not implemented
+    @Test
+    @DisplayName("Can receive uint96 max value from contract call")
+    void canCallContractFunctionUint96Max() throws Exception {
+        BigInteger uint96Max = new BigInteger(
+            "79228162514264337593543950335");
 
-    ContractFunctionResult#getUint216 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint96", new ContractFunctionParameters().addUint96(uint96Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint224 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(uint96Max);
+    }
 
-    ContractFunctionResult#getUint232 is not implemented
+    @Test
+    @DisplayName("Can receive uint104 min value from contract call")
+    void canCallContractFunctionUint104Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint104", new ContractFunctionParameters().addUint104(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getUint240 is not implemented
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
 
-    ContractFunctionResult#getUint248 is not implemented
-    */
+    @Test
+    @DisplayName("Can receive uint104 max value from contract call")
+    void canCallContractFunctionUint104Max() throws Exception {
+        BigInteger uint104Max = new BigInteger(
+            "20282409603651670423947251286015");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint104", new ContractFunctionParameters().addUint104(uint104Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint104Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint112 min value from contract call")
+    void canCallContractFunctionUint112Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint112", new ContractFunctionParameters().addUint112(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint112 max value from contract call")
+    void canCallContractFunctionUint112Max() throws Exception {
+        BigInteger uint112Max = new BigInteger(
+            "5192296858534827628530496329220095");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint112", new ContractFunctionParameters().addUint112(uint112Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint112Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint120 min value from contract call")
+    void canCallContractFunctionUint120Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint120", new ContractFunctionParameters().addUint120(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint120 max value from contract call")
+    void canCallContractFunctionUint120Max() throws Exception {
+        BigInteger uint120Max = new BigInteger(
+            "1329227995784915872903807060280344575");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint120", new ContractFunctionParameters().addUint120(uint120Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint120Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint128 min value from contract call")
+    void canCallContractFunctionUint128Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint128", new ContractFunctionParameters().addUint128(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint128 max value from contract call")
+    void canCallContractFunctionUint128Max() throws Exception {
+        BigInteger uint128Max = new BigInteger(
+            "340282366920938463463374607431768211455");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint128", new ContractFunctionParameters().addUint128(uint128Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint128Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint136 min value from contract call")
+    void canCallContractFunctionUint136Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint136", new ContractFunctionParameters().addUint136(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint136 max value from contract call")
+    void canCallContractFunctionUint136Max() throws Exception {
+        BigInteger uint136Max = new BigInteger(
+            "87112285931760246646623899502532662132735");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint136", new ContractFunctionParameters().addUint136(uint136Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint136Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint144 min value from contract call")
+    void canCallContractFunctionUint144Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint144", new ContractFunctionParameters().addUint144(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint144 max value from contract call")
+    void canCallContractFunctionUint144Max() throws Exception {
+        BigInteger uint144Max = new BigInteger(
+            "22300745198530623141535718272648361505980415");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint144", new ContractFunctionParameters().addUint144(uint144Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint144Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint152 min value from contract call")
+    void canCallContractFunctionUint152Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint152", new ContractFunctionParameters().addUint152(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint152 max value from contract call")
+    void canCallContractFunctionUint152Max() throws Exception {
+        BigInteger uint152Max = new BigInteger(
+            "5708990770823839524233143877797980545530986495");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint152", new ContractFunctionParameters().addUint152(uint152Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint152Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint160 min value from contract call")
+    void canCallContractFunctionUint160Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint160", new ContractFunctionParameters().addUint160(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint160 max value from contract call")
+    void canCallContractFunctionUint160Max() throws Exception {
+        BigInteger uint160Max = new BigInteger(
+            "1461501637330902918203684832716283019655932542975");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint160", new ContractFunctionParameters().addUint160(uint160Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint160Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint168 min value from contract call")
+    void canCallContractFunctionUint168Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint168", new ContractFunctionParameters().addUint168(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint168 max value from contract call")
+    void canCallContractFunctionUint168Max() throws Exception {
+        BigInteger uint168Max = new BigInteger(
+            "374144419156711147060143317175368453031918731001855");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint168", new ContractFunctionParameters().addUint168(uint168Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint168Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint176 min value from contract call")
+    void canCallContractFunctionUint176Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint176", new ContractFunctionParameters().addUint176(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint176 max value from contract call")
+    void canCallContractFunctionUint176Max() throws Exception {
+        BigInteger uint176Max = new BigInteger(
+            "95780971304118053647396689196894323976171195136475135");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint176", new ContractFunctionParameters().addUint176(uint176Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint176Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint184 min value from contract call")
+    void canCallContractFunctionUint184Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint184", new ContractFunctionParameters().addUint184(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint184 max value from contract call")
+    void canCallContractFunctionUint184Max() throws Exception {
+        BigInteger uint184Max = new BigInteger(
+            "24519928653854221733733552434404946937899825954937634815");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint184", new ContractFunctionParameters().addUint184(uint184Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint184Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint192 min value from contract call")
+    void canCallContractFunctionUint192Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint192", new ContractFunctionParameters().addUint192(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint192 max value from contract call")
+    void canCallContractFunctionUint192Max() throws Exception {
+        BigInteger uint192Max = new BigInteger(
+            "6277101735386680763835789423207666416102355444464034512895");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint192", new ContractFunctionParameters().addUint192(uint192Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint192Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint200 min value from contract call")
+    void canCallContractFunctionUint200Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint200", new ContractFunctionParameters().addUint200(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint200 max value from contract call")
+    void canCallContractFunctionUint200Max() throws Exception {
+        BigInteger uint200Max = new BigInteger(
+            "1606938044258990275541962092341162602522202993782792835301375");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint200", new ContractFunctionParameters().addUint200(uint200Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint200Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint208 min value from contract call")
+    void canCallContractFunctionUint208Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint208", new ContractFunctionParameters().addUint208(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint208 max value from contract call")
+    void canCallContractFunctionUint208Max() throws Exception {
+        BigInteger uint208Max = new BigInteger(
+            "411376139330301510538742295639337626245683966408394965837152255");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint208", new ContractFunctionParameters().addUint208(uint208Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint208Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint216 min value from contract call")
+    void canCallContractFunctionUint216Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint216", new ContractFunctionParameters().addUint216(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint216 max value from contract call")
+    void canCallContractFunctionUint216Max() throws Exception {
+        BigInteger uint216Max = new BigInteger(
+            "105312291668557186697918027683670432318895095400549111254310977535");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint216", new ContractFunctionParameters().addUint216(uint216Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint216Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint224 min value from contract call")
+    void canCallContractFunctionUint224Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint224", new ContractFunctionParameters().addUint224(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint224 max value from contract call")
+    void canCallContractFunctionUint224Max() throws Exception {
+        BigInteger uint224Max = new BigInteger(
+            "26959946667150639794667015087019630673637144422540572481103610249215");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint224", new ContractFunctionParameters().addUint224(uint224Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint224Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint232 min value from contract call")
+    void canCallContractFunctionUint232Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint232", new ContractFunctionParameters().addUint232(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint232 max value from contract call")
+    void canCallContractFunctionUint232Max() throws Exception {
+        BigInteger uint232Max = new BigInteger(
+            "6901746346790563787434755862277025452451108972170386555162524223799295");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint232", new ContractFunctionParameters().addUint232(uint232Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint232Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint240 min value from contract call")
+    void canCallContractFunctionUint240Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint240", new ContractFunctionParameters().addUint240(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint240 max value from contract call")
+    void canCallContractFunctionUint240Max() throws Exception {
+        BigInteger uint240Max = new BigInteger(
+            "1766847064778384329583297500742918515827483896875618958121606201292619775");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint240", new ContractFunctionParameters().addUint240(uint240Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint240Max);
+    }
+
+    @Test
+    @DisplayName("Can receive uint248 min value from contract call")
+    void canCallContractFunctionUint248Min() throws Exception {
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint248", new ContractFunctionParameters().addUint248(BigInteger.ZERO))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(BigInteger.ZERO);
+    }
+
+    @Test
+    @DisplayName("Can receive uint248 max value from contract call")
+    void canCallContractFunctionUint248Max() throws Exception {
+        BigInteger uint248Max = new BigInteger(
+            "452312848583266388373324160190187140051835877600158453279131187530910662655");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnUint248", new ContractFunctionParameters().addUint248(uint248Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getUint256(0)).isEqualTo(uint248Max);
+    }
 
     @Test
     @DisplayName("Can receive uint256 min value from contract call")
@@ -276,11 +1039,65 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(response.getInt8(0)).isEqualTo(Byte.MAX_VALUE);
     }
 
-    /*
-    ContractFunctionResult#getInt16 is not implemented
+    @Test
+    @DisplayName("Can receive int16 min value from contract call")
+    void canCallContractFunctionInt16Min() throws Exception {
+        int int16Min = -32768;
 
-    ContractFunctionResult#getInt24 is not implemented
-     */
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt16", new ContractFunctionParameters().addInt16(int16Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt32(0)).isEqualTo(int16Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int16 max value from contract call")
+    void canCallContractFunctionInt16Max() throws Exception {
+        int int16Max = 32767;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt16", new ContractFunctionParameters().addInt16(int16Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt32(0)).isEqualTo(int16Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int24 min value from contract call")
+    void canCallContractFunctionInt24Min() throws Exception {
+        int int24Min = -8388608;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt24", new ContractFunctionParameters().addInt24(int24Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt32(0)).isEqualTo(int24Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int24 max value from contract call")
+    void canCallContractFunctionInt24Max() throws Exception {
+        int int24Max = 8388607;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt24", new ContractFunctionParameters().addInt24(int24Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt32(0)).isEqualTo(int24Max);
+    }
 
     @Test
     @DisplayName("Can receive int32 min value from contract call")
@@ -308,13 +1125,95 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(response.getInt32(0)).isEqualTo(Integer.MAX_VALUE);
     }
 
-    /*
-    ContractFunctionResult#getInt40 is not implemented
+    @Test
+    @DisplayName("Can receive int40 min value from contract call")
+    void canCallContractFunctionInt40Min() throws Exception {
+        long int40Min = -140737488355328L;
 
-    ContractFunctionResult#getInt48 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt40", new ContractFunctionParameters().addInt40(int40Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt56 is not implemented
-    */
+        assertThat(response.getInt64(0)).isEqualTo(int40Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int40 max value from contract call")
+    void canCallContractFunctionInt40Max() throws Exception {
+        long int40Max = 140737488355327L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt40", new ContractFunctionParameters().addInt40(int40Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int40Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int48 min value from contract call")
+    void canCallContractFunctionInt48Min() throws Exception {
+        long int48Min = -140737488355328L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt48", new ContractFunctionParameters().addInt48(int48Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int48Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int48 max value from contract call")
+    void canCallContractFunctionInt48Max() throws Exception {
+        long int48Max = 140737488355327L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt48", new ContractFunctionParameters().addInt48(int48Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int48Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int56 min value from contract call")
+    void canCallContractFunctionInt56Min() throws Exception {
+        long int56Min = -36028797018963968L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt56", new ContractFunctionParameters().addInt56(int56Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int56Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int56 max value from contract call")
+    void canCallContractFunctionInt56Max() throws Exception {
+        long int56Max = 36028797018963967L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt56", new ContractFunctionParameters().addInt56(int56Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int56Max);
+    }
 
     @Test
     @DisplayName("Can receive int64 min value from contract call")
@@ -342,53 +1241,741 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(response.getUint64(0)).isEqualTo(Long.MAX_VALUE);
     }
 
-    /*
-    ContractFunctionResult#getInt72 is not implemented
+    @Test
+    @DisplayName("Can receive int72 min value from contract call")
+    void canCallContractFunctionInt72Min() throws Exception {
+        BigInteger int72Min = new BigInteger(
+            "-2361183241434822606848");
 
-    ContractFunctionResult#getInt80 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt72", new ContractFunctionParameters().addInt72(int72Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt88 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int72Min);
+    }
 
-    ContractFunctionResult#getInt96 is not implemented
+    @Test
+    @DisplayName("Can receive int72 max value from contract call")
+    void canCallContractFunctionInt72Max() throws Exception {
+        BigInteger int72Max = new BigInteger(
+            "2361183241434822606847");
 
-    ContractFunctionResult#getInt104 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt72", new ContractFunctionParameters().addInt72(int72Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt112 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int72Max);
+    }
 
-    ContractFunctionResult#getInt120 is not implemented
+    @Test
+    @DisplayName("Can receive int80 min value from contract call")
+    void canCallContractFunctionInt80Min() throws Exception {
+        BigInteger int80Min = new BigInteger(
+            "-604462909807314587353088");
 
-    ContractFunctionResult#getInt128 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt80", new ContractFunctionParameters().addInt80(int80Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt136 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int80Min);
+    }
 
-    ContractFunctionResult#getInt144 is not implemented
+    @Test
+    @DisplayName("Can receive int80 max value from contract call")
+    void canCallContractFunctionInt80Max() throws Exception {
+        BigInteger int80Max = new BigInteger(
+            "604462909807314587353087");
 
-    ContractFunctionResult#getInt152 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt80", new ContractFunctionParameters().addInt80(int80Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt160 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int80Max);
+    }
 
-    ContractFunctionResult#getInt168 is not implemented
+    @Test
+    @DisplayName("Can receive int88 min value from contract call")
+    void canCallContractFunctionInt88Min() throws Exception {
+        BigInteger int88Min = new BigInteger(
+            "-154742504910672534362390528");
 
-    ContractFunctionResult#getInt176 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt88", new ContractFunctionParameters().addInt88(int88Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt184 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int88Min);
+    }
 
-    ContractFunctionResult#getInt192 is not implemented
+    @Test
+    @DisplayName("Can receive int88 max value from contract call")
+    void canCallContractFunctionInt88Max() throws Exception {
+        BigInteger int88Max = new BigInteger(
+            "154742504910672534362390527");
 
-    ContractFunctionResult#getInt200 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt88", new ContractFunctionParameters().addInt88(int88Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt208 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int88Max);
+    }
 
-    ContractFunctionResult#getInt216 is not implemented
+    @Test
+    @DisplayName("Can receive int96 min value from contract call")
+    void canCallContractFunctionInt96Min() throws Exception {
+        BigInteger int96Min = new BigInteger(
+            "-39614081257132168796771975168");
 
-    ContractFunctionResult#getInt224 is not implemented
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt96", new ContractFunctionParameters().addInt96(int96Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
-    ContractFunctionResult#getInt232 is not implemented
+        assertThat(response.getInt256(0)).isEqualTo(int96Min);
+    }
 
-    ContractFunctionResult#getInt240 is not implemented
+    @Test
+    @DisplayName("Can receive int96 max value from contract call")
+    void canCallContractFunctionInt96Max() throws Exception {
+        BigInteger int96Max = new BigInteger(
+            "39614081257132168796771975167");
 
-    ContractFunctionResult#getInt248 is not implemented
-    */
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt96", new ContractFunctionParameters().addInt96(int96Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int96Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int104 min value from contract call")
+    void canCallContractFunctionInt104Min() throws Exception {
+        BigInteger int104Min = new BigInteger(
+            "-10141204801825835211973625643008");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt104", new ContractFunctionParameters().addInt104(int104Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int104Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int104 max value from contract call")
+    void canCallContractFunctionInt104Max() throws Exception {
+        BigInteger int104Max = new BigInteger(
+            "10141204801825835211973625643007");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt104", new ContractFunctionParameters().addInt104(int104Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int104Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int112 min value from contract call")
+    void canCallContractFunctionInt112Min() throws Exception {
+        BigInteger int112Min = new BigInteger(
+            "-2596148429267413814265248164610048");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt112", new ContractFunctionParameters().addInt112(int112Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int112Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int112 max value from contract call")
+    void canCallContractFunctionInt112Max() throws Exception {
+        BigInteger int112Max = new BigInteger(
+            "2596148429267413814265248164610047");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt112", new ContractFunctionParameters().addInt112(int112Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int112Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int120 min value from contract call")
+    void canCallContractFunctionInt120Min() throws Exception {
+        BigInteger int120Min = new BigInteger(
+            "-664613997892457936451903530140172288");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt120", new ContractFunctionParameters().addInt120(int120Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int120Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int120 max value from contract call")
+    void canCallContractFunctionInt120Max() throws Exception {
+        BigInteger int120Max = new BigInteger(
+            "664613997892457936451903530140172287");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt120", new ContractFunctionParameters().addInt120(int120Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int120Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int128 min value from contract call")
+    void canCallContractFunctionInt128Min() throws Exception {
+        BigInteger int128Min = new BigInteger(
+            "-170141183460469231731687303715884105728");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt128", new ContractFunctionParameters().addInt128(int128Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int128Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int128 max value from contract call")
+    void canCallContractFunctionInt128Max() throws Exception {
+        BigInteger int128Max = new BigInteger(
+            "170141183460469231731687303715884105727");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt128", new ContractFunctionParameters().addInt128(int128Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int128Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int136 min value from contract call")
+    void canCallContractFunctionInt136Min() throws Exception {
+        BigInteger int136Min = new BigInteger(
+            "-43556142965880123323311949751266331066368");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt136", new ContractFunctionParameters().addInt136(int136Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int136Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int136 max value from contract call")
+    void canCallContractFunctionInt136Max() throws Exception {
+        BigInteger int136Max = new BigInteger(
+            "43556142965880123323311949751266331066367");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt136", new ContractFunctionParameters().addInt136(int136Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int136Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int144 min value from contract call")
+    void canCallContractFunctionInt144Min() throws Exception {
+        BigInteger int144Min = new BigInteger(
+            "-11150372599265311570767859136324180752990208");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt144", new ContractFunctionParameters().addInt144(int144Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int144Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int144 max value from contract call")
+    void canCallContractFunctionInt144Max() throws Exception {
+        BigInteger int144Max = new BigInteger(
+            "11150372599265311570767859136324180752990207");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt144", new ContractFunctionParameters().addInt144(int144Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int144Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int152 min value from contract call")
+    void canCallContractFunctionInt152Min() throws Exception {
+        BigInteger int152Min = new BigInteger(
+            "-2854495385411919762116571938898990272765493248");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt152", new ContractFunctionParameters().addInt152(int152Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int152Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int152 max value from contract call")
+    void canCallContractFunctionInt152Max() throws Exception {
+        BigInteger int152Max = new BigInteger(
+            "2854495385411919762116571938898990272765493247");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt152", new ContractFunctionParameters().addInt152(int152Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int152Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int160 min value from contract call")
+    void canCallContractFunctionInt160Min() throws Exception {
+        BigInteger int160Min = new BigInteger(
+            "-730750818665451459101842416358141509827966271488");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt160", new ContractFunctionParameters().addInt160(int160Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int160Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int160 max value from contract call")
+    void canCallContractFunctionInt160Max() throws Exception {
+        BigInteger int160Max = new BigInteger(
+            "730750818665451459101842416358141509827966271487");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt160", new ContractFunctionParameters().addInt160(int160Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int160Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int168 min value from contract call")
+    void canCallContractFunctionInt168Min() throws Exception {
+        BigInteger int168Min = new BigInteger(
+            "-187072209578355573530071658587684226515959365500928");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt168", new ContractFunctionParameters().addInt168(int168Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int168Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int168 max value from contract call")
+    void canCallContractFunctionInt168Max() throws Exception {
+        BigInteger int168Max = new BigInteger(
+            "187072209578355573530071658587684226515959365500927");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt168", new ContractFunctionParameters().addInt168(int168Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int168Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int176 min value from contract call")
+    void canCallContractFunctionInt176Min() throws Exception {
+        BigInteger int176Min = new BigInteger(
+            "-47890485652059026823698344598447161988085597568237568");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt176", new ContractFunctionParameters().addInt176(int176Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int176Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int176 max value from contract call")
+    void canCallContractFunctionInt176Max() throws Exception {
+        BigInteger int176Max = new BigInteger(
+            "47890485652059026823698344598447161988085597568237567");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt176", new ContractFunctionParameters().addInt176(int176Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int176Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int184 min value from contract call")
+    void canCallContractFunctionInt184Min() throws Exception {
+        BigInteger int184Min = new BigInteger(
+            "-12259964326927110866866776217202473468949912977468817408");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt184", new ContractFunctionParameters().addInt184(int184Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int184Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int184 max value from contract call")
+    void canCallContractFunctionInt184Max() throws Exception {
+        BigInteger int184Max = new BigInteger(
+            "12259964326927110866866776217202473468949912977468817407");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt184", new ContractFunctionParameters().addInt184(int184Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int184Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int192 min value from contract call")
+    void canCallContractFunctionInt192Min() throws Exception {
+        BigInteger int192Min = new BigInteger(
+            "-3138550867693340381917894711603833208051177722232017256448");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt192", new ContractFunctionParameters().addInt192(int192Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int192Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int192 max value from contract call")
+    void canCallContractFunctionInt192Max() throws Exception {
+        BigInteger int192Max = new BigInteger(
+            "3138550867693340381917894711603833208051177722232017256447");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt192", new ContractFunctionParameters().addInt192(int192Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int192Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int200 min value from contract call")
+    void canCallContractFunctionInt200Min() throws Exception {
+        BigInteger int200Min = new BigInteger(
+            "-803469022129495137770981046170581301261101496891396417650688");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt200", new ContractFunctionParameters().addInt200(int200Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int200Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int200 max value from contract call")
+    void canCallContractFunctionInt200Max() throws Exception {
+        BigInteger int200Max = new BigInteger(
+            "803469022129495137770981046170581301261101496891396417650687");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt200", new ContractFunctionParameters().addInt200(int200Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int200Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int208 min value from contract call")
+    void canCallContractFunctionInt208Min() throws Exception {
+        BigInteger int208Min = new BigInteger(
+            "-205688069665150755269371147819668813122841983204197482918576128");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt208", new ContractFunctionParameters().addInt208(int208Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int208Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int208 max value from contract call")
+    void canCallContractFunctionInt208Max() throws Exception {
+        BigInteger int208Max = new BigInteger(
+            "205688069665150755269371147819668813122841983204197482918576127");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt208", new ContractFunctionParameters().addInt208(int208Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int208Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int216 min value from contract call")
+    void canCallContractFunctionInt216Min() throws Exception {
+        BigInteger int216Min = new BigInteger(
+            "-52656145834278593348959013841835216159447547700274555627155488768");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt216", new ContractFunctionParameters().addInt216(int216Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int216Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int216 max value from contract call")
+    void canCallContractFunctionInt216Max() throws Exception {
+        BigInteger int216Max = new BigInteger(
+            "52656145834278593348959013841835216159447547700274555627155488767");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt216", new ContractFunctionParameters().addInt216(int216Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int216Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int224 min value from contract call")
+    void canCallContractFunctionInt224Min() throws Exception {
+        BigInteger int224Min = new BigInteger(
+            "-13479973333575319897333507543509815336818572211270286240551805124608");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt224", new ContractFunctionParameters().addInt224(int224Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int224Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int224 max value from contract call")
+    void canCallContractFunctionInt224Max() throws Exception {
+        BigInteger int224Max = new BigInteger(
+            "13479973333575319897333507543509815336818572211270286240551805124607");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt224", new ContractFunctionParameters().addInt224(int224Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int224Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int232 min value from contract call")
+    void canCallContractFunctionInt232Min() throws Exception {
+        BigInteger int232Min = new BigInteger(
+            "-3450873173395281893717377931138512726225554486085193277581262111899648");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt232", new ContractFunctionParameters().addInt232(int232Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int232Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int232 max value from contract call")
+    void canCallContractFunctionInt232Max() throws Exception {
+        BigInteger int232Max = new BigInteger(
+            "3450873173395281893717377931138512726225554486085193277581262111899647");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt232", new ContractFunctionParameters().addInt232(int232Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int232Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int240 min value from contract call")
+    void canCallContractFunctionInt240Min() throws Exception {
+        BigInteger int240Min = new BigInteger(
+            "-883423532389192164791648750371459257913741948437809479060803100646309888");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt240", new ContractFunctionParameters().addInt240(int240Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int240Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int240 max value from contract call")
+    void canCallContractFunctionInt240Max() throws Exception {
+        BigInteger int240Max = new BigInteger(
+            "883423532389192164791648750371459257913741948437809479060803100646309887");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt240", new ContractFunctionParameters().addInt240(int240Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int240Max);
+    }
+
+    @Test
+    @DisplayName("Can receive int248 min value from contract call")
+    void canCallContractFunctionInt248Min() throws Exception {
+        BigInteger int248Min = new BigInteger(
+            "-226156424291633194186662080095093570025917938800079226639565593765455331328");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt248", new ContractFunctionParameters().addInt248(int248Min))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int248Min);
+    }
+
+    @Test
+    @DisplayName("Can receive int248 max value from contract call")
+    void canCallContractFunctionInt248Max() throws Exception {
+        BigInteger int248Max = new BigInteger(
+            "226156424291633194186662080095093570025917938800079226639565593765455331327");
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnInt248", new ContractFunctionParameters().addInt248(int248Max))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt256(0)).isEqualTo(int248Max);
+    }
 
     @Test
     @DisplayName("Can receive int256 min value from contract call")
@@ -420,8 +2007,6 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(response.getInt256(0)).isEqualTo(int256Max);
     }
 
-    // How getX by valIndex works?
-
     @Test
     @DisplayName("Can receive multiple int8 values from contract call")
     void canCallContractFunctionMultipleInt8() throws Exception {
@@ -436,9 +2021,21 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(response.getInt8(1)).isEqualTo((byte) -108);
     }
 
-    /*
-    ContractFunctionResult#getInt40 is not implemented
-     */
+    @Test
+    @DisplayName("Can receive multiple int40 values from contract call")
+    void canCallContractFunctionMultipleInt40() throws Exception {
+        long int40 = 549755813885L;
+
+        var response = new ContractCallQuery()
+            .setContractId(contractId)
+            .setGas(1500000)
+            .setFunction("returnMultipleInt40", new ContractFunctionParameters().addInt40(int40))
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
+
+        assertThat(response.getInt64(0)).isEqualTo(int40);
+        assertThat(response.getInt64(1)).isEqualTo(int40 + 1);
+    }
 
     @Test
     @DisplayName("Can receive multiple int256 values from contract call")
@@ -475,7 +2072,7 @@ public class ContractFunctionParametersIntegrationTest {
     }
 
     /*
-    ContractFunctionResult#GetBigInt is not implemented (re tests for BigInt256, BigUint256 and MultipleBigInt256)
+    ContractFunctionParameters#AddInt256BigInt && #AddInt256BigUInt is not implemented (re tests for BigInt256, BigUint256 and MultipleBigInt256)
     */
 
     @Test
