@@ -1,40 +1,32 @@
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
-import java8.util.function.Function;
-import org.junit.jupiter.api.Assumptions;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.annotation.Nullable;
+import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv {
+    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+    private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
     public boolean isLocalNode = false;
-    private Client originalClient;
-
-    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
 
     public IntegrationTestEnv() throws Exception {
         this(0);
@@ -54,6 +46,48 @@ public class IntegrationTestEnv {
         try {
             var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
             operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+            operatorKey = operatorPrivateKey.getPublicKey();
+
+            client.setOperator(operatorId, operatorPrivateKey);
+        } catch (RuntimeException ignored) {
+        }
+
+        operatorKey = client.getOperatorPublicKey();
+        operatorId = client.getOperatorAccountId();
+
+        assertThat(client.getOperatorAccountId()).isNotNull();
+        assertThat(client.getOperatorPublicKey()).isNotNull();
+
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+            isLocalNode = true;
+        }
+
+        var nodeGetter = new TestEnvNodeGetter(client);
+        var network = new HashMap<String, AccountId>();
+
+        var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
+        for (@Var int i = 0; i < nodeCount; i++) {
+            nodeGetter.nextNode(network);
+        }
+        client.setNetwork(network);
+    }
+
+    // revisit me later
+    public IntegrationTestEnv(int maxNodesPerTransaction, int previewnet) throws Exception {
+
+        client = Client.forPreviewnet();
+
+        if (maxNodesPerTransaction == 0) {
+            maxNodesPerTransaction = client.getNetwork().size();
+        }
+
+        client.setMaxNodesPerTransaction(maxNodesPerTransaction);
+        originalClient = client;
+
+        try {
+            var operatorPrivateKey = PrivateKey.fromString(
+                "302e020100300506032b657004220420895ce211730a889dce859325fc2dc79517f6cd2071ac4c4e135fcc46b09c83dd");
+            operatorId = AccountId.fromString("0.0.1071");
             operatorKey = operatorPrivateKey.getPublicKey();
 
             client.setOperator(operatorId, operatorPrivateKey);
@@ -187,10 +221,10 @@ public class IntegrationTestEnv {
     }
 
     private static class TestEnvNodeGetter {
-        private Client client;
+        private final Client client;
+        private final List<Map.Entry<String, AccountId>> nodes;
         @Var
         private int index = 0;
-        private List<Map.Entry<String, AccountId>> nodes;
 
         public TestEnvNodeGetter(Client client) {
             this.client = client;
@@ -200,7 +234,8 @@ public class IntegrationTestEnv {
 
         public void nextNode(Map<String, AccountId> outMap) throws Exception {
             if (nodes.isEmpty()) {
-                throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
+                throw new IllegalStateException(
+                    "IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
             }
             for (; index < nodes.size(); index++) {
                 var node = nodes.get(index);

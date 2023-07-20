@@ -19,22 +19,16 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
-import io.grpc.MethodDescriptor;
-import io.grpc.Server;
-import io.grpc.ServerMethodDefinition;
-import io.grpc.ServerServiceDefinition;
-import io.grpc.ServiceDescriptor;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
+import com.hedera.hashgraph.sdk.proto.*;
 import io.grpc.Status;
+import io.grpc.*;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.ServerCalls;
-import org.threeten.bp.Duration;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +37,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Mocker implements AutoCloseable {
     private static final PrivateKey PRIVATE_KEY = PrivateKey.fromString("302e020100300506032b657004220420d45e1557156908c967804615af59a000be88c7aa7058bfcbe0f46b16c28f887d");
-
+    public final Client client;
     private final List<ServiceDescriptor> services = List.of(
         CryptoServiceGrpc.getServiceDescriptor(),
         FileServiceGrpc.getServiceDescriptor(),
@@ -53,8 +47,6 @@ public class Mocker implements AutoCloseable {
     );
     private final List<List<Object>> responses;
     private final List<Server> servers = new ArrayList<>();
-
-    public final Client client;
 
     Mocker(List<List<Object>> responses) {
         this.responses = responses;
@@ -85,7 +77,7 @@ public class Mocker implements AutoCloseable {
 
                             var r = response.get(responseIndex);
 
-                            if (r instanceof Function<?, ?>){
+                            if (r instanceof Function<?, ?>) {
                                 try {
                                     r = ((Function<Object, Object>) r).apply(request);
                                 } catch (Throwable e) {
@@ -121,7 +113,8 @@ public class Mocker implements AutoCloseable {
             .setNodeMinBackoff(Duration.ofMillis(0))
             .setNodeMaxBackoff(Duration.ofMillis(0))
             .setMinNodeReadmitTime(Duration.ofMillis(0))
-            .setMaxNodeReadmitTime(Duration.ofMillis(0));
+            .setMaxNodeReadmitTime(Duration.ofMillis(0))
+            .setLogger(new Logger(LogLevel.SILENT));
     }
 
     public static Mocker withResponses(List<List<Object>> responses) {

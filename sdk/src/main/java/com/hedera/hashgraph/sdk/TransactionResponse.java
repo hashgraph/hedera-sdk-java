@@ -20,11 +20,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
-import org.threeten.bp.Duration;
+import java.time.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -34,10 +34,10 @@ import java.util.concurrent.TimeoutException;
 /**
  * When the client sends the node a transaction of any kind, the node
  * replies with this, which simply says that the transaction passed
- * the precheck (so the node will submit it to the network) or it failed
+ * the pre-check (so the node will submit it to the network) or it failed
  * (so it won't). To learn the consensus result, the client should later
  * obtain a receipt (free), or can buy a more detailed record (not free).
- *
+ * <br>
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/miscellaneous/transactionresponse">Hedera Documentation</a>
  */
 public final class TransactionResponse {

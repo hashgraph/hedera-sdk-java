@@ -21,12 +21,12 @@ package com.hedera.hashgraph.sdk;
 
 /**
  * Possible Token Types (IWA Compatibility).
- *
+ * <p>
  * Apart from fungible and non-fungible, Tokens can have either a common or
  * unique representation. This distinction might seem subtle, but it is
  * important when considering how tokens can be traced and if they can have
  * isolated and unique properties.
- *
+ * <p>
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokentype">Hedera Documentation</a>
  */
 public enum TokenType {
@@ -46,7 +46,7 @@ public enum TokenType {
     /**
      * Constructor.
      *
-     * @param code                      the token type
+     * @param code the token type
      */
     TokenType(com.hedera.hashgraph.sdk.proto.TokenType code) {
         this.code = code;
@@ -55,29 +55,26 @@ public enum TokenType {
     /**
      * What type are we.
      *
-     * @param code                      the token type in question
-     * @return                          the token type
+     * @param code the token type in question
+     * @return the token type
      */
     static TokenType valueOf(com.hedera.hashgraph.sdk.proto.TokenType code) {
-        switch (code) {
-            case FUNGIBLE_COMMON:
-                return FUNGIBLE_COMMON;
-            case NON_FUNGIBLE_UNIQUE:
-                return NON_FUNGIBLE_UNIQUE;
-            default:
-                throw new IllegalStateException("(BUG) unhandled TokenType");
-        }
+        return switch (code) {
+            case FUNGIBLE_COMMON -> FUNGIBLE_COMMON;
+            case NON_FUNGIBLE_UNIQUE -> NON_FUNGIBLE_UNIQUE;
+            default -> throw new IllegalStateException("(BUG) unhandled TokenType");
+        };
     }
 
     @Override
     public String toString() {
-        switch (this) {
-            case FUNGIBLE_COMMON:
-                return "FUNGIBLE_COMMON";
-            case NON_FUNGIBLE_UNIQUE:
-                return "NON_FUNGIBLE_UNIQUE";
-            default:
-                return "<UNRECOGNIZED VALUE>";
-        }
+        return switch (this) {
+            case FUNGIBLE_COMMON -> "FUNGIBLE_COMMON";
+            case NON_FUNGIBLE_UNIQUE -> "NON_FUNGIBLE_UNIQUE";
+        };
+    }
+
+    public com.hedera.hashgraph.sdk.proto.TokenType toProtobuf() {
+        return this.code;
     }
 }

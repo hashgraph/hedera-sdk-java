@@ -20,7 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
-import org.threeten.bp.Instant;
+import java.time.Instant;
 
 /**
  * A chunk of the topic message.

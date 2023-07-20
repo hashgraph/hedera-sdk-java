@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
@@ -26,25 +28,23 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
-import java8.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.stubbing.Answer;
-import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.*;
 
 class ExecutableTest {
     Client client;
@@ -57,6 +57,7 @@ class ExecutableTest {
         client = Client.forMainnet();
         network = mock(Network.class);
         client.network = network;
+        client.setLogger(new Logger(LogLevel.WARN));
 
         node3 = mock(Node.class);
         node4 = mock(Node.class);
@@ -129,7 +130,7 @@ class ExecutableTest {
         tx.setGrpcDeadline(Duration.ofMillis(defaultDeadlineMs));
 
         tx.blockingUnaryCall = (grpcRequest) -> {
-            var grpc = (Executable.GrpcRequest)grpcRequest;
+            var grpc = (Executable.GrpcRequest) grpcRequest;
 
             var grpcTimeRemaining = grpc.getCallOptions().getDeadline().timeRemaining(TimeUnit.MILLISECONDS);
 
@@ -264,7 +265,7 @@ class ExecutableTest {
 
     @Test
     void successfulExecute() throws PrecheckStatusException, TimeoutException {
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override
@@ -307,7 +308,7 @@ class ExecutableTest {
         when(node3.channelFailedToConnect()).thenReturn(true);
         when(node4.channelFailedToConnect()).thenReturn(false);
 
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override
@@ -361,7 +362,7 @@ class ExecutableTest {
         when(node4.getRemainingTimeForBackoff()).thenReturn(600L);
         when(node5.getRemainingTimeForBackoff()).thenReturn(700L);
 
-        var now = org.threeten.bp.Instant.now();
+        var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
             @Nullable
             @Override

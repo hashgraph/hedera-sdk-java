@@ -170,4 +170,15 @@ class Ed25519PublicKeyTest {
 
         assertThat(key.isECDSA()).isFalse();
     }
+
+    @Test
+    @DisplayName("DER import test vectors")
+    void DERImportTestVectors() {
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
+        var PUBLIC_KEY_DER1 = "302a300506032b65700321008ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
+        var PUBLIC_KEY1 = "8ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
+
+        var ed25519PublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);
+        assertThat(ed25519PublicKey1.toStringRaw()).isEqualTo(PUBLIC_KEY1);
+    }
 }

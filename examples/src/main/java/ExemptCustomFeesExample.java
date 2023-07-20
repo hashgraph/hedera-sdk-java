@@ -19,7 +19,7 @@
  */
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java8.util.Lists;
+import java.util.List;
 
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -123,7 +123,7 @@ public final class ExemptCustomFeesExample {
             .setWipeKey(OPERATOR_KEY)
             .setInitialSupply(100_000_000)
             .setDecimals(2)
-            .setCustomFees(Lists.of(fee1, fee2, fee3))
+            .setCustomFees(List.of(fee1, fee2, fee3))
             .freezeWith(client)
             .sign(firstAccountPrivateKey)
             .sign(secondAccountPrivateKey)

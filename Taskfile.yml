@@ -18,9 +18,6 @@ tasks:
         cmds:
             - ./gradlew clean
 
-    format:
-    lint:
-
     package:
         cmds:
             - ./gradlew sdk:assemble
@@ -35,7 +32,11 @@ tasks:
 
     "test:integration":
         cmds:
-            - ./gradlew -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID -PCONFIG_FILE=$CONFIG_FILE integrationTest {{.CLI_ARGS}}
+            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK integrationTest {{.CLI_ARGS}}
+        env:
+            OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
+            OPERATOR_ID: '0.0.1022'
+            HEDERA_NETWORK: 'localhost'
 
     "update:snapshots":
         cmds:
@@ -69,15 +70,15 @@ tasks:
 
     "update:addressbooks":
         cmds:
-            - task: "update:addressbooks:mainnet"
-            - task: "update:addressbooks:testnet"
-            - task: "update:addressbooks:previewnet"
+            -   task: "update:addressbooks:mainnet"
+            -   task: "update:addressbooks:testnet"
+            -   task: "update:addressbooks:previewnet"
 
     update:
         cmds:
-            - task: "update:proto"
-            - task: "update:snapshots"
-            - task: "update:addressbooks"
+            -   task: "update:proto"
+            -   task: "update:snapshots"
+            -   task: "update:addressbooks"
 
     publish:
         env:
@@ -86,18 +87,6 @@ tasks:
             - git diff-index --quiet HEAD
         cmds:
             - git clean -ffdx
-            - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-            - perl -p -i -e "s#sdk-jdk7\.gradle#sdk.gradle#g" sdk/build.gradle
-            - git clean -ffdx
-            - rm -f sdk/src/main/java/com/hedera/hashgraph/sdk/FutureConverter.java
-            - perl -p -i -e "s#java8#java#g" $FILES
-            - perl -p -i -e "s#org\.threeten\.bp#java.time#g" $FILES
-            - perl -p -i -e "s#J8Arrays#Arrays#g" $FILES
-            - perl -p -i -e "s#IntStreams#IntStream#g" $FILES
-            - perl -p -i -e "s#\bLists\b#List#g" $FILES
-            - perl -p -i -e "s#StreamSupport\.stream\((.*)\).map#\1.stream().map#g" $FILES
-            - perl -p -i -e "s#import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;#import net.javacrumbs.futureconverter.guavacommon.GuavaFutureUtils;\nimport net.javacrumbs.futureconverter.java8common.Java8FutureUtils;#g" $FILES
-            - perl -p -i -e "s#toCompletableFuture\((.*)\).handle#Java8FutureUtils.createCompletableFuture(GuavaFutureUtils.createValueSource(\1)).handle#g" $FILES
             - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
             - perl -p -i -e "s#sdk\.gradle#sdk-full.gradle#g" sdk/build.gradle
             - git clean -ffdx

@@ -19,11 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-//import com.hedera.hashgraph.sdk.BadKeyException;
-//import com.hedera.hashgraph.sdk.Mnemonic;
-
-import java8.util.stream.RefStreams;
-import java8.util.stream.Stream;
+import java.util.stream.Stream;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -65,6 +61,8 @@ class Ed25519PrivateKeyTest {
 
     private static final String PEM_PASSPHRASE = "this is a passphrase";
 
+    private static final String TEST_VECTOR_PEM_PASSPHRASE = "asdasd123";
+
     /*
         # enter passphrase "this is a passphrase"
         echo '302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10' \
@@ -83,7 +81,7 @@ class Ed25519PrivateKeyTest {
 
     @SuppressWarnings("unused")
     private static Stream<String> privKeyStrings() {
-        return RefStreams.of(
+        return Stream.of(
             TEST_KEY_STR,
             // raw hex (concatenated private + public key)
             TEST_KEY_STR_RAW +
@@ -505,5 +503,46 @@ class Ed25519PrivateKeyTest {
         assertThat(Hex.toHexString(key6.getChainCode().getKey())).isEqualTo(CHAIN_CODE6);
         assertThat(key6.toStringRaw()).isEqualTo(PRIVATE_KEY6);
         assertThat(key6.getPublicKey().toStringRaw()).isSubstringOf(PUBLIC_KEY6);
+    }
+
+    @Test
+    @DisplayName("PEM import test vectors")
+    void PEMImportTestVectors() throws IOException {
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
+        var PRIVATE_KEY_PEM1 = "-----BEGIN PRIVATE KEY-----\n" +
+            "MC4CAQAwBQYDK2VwBCIEIOgbjaHgEqF7PY0t2dUf2VU0u1MRoKii/fywDlze4lvl\n" +
+            "-----END PRIVATE KEY-----";
+        var PRIVATE_KEY1 = "e81b8da1e012a17b3d8d2dd9d51fd95534bb5311a0a8a2fdfcb00e5cdee25be5";
+        var PUBLIC_KEY1 = "f7b9aa4a8e4eee94e4277dfe757d8d7cde027e7cd5349b7d8e6ee21c9b9395be";
+
+        var PRIVATE_KEY_PEM2 = "-----BEGIN ENCRYPTED PRIVATE KEY-----\n" +
+            "MIGbMFcGCSqGSIb3DQEFDTBKMCkGCSqGSIb3DQEFDDAcBAiho4GvPxvL6wICCAAw\n" +
+            "DAYIKoZIhvcNAgkFADAdBglghkgBZQMEAQIEEIdsubXR0QvxXGSprqDuDXwEQJZl\n" +
+            "OBtwm2p2P7WrWE0OnjGxUe24fWwdrvJUuguFtH3FVWc8C5Jbxgbyxsuzbf+utNL6\n" +
+            "0ey+WdbGL06Bw0HGqs8=\n" +
+            "-----END ENCRYPTED PRIVATE KEY-----";
+        var PRIVATE_KEY2 = "fa0857e963946d5f5e035684c40354d3cd3dcc80c0fb77beac2ef7c4b5271599";
+        var PUBLIC_KEY2 = "202af61e141465d4bf2c356d37d18bd026c246bde4eb73258722ad11f790be4e";
+
+        var ed25519PrivateKey1 = PrivateKey.fromPem(PRIVATE_KEY_PEM1);
+        assertThat(ed25519PrivateKey1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(ed25519PrivateKey1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
+
+        var ed25519PrivateKey2 = PrivateKey.fromPem(PRIVATE_KEY_PEM2, TEST_VECTOR_PEM_PASSPHRASE);
+        assertThat(ed25519PrivateKey2.toStringRaw()).isEqualTo(PRIVATE_KEY2);
+        assertThat(ed25519PrivateKey2.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY2);
+    }
+
+    @Test
+    @DisplayName("DER import test vectors")
+    void DERImportTestVectors() {
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
+        var PRIVATE_KEY_DER1 = "302e020100300506032b657004220420feb858a4a69600a5eef2d9c76f7fb84fc0b6627f29e0ab17e160f640c267d404";
+        var PRIVATE_KEY1 = "feb858a4a69600a5eef2d9c76f7fb84fc0b6627f29e0ab17e160f640c267d404";
+        var PUBLIC_KEY1 = "8ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
+
+        var ed25519PrivateKey1 = PrivateKey.fromStringDER(PRIVATE_KEY_DER1);
+        assertThat(ed25519PrivateKey1.toStringRaw()).isEqualTo(PRIVATE_KEY1);
+        assertThat(ed25519PrivateKey1.getPublicKey().toStringRaw()).isEqualTo(PUBLIC_KEY1);
     }
 }
