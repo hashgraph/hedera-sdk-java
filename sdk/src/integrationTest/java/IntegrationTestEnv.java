@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Assumptions;
 public class IntegrationTestEnv {
     private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
     private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+    private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
     public boolean isLocalNode = false;
-    private final Client originalClient;
 
     public IntegrationTestEnv() throws Exception {
         this(0);
@@ -46,6 +46,48 @@ public class IntegrationTestEnv {
         try {
             var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
             operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+            operatorKey = operatorPrivateKey.getPublicKey();
+
+            client.setOperator(operatorId, operatorPrivateKey);
+        } catch (RuntimeException ignored) {
+        }
+
+        operatorKey = client.getOperatorPublicKey();
+        operatorId = client.getOperatorAccountId();
+
+        assertThat(client.getOperatorAccountId()).isNotNull();
+        assertThat(client.getOperatorPublicKey()).isNotNull();
+
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+            isLocalNode = true;
+        }
+
+        var nodeGetter = new TestEnvNodeGetter(client);
+        var network = new HashMap<String, AccountId>();
+
+        var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
+        for (@Var int i = 0; i < nodeCount; i++) {
+            nodeGetter.nextNode(network);
+        }
+        client.setNetwork(network);
+    }
+
+    // revisit me later
+    public IntegrationTestEnv(int maxNodesPerTransaction, int previewnet) throws Exception {
+
+        client = Client.forPreviewnet();
+
+        if (maxNodesPerTransaction == 0) {
+            maxNodesPerTransaction = client.getNetwork().size();
+        }
+
+        client.setMaxNodesPerTransaction(maxNodesPerTransaction);
+        originalClient = client;
+
+        try {
+            var operatorPrivateKey = PrivateKey.fromString(
+                "302e020100300506032b657004220420895ce211730a889dce859325fc2dc79517f6cd2071ac4c4e135fcc46b09c83dd");
+            operatorId = AccountId.fromString("0.0.1071");
             operatorKey = operatorPrivateKey.getPublicKey();
 
             client.setOperator(operatorId, operatorPrivateKey);
@@ -180,9 +222,9 @@ public class IntegrationTestEnv {
 
     private static class TestEnvNodeGetter {
         private final Client client;
+        private final List<Map.Entry<String, AccountId>> nodes;
         @Var
         private int index = 0;
-        private final List<Map.Entry<String, AccountId>> nodes;
 
         public TestEnvNodeGetter(Client client) {
             this.client = client;
