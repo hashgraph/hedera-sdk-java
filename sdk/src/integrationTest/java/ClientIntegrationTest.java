@@ -1,13 +1,15 @@
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

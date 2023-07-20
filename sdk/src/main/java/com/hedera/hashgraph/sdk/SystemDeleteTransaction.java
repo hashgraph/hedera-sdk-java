@@ -28,8 +28,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
-import java.util.concurrent.CompletableFuture;
-import java.time.Instant;
+import java8.util.concurrent.CompletableFuture;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;

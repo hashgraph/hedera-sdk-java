@@ -32,22 +32,24 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
 import io.grpc.stub.StreamObserver;
-import java.time.Duration;
-import java.time.Instant;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Subscribe to a topic ID's messages from a mirror node. You will receive all messages for the specified topic or
- * within the defined start and end time.
+ * Subscribe to a topic ID's messages from a mirror node. You will receive
+ * all messages for the specified topic or within the defined start and end
+ * time.
  */
 public final class TopicMessageQuery {
 
@@ -70,7 +72,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the topic id.
      *
-     * @param topicId the topic id
+     * @param topicId                   the topic id
      * @return {@code this}
      */
     public TopicMessageQuery setTopicId(TopicId topicId) {
@@ -82,7 +84,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the start time.
      *
-     * @param startTime the start time
+     * @param startTime                 the start time
      * @return {@code this}
      */
     public TopicMessageQuery setStartTime(Instant startTime) {
@@ -94,7 +96,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the end time.
      *
-     * @param endTime the end time
+     * @param endTime                   the end time
      * @return {@code this}
      */
     public TopicMessageQuery setEndTime(Instant endTime) {
@@ -106,7 +108,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the number of messages to return.
      *
-     * @param limit the number of messages to return
+     * @param limit                     the number of messages to return
      * @return {@code this}
      */
     public TopicMessageQuery setLimit(long limit) {
@@ -117,7 +119,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the call back function.
      *
-     * @param completionHandler the call back function
+     * @param completionHandler         the call back function
      * @return {@code this}
      */
     public TopicMessageQuery setCompletionHandler(Runnable completionHandler) {
@@ -129,7 +131,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the error handler does not return a value.
      *
-     * @param errorHandler the error handler
+     * @param errorHandler              the error handler
      * @return {@code this}
      */
     public TopicMessageQuery setErrorHandler(BiConsumer<Throwable, TopicMessage> errorHandler) {
@@ -141,7 +143,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the maximum number of attempts.
      *
-     * @param maxAttempts the max attempts
+     * @param maxAttempts               the max attempts
      * @return {@code this}
      */
     public TopicMessageQuery setMaxAttempts(int maxAttempts) {
@@ -155,7 +157,7 @@ public final class TopicMessageQuery {
     /**
      * The maximum backoff in milliseconds.
      *
-     * @param maxBackoff the maximum backoff
+     * @param maxBackoff                the maximum backoff
      * @return {@code this}
      */
     @SuppressFBWarnings(
@@ -173,7 +175,7 @@ public final class TopicMessageQuery {
     /**
      * Assign the retry handler.
      *
-     * @param retryHandler the retry handler
+     * @param retryHandler              the retry handler
      * @return {@code this}
      */
     public TopicMessageQuery setRetryHandler(Predicate<Throwable> retryHandler) {
@@ -190,10 +192,10 @@ public final class TopicMessageQuery {
     private void onError(Throwable throwable, TopicMessage topicMessage) {
         var topicId = TopicId.fromProtobuf(builder.getTopicID());
 
-        if (throwable instanceof StatusRuntimeException sre && sre.getStatus().getCode()
-            .equals(Status.Code.CANCELLED)) {
+        if (throwable instanceof StatusRuntimeException && ((StatusRuntimeException)throwable).getStatus().getCode().equals(Status.Code.CANCELLED)) {
             LOGGER.warn("Call is cancelled for topic {}.", topicId);
-        } else {
+        }
+        else {
             LOGGER.error("Error attempting to subscribe to topic {}:", topicId, throwable);
         }
     }
@@ -201,13 +203,12 @@ public final class TopicMessageQuery {
     /**
      * This method will retry the following scenarios:
      * <p>
-     * NOT_FOUND: Can occur when a client creates a topic and attempts to subscribe to it immediately before it is
-     * available in the mirror node.
+     * NOT_FOUND: Can occur when a client creates a topic and attempts to subscribe to it immediately before it
+     * is available in the mirror node.
      * <p>
      * UNAVAILABLE: Can occur when the mirror node's database or other downstream components are temporarily down.
      * <p>
-     * RESOURCE_EXHAUSTED: Can occur when the mirror node's resources (database, threads, etc.) are temporarily
-     * exhausted.
+     * RESOURCE_EXHAUSTED: Can occur when the mirror node's resources (database, threads, etc.) are temporarily exhausted.
      * <p>
      * INTERNAL: With a gRPC error status description that indicates the stream was reset. Stream resets can sometimes
      * occur when a proxy or load balancer disconnects the client.
@@ -217,15 +218,15 @@ public final class TopicMessageQuery {
      */
     @SuppressWarnings("MethodCanBeStatic")
     private boolean shouldRetry(Throwable throwable) {
-        if (throwable instanceof StatusRuntimeException statusRuntimeException) {
+        if (throwable instanceof StatusRuntimeException) {
+            var statusRuntimeException = (StatusRuntimeException) throwable;
             var code = statusRuntimeException.getStatus().getCode();
             var description = statusRuntimeException.getStatus().getDescription();
 
             return (code == Status.Code.NOT_FOUND) ||
                 (code == Status.Code.UNAVAILABLE) ||
                 (code == Status.Code.RESOURCE_EXHAUSTED) ||
-                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description)
-                    .matches());
+                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description).matches());
         }
 
         return false;
@@ -234,9 +235,9 @@ public final class TopicMessageQuery {
     /**
      * Subscribe to the topic.
      *
-     * @param client the configured client
-     * @param onNext the consumer
-     * @return the subscription handle
+     * @param client                    the configured client
+     * @param onNext                    the consumer
+     * @return                          the subscription handle
      */
     // TODO: Refactor into a base class when we add more mirror query types
     public SubscriptionHandle subscribe(Client client, Consumer<TopicMessage> onNext) {
@@ -244,8 +245,7 @@ public final class TopicMessageQuery {
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
 
         try {
-            makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(),
-                pendingMessages);
+            makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(), pendingMessages);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -357,8 +357,7 @@ public final class TopicMessageQuery {
                 }
 
                 try {
-                    makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage,
-                        pendingMessages);
+                    makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage, pendingMessages);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

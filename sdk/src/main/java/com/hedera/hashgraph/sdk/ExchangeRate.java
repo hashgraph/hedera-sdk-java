@@ -20,7 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 /**
  * Denotes a conversion between Hbars and cents (USD).

@@ -1,32 +1,40 @@
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
+import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java8.util.function.Function;
+import org.junit.jupiter.api.Assumptions;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import org.junit.jupiter.api.Assumptions;
+import java.util.concurrent.TimeoutException;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class IntegrationTestEnv {
-    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
     public Client client;
     public PublicKey operatorKey;
     public AccountId operatorId;
     public boolean isLocalNode = false;
-    private final Client originalClient;
+    private Client originalClient;
+
+    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
 
     public IntegrationTestEnv() throws Exception {
         this(0);
@@ -179,10 +187,10 @@ public class IntegrationTestEnv {
     }
 
     private static class TestEnvNodeGetter {
-        private final Client client;
+        private Client client;
         @Var
         private int index = 0;
-        private final List<Map.Entry<String, AccountId>> nodes;
+        private List<Map.Entry<String, AccountId>> nodes;
 
         public TestEnvNodeGetter(Client client) {
             this.client = client;
@@ -192,8 +200,7 @@ public class IntegrationTestEnv {
 
         public void nextNode(Map<String, AccountId> outMap) throws Exception {
             if (nodes.isEmpty()) {
-                throw new IllegalStateException(
-                    "IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
+                throw new IllegalStateException("IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
             }
             for (; index < nodes.size(); index++) {
                 var node = nodes.get(index);

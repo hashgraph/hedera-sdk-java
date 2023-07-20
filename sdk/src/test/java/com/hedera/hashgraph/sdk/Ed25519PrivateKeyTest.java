@@ -19,7 +19,11 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.util.stream.Stream;
+//import com.hedera.hashgraph.sdk.BadKeyException;
+//import com.hedera.hashgraph.sdk.Mnemonic;
+
+import java8.util.stream.RefStreams;
+import java8.util.stream.Stream;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -79,7 +83,7 @@ class Ed25519PrivateKeyTest {
 
     @SuppressWarnings("unused")
     private static Stream<String> privKeyStrings() {
-        return Stream.of(
+        return RefStreams.of(
             TEST_KEY_STR,
             // raw hex (concatenated private + public key)
             TEST_KEY_STR_RAW +

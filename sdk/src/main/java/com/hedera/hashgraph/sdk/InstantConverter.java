@@ -21,7 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 /**
  * Instance in time utilities.

@@ -27,7 +27,7 @@ import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import org.bouncycastle.util.encoders.Hex;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;

@@ -1,10 +1,10 @@
-apply from: "./jdk9.gradle"
+apply from: "./jdk7.gradle"
 apply from: "./protobuf-lite.gradle"
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId = "sdk"
+            artifactId = "sdk-jdk7"
         }
     }
 }

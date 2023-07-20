@@ -7,7 +7,7 @@ import com.hedera.hashgraph.sdk.Status;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 import java.util.Objects;
 

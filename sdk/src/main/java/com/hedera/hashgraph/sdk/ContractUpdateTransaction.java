@@ -31,8 +31,8 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.checkerframework.checker.units.qual.A;
-import java.time.Duration;
-import java.time.Instant;
+import org.threeten.bp.Duration;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;

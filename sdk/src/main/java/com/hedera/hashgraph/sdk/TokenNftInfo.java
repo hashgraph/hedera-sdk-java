@@ -22,7 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 import java.util.Objects;

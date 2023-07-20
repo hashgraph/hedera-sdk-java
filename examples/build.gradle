@@ -1,10 +1,17 @@
 dependencies {
+    // implementation "com.hedera.hashgraph:sdk:2.0.3"
+    implementation project(":sdk")
+
     implementation "com.google.code.gson:gson:2.10.1"
     implementation "org.slf4j:slf4j-simple:2.0.7"
-    implementation "io.grpc:grpc-netty-shaded:1.55.1"
+    implementation "io.grpc:grpc-netty-shaded:1.54.1"
     implementation "io.github.cdimascio:java-dotenv:5.3.1"
-    implementation "com.google.errorprone:error_prone_core:2.19.1"
-    implementation project(path: ':sdk')
+    implementation "com.google.errorprone:error_prone_core:2.18.0"
+}
+
+java {
+    sourceCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
+    targetCompatibility = org.gradle.api.JavaVersion.VERSION_1_8
 }
 
 tasks.addRule("Pattern: run<Example>: Runs an example.") { String taskName ->

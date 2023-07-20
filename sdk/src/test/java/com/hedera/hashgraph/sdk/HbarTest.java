@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.util.List;
+import java8.util.stream.RefStreams;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -40,7 +40,7 @@ public class HbarTest {
     private final Hbar negativeFiftyHbar = new Hbar(-50);
 
     static Iterator<Arguments> getValueConversions() {
-        return List.of(
+        return RefStreams.of(
             Arguments.arguments(new BigDecimal(50_000_000), HbarUnit.MICROBAR),
             Arguments.arguments(new BigDecimal(50_000), HbarUnit.MILLIBAR),
             Arguments.arguments(new BigDecimal(50), HbarUnit.HBAR),

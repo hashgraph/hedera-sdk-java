@@ -23,7 +23,7 @@ import com.hedera.hashgraph.sdk.TransferTransaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;

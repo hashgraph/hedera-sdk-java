@@ -23,7 +23,7 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleGetInfoResponse;
-import java.time.Instant;
+import org.threeten.bp.Instant;
 
 import javax.annotation.Nullable;
 

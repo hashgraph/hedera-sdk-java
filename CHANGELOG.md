@@ -5,21 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.25.0
-
-### Added
-- Custom logger used in `Client` and `Executable`
-
-### Removed
-- ThreeTen dependency
-- Jabel dependency
-- future-converter-java8-guava dependency
-- sdk-jdk7 artifact
-
-### Changed
-- Minimum Java version to 17
-- Minimum supported Android version to 8
-
 ## 2.24.1
 
 ### Fixed

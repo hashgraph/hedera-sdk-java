@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 /**
  * Utility class used internally by the sdk.

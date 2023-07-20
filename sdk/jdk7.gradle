@@ -1,0 +1,24 @@
+dependencies {
+    // NOTE: This is to support Android API < 24. Once it becomes acceptable to require API 24+ we can drop this and
+    //       use CompletableFuture directly.
+    // https://github.com/stefan-zobel/streamsupport
+    // https://developer.android.com/about/dashboards/index.html
+    api "net.sourceforge.streamsupport:streamsupport:1.7.4"
+    api "net.sourceforge.streamsupport:streamsupport-cfuture:1.7.4"
+
+    // NOTE: This is to support Android API < 26.
+    api "org.threeten:threetenbp:1.6.0"
+}
+
+apply from: "./protobuf-lite.gradle"
+
+tasks.withType(JavaCompile).configureEach {
+    // https://github.com/gradle/gradle/issues/2510#issuecomment-604986414
+    // release = 8
+    compileJava {
+        options.compilerArgs += [
+                "--release",
+                "8" // Avoid using Java 12 APIs
+        ]
+    }
+}

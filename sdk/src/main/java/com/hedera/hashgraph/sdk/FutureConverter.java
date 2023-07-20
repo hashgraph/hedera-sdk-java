@@ -23,8 +23,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Consumer;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;

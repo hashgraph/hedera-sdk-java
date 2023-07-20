@@ -22,7 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 /**
  *A hash (presumably of some kind of credential or certificate), along with a

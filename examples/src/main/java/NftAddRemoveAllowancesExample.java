@@ -20,10 +20,11 @@
 
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.List;
+import java8.util.Lists;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
@@ -88,7 +89,7 @@ public final class NftAddRemoveAllowancesExample {
         for (int i = 0; i < CIDs.length; i++) {
             nftCollection.add(new TokenMintTransaction()
                 .setTokenId(nftTokenId)
-                .setMetadata(List.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
+                .setMetadata(Lists.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
                 .freezeWith(client)
                 .execute(client)
                 .getReceipt(client));
@@ -119,7 +120,7 @@ public final class NftAddRemoveAllowancesExample {
         // Associate the spender with the NFT
         TransactionReceipt spenderAssociateReceipt = new TokenAssociateTransaction()
             .setAccountId(spenderAccountId)
-            .setTokenIds(List.of(nftTokenId))
+            .setTokenIds(Lists.of(nftTokenId))
             .freezeWith(client)
             .sign(spenderKey)
             .execute(client)
@@ -129,7 +130,7 @@ public final class NftAddRemoveAllowancesExample {
         // Associate the receiver with the NFT
         TransactionReceipt receiverAssociateReceipt = new TokenAssociateTransaction()
             .setAccountId(receiverAccountId)
-            .setTokenIds(List.of(nftTokenId))
+            .setTokenIds(Lists.of(nftTokenId))
             .freezeWith(client)
             .sign(receiverKey)
             .execute(client)
@@ -215,7 +216,7 @@ public final class NftAddRemoveAllowancesExample {
         for (int i = 0; i < CIDs2.length; i++) {
             nftCollection2.add(new TokenMintTransaction()
                 .setTokenId(nftTokenId2)
-                .setMetadata(List.of(CIDs2[i].getBytes(StandardCharsets.UTF_8)))
+                .setMetadata(Lists.of(CIDs2[i].getBytes(StandardCharsets.UTF_8)))
                 .freezeWith(client)
                 .execute(client)
                 .getReceipt(client));
@@ -246,7 +247,7 @@ public final class NftAddRemoveAllowancesExample {
         // Associate the spender with the NFT
         TransactionReceipt spenderAssociateReceipt2 = new TokenAssociateTransaction()
             .setAccountId(delegatingSpenderAccountId)
-            .setTokenIds(List.of(nftTokenId2))
+            .setTokenIds(Lists.of(nftTokenId2))
             .freezeWith(client)
             .sign(delegatingSpenderKey2)
             .execute(client)
@@ -256,7 +257,7 @@ public final class NftAddRemoveAllowancesExample {
         // Associate the receiver with the NFT
         TransactionReceipt receiverAssociateReceipt2 = new TokenAssociateTransaction()
             .setAccountId(receiverAccountId2)
-            .setTokenIds(List.of(nftTokenId2))
+            .setTokenIds(Lists.of(nftTokenId2))
             .freezeWith(client)
             .sign(receiverKey2)
             .execute(client)

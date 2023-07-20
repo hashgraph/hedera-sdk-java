@@ -29,7 +29,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import org.bouncycastle.util.Arrays;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.LinkedHashMap;

@@ -24,6 +24,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.TokenID;
 import com.hedera.hashgraph.sdk.proto.TokenTransferList;
+import java8.util.Lists;
+
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -49,19 +52,19 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
      */
     public final long serial;
     /**
-     * If true then the transfer is expected to be an approved allowance and the sender is expected to be the owner. The
-     * default is false.
+     * If true then the transfer is expected to be an approved allowance and the
+     * sender is expected to be the owner. The default is false.
      */
     public boolean isApproved;
 
     /**
      * Constructor.
      *
-     * @param tokenId    the token id
-     * @param sender     the sender account id
-     * @param receiver   the receiver account id
-     * @param serial     the serial number
-     * @param isApproved is it approved
+     * @param tokenId                   the token id
+     * @param sender                    the sender account id
+     * @param receiver                  the receiver account id
+     * @param serial                    the serial number
+     * @param isApproved                is it approved
      */
     TokenNftTransfer(TokenId tokenId, AccountId sender, AccountId receiver, long serial, boolean isApproved) {
         this.tokenId = tokenId;
@@ -74,8 +77,8 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     /**
      * Create a list of token nft transfer records from a protobuf.
      *
-     * @param tokenTransferList the protobuf
-     * @return the new list
+     * @param tokenTransferList         the protobuf
+     * @return                          the new list
      */
     static ArrayList<TokenNftTransfer> fromProtobuf(List<TokenTransferList> tokenTransferList) {
         var transfers = new ArrayList<TokenNftTransfer>();
@@ -100,14 +103,14 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     /**
      * Convert a byte array to a token NFT transfer object.
      *
-     * @param bytes the byte array
-     * @return the converted token nft transfer object
-     * @throws InvalidProtocolBufferException when there is an issue with the protobuf
+     * @param bytes                     the byte array
+     * @return                          the converted token nft transfer object
+     * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     @Deprecated
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(
-            List.of(
+            Lists.of(
                 TokenTransferList.newBuilder()
                     .setToken(TokenID.newBuilder().build())
                     .addNftTransfers(NftTransfer.parseFrom(bytes))
@@ -119,7 +122,7 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     /**
      * Create the protobuf.
      *
-     * @return the protobuf representation
+     * @return                          the protobuf representation
      */
     NftTransfer toProtobuf() {
         return NftTransfer.newBuilder()
@@ -144,7 +147,7 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
     /**
      * Convert the token NFT transfer object to a byte array.
      *
-     * @return the converted token NFT transfer object
+     * @return                          the converted token NFT transfer object
      */
     @Deprecated
     public byte[] toBytes() {
@@ -166,15 +169,10 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         TokenNftTransfer that = (TokenNftTransfer) o;
-        return serial == that.serial && isApproved == that.isApproved && tokenId.equals(that.tokenId) && sender.equals(
-            that.sender) && receiver.equals(that.receiver);
+        return serial == that.serial && isApproved == that.isApproved && tokenId.equals(that.tokenId) && sender.equals(that.sender) && receiver.equals(that.receiver);
     }
 
     @Override

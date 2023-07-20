@@ -20,11 +20,11 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import org.bouncycastle.util.encoders.Hex;
-import java.time.Duration;
+import org.threeten.bp.Duration;
 
 import javax.annotation.Nullable;
 import java.util.Collections;

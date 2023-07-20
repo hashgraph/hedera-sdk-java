@@ -1,8 +1,8 @@
 # Hedera™ Hashgraph Java SDK
 
-![](https://img.shields.io/badge/java-17%2B-blue?style=flat-square)
-![](https://img.shields.io/badge/android-24%2B-blue?style=flat-square)
-[![](https://img.shields.io/github/actions/workflow/status/hashgraph/hedera-sdk-java/build.yml?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
+![](https://img.shields.io/badge/java-7%2B-blue?style=flat-square)
+![](https://img.shields.io/badge/android-19%2B-blue?style=flat-square)
+[![](https://img.shields.io/github/workflow/status/hashgraph/hedera-sdk-java/Java/develop?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
 [![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
 > The Java SDK for interacting with Hedera Hashgraph: the official distributed
@@ -19,7 +19,11 @@
 Select _one_ of the following depending on your target platform.
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:2.25.0'
+// Android, Corda DJVM, Java 7+
+implementation 'com.hedera.hashgraph:sdk-jdk7:2.24.1'
+
+// Java 9+, Kotlin
+implementation 'com.hedera.hashgraph:sdk:2.24.1'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
@@ -53,10 +57,18 @@ implementation 'org.slf4j:slf4j-nop:2.0.3'
 Select _one_ of the following depending on your target platform.
 
 ```xml
+<!-- Android, Corda DJVM, Java 7+ -->
+<dependency>
+  <groupId>com.hedera.hashgraph</groupId>
+  <artifactId>sdk-jdk7</artifactId>
+  <version>2.24.1</version>
+</dependency>
+
+<!-- Java 9+, Kotlin -->
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.25.0</version>
+  <version>2.24.1</version>
 </dependency>
 ```
 
@@ -100,7 +112,7 @@ within the repository in [`examples/`](./examples/src/main/java).
 
 ### Dependencies
 
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v17+ (note this is to _build_, not run)
+ * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v14+ (note this is to _build_, not run)
 
 ### Compile
 
