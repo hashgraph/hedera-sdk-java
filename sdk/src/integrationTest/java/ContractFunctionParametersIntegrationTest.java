@@ -14,6 +14,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import java.math.BigInteger;
 import java.util.Objects;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,6 +69,12 @@ public class ContractFunctionParametersIntegrationTest {
             .getReceipt(testEnv.client);
 
         testEnv.close();
+    }
+
+    // so we don't get "network is busy" error
+    @AfterEach
+    public void afterEach() throws InterruptedException {
+        Thread.sleep(150);
     }
 
     @Test
@@ -1128,7 +1135,7 @@ public class ContractFunctionParametersIntegrationTest {
     @Test
     @DisplayName("Can receive int40 min value from contract call")
     void canCallContractFunctionInt40Min() throws Exception {
-        long int40Min = -140737488355328L;
+        long int40Min = -549755813888L;
 
         var response = new ContractCallQuery()
             .setContractId(contractId)
@@ -1143,7 +1150,7 @@ public class ContractFunctionParametersIntegrationTest {
     @Test
     @DisplayName("Can receive int40 max value from contract call")
     void canCallContractFunctionInt40Max() throws Exception {
-        long int40Max = 140737488355327L;
+        long int40Max = 549755813887L;
 
         var response = new ContractCallQuery()
             .setContractId(contractId)
