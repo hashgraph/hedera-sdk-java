@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.MessageLite;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
@@ -29,9 +31,6 @@ import io.grpc.MethodDescriptor;
 import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,10 +41,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Abstract base utility class.
@@ -406,7 +409,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 delay(node.getRemainingTimeForBackoff());
             }
 
-            if (node.channelFailedToConnect()) {
+            if (node.channelFailedToConnect(timeoutTime)) {
                 logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
                 lastException = grpcRequest.reactToConnectionFailure();
                 continue;
