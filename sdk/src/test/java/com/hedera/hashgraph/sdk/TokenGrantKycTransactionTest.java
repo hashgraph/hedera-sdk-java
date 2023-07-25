@@ -81,7 +81,7 @@ public class TokenGrantKycTransactionTest {
     }
 
     @Test
-    void constructTokenPauseTransactionFromTransactionBodyProtobuf() {
+    void constructTokenGrantKycTransactionFromTransactionBodyProtobuf() {
         var transactionBody = TokenGrantKycTransactionBody.newBuilder().setAccount(testAccountId.toProtobuf())
             .setToken(testTokenId.toProtobuf()).build();
 
