@@ -19,6 +19,14 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
@@ -28,12 +36,8 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
-
-import javax.annotation.Nullable;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -41,10 +45,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.*;
+import javax.annotation.Nullable;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 
 class ExecutableTest {
     Client client;
@@ -269,7 +273,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
@@ -293,7 +298,8 @@ class ExecutableTest {
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
+        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+            client);
 
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
         assertThat(resp.getValidateStatus()).isTrue();
@@ -312,7 +318,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(4),
                     TransactionId.withValidStart(new AccountId(4), now),
@@ -335,7 +342,8 @@ class ExecutableTest {
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
+        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+            client);
 
         verify(node3).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
@@ -366,7 +374,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
@@ -389,7 +398,8 @@ class ExecutableTest {
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(client);
+        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+            client);
 
         verify(node3, times(2)).channelFailedToConnect();
         verify(node4).channelFailedToConnect();
@@ -424,8 +434,8 @@ class ExecutableTest {
         when(node3.isHealthy()).thenReturn(true);
         when(node4.isHealthy()).thenReturn(true);
 
-        when(node3.channelFailedToConnect()).thenReturn(false);
-        when(node4.channelFailedToConnect()).thenReturn(false);
+        when(node3.channelFailedToConnect(any(Instant.class))).thenReturn(false);
+        when(node4.channelFailedToConnect(any(Instant.class))).thenReturn(false);
 
         var tx = new DummyTransaction();
         var nodeAccountIds = Arrays.asList(
@@ -436,16 +446,38 @@ class ExecutableTest {
         tx.setNodeAccountIds(nodeAccountIds);
 
         tx.blockingUnaryCall = (grpcRequest) -> {
-            if (i.getAndIncrement() == 0)
+            if (i.getAndIncrement() == 0) {
                 throw new StatusRuntimeException(io.grpc.Status.UNAVAILABLE);
-            else
+            } else {
                 throw new StatusRuntimeException(io.grpc.Status.ABORTED);
+            }
         };
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> tx.execute(client));
 
-        verify(node3).channelFailedToConnect();
-        verify(node4).channelFailedToConnect();
+        verify(node3).channelFailedToConnect(any(Instant.class));
+        verify(node4).channelFailedToConnect(any(Instant.class));
+    }
+
+    @Test
+    void testChannelFailedToConnectTimeout() {
+        TransactionResponse transactionResponse = new TransactionResponse(
+            new AccountId(3),
+            TransactionId.withValidStart(new AccountId(3), java.time.Instant.now()),
+            new byte[]{1, 2, 3},
+            null
+        );
+        var tx = new DummyTransaction();
+
+        tx.blockingUnaryCall = (grpcRequest) -> {
+            throw new StatusRuntimeException(io.grpc.Status.UNAVAILABLE);
+        };
+
+        when(node3.isHealthy()).thenReturn(true);
+        when(node3.channelFailedToConnect(any(Instant.class))).thenReturn(true);
+
+        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(
+            () -> transactionResponse.getReceipt(client, Duration.ofSeconds(2)));
     }
 
     @Test
@@ -529,7 +561,8 @@ class ExecutableTest {
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 
-        assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(ExecutionState.SERVER_ERROR);
+        assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(
+            ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.SUCCESS);
@@ -548,7 +581,8 @@ class ExecutableTest {
     }
 
     static class DummyTransaction<T extends Transaction<T>>
-        extends Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
+        extends
+        Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
 
         @Override
         void onExecute(Client client) {
@@ -568,7 +602,8 @@ class ExecutableTest {
 
         @Nullable
         @Override
-        TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+        TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId,
+            com.hedera.hashgraph.sdk.proto.Transaction request) {
             return null;
         }
 
@@ -596,7 +631,8 @@ class ExecutableTest {
         }
 
         @Override
-        TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
+        TransactionReceipt mapResponse(Response response, AccountId nodeId,
+            com.hedera.hashgraph.sdk.proto.Query request) {
             return null;
         }
 
