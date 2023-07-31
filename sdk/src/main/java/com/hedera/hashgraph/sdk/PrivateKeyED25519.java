@@ -122,7 +122,7 @@ class PrivateKeyED25519 extends PrivateKey {
      * @param privateKey                the byte array
      * @return                          the new key
      */
-    public static PrivateKey fromBytesInternal(byte[] privateKey) {
+    static PrivateKey fromBytesInternal(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key

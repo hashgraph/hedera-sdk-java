@@ -153,4 +153,27 @@ public class ECDSAPublicKeyTest {
 
         assertThat(key.toEvmAddress()).hasToString(expectedEvmAddress);
     }
+
+    @Test
+    @DisplayName("DER import test vectors")
+    void DERImportTestVectors() {
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
+        var PUBLIC_KEY_DER1 = "302d300706052b8104000a032200028173079d2e996ef6b2d064fc82d5fc7094367211e28422bec50a2f75c365f5fd";
+        var PUBLIC_KEY1 = "028173079d2e996ef6b2d064fc82d5fc7094367211e28422bec50a2f75c365f5fd";
+
+        var PUBLIC_KEY_DER2 = "3036301006072a8648ce3d020106052b8104000a032200036843f5cb338bbb4cdb21b0da4ea739d910951d6e8a5f703d313efe31afe788f4";
+        var PUBLIC_KEY2 = "036843f5cb338bbb4cdb21b0da4ea739d910951d6e8a5f703d313efe31afe788f4";
+
+        var PUBLIC_KEY_DER3 = "3056301006072a8648ce3d020106052b8104000a03420004aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a6597795f855ddcad2377e22259d1fcb4e0f1d35e8f2056300c15070bcbfce3759cc9d";
+        var PUBLIC_KEY3 = "03aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a65977";
+
+        var ecdsaPublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);
+        assertThat(ecdsaPublicKey1.toStringRaw()).isEqualTo(PUBLIC_KEY1);
+
+        var ecdsaPublicKey2 = PublicKey.fromStringDER(PUBLIC_KEY_DER2);
+        assertThat(ecdsaPublicKey2.toStringRaw()).isEqualTo(PUBLIC_KEY2);
+
+        var ecdsaPublicKey3 = PublicKey.fromStringDER(PUBLIC_KEY_DER3);
+        assertThat(ecdsaPublicKey3.toStringRaw()).isEqualTo(PUBLIC_KEY3);
+    }
 }

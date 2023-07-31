@@ -22,6 +22,7 @@ package com.hedera.hashgraph.sdk;
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
@@ -224,7 +225,11 @@ public abstract class PrivateKey extends Key {
      * @return                          the private key
      */
     public static PrivateKey fromBytesDER(byte[] privateKey) {
-        return PrivateKey.fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
+        try {
+            return fromPrivateKeyInfo(PrivateKeyInfo.getInstance(privateKey));
+        } catch (ClassCastException | IllegalArgumentException e) {
+            return PrivateKeyECDSA.fromECPrivateKeyInternal(ECPrivateKey.getInstance(privateKey));
+        }
     }
 
     /**

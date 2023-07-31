@@ -76,7 +76,7 @@ public class PublicKeyECDSA extends PublicKey {
      * @return                          the new public key
      */
     static PublicKeyECDSA fromSubjectKeyInfoInternal(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        return new PublicKeyECDSA(subjectPublicKeyInfo.getPublicKeyData().getBytes());
+        return fromBytesInternal(subjectPublicKeyInfo.getPublicKeyData().getBytes());
     }
 
     @Override
@@ -119,7 +119,7 @@ public class PublicKeyECDSA extends PublicKey {
     public byte[] toBytesDER() {
         try {
             return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_ECDSA_SECP256K1),
+                new AlgorithmIdentifier(ID_EC_PUBLIC_KEY, ID_ECDSA_SECP256K1),
                 keyData
             ).getEncoded("DER");
         } catch (IOException e) {

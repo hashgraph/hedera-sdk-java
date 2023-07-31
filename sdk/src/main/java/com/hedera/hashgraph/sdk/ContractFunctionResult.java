@@ -23,13 +23,14 @@ import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
+import org.bouncycastle.util.encoders.Hex;
+
+import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
-import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Result of invoking a contract via {@link ContractCallQuery}, or {@link ContractExecuteTransaction}, or the result of
@@ -109,6 +110,11 @@ public final class ContractFunctionResult {
      */
     @Nullable
     public final AccountId senderAccountId;
+    /**
+     * A list of updated contract account nonces containing the new nonce value for each contract account.
+     * This is always empty in a ContractCallLocalResponse#ContractFunctionResult message, since no internal creations can happen in a static EVM call.
+     */
+    public final List<ContractNonceInfo> contractNonces;
     private final ByteString rawResult;
 
     /**
@@ -158,6 +164,8 @@ public final class ContractFunctionResult {
         contractFunctionParametersBytes = inner.getFunctionParameters().toByteArray();
 
         senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
+
+        contractNonces = inner.getContractNoncesList().stream().map(ContractNonceInfo::fromProtobuf).toList();
     }
 
     /**
@@ -440,6 +448,10 @@ public final class ContractFunctionResult {
         //     contractFunctionResult.addStateChanges(stateChange.toProtobuf());
         // }
 
+        for (var contractNonce : contractNonces) {
+            contractFunctionResult.addContractNonces(contractNonce.toProtobuf());
+        }
+
         return contractFunctionResult.build();
     }
 
@@ -459,6 +471,7 @@ public final class ContractFunctionResult {
             .add("contractFunctionparametersBytes", Hex.toHexString(contractFunctionParametersBytes))
             .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
             .add("senderAccountId", senderAccountId)
+            .add("contractNonces", contractNonces)
             .toString();
     }
 }

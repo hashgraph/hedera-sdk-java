@@ -435,7 +435,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Mnemonic.toStandardED25519PrivateKey() test vector")
     void toStandardED25519PrivateKey() throws BadMnemonicException {
-        // TODO: add link to reference test vectors
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/73#issuecomment-1422330626
         final String CHAIN_CODE1 = "404914563637c92d688deb9d41f3f25cbe8d6659d859cc743712fcfac72d7eda";
         final String PRIVATE_KEY1 = "f8dcc99a1ced1cc59bc2fee161c26ca6d6af657da9aa654da724441343ecd16f";
         final String PUBLIC_KEY1 = "2e42c9f5a5cdbde64afa65ce3dbaf013d5f9ff8d177f6ef4eb89fbe8c084ec0d";
@@ -482,7 +482,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Mnemonic.toStandardED25519PrivateKey() test vector 2")
     void toStandardED25519PrivateKey2() throws BadMnemonicException {
-        // TODO: add link to reference test vectors
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/73#issuecomment-1424761224
         final String CHAIN_CODE1 = "48c89d67e9920e443f09d2b14525213ff83b245c8b98d63747ea0801e6d0ff3f";
         final String PRIVATE_KEY1 = "020487611f3167a68482b0f4aacdeb02cc30c52e53852af7b73779f67eeca3c5";
         final String PUBLIC_KEY1 = "2d047ff02a2091f860633f849ea2024b23e7803cfd628c9bdd635010cbd782d3";
@@ -541,7 +541,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Mnemonic.toStandardECDSAsecp256k1PrivateKey() test vector")
     void toStandardECDSAsecp256k1PrivateKey() throws BadMnemonicException {
-        // TODO: add link to reference test vectors
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/73#issuecomment-1422330626
         final String CHAIN_CODE1 = "7717bc71194c257d4b233e16cf48c24adef630052f874a262d19aeb2b527620d";
         final String PRIVATE_KEY1 = "0fde7bfd57ae6ec310bdd8b95967d98e8762a2c02da6f694b152cf9860860ab8";
         final String PUBLIC_KEY1 = "03b1c064b4d04d52e51f6c8e8bb1bff75d62fa7b1446412d5901d424f6aedd6fd4";
@@ -608,7 +608,7 @@ public class MnemonicTest {
     @Test
     @DisplayName("Mnemonic.toStandardECDSAsecp256k1PrivateKey() test vector 2")
     void toStandardECDSAsecp256k1PrivateKey2() throws BadMnemonicException {
-        // TODO: add link to reference test vectors
+        // https://github.com/hashgraph/hedera-sdk-reference/issues/73#issuecomment-1424761224
         final String CHAIN_CODE1 = "e76e0480faf2790e62dc1a7bac9dce51db1b3571fd74d8e264abc0d240a55d09";
         final String PRIVATE_KEY1 = "f033824c20dd9949ad7a4440f67120ee02a826559ed5884077361d69b2ad51dd";
         final String PUBLIC_KEY1 = "0294bf84a54806989a74ca4b76291d386914610b40b610d303162b9e495bc06416";

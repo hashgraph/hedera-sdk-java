@@ -32,7 +32,11 @@ tasks:
 
     "test:integration":
         cmds:
-            - ./gradlew -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID -PCONFIG_FILE=$CONFIG_FILE integrationTest {{.CLI_ARGS}}
+            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK integrationTest {{.CLI_ARGS}}
+        env:
+            OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
+            OPERATOR_ID: '0.0.1022'
+            HEDERA_NETWORK: 'localhost'
 
     "update:snapshots":
         cmds:
@@ -66,15 +70,15 @@ tasks:
 
     "update:addressbooks":
         cmds:
-            - task: "update:addressbooks:mainnet"
-            - task: "update:addressbooks:testnet"
-            - task: "update:addressbooks:previewnet"
+            -   task: "update:addressbooks:mainnet"
+            -   task: "update:addressbooks:testnet"
+            -   task: "update:addressbooks:previewnet"
 
     update:
         cmds:
-            - task: "update:proto"
-            - task: "update:snapshots"
-            - task: "update:addressbooks"
+            -   task: "update:proto"
+            -   task: "update:snapshots"
+            -   task: "update:addressbooks"
 
     publish:
         env:
