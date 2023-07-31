@@ -311,8 +311,8 @@ class ExecutableTest {
         when(node3.isHealthy()).thenReturn(true);
         when(node4.isHealthy()).thenReturn(true);
 
-        when(node3.channelFailedToConnect()).thenReturn(true);
-        when(node4.channelFailedToConnect()).thenReturn(false);
+        when(node3.channelFailedToConnect(any(Instant.class))).thenReturn(true);
+        when(node4.channelFailedToConnect(any(Instant.class))).thenReturn(false);
 
         var now = java.time.Instant.now();
         var tx = new DummyTransaction() {
@@ -345,8 +345,8 @@ class ExecutableTest {
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
             client);
 
-        verify(node3).channelFailedToConnect();
-        verify(node4).channelFailedToConnect();
+        verify(node3).channelFailedToConnect(any(Instant.class));
+        verify(node4).channelFailedToConnect(any(Instant.class));
         assertThat(resp.nodeId).isEqualTo(new AccountId(4));
     }
 
@@ -362,9 +362,10 @@ class ExecutableTest {
         when(node4.isHealthy()).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
         when(node5.isHealthy()).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
 
-        when(node3.channelFailedToConnect()).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
-        when(node4.channelFailedToConnect()).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
-        when(node5.channelFailedToConnect()).thenAnswer((Answer<Boolean>) inv -> i.getAndIncrement() == 0);
+        when(node3.channelFailedToConnect(any(Instant.class))).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
+        when(node4.channelFailedToConnect(any(Instant.class))).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
+        when(node5.channelFailedToConnect(any(Instant.class))).thenAnswer(
+            (Answer<Boolean>) inv -> i.getAndIncrement() == 0);
 
         when(node3.getRemainingTimeForBackoff()).thenReturn(500L);
         when(node4.getRemainingTimeForBackoff()).thenReturn(600L);
@@ -401,9 +402,9 @@ class ExecutableTest {
         com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
             client);
 
-        verify(node3, times(2)).channelFailedToConnect();
-        verify(node4).channelFailedToConnect();
-        verify(node5).channelFailedToConnect();
+        verify(node3, times(2)).channelFailedToConnect(any(Instant.class));
+        verify(node4).channelFailedToConnect(any(Instant.class));
+        verify(node5).channelFailedToConnect(any(Instant.class));
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
     }
 
@@ -413,9 +414,9 @@ class ExecutableTest {
         when(node4.isHealthy()).thenReturn(true);
         when(node5.isHealthy()).thenReturn(true);
 
-        when(node3.channelFailedToConnect()).thenReturn(true);
-        when(node4.channelFailedToConnect()).thenReturn(true);
-        when(node5.channelFailedToConnect()).thenReturn(true);
+        when(node3.channelFailedToConnect(any(Instant.class))).thenReturn(true);
+        when(node4.channelFailedToConnect(any(Instant.class))).thenReturn(true);
+        when(node5.channelFailedToConnect(any(Instant.class))).thenReturn(true);
 
         var tx = new DummyTransaction();
         var nodeAccountIds = Arrays.asList(
@@ -518,8 +519,8 @@ class ExecutableTest {
         tx.blockingUnaryCall = (grpcRequest) -> resp;
         tx.execute(client);
 
-        verify(node3).channelFailedToConnect();
-        verify(node4).channelFailedToConnect();
+        verify(node3).channelFailedToConnect(any(Instant.class));
+        verify(node4).channelFailedToConnect(any(Instant.class));
     }
 
 
@@ -550,7 +551,7 @@ class ExecutableTest {
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> tx.execute(client));
 
-        verify(node3).channelFailedToConnect();
+        verify(node3).channelFailedToConnect(any(Instant.class));
     }
 
     @Test
