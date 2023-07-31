@@ -86,8 +86,8 @@ public class IntegrationTestEnv {
 
         try {
             var operatorPrivateKey = PrivateKey.fromString(
-                "302e020100300506032b657004220420895ce211730a889dce859325fc2dc79517f6cd2071ac4c4e135fcc46b09c83dd");
-            operatorId = AccountId.fromString("0.0.1071");
+                "302e020100300506032b6570042204203b4688dbe47a0c1b963857e7618b5aef9eda5ab2ef5ff06527d393670e87a1d9");
+            operatorId = AccountId.fromString("0.0.1287");
             operatorKey = operatorPrivateKey.getPublicKey();
 
             client.setOperator(operatorId, operatorPrivateKey);

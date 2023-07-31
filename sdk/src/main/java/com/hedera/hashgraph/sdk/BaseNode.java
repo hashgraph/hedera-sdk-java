@@ -296,12 +296,20 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
      * @return                          did we fail to connect
      */
     boolean channelFailedToConnect() {
+        return channelFailedToConnect(Instant.MAX);
+    }
+
+    boolean channelFailedToConnect(Instant timeoutTime) {
         if (hasConnected) {
             return false;
         }
         hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
         try {
             for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
+                Duration currentTimeout = Duration.between(Instant.now(), timeoutTime);
+                if (currentTimeout.isNegative() || currentTimeout.isZero()) {
+                    return false;
+                }
                 TimeUnit.MILLISECONDS.sleep(GET_STATE_INTERVAL_MILLIS);
                 hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
             }
@@ -310,6 +318,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         }
         return !hasConnected;
     }
+
 
     private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
         hasConnected = (state == ConnectivityState.READY);
