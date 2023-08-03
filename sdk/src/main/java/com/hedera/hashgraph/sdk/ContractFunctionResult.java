@@ -19,18 +19,19 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.esaulpaugh.headlong.abi.Tuple;
+import com.esaulpaugh.headlong.abi.TupleType;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Result of invoking a contract via {@link ContractCallQuery}, or {@link ContractExecuteTransaction}, or the result of
@@ -111,8 +112,9 @@ public final class ContractFunctionResult {
     @Nullable
     public final AccountId senderAccountId;
     /**
-     * A list of updated contract account nonces containing the new nonce value for each contract account.
-     * This is always empty in a ContractCallLocalResponse#ContractFunctionResult message, since no internal creations can happen in a static EVM call.
+     * A list of updated contract account nonces containing the new nonce value for each contract account. This is
+     * always empty in a ContractCallLocalResponse#ContractFunctionResult message, since no internal creations can
+     * happen in a static EVM call.
      */
     public final List<ContractNonceInfo> contractNonces;
     private final ByteString rawResult;
@@ -473,5 +475,10 @@ public final class ContractFunctionResult {
             .add("senderAccountId", senderAccountId)
             .add("contractNonces", contractNonces)
             .toString();
+    }
+
+    public Tuple getResult(String types) {
+        TupleType tupleType = TupleType.parse(types);
+        return tupleType.decode(rawResult.toByteArray());
     }
 }
