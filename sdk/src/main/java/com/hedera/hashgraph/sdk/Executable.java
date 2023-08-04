@@ -421,6 +421,11 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             try {
                 response = blockingUnaryCall.apply(grpcRequest);
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
+            } catch (StatusRuntimeException e) {
+                if (e.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
+                    throw new TimeoutException();
+                }
+                throw e;
             } catch (Throwable e) {
                 lastException = e;
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
@@ -446,7 +451,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     // Response is not ready yet from server, need to wait.
                     lastException = grpcRequest.mapStatusException();
                     if (attempt < maxAttempts) {
-                        delay(grpcRequest.getDelay());
+                        currentTimeout = Duration.between(Instant.now(), timeoutTime);
+                        delay(Math.min(currentTimeout.toMillis(), grpcRequest.getDelay()));
                     }
                     continue;
                 case REQUEST_ERROR:
