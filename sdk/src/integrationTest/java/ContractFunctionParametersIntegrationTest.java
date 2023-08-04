@@ -2673,6 +2673,19 @@ public class ContractFunctionParametersIntegrationTest {
     }
 
     @Test
+    @DisplayName("Can receive string array value from contract call with getResult function")
+    void canCallContractFunctionStringArrayType_getResult() throws Exception {
+        var testStringArray = new String[]{"Test1", "Test2"};
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+            .setFunction("returnStringArr", new ContractFunctionParameters().addStringArray(testStringArray))
+            .setQueryPayment(new Hbar(10)).execute(testEnv.client);
+
+        var responseResult = (String[]) response.getResult("(string[])").get(0);
+        assertThat(responseResult).isEqualTo(testStringArray);
+    }
+
+    @Test
     @DisplayName("Can receive address value from contract call")
     void canCallContractFunctionAddressType() throws Exception {
         var testAddress = "1234567890123456789012345678901234567890";
