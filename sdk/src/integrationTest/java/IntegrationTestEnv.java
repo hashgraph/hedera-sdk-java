@@ -72,48 +72,6 @@ public class IntegrationTestEnv {
         client.setNetwork(network);
     }
 
-    // revisit me later
-    public IntegrationTestEnv(int maxNodesPerTransaction, int previewnet) throws Exception {
-
-        client = Client.forPreviewnet();
-
-        if (maxNodesPerTransaction == 0) {
-            maxNodesPerTransaction = client.getNetwork().size();
-        }
-
-        client.setMaxNodesPerTransaction(maxNodesPerTransaction);
-        originalClient = client;
-
-        try {
-            var operatorPrivateKey = PrivateKey.fromString(
-                "302e020100300506032b6570042204203b4688dbe47a0c1b963857e7618b5aef9eda5ab2ef5ff06527d393670e87a1d9");
-            operatorId = AccountId.fromString("0.0.1287");
-            operatorKey = operatorPrivateKey.getPublicKey();
-
-            client.setOperator(operatorId, operatorPrivateKey);
-        } catch (RuntimeException ignored) {
-        }
-
-        operatorKey = client.getOperatorPublicKey();
-        operatorId = client.getOperatorAccountId();
-
-        assertThat(client.getOperatorAccountId()).isNotNull();
-        assertThat(client.getOperatorPublicKey()).isNotNull();
-
-        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
-            isLocalNode = true;
-        }
-
-        var nodeGetter = new TestEnvNodeGetter(client);
-        var network = new HashMap<String, AccountId>();
-
-        var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
-        for (@Var int i = 0; i < nodeCount; i++) {
-            nodeGetter.nextNode(network);
-        }
-        client.setNetwork(network);
-    }
-
     @SuppressWarnings("EmptyCatch")
     private static Client createTestEnvClient() throws Exception {
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
