@@ -421,12 +421,13 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             try {
                 response = blockingUnaryCall.apply(grpcRequest);
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
-            } catch (StatusRuntimeException e) {
-                if (e.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
-                    throw new TimeoutException();
-                }
-                throw e;
             } catch (Throwable e) {
+                if (e instanceof StatusRuntimeException) {
+                    StatusRuntimeException statusRuntimeException = (StatusRuntimeException) e;
+                    if (statusRuntimeException.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
+                        throw new TimeoutException();
+                    }
+                }
                 lastException = e;
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
             }
