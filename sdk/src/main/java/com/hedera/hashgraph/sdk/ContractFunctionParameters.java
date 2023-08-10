@@ -93,6 +93,10 @@ public final class ContractFunctionParameters {
         return rightPad32(ByteString.copyFrom(bytes));
     }
 
+    private static ByteString encodeBool(boolean bool) {
+        return int256(bool ? 1 : 0, 8);
+    }
+
     private static ByteString encodeArray(Stream<ByteString> elements) {
         List<ByteString> list = elements.toList();
 
@@ -312,7 +316,27 @@ public final class ContractFunctionParameters {
      */
     public ContractFunctionParameters addBool(boolean bool) {
         // boolean encodes to `uint8` of values [0, 1]
-        args.add(new Argument("bool", int256(bool ? 1 : 0, 8), false));
+        args.add(new Argument("bool", encodeBool(bool), false));
+        return this;
+    }
+
+    /**
+     * Add a boolean array parameter
+     *
+     * @param param The array of booleans to be added
+     * @return {@code this}
+     */
+    public ContractFunctionParameters addBoolArray(boolean[] param) {
+        Boolean[] boolWrapperArray = new Boolean[param.length];
+        for (int i = 0; i < param.length; i++) {
+            boolWrapperArray[i] = param[i];
+        }
+
+        Stream<ByteString> bools = Arrays.stream(boolWrapperArray)
+            .map(ContractFunctionParameters::encodeBool);
+
+        args.add(new Argument("bool[]", encodeArray(bools), true));
+
         return this;
     }
 
