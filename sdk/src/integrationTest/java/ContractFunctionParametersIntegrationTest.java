@@ -2698,7 +2698,7 @@ public class ContractFunctionParametersIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can receive address value from contract call")
+    @DisplayName("Can receive address array value from contract call")
     void canCallContractFunctionAddressArrayType() throws Exception {
         var testAddressArray = new String[]{"1234567890123456789012345678901234567890",
             "1234567890123456789012345678901234567891"};
@@ -2725,6 +2725,20 @@ public class ContractFunctionParametersIntegrationTest {
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
         assertThat(response.getBool(0)).isEqualTo(testBoolean);
+    }
+
+    @Test
+    @DisplayName("Can receive boolean array value from contract call")
+    void canCallContractFunctionBooleanArrayType() throws Exception {
+        var testBooleanArray = new boolean[]{true, false};
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+            .setFunction("returnBooleanArr", new ContractFunctionParameters().addBoolArray(testBooleanArray))
+            .setQueryPayment(new Hbar(10)).execute(testEnv.client);
+
+        var responseResult = (boolean[]) response.getResult("(bool[])").get(0);
+
+        assertThat(responseResult).isEqualTo(testBooleanArray);
     }
 
     @Test
