@@ -22,13 +22,13 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The ID for a cryptocurrency account on Hedera.
@@ -206,14 +206,18 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromEvmAddress(EvmAddress evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
-        return new AccountId(
-            shard,
-            realm,
-            0,
-            null,
-            null,
-            evmAddress
-        );
+        if (EntityIdHelper.isLongZeroAddress(evmAddress.toBytes())) {
+            return fromSolidityAddress(evmAddress.toString());
+        } else {
+            return new AccountId(
+                shard,
+                realm,
+                0,
+                null,
+                null,
+                evmAddress
+            );
+        }
     }
 
     /**
@@ -223,7 +227,11 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromSolidityAddress(String address) {
-        return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
+        if (EntityIdHelper.isLongZeroAddress(Hex.decode(address))) {
+            return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
+        } else {
+            return fromEvmAddress(address);
+        }
     }
 
     /**
@@ -291,6 +299,27 @@ public final class AccountId implements Comparable<AccountId> {
             accountIdBuilder.setAccountNum(num);
         }
         return accountIdBuilder.build();
+    }
+
+    /**
+     * @description Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     *
+     * @param {Client} client
+     * @returns populated AccountId instance
+     */
+    public AccountId populateAccountNum(Client client) throws IOException, InterruptedException {
+        long accountNumFromMirrorNode = EntityIdHelper.getAccountNumFromMirrorNode(client, evmAddress.toString());
+
+        return new AccountId(
+            this.shard,
+            this.realm,
+            accountNumFromMirrorNode,
+            this.checksum,
+            this.aliasKey,
+            this.evmAddress
+        );
     }
 
     /**

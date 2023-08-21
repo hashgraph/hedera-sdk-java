@@ -20,9 +20,17 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.DecoderException;
@@ -254,6 +262,84 @@ class EntityIdHelper {
             throw new IllegalStateException(
                 "Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's ledgerId is set.");
         }
+    }
+
+    /**
+     * Takes an address as `byte[]` and returns whether this is a long-zero address
+     * @param address
+     * @return
+     */
+    public static boolean isLongZeroAddress(byte[] address) {
+        for (int i = 0; i < 12; i++) {
+            if (address[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get AccountId num from mirror node using evm address.
+     *
+     * @param client
+     * @param evmAddress
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static long getAccountNumFromMirrorNode(Client client, String evmAddress) throws IOException, InterruptedException {
+        String apiEndpoint = "/accounts/" + evmAddress;
+
+        return parseNumFromMirrorNodeResponse(
+            performQueryToMirrorNode(client, apiEndpoint),
+            "account");
+    }
+
+    /**
+     * Get ContractId num from mirror node using evm address.
+     *
+     * @param client
+     * @param evmAddress
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static long getContractNumFromMirrorNode(Client client, String evmAddress) throws IOException, InterruptedException {
+        String apiEndpoint = "/contracts/" + evmAddress;
+
+        return parseNumFromMirrorNodeResponse(
+            performQueryToMirrorNode(client, apiEndpoint),
+            "contract_id");
+    }
+
+    private static String performQueryToMirrorNode(Client client, String apiEndpoint) throws IOException, InterruptedException {
+        Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
+            .map(url -> url.substring(0, url.indexOf(":")))
+            .findFirst();
+
+        if (mirrorUrl.isEmpty()) {
+            throw new IllegalArgumentException("Mirror URL not found");
+        }
+
+        String apiUrl = "https://" + mirrorUrl.get() + "/api/v1" + apiEndpoint;
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+            .uri(URI.create(apiUrl))
+            .build();
+
+        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
+
+        return response.body();
+    }
+
+    private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
+
+        String num = jsonObject.get(memberName).getAsString();
+
+        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
     }
 
     @FunctionalInterface

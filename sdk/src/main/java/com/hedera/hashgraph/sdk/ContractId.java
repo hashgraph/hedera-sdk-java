@@ -22,13 +22,13 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractID;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The ID for a smart contract instance on Hedera.
@@ -133,7 +133,11 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * @return                          the contract id object
      */
     public static ContractId fromSolidityAddress(String address) {
-        return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
+        if (EntityIdHelper.isLongZeroAddress(Hex.decode(address))) {
+            return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
+        } else {
+            return fromEvmAddress(0, 0, address);
+        }
     }
 
     /**
@@ -145,11 +149,15 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * @return                          the contract id object
      */
     public static ContractId fromEvmAddress(@Nonnegative long shard, @Nonnegative long realm, String evmAddress) {
-        return new ContractId(
-            shard,
-            realm,
-            Hex.decode(evmAddress.startsWith("0x") ? evmAddress.substring(2) : evmAddress)
-        );
+        if (EntityIdHelper.isLongZeroAddress(Hex.decode(evmAddress))) {
+            return fromSolidityAddress(evmAddress);
+        } else {
+            return new ContractId(
+                shard,
+                realm,
+                Hex.decode(evmAddress.startsWith("0x") ? evmAddress.substring(2) : evmAddress)
+            );
+        }
     }
 
     /**
@@ -210,6 +218,26 @@ public class ContractId extends Key implements Comparable<ContractId> {
             builder.setContractNum(num);
         }
         return builder.build();
+    }
+
+    /**
+     * @description Gets the actual `num` field of the `ContractId` from the Mirror Node.
+     * Should be used after generating `ContractId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     *
+     * @param {Client} client
+     * @returns {Promise<ContractId>}
+     */
+    public ContractId populateContractNum(Client client) throws IOException, InterruptedException {
+        EvmAddress address = new EvmAddress(this.evmAddress);
+        long contractNumFromMirrorNode = EntityIdHelper.getContractNumFromMirrorNode(client, address.toString());
+
+        return new ContractId(
+            this.shard,
+            this.realm,
+            contractNumFromMirrorNode,
+            checksum
+        );
     }
 
     /**
