@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.28.0
+
+## What's Changed
+* Improvements in HIP-729 integration test by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1523
+* Update copyright date by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1522
+* Improvements after resolving issue #1497 by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1521
+* Add integration tests for `ContractFunctionParameters` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1494
+* Update README.md by @SimiHunjan in https://github.com/hashgraph/hedera-sdk-java/pull/1536
+* Fix for `java.lang.VerifyError` exception in examples. by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1541
+* Add unit tests for `TopicMessageSubmitTransaction` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1544
+* Add `addBoolArray` function to `ContractFunctionParameters` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1543
+* Add unit tests for `TopicMessageChunk` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1550
+* Add unit tests for `TopicMessage` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1549
+* Add more unit tests for `TopicUpdateTransaction` by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1551
+* Updated addressbooks by @thenswan in https://github.com/hashgraph/hedera-sdk-java/pull/1558
+
 ## 2.27.0
 
 ### Fixed
