@@ -113,7 +113,7 @@ class EntityIdHelper {
      * @param address the string representation
      * @return the decoded address
      */
-    private static byte[] decodeSolidityAddress(@Var String address) {
+    public static byte[] decodeSolidityAddress(@Var String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {

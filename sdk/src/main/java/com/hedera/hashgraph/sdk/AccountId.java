@@ -224,7 +224,7 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromSolidityAddress(String address) {
-        if (EntityIdHelper.isLongZeroAddress(Hex.decode(address))) {
+        if (EntityIdHelper.isLongZeroAddress(EntityIdHelper.decodeSolidityAddress(address))) {
             return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
         } else {
             return fromEvmAddress(address);
