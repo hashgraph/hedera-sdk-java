@@ -327,6 +327,10 @@ class EntityIdHelper {
 
         String apiUrl = "https://" + mirrorUrl.get() + "/api/v1" + apiEndpoint;
 
+        if (client.getLedgerId() == null) {
+            apiUrl = "http://" + mirrorUrl.get() + ":5551/api/v1" + apiEndpoint;
+        }
+
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
             .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
