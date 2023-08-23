@@ -218,28 +218,26 @@ public class ContractId extends Key implements Comparable<ContractId> {
     }
 
     /**
-     * @description Gets the actual `num` field of the `ContractId` from the Mirror Node.
+     *  Gets the actual `num` field of the `ContractId` from the Mirror Node.
      * Should be used after generating `ContractId.fromEvmAddress()` because it sets the `num` field to `0`
      * automatically since there is no connection between the `num` and the `evmAddress`
-     *
      * Sync version
      *
-     * @param {Client} client
-     * @returns {Promise<ContractId>}
+     * @param client
+     * @return populated ContractId instance
      */
     public ContractId populateContractNum(Client client) throws InterruptedException, ExecutionException {
         return populateContractNumAsync(client).get();
     }
 
     /**
-     * @description Gets the actual `num` field of the `ContractId` from the Mirror Node.
+     * Gets the actual `num` field of the `ContractId` from the Mirror Node.
      * Should be used after generating `ContractId.fromEvmAddress()` because it sets the `num` field to `0`
      * automatically since there is no connection between the `num` and the `evmAddress`
-     *
      * Async version
      *
-     * @param {Client} client
-     * @returns {Promise<ContractId>}
+     * @param client
+     * @return populated ContractId instance
      */
     public CompletableFuture<ContractId> populateContractNumAsync(Client client) {
         EvmAddress address = new EvmAddress(this.evmAddress);

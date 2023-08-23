@@ -207,18 +207,14 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromEvmAddress(EvmAddress evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
-        if (EntityIdHelper.isLongZeroAddress(evmAddress.toBytes())) {
-            return fromSolidityAddress(evmAddress.toString());
-        } else {
-            return new AccountId(
-                shard,
-                realm,
-                0,
-                null,
-                null,
-                evmAddress
-            );
-        }
+        return new AccountId(
+            shard,
+            realm,
+            0,
+            null,
+            null,
+            evmAddress
+        );
     }
 
     /**
@@ -303,28 +299,26 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
-     * @description Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Gets the actual `num` field of the `AccountId` from the Mirror Node.
      * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
      * automatically since there is no connection between the `num` and the `evmAddress`
-     *
      * Sync version
      *
-     * @param {Client} client
-     * @returns populated AccountId instance
+     * @param client
+     * @return populated AccountId instance
      */
     public AccountId populateAccountNum(Client client) throws InterruptedException, ExecutionException {
         return populateAccountNumAsync(client).get();
     }
 
     /**
-     * @description Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Gets the actual `num` field of the `AccountId` from the Mirror Node.
      * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
      * automatically since there is no connection between the `num` and the `evmAddress`
-     *
      * Async version
      *
-     * @param {Client} client
-     * @returns populated AccountId instance
+     * @param client
+     * @return populated AccountId instance
      */
     public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
         return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
