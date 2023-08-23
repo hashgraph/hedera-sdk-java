@@ -27,14 +27,13 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 /**
  * Internal utility class.
@@ -282,9 +281,10 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
 
         channel = channelBuilder
             .keepAliveTimeout(10, TimeUnit.SECONDS)
+            .keepAliveWithoutCalls(true)
+            .disableRetry()
             .userAgent(getUserAgent())
             .executor(executor)
-            .disableRetry()
             .build();
 
         return channel;
