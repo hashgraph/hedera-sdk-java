@@ -22,9 +22,10 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
@@ -306,20 +307,35 @@ public final class AccountId implements Comparable<AccountId> {
      * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
      * automatically since there is no connection between the `num` and the `evmAddress`
      *
+     * Sync version
+     *
      * @param {Client} client
      * @returns populated AccountId instance
      */
-    public AccountId populateAccountNum(Client client) throws IOException, InterruptedException {
-        long accountNumFromMirrorNode = EntityIdHelper.getAccountNumFromMirrorNode(client, evmAddress.toString());
+    public AccountId populateAccountNum(Client client) throws InterruptedException, ExecutionException {
+        return populateAccountNumAsync(client).get();
+    }
 
-        return new AccountId(
-            this.shard,
-            this.realm,
-            accountNumFromMirrorNode,
-            this.checksum,
-            this.aliasKey,
-            this.evmAddress
-        );
+    /**
+     * @description Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     *
+     * Async version
+     *
+     * @param {Client} client
+     * @returns populated AccountId instance
+     */
+    public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
+        return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
+            .thenApply(accountNumFromMirrorNode ->
+                new AccountId(
+                    this.shard,
+                    this.realm,
+                    accountNumFromMirrorNode,
+                    this.checksum,
+                    this.aliasKey,
+                    this.evmAddress));
     }
 
     /**

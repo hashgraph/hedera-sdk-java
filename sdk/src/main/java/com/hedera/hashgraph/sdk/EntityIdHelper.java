@@ -28,9 +28,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.DecoderException;
@@ -52,6 +54,8 @@ class EntityIdHelper {
 
     private static final Pattern ENTITY_ID_REGEX = Pattern.compile(
         "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
+
+    static final Duration MIRROR_NODE_CONNECTION_TIMEOUT = Duration.ofSeconds(30);
 
     /**
      * Constructor.
@@ -287,12 +291,11 @@ class EntityIdHelper {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static long getAccountNumFromMirrorNode(Client client, String evmAddress) throws IOException, InterruptedException {
+    public static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/accounts/" + evmAddress;
-
-        return parseNumFromMirrorNodeResponse(
-            performQueryToMirrorNode(client, apiEndpoint),
-            "account");
+        return performQueryToMirrorNodeAsync(client, apiEndpoint)
+            .thenApply(response ->
+                parseNumFromMirrorNodeResponse(response, "account"));
     }
 
     /**
@@ -304,33 +307,34 @@ class EntityIdHelper {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static long getContractNumFromMirrorNode(Client client, String evmAddress) throws IOException, InterruptedException {
+    public static CompletableFuture<Long> getContractNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/contracts/" + evmAddress;
 
-        return parseNumFromMirrorNodeResponse(
-            performQueryToMirrorNode(client, apiEndpoint),
-            "contract_id");
+        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint);
+
+        return responseFuture.thenApply(response ->
+            parseNumFromMirrorNodeResponse(response, "contract_id"));
     }
 
-    private static String performQueryToMirrorNode(Client client, String apiEndpoint) throws IOException, InterruptedException {
+    private static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint) {
         Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
             .map(url -> url.substring(0, url.indexOf(":")))
             .findFirst();
 
         if (mirrorUrl.isEmpty()) {
-            throw new IllegalArgumentException("Mirror URL not found");
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Mirror URL not found"));
         }
 
         String apiUrl = "https://" + mirrorUrl.get() + "/api/v1" + apiEndpoint;
 
         HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
+            .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
             .uri(URI.create(apiUrl))
             .build();
 
-        HttpResponse<String> response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-
-        return response.body();
+        return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body);
     }
 
     private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
