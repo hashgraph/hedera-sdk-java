@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.protobuf.MessageLite;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
@@ -29,9 +31,6 @@ import io.grpc.MethodDescriptor;
 import io.grpc.Status.Code;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.ClientCalls;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,10 +41,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-
-import static com.hedera.hashgraph.sdk.FutureConverter.toCompletableFuture;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Abstract base utility class.
@@ -406,16 +409,25 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 delay(node.getRemainingTimeForBackoff());
             }
 
-            if (node.channelFailedToConnect()) {
+            if (node.channelFailedToConnect(timeoutTime)) {
                 logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
                 lastException = grpcRequest.reactToConnectionFailure();
                 continue;
             }
 
+            currentTimeout = Duration.between(Instant.now(), timeoutTime);
+            grpcRequest.setGrpcDeadline(currentTimeout);
+
             try {
                 response = blockingUnaryCall.apply(grpcRequest);
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
             } catch (Throwable e) {
+                if (e instanceof StatusRuntimeException) {
+                    StatusRuntimeException statusRuntimeException = (StatusRuntimeException) e;
+                    if (statusRuntimeException.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
+                        throw new TimeoutException();
+                    }
+                }
                 lastException = e;
                 logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
             }
@@ -440,7 +452,8 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                     // Response is not ready yet from server, need to wait.
                     lastException = grpcRequest.mapStatusException();
                     if (attempt < maxAttempts) {
-                        delay(grpcRequest.getDelay());
+                        currentTimeout = Duration.between(Instant.now(), timeoutTime);
+                        delay(Math.min(currentTimeout.toMillis(), grpcRequest.getDelay()));
                     }
                     continue;
                 case REQUEST_ERROR:
@@ -835,8 +848,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         private final ProtoRequestT request;
         private final long startAt;
         private final long delay;
-        private final Duration grpcDeadline;
-
+        private Duration grpcDeadline;
         private ResponseT response;
         private double latency;
         private Status responseStatus;
@@ -860,6 +872,10 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 Executable.this.grpcDeadline.toMillis());
 
             return CallOptions.DEFAULT.withDeadlineAfter(deadline, TimeUnit.MILLISECONDS);
+        }
+
+        public void setGrpcDeadline(Duration grpcDeadline) {
+            this.grpcDeadline = grpcDeadline;
         }
 
         public Node getNode() {

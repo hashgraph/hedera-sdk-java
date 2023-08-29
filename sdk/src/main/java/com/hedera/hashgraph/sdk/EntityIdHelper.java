@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,19 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.DecoderException;
@@ -44,6 +54,8 @@ class EntityIdHelper {
 
     private static final Pattern ENTITY_ID_REGEX = Pattern.compile(
         "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
+
+    static final Duration MIRROR_NODE_CONNECTION_TIMEOUT = Duration.ofSeconds(30);
 
     /**
      * Constructor.
@@ -101,7 +113,7 @@ class EntityIdHelper {
      * @param address the string representation
      * @return the decoded address
      */
-    private static byte[] decodeSolidityAddress(@Var String address) {
+    public static byte[] decodeSolidityAddress(@Var String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
@@ -254,6 +266,88 @@ class EntityIdHelper {
             throw new IllegalStateException(
                 "Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's ledgerId is set.");
         }
+    }
+
+    /**
+     * Takes an address as `byte[]` and returns whether this is a long-zero address
+     * @param address
+     * @return
+     */
+    public static boolean isLongZeroAddress(byte[] address) {
+        for (int i = 0; i < 12; i++) {
+            if (address[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Get AccountId num from mirror node using evm address.
+     *
+     * @param client
+     * @param evmAddress
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
+        String apiEndpoint = "/accounts/" + evmAddress;
+        return performQueryToMirrorNodeAsync(client, apiEndpoint)
+            .thenApply(response ->
+                parseNumFromMirrorNodeResponse(response, "account"));
+    }
+
+    /**
+     * Get ContractId num from mirror node using evm address.
+     *
+     * @param client
+     * @param evmAddress
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static CompletableFuture<Long> getContractNumFromMirrorNodeAsync(Client client, String evmAddress) {
+        String apiEndpoint = "/contracts/" + evmAddress;
+
+        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint);
+
+        return responseFuture.thenApply(response ->
+            parseNumFromMirrorNodeResponse(response, "contract_id"));
+    }
+
+    private static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint) {
+        Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
+            .map(url -> url.substring(0, url.indexOf(":")))
+            .findFirst();
+
+        if (mirrorUrl.isEmpty()) {
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Mirror URL not found"));
+        }
+
+        String apiUrl = "https://" + mirrorUrl.get() + "/api/v1" + apiEndpoint;
+
+        if (client.getLedgerId() == null) {
+            apiUrl = "http://" + mirrorUrl.get() + ":5551/api/v1" + apiEndpoint;
+        }
+
+        HttpClient httpClient = HttpClient.newHttpClient();
+        HttpRequest httpRequest = HttpRequest.newBuilder()
+            .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
+            .uri(URI.create(apiUrl))
+            .build();
+
+        return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+            .thenApply(HttpResponse::body);
+    }
+
+    private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
+
+        String num = jsonObject.get(memberName).getAsString();
+
+        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
     }
 
     @FunctionalInterface

@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The ID for a cryptocurrency account on Hedera.
@@ -223,7 +224,11 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromSolidityAddress(String address) {
-        return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
+        if (EntityIdHelper.isLongZeroAddress(EntityIdHelper.decodeSolidityAddress(address))) {
+            return EntityIdHelper.fromSolidityAddress(address, AccountId::new);
+        } else {
+            return fromEvmAddress(address);
+        }
     }
 
     /**
@@ -291,6 +296,40 @@ public final class AccountId implements Comparable<AccountId> {
             accountIdBuilder.setAccountNum(num);
         }
         return accountIdBuilder.build();
+    }
+
+    /**
+     * Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     * Sync version
+     *
+     * @param client
+     * @return populated AccountId instance
+     */
+    public AccountId populateAccountNum(Client client) throws InterruptedException, ExecutionException {
+        return populateAccountNumAsync(client).get();
+    }
+
+    /**
+     * Gets the actual `num` field of the `AccountId` from the Mirror Node.
+     * Should be used after generating `AccountId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     * Async version
+     *
+     * @param client
+     * @return populated AccountId instance
+     */
+    public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
+        return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
+            .thenApply(accountNumFromMirrorNode ->
+                new AccountId(
+                    this.shard,
+                    this.realm,
+                    accountNumFromMirrorNode,
+                    this.checksum,
+                    this.aliasKey,
+                    this.evmAddress));
     }
 
     /**

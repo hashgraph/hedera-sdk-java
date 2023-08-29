@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ package com.hedera.hashgraph.sdk;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractID;
-import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The ID for a smart contract instance on Hedera.
@@ -133,7 +134,11 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * @return                          the contract id object
      */
     public static ContractId fromSolidityAddress(String address) {
-        return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
+        if (EntityIdHelper.isLongZeroAddress(EntityIdHelper.decodeSolidityAddress(address))) {
+            return EntityIdHelper.fromSolidityAddress(address, ContractId::new);
+        } else {
+            return fromEvmAddress(0, 0, address);
+        }
     }
 
     /**
@@ -210,6 +215,36 @@ public class ContractId extends Key implements Comparable<ContractId> {
             builder.setContractNum(num);
         }
         return builder.build();
+    }
+
+    /**
+     *  Gets the actual `num` field of the `ContractId` from the Mirror Node.
+     * Should be used after generating `ContractId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     * Sync version
+     *
+     * @param client
+     * @return populated ContractId instance
+     */
+    public ContractId populateContractNum(Client client) throws InterruptedException, ExecutionException {
+        return populateContractNumAsync(client).get();
+    }
+
+    /**
+     * Gets the actual `num` field of the `ContractId` from the Mirror Node.
+     * Should be used after generating `ContractId.fromEvmAddress()` because it sets the `num` field to `0`
+     * automatically since there is no connection between the `num` and the `evmAddress`
+     * Async version
+     *
+     * @param client
+     * @return populated ContractId instance
+     */
+    public CompletableFuture<ContractId> populateContractNumAsync(Client client) {
+        EvmAddress address = new EvmAddress(this.evmAddress);
+
+        return EntityIdHelper.getContractNumFromMirrorNodeAsync(client, address.toString())
+            .thenApply(contractNumFromMirrorNode ->
+                new ContractId(this.shard, this.realm, contractNumFromMirrorNode, checksum));
     }
 
     /**

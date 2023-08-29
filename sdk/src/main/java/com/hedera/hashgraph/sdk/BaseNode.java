@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2022 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,14 +27,13 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
-import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nullable;
 
 /**
  * Internal utility class.
@@ -282,9 +281,10 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
 
         channel = channelBuilder
             .keepAliveTimeout(10, TimeUnit.SECONDS)
+            .keepAliveWithoutCalls(true)
+            .disableRetry()
             .userAgent(getUserAgent())
             .executor(executor)
-            .disableRetry()
             .build();
 
         return channel;
@@ -296,12 +296,20 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
      * @return                          did we fail to connect
      */
     boolean channelFailedToConnect() {
+        return channelFailedToConnect(Instant.MAX);
+    }
+
+    boolean channelFailedToConnect(Instant timeoutTime) {
         if (hasConnected) {
             return false;
         }
         hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
         try {
             for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
+                Duration currentTimeout = Duration.between(Instant.now(), timeoutTime);
+                if (currentTimeout.isNegative() || currentTimeout.isZero()) {
+                    return false;
+                }
                 TimeUnit.MILLISECONDS.sleep(GET_STATE_INTERVAL_MILLIS);
                 hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
             }
@@ -310,6 +318,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         }
         return !hasConnected;
     }
+
 
     private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
         hasConnected = (state == ConnectivityState.READY);
