@@ -19,22 +19,21 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.failedFuture;
+
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.failedFuture;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
  * The client-generated ID for a transaction.
@@ -63,6 +62,8 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     @Nullable
     private Integer nonce = null;
+
+    private static final AtomicLong monotonicTime = new AtomicLong();
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -97,8 +98,19 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @return {@link com.hedera.hashgraph.sdk.TransactionId}
      */
     public static TransactionId generate(AccountId accountId) {
-        Instant instant = Clock.systemUTC().instant().minusNanos((long) (Math.random() * 5000000000L + 8000000000L));
-        return new TransactionId(accountId, instant);
+        long currentTime;
+        long lastTime;
+
+        do {
+            currentTime = System.currentTimeMillis() * 1_000_000L;
+            lastTime = monotonicTime.get();
+            if (currentTime <= lastTime) currentTime = lastTime + 1000L;
+        }
+
+        while (!monotonicTime.compareAndSet(lastTime, currentTime));
+
+        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime));
+
     }
 
     /**
