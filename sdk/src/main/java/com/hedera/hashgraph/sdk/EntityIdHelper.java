@@ -299,6 +299,22 @@ class EntityIdHelper {
     }
 
     /**
+     * Get EvmAddress from mirror node using account num.
+     *
+     * @param client
+     * @param num
+     * @return
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public static CompletableFuture<EvmAddress> getEvmAddressFromMirrorNodeAsync(Client client, long num) {
+        String apiEndpoint = "/accounts/" + num;
+        return performQueryToMirrorNodeAsync(client, apiEndpoint)
+            .thenApply(response ->
+                EvmAddress.fromString(parseEvmAddressFromMirrorNodeResponse(response, "evm_address")));
+    }
+
+    /**
      * Get ContractId num from mirror node using evm address.
      *
      * @param client
@@ -348,6 +364,15 @@ class EntityIdHelper {
         String num = jsonObject.get(memberName).getAsString();
 
         return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
+    }
+
+    private static String parseEvmAddressFromMirrorNodeResponse(String responseBody, String memberName) {
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
+
+        String evmAddress = jsonObject.get(memberName).getAsString();
+
+        return evmAddress.substring(evmAddress.lastIndexOf(".") + 1);
     }
 
     @FunctionalInterface
