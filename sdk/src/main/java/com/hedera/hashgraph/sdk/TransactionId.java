@@ -63,7 +63,12 @@ public final class TransactionId implements Comparable<TransactionId> {
     @Nullable
     private Integer nonce = null;
 
+    private static final long MICROSECONDS_PER_MILLISECOND = 1_000_000L;
+
+    private static final long CLOCK_DRIFT_THRESHOLD = 1_000L;
+
     private static final AtomicLong monotonicTime = new AtomicLong();
+
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -101,16 +106,24 @@ public final class TransactionId implements Comparable<TransactionId> {
         long currentTime;
         long lastTime;
 
+        // Loop to ensure the generated timestamp is strictly increasing,
+        // and it handles the case where the system clock appears to move backward
+        // or if multiple threads attempt to generate a timestamp concurrently.
         do {
-            currentTime = System.currentTimeMillis() * 1_000_000L;
-            lastTime = monotonicTime.get();
-            if (currentTime <= lastTime) currentTime = lastTime + 1000L;
-        }
+            // Get the current time in microseconds.
+            currentTime = System.currentTimeMillis() * MICROSECONDS_PER_MILLISECOND;
 
-        while (!monotonicTime.compareAndSet(lastTime, currentTime));
+            // Get the last recorded timestamp.
+            lastTime = monotonicTime.get();
+
+            // Check for clock drift. If the current time is less than or equal to
+            // the last recorded time, adjust the timestamp to ensure it is strictly increasing.
+            if (currentTime <= lastTime) {
+                currentTime = lastTime + CLOCK_DRIFT_THRESHOLD;
+            }
+        } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
         return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime));
-
     }
 
     /**
