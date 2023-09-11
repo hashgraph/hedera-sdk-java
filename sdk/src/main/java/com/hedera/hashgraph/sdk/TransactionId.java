@@ -19,22 +19,21 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static java.util.concurrent.CompletableFuture.completedFuture;
+import static java.util.concurrent.CompletableFuture.failedFuture;
+
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.failedFuture;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
  * The client-generated ID for a transaction.
@@ -63,6 +62,13 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     @Nullable
     private Integer nonce = null;
+
+    private static final long MICROSECONDS_PER_MILLISECOND = 1_000_000L;
+
+    private static final long CLOCK_DRIFT_THRESHOLD = 1_000L;
+
+    private static final AtomicLong monotonicTime = new AtomicLong();
+
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -97,8 +103,27 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @return {@link com.hedera.hashgraph.sdk.TransactionId}
      */
     public static TransactionId generate(AccountId accountId) {
-        Instant instant = Clock.systemUTC().instant().minusNanos((long) (Math.random() * 5000000000L + 8000000000L));
-        return new TransactionId(accountId, instant);
+        long currentTime;
+        long lastTime;
+
+        // Loop to ensure the generated timestamp is strictly increasing,
+        // and it handles the case where the system clock appears to move backward
+        // or if multiple threads attempt to generate a timestamp concurrently.
+        do {
+            // Get the current time in microseconds.
+            currentTime = System.currentTimeMillis() * MICROSECONDS_PER_MILLISECOND;
+
+            // Get the last recorded timestamp.
+            lastTime = monotonicTime.get();
+
+            // Check for clock drift. If the current time is less than or equal to
+            // the last recorded time, adjust the timestamp to ensure it is strictly increasing.
+            if (currentTime <= lastTime) {
+                currentTime = lastTime + CLOCK_DRIFT_THRESHOLD;
+            }
+        } while (!monotonicTime.compareAndSet(lastTime, currentTime));
+
+        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime));
     }
 
     /**
