@@ -63,9 +63,9 @@ public final class TransactionId implements Comparable<TransactionId> {
     @Nullable
     private Integer nonce = null;
 
-    private static final long MICROSECONDS_PER_MILLISECOND = 1_000_000L;
+    private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
 
-    private static final long CLOCK_DRIFT_THRESHOLD = 1_000L;
+    private static final long TIMESTAMP_INCREMENT_NANOSECONDS = 1_000L;
 
     private static final AtomicLong monotonicTime = new AtomicLong();
 
@@ -110,16 +110,16 @@ public final class TransactionId implements Comparable<TransactionId> {
         // and it handles the case where the system clock appears to move backward
         // or if multiple threads attempt to generate a timestamp concurrently.
         do {
-            // Get the current time in microseconds.
-            currentTime = System.currentTimeMillis() * MICROSECONDS_PER_MILLISECOND;
+            // Get the current time in nanoseconds.
+            currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND;
 
             // Get the last recorded timestamp.
             lastTime = monotonicTime.get();
 
-            // Check for clock drift. If the current time is less than or equal to
-            // the last recorded time, adjust the timestamp to ensure it is strictly increasing.
+            // If the current time is less than or equal to the last recorded time,
+            // adjust the timestamp to ensure it is strictly increasing.
             if (currentTime <= lastTime) {
-                currentTime = lastTime + CLOCK_DRIFT_THRESHOLD;
+                currentTime = lastTime + TIMESTAMP_INCREMENT_NANOSECONDS;
             }
         } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
