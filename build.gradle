@@ -3,7 +3,7 @@ plugins {
 
     // Gradle plugin to discover dependency updates
     // <https://github.com/ben-manes/gradle-versions-plugin>
-    id "com.github.ben-manes.versions" version "0.47.0"
+    id "com.github.ben-manes.versions" version "0.48.0"
 
     id "jacoco"
     id "org.sonarqube" version "4.3.1.3277"
@@ -31,7 +31,7 @@ allprojects {
         errorprone "com.google.errorprone:error_prone_core:2.21.1"
 
         // https://github.com/uber/NullAway
-        errorprone "com.uber.nullaway:nullaway:0.10.13"
+        errorprone "com.uber.nullaway:nullaway:0.10.14"
 
         // https://github.com/grpc/grpc-java-api-checker
         errorprone "io.grpc:grpc-java-api-checker:1.1.0"
