@@ -333,6 +333,36 @@ public final class AccountId implements Comparable<AccountId> {
     }
 
     /**
+     * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
+     * Sync version
+     *
+     * @param client
+     * @return populated AccountId instance
+     */
+    public AccountId populateAccountEvmAddress(Client client) throws ExecutionException, InterruptedException {
+        return populateAccountEvmAddressAsync(client).get();
+    }
+
+    /**
+     * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
+     * Async version
+     *
+     * @param client
+     * @return populated AccountId instance
+     */
+    public CompletableFuture<AccountId> populateAccountEvmAddressAsync(Client client) {
+        return EntityIdHelper.getEvmAddressFromMirrorNodeAsync(client, num)
+            .thenApply(evmAddressFromMirrorNode ->
+                new AccountId(
+                    this.shard,
+                    this.realm,
+                    this.num,
+                    this.checksum,
+                    this.aliasKey,
+                    evmAddressFromMirrorNode));
+    }
+
+    /**
      * @param client to validate against
      * @throws BadEntityIdException if entity ID is formatted poorly
      * @deprecated Use {@link #validateChecksum(Client)} instead.
