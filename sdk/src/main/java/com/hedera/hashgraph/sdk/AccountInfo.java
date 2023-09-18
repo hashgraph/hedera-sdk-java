@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static java.util.stream.Collectors.toList;
+
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
@@ -261,7 +263,7 @@ public final class AccountInfo {
 
         var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
             .map((liveHash) -> LiveHash.fromProtobuf((com.hedera.hashgraph.sdk.proto.LiveHash) liveHash))
-            .toList();
+            .collect(toList());
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
 
@@ -317,7 +319,7 @@ public final class AccountInfo {
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var hashes = Arrays.stream(liveHashes.toArray())
             .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
-            .toList();
+            .collect(toList());
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
             .setAccountID(accountId.toProtobuf())
