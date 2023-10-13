@@ -65,6 +65,12 @@ Running test function:
 $ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
 ```
 
+#### Running with Intellij IDEA
+1. Create a new Gradle run configuration (easiest way is to run test class or individual test function from the IDE).
+2. Update "Run" configuration to pass the required system properties (`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK`).
+3. Update "Environment variables" to pass the `CONFIG_FILE=whatever`.
+<img src="../assets/intellij-integration-tests.png">
+
 ## Maintaining generated files
 >To execute the tasks below, you need to install the tool from this link: https://taskfile.dev/
 > (these tasks are from the file Taskfile.yml, which is located in the root of the repository).
