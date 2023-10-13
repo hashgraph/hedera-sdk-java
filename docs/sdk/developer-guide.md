@@ -28,7 +28,7 @@ $ ./gradlew test
 `HEDERA_NETWORK` can be set to `localhost`, `testnet` or `previewnet`.
 
 ```sh
-$ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet"
+$ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="<network>"
 ```
 
 #### Using configuration file
@@ -52,6 +52,18 @@ The format of the configuration file should be as follows:
 ```
 
 `HEDERA_NETWORK` can be set to `testnet`, `previewnet` or `mainnet`.
+
+#### Running individual test classes or functions
+
+Running test class:
+```sh
+$ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
+```
+
+Running test function:
+```sh
+$ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
+```
 
 ## Maintaining generated files
 >To execute the tasks below, you need to install the tool from this link: https://taskfile.dev/
