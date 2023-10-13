@@ -18,7 +18,7 @@ $ ./gradlew test
 ### Integration Tests
 
 > The tests are only executed if the configuration is provided
-> as an environment variable (see the `onlyIf` block in [sdk/build.gradle](../../sdk/build.gradle)).
+> as an environment variable (see the `onlyIf` block in [`sdk/build.gradle`](../../sdk/build.gradle)).
 > That's why we need to pass the configuration file at the beginning of the command.
 > The `CONFIG_FILE` environment variable is not used, so you can provide any value,
 > but it should not be `null`.
@@ -52,3 +52,36 @@ The format of the configuration file should be as follows:
 ```
 
 `HEDERA_NETWORK` can be set to `testnet`, `previewnet` or `mainnet`.
+
+## Maintaining generated files
+>To execute the tasks below, you need to install the tool from this link: https://taskfile.dev/
+> (these tasks are from the file Taskfile.yml, which is located in the root of the repository).
+> Once installed, you can run the commands as shown below.
+
+### Updating unit tests snapshots
+```shell
+$ task update:snapshots
+```
+
+### Updating proto files
+```shell
+$ task update:proto
+```
+
+### Updating address books
+Update all address books:
+```shell
+$ task update:addressbooks
+```
+Update address books only for a mainnet:
+```shell
+$ task update:addressbooks:mainnet
+```
+Update address books only for a testnet:
+```shell
+$ task update:addressbooks:testnet
+```
+Update address books only for a previewnet:
+```shell
+$ task update:addressbooks:previewnet
+```

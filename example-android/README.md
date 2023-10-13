@@ -10,7 +10,7 @@ the "Generate" button.
 - **Account Balance tab** allows you to retrieve the balance of an account by
 pressing the "Get Account Balance" button and specifying the desired account,
 which can be different from the default account specified in the
-`app/src/main/res/values/strings.xml` file.
+  [`app/src/main/res/values/strings.xml`](../example-android/app/src/main/res/values/strings.xml) file.
 - **Crypto Transfer tab** allows you to transfer a specified amount of HBARs
 from your account to a recipient account by pressing the "Send HBAR" button
 and setting the recipient's account in the provided text field.

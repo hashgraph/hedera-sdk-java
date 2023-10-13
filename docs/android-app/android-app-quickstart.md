@@ -12,7 +12,7 @@ implementation 'com.hedera.hashgraph:sdk:2.29.0'
 2. gRPC implementation:
 ```groovy
 // okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.46.0'
+implementation 'io.grpc:grpc-okhttp:1.58.0'
 ```
 
 ## Next steps

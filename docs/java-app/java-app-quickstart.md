@@ -4,14 +4,14 @@
 
 To get started with a Java project, you'll need to add the following three dependencies:
 
-1. Hedera Java SDK:
+**1. Hedera Java SDK:**
 
-**Gradle:**
+_Gradle:_
 ```groovy
 implementation 'com.hedera.hashgraph:sdk:2.29.0'
 ```
 
-**Maven:**
+_Maven:_
 ```xml
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
@@ -20,29 +20,29 @@ implementation 'com.hedera.hashgraph:sdk:2.29.0'
 </dependency>
 ```
 
-2. gRPC implementation (select _one_ of the following):
+**2. gRPC implementation** _(select one of the following)_**:**
 
-**Gradle:**
+_Gradle:_
 ```groovy
 // netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded:1.46.0'
+implementation 'io.grpc:grpc-netty-shaded:1.57.2'
 ```
 ```groovy
 // netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty:1.46.0'
+implementation 'io.grpc:grpc-netty:1.57.2'
 ```
 ```groovy
 // okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.46.0'
+implementation 'io.grpc:grpc-okhttp:1.57.2'
 ```
 
-**Maven:**
+_Maven:_
 ```xml
 <!-- netty transport (for server or desktop applications) -->
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.46.0</version>
+  <version>1.57.2</version>
 </dependency>
 ```
 ```xml
@@ -50,7 +50,7 @@ implementation 'io.grpc:grpc-okhttp:1.46.0'
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty</artifactId>
-  <version>1.46.0</version>
+  <version>1.57.2</version>
 </dependency>
 ```
 ```xml
@@ -58,29 +58,29 @@ implementation 'io.grpc:grpc-okhttp:1.46.0'
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-okhttp</artifactId>
-  <version>1.46.0</version>
+  <version>1.57.2</version>
 </dependency>
 ```
 
-3. Simple Logging Facade for Java (select one of the following to enable or disable logs):
+**3. Simple Logging Facade for Java** _(select one of the following to enable or disable logs)_**:**
 
-**Gradle:**
+_Gradle:_
 ```groovy
 // Enable logs
-implementation 'org.slf4j:slf4j-simple:2.0.3'
+implementation 'org.slf4j:slf4j-simple:2.0.9'
 ```
 ```groovy
 // Disable logs
-implementation 'org.slf4j:slf4j-nop:2.0.3'
+implementation 'org.slf4j:slf4j-nop:2.0.9'
 ```
 
-**Maven:**
+_Maven:_
 ```xml
 <!-- Enable logs -->
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-simple</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.9</version>
 </dependency>
 ```
 ```xml
@@ -88,7 +88,7 @@ implementation 'org.slf4j:slf4j-nop:2.0.3'
 <dependency>
     <groupId>org.slf4j</groupId>
     <artifactId>slf4j-nop</artifactId>
-    <version>2.0.3</version>
+    <version>2.0.9</version>
 </dependency>
 ```
 

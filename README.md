@@ -10,14 +10,21 @@
 > fair and secure transactions. Hedera enables and empowers developers to
 > build an entirely new class of decentralized applications.
 
-**NOTE**: v1 of the SDK is deprecated and support was discontinued after October 2021. Please install the latest version 2.x.x or migrate from v1 to the latest 2.x.x version. You can reference the [migration documentation](docs/sdk/MIGRATING_V1.md).
+**NOTE**: v1 of the SDK is deprecated and support was discontinued after October 2021.
+Please install the latest version 2.x.x or migrate from v1 to the latest 2.x.x version.
+You can reference the [migration documentation](docs/sdk/MIGRATING_V1.md).
 
-## How to get started
-If you want to use the Hedera Java SDK in a Java project, please refer to the [Java application quickstart guide](docs/java-app/java-app-quickstart.md).\
-For using the Hedera Java SDK in an Android project, please refer to the [Android application quickstart guide](docs/android-app/android-app-quickstart.md).
+## Java app quickstart
+[The Java application quickstart guide](docs/java-app/java-app-quickstart.md) covers how to properly set up the dependencies
+needed to start developing your Java project using the Hedera Java SDK.
+
+## Android app quickstart
+[The Android application quickstart guide](docs/android-app/android-app-quickstart.md) covers how to properly set up the dependencies
+needed to start developing your Android project using the Hedera Java SDK.
 
 ## Examples
-This repository includes [Java examples](examples/README.md) and [an Android example](example-android/README.md) that showcase different use cases and workflows.
+This repository includes [Java examples](examples/README.md) and [an Android example](example-android/README.md)
+that showcase different use cases and workflows.
 
 ## Developer quickstart
 The [developer quickstart guide](docs/sdk/developer-guide.md) provides instructions on how to set up the environment,
