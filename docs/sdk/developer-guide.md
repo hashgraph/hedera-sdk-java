@@ -1,0 +1,54 @@
+## JVM
+JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.net/) are strongly recommended.
+
+## Setup
+
+### Building
+
+```sh
+$ ./gradlew compileJava
+```
+
+### Unit Tests
+
+```sh
+$ ./gradlew test
+```
+
+### Integration Tests
+
+> The tests are only executed if the configuration is provided
+> as an environment variable (see the `onlyIf` block in [sdk/build.gradle](../../sdk/build.gradle)).
+> That's why we need to pass the configuration file at the beginning of the command.
+> The `CONFIG_FILE` environment variable is not used, so you can provide any value,
+> but it should not be `null`.
+
+#### Using system properties
+`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK` must be passed into system properties.\
+`HEDERA_NETWORK` can be set to `localhost`, `testnet` or `previewnet`.
+
+```sh
+$ CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet"
+```
+
+#### Using configuration file
+
+```sh
+$ CONFIG_FILE=whatever ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
+```
+
+An example configuration file can be found in the repo here:
+[sdk/src/test/resources/client-config-with-operator.json](../../sdk/src/test/resources/client-config-with-operator.json)
+
+The format of the configuration file should be as follows:
+```
+{
+    "network": "testnet",
+    "operator": {
+        "accountId": "0.0.7",
+        "privateKey": "d5d37..."
+    }
+}
+```
+
+`HEDERA_NETWORK` can be set to `testnet`, `previewnet` or `mainnet`.

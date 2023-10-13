@@ -1,7 +1,7 @@
 # Hedera™ Hashgraph Java SDK
 
 ![](https://img.shields.io/badge/java-17%2B-blue?style=flat-square)
-![](https://img.shields.io/badge/android-24%2B-blue?style=flat-square)
+![](https://img.shields.io/badge/android-26%2B-blue?style=flat-square)
 [![](https://img.shields.io/github/actions/workflow/status/hashgraph/hedera-sdk-java/build.yml?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
 [![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
@@ -10,176 +10,33 @@
 > fair and secure transactions. Hedera enables and empowers developers to
 > build an entirely new class of decentralized applications.
 
-## Install
+**NOTE**: v1 of the SDK is deprecated and support was discontinued after October 2021. Please install the latest version 2.x.x or migrate from v1 to the latest 2.x.x version. You can reference the [migration documentation](docs/sdk/MIGRATING_V1.md).
 
-**NOTE**: v1 of the SDK is deprecated and support will be discontinued after October 2021. Please install the latest version 2.0.x or migrate from v1 to the latest 2.0.x version. You can reference the [migration documentation](/MIGRATING_V1.md).
+## How to get started
+If you want to use the Hedera Java SDK in a Java project, please refer to the [Java application quickstart guide](docs/java-app/java-app-quickstart.md).\
+For using the Hedera Java SDK in an Android project, please refer to the [Android application quickstart guide](docs/android-app/android-app-quickstart.md).
 
-#### Gradle
+## Examples
+This repository includes [Java examples](examples/README.md) and [an Android example](example-android/README.md) that showcase different use cases and workflows.
 
-Select _one_ of the following depending on your target platform.
+## Developer quickstart
+The [developer quickstart guide](docs/sdk/developer-guide.md) provides instructions on how to set up the environment,
+run unit and integration tests, and configure the project to work with different networks
+such as the Hedera test network, preview network, etc.
 
-```groovy
-implementation 'com.hedera.hashgraph:sdk:2.29.0'
-```
+## Support
+If you have a question on how to use the product, please see our
+[support guide](https://github.com/hashgraph/.github/blob/main/SUPPORT.md).
 
-Select _one_ of the following to provide the gRPC implementation.
-
-```groovy
-// netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded:1.46.0'
-
-// netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty:1.46.0'
-
-// okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.46.0'
-```
-
-Select _one_ of the following to enable or disable Simple Logging Facade for Java (SLFJ4).
-
-```groovy
-// Enable logs
-implementation 'org.slf4j:slf4j-simple:2.0.3'
-
-// Disable logs
-implementation 'org.slf4j:slf4j-nop:2.0.3'
-
-```
-
-
-
-#### Maven
-
-Select _one_ of the following depending on your target platform.
-
-```xml
-<dependency>
-  <groupId>com.hedera.hashgraph</groupId>
-  <artifactId>sdk</artifactId>
-  <version>2.29.0</version>
-</dependency>
-```
-
-Select _one_ of the following to provide the gRPC implementation.
-
-```xml
-<!-- netty transport (for server or desktop applications) -->
-<dependency>
-  <groupId>io.grpc</groupId>
-  <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.46.0</version>
-</dependency>
-
-<!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
-<dependency>
-  <groupId>io.grpc</groupId>
-  <artifactId>grpc-netty</artifactId>
-  <version>1.46.0</version>
-</dependency>
-
-<!-- okhttp transport (for lighter-weight applications or Android) -->
-<dependency>
-  <groupId>io.grpc</groupId>
-  <artifactId>grpc-okhttp</artifactId>
-  <version>1.46.0</version>
-</dependency>
-```
-
-## Usage
-
-Examples of several potential use cases and workflows are available
-within the repository in [`examples/`](./examples/src/main/java).
-
- * [Create Account](./examples/src/main/java/CreateAccountExample.java)
-
- * [Transfer Hbar](./examples/src/main/java/TransferCryptoExample.java)
-
- * [Hedera Consensus Service (HCS)](./examples/src/main/java/ConsensusPubSubExample.java)
-
-## Development
-
-### Dependencies
-
- * [Java Development Kit (JDK)](https://adoptopenjdk.net/) v17+ (note this is to _build_, not run)
-
-### Compile
-
-```sh
-$ ./gradlew compileJava
-```
-
-### Unit Test
-
-```sh
-$ ./gradlew test
-```
-
-### Integration Test
-
-The easiest way to run integration tests is by providing network and operator information in a configuration file.
-This configuration file is passed into system properties.
-
-```sh
-$ ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
-```
-
-An example configuration file can be found in the repo here:
-
-[sdk/src/test/resources/client-config-with-operator.json](sdk/src/test/resources/client-config-with-operator.json)
-
-The format of the configuration file should be as follows:
-
-```
-{
-    "network": {
-        "<NodeAddress>": "<NodeAccountId>",
-        ...
-    },
-    "operator": {
-        "accountId": "<shard.realm.num>",
-        "privateKey": "<PrivateKey>"
-    }
-}
-```
-
-If a configuration file is not provided, `OPERATOR_ID` and `OPERATOR_KEY` must be passed into system properties
-and integration tests will run against the Hedera test network.
-
-```sh
-$ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>"
-```
-
-`HEDERA_NETWORK` can optionally be used to use `previewnet`.  This System Property can only be set to `previewnet`.
-
-```sh
-$ ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="previewnet"
-```
-
-Note: It is also possible to use a custom network in a configuration file and pass `OPERATOR_ID` and `OPERATOR_KEY`
-into system properties.
-
-An example configuration file containing only network information can be found in the repo here:
-
-[sdk/src/test/resources/client-config.json](sdk/src/test/resources/client-config.json)
-
-### Examples
-
-Requires `OPERATOR_ID` and `OPERATOR_KEY` to be in a .env file in the examples directory.   Many examples run against
-the Hedera test network.
-
-```sh
-$ ./gradlew -q example:run<NameOfExample>
-$ ./gradlew -q example:runGenerateKey
-```
-
-## Contributing to this Project
-
-We welcome participation from all developers!
+## Contributing
+We welcome participation from all developers!\
 For instructions on how to contribute to this repo, please
-review the [Contributing Guide](CONTRIBUTING.md).
+review the [Contributing Guide](docs/sdk/CONTRIBUTING.md).\
+More instructions for contribution can be found in the [Global Contributing Guide](https://github.com/hashgraph/.github/blob/main/CONTRIBUTING.md).
 
-## License Information
+## Code of Conduct
+This project is governed by the [Contributor Covenant Code of Conduct](https://github.com/hashgraph/.github/blob/main/CODE_OF_CONDUCT.md). By participating, you are
+expected to uphold this code of conduct.
 
-Licensed under Apache License,
-Version 2.0 – see [LICENSE](LICENSE) in this repo
-or [apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0).
+## License
+[Apache License 2.0](LICENSE)
