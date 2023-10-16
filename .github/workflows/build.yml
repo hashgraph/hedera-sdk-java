@@ -67,7 +67,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Start the local node
-        run: npx @hashgraph/hedera-local start -d --network local
+        run: npx @hashgraph/hedera-local@2.13.0 start -d --network local
 
       - name: Run Tests
         env:
