@@ -72,7 +72,7 @@
 ## Usage
 
 ### Configuration
-Running the examples requires `.env` file to exist under [`root project folder`](../examples):
+Running the examples requires `.env` file to exist under [`root project folder`](../):
 
 ```sh
 $ cp .env.sample ../.env
