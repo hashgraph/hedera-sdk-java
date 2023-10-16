@@ -2,7 +2,7 @@
 
 > Please note that JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.net/) are strongly recommended.
 
-To get started with a Java project, you'll need to add the following three dependencies:
+To get started with a Java project, you'll need to add the following **three** dependencies:
 
 **1. Hedera Java SDK:**
 

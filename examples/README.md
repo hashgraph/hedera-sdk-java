@@ -72,10 +72,10 @@
 ## Usage
 
 ### Configuration
-Running the examples requires `.env` file to exist under [`examples folder`](../examples):
+Running the examples requires `.env` file to exist under [`root project folder`](../examples):
 
 ```sh
-$ cp .env.example .env
+$ cp .env.sample ../.env
 ```
 
 The `OPERATOR_ID` and `OPERATOR_KEY` variables should be set in a `.env` file.
