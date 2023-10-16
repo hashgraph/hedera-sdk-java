@@ -92,6 +92,11 @@ _Maven:_
 </dependency>
 ```
 
+## Additional useful information
+### Fat/uber JAR
+[Creating a fat/uber JAR guide](create-jar-guide.md) covers how to properly set up Shadow Gradle plugin
+to create a fat/uber JAR of your Java application that uses the Hedera Java SDK.
+
 ## Next steps
 To make it easier to start your Java project using the Hedera Java SDK,
 we recommend checking out the [Java examples](../../examples/README.md).
