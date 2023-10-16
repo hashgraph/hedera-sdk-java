@@ -40,8 +40,29 @@ $ CONFIG_FILE=whatever ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFi
 An example configuration file can be found in the repo here:
 [sdk/src/test/resources/client-config-with-operator.json](../../sdk/src/test/resources/client-config-with-operator.json)
 
+**Running against the local network**
+
 The format of the configuration file should be as follows:
+```json
+{
+    "network": {
+        "0.0.3": "127.0.0.1:50211"
+    },
+    "mirrorNetwork": [
+        "127.0.0.1:5600"
+    ],
+    "operator": {
+        "accountId": "0.0.1022",
+        "privateKey": "0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4"
+    }
+}
+
 ```
+
+**Running against remote networks**
+
+The format of the configuration file should be as follows:
+```json
 {
     "network": "testnet",
     "operator": {
