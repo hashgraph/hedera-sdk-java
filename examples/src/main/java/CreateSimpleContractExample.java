@@ -106,8 +106,7 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractCallResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);

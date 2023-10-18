@@ -41,7 +41,7 @@ public class AutoCreateAccountTransferTransactionExample {
     - Sign with the private key that corresponds to the public key on the hollow account
     - Get the `AccountInfo` for the account and return the public key on the account to show it is a complete account
     */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -111,7 +111,7 @@ public class AutoCreateAccountTransferTransactionExample {
         if (((KeyList) accountInfo.key).isEmpty()) {
             System.out.println("The newly created account is a hollow account");
         } else {
-            System.out.println("Not a hollow account");
+            throw new Exception("Not a hollow account");
         }
 
         /*

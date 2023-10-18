@@ -15,7 +15,7 @@ task runAllExamples {
         .filter { it.name.endsWith('Example.java') }
         .map { it.name.replaceAll('\\.java$', '') }
         .filter { !it.equals('ValidateChecksumExample') } // disabled this example, because it needs user input (but it WORKS)
-        .filter { !it.equals('ZeroTokenOperationsExample') } // doesn't work with hedera-local-node
+        .filter { !it.equals('ZeroTokenOperationsExample') } // doesn't work
         .filter { !it.equals('SolidityPrecompileExample') } // doesn't work with hedera-local-node
         .filter { !it.equals('ConsensusPubSubChunkedExample') } // doesn't work on CI
         .toList()

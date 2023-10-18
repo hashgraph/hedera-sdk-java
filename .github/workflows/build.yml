@@ -111,9 +111,9 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: Compile SDK
+      - name: Assemble SDK
         run: ./gradlew :sdk:assemble
-      - name: Compile Examples
+      - name: Assemble Examples
         run: ./gradlew :examples:assemble
 
       - name: Start the local node
@@ -128,3 +128,6 @@ jobs:
       - name: Run Examples
         run: |
             ./gradlew :examples:runAllExamples
+
+      - name: Stop the local node
+        run: npx @hashgraph/hedera-local stop
