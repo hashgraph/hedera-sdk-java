@@ -120,7 +120,7 @@ public final class ConsensusPubSubChunkedExample {
         // get the receipt to ensure there were no errors
         transaction.execute(client).getReceipt(client);
 
-        boolean largeMessageReceived = largeMessageLatch.await(30, TimeUnit.SECONDS);
+        boolean largeMessageReceived = largeMessageLatch.await(60, TimeUnit.SECONDS);
         if (!largeMessageReceived) {
             throw new TimeoutException("Large topic message was not received!");
         }
