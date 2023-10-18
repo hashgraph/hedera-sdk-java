@@ -24,7 +24,7 @@ public class CreateAccountWithAliasExample {
     - Sign the `AccountCreateTransaction` transaction with the new private key
     - Get the `AccountInfo` and show that the account has contractAccountId
     */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -85,7 +85,7 @@ public class CreateAccountWithAliasExample {
         if (accountInfo.contractAccountId != null) {
             System.out.println("The new account has alias " + accountInfo.contractAccountId);
         } else {
-            System.out.println("The new account doesn't have alias");
+            throw new Exception("The new account doesn't have alias");
         }
     }
 }

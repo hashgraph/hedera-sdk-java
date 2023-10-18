@@ -54,7 +54,7 @@ public final class ContractNoncesExample {
     }
 
     public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+        throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -90,8 +90,7 @@ public final class ContractNoncesExample {
             .getReceipt(client);
 
         if (contractDeleteResult.status != Status.SUCCESS) {
-            System.out.println("error deleting contract: " + contractDeleteResult.status);
-            return;
+            throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
     }

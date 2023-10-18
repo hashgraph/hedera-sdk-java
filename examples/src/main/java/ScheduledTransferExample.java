@@ -52,7 +52,7 @@ public final class ScheduledTransferExample {
     }
 
     public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+        throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -169,9 +169,7 @@ public final class ScheduledTransferExample {
             System.out.println("The scheduled transfer transaction from Bob's POV:");
             System.out.println(scheduledTransfer);
         } else {
-            System.out.println("The scheduled transaction was not a transfer transaction.");
-            System.out.println("Something has gone horribly wrong.  Crashing...");
-            System.exit(-1);
+            throw new Exception("The scheduled transaction was not a transfer transaction.");
         }
 
         new ScheduleSignTransaction()

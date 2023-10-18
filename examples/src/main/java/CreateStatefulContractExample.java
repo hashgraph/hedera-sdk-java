@@ -57,7 +57,7 @@ public final class CreateStatefulContractExample {
     }
 
     public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException, InterruptedException {
+        throws Exception {
         String byteCodeHex = ContractHelper.getBytecodeHex("stateful.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
@@ -105,8 +105,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractCallResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);
@@ -132,8 +131,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         if (contractUpdateResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractUpdateResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractUpdateResult.errorMessage);
         }
 
         String message2 = contractUpdateResult.getString(0);

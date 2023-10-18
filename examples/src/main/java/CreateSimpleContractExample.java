@@ -57,7 +57,7 @@ public final class CreateSimpleContractExample {
     }
 
     public static void main(String[] args)
-        throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException, InterruptedException {
+        throws Exception {
         String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
@@ -122,8 +122,7 @@ public final class CreateSimpleContractExample {
             .getReceipt(client);
 
         if (contractDeleteResult.status != Status.SUCCESS) {
-            System.out.println("error deleting contract: " + contractDeleteResult.status);
-            return;
+            throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
     }
