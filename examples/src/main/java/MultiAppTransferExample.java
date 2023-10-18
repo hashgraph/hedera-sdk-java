@@ -49,7 +49,11 @@ public final class MultiAppTransferExample {
     private static final Client client;
 
     static {
-        client = Client.forName(HEDERA_NETWORK);
+        try {
+            client = ClientHelper.forName(HEDERA_NETWORK);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key

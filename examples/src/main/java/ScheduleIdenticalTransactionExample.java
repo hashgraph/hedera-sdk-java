@@ -55,9 +55,9 @@ public class ScheduleIdenticalTransactionExample {
     private ScheduleIdenticalTransactionExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args)
+        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -92,7 +92,7 @@ public class ScheduleIdenticalTransactionExample {
             // Make sure the transaction succeeded
             TransactionReceipt transactionReceipt = createResponse.getReceipt(client);
 
-            Client newClient = Client.forName(HEDERA_NETWORK);
+            Client newClient = ClientHelper.forName(HEDERA_NETWORK);
             newClient.setOperator(Objects.requireNonNull(transactionReceipt.accountId), newKey);
             clients[i] = newClient;
             accounts[i] = transactionReceipt.accountId;

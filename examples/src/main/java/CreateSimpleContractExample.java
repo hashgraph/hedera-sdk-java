@@ -56,11 +56,11 @@ public final class CreateSimpleContractExample {
     private CreateSimpleContractExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
+    public static void main(String[] args)
+        throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException, InterruptedException {
         String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
 
-
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key

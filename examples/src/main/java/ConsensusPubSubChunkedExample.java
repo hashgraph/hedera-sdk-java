@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -46,11 +48,13 @@ public final class ConsensusPubSubChunkedExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
+    private static final CountDownLatch largeMessageLatch = new CountDownLatch(1);
+
     private ConsensusPubSubChunkedExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException, InvalidProtocolBufferException {
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -80,6 +84,7 @@ public final class ConsensusPubSubChunkedExample {
             .setTopicId(newTopicId)
             .subscribe(client, topicMessage -> {
                 System.out.println("at " + topicMessage.consensusTimestamp + " ( seq = " + topicMessage.sequenceNumber + " ) received topic message of " + topicMessage.contents.length + " bytes");
+                largeMessageLatch.countDown();
             });
 
         // get a large file to send
@@ -115,12 +120,9 @@ public final class ConsensusPubSubChunkedExample {
         // get the receipt to ensure there were no errors
         transaction.execute(client).getReceipt(client);
 
-        // noinspection InfiniteLoopStatement
-        while (true) {
-            System.out.println("waiting ...");
-
-            // noinspection BusyWait
-            Thread.sleep(2500);
+        boolean largeMessageReceived = largeMessageLatch.await(30, TimeUnit.SECONDS);
+        if (!largeMessageReceived) {
+            throw new TimeoutException("Large topic message was not received!");
         }
     }
 

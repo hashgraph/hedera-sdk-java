@@ -48,7 +48,7 @@ public final class ExemptCustomFeesExample {
     }
 
     public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         /*

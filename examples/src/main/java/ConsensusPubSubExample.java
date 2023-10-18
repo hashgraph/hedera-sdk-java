@@ -32,6 +32,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 
@@ -41,11 +43,14 @@ class ConsensusPubSubExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
+    private static final int TOTAL_MESSAGES = 5;
+    private static final CountDownLatch messagesLatch = new CountDownLatch(TOTAL_MESSAGES);
+
     private ConsensusPubSubExample() {
     }
 
     public static void main(String[] args) throws TimeoutException, InterruptedException, PrecheckStatusException, ReceiptStatusException {
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -68,11 +73,10 @@ class ConsensusPubSubExample {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
 
                 System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
+                messagesLatch.countDown();
             });
 
-        // keep the main thread from exiting because the listeners run on daemon threads
-        // noinspection InfiniteLoopStatement
-        for (int i = 0; ; i++) {
+        for (int i = 0; i <= TOTAL_MESSAGES; i++) {
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
                 .setMessage("hello, HCS! " + i)
@@ -80,6 +84,11 @@ class ConsensusPubSubExample {
                 .getReceipt(client);
 
             Thread.sleep(2500);
+        }
+
+        boolean allMessagesReceived = messagesLatch.await(30, TimeUnit.SECONDS);
+        if (!allMessagesReceived) {
+            throw new TimeoutException("Not all topic messages were received!");
         }
     }
 }

@@ -61,11 +61,12 @@ class TopicWithAdminKeyExample {
 
     private PrivateKey[] initialAdminKeys;
 
-    private TopicWithAdminKeyExample() {
+    private TopicWithAdminKeyExample() throws InterruptedException {
         setupHapiClient();
     }
 
-    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
+    public static void main(String[] args)
+        throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InterruptedException {
         new TopicWithAdminKeyExample().execute();
     }
 
@@ -75,8 +76,8 @@ class TopicWithAdminKeyExample {
         updateTopicAdminKeyAndMemo();
     }
 
-    private void setupHapiClient() {
-        hapiClient = Client.forName(HEDERA_NETWORK);
+    private void setupHapiClient() throws InterruptedException {
+        hapiClient = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key
