@@ -112,9 +112,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Compile SDK
-        run: ./gradlew compileJava
+        run: ./gradlew :sdk:assemble
       - name: Compile Examples
-        run: ./gradlew :examples:compileJava
+        run: ./gradlew :examples:assemble
 
       - name: Start the local node
         run: npx @hashgraph/hedera-local@2.13.0 start -d --network local
