@@ -56,10 +56,11 @@ public final class CreateStatefulContractExample {
     private CreateStatefulContractExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, IOException, ReceiptStatusException {
+    public static void main(String[] args)
+        throws Exception {
         String byteCodeHex = ContractHelper.getBytecodeHex("stateful.json");
 
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -104,8 +105,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractCallResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);
@@ -131,8 +131,7 @@ public final class CreateStatefulContractExample {
             .execute(client);
 
         if (contractUpdateResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractUpdateResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractUpdateResult.errorMessage);
         }
 
         String message2 = contractUpdateResult.getString(0);

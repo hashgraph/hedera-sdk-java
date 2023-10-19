@@ -33,8 +33,7 @@ public class ConstructClientExample {
     // or set environment variables with the same names
     @Nullable
     private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+    private static final String HEDERA_NETWORK = "testnet";
 
     ConstructClientExample() {
     }
