@@ -26,11 +26,11 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletionStage;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 import java.time.Duration;
 
 import javax.annotation.Nullable;

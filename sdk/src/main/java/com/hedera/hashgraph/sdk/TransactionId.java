@@ -19,8 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.failedFuture;
+import static java8.util.concurrent.CompletableFuture.completedFuture;
+import static java8.util.concurrent.CompletableFuture.failedFuture;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -28,11 +28,11 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import javax.annotation.Nullable;
 
 /**

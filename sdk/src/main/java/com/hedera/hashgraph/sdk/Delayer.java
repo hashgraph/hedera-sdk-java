@@ -19,9 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java8.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.time.Duration;
@@ -34,12 +32,6 @@ import java.util.concurrent.TimeUnit;
  */
 final class Delayer {
     private static final Logger logger = LoggerFactory.getLogger(Delayer.class);
-
-    private static final ScheduledExecutorService SCHEDULER = Executors.newSingleThreadScheduledExecutor(r -> {
-        Thread t = new Thread(r);
-        t.setDaemon(true);
-        return t;
-    });
 
     private static final Duration MIN_DELAY = Duration.ofMillis(500);
 
@@ -75,10 +67,6 @@ final class Delayer {
         return CompletableFuture.runAsync(
             () -> {
             },
-            delayedExecutor(milliseconds, TimeUnit.MILLISECONDS, executor));
-    }
-
-    private static Executor delayedExecutor(long delay, TimeUnit unit, Executor executor) {
-        return r -> SCHEDULER.schedule(() -> executor.execute(r), delay, unit);
+            CompletableFuture.delayedExecutor(milliseconds, TimeUnit.MILLISECONDS, executor));
     }
 }
