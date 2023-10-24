@@ -40,8 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.function.Function;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
 import org.bouncycastle.crypto.digests.SHA384Digest;
@@ -834,7 +834,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param transactionSigner the key list
      * @return {@code this}
      */
-    public T signWith(PublicKey publicKey, UnaryOperator<byte[]> transactionSigner) {
+    public T signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         if (!isFrozen()) {
             throw new IllegalStateException("Signing requires transaction to be frozen");
         }
