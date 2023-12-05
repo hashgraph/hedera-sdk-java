@@ -47,8 +47,7 @@ public abstract class PublicKey extends Key {
             return new PublicKeyED25519(publicKey);
         }
 
-        // Assume a DER-encoded private key descriptor
-        return fromBytesDER(publicKey);
+        return fromBytesECDSA(publicKey);
     }
 
     /**
