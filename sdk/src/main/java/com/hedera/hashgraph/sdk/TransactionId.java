@@ -67,8 +67,6 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private static final long TIMESTAMP_INCREMENT_NANOSECONDS = 1_000L;
 
-    private static final long NANOSECONDS_TO_REMOVE =  (long) (Math.random() * 5000000000L + 8000000000L);
-
     private static final AtomicLong monotonicTime = new AtomicLong();
 
 
@@ -108,6 +106,8 @@ public final class TransactionId implements Comparable<TransactionId> {
         long currentTime;
         long lastTime;
 
+        long NANOSECONDS_TO_REMOVE = 5000000L + (long)(Math.random() * 2L); //(long) (Math.random() * 5000000000L + 8000000000L);
+
         // Loop to ensure the generated timestamp is strictly increasing,
         // and it handles the case where the system clock appears to move backward
         // or if multiple threads attempt to generate a timestamp concurrently.
@@ -122,7 +122,7 @@ public final class TransactionId implements Comparable<TransactionId> {
             // If the current time is less than or equal to the last recorded time,
             // adjust the timestamp to ensure it is strictly increasing.
             if (currentTime <= lastTime) {
-                currentTime = lastTime + TIMESTAMP_INCREMENT_NANOSECONDS;
+                currentTime = lastTime + 1L;//TIMESTAMP_INCREMENT_NANOSECONDS;
             }
         } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
