@@ -45,14 +45,18 @@ public abstract class PublicKey extends Key {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
             // If this is a 32 byte string, assume an Ed25519 public key
             return new PublicKeyED25519(publicKey);
+        } else if (publicKey.length == 33) {
+            // compressed 33 byte raw form
+            return new PublicKeyECDSA(publicKey);
+        } else if (publicKey.length == 65) {
+            // compress the 65 byte form
+            return new PublicKeyECDSA(
+                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true)
+            );
         }
 
-        try {
-            return fromBytesDER(publicKey);
-        } catch (Exception e) {
-            return fromBytesECDSA(publicKey);
-        }
-
+        // Assume a DER-encoded public key descriptor
+        return fromBytesDER(publicKey);
     }
 
     /**
