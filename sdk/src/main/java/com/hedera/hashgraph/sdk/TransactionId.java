@@ -67,6 +67,8 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private static final long TIMESTAMP_INCREMENT_NANOSECONDS = 1_000L;
 
+    private static final long NANOSECONDS_TO_REMOVE =  (long) (Math.random() * 5000000000L + 8000000000L);
+
     private static final AtomicLong monotonicTime = new AtomicLong();
 
 
@@ -110,8 +112,9 @@ public final class TransactionId implements Comparable<TransactionId> {
         // and it handles the case where the system clock appears to move backward
         // or if multiple threads attempt to generate a timestamp concurrently.
         do {
-            // Get the current time in nanoseconds.
-            currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND;
+            // Get the current time in nanoseconds and remove a few seconds to allow for some time drift
+            // between the client and the receiving node and prevented spurious INVALID_TRANSACTION_START.
+            currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND - NANOSECONDS_TO_REMOVE;
 
             // Get the last recorded timestamp.
             lastTime = monotonicTime.get();
