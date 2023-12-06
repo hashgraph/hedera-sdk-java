@@ -47,7 +47,12 @@ public abstract class PublicKey extends Key {
             return new PublicKeyED25519(publicKey);
         }
 
-        return fromBytesECDSA(publicKey);
+        try {
+            return fromBytesDER(publicKey);
+        } catch (Exception e) {
+            return fromBytesECDSA(publicKey);
+        }
+
     }
 
     /**
