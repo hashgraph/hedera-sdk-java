@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -27,6 +28,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
@@ -82,6 +84,28 @@ class Ed25519PublicKeyTest {
 
         assertThat(key2Bytes).containsExactly(key1Bytes);
         assertThat(key3Bytes).containsExactly(key1Bytes);
+    }
+
+    @Test
+    @DisplayName("public key can be recovered after transaction serialization")
+    void keyByteSerializationThroughTransaction() {
+        var senderAccount = AccountId.fromString("0.0.1337");
+        var receiverAccount = AccountId.fromString("0.0.3");
+        var transferAmount = Hbar.from(new BigDecimal("0.0001"), HbarUnit.HBAR);
+        var privateKey = PrivateKey.generateED25519();
+        var client = Client.forTestnet()
+            .setOperator(senderAccount, privateKey);
+        var tx = new TransferTransaction()
+            .addHbarTransfer(senderAccount, transferAmount.negated())
+            .addHbarTransfer(receiverAccount, transferAmount);
+
+        tx.freezeWith(client);
+        tx.signWithOperator(client);
+
+        var bytes = tx.toBytes();
+
+        assertThatNoException().isThrownBy(() -> Transaction.fromBytes(bytes));
+        assertThat(tx.getSignatures()).isNotEmpty();
     }
 
     @Test
