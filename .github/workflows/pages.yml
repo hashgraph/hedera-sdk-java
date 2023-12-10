@@ -13,6 +13,10 @@ permissions:
   id-token: write
   pages: write
 
+env:
+  LC_ALL: en.UTF-8
+  LANG: en_US.UTF-8
+
 jobs:
   publish:
     name: Publish
@@ -31,10 +35,10 @@ jobs:
         uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
 
       - name: Compile SDK
-        run: ./gradlew compileJava
+        run: ./gradlew compileJava --scan
 
       - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc
+        run: ./gradlew sdk:javadoc -Dfile.encoding=UTF-8 --scan
 
       - name: Pages
         uses: actions/upload-pages-artifact@a753861a5debcf57bf8b404356158c8e1e33150c # v2.0.0

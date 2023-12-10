@@ -1,3 +1,14 @@
+plugins {
+    id "com.gradle.enterprise" version "3.15.1"
+}
+
 include 'sdk'
 include 'examples'
 include 'example-android'
+
+gradleEnterprise {
+    buildScan {
+        termsOfServiceUrl = 'https://gradle.com/terms-of-service'
+        termsOfServiceAgree = 'yes'
+    }
+}

@@ -19,9 +19,13 @@ defaults:
 permissions:
   contents: read
 
+env:
+  LC_ALL: en.UTF-8
+  LANG: en_US.UTF-8
+
 jobs:
   compile:
-    name: Compile Code
+    name: Code Compiles
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     steps:
       - name: Checkout Code
@@ -35,25 +39,20 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+        with:
+          cache-read-only: false
 
       - name: Compile SDK
-        run: ./gradlew compileJava
-
-      - name: Compile Tests
-        run: ./gradlew compileTestJava
-
-      - name: Compile Integration Tests
-        run: ./gradlew compileIntegrationTestJava
-
-      - name: Compile Examples
-        run: ./gradlew :examples:compileJava
+        run: ./gradlew assemble --scan
 
       - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc
+        run: ./gradlew javadoc -Dfile.encoding=UTF-8 --scan
 
-  test:
+  unit-tests:
     name: Unit Tests
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    needs:
+      - compile
     steps:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -77,11 +76,11 @@ jobs:
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local@2.13.0
 
+      - name: Compile Code
+        run: ./gradlew assemble --scan
+
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local
-
-      - name: Compile Code
-        run: ./gradlew assemble
 
       - name: Run Tests
         env:
@@ -89,14 +88,14 @@ jobs:
           OPERATOR_ID: '0.0.1022'
           HEDERA_NETWORK: 'localhost'
         run: |
-          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport --scan
 
       - name: Build with Sonar
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube --info
+        run: ./gradlew sonarqube --info --scan
 
       - name: Publish To Codecov
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
@@ -105,9 +104,11 @@ jobs:
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
 
-  examples:
+  example-tests:
     name: Example Code Tests
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    needs:
+      - compile
     steps:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
@@ -126,11 +127,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
 
-      - name: Compile Code
-        run: ./gradlew assemble
-
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local@2.13.0
+
+      - name: Compile Code
+        run: ./gradlew assemble --scan
 
       - name: Start the local node
         run: npx @hashgraph/hedera-local start -d --network local
@@ -142,7 +143,7 @@ jobs:
           echo "HEDERA_NETWORK=localhost" >> examples/.env
 
       - name: Run Examples
-        run: ./gradlew :examples:runAllExamples
+        run: ./gradlew :examples:runAllExamples --scan
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
