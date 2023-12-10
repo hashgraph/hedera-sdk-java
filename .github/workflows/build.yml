@@ -20,7 +20,7 @@ permissions:
   contents: read
 
 env:
-  LC_ALL: en.UTF-8
+  LC_ALL: en_US.UTF-8
   LANG: en_US.UTF-8
 
 jobs:
@@ -42,11 +42,8 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Compile SDK
-        run: ./gradlew assemble --scan
-
-      - name: Generate Javadoc
-        run: ./gradlew javadoc -Dfile.encoding=UTF-8 --scan
+      - name: Compile SDK & Javadoc
+        run: ./gradlew assemble javadoc -Dfile.encoding=UTF-8 --scan
 
   unit-tests:
     name: Unit Tests
