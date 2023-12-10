@@ -86,7 +86,7 @@ jobs:
         run: |
           ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport --scan
 
-      - name: Build with Sonar
+      - name: Sonar Scan
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

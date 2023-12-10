@@ -14,8 +14,7 @@ permissions:
   pages: write
 
 env:
-  LC_ALL: en.UTF-8
-  LANG: en_US.UTF-8
+  LC_ALL: C.UTF-8
 
 jobs:
   publish:
