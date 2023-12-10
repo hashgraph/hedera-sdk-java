@@ -12,3 +12,26 @@ gradleEnterprise {
         termsOfServiceAgree = 'yes'
     }
 }
+
+var isCiServer = System.getenv().containsKey("CI")
+var gradleCacheUsername= System.getenv("GRADLE_CACHE_USERNAME")
+var gradleCachePassword = System.getenv("GRADLE_CACHE_PASSWORD")
+var gradleCacheAuthorized =
+        !(gradleCacheUsername?.isEmpty() ?: false) && !(gradleCachePassword?.isEmpty() ?: false)
+
+buildCache {
+    remote(HttpBuildCache) {
+        url = uri("https://cache.gradle.hedera.svcs.eng.swirldslabs.io/cache/")
+        push = isCiServer && gradleCacheAuthorized
+
+        useExpectContinue = true
+        enabled = !gradle.startParameter.offline
+
+        if (isCiServer && gradleCacheAuthorized) {
+            credentials {
+                username = gradleCacheUsername
+                password = gradleCachePassword
+            }
+        }
+    }
+}

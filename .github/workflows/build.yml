@@ -21,6 +21,8 @@ permissions:
 
 env:
   LC_ALL: C.UTF-8
+  GRADLE_CACHE_USERNAME: ${{ secrets.GRADLE_CACHE_USERNAME }}
+  GRADLE_CACHE_PASSWORD: ${{ secrets.GRADLE_CACHE_PASSWORD }}
 
 jobs:
   compile:
