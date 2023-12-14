@@ -248,4 +248,5 @@ publishing {
 
 signing {
     sign publishing.publications.mavenJava
+    useGpgCmd()
 }
