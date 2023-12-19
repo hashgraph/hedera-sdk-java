@@ -35,8 +35,8 @@ public final class AccountCreateWithHtsExample {
     private AccountCreateWithHtsExample() {
     }
 
-    public static void main(String[] args) throws NullPointerException, PrecheckStatusException, ReceiptStatusException, InterruptedException, TimeoutException {
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args) throws Exception {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -149,11 +149,11 @@ public final class AccountCreateWithHtsExample {
 
         System.out.println("The normal account ID of the given alias: " + accountId);
 
-        if (nftOwnerAccountId.equals(accountId))
+        if (nftOwnerAccountId.equals(accountId)) {
             System.out.println("The NFT owner accountId matches the accountId created with the HTS");
-        else
-            System.out.println("The two account IDs does not match");
-
+        } else {
+            throw new Exception("The two account IDs does not match");
+        }
 
         System.out.println("Example 2");
 
@@ -224,7 +224,7 @@ public final class AccountCreateWithHtsExample {
         if (tokenBalanceAccountId2 == 10)
             System.out.println("Account is created successfully using HTS 'TransferTransaction'");
         else
-            System.out.println("Creating account with HTS using public key alias failed");
+            throw new Exception("Creating account with HTS using public key alias failed");
 
         client.close();
     }

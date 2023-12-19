@@ -101,3 +101,11 @@ nexusPublishing {
         }
     }
 }
+
+tasks.register("showVersion") {
+    group = "versioning"
+    inputs.property("version", project.version)
+    doLast {
+        println(inputs.properties["version"])
+    }
+}

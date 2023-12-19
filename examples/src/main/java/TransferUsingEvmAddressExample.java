@@ -36,7 +36,7 @@ public class TransferUsingEvmAddressExample {
         - Get the `AccountInfo` of the account and show the account is now a complete account by returning the public key on the account
     */
     public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);

@@ -32,10 +32,13 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
 import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenInfo;
 import com.hedera.hashgraph.sdk.TokenInfoQuery;
+import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hedera.hashgraph.sdk.TokenWipeTransaction;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -58,8 +61,9 @@ public final class CustomFeesExample {
     private CustomFeesExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args)
+        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -129,6 +133,7 @@ public final class CustomFeesExample {
             .setAdminKey(aliceKey)
             .setSupplyKey(aliceKey)
             .setFeeScheduleKey(aliceKey)
+            .setWipeKey(aliceKey)
             .setTreasuryAccountId(aliceId)
             .setCustomFees(hbarFeeList)
             .setInitialSupply(100)
@@ -259,13 +264,74 @@ public final class CustomFeesExample {
 
         // clean up
 
-        new TokenDeleteTransaction()
+        // move token to operator account
+        new TokenAssociateTransaction()
+            .setAccountId(client.getOperatorAccountId())
+            .setTokenIds(Collections.singletonList(tokenId))
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenUpdateTransaction()
             .setTokenId(tokenId)
+            .setAdminKey(OPERATOR_KEY)
+            .setSupplyKey(OPERATOR_KEY)
+            .setFeeScheduleKey(OPERATOR_KEY)
+            .setWipeKey(OPERATOR_KEY)
+            .setTreasuryAccountId(client.getOperatorAccountId())
             .freezeWith(client)
             .sign(aliceKey)
             .execute(client)
             .getReceipt(client);
 
+        // wipe token on created accounts
+        Map<TokenId, Long> charlieTokensBeforeWipe = new AccountBalanceQuery()
+            .setAccountId(charlieId)
+            .execute(client)
+            .tokens;
+        System.out.println("Charlie's token balance (before wipe): " + charlieTokensBeforeWipe.get(tokenId));
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAmount(charlieTokensBeforeWipe.get(tokenId))
+            .setAccountId(charlieId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        Map<TokenId, Long> bobTokensBeforeWipe = new AccountBalanceQuery()
+            .setAccountId(bobId)
+            .execute(client)
+            .tokens;
+        System.out.println("Bob's token balance (before wipe): " + bobTokensBeforeWipe.get(tokenId));
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAmount(bobTokensBeforeWipe.get(tokenId))
+            .setAccountId(bobId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        Map<TokenId, Long> aliceTokensBeforeWipe = new AccountBalanceQuery()
+            .setAccountId(aliceId)
+            .execute(client)
+            .tokens;
+        System.out.println("Alice's token balance (before wipe): " + aliceTokensBeforeWipe.get(tokenId));
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAmount(aliceTokensBeforeWipe.get(tokenId))
+            .setAccountId(aliceId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        // delete accounts and token
         new AccountDeleteTransaction()
             .setAccountId(charlieId)
             .setTransferAccountId(client.getOperatorAccountId())
@@ -287,6 +353,13 @@ public final class CustomFeesExample {
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
             .sign(aliceKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
             .execute(client)
             .getReceipt(client);
 

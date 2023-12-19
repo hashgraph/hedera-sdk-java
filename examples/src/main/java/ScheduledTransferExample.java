@@ -51,8 +51,9 @@ public final class ScheduledTransferExample {
     private ScheduledTransferExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args)
+        throws Exception {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -97,8 +98,8 @@ public final class ScheduledTransferExample {
             .accountId;
         Objects.requireNonNull(bobsId);
 
-        System.out.println("Alice's ID: " + client.getOperatorAccountId().toStringWithChecksum(client));
-        System.out.println("Bob's ID: " + bobsId.toStringWithChecksum(client));
+        System.out.println("Alice's ID: " + client.getOperatorAccountId());
+        System.out.println("Bob's ID: " + bobsId);
 
         AccountBalance bobsInitialBalance = new AccountBalanceQuery()
             .setAccountId(bobsId)
@@ -134,7 +135,7 @@ public final class ScheduledTransferExample {
             .getReceipt(client)
             .scheduleId;
         Objects.requireNonNull(scheduleId);
-        System.out.println("The scheduleId is: " + scheduleId.toStringWithChecksum(client));
+        System.out.println("The scheduleId is: " + scheduleId);
 
         /*
          * Bob's balance should be unchanged.  The transfer has been scheduled, but it hasn't been executed yet
@@ -168,9 +169,7 @@ public final class ScheduledTransferExample {
             System.out.println("The scheduled transfer transaction from Bob's POV:");
             System.out.println(scheduledTransfer);
         } else {
-            System.out.println("The scheduled transaction was not a transfer transaction.");
-            System.out.println("Something has gone horribly wrong.  Crashing...");
-            System.exit(-1);
+            throw new Exception("The scheduled transaction was not a transfer transaction.");
         }
 
         new ScheduleSignTransaction()

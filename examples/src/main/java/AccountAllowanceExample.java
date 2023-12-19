@@ -57,15 +57,17 @@ public class AccountAllowanceExample {
     private final PrivateKey charlieKey;
     private final AccountId charlieId;
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    public static void main(String[] args)
+        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
         AccountAllowanceExample example = new AccountAllowanceExample();
         example.demonstrateAllowances();
         example.cleanUp();
         System.out.println("End of example");
     }
 
-    private AccountAllowanceExample() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        client = Client.forName(HEDERA_NETWORK);
+    private AccountAllowanceExample()
+        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+        client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key

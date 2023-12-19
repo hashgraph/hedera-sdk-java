@@ -38,8 +38,8 @@ public final class GetAccountBalanceExample {
     private GetAccountBalanceExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException {
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Because AccountBalanceQuery is a free query, we can make it without setting an operator on the client.
 

@@ -19,8 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static java.util.concurrent.CompletableFuture.completedFuture;
-import static java.util.concurrent.CompletableFuture.failedFuture;
+import static java8.util.concurrent.CompletableFuture.completedFuture;
+import static java8.util.concurrent.CompletableFuture.failedFuture;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -28,11 +28,11 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
 import javax.annotation.Nullable;
 
 /**
@@ -66,6 +66,8 @@ public final class TransactionId implements Comparable<TransactionId> {
     private static final long NANOSECONDS_PER_MILLISECOND = 1_000_000L;
 
     private static final long TIMESTAMP_INCREMENT_NANOSECONDS = 1_000L;
+
+    private static final long NANOSECONDS_TO_REMOVE = 10000000000L;
 
     private static final AtomicLong monotonicTime = new AtomicLong();
 
@@ -110,8 +112,9 @@ public final class TransactionId implements Comparable<TransactionId> {
         // and it handles the case where the system clock appears to move backward
         // or if multiple threads attempt to generate a timestamp concurrently.
         do {
-            // Get the current time in nanoseconds.
-            currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND;
+            // Get the current time in nanoseconds and remove a few seconds to allow for some time drift
+            // between the client and the receiving node and prevented spurious INVALID_TRANSACTION_START.
+            currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND - NANOSECONDS_TO_REMOVE;
 
             // Get the last recorded timestamp.
             lastTime = monotonicTime.get();
