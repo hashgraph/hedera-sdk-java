@@ -1,6 +1,7 @@
 package com.hedera.hashgraph.sdk;
 
 import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNTS_ROUTE;
+import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNT_TOKENS_ROUTE;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -31,14 +32,19 @@ class MirrorNodeGateway {
     JsonObject getAccountInfo(String id) throws IOException, InterruptedException {
         var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNTS_ROUTE, id);
 
-         var responseBody = performQueryToMirrorNode(fullApiUrl);
+        var responseBody = performQueryToMirrorNode(fullApiUrl);
 
         JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
         return jsonObject;
     }
 
-    JsonObject getContractInfo(String contractId) {
-        throw new UnsupportedOperationException("Not implemented yet!");
+    JsonObject getAccountTokens(String id) throws IOException, InterruptedException {
+        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNT_TOKENS_ROUTE, id);
+
+        var responseBody = performQueryToMirrorNode(fullApiUrl);
+
+        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+        return jsonObject;
     }
 
     private String performQueryToMirrorNode(String apiUrl) throws IOException, InterruptedException {

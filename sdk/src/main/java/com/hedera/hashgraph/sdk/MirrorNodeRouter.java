@@ -12,11 +12,11 @@ class MirrorNodeRouter {
     private static final String LOCAL_NODE_PORT_NUMBER = "5551";
 
     static final String ACCOUNTS_ROUTE = "accounts";
-    static final String CONTRACTS_ROUTE = "contracts";
+    static final String ACCOUNT_TOKENS_ROUTE = "account_tokens";
 
     private static final Map<String, String> routes = Map.of(
-        ACCOUNTS_ROUTE, "/accounts",
-        CONTRACTS_ROUTE, "/contracts"
+        ACCOUNTS_ROUTE, "/accounts/%s",
+        ACCOUNT_TOKENS_ROUTE, "/accounts/%s/tokens"
     );
 
     static String getMirrorNodeUrl(List<String> mirrorNetwork, LedgerId ledgerId) {
@@ -41,7 +41,7 @@ class MirrorNodeRouter {
     }
 
     static String buildApiUrl(String mirrorNodeUrl, String route, String id) {
-        String fullApiUrl =  mirrorNodeUrl + API_VERSION + routes.get(route) + "/" + id;
+        String fullApiUrl = mirrorNodeUrl + API_VERSION + String.format(routes.get(route), id);
 
         return fullApiUrl;
     }
