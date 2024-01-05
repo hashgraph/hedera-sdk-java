@@ -22,23 +22,22 @@ package com.hedera.hashgraph.sdk;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
-import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.TokenBalance;
 import io.grpc.MethodDescriptor;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
 /**
- * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
- * smaller and faster reply than {@link AccountInfoQuery}.
+ * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a smaller and faster
+ * reply than {@link AccountInfoQuery}.
  *
  * <p>This query is free.
  */
@@ -81,7 +80,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     /**
      * Extract the contract id.
      *
-     * @return                          the contract id
+     * @return the contract id
      */
     @Nullable
     public ContractId getContractId() {
@@ -138,7 +137,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
         long accountNum = getNumForQuery(request);
 
-        JsonObject accountBalanceResponse = null;
+        JsonObject accountBalanceResponse;
         try {
             accountBalanceResponse = mirrorNodeGateway.getAccountInfo(String.valueOf(accountNum));
         } catch (IOException | InterruptedException e) {
@@ -149,25 +148,14 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
         long hbarBalance = balanceObject.get("balance").getAsLong();
         JsonArray tokens = balanceObject.get("tokens").getAsJsonArray();
 
-        List<TokenBalance> tokenBalanceList = tokens.asList().stream().map(jsonElement -> {
-            var jsonObject = jsonElement.getAsJsonObject();
-            var tokenId = jsonObject.get("token_id").getAsString();
-            var tokenBalance = jsonObject.get("balance").getAsLong();
+        Map<TokenId, Long> tokensMap = tokens.asList().stream().collect(
+            Collectors.toMap(tokenId -> TokenId.fromString(tokenId.getAsJsonObject().get("token_id").getAsString()),
+                tokenBalance -> tokenBalance.getAsJsonObject().get("balance").getAsLong()));
 
-            return TokenBalance.newBuilder()
-                .setTokenId(TokenId.fromString(tokenId).toProtobuf())
-                .setBalance(tokenBalance)
-                // no tokenDecimals :( -- additional query per each token is needed to figure it out
-//                        .setDecimals()
-                .build();
-        }).collect(Collectors.toList());
+        // no tokenDecimals for now (additional query per each token is needed to figure it out)
+        Map<TokenId, Integer> tokenDecimals = new HashMap<>();
 
-        var reconstructedProtobuf = CryptoGetAccountBalanceResponse.newBuilder()
-            .setBalance(hbarBalance)
-            .addAllTokenBalances(tokenBalanceList)
-            .build();
-
-        return AccountBalance.fromProtobuf(reconstructedProtobuf);
+        return new AccountBalance(Hbar.fromTinybars(hbarBalance), tokensMap, tokenDecimals);
     }
 
     @Override
