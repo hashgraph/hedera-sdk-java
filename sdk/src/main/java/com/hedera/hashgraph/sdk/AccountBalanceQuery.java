@@ -19,13 +19,20 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
+import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.TokenBalance;
 import io.grpc.MethodDescriptor;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
@@ -127,7 +134,40 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
     @Override
     AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
+
+        long accountNum = getNumForQuery(request);
+
+        JsonObject accountBalanceResponse = null;
+        try {
+            accountBalanceResponse = mirrorNodeGateway.getAccountInfo(String.valueOf(accountNum));
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
+        }
+
+        JsonObject balanceObject = accountBalanceResponse.get("balance").getAsJsonObject();
+        long hbarBalance = balanceObject.get("balance").getAsLong();
+        JsonArray tokens = balanceObject.get("tokens").getAsJsonArray();
+
+        List<TokenBalance> tokenBalanceList = tokens.asList().stream().map(jsonElement -> {
+            var jsonObject = jsonElement.getAsJsonObject();
+            var tokenId = jsonObject.get("token_id").getAsString();
+            var tokenBalance = jsonObject.get("balance").getAsLong();
+
+            return TokenBalance.newBuilder()
+                .setTokenId(TokenId.fromString(tokenId).toProtobuf())
+                .setBalance(tokenBalance)
+                // no tokenDecimals :( -- additional query per each token is needed to figure it out
+//                        .setDecimals()
+                .build();
+        }).collect(Collectors.toList());
+
+        var reconstructedProtobuf = CryptoGetAccountBalanceResponse.newBuilder()
+            .setBalance(hbarBalance)
+            .addAllTokenBalances(tokenBalanceList)
+            .build();
+
+        return AccountBalance.fromProtobuf(reconstructedProtobuf);
     }
 
     @Override
@@ -144,4 +184,22 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getCryptoGetBalanceMethod();
     }
+
+    private long getNumForQuery(com.hedera.hashgraph.sdk.proto.Query request) {
+        switch (request.getCryptogetAccountBalance().getBalanceSourceCase()) {
+            case ACCOUNTID -> {
+                if (this.accountId != null) {
+                    return this.accountId.num;
+                }
+            }
+            case CONTRACTID -> {
+                if (this.contractId != null) {
+                    return this.contractId.num;
+                }
+            }
+        }
+
+        throw new IllegalStateException("Either accountId or contractId should be set!");
+    }
+
 }
