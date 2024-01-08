@@ -11,11 +11,9 @@ class MirrorNodeRouter {
     // TODO: check how to make it configurable, not hardcoded
     private static final String LOCAL_NODE_PORT_NUMBER = "5551";
 
-    static final String ACCOUNTS_ROUTE = "accounts";
     static final String ACCOUNT_TOKENS_ROUTE = "account_tokens";
 
     private static final Map<String, String> routes = Map.of(
-        ACCOUNTS_ROUTE, "/accounts/%s",
         ACCOUNT_TOKENS_ROUTE, "/accounts/%s/tokens"
     );
 

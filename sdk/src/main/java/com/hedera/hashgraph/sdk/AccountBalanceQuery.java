@@ -19,22 +19,16 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceQuery;
-import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TokenBalance;
 import io.grpc.MethodDescriptor;
-
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a smaller and faster
@@ -135,33 +129,16 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     @Override
     AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
         MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
         long accountNum = getNumForQuery(request);
 
-        JsonObject accountTokensResponse;
-        try {
-            accountTokensResponse = mirrorNodeGateway.getAccountTokens(String.valueOf(accountNum));
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
-        }
-        JsonArray tokens = accountTokensResponse.get("tokens").getAsJsonArray();
-
-        List<TokenBalance> tokenBalanceList = tokens.asList().stream().map(jsonElement -> {
-            var jsonObject = jsonElement.getAsJsonObject();
-            var tokenId = jsonObject.get("token_id").getAsString();
-            var tokenBalance = jsonObject.get("balance").getAsLong();
-
-            return TokenBalance.newBuilder().setTokenId(TokenId.fromString(tokenId).toProtobuf())
-                .setBalance(tokenBalance)
-                // no tokenDecimals :( -- additional query per each token is needed to figure it out
-//                        .setDecimals()
-                .build();
-        }).collect(Collectors.toList());
+        List<TokenBalance> tokenBalanceList = mirrorNodeService
+            .getTokenBalancesForAccount(String.valueOf(accountNum));
 
         var protobufFromConsensusNode = response.getCryptogetAccountBalance();
-
-        var protobufUpdatedByMirrorNode = CryptoGetAccountBalanceResponse.newBuilder()
-            .setBalance(protobufFromConsensusNode.getBalance())
+        var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
+            .clearTokenBalances()
             .addAllTokenBalances(tokenBalanceList)
             .build();
 
@@ -199,5 +176,4 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
         throw new IllegalStateException("Either accountId or contractId should be set!");
     }
-
 }

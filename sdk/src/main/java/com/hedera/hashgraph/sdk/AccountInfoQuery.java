@@ -24,11 +24,12 @@ import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.TokenRelationship;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
+import java8.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 
 /**
  * Get all the information about an account, including the balance.
@@ -97,7 +98,19 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
 
     @Override
     AccountInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountInfo.fromProtobuf(response.getCryptoGetInfo().getAccountInfo());
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        List<TokenRelationship> tokenRelationships = mirrorNodeService
+            .getTokenRelationshipsForAccount(String.valueOf(this.accountId.num));
+
+        var protobufFromConsensusNode = response.getCryptoGetInfo().getAccountInfo();
+        var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
+            .clearTokenRelationships()
+            .addAllTokenRelationships(tokenRelationships)
+            .build();
+
+        return AccountInfo.fromProtobuf(protobufUpdatedByMirrorNode);
     }
 
     @Override

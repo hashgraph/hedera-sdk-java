@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNTS_ROUTE;
 import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNT_TOKENS_ROUTE;
 
 import com.google.gson.JsonObject;
@@ -29,15 +28,6 @@ class MirrorNodeGateway {
         return new MirrorNodeGateway(mirrorNodeUrl);
     }
 
-    JsonObject getAccountInfo(String id) throws IOException, InterruptedException {
-        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNTS_ROUTE, id);
-
-        var responseBody = performQueryToMirrorNode(fullApiUrl);
-
-        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-        return jsonObject;
-    }
-
     JsonObject getAccountTokens(String id) throws IOException, InterruptedException {
         var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNT_TOKENS_ROUTE, id);
 
@@ -56,5 +46,4 @@ class MirrorNodeGateway {
 
         return httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString()).body();
     }
-
 }
