@@ -18,11 +18,78 @@ class MirrorNodeService {
         this.mirrorNodeGateway = mirrorNodeGateway;
     }
 
-    List<TokenBalance> getTokenBalancesForAccount(String id) {
+    /**
+     * Get AccountId num from mirror node using evm address.
+     *
+     * @param evmAddress
+     * @return
+     */
+    Long getAccountNum(String evmAddress) {
+        JsonObject accountInfoResponse;
+
+        try {
+            accountInfoResponse = mirrorNodeGateway.getAccountInfo(evmAddress);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
+        }
+
+        String num = accountInfoResponse.get("account").getAsString();
+
+        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
+    }
+
+    /**
+     * Get EvmAddress from mirror node using account num.
+     *
+     * @param num
+     * @return
+     */
+    EvmAddress getAccountEvmAddress(long num) {
+        JsonObject accountInfoResponse;
+
+        try {
+            accountInfoResponse = mirrorNodeGateway.getAccountInfo(String.valueOf(num));
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
+        }
+
+        String evmAddressString = accountInfoResponse.get("evm_address").getAsString();
+
+        return EvmAddress.fromString(
+            evmAddressString.substring(evmAddressString.lastIndexOf(".") + 1));
+    }
+
+    /**
+     * Get ContractId num from mirror node using evm address.
+     *
+     * @param evmAddress
+     * @return
+     */
+    Long getContractNum(String evmAddress) {
+        JsonObject accountInfoResponse;
+
+        try {
+            accountInfoResponse = mirrorNodeGateway.getContractInfo(evmAddress);
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Error, while processing getContractInfo mirror node query", e);
+        }
+
+        String num = accountInfoResponse.get("contract_id").getAsString();
+
+        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
+    }
+
+    /**
+     * Build the list of com.hedera.hashgraph.sdk.proto.TokenBalance for a given account.
+     *
+     * @param idOrAliasOrEvmAddress
+     * @return
+     */
+    List<TokenBalance> getTokenBalancesForAccount(String idOrAliasOrEvmAddress) {
         JsonObject accountTokensResponse;
 
         try {
-            accountTokensResponse = mirrorNodeGateway.getAccountTokens(id);
+            accountTokensResponse = mirrorNodeGateway.getAccountTokens(idOrAliasOrEvmAddress);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
         }
@@ -43,10 +110,16 @@ class MirrorNodeService {
         return tokenBalanceList;
     }
 
-    List<TokenRelationship> getTokenRelationshipsForAccount(String id) {
+    /**
+     * Build the list of com.hedera.hashgraph.sdk.proto.TokenRelationship for a given account.
+     *
+     * @param idOrAliasOrEvmAddress
+     * @return
+     */
+    List<TokenRelationship> getTokenRelationshipsForAccount(String idOrAliasOrEvmAddress) {
         JsonObject accountTokensResponse;
         try {
-            accountTokensResponse = mirrorNodeGateway.getAccountTokens(id);
+            accountTokensResponse = mirrorNodeGateway.getAccountTokens(idOrAliasOrEvmAddress);
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException("Error, while processing getAccountTokens mirror node query", e);
         }

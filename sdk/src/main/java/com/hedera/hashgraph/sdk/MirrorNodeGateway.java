@@ -1,6 +1,8 @@
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNTS_ROUTE;
 import static com.hedera.hashgraph.sdk.MirrorNodeRouter.ACCOUNT_TOKENS_ROUTE;
+import static com.hedera.hashgraph.sdk.MirrorNodeRouter.CONTRACTS_ROUTE;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -22,19 +24,41 @@ class MirrorNodeGateway {
         this.mirrorNodeUrl = mirrorNodeUrl;
     }
 
+    static MirrorNodeGateway forClient(Client client) {
+        final String mirrorNodeUrl = MirrorNodeRouter.getMirrorNodeUrl(client.getMirrorNetwork(),
+            client.getLedgerId());
+
+        return new MirrorNodeGateway(mirrorNodeUrl);
+    }
+
     static MirrorNodeGateway forNetwork(List<String> mirrorNetwork, LedgerId ledgerId) {
         final String mirrorNodeUrl = MirrorNodeRouter.getMirrorNodeUrl(mirrorNetwork, ledgerId);
 
         return new MirrorNodeGateway(mirrorNodeUrl);
     }
 
-    JsonObject getAccountTokens(String id) throws IOException, InterruptedException {
-        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNT_TOKENS_ROUTE, id);
+    JsonObject getAccountInfo(String idOrAliasOrEvmAddress) throws IOException, InterruptedException {
+        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNTS_ROUTE, idOrAliasOrEvmAddress);
 
         var responseBody = performQueryToMirrorNode(fullApiUrl);
 
-        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
-        return jsonObject;
+        return JsonParser.parseString(responseBody).getAsJsonObject();
+    }
+
+    JsonObject getContractInfo(String contractIdOrAddress) throws IOException, InterruptedException {
+        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, CONTRACTS_ROUTE, contractIdOrAddress);
+
+        var responseBody = performQueryToMirrorNode(fullApiUrl);
+
+        return JsonParser.parseString(responseBody).getAsJsonObject();
+    }
+
+    JsonObject getAccountTokens(String idOrAliasOrEvmAddress) throws IOException, InterruptedException {
+        var fullApiUrl = MirrorNodeRouter.buildApiUrl(mirrorNodeUrl, ACCOUNT_TOKENS_ROUTE, idOrAliasOrEvmAddress);
+
+        var responseBody = performQueryToMirrorNode(fullApiUrl);
+
+        return JsonParser.parseString(responseBody).getAsJsonObject();
     }
 
     private String performQueryToMirrorNode(String apiUrl) throws IOException, InterruptedException {

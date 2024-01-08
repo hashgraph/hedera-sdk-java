@@ -11,9 +11,15 @@ class MirrorNodeRouter {
     // TODO: check how to make it configurable, not hardcoded
     private static final String LOCAL_NODE_PORT_NUMBER = "5551";
 
+    static final String ACCOUNTS_ROUTE = "accounts";
+
+    static final String CONTRACTS_ROUTE = "contracts";
+
     static final String ACCOUNT_TOKENS_ROUTE = "account_tokens";
 
     private static final Map<String, String> routes = Map.of(
+        ACCOUNTS_ROUTE, "/accounts/%s",
+        CONTRACTS_ROUTE, "/contracts/%s",
         ACCOUNT_TOKENS_ROUTE, "/accounts/%s/tokens"
     );
 
@@ -39,9 +45,6 @@ class MirrorNodeRouter {
     }
 
     static String buildApiUrl(String mirrorNodeUrl, String route, String id) {
-        String fullApiUrl = mirrorNodeUrl + API_VERSION + String.format(routes.get(route), id);
-
-        return fullApiUrl;
+        return mirrorNodeUrl + API_VERSION + String.format(routes.get(route), id);
     }
-
 }
