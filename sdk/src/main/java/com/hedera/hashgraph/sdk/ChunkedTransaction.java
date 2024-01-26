@@ -26,14 +26,7 @@ import com.hedera.hashgraph.sdk.proto.SignatureMap;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
-import java8.util.concurrent.CompletableFuture;
-import java8.util.concurrent.CompletionStage;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
-import java8.util.function.Function;
 import java.time.Duration;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -41,8 +34,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.TimeoutException;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import javax.annotation.Nullable;
 
 /**
  * A common base for file and topic message transactions.

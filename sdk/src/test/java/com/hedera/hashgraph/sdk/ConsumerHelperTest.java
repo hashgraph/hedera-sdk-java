@@ -1,12 +1,15 @@
 package com.hedera.hashgraph.sdk;
 
-import java8.util.concurrent.CompletableFuture;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.Test;
 
 class ConsumerHelperTest {
     @Test
