@@ -56,11 +56,11 @@ public final class CreateSimpleContractExample {
     private CreateSimpleContractExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, IOException, TimeoutException, ReceiptStatusException {
+    public static void main(String[] args)
+        throws Exception {
         String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
 
-
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -106,8 +106,7 @@ public final class CreateSimpleContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            System.out.println("error calling contract: " + contractCallResult.errorMessage);
-            return;
+            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);
@@ -122,8 +121,7 @@ public final class CreateSimpleContractExample {
             .getReceipt(client);
 
         if (contractDeleteResult.status != Status.SUCCESS) {
-            System.out.println("error deleting contract: " + contractDeleteResult.status);
-            return;
+            throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
     }

@@ -12,62 +12,73 @@ on:
       - develop
       - release/*
 
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+env:
+  LC_ALL: C.UTF-8
+  GRADLE_CACHE_USERNAME: ${{ secrets.GRADLE_CACHE_USERNAME }}
+  GRADLE_CACHE_PASSWORD: ${{ secrets.GRADLE_CACHE_PASSWORD }}
+
 jobs:
   compile:
-    runs-on: ubuntu-latest
-
+    name: Code Compiles
+    runs-on: [ self-hosted, Linux, medium, ephemeral ]
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup Java
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+        with:
+          cache-read-only: false
+
+      - name: Compile SDK & Javadoc
+        run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    needs:
+      - compile
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-      - name: Compile SDK
-        run: ./gradlew compileJava
-      - name: Compile Tests
-        run: ./gradlew compileTestJava
-      - name: Compile Integration Tests
-        run: ./gradlew compileIntegrationTestJava
-      - name: Compile Examples
-        run: ./gradlew :examples:compileJava
-      - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc
-  test:
-    runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v2
+      - name: Setup NodeJS
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
-        with:
-          java-version: '17'
-          distribution: 'adopt'
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          node-version: 18
 
-      - name: Start the local node
-        run: npx @hashgraph/hedera-local@2.13.0 start -d --network local
+      - name: Setup Java
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+
+      - name: Install Local Node
+        run: npm install @hashgraph/hedera-local@2.13.0
+
+      - name: Compile Code
+        run: ./gradlew assemble --scan
+
+      - name: Start Local Node
+        run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Run Tests
         env:
@@ -75,17 +86,62 @@ jobs:
           OPERATOR_ID: '0.0.1022'
           HEDERA_NETWORK: 'localhost'
         run: |
-          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport --scan
 
-      - name: Build with Sonar
-        if: github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]')
+      - name: Sonar Scan
+        if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
         env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube --info
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info --scan
+
       - name: Publish To Codecov
-        if: always()
-        uses: codecov/codecov-action@v3
+        if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
+        uses: codecov/codecov-action@eaaf4bedf32dbdc6b720b63067d99c4d77d6047d # v3.1.4
+
+      - name: Stop the local node
+        run: npx @hashgraph/hedera-local stop
+
+  example-tests:
+    name: Example Code Tests
+    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    needs:
+      - compile
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        with:
+          node-version: 18
+
+      - name: Setup Java
+        uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@842c587ad8aa4c68eeba24c396e15af4c2e9f30a # v2.9.0
+
+      - name: Install Local Node
+        run: npm install @hashgraph/hedera-local@2.13.0
+
+      - name: Compile Code
+        run: ./gradlew assemble --scan
+
+      - name: Start the local node
+        run: npx @hashgraph/hedera-local start -d --network local
+
+      - name: Prepare .env for Examples
+        run: |
+          echo "OPERATOR_KEY=0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4" > examples/.env
+          echo "OPERATOR_ID=0.0.1022" >> examples/.env
+          echo "HEDERA_NETWORK=localhost" >> examples/.env
+
+      - name: Run Examples
+        run: ./gradlew :examples:runAllExamples --scan
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop

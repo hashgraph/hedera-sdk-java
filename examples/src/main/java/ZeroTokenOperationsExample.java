@@ -36,7 +36,7 @@ public final class ZeroTokenOperationsExample {
     }
 
     public static void main(String[] args) throws Exception {
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key

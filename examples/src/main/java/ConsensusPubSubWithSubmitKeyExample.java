@@ -58,7 +58,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
     private TopicId topicId;
     private PrivateKey submitKey;
 
-    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages) {
+    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages)
+        throws InterruptedException {
         this.messagesToPublish = messagesToPublish;
         this.millisBetweenMessages = millisBetweenMessages;
         setupClient();
@@ -77,8 +78,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
         publishMessagesToTopic();
     }
 
-    private void setupClient() {
-        client = Client.forName(HEDERA_NETWORK);
+    private void setupClient() throws InterruptedException {
+        client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this
         // account and be signed by this key

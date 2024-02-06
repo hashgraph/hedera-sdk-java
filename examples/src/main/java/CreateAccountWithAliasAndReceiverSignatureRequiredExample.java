@@ -24,8 +24,9 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
     - Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
     - Get the `AccountInfo` and show that the account has contractAccountId
     */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args)
+        throws Exception {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -83,7 +84,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         if (accountInfo.contractAccountId != null) {
             System.out.println("The new account has alias " + accountInfo.contractAccountId);
         } else {
-            System.out.println("The new account doesn't have alias");
+            throw new Exception("The new account doesn't have alias");
         }
     }
 }

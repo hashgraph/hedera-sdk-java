@@ -187,22 +187,18 @@ public class ContractHelper {
                 .setValidateStatus(false)
                 .getRecord(client);
 
-            try {
-                if (record.receipt.status != Status.SUCCESS) {
-                    throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
-                }
-                ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
-                System.out.println("gas used: " + functionResult.gasUsed);
-                if (getResultValidator(stepIndex).apply(functionResult)) {
-                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
-                } else {
-                    throw new Exception("returned invalid result");
-                }
-            } catch (Throwable error) {
-                System.out.println("Error occurred in step " + stepIndex + ": " + error.getMessage());
-                System.out.println("Transaction record: " + record);
-                break;
+            if (record.receipt.status != Status.SUCCESS) {
+                throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
             }
+            ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
+            System.out.println("gas used: " + functionResult.gasUsed);
+            if (getResultValidator(stepIndex).apply(functionResult)) {
+                System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
+            } else {
+                throw new Exception("returned invalid result");
+            }
+
+            break;
         }
         return this;
     }

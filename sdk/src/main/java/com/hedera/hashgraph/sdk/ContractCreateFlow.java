@@ -27,11 +27,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -120,7 +120,7 @@ public class ContractCreateFlow {
     private PublicKey signPublicKey = null;
 
     @Nullable
-    private UnaryOperator<byte[]> transactionSigner = null;
+    private Function<byte[], byte[]> transactionSigner = null;
 
     /**
      * Constructor
@@ -544,7 +544,7 @@ public class ContractCreateFlow {
      * @param transactionSigner the key list
      * @return {@code this}
      */
-    public ContractCreateFlow signWith(PublicKey publicKey, UnaryOperator<byte[]> transactionSigner) {
+    public ContractCreateFlow signWith(PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
         this.signPublicKey = publicKey;
         this.transactionSigner = transactionSigner;
         this.signPrivateKey = null;

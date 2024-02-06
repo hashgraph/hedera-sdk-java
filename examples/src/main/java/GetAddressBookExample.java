@@ -48,7 +48,7 @@ public final class GetAddressBookExample {
 
         System.out.println("Getting address book for " + HEDERA_NETWORK);
 
-        Client client = Client.forName(HEDERA_NETWORK);
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         NodeAddressBook addressBook = new AddressBookQuery()
             .setFileId(FileId.ADDRESS_BOOK)

@@ -55,9 +55,9 @@ public class ScheduleIdenticalTransactionExample {
     private ScheduleIdenticalTransactionExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-
-        Client client = Client.forName(HEDERA_NETWORK);
+    public static void main(String[] args)
+        throws Exception {
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
@@ -92,7 +92,7 @@ public class ScheduleIdenticalTransactionExample {
             // Make sure the transaction succeeded
             TransactionReceipt transactionReceipt = createResponse.getReceipt(client);
 
-            Client newClient = Client.forName(HEDERA_NETWORK);
+            Client newClient = ClientHelper.forName(HEDERA_NETWORK);
             newClient.setOperator(Objects.requireNonNull(transactionReceipt.accountId), newKey);
             clients[i] = newClient;
             accounts[i] = transactionReceipt.accountId;
@@ -151,8 +151,7 @@ public class ScheduleIdenticalTransactionExample {
             }
 
             if (!scheduleID.equals(Objects.requireNonNull(loopReceipt.scheduleId))) {
-                System.out.println("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.scheduleId);
-                return;
+                throw new Exception("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.scheduleId);
             }
 
             // If the status return by the receipt is related to already created, execute a schedule sign transaction
@@ -167,8 +166,7 @@ public class ScheduleIdenticalTransactionExample {
                     .setTransactionId(signTransaction.transactionId)
                     .execute(client);
                 if (signReceipt.status != Status.SUCCESS && signReceipt.status != Status.SCHEDULE_ALREADY_EXECUTED) {
-                    System.out.println("Bad status while getting receipt of schedule sign with operator " + operatorId + ": " + signReceipt.status);
-                    return;
+                    throw new Exception("Bad status while getting receipt of schedule sign with operator " + operatorId + ": " + signReceipt.status);
                 }
             }
         }

@@ -37,11 +37,14 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
+import java8.util.concurrent.CompletableFuture;
+import java8.util.concurrent.CompletionStage;
+import java8.util.function.BiConsumer;
+import java8.util.function.Consumer;
+import java8.util.function.Function;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -735,7 +738,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
-                                               UnaryOperator<byte[]> transactionSigner) {
+        Function<byte[], byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
@@ -1385,9 +1388,9 @@ public final class Client implements AutoCloseable {
     static class Operator {
         final AccountId accountId;
         final PublicKey publicKey;
-        final UnaryOperator<byte[]> transactionSigner;
+        final Function<byte[], byte[]> transactionSigner;
 
-        Operator(AccountId accountId, PublicKey publicKey, UnaryOperator<byte[]> transactionSigner) {
+        Operator(AccountId accountId, PublicKey publicKey, Function<byte[], byte[]> transactionSigner) {
             this.accountId = accountId;
             this.publicKey = publicKey;
             this.transactionSigner = transactionSigner;
