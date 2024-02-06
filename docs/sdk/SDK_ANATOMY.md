@@ -1,3 +1,5 @@
+> Please note that this document may be a bit outdated.
+
 ## Tools and Libraries:
 
 Gradle plugins are used for including libraries and tools.
