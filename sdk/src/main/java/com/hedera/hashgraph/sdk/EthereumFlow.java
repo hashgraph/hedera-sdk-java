@@ -1,12 +1,12 @@
 package com.hedera.hashgraph.sdk;
 
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Arrays;
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
-import java8.util.function.BiConsumer;
-import java8.util.function.Consumer;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import javax.annotation.Nullable;
 
 /**
  * Execute an Ethereum transaction on Hedera
