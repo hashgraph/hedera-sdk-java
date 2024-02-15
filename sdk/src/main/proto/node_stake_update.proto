@@ -44,7 +44,8 @@ message NodeStakeUpdateTransactionBody {
   repeated NodeStake node_stake = 2;
 
   /**
-   * The maximum reward rate, in tinybars per whole hbar, that any account can receive in a day.
+   * The maximum reward rate, in tinybars per whole hbar, that any account could receive in this
+   * staking period.
    */
   int64 max_staking_reward_rate_per_hbar = 3;
 
@@ -77,9 +78,43 @@ message NodeStakeUpdateTransactionBody {
   int64 staking_start_threshold = 8;
 
   /**
-   * The total number of tinybars to be distributed as staking rewards each period.
+   * (DEPRECATED) The maximum total number of tinybars to be distributed as staking rewards in the 
+   * ending period. Please consult the max_total_reward field instead.
    */
-  int64 staking_reward_rate = 9;
+  int64 staking_reward_rate = 9 [deprecated = true];
+
+  /**
+   * The amount of the staking reward funds (account 0.0.800) reserved to pay pending rewards that 
+   * have been earned but not collected.
+   */
+  int64 reserved_staking_rewards = 10;
+
+  /**
+   * The unreserved balance of account 0.0.800 at the close of the just-ending period; this value is 
+   * used to compute the HIP-782 balance ratio.
+   */
+  int64 unreserved_staking_reward_balance = 11;
+
+  /**
+   * The unreserved tinybar balance of account 0.0.800 required to achieve the maximum per-hbar reward 
+   * rate in any period; please see HIP-782 for details.
+   */
+  int64 reward_balance_threshold = 12;
+
+  /**
+   * The maximum amount of tinybar that can be staked for reward while still achieving the maximum 
+   * per-hbar reward rate in any period; please see HIP-782 for details.
+   */
+  int64 max_stake_rewarded = 13;
+
+  /**
+   * The maximum total tinybars that could be paid as staking rewards in the ending period, after 
+   * applying the settings for the 0.0.800 balance threshold and the maximum stake rewarded. This
+   * field replaces the deprecated field staking_reward_rate. It is only for convenience, since a 
+   * mirror node could also calculate its value by iterating the node_stake list and summing 
+   * stake_rewarded fields; then multiplying this sum by the max_staking_reward_rate_per_hbar.
+   */
+  int64 max_total_reward = 14;
 }
 
 /**

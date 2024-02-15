@@ -1236,7 +1236,7 @@ message TransactionFeeSchedule {
 }
 
 /**
- * The total fee charged for a transaction. It is composed of three components – a node fee that
+ * The total fee charged for a transaction. It is composed of three components - a node fee that
  * compensates the specific node that submitted the transaction, a network fee that compensates the
  * network for assigning the transaction a consensus timestamp, and a service fee that compensates
  * the network for the ongoing maintenance of the consequences of the transaction.
