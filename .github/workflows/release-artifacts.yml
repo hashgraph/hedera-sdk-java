@@ -66,7 +66,7 @@ jobs:
         if: ${{ github.event_name == 'push' }}
         run: |
           if [[ "${{ steps.tag.outputs.version }}" != "${{ steps.project.outputs.version }}" ]]; then
-            echo "::error file=version.gradle,line=5,title=Version Mismatch::Tag version '${{ steps.tag.outputs.version }}' does not match the Gradle project version '${{ steps.project.outputs.version }}'. Please update the 'version.gradle' file before tagging."
+            echo "::error file=version.txt,line=0,title=Version Mismatch::Tag version '${{ steps.tag.outputs.version }}' does not match the Gradle project version '${{ steps.project.outputs.version }}'. Please update the 'version.txt' file before tagging."
             exit 1
           fi
 
