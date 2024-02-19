@@ -19,7 +19,7 @@
 - **Stop** the local node
 - Run `task test:unit`
 - Create a new branch: `release/vX.Y.Z`
-- Change the version in `version.gradle`
+- Change the version in `version.txt`
 - Change the version in `CHANGELOG.md` (from unreleased)
 - Change the version in `example-android/app/build.gradle`
 - Change the version in README.md (Once in the Gradle section and once in the Maven section)
