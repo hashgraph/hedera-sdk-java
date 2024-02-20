@@ -17,7 +17,6 @@
 plugins {
     id("com.hedera.gradlebuild.repositories")
     id("com.autonomousapps.dependency-analysis")
-    // TODO id "com.github.ben-manes.versions" version "0.48.0"
     // TODO id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
 }
 
