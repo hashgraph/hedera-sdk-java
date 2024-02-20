@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Resources;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 
@@ -185,7 +184,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
      * @return                          the list of address book records
      */
     static Map<AccountId, NodeAddress> readAddressBookResource(String fileName) {
-        try (var inputStream = Resources.getResource(fileName).openStream()) {
+        try (var inputStream = Objects.requireNonNull(Network.class.getResource("/" + fileName)).openStream()) {
             var contents = ByteStreams.toByteArray(inputStream);
             var nodeAddressBook = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
             var map = new HashMap<AccountId, NodeAddress>();
