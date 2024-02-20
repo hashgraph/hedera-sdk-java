@@ -11,4 +11,3 @@ includeBuild("..")
 rootProject.name = "Android Example"
 
 include("app")
-include("examples")
