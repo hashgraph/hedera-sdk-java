@@ -95,7 +95,7 @@ jobs:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew assemble :sdk:javadoc --scan
 
       - name: Nexus Release
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
