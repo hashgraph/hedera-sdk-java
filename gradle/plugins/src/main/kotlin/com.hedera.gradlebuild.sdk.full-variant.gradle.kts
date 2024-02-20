@@ -41,6 +41,7 @@ if (publishFull) {
             exportAllPackages()
             requireAllDefinedDependencies()
             requires("java.logging")
+            requires("jdk.unsupported")
         }
     }
 }
