@@ -59,7 +59,7 @@ public class ContractHelper {
     final Map<Integer, AccountId> stepFeePayers = new HashMap<>();
 
     public static String getBytecodeHex(String filename) throws IOException {
-        try (InputStream jsonStream = ContractHelper.class.getClassLoader().getResourceAsStream(filename)) {
+        try (InputStream jsonStream = ContractHelper.class.getResourceAsStream(filename)) {
             if (jsonStream == null) {
                 throw new RuntimeException("failed to get " + filename);
             }
