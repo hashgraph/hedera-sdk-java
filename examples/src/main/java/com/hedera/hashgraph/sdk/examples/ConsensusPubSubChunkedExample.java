@@ -130,8 +130,7 @@ public final class ConsensusPubSubChunkedExample {
     }
 
     private static String readResources(String filename) {
-        ClassLoader classLoader = ConsensusPubSubChunkedExample.class.getClassLoader();
-        InputStream inputStream = classLoader.getResourceAsStream(filename);
+        InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
             @Var String line;
