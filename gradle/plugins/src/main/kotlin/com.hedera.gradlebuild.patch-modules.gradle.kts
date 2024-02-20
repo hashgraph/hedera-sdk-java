@@ -53,6 +53,8 @@ dependencies.components {
             "org.codehaus.mojo:animal-sniffer-annotations"
         )
 
+    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-netty-shaded") {  params(grpcComponents + annotationLibraries) }
+    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-netty-shaded") { params(grpcModule) }
     withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcComponents + annotationLibraries) }
     withModule<AddDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcModule) }
     withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf") { params(grpcComponents + annotationLibraries) }
@@ -95,6 +97,7 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+    module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded")
     module("io.grpc:grpc-protobuf-lite", "grpc.protobuf.lite")
     module("io.grpc:grpc-protobuf", "grpc.protobuf")
     module("io.grpc:grpc-stub", "io.grpc.stub") {
