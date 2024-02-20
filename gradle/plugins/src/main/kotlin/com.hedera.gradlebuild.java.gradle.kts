@@ -54,7 +54,6 @@ dependencies {
     errorprone("io.grpc:grpc-java-api-checker:1.1.0")
 }
 
-
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"
 
@@ -93,4 +92,11 @@ tasks.withType<JavaCompile>().configureEach {
         disableWarningsInGeneratedCode = true
         excludedPaths = ".*generated.*"
     }
+}
+
+tasks.withType<AbstractArchiveTask>().configureEach {
+    isPreserveFileTimestamps = false
+    isReproducibleFileOrder = true
+    fileMode = 436 // octal: 0664
+    dirMode = 509 // octal: 0775
 }
