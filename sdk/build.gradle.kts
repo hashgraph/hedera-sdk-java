@@ -2,12 +2,24 @@ plugins {
     id("com.hedera.gradlebuild.sdk.java")
 }
 
+tasks.generateProto {
+    builtins.named("java") { option("lite") }
+    plugins.named("grpc") { option("lite") }
+}
+
+// Define versions of protobuf by dependency coordinates as both
+// have the module name 'com.google.protobuf'
+val protobufVersion = "3.24.3"
+dependencies.constraints {
+    versions("com.google.protobuf:protobuf-java:$protobufVersion")
+    versions("com.google.protobuf:protobuf-javalite:$protobufVersion")
+}
+
 moduleInfo {
     version("com.github.spotbugs.annotations", "4.7.3")
     version("com.google.common", "33.0.0-jre")
     version("com.google.errorprone.annotations", "2.21.1")
     version("com.google.gson", "2.10.1")
-    version("com.google.protobuf", "3.24.3")
     version("grpc.protobuf.lite", "1.46.0")
     version("grpc.protobuf", "1.46.0")
     version("headlong", "10.0.0")

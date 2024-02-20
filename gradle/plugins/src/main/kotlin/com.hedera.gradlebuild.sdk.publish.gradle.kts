@@ -32,6 +32,8 @@ val mavenJava = publishing.publications.create<MavenPublication>("mavenJava") {
         allVariants { fromResolutionResult() }
     }
 
+    suppressAllPomMetadataWarnings()
+
     pom {
         name = "Hedera SDK"
         description = "Hedera™ Hashgraph SDK for Java"
