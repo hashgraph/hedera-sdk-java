@@ -44,7 +44,7 @@ jobs:
         run: ./gradlew compileJava --scan
 
       - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew sdk:javadoc --scan
 
       - name: Pages
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1

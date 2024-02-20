@@ -121,11 +121,11 @@ jobs:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew assemble :sdk:javadoc --scan
 
       - name: Nexus Release
         if: ${{ github.event_name == 'push' }}
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
 
       - name: Nexus Release (workflow_dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
