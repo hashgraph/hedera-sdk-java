@@ -97,6 +97,11 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+    module("com.google.protobuf:protobuf-javalite", "com.google.protobuf") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
     module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded")
     module("io.grpc:grpc-protobuf-lite", "grpc.protobuf.lite")
     module("io.grpc:grpc-protobuf", "grpc.protobuf")

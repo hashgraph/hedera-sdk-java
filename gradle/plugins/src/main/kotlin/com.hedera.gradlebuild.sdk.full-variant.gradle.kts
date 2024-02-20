@@ -34,11 +34,15 @@ protobuf.generateProtoTasks {
     }
 }
 
-val protobufVariant = if (publishFull) "protobuf-java" else "protobuf-javalite"
-extraJavaModuleInfo.module("com.google.protobuf:$protobufVariant", "com.google.protobuf") {
-    exportAllPackages()
-    requireAllDefinedDependencies()
-    requires("java.logging")
+if (publishFull) {
+    extraJavaModuleInfo {
+        module("com.google.protobuf:protobuf-javalite", "com.google.protobuf.UNUSED")
+        module("com.google.protobuf:protobuf-java", "com.google.protobuf") {
+            exportAllPackages()
+            requireAllDefinedDependencies()
+            requires("java.logging")
+        }
+    }
 }
 
 publishing.publications.named<MavenPublication>("mavenJava") {
