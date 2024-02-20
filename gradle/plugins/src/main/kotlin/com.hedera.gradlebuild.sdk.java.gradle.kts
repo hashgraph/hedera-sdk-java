@@ -56,10 +56,10 @@ tasks.withType<Test>().configureEach {
     }
 
     // propagate system environment to test runner
-    systemProperty("OPERATOR_ID", providers.systemProperty("OPERATOR_ID").getOrElse(""))
-    systemProperty("OPERATOR_KEY", providers.systemProperty("OPERATOR_KEY").getOrElse(""))
-    systemProperty("CONFIG_FILE", providers.systemProperty("CONFIG_FILE").getOrElse(""))
-    systemProperty("HEDERA_NETWORK", providers.systemProperty("HEDERA_NETWORK").getOrElse(""))
+    systemProperty("OPERATOR_ID", providers.gradleProperty("OPERATOR_ID").getOrElse(""))
+    systemProperty("OPERATOR_KEY", providers.gradleProperty("OPERATOR_KEY").getOrElse(""))
+    systemProperty("CONFIG_FILE", providers.gradleProperty("CONFIG_FILE").getOrElse(""))
+    systemProperty("HEDERA_NETWORK", providers.gradleProperty("HEDERA_NETWORK").getOrElse(""))
 }
 
 tasks.jacocoTestReport {
