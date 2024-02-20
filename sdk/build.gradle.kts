@@ -39,16 +39,6 @@ testModuleInfo {
     runtimeOnly("org.slf4j.simple")
 }
 
-dependencies {
-    integrationTestImplementation("com.esaulpaugh:headlong:10.0.0")
-    integrationTestImplementation("com.google.errorprone:error_prone_annotations:2.21.1")
-    integrationTestImplementation("org.assertj:assertj-core:3.24.2")
-    integrationTestImplementation("org.bouncycastle:bcprov-jdk18on:1.76")
-    integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
-
-    integrationTestCompileOnly("javax.annotation:javax.annotation-api")
-
-    integrationTestRuntimeOnly("io.grpc:grpc-netty-shaded:1.57.2")
-    integrationTestRuntimeOnly("org.slf4j:slf4j-nop:2.0.9")
-
+integrationTestModuleInfo {
+    runtimeOnly("org.slf4j.simple")
 }
