@@ -99,6 +99,3 @@ jobs:
 
       - name: Nexus Release
         run: ./gradlew closeAndReleaseSonatypeStagingRepository --no-configuration-cache --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
-
-      - name: Nexus Release (sdk-full)
-        run: ./gradlew -Pfull=true closeAndReleaseSonatypeStagingRepository --no-configuration-cache --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}

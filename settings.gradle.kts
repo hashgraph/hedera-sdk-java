@@ -7,5 +7,7 @@ plugins {
 
 includeBuild("example-android")
 
-include("sdk")
 include("examples")
+
+include("sdk")
+include("sdk-full")
