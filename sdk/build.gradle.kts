@@ -20,7 +20,6 @@ moduleInfo {
     version("org.slf4j.simple", "2.0.9")
 
     // Versions only required for tests and examples
-    version("com.fasterxml.jackson.core", "2.16.1")
     version("java.dotenv", "5.3.1")
     version("json.snapshot", "1.0.17")
     version("kotlin.stdlib", "1.9.22")
