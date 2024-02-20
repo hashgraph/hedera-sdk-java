@@ -22,6 +22,8 @@ plugins {
     id("com.github.spotbugs")
     id("org.sonarqube")
     id("com.hedera.gradlebuild.java")
+    id("com.hedera.gradlebuild.sdk.publish")
+    id("com.hedera.gradlebuild.sdk.full-variant")
 }
 
 @Suppress("UnstableApiUsage")
@@ -90,6 +92,11 @@ protobuf {
             artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
         }
     }
+}
+
+tasks.jar {
+    exclude("**/*.proto")
+    includeEmptyDirs = false
 }
 
 sourceSets.all {

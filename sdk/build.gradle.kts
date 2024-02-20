@@ -1,6 +1,5 @@
 plugins {
     id("com.hedera.gradlebuild.sdk.java")
-    id("com.hedera.gradlebuild.sdk.publish")
 }
 
 moduleInfo {
@@ -8,8 +7,9 @@ moduleInfo {
     version("com.google.common", "33.0.0-jre")
     version("com.google.errorprone.annotations", "2.21.1")
     version("com.google.gson", "2.10.1")
-    version("com.google.protobuf", "3.21.9")
+    version("com.google.protobuf", "3.24.3")
     version("grpc.protobuf.lite", "1.46.0")
+    version("grpc.protobuf", "1.46.0")
     version("headlong", "10.0.0")
     version("io.grpc", "3.2.1")
     version("io.grpc.stub", "1.58.0")

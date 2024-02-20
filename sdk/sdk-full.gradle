@@ -1,9 +1,0 @@
-apply from: "./protobuf.gradle"
-
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId = "sdk-full"
-        }
-    }
-}
