@@ -35,7 +35,7 @@ sourceSets.all {
 dependencies.components {
     // The following 'io.grpc' libraries are replaced with a singe dependency to
     // 'io.helidon.grpc:io.grpc', which is a re-packaged Modular Jar of all the 'grpc' libraries.
-    val grpcComponents = listOf("io.grpc:grpc-api", "io.grpc:grpc-context", "io.grpc:grpc-core")
+    val grpcComponents = listOf("io.grpc:grpc-api", "io.grpc:grpc-context", "io.grpc:grpc-core", "io.grpc:grpc-protobuf-lite")
     val grpcModule = listOf("io.helidon.grpc:io.grpc")
 
     // These compile time annotation libraries are not of interest in our setup and are thus removed
@@ -55,6 +55,8 @@ dependencies.components {
 
     withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcComponents + annotationLibraries) }
     withModule<AddDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcModule) }
+    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf") { params(grpcComponents + annotationLibraries) }
+    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-protobuf") { params(grpcModule) }
     withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-stub") {  params(grpcComponents + annotationLibraries) }
     withModule<AddDependenciesMetadataRule>("io.grpc:grpc-stub") { params(grpcModule) }
 
@@ -93,12 +95,8 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
-    module("com.google.protobuf:protobuf-javalite", "com.google.protobuf") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-    }
     module("io.grpc:grpc-protobuf-lite", "grpc.protobuf.lite")
+    module("io.grpc:grpc-protobuf", "grpc.protobuf")
     module("io.grpc:grpc-stub", "io.grpc.stub") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -110,6 +108,9 @@ extraJavaModuleInfo {
         mergeJar("com.google.code.findbugs:jsr305")
     }
     module("org.jetbrains:annotations", "org.jetbrains.annotations")
+
+    // Full protobuf only
+    module("com.google.api.grpc:proto-google-common-protos", "com.google.api.grpc.common")
 
     // Testing only
     module("io.github.cdimascio:java-dotenv", "java.dotenv")

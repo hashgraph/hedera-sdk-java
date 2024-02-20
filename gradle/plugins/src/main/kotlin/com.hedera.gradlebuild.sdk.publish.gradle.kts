@@ -18,7 +18,6 @@ plugins {
     id("java")
     id("maven-publish")
     id("signing")
-    id("com.hedera.gradlebuild.protobuf-lite")
 }
 
 java {
