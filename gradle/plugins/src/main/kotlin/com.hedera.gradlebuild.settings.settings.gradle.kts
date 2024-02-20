@@ -26,13 +26,6 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention")
 }
 
-// TODO do this smarter
-val publishFull = providers.gradleProperty("full").getOrElse("false").toBoolean()
-if (publishFull) {
-    val sdkModuleInfo = File(rootDir, "sdk/src/main/java/module-info.java")
-    sdkModuleInfo.writeText(sdkModuleInfo.readText().replace("grpc.protobuf.lite", "grpc.protobuf"))
-}
-
 includeBuild(".")
 
 // Enable Gradle Build Scan

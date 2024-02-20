@@ -23,7 +23,6 @@ plugins {
     id("org.sonarqube")
     id("com.hedera.gradlebuild.java")
     id("com.hedera.gradlebuild.sdk.publish")
-    id("com.hedera.gradlebuild.sdk.full-variant")
 }
 
 @Suppress("UnstableApiUsage")
@@ -38,7 +37,7 @@ testing.suites {
 
 tasks.withType<Test>().configureEach {
     // NOTE: Uncomment to enable trace logs in the SDK during tests
-    // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+    // jvmArgs("-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace")
 
     // this task will fail on the first failed test
     failFast = true
@@ -92,6 +91,9 @@ protobuf {
             artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
         }
     }
+}
+tasks.generateProto {
+    plugins { plugins.register("grpc") }
 }
 
 tasks.jar {
