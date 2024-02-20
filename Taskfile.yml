@@ -88,7 +88,6 @@ tasks:
         cmds:
             - git clean -ffdx
             - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-            - perl -p -i -e "s#sdk\.gradle#sdk-full.gradle#g" sdk/build.gradle
             - git clean -ffdx
-            - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
+            - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -Pfull=true
             - git restore sdk
