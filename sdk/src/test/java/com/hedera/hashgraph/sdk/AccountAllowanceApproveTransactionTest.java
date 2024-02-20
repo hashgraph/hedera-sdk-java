@@ -19,20 +19,21 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody;
+import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.Arrays;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.hedera.hashgraph.sdk.proto.CryptoApproveAllowanceTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import java.time.Instant;
-import java.util.Arrays;
-import org.junit.AfterClass;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 public class AccountAllowanceApproveTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
@@ -49,7 +50,7 @@ public class AccountAllowanceApproveTransactionTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

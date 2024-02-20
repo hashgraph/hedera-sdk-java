@@ -17,11 +17,14 @@ import net.ltgt.gradle.errorprone.errorprone
  */
 
 plugins {
-    id("java-library")
+    id("java")
     id("jacoco")
     id("net.ltgt.errorprone")
+    id("org.gradlex.java-module-dependencies")
+    id("org.gradlex.java-module-versions")
     id("com.hedera.gradlebuild.base")
     id("com.hedera.gradlebuild.repositories")
+    id("com.hedera.gradlebuild.patch-modules")
 }
 
 java {
@@ -33,6 +36,10 @@ java {
 
 jacoco {
     toolVersion = "0.8.8"
+}
+
+javaModuleDependencies {
+    versionsFromPlatformAndConsistentResolution(":sdk", ":sdk")
 }
 
 dependencies {

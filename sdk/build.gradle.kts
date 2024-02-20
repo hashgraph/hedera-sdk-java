@@ -3,39 +3,52 @@ plugins {
     id("com.hedera.gradlebuild.sdk.publish")
 }
 
+moduleInfo {
+    version("com.github.spotbugs.annotations", "4.7.3")
+    version("com.google.common", "33.0.0-jre")
+    version("com.google.errorprone.annotations", "2.21.1")
+    version("com.google.gson", "2.10.1")
+    version("com.google.protobuf", "3.21.9")
+    version("grpc.protobuf.lite", "1.46.0")
+    version("headlong", "10.0.0")
+    version("io.grpc", "1.58.0")
+    version("io.grpc.stub", "1.58.0")
+    version("java.annotation", "1.3.2")
+    version("org.bouncycastle.pkix", "1.76")
+    version("org.bouncycastle.provider", "1.76")
+    version("org.slf4j", "2.0.9")
+    version("org.slf4j.simple", "2.0.9")
+
+    version("org.assertj.core", "3.24.2")
+    version("java.dotenv", "5.3.1")
+    version("json.snapshot", "1.0.17")
+    version("kotlin.stdlib", "1.9.22")
+}
+
+testModuleInfo {
+    requires("org.assertj.core")
+    requires("org.junit.jupiter.api")
+    requires("org.junit.jupiter.params")
+    requires("org.mockito")
+    requires("json.snapshot")
+
+    requiresStatic("java.annotation")
+    requiresStatic("com.github.spotbugs.annotations")
+    requiresStatic("com.google.errorprone.annotations")
+
+    runtimeOnly("org.slf4j.simple")
+}
+
 dependencies {
-    // https://mvnrepository.com/artifact/com.github.spotbugs/spotbugs-annotations
-    implementation("com.github.spotbugs:spotbugs-annotations:4.7.3")
-
-    // https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15to18
-    implementation("org.bouncycastle:bcprov-jdk15to18:1.76")
-
-    // https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15to18
-    implementation("org.bouncycastle:bcpkix-jdk15to18:1.76")
-
-    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
-    implementation("org.slf4j:slf4j-api:2.0.9")
-
-    implementation("io.grpc:grpc-core:1.57.2")
-    implementation("io.grpc:grpc-stub:1.58.0")
-
-    implementation("com.google.code.gson:gson:2.10.1")
-    implementation("javax.annotation:javax.annotation-api:1.3.2")
-    implementation("com.esaulpaugh:headlong:10.0.0")
-
-    testImplementation("com.google.errorprone:error_prone_annotations:2.21.1")
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation("io.github.json-snapshot:json-snapshot:1.0.17")
-
-    testRuntimeOnly("org.slf4j:slf4j-simple:2.0.9")
-    testRuntimeOnly("io.grpc:grpc-netty-shaded:1.57.2")
-    testRuntimeOnly("org.slf4j:slf4j-nop:2.0.9")
-
-    integrationTestImplementation("com.google.code.findbugs:jsr305:3.0.2")
     integrationTestImplementation("com.esaulpaugh:headlong:10.0.0")
-    integrationTestImplementation("org.bouncycastle:bcprov-jdk15to18:1.76")
     integrationTestImplementation("com.google.errorprone:error_prone_annotations:2.21.1")
     integrationTestImplementation("org.assertj:assertj-core:3.24.2")
+    integrationTestImplementation("org.bouncycastle:bcprov-jdk18on:1.76")
+    integrationTestImplementation("org.junit.jupiter:junit-jupiter-api")
+
+    integrationTestCompileOnly("javax.annotation:javax.annotation-api")
+
     integrationTestRuntimeOnly("io.grpc:grpc-netty-shaded:1.57.2")
     integrationTestRuntimeOnly("org.slf4j:slf4j-nop:2.0.9")
+
 }

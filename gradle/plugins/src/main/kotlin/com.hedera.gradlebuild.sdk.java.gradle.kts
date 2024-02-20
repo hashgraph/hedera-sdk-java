@@ -17,10 +17,11 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
  * limitations under the License.
  */
 plugins {
-    id("com.hedera.gradlebuild.java")
+    id("java-library")
     id("com.google.protobuf")
     id("com.github.spotbugs")
     id("org.sonarqube")
+    id("com.hedera.gradlebuild.java")
 }
 
 @Suppress("UnstableApiUsage")
@@ -99,6 +100,10 @@ protobuf {
             artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
         }
     }
+}
+
+sourceSets.all {
+    configurations[getTaskName("", "compileProtoPath")].extendsFrom(configurations["internal"])
 }
 
 spotbugs {
