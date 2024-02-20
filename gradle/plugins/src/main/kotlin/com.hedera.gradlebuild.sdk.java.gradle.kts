@@ -34,13 +34,6 @@ testing.suites {
         dependencies {
             implementation(project())
         }
-        targets.all {
-            testTask {
-                onlyIf {
-                    System.getenv("OPERATOR_ID") != null && System.getenv("OPERATOR_KEY") != null || System.getenv("CONFIG_FILE") != null
-                }
-            }
-        }
     }
 }
 
