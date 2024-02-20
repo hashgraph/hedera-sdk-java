@@ -14,17 +14,4 @@
  * limitations under the License.
  */
 
-plugins {
-    id("org.sonarqube")
-}
-
 group = "com.hedera.hashgraph"
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "hashgraph_hedera-sdk-java")
-        property("sonar.organization", "hashgraph")
-        property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.exclusions", "examples/**")
-    }
-}

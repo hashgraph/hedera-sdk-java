@@ -20,6 +20,7 @@ plugins {
     id("com.hedera.gradlebuild.java")
     id("com.google.protobuf")
     id("com.github.spotbugs")
+    id("org.sonarqube")
 }
 
 @Suppress("UnstableApiUsage")
@@ -124,5 +125,14 @@ tasks.spotbugsMain {
         required = true
         outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
         setStylesheet("fancy-hist.xsl")
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "hashgraph_hedera-sdk-java")
+        property("sonar.organization", "hashgraph")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.exclusions", "examples/**")
     }
 }
