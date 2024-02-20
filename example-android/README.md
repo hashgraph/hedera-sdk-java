@@ -27,13 +27,10 @@ resource strings to be set in
 <string name="operator_key">...</string>
 ```
 
-### Running with a local SDK version
-By default, the example uses the SDK version published on Maven Central.
-If you want to use the local version, follow the steps below:
-- Publish the SDK to the local Maven repo - `./gradlew :sdk:publishToMavenLocal`
-- Uncomment the `mavenLocal()` line in `example-android/build.gradle`
-- Build the example - `./gradlew :example-android:build --refresh-dependencies`
-- Run the example
+## Running with a local SDK version
+
+The example uses the local SDK version. If you want to use the example stand-alone with an SDK version published to
+Maven Central you need to remove the line `includeBuild("..")` from [settings.gradle.kts](settings.gradle.kts).
 
 > Note that the above `./gradlew` commands should be run from the root of the project.
 

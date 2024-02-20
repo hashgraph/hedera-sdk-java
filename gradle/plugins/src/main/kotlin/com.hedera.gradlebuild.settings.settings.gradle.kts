@@ -27,6 +27,8 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention")
 }
 
+includeBuild(".")
+
 // Enable Gradle Build Scan
 gradleEnterprise {
     buildScan {
