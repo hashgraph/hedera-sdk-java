@@ -15,16 +15,8 @@
  */
 
 plugins {
-    id("java-library")
+    id("java")
     id("com.google.protobuf")
-}
-
-dependencies {
-    implementation("io.grpc:grpc-protobuf-lite:1.46.0")
-
-    // Protobuf Lite is used to maintain easy compatibility with Android
-    // https://github.com/protocolbuffers/protobuf/blob/master/java/lite.md
-    api("com.google.protobuf:protobuf-javalite:3.21.9")
 }
 
 protobuf {

@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("java-library")
+    id("java")
     id("maven-publish")
     id("signing")
     id("com.hedera.gradlebuild.protobuf-lite")
@@ -27,47 +27,52 @@ java {
 }
 
 val mavenJava = publishing.publications.create<MavenPublication>("mavenJava") {
-        from(components["java"])
-        pom {
-            name = "Hedera SDK"
-            description = "Hedera™ Hashgraph SDK for Java"
+    from(components["java"])
+
+    versionMapping {
+        allVariants { fromResolutionResult() }
+    }
+
+    pom {
+        name = "Hedera SDK"
+        description = "Hedera™ Hashgraph SDK for Java"
+        url = "https://github.com/hashgraph/hedera-sdk-java"
+
+        organization {
+            name = "Hedera Hashgraph"
+            url = "https://www.hedera.com"
+        }
+
+        issueManagement {
+            system = "GitHub"
+            url = "https://github.com/hashgraph/hedera-sdk-java/issues"
+        }
+
+        licenses {
+            license {
+                name = "Apache License, Version 2.0"
+                url = "https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE"
+                distribution = "repo"
+            }
+        }
+
+        scm {
             url = "https://github.com/hashgraph/hedera-sdk-java"
+            connection = "scm:git:https://github.com/hashgraph/hedera-sdk-java.git"
+            developerConnection = "scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git"
+        }
 
-            organization {
-                name = "Hedera Hashgraph"
-                url = "https://www.hedera.com"
+        developers {
+            developer {
+                name = "Ryan Leckey"
             }
 
-            issueManagement {
-                system = "GitHub"
-                url = "https://github.com/hashgraph/hedera-sdk-java/issues"
-            }
-
-            licenses {
-                license {
-                    name = "Apache License, Version 2.0"
-                    url = "https://github.com/hashgraph/hedera-sdk-java/blob/main/LICENSE"
-                    distribution = "repo"
-                }
-            }
-
-            scm {
-                url = "https://github.com/hashgraph/hedera-sdk-java"
-                connection = "scm:git:https://github.com/hashgraph/hedera-sdk-java.git"
-                developerConnection = "scm:git:ssh://github.com:hashgraph/hedera-sdk-java.git"
-            }
-
-            developers {
-                developer {
-                    name = "Ryan Leckey"
-                }
-
-                developer {
-                    name = "Daniel Akhterov"
-                }
+            developer {
+                name = "Daniel Akhterov"
             }
         }
     }
+}
 
 signing {
     sign(mavenJava)

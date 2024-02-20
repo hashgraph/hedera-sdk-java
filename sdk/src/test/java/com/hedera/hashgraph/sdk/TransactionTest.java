@@ -19,18 +19,19 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static com.hedera.hashgraph.sdk.Transaction.fromBytes;
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Test;
+
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-import org.bouncycastle.util.encoders.Hex;
-import org.junit.jupiter.api.Test;
+
+import static com.hedera.hashgraph.sdk.Transaction.fromBytes;
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class TransactionTest {
