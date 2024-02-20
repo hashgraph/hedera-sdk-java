@@ -17,7 +17,7 @@
 plugins {
     id("com.hedera.gradlebuild.repositories")
     id("com.autonomousapps.dependency-analysis")
-    // TODO id "io.github.gradle-nexus.publish-plugin" version "1.3.0"
+    id("io.github.gradle-nexus.publish-plugin")
 }
 
 val productVersion = layout.projectDirectory.file("version.txt").asFile.readText().trim()
@@ -28,4 +28,16 @@ tasks.register("showVersion") {
     inputs.property("version", productVersion)
 
     doLast { println(inputs.properties["version"]) }
+}
+
+nexusPublishing {
+    repositories {
+        sonatype { }
+    }
+}
+
+tasks.named("closeSonatypeStagingRepository") {
+    // The publishing of all components to Maven Central (in this case only 'sdk') is
+    // automatically done before close (which is done before release).
+    dependsOn(":sdk:publishToSonatype")
 }

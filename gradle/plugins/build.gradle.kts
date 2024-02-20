@@ -8,6 +8,7 @@ dependencies {
     implementation("com.autonomousapps:dependency-analysis-gradle-plugin:1.30.0")
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.7")
     implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.4")
+    implementation("io.github.gradle-nexus:publish-plugin:1.3.0")
     implementation("net.ltgt.gradle:gradle-errorprone-plugin:3.1.0")
     implementation("org.gradlex:extra-java-module-info:1.8")
     implementation("org.gradlex:java-ecosystem-capabilities:1.5.1")
