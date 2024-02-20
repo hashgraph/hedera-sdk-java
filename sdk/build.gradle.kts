@@ -25,6 +25,7 @@ moduleInfo {
     version("kotlin.stdlib", "1.9.22")
     version("org.assertj.core", "3.24.2")
     version("org.apache.commons.lang3", "3.14.0")
+    version("grpc.netty.shaded", "1.57.2")
 }
 
 testModuleInfo {
@@ -38,9 +39,11 @@ testModuleInfo {
     requiresStatic("com.github.spotbugs.annotations")
     requiresStatic("com.google.errorprone.annotations")
 
+    runtimeOnly("grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }
 
 integrationTestModuleInfo {
+    runtimeOnly("grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }
