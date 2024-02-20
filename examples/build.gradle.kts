@@ -1,5 +1,5 @@
 plugins {
-    id("com.hedera.gradlebuild.examples-java")
+    id("com.hedera.gradlebuild.examples.java")
 }
 
 dependencies {
