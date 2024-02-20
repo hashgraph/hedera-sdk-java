@@ -101,6 +101,7 @@ extraJavaModuleInfo {
         exportAllPackages()
         requireAllDefinedDependencies()
         requires("java.logging")
+        requires("jdk.unsupported")
     }
     module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded") {
         exportAllPackages()
