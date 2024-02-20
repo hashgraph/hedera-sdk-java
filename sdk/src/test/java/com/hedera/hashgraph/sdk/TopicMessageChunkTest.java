@@ -1,13 +1,14 @@
 package com.hedera.hashgraph.sdk;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
-import java.time.Instant;
 import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TopicMessageChunkTest {
 

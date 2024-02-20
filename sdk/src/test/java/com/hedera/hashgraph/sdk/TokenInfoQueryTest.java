@@ -19,13 +19,13 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenInfoQueryTest {
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");

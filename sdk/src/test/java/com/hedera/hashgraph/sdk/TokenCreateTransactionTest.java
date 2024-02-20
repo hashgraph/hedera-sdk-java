@@ -19,16 +19,15 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.time.Instant;
-
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -45,7 +44,7 @@ public class TokenCreateTransactionTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

@@ -21,9 +21,8 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -48,7 +47,7 @@ public class ContractFunctionParametersTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

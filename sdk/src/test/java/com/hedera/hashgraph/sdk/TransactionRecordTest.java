@@ -23,13 +23,13 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +47,7 @@ public class TransactionRecordTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

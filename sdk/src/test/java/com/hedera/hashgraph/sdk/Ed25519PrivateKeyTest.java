@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java.util.stream.Stream;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
@@ -30,6 +29,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

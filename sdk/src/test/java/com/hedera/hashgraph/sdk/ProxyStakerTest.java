@@ -1,11 +1,10 @@
 package com.hedera.hashgraph.sdk;
 
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeAll;
-
 import com.hedera.hashgraph.sdk.proto.ProxyStaker;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class ProxyStakerTest {
     private static final ProxyStaker proxyStaker = ProxyStaker.newBuilder()
@@ -18,7 +17,7 @@ public class ProxyStakerTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
