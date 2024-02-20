@@ -102,7 +102,13 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
-    module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded")
+    module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        requires("jdk.unsupported")
+        ignoreServiceProvider("reactor.blockhound.integration.BlockHoundIntegration")
+    }
     module("io.grpc:grpc-protobuf-lite", "grpc.protobuf.lite")
     module("io.grpc:grpc-protobuf", "grpc.protobuf")
     module("io.grpc:grpc-stub", "io.grpc.stub") {
