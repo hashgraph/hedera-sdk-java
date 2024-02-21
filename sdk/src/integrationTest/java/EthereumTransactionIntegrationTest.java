@@ -10,6 +10,7 @@ import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
+import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.ContractInfoQuery;
 import com.hedera.hashgraph.sdk.EthereumTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
@@ -33,42 +34,24 @@ public class EthereumTransactionIntegrationTest {
         var testEnv = new IntegrationTestEnv(1);
 
         var privateKey = PrivateKey.generateECDSA();
-        var publicKey = privateKey.getPublicKey();
-        var evmAddress = publicKey.toEvmAddress();
+        var newAccountAliasId = privateKey.toAccountId(0, 0);
 
-//        var newAccountAliasId = privateKey.toAccountId(0, 0);
-
-//        var transferTransactionReceipt = new TransferTransaction()
-//            .addHbarTransfer(testEnv.operatorId, new Hbar(100).negated())
-//            .addHbarTransfer(newAccountAliasId, new Hbar(100))
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-
-//        System.out.println("Transfer transaction which should create new account: " + transferTransactionReceipt);
-
-//        var newAccountInfo = new AccountInfoQuery()
-//            .setAccountId(newAccountAliasId)
-//            .execute(testEnv.client);
-
-//        System.out.println("Successfully created new account: " + newAccountInfo);
-
-        // check a new account
-//        assertThat(privateKey.getPublicKey()).isEqualTo(newAccountInfo.aliasKey);
-
-        var newAccountId = new AccountCreateTransaction()
-            .setKey(privateKey)
-            .setAlias(evmAddress)
-            .setInitialBalance(new Hbar(100))
-            .freezeWith(testEnv.client)
+        var transferTransactionReceipt = new TransferTransaction()
+            .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
+            .addHbarTransfer(newAccountAliasId, new Hbar(1))
             .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
+            .getReceipt(testEnv.client);
+
+        System.out.println("Transfer transaction which should create new account: " + transferTransactionReceipt);
 
         var newAccountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+            .setAccountId(newAccountAliasId)
             .execute(testEnv.client);
 
         System.out.println("Successfully created new account: " + newAccountInfo);
+
+        // check a new account
+        assertThat(privateKey.getPublicKey()).isEqualTo(newAccountInfo.aliasKey);
 
         var fileCreateTransactionResponse = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -93,23 +76,19 @@ public class EthereumTransactionIntegrationTest {
 
         System.out.println("Successfully created new contract: " + contractInfo);
 
-        var contractFunctionParameters = new ContractFunctionParameters()
-            .addString("new message")
-            .toBytes("setMessage");
-
+        int nonce = 0;
         byte[] chainId = Hex.decode("012a");
-        byte[] nonce = Hex.decode("05");
         byte[] maxPriorityGas = Hex.decode("00");
         byte[] maxGas = Hex.decode("d1385c7bf0");
-        byte[] gasLimit = Hex.decode("6050");
         byte[] to = Hex.decode(contractId.toSolidityAddress());
-        byte[] value = Hex.decode("01");
-        byte[] callData = contractFunctionParameters.toByteArray();
-        byte[] recId = Hex.decode("01");
+        byte[] callData = new ContractFunctionParameters()
+            .addString("new message")
+            .toBytes("setMessage")
+            .toByteArray();
 
         var sequence = RLPEncoder.sequence(Integers.toBytes(2), new Object[] {
             chainId,
-            Integers.toBytes(1), // nonce
+            Integers.toBytes(nonce), // nonce
             maxPriorityGas,
             maxGas,
             Integers.toBytes(150000), // gasLimit
@@ -131,7 +110,7 @@ public class EthereumTransactionIntegrationTest {
             Integers.toBytes(0x02),
             List.of(
                 chainId,
-                Integers.toBytes(1), // nonce
+                Integers.toBytes(nonce), // nonce
                 maxPriorityGas,
                 maxGas,
                 Integers.toBytes(150000), // gasLimit
@@ -143,17 +122,23 @@ public class EthereumTransactionIntegrationTest {
                 r,
                 s));
 
-        // create the client specifically for executing ethereum transaction
-        var ethereumClient = testEnv.client;
-        ethereumClient.setOperator(newAccountId, privateKey);
-
         EthereumTransaction ethereumTransaction = new EthereumTransaction()
             .setEthereumData(ethereumData);
-        var ethereumTransactionResponse = ethereumTransaction.execute(ethereumClient);
+        var ethereumTransactionResponse = ethereumTransaction.execute(testEnv.client);
+        var ethereumTransactionRecord = ethereumTransactionResponse.getRecord(testEnv.client);
 
-        System.out.println("Executed ethereum transaction: " + ethereumTransactionResponse.getRecord(ethereumClient));
+        System.out.println("Executed ethereum transaction: " + ethereumTransactionRecord);
+        System.out.println("Signer nonce= " + ethereumTransactionRecord.contractFunctionResult.signerNonce);
+
+
+        EthereumTransaction ethereumTransaction2 = new EthereumTransaction()
+            .setEthereumData(ethTxData(contractId, privateKey, 1));
+        var ethereumTransactionResponse2 = ethereumTransaction2.execute(testEnv.client);
+        var ethereumTransactionRecord2 = ethereumTransactionResponse2.getRecord(testEnv.client);
+
+        System.out.println("Executed ethereum transaction (2): " + ethereumTransactionRecord2);
+        System.out.println("Signer nonce (2)= " + ethereumTransactionRecord2.contractFunctionResult.signerNonce);
         ///
-
 
         new ContractDeleteTransaction()
             .setTransferAccountId(testEnv.operatorId)
@@ -168,6 +153,54 @@ public class EthereumTransactionIntegrationTest {
 
         testEnv.close();
     }
+
+    byte[] ethTxData(ContractId contractId, PrivateKey privateKey, int nonce) {
+        byte[] chainId = Hex.decode("012a");
+        byte[] maxPriorityGas = Hex.decode("00");
+        byte[] maxGas = Hex.decode("d1385c7bf0");
+        byte[] to = Hex.decode(contractId.toSolidityAddress());
+        byte[] callData = new ContractFunctionParameters()
+            .addString("new message")
+            .toBytes("setMessage")
+            .toByteArray();
+
+        var sequence = RLPEncoder.sequence(Integers.toBytes(2), new Object[] {
+            chainId,
+            Integers.toBytes(nonce), // nonce
+            maxPriorityGas,
+            maxGas,
+            Integers.toBytes(150000), // gasLimit
+            to,
+            Integers.toBytesUnsigned(BigInteger.ZERO), // value
+            callData,
+            new Object[0]
+        });
+
+        byte[] signedBytes = privateKey.sign(sequence);
+
+        // wrap in signature object
+        final byte[] r = new byte[32];
+        System.arraycopy(signedBytes, 0, r, 0, 32);
+        final byte[] s = new byte[32];
+        System.arraycopy(signedBytes, 32, s, 0, 32);
+
+        return RLPEncoder.sequence(
+            Integers.toBytes(0x02),
+            List.of(
+                chainId,
+                Integers.toBytes(nonce), // nonce
+                maxPriorityGas,
+                maxGas,
+                Integers.toBytes(150000), // gasLimit
+                to,
+                Integers.toBytesUnsigned(BigInteger.ZERO), // value
+                callData,
+                List.of(/*accessList*/ ),
+                Integers.toBytes(1), // recId
+                r,
+                s));
+    }
+
 
     /*
       @HapiTest
