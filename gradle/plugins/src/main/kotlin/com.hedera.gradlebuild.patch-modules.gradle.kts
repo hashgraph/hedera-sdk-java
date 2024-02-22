@@ -136,7 +136,11 @@ extraJavaModuleInfo {
     // Testing only
     module("com.fasterxml.jackson.core:jackson-annotations", "com.fasterxml.jackson.annotations")
     module("com.fasterxml.jackson.core:jackson-core", "com.fasterxml.jackson.core")
-    module("com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.databind")
+    module("com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.databind") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.sql")
+    }
     module("io.github.cdimascio:java-dotenv", "java.dotenv")
     module("io.github.json-snapshot:json-snapshot", "json.snapshot")
     module("junit:junit", "junit")
