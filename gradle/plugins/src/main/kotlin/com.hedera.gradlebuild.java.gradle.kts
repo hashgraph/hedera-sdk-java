@@ -1,5 +1,3 @@
-import net.ltgt.gradle.errorprone.errorprone
-
 /*
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
@@ -16,87 +14,130 @@ import net.ltgt.gradle.errorprone.errorprone
  * limitations under the License.
  */
 
+import com.google.protobuf.gradle.id
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+
 plugins {
-    id("java")
-    id("jacoco")
-    id("net.ltgt.errorprone")
-    id("org.gradlex.java-module-dependencies")
-    id("org.gradlex.java-module-versions")
-    id("com.hedera.gradlebuild.base")
-    id("com.hedera.gradlebuild.repositories")
-    id("com.hedera.gradlebuild.patch-modules")
+    id("java-library")
+    id("com.google.protobuf")
+    id("com.github.spotbugs")
+    id("org.sonarqube")
+    id("com.hedera.gradlebuild.java-base")
+    id("com.hedera.gradlebuild.publish")
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
-        vendor = JvmVendorSpec.ADOPTIUM
+@Suppress("UnstableApiUsage")
+testing.suites {
+    named<JvmTestSuite>("test") {
+        useJUnitJupiter()
+    }
+    register<JvmTestSuite>("integrationTest") {
+        testType = TestSuiteType.INTEGRATION_TEST
     }
 }
 
-jacoco {
-    toolVersion = "0.8.8"
+tasks.withType<Test>().configureEach {
+    // NOTE: Uncomment to enable trace logs in the SDK during tests
+    // jvmArgs("-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace")
+
+    // this task will fail on the first failed test
+    failFast = true
+
+    // emit logs per passed or failed test
+    testLogging {
+        exceptionFormat = FULL
+        events("passed", "skipped", "failed", "standardOut", "standardError")
+    }
+
+    // propagate system environment to test runner
+    systemProperty("OPERATOR_ID", providers.gradleProperty("OPERATOR_ID").getOrElse(""))
+    systemProperty("OPERATOR_KEY", providers.gradleProperty("OPERATOR_KEY").getOrElse(""))
+    systemProperty("CONFIG_FILE", providers.gradleProperty("CONFIG_FILE").getOrElse(""))
+    systemProperty("HEDERA_NETWORK", providers.gradleProperty("HEDERA_NETWORK").getOrElse(""))
 }
 
-javaModuleDependencies {
-    versionsFromPlatformAndConsistentResolution(":sdk", ":sdk")
-}
+tasks.jacocoTestReport {
+    // make sure to use any/all test coverage data for the report and run all tests before this report is made
+    executionData.from(
+        tasks.test.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! },
+        tasks.named("integrationTest").map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! }
+    )
 
-dependencies {
-    // https://github.com/google/error-prone
-    // https://errorprone.info/
-    errorprone("com.google.errorprone:error_prone_core:2.21.1")
+    // remove generated proto files from report
+    classDirectories.setFrom(sourceSets.main.get().output.asFileTree.matching {
+        exclude(
+            "**/proto/**",
+            "**/AccountAllowanceAdjustTransaction.*",
+            "**/HederaPreCheckStatusException.*",
+            "**/HederaReceiptStatusException.*"
+        )
+    })
 
-    // https://github.com/uber/NullAway
-    errorprone("com.uber.nullaway:nullaway:0.10.14")
-
-    // https://github.com/grpc/grpc-java-api-checker
-    errorprone("io.grpc:grpc-java-api-checker:1.1.0")
-}
-
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-
-    // Disable warnings because I'm tired of them :P
-    options.isWarnings = false
-
-    options.errorprone {
-        // https://github.com/uber/NullAway
-        warn("NullAway")
-        option("NullAway:AnnotatedPackages", "com.hedera.hashgraph.sdk")
-        option("NullAway:TreatGeneratedAsUnannotated", "true")
-
-        // https://github.com/grpc/grpc-java-api-checker
-        disable("GrpcExperimentalApi")
-        warn("GrpcInternal")
-
-        // Enable _all_ error prone checks then selectively disble
-        // Checks that are default-disabled are enabled as warnings
-        allDisabledChecksAsWarnings = true
-        disable("TryFailRefactoring")
-        disable("ThrowSpecificExceptions")
-        disable("FutureReturnValueIgnored")
-        disable("FieldCanBeFinal")
-        disable("Finally")
-        disable("BooleanParameter")
-        disable("ThreadJoinLoop")
-        disable("UnnecessaryDefaultInEnumSwitch")
-        disable("UngroupedOverloads")
-        disable("InlineMeSuggester")
-
-        // Uncomment do disable Android + JDK7 checks
-        // disable("Java7ApiChecker")
-        // disable("AndroidJdkLibsChecker")
-
-        // Ignore generated and protobuf code
-        disableWarningsInGeneratedCode = true
-        excludedPaths = ".*generated.*"
+    // configure it so only xml is generated for the report
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
     }
 }
 
-tasks.withType<AbstractArchiveTask>().configureEach {
-    isPreserveFileTimestamps = false
-    isReproducibleFileOrder = true
-    fileMode = 436 // octal: 0664
-    dirMode = 509 // octal: 0775
+
+// https://github.com/google/protobuf-gradle-plugin
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.3"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+        }
+    }
+}
+tasks.generateProto {
+    plugins { plugins.register("grpc") }
+}
+
+tasks.jar {
+    exclude("**/*.proto")
+    includeEmptyDirs = false
+}
+
+sourceSets.all {
+    configurations[getTaskName("", "compileProtoPath")].extendsFrom(configurations["internal"])
+}
+
+spotbugs {
+    //ignoreFailures = false
+    //showStackTraces = true
+    //showProgress = false
+    //reportLevel = 'default'
+    //effort = 'default'
+    //visitors = [ 'FindSqlInjection', 'SwitchFallthrough' ]
+    //omitVisitors = [ 'FindNonShortCircuit' ]
+    reportsDir = layout.buildDirectory.dir("reports/spotbugs")
+    //includeFilter = file('spotbugs-include.xml')
+    //excludeFilter = file('spotbugs-exclude.xml')
+    onlyAnalyze = listOf("com.hedera.hashgraph.sdk.*")
+    //projectName = name
+    //release = version
+    //extraArgs = [ '-nested:false' ]
+    //jvmArgs = [ '-Duser.language=ja' ]
+    //maxHeapSize = '512m'
+}
+
+tasks.spotbugsMain {
+    reports.named("html") {
+        required = true
+        outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
+        setStylesheet("fancy-hist.xsl")
+    }
+}
+
+sonarqube {
+    properties {
+        property("sonar.projectKey", "hashgraph_hedera-sdk-java")
+        property("sonar.organization", "hashgraph")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.exclusions", "examples/**")
+    }
 }
