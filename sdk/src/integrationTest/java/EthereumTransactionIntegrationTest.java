@@ -1,17 +1,10 @@
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.esaulpaugh.headlong.rlp.RLPEncoder;
-import com.esaulpaugh.headlong.rlp.RLPItem;
 import com.esaulpaugh.headlong.util.Integers;
-import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.ContractInfoQuery;
 import com.hedera.hashgraph.sdk.EthereumTransaction;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
@@ -19,7 +12,6 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.bouncycastle.util.encoders.Hex;
@@ -31,27 +23,17 @@ public class EthereumTransactionIntegrationTest {
 
     @Test
     void signerNonceChangedOnEthereumTransaction() throws Exception {
+        // HIP-844
         var testEnv = new IntegrationTestEnv(1);
 
         var privateKey = PrivateKey.generateECDSA();
         var newAccountAliasId = privateKey.toAccountId(0, 0);
 
-        var transferTransactionReceipt = new TransferTransaction()
+        new TransferTransaction()
             .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
             .addHbarTransfer(newAccountAliasId, new Hbar(1))
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
-
-        System.out.println("Transfer transaction which should create new account: " + transferTransactionReceipt);
-
-        var newAccountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountAliasId)
-            .execute(testEnv.client);
-
-        System.out.println("Successfully created new account: " + newAccountInfo);
-
-        // check a new account
-        assertThat(privateKey.getPublicKey()).isEqualTo(newAccountInfo.aliasKey);
 
         var fileCreateTransactionResponse = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -69,12 +51,6 @@ public class EthereumTransactionIntegrationTest {
             .execute(testEnv.client);
 
         var contractId = Objects.requireNonNull(contractCreateTransactionResponse.getReceipt(testEnv.client).contractId);
-
-        var contractInfo = new ContractInfoQuery()
-            .setContractId(contractId)
-            .execute(testEnv.client);
-
-        System.out.println("Successfully created new contract: " + contractInfo);
 
         int nonce = 0;
         byte[] chainId = Hex.decode("012a");
@@ -127,18 +103,7 @@ public class EthereumTransactionIntegrationTest {
         var ethereumTransactionResponse = ethereumTransaction.execute(testEnv.client);
         var ethereumTransactionRecord = ethereumTransactionResponse.getRecord(testEnv.client);
 
-        System.out.println("Executed ethereum transaction: " + ethereumTransactionRecord);
-        System.out.println("Signer nonce= " + ethereumTransactionRecord.contractFunctionResult.signerNonce);
-
-
-        EthereumTransaction ethereumTransaction2 = new EthereumTransaction()
-            .setEthereumData(ethTxData(contractId, privateKey, 1));
-        var ethereumTransactionResponse2 = ethereumTransaction2.execute(testEnv.client);
-        var ethereumTransactionRecord2 = ethereumTransactionResponse2.getRecord(testEnv.client);
-
-        System.out.println("Executed ethereum transaction (2): " + ethereumTransactionRecord2);
-        System.out.println("Signer nonce (2)= " + ethereumTransactionRecord2.contractFunctionResult.signerNonce);
-        ///
+        assertThat(ethereumTransactionRecord.contractFunctionResult.signerNonce).isEqualTo(1);
 
         new ContractDeleteTransaction()
             .setTransferAccountId(testEnv.operatorId)
@@ -153,77 +118,4 @@ public class EthereumTransactionIntegrationTest {
 
         testEnv.close();
     }
-
-    byte[] ethTxData(ContractId contractId, PrivateKey privateKey, int nonce) {
-        byte[] chainId = Hex.decode("012a");
-        byte[] maxPriorityGas = Hex.decode("00");
-        byte[] maxGas = Hex.decode("d1385c7bf0");
-        byte[] to = Hex.decode(contractId.toSolidityAddress());
-        byte[] callData = new ContractFunctionParameters()
-            .addString("new message")
-            .toBytes("setMessage")
-            .toByteArray();
-
-        var sequence = RLPEncoder.sequence(Integers.toBytes(2), new Object[] {
-            chainId,
-            Integers.toBytes(nonce), // nonce
-            maxPriorityGas,
-            maxGas,
-            Integers.toBytes(150000), // gasLimit
-            to,
-            Integers.toBytesUnsigned(BigInteger.ZERO), // value
-            callData,
-            new Object[0]
-        });
-
-        byte[] signedBytes = privateKey.sign(sequence);
-
-        // wrap in signature object
-        final byte[] r = new byte[32];
-        System.arraycopy(signedBytes, 0, r, 0, 32);
-        final byte[] s = new byte[32];
-        System.arraycopy(signedBytes, 32, s, 0, 32);
-
-        return RLPEncoder.sequence(
-            Integers.toBytes(0x02),
-            List.of(
-                chainId,
-                Integers.toBytes(nonce), // nonce
-                maxPriorityGas,
-                maxGas,
-                Integers.toBytes(150000), // gasLimit
-                to,
-                Integers.toBytesUnsigned(BigInteger.ZERO), // value
-                callData,
-                List.of(/*accessList*/ ),
-                Integers.toBytes(1), // recId
-                r,
-                s));
-    }
-
-
-    /*
-      @HapiTest
-    HapiSpec nonceUpdatedAfterSuccessfulEthereumContractCreation() {
-        return defaultHapiSpec("nonceUpdatedAfterSuccessfulEthereumContractCreation", NONDETERMINISTIC_ETHEREUM_DATA)
-                .given(
-                        newKeyNamed(SECP_256K1_SOURCE_KEY).shape(SECP_256K1_SHAPE),
-                        cryptoCreate(RELAYER).balance(ONE_MILLION_HBARS),
-                        cryptoTransfer(tinyBarsFromAccountToAlias(GENESIS, SECP_256K1_SOURCE_KEY, ONE_MILLION_HBARS)),
-                        uploadInitCode(INTERNAL_CALLER_CONTRACT))
-                .when(ethereumContractCreate(INTERNAL_CALLER_CONTRACT)
-                        .type(EthTxData.EthTransactionType.EIP1559)
-                        .signingWith(SECP_256K1_SOURCE_KEY)
-                        .payingWith(RELAYER)
-                        .nonce(0)
-                        .gasLimit(ENOUGH_GAS_LIMIT)
-                        .via(TX))
-                .then(
-                        getAliasedAccountInfo(SECP_256K1_SOURCE_KEY)
-                                .has(accountWith().nonce(1L)),
-                        getTxnRecord(TX)
-                                .hasPriority(recordWith()
-                                        .contractCreateResult(resultWith().signerNonce(1L))));
-    }
-     */
 }
