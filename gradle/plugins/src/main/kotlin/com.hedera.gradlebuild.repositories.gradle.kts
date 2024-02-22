@@ -16,5 +16,5 @@
 
 repositories {
     mavenCentral()
-    maven("https://jitpack.io")
+    maven("https://jitpack.io") // for 'io.github.cdimascio:java-dotenv'
 }
