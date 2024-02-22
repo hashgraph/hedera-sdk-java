@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import java.math.BigInteger;
@@ -2604,7 +2605,7 @@ public final class ContractFunctionParameters {
      *
      * @return the Solidity encoding of the call parameters in the order they were added.
      */
-    public ByteString toBytes(@Nullable String funcName) {
+    ByteString toBytes(@Nullable String funcName) {
         // offset for dynamic-length data, immediately after value arguments
         @Var var dynamicOffset = args.size() * 32;
 
