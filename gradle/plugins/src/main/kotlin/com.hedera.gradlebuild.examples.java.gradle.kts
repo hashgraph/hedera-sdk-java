@@ -18,7 +18,7 @@ import net.ltgt.gradle.errorprone.errorprone
 
 plugins {
     id("application")
-    id("com.hedera.gradlebuild.java")
+    id("com.hedera.gradlebuild.java-base")
 }
 
 tasks.withType<JavaCompile>().configureEach {
