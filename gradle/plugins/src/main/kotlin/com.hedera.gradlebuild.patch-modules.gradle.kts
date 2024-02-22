@@ -97,6 +97,12 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.logging")
     }
+    module("com.google.protobuf:protobuf-java", "com.google.protobuf") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        requires("jdk.unsupported")
+    }
     module("com.google.protobuf:protobuf-javalite", "com.google.protobuf") {
         exportAllPackages()
         requireAllDefinedDependencies()
