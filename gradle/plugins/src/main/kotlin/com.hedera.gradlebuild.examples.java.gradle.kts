@@ -30,13 +30,13 @@ tasks.withType<JavaCompile>().configureEach {
 
 tasks.register<RunAllExample>("runAllExamples") {
     sources.from(sourceSets.main.get().java.asFileTree)
-    rtClasspath.from(sourceSets.main.get().runtimeClasspath)
+    rtClasspath.from(configurations.runtimeClasspath.get() + files(tasks.jar))
 }
 
 tasks.addRule("Pattern: run<Example>: Runs an example.") {
     if (startsWith("run")) {
         tasks.register<JavaExec>(this) {
-            classpath = sourceSets.main.get().runtimeClasspath
+            classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
             mainModule = "com.hedera.hashgraph.examples"
             mainClass = "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
 
