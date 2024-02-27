@@ -19,7 +19,7 @@
 Select _one_ of the following depending on your target platform.
 
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:2.29.2'
+implementation 'com.hedera.hashgraph:sdk:2.30.0'
 ```
 
 Select _one_ of the following to provide the gRPC implementation.
@@ -56,7 +56,7 @@ Select _one_ of the following depending on your target platform.
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.29.2</version>
+  <version>2.30.0</version>
 </dependency>
 ```
 
