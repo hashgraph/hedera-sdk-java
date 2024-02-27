@@ -72,7 +72,7 @@ jobs:
         uses: gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e # v3.1.0
 
       - name: Install Local Node
-        run: npm install @hashgraph/hedera-local@2.13.0
+        run: npm install @hashgraph/hedera-local
 
       - name: Compile Code
         run: ./gradlew assemble --scan
@@ -126,7 +126,7 @@ jobs:
         uses: gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e # v3.1.0
 
       - name: Install Local Node
-        run: npm install @hashgraph/hedera-local@2.13.0
+        run: npm install @hashgraph/hedera-local
 
       - name: Compile Code
         run: ./gradlew assemble --scan

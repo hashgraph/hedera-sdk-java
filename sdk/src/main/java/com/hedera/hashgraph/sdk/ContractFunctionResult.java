@@ -24,6 +24,7 @@ import com.esaulpaugh.headlong.abi.TupleType;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
+import com.google.protobuf.Int64Value;
 import com.hedera.hashgraph.sdk.proto.ContractFunctionResultOrBuilder;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
@@ -117,6 +118,12 @@ public final class ContractFunctionResult {
      * happen in a static EVM call.
      */
     public final List<ContractNonceInfo> contractNonces;
+    /**
+     * If not null this field specifies what the value of the signer account nonce is post transaction execution.
+     * For transactions that don't update the signer nonce (like HAPI ContractCall and ContractCreate transactions) this field should be null.
+     */
+    public final long signerNonce;
+
     private final ByteString rawResult;
 
     /**
@@ -168,6 +175,8 @@ public final class ContractFunctionResult {
         senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
 
         contractNonces = inner.getContractNoncesList().stream().map(ContractNonceInfo::fromProtobuf).toList();
+
+        signerNonce = inner.getSignerNonce().getValue();
     }
 
     /**
@@ -421,7 +430,8 @@ public final class ContractFunctionResult {
             .setContractID(contractId.toProtobuf())
             .setContractCallResult(rawResult)
             .setBloom(bloom)
-            .setGasUsed(gasUsed);
+            .setGasUsed(gasUsed)
+            .setSignerNonce(Int64Value.of(this.signerNonce));
 
         if (evmAddress != null) {
             contractFunctionResult.setEvmAddress(BytesValue.newBuilder()
@@ -474,6 +484,7 @@ public final class ContractFunctionResult {
             .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
             .add("senderAccountId", senderAccountId)
             .add("contractNonces", contractNonces)
+            .add("signerNonce", signerNonce)
             .toString();
     }
 
