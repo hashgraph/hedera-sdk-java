@@ -48,6 +48,8 @@ public class ContractNonceInfoIntegrationTest {
         assertThat(contractANonceInfo.nonce).isEqualTo(2);
         // B.nonce = 1
         assertThat(contractBNonceInfo.nonce).isEqualTo(1);
+        // validate HIP-844 case - signer nonce should be set only for Ethereum transactions
+        assertThat(contractFunctionResult.signerNonce).isEqualTo(0);
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
