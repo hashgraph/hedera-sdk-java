@@ -1,4 +1,6 @@
 import com.hedera.hashgraph.sdk.*;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -371,5 +373,132 @@ class AccountCreateIntegrationTest {
             .getReceipt(testEnv.client)).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close();
+    }
+
+    @Test
+    void canSerializeDeserializeCompareFields() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var createAccountTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(5L));
+
+        var expectedNodeAccountIds = createAccountTransaction.getNodeAccountIds();
+        var expectedBalance = new Hbar(5L);
+
+        var transactionBytesSerialized = createAccountTransaction.toBytes();
+        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        assertThat(expectedNodeAccountIds).isEqualTo(createAccountTransactionDeserialized.getNodeAccountIds());
+        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+                createAccountTransactionDeserialized::getTransactionId);
+
+        testEnv.close();
+    }
+
+    @Test
+    void canSerializeDeserializeEditCompareFields() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var createAccountTransaction = new AccountCreateTransaction()
+            .setKey(publicKey);
+
+        var expectedBalance = new Hbar(5L);
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var transactionBytesSerialized = createAccountTransaction.toBytes();
+        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = createAccountTransactionDeserialized
+            .setInitialBalance(new Hbar(5L))
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+    }
+
+    @Test
+    void canIncompleteSerializeDeserializeAndExecute() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var createAccountTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(5L));
+
+        var transactionBytesSerialized = createAccountTransaction.toBytes();
+        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = createAccountTransactionDeserialized
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+    }
+
+    @Test
+    void canFreezeSignSerializeDeserializeAndExecute() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var evmAddress = publicKey.toEvmAddress();
+        var initialBalance = new Hbar(5L);
+        var autoRenewPeriod = Duration.ofSeconds(2592000);
+        var memo = "test account memo";
+        var maxAutomaticTokenAssociations = 4;
+
+        var createAccountTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(initialBalance)
+            .setReceiverSignatureRequired(true)
+            .setAutoRenewPeriod(autoRenewPeriod)
+            .setAccountMemo(memo)
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setDeclineStakingReward(true)
+            .setAlias(evmAddress)
+            .freezeWith(testEnv.client)
+            .sign(adminKey);
+
+        var transactionBytesSerialized = createAccountTransaction.toBytes();
+        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = createAccountTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        var txResponse = createAccountTransactionDeserialized.execute(testEnv.client);
+
+        var accountId = txResponse.getReceipt(testEnv.client).accountId;
+
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
     }
 }

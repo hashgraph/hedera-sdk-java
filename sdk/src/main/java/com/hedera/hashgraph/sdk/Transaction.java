@@ -31,6 +31,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionList;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +60,16 @@ public abstract class Transaction<T extends Transaction<T>>
      * Default auto renew duration for accounts, contracts, topics, and files (entities)
      */
     static final Duration DEFAULT_AUTO_RENEW_PERIOD = Duration.ofDays(90);
+
+    /**
+     * Dummy account ID used to assist in deserializing incomplete Transactions.
+     */
+    protected static final AccountId DUMMY_ACCOUNT_ID = new AccountId(0L, 0L, 0L);
+
+    /**
+     * Dummy transaction ID used to assist in deserializing incomplete Transactions.
+     */
+    protected static final TransactionId DUMMY_TRANSACTION_ID = TransactionId.withValidStart(DUMMY_ACCOUNT_ID, Instant.EPOCH);
 
     /**
      * Default transaction duration
@@ -163,70 +174,81 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
         throws InvalidProtocolBufferException {
+
+        // try to move these below to 'else' statement
         var txCount = txs.keySet().size();
-        var nodeCount = txs.values().iterator().next().size();
-
-        nodeAccountIds.ensureCapacity(nodeCount);
-        sigPairLists = new ArrayList<>(nodeCount * txCount);
-        outerTransactions = new ArrayList<>(nodeCount * txCount);
-        innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
         transactionIds.ensureCapacity(txCount);
-
         for (var transactionEntry : txs.entrySet()) {
-            transactionIds.add(transactionEntry.getKey());
+            if (!transactionEntry.getKey().equals(DUMMY_TRANSACTION_ID)) {
+                transactionIds.add(transactionEntry.getKey());
+            }
+        }
 
-            for (var nodeEntry : transactionEntry.getValue().entrySet()) {
-                if (nodeAccountIds.size() != nodeCount) {
-                    nodeAccountIds.add(nodeEntry.getKey());
-                }
+        LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> transactionMap = txs.values().iterator().next();
+        if (!transactionMap.isEmpty() && transactionMap.keySet().iterator().next().equals(DUMMY_ACCOUNT_ID)) {
+            // If the first account ID is a dummy account ID, then only the source TransactionBody needs to be copied.
+            var signedTransaction = SignedTransaction.parseFrom(transactionMap.values().iterator().next().getSignedTransactionBytes());
+            sourceTransactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
+        } else {
+            var nodeCount = txs.values().iterator().next().size();
 
-                var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
-                outerTransactions.add(nodeEntry.getValue());
-                sigPairLists.add(transaction.getSigMap().toBuilder());
-                innerSignedTransactions.add(transaction.toBuilder());
+            nodeAccountIds.ensureCapacity(nodeCount);
+            sigPairLists = new ArrayList<>(nodeCount * txCount);
+            outerTransactions = new ArrayList<>(nodeCount * txCount);
+            innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
 
-                if (publicKeys.isEmpty()) {
-                    for (var sigPair : transaction.getSigMap().getSigPairList()) {
-                        publicKeys.add(PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()));
-                        signers.add(null);
+            for (var transactionEntry : txs.entrySet()) {
+                for (var nodeEntry : transactionEntry.getValue().entrySet()) {
+                    if (nodeAccountIds.size() != nodeCount) {
+                        nodeAccountIds.add(nodeEntry.getKey());
+                    }
+
+                    var transaction = SignedTransaction.parseFrom(nodeEntry.getValue().getSignedTransactionBytes());
+                    outerTransactions.add(nodeEntry.getValue());
+                    sigPairLists.add(transaction.getSigMap().toBuilder());
+                    innerSignedTransactions.add(transaction.toBuilder());
+
+                    if (publicKeys.isEmpty()) {
+                        for (var sigPair : transaction.getSigMap().getSigPairList()) {
+                            publicKeys.add(PublicKey.fromBytes(sigPair.getPubKeyPrefix().toByteArray()));
+                            signers.add(null);
+                        }
                     }
                 }
             }
-        }
 
-        nodeAccountIds.remove(new AccountId(0)).setLocked(true);
-        transactionIds.setLocked(true);
+            nodeAccountIds.remove(new AccountId(0));
 
-        // Verify that transaction bodies match
-        for (@Var int i = 0; i < txCount; i++) {
-            @Var TransactionBody firstTxBody = null;
-            for (@Var int j = 0; j < nodeCount; j++) {
-                int k = i * nodeCount + j;
-                var txBody = TransactionBody.parseFrom(innerSignedTransactions.get(k).getBodyBytes());
-                if (firstTxBody == null) {
-                    firstTxBody = txBody;
-                } else {
-                    requireProtoMatches(
-                        firstTxBody,
-                        txBody,
-                        new HashSet<>(List.of("NodeAccountID")),
-                        "TransactionBody"
-                    );
+            // Verify that transaction bodies match
+            for (@Var int i = 0; i < txCount; i++) {
+                @Var TransactionBody firstTxBody = null;
+                for (@Var int j = 0; j < nodeCount; j++) {
+                    int k = i * nodeCount + j;
+                    var txBody = TransactionBody.parseFrom(innerSignedTransactions.get(k).getBodyBytes());
+                    if (firstTxBody == null) {
+                        firstTxBody = txBody;
+                    } else {
+                        requireProtoMatches(
+                            firstTxBody,
+                            txBody,
+                            new HashSet<>(List.of("NodeAccountID")),
+                            "TransactionBody"
+                        );
+                    }
                 }
             }
+            sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
         }
-
-        sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
 
         setTransactionValidDuration(
             DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
         setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
         setTransactionMemo(sourceTransactionBody.getMemo());
 
-        // This constructor is used in fromBytes(), which means we're reconstructing
-        // a transaction that was frozen and then serialized via toBytes(),
-        // so this transaction should be constructed as frozen.
-        frozenBodyBuilder = sourceTransactionBody.toBuilder();
+        // The presence of signatures implies the Transaction should be frozen.
+        if (!publicKeys.isEmpty()) {
+            frozenBodyBuilder = sourceTransactionBody.toBuilder();
+        }
     }
 
     /**
@@ -263,8 +285,10 @@ public abstract class Transaction<T extends Transaction<T>>
 
             dataCase = txBody.getDataCase();
 
-            var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
-            var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
+            var account = txBody.hasNodeAccountID() ? AccountId.fromProtobuf(txBody.getNodeAccountID())
+                : DUMMY_ACCOUNT_ID;
+            var transactionId = txBody.hasTransactionID() ? TransactionId.fromProtobuf(txBody.getTransactionID())
+                : DUMMY_TRANSACTION_ID;
 
             var linked = new LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>();
             linked.put(account, transaction.build());
@@ -278,8 +302,10 @@ public abstract class Transaction<T extends Transaction<T>>
                     dataCase = txBody.getDataCase();
                 }
 
-                var account = AccountId.fromProtobuf(txBody.getNodeAccountID());
-                var transactionId = TransactionId.fromProtobuf(txBody.getTransactionID());
+                var account = txBody.hasNodeAccountID() ? AccountId.fromProtobuf(txBody.getNodeAccountID())
+                    : DUMMY_ACCOUNT_ID;
+                var transactionId = txBody.hasTransactionID() ? TransactionId.fromProtobuf(txBody.getTransactionID())
+                    : DUMMY_TRANSACTION_ID;
 
                 var linked = txs.containsKey(transactionId) ?
                     Objects.requireNonNull(txs.get(transactionId)) :
@@ -694,7 +720,74 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @return the byte array representation
      */
+
+    // Will need to check for edge-cases
     public byte[] toBytes() {
+        // If no nodes have been selected yet, the sourceTransactionBody can be used to build a Transaction protobuf object.
+
+        var list = TransactionList.newBuilder();
+
+        if (nodeAccountIds.isEmpty()) {
+            // analogue of 'schedule()`
+            ///
+
+            // Make sure the Transaction has, if any, all recent changes.
+
+            // it should be something different from a `frozenBodyBuilder`
+            // because it will trigger `this.isFrozen()` condition
+
+            var bodyBuilder = spawnBodyBuilder(null);
+            // not sure where transaction id will come from at this point!
+            if (!transactionIds.isEmpty()) {
+                bodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
+            }
+            onFreeze(bodyBuilder);
+
+            var signedTransaction = SignedTransaction.newBuilder()
+                .setBodyBytes(bodyBuilder.build().toByteString())
+                .build();
+
+            var transaction = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                .setSignedTransactionBytes(signedTransaction.toByteString())
+                .build();
+
+            list.addTransactionList(transaction);
+        } else {
+            // Generate the SignedTransaction protobuf objects if the Transaction's not frozen.
+            if (!this.isFrozen()) {
+                // analogue to the end of `freezeWith()`
+                // but I think generating transation ids here is an issue
+                ///
+
+                // regenerateSignedTransactions
+
+                // Update this Transaction's source TransactionBody protobuf object.
+                // frozenBodyBuilder, because `wipeTransactionLists` function needs it
+                frozenBodyBuilder = spawnBodyBuilder(null);
+                if (!transactionIds.isEmpty()) {
+                    frozenBodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
+                }
+                onFreeze(frozenBodyBuilder);
+
+                int requiredChunks = getRequiredChunks();
+
+                // not sure this line is needed, maybe just add an if condition
+                generateTransactionIds(transactionIds.get(0), requiredChunks);
+
+                wipeTransactionLists(requiredChunks);
+            }
+
+            // Build all the Transaction protobuf objects and add them to the TransactionList protobuf object.
+            buildAllTransactions();
+            for (var transaction : outerTransactions) {
+                list.addTransactionList(transaction);
+            }
+        }
+
+
+        ///
+
+        /*
         if (!this.isFrozen()) {
             throw new IllegalStateException(
                 "transaction must have been frozen before conversion to bytes will be stable, try calling `freeze`");
@@ -707,6 +800,7 @@ public abstract class Transaction<T extends Transaction<T>>
         for (var transaction : outerTransactions) {
             list.addTransactionList(transaction);
         }
+         */
 
         return list.build().toByteArray();
     }
@@ -765,9 +859,9 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return the transaction id
      */
     public final TransactionId getTransactionId() {
-        if (transactionIds.isEmpty() || !this.isFrozen()) {
-            throw new IllegalStateException(
-                "transaction must have been frozen before getting the transaction ID, try calling `freeze`");
+        // not sure why this change is needed
+        if (transactionIds.isEmpty()) {
+            throw new IllegalStateException("No transaction ID generated yet. Try freezing the transaction or manually setting the transaction ID.");
         }
 
         return transactionIds.setLocked(true).getCurrent();
@@ -946,6 +1040,10 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return the list of account id and public keys
      */
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
+        if (!isFrozen()) {
+            throw new IllegalStateException("Transaction must be frozen in order to have signatures.");
+        }
+
         if (publicKeys.isEmpty()) {
             return Collections.emptyMap();
         }
@@ -1138,6 +1236,9 @@ public abstract class Transaction<T extends Transaction<T>>
         transactionIds.setLocked(true);
         nodeAccountIds.setLocked(true);
 
+        // Go through each SignedTransaction protobuf object and add all signatures to its SignatureMap protobuf object.
+        // from C++ perspective, `innerSignedTransactions` is a `mSignedTransactions`
+
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
         }
@@ -1161,6 +1262,7 @@ public abstract class Transaction<T extends Transaction<T>>
 
         signTransaction(index);
 
+        // `outerTransactions` is `mImpl->mTransactions` per C++ codebase
         outerTransactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(
                 innerSignedTransactions.get(index)

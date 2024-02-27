@@ -182,6 +182,11 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
         } catch (InvalidProtocolBufferException exc) {
             throw new IllegalArgumentException(exc.getMessage());
         }
+
+        // examine this place later
+        if (data.equals(ByteString.EMPTY)) {
+            data = body.getContents();
+        }
     }
 
     /**
