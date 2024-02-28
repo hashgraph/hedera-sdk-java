@@ -238,12 +238,21 @@ public abstract class Transaction<T extends Transaction<T>>
                 }
             }
             sourceTransactionBody = TransactionBody.parseFrom(innerSignedTransactions.get(0).getBodyBytes());
+
+            setTransactionValidDuration(
+                DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
+            setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
+            setTransactionMemo(sourceTransactionBody.getMemo());
+
+            frozenBodyBuilder = sourceTransactionBody.toBuilder();
         }
 
-        setTransactionValidDuration(
-            DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
-        setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
-        setTransactionMemo(sourceTransactionBody.getMemo());
+        if (!isFrozen()) {
+            setTransactionValidDuration(
+                DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
+            setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
+            setTransactionMemo(sourceTransactionBody.getMemo());
+        }
 
         // The presence of signatures implies the Transaction should be frozen.
         if (!publicKeys.isEmpty()) {
