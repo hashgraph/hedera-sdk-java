@@ -246,9 +246,9 @@ public abstract class Transaction<T extends Transaction<T>>
         setTransactionMemo(sourceTransactionBody.getMemo());
 
         // The presence of signatures implies the Transaction should be frozen.
-        if (!publicKeys.isEmpty()) {
+//        if (!publicKeys.isEmpty()) {
             frozenBodyBuilder = sourceTransactionBody.toBuilder();
-        }
+//        }
     }
 
     /**
