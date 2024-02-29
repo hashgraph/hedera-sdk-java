@@ -485,21 +485,23 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         innerSignedTransactions = new ArrayList<>(requiredChunks * nodeAccountIds.size());
 
         for (int i = 0; i < requiredChunks; i++) {
-            var startIndex = i * chunkSize;
-            @Var var endIndex = startIndex + chunkSize;
+            if (!transactionIds.isEmpty()) {
+                var startIndex = i * chunkSize;
+                @Var var endIndex = startIndex + chunkSize;
 
-            if (endIndex > this.data.size()) {
-                endIndex = this.data.size();
+                if (endIndex > this.data.size()) {
+                    endIndex = this.data.size();
+                }
+
+                onFreezeChunk(
+                    Objects.requireNonNull(frozenBodyBuilder).setTransactionID(transactionIds.get(i).toProtobuf()),
+                    transactionIds.get(0).toProtobuf(),
+                    startIndex,
+                    endIndex,
+                    i,
+                    requiredChunks
+                );
             }
-
-            onFreezeChunk(
-                Objects.requireNonNull(frozenBodyBuilder).setTransactionID(transactionIds.get(i).toProtobuf()),
-                transactionIds.get(0).toProtobuf(),
-                startIndex,
-                endIndex,
-                i,
-                requiredChunks
-            );
 
             // For each node we add a transaction with that node
             for (var nodeId : nodeAccountIds) {

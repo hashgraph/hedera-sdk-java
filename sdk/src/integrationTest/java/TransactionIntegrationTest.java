@@ -169,6 +169,41 @@ public class TransactionIntegrationTest {
         var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
         var createAccountTransaction = new AccountCreateTransaction()
+            .setKey(publicKey);
+
+        var expectedBalance = new Hbar(5L);
+
+        var transactionBytesSerialized = createAccountTransaction.toBytes();
+        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = createAccountTransactionDeserialized
+            .setInitialBalance(new Hbar(5L))
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+    }
+
+    @Test
+    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeEditExecuteCompareFields_3() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var createAccountTransaction = new AccountCreateTransaction()
             .setKey(publicKey)
             .setNodeAccountIds(nodeAccountIds);
 
@@ -289,6 +324,53 @@ public class TransactionIntegrationTest {
     }
 
     @Test
+    @DisplayName("transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    void canFreezeSignSerializeDeserializeAndCompare() throws Exception {
+        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
+        var testEnv = new IntegrationTestEnv(2);
+
+        // Skip if using local node.
+        // Note: this check should be removed once the local node is supporting multiple nodes.
+        testEnv.assumeNotLocalNode();
+
+        var privateKey = PrivateKey.generateED25519();
+
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
+
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        var fileAppendTransaction = new FileAppendTransaction()
+            .setFileId(fileId)
+            .setContents(Contents.BIG_CONTENTS)
+            .freezeWith(testEnv.client)
+            .sign(privateKey);
+
+        var transactionBytesSerialized = fileAppendTransaction.toBytes();
+        FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        testEnv.close();
+    }
+
+    @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecute() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
@@ -355,8 +437,8 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
-    void canFreezeSignSerializeDeserializeAndCompare() throws Exception {
+    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecute_2() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
 
@@ -364,7 +446,7 @@ public class TransactionIntegrationTest {
         // Note: this check should be removed once the local node is supporting multiple nodes.
         testEnv.assumeNotLocalNode();
 
-        var privateKey = PrivateKey.generateED25519();
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -387,21 +469,42 @@ public class TransactionIntegrationTest {
         assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
         var fileAppendTransaction = new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
             .setFileId(fileId)
-            .setContents(Contents.BIG_CONTENTS)
-            .freezeWith(testEnv.client)
-            .sign(privateKey);
+            .setContents(Contents.BIG_CONTENTS);
 
         var transactionBytesSerialized = fileAppendTransaction.toBytes();
         FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-        var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
-        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+        fileAppendTransactionDeserialized
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
+
+        info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(13522);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         testEnv.close();
     }
-
-
 
     // TODO: this test has a bunch of things hard-coded into it, which is kinda dumb, but it's a good idea for a test.
     //       Any way to fix it and bring it back?
