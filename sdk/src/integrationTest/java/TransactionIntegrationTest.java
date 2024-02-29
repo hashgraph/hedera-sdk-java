@@ -79,40 +79,69 @@ public class TransactionIntegrationTest {
         var adminKey = PrivateKey.generateECDSA();
         var publicKey = adminKey.getPublicKey();
 
-        var createAccountTransaction = new AccountCreateTransaction()
+        var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(publicKey)
-            .setInitialBalance(new Hbar(5L));
+            .setInitialBalance(new Hbar(1L));
 
-        var expectedNodeAccountIds = createAccountTransaction.getNodeAccountIds();
-        var expectedBalance = new Hbar(5L);
+        var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
+        var expectedBalance = new Hbar(1L);
 
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-        assertThat(expectedNodeAccountIds).isEqualTo(createAccountTransactionDeserialized.getNodeAccountIds());
-        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+        assertThat(expectedNodeAccountIds).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            createAccountTransactionDeserialized::getTransactionId);
+            accountCreateTransactionDeserialized::getTransactionId);
 
         testEnv.close();
     }
 
     @Test
-    @DisplayName("incomplete transaction can be serialized into bytes, deserialized, signature added and executed")
-    void canIncompleteSerializeDeserializeAndExecute() throws Exception {
+    @DisplayName("transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
+    void canSerializeWithNodeAccountIdsDeserializeCompareFields() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
         var adminKey = PrivateKey.generateECDSA();
         var publicKey = adminKey.getPublicKey();
 
-        var createAccountTransaction = new AccountCreateTransaction()
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
             .setKey(publicKey)
-            .setInitialBalance(new Hbar(5L));
+            .setInitialBalance(new Hbar(1L));
 
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
+        var expectedBalance = new Hbar(1L);
 
-        var txReceipt = createAccountTransactionDeserialized
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        assertThat(expectedNodeAccountIds.size()).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds().size());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            accountCreateTransactionDeserialized::getTransactionId);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized and executed")
+    void canSerializeDeserializeAndExecuteIncompleteTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -122,6 +151,40 @@ public class TransactionIntegrationTest {
             .freezeWith(testEnv.client)
             .sign(adminKey)
             .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and executed")
+    void canSerializeDeserializeAndExecuteIncompleteTransactionWithNodeAccountIds() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -132,23 +195,23 @@ public class TransactionIntegrationTest {
         var adminKey = PrivateKey.generateECDSA();
         var publicKey = adminKey.getPublicKey();
 
-        var createAccountTransaction = new AccountCreateTransaction()
+        var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(publicKey);
 
-        var expectedBalance = new Hbar(5L);
+        var expectedBalance = new Hbar(1L);
         var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-        var txReceipt = createAccountTransactionDeserialized
-            .setInitialBalance(new Hbar(5L))
+        var txReceipt = accountCreateTransactionDeserialized
+            .setInitialBalance(new Hbar(1L))
             .setNodeAccountIds(nodeAccountIds)
             .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
 
         new AccountDeleteTransaction()
             .setAccountId(txReceipt.accountId)
@@ -156,11 +219,13 @@ public class TransactionIntegrationTest {
             .freezeWith(testEnv.client)
             .sign(adminKey)
             .execute(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
-    void canSerializeDeserializeEditExecuteCompareFields_2() throws Exception {
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeEditExecuteCompareFieldsIncompleteTransactionWithNodeAccountIds() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
         var adminKey = PrivateKey.generateECDSA();
@@ -168,22 +233,22 @@ public class TransactionIntegrationTest {
 
         var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
-        var createAccountTransaction = new AccountCreateTransaction()
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
             .setKey(publicKey);
 
-        var expectedBalance = new Hbar(5L);
+        var expectedBalance = new Hbar(1L);
 
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-        var txReceipt = createAccountTransactionDeserialized
-            .setInitialBalance(new Hbar(5L))
-            .setNodeAccountIds(nodeAccountIds)
+        var txReceipt = accountCreateTransactionDeserialized
+            .setInitialBalance(new Hbar(1L))
             .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
 
         new AccountDeleteTransaction()
             .setAccountId(txReceipt.accountId)
@@ -191,45 +256,12 @@ public class TransactionIntegrationTest {
             .freezeWith(testEnv.client)
             .sign(adminKey)
             .execute(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
-    void canSerializeDeserializeEditExecuteCompareFields_3() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
-
-        var adminKey = PrivateKey.generateECDSA();
-        var publicKey = adminKey.getPublicKey();
-
-        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
-
-        var createAccountTransaction = new AccountCreateTransaction()
-            .setKey(publicKey)
-            .setNodeAccountIds(nodeAccountIds);
-
-        var expectedBalance = new Hbar(5L);
-
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
-
-        var txReceipt = createAccountTransactionDeserialized
-            .setInitialBalance(new Hbar(5L))
-            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        assertThat(expectedBalance).isEqualTo(createAccountTransactionDeserialized.getInitialBalance());
-
-        new AccountDeleteTransaction()
-            .setAccountId(txReceipt.accountId)
-            .setTransferAccountId(testEnv.client.getOperatorAccountId())
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client);
-    }
-
-    @Test
-    @DisplayName("complete frozen and signed transaction can be serialized into bytes, deserialized and executed")
+    @DisplayName("complete frozen and signed transaction can be serialized into bytes, deserialized (x2) and executed")
     void canFreezeSignSerializeDeserializeAndExecute() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -237,12 +269,12 @@ public class TransactionIntegrationTest {
         var publicKey = adminKey.getPublicKey();
 
         var evmAddress = publicKey.toEvmAddress();
-        var initialBalance = new Hbar(5L);
+        var initialBalance = new Hbar(1L);
         var autoRenewPeriod = java.time.Duration.ofSeconds(2592000);
         var memo = "test account memo";
         var maxAutomaticTokenAssociations = 4;
 
-        var createAccountTransaction = new AccountCreateTransaction()
+        var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(publicKey)
             .setInitialBalance(initialBalance)
             .setReceiverSignatureRequired(true)
@@ -254,15 +286,15 @@ public class TransactionIntegrationTest {
             .freezeWith(testEnv.client)
             .sign(adminKey);
 
-        var transactionBytesSerialized = createAccountTransaction.toBytes();
-        AccountCreateTransaction createAccountTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-        var transactionBytesReserialized = createAccountTransactionDeserialized.toBytes();
+        var transactionBytesReserialized = accountCreateTransactionDeserialized.toBytes();
         assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
 
-        AccountCreateTransaction createAccountTransactionDeserialized2 = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesReserialized);
+        AccountCreateTransaction accountCreateTransactionReserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesReserialized);
 
-        var txResponse = createAccountTransactionDeserialized2.execute(testEnv.client);
+        var txResponse = accountCreateTransactionReserialized.execute(testEnv.client);
 
         var accountId = txResponse.getReceipt(testEnv.client).accountId;
 
@@ -272,6 +304,8 @@ public class TransactionIntegrationTest {
             .freezeWith(testEnv.client)
             .sign(adminKey)
             .execute(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -302,30 +336,22 @@ public class TransactionIntegrationTest {
             .setTransferAccountId(testEnv.operatorId)
             .freezeWith(testEnv.client);
 
-        System.out.println("TransactionId (before)= " + deleteTransaction.getTransactionId());
-        System.out.println("NodeAccountIds (before)= " + deleteTransaction.getNodeAccountIds());
         var updateBytes = deleteTransaction.toBytes();
 
         var sig1 = key.signTransaction(deleteTransaction);
 
         var deleteTransaction2 = Transaction.fromBytes(updateBytes);
 
-        System.out.println("TransactionId (after)= " + deleteTransaction2.getTransactionId());
-        System.out.println("NodeAccountIds (after)= " + deleteTransaction2.getNodeAccountIds());
-
-        response = deleteTransaction2
+        deleteTransaction2
             .addSignature(key.getPublicKey(), sig1)
             .execute(testEnv.client);
-
-        System.out.println("record= " + response.getRecord(testEnv.client));
-        System.out.println("receipt= " + response.getReceipt(testEnv.client));
 
         testEnv.close();
     }
 
     @Test
-    @DisplayName("transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
-    void canFreezeSignSerializeDeserializeAndCompare() throws Exception {
+    @DisplayName("file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    void canFreezeSignSerializeDeserializeAndCompareFileAppendChunkedTransaction() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
 
@@ -371,8 +397,8 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
-    void canSerializeDeserializeExecute() throws Exception {
+    @DisplayName("file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteFileAppendChunkedTransaction() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
 
@@ -437,8 +463,8 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
-    void canSerializeDeserializeExecute_2() throws Exception {
+    @DisplayName("incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteFileAppendChunkedTransactionWithNodeAccountIds() throws Exception {
         // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
 
