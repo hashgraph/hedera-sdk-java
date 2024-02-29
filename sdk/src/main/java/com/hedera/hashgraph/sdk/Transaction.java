@@ -244,7 +244,7 @@ public abstract class Transaction<T extends Transaction<T>>
             setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
             setTransactionMemo(sourceTransactionBody.getMemo());
 
-            frozenBodyBuilder = sourceTransactionBody.toBuilder();
+//            frozenBodyBuilder = sourceTransactionBody.toBuilder();
         }
 
         if (!isFrozen()) {
@@ -781,7 +781,9 @@ public abstract class Transaction<T extends Transaction<T>>
                 int requiredChunks = getRequiredChunks();
 
                 // not sure this line is needed, maybe just add an if condition
-                generateTransactionIds(transactionIds.get(0), requiredChunks);
+                if (!transactionIds.isEmpty()){
+                    generateTransactionIds(transactionIds.get(0), requiredChunks);
+                }
 
                 wipeTransactionLists(requiredChunks);
             }
@@ -998,7 +1000,7 @@ public abstract class Transaction<T extends Transaction<T>>
     public T addSignature(PublicKey publicKey, byte[] signature) {
         requireOneNodeAccountId();
         if (!isFrozen()) {
-            throw new IllegalStateException("Adding signature requires transaction to be frozen");
+            freeze();
         }
 
         if (keyAlreadySigned(publicKey)) {
@@ -1220,7 +1222,9 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param requiredChunks the number of required chunks
      */
     void wipeTransactionLists(int requiredChunks) {
-        Objects.requireNonNull(frozenBodyBuilder).setTransactionID(getTransactionIdInternal().toProtobuf());
+        if (!transactionIds.isEmpty()) {
+            Objects.requireNonNull(frozenBodyBuilder).setTransactionID(getTransactionIdInternal().toProtobuf());
+        }
 
         outerTransactions = new ArrayList<>(nodeAccountIds.size());
         sigPairLists = new ArrayList<>(nodeAccountIds.size());
