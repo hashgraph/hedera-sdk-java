@@ -715,24 +715,13 @@ public abstract class Transaction<T extends Transaction<T>>
      *
      * @return the byte array representation
      */
-
-    // Will need to check for edge-cases
     public byte[] toBytes() {
-        // If no nodes have been selected yet, the sourceTransactionBody can be used to build a Transaction protobuf object.
-
         var list = TransactionList.newBuilder();
 
+        // If no nodes have been selected yet,
+        // the new TransactionBody can be used to build a Transaction protobuf object.
         if (nodeAccountIds.isEmpty()) {
-            // analogue of 'schedule()`
-            ///
-
-            // Make sure the Transaction has, if any, all recent changes.
-
-            // it should be something different from a `frozenBodyBuilder`
-            // because it will trigger `this.isFrozen()` condition
-
             var bodyBuilder = spawnBodyBuilder(null);
-            // not sure where transaction id will come from at this point!
             if (!transactionIds.isEmpty()) {
                 bodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
             }
@@ -750,14 +739,6 @@ public abstract class Transaction<T extends Transaction<T>>
         } else {
             // Generate the SignedTransaction protobuf objects if the Transaction's not frozen.
             if (!this.isFrozen()) {
-                // analogue to the end of `freezeWith()`
-                // but I think generating transation ids here is an issue
-                ///
-
-                // regenerateSignedTransactions
-
-                // Update this Transaction's source TransactionBody protobuf object.
-                // frozenBodyBuilder, because `wipeTransactionLists` function needs it
                 frozenBodyBuilder = spawnBodyBuilder(null);
                 if (!transactionIds.isEmpty()) {
                     frozenBodyBuilder.setTransactionID(transactionIds.get(0).toProtobuf());
@@ -765,12 +746,9 @@ public abstract class Transaction<T extends Transaction<T>>
                 onFreeze(frozenBodyBuilder);
 
                 int requiredChunks = getRequiredChunks();
-
-                // not sure this line is needed, maybe just add an if condition
                 if (!transactionIds.isEmpty()){
                     generateTransactionIds(transactionIds.get(0), requiredChunks);
                 }
-
                 wipeTransactionLists(requiredChunks);
             }
 
@@ -780,24 +758,6 @@ public abstract class Transaction<T extends Transaction<T>>
                 list.addTransactionList(transaction);
             }
         }
-
-
-        ///
-
-        /*
-        if (!this.isFrozen()) {
-            throw new IllegalStateException(
-                "transaction must have been frozen before conversion to bytes will be stable, try calling `freeze`");
-        }
-
-        buildAllTransactions();
-
-        var list = TransactionList.newBuilder();
-
-        for (var transaction : outerTransactions) {
-            list.addTransactionList(transaction);
-        }
-         */
 
         return list.build().toByteArray();
     }
@@ -856,8 +816,7 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return the transaction id
      */
     public final TransactionId getTransactionId() {
-        // not sure why this change is needed
-        if (transactionIds.isEmpty()) {
+        if (transactionIds.isEmpty() || !this.isFrozen()) {
             throw new IllegalStateException("No transaction ID generated yet. Try freezing the transaction or manually setting the transaction ID.");
         }
 
@@ -1235,9 +1194,6 @@ public abstract class Transaction<T extends Transaction<T>>
         transactionIds.setLocked(true);
         nodeAccountIds.setLocked(true);
 
-        // Go through each SignedTransaction protobuf object and add all signatures to its SignatureMap protobuf object.
-        // from C++ perspective, `innerSignedTransactions` is a `mSignedTransactions`
-
         for (var i = 0; i < innerSignedTransactions.size(); ++i) {
             buildTransaction(i);
         }
@@ -1261,7 +1217,6 @@ public abstract class Transaction<T extends Transaction<T>>
 
         signTransaction(index);
 
-        // `outerTransactions` is `mImpl->mTransactions` per C++ codebase
         outerTransactions.set(index, com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(
                 innerSignedTransactions.get(index)
