@@ -158,6 +158,11 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         } catch (InvalidProtocolBufferException exc) {
             throw new IllegalArgumentException(exc.getMessage());
         }
+
+        // examine this place later
+        if (data.equals(ByteString.EMPTY)) {
+            data = body.getMessage();
+        }
     }
 
     /**

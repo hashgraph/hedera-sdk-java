@@ -11,6 +11,10 @@ import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
@@ -27,6 +31,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import java.util.Objects;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -72,7 +77,7 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized and be equal to the original one")
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized and be equal to the original one")
     void canSerializeDeserializeCompareFields() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -98,7 +103,7 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
     void canSerializeWithNodeAccountIdsDeserializeCompareFields() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -139,7 +144,8 @@ public class TransactionIntegrationTest {
             .setInitialBalance(new Hbar(1L));
 
         var transactionBytesSerialized = accountCreateTransaction.toBytes();
-        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
+            transactionBytesSerialized);
 
         var txReceipt = accountCreateTransactionDeserialized
             .execute(testEnv.client)
@@ -171,7 +177,8 @@ public class TransactionIntegrationTest {
             .setInitialBalance(new Hbar(1L));
 
         var transactionBytesSerialized = accountCreateTransaction.toBytes();
-        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
+            transactionBytesSerialized);
 
         var txReceipt = accountCreateTransactionDeserialized
             .execute(testEnv.client)
@@ -188,7 +195,7 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeEditExecuteCompareFields() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -262,7 +269,7 @@ public class TransactionIntegrationTest {
 
     @Test
     @DisplayName("complete frozen and signed transaction can be serialized into bytes, deserialized (x2) and executed")
-    void canFreezeSignSerializeDeserializeAndExecute() throws Exception {
+    void canFreezeSignSerializeDeserializeReserializeAndExecute() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
         var adminKey = PrivateKey.generateECDSA();
@@ -352,12 +359,7 @@ public class TransactionIntegrationTest {
     @Test
     @DisplayName("file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
     void canFreezeSignSerializeDeserializeAndCompareFileAppendChunkedTransaction() throws Exception {
-        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
-
-        // Skip if using local node.
-        // Note: this check should be removed once the local node is supporting multiple nodes.
-        testEnv.assumeNotLocalNode();
 
         var privateKey = PrivateKey.generateED25519();
 
@@ -397,14 +399,9 @@ public class TransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName("incomplete file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteFileAppendChunkedTransaction() throws Exception {
-        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
-
-        // Skip if using local node.
-        // Note: this check should be removed once the local node is supporting multiple nodes.
-        testEnv.assumeNotLocalNode();
 
         var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
@@ -465,12 +462,7 @@ public class TransactionIntegrationTest {
     @Test
     @DisplayName("incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteFileAppendChunkedTransactionWithNodeAccountIds() throws Exception {
-        // There are potential bugs in FileAppendTransaction which require more than one node to trigger.
         var testEnv = new IntegrationTestEnv(2);
-
-        // Skip if using local node.
-        // Note: this check should be removed once the local node is supporting multiple nodes.
-        testEnv.assumeNotLocalNode();
 
         var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
@@ -526,6 +518,164 @@ public class TransactionIntegrationTest {
 
         new FileDeleteTransaction()
             .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("topic message submit chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    void canFreezeSignSerializeDeserializeAndCompareTopicMessageSubmitChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var privateKey = PrivateKey.generateED25519();
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS)
+            .freezeWith(testEnv.client)
+            .sign(privateKey);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction fileAppendTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("incomplete topic message submit chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
+
+        for (var resp : responses) {
+            resp.getReceipt(testEnv.client);
+        }
+
+        info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(14);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("incomplete topic message submit chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransactionWithNodeAccountIds()
+        throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
+
+        for (var resp : responses) {
+            resp.getReceipt(testEnv.client);
+        }
+
+        info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(14);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
