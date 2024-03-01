@@ -174,30 +174,25 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     Transaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
         throws InvalidProtocolBufferException {
-
-        // try to move these below to 'else' statement
-        var txCount = txs.keySet().size();
-        transactionIds.ensureCapacity(txCount);
-        for (var transactionEntry : txs.entrySet()) {
-            if (!transactionEntry.getKey().equals(DUMMY_TRANSACTION_ID)) {
-                transactionIds.add(transactionEntry.getKey());
-            }
-        }
-
         LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction> transactionMap = txs.values().iterator().next();
         if (!transactionMap.isEmpty() && transactionMap.keySet().iterator().next().equals(DUMMY_ACCOUNT_ID)) {
             // If the first account ID is a dummy account ID, then only the source TransactionBody needs to be copied.
             var signedTransaction = SignedTransaction.parseFrom(transactionMap.values().iterator().next().getSignedTransactionBytes());
             sourceTransactionBody = TransactionBody.parseFrom(signedTransaction.getBodyBytes());
         } else {
+            var txCount = txs.keySet().size();
             var nodeCount = txs.values().iterator().next().size();
 
             nodeAccountIds.ensureCapacity(nodeCount);
             sigPairLists = new ArrayList<>(nodeCount * txCount);
             outerTransactions = new ArrayList<>(nodeCount * txCount);
             innerSignedTransactions = new ArrayList<>(nodeCount * txCount);
+            transactionIds.ensureCapacity(txCount);
 
             for (var transactionEntry : txs.entrySet()) {
+                if (!transactionEntry.getKey().equals(DUMMY_TRANSACTION_ID)) {
+                    transactionIds.add(transactionEntry.getKey());
+                }
                 for (var nodeEntry : transactionEntry.getValue().entrySet()) {
                     if (nodeAccountIds.size() != nodeCount) {
                         nodeAccountIds.add(nodeEntry.getKey());
@@ -243,8 +238,6 @@ public abstract class Transaction<T extends Transaction<T>>
                 DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
             setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
             setTransactionMemo(sourceTransactionBody.getMemo());
-
-//            frozenBodyBuilder = sourceTransactionBody.toBuilder();
         }
 
         if (!isFrozen()) {
