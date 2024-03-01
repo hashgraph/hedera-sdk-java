@@ -172,19 +172,19 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
             fileId = FileId.fromProtobuf(body.getFileID());
         }
 
-        try {
-            for (var i = 0; i < innerSignedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-                data = data.concat(
-                    TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
-                        .getFileAppend().getContents()
-                );
+        if (!innerSignedTransactions.isEmpty()) {
+            try {
+                for (var i = 0; i < innerSignedTransactions.size();
+                    i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+                    data = data.concat(
+                        TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
+                            .getFileAppend().getContents()
+                    );
+                }
+            } catch (InvalidProtocolBufferException exc) {
+                throw new IllegalArgumentException(exc.getMessage());
             }
-        } catch (InvalidProtocolBufferException exc) {
-            throw new IllegalArgumentException(exc.getMessage());
-        }
-
-        // examine this place later
-        if (data.equals(ByteString.EMPTY)) {
+        } else {
             data = body.getContents();
         }
     }
