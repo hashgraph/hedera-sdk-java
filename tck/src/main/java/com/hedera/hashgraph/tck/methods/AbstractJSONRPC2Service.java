@@ -3,13 +3,14 @@ package com.hedera.hashgraph.tck.methods;
 import static com.hedera.hashgraph.tck.methods.JSONRPC2Error.HEDERA_ERROR;
 
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
-import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2ParamsException;
+import com.hedera.hashgraph.tck.methods.JSONRPC2Error.ErrorData;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
 import com.thetransactioncompany.jsonrpc2.server.MessageContext;
 import com.thetransactioncompany.jsonrpc2.server.RequestHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -24,8 +25,9 @@ import java.util.Map;
  * and invokes it.
  */
 public abstract class AbstractJSONRPC2Service implements RequestHandler {
-    // TODO potential concurrency issues
-    // This should not have concurrent reads/writes but should investigate more on this
+
+    // this is shared state to all requests so there could be race conditions
+    // although the tck driver would not call these methods in such way
     private final Map<String, Method> methodMap;
 
     public AbstractJSONRPC2Service() {
@@ -70,11 +72,14 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
             }
         } catch (InvalidJSONRPC2ParamsException e) {
             return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
-        } catch (HederaException e) {
-            // TODO set the data properly
-            var err = HEDERA_ERROR.setData(e);
-            return new JSONRPC2Response(err, req.getID());
+        } catch (InvocationTargetException e) {
+            // the target is HederaException
+            var hederaException = e.getTargetException();
+            var errorData = new ErrorData(hederaException.getMessage(), "");
+            var hederaError = HEDERA_ERROR.setData(errorData);
+            return new JSONRPC2Response(hederaError, req.getID());
         } catch (Exception e) {
+            // other exceptions
             return new JSONRPC2Response(JSONRPC2Error.INTERNAL_ERROR, req.getID());
         }
     }

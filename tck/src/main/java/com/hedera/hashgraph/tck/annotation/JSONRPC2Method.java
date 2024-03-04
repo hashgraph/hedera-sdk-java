@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to mark methods as JSON-RPC methods.
+ * Marks methods as JSON-RPC methods.
  * Methods marked with this annotation will be registered
  * as handlers for JSON-RPC requests with the specified method name.
  */

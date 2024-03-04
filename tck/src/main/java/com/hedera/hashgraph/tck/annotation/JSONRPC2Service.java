@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 import org.springframework.stereotype.Component;
 
 /**
- * Annotation to mark classes as JSON-RPC services.
+ * Marks classes as JSON-RPC services.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

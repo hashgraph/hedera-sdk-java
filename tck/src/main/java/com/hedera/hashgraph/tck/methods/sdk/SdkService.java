@@ -18,11 +18,9 @@ import java.util.Map;
  */
 @JSONRPC2Service
 public class SdkService extends AbstractJSONRPC2Service {
-    // TODO this is shared state to all requests so there could be race condition
-    //  although the tck driver would not call these methods in such way
+    // this is shared state to all requests so there could be race conditions
+    // although the tck driver would not call these methods in such way
     private Client client;
-
-    // TODO add logger here or in the abstract class
 
     @JSONRPC2Method("setup")
     public SetupResponse setup(final SetupParams params) throws HederaException {
@@ -33,7 +31,8 @@ public class SdkService extends AbstractJSONRPC2Service {
                     && params.getMirrorNetworkIp() != null) {
                 // Custom client setup
                 Map<String, AccountId> node = new HashMap<>();
-                node.put(params.getNodeIp(), AccountId.fromString(params.getNodeAccountId()));
+                var nodeId = new AccountId(Integer.parseInt(params.getNodeAccountId()));
+                node.put(params.getNodeIp(), nodeId);
                 client = Client.forNetwork(node);
                 clientType = "custom";
                 client.setMirrorNetwork(List.of(params.getMirrorNetworkIp()));
@@ -46,8 +45,10 @@ public class SdkService extends AbstractJSONRPC2Service {
             client.setOperator(
                     AccountId.fromString(params.getOperatorAccountId()),
                     PrivateKey.fromString(params.getOperatorPrivateKey()));
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new HederaException(e);
+        } catch (Exception e) {
             throw new HederaException(e);
         }
         return new SetupResponse("Successfully setup " + clientType + " client.");

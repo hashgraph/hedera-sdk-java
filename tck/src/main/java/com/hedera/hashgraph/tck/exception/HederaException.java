@@ -3,7 +3,7 @@ package com.hedera.hashgraph.tck.exception;
 /**
  * Thrown when the SDK returns an error
  */
-public class HederaException extends RuntimeException {
+public class HederaException extends Exception {
 
     public HederaException() {
         super();

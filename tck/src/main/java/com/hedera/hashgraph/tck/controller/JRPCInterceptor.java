@@ -12,7 +12,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * Interceptor class to map HttpServletRequest body to {@link JSONRPC2Request}
  * before the request reaches the controller
  */
-public class JSONRPC2Interceptor implements HandlerInterceptor {
+public class JRPCInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler)
