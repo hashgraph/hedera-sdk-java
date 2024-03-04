@@ -29,7 +29,6 @@ public class EthereumTransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-844
      */
     @Test
-    @Disabled // temp
     @DisplayName("Signer nonce changed on Ethereum transaction")
     void signerNonceChangedOnEthereumTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
