@@ -3,7 +3,6 @@ package com.hedera.hashgraph.tck.controller;
 import static com.hedera.hashgraph.tck.util.JSONRPC2ServiceScanner.registerServices;
 
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Controller;
-import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.server.Dispatcher;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 @JSONRPC2Controller
 public class JRPCController {
-    private final Logger logger = LoggerFactory.getLogger(AbstractJSONRPC2Service.class);
+    private final Logger logger = LoggerFactory.getLogger(JRPCController.class);
     private final Dispatcher dispatcher;
 
     public JRPCController(final Dispatcher dispatcher, final ApplicationContext applicationContext) {
