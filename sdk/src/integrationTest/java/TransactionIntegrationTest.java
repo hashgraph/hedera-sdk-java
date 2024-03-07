@@ -75,6 +75,10 @@ public class TransactionIntegrationTest {
         testEnv.close(accountId, key);
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction can be serialized into bytes, deserialized and be equal to the original one")
     void canSerializeDeserializeCompareFields() throws Exception {
@@ -101,6 +105,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
     void canSerializeWithNodeAccountIdsDeserializeCompareFields() throws Exception {
@@ -130,6 +138,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction can be serialized into bytes, deserialized and executed")
     void canSerializeDeserializeAndExecuteIncompleteTransaction() throws Exception {
@@ -160,6 +172,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and executed")
     void canSerializeDeserializeAndExecuteIncompleteTransactionWithNodeAccountIds() throws Exception {
@@ -193,6 +209,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeEditExecuteCompareFields() throws Exception {
@@ -229,6 +249,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeEditExecuteCompareFieldsIncompleteTransactionWithNodeAccountIds() throws Exception {
@@ -266,6 +290,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("complete frozen and signed transaction can be serialized into bytes, deserialized (x2) and executed")
     void canFreezeSignSerializeDeserializeReserializeAndExecute() throws Exception {
@@ -355,6 +383,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
     void canFreezeSignSerializeDeserializeAndCompareFileAppendChunkedTransaction() throws Exception {
@@ -397,6 +429,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteFileAppendChunkedTransaction() throws Exception {
@@ -458,6 +494,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteFileAppendChunkedTransactionWithNodeAccountIds() throws Exception {
@@ -523,6 +563,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("topic message submit chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
     void canFreezeSignSerializeDeserializeAndCompareTopicMessageSubmitChunkedTransaction() throws Exception {
@@ -569,6 +613,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete topic message submit chunked transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransaction() throws Exception {
@@ -623,6 +671,10 @@ public class TransactionIntegrationTest {
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
     @DisplayName("incomplete topic message submit chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransactionWithNodeAccountIds()
