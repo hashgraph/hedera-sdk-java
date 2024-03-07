@@ -32,7 +32,7 @@ public class ContractExecuteIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -68,7 +68,7 @@ public class ContractExecuteIntegrationTest {
     void cannotExecuteContractWhenContractIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new ContractExecuteTransaction()
                 .setGas(100000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
@@ -94,7 +94,7 @@ public class ContractExecuteIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(100000)
+                .setGas(200000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -140,7 +140,7 @@ public class ContractExecuteIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(100000)
+                .setGas(200000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")

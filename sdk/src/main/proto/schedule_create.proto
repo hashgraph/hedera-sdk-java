@@ -123,7 +123,7 @@ message ScheduleCreateTransactionBody {
    * Setting this to false does not necessarily mean that the transaction will never execute at expiration_time.
    *  For Example - If the signature requirements for a Scheduled Transaction change via external means (e.g. CryptoUpdate)
    *  such that the Scheduled Transaction would be allowed to execute, it will do so autonomously at expiration_time, unless a
-   *  ScheduleSign comes in to “poke” it and force it to go through immediately.
+   *  ScheduleSign comes in to "poke" it and force it to go through immediately.
    *
    * Note: This field is unused and forced to be unset until Long Term Scheduled Transactions are enabled. Before Long Term
    *       Scheduled Transactions are enabled, Scheduled Transactions will _never_ execute at expiration  - they will _only_

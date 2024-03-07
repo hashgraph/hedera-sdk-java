@@ -34,7 +34,7 @@ public class ContractCallIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -44,7 +44,7 @@ public class ContractCallIntegrationTest {
 
         var callQuery = new ContractCallQuery()
             .setContractId(contractId)
-            .setGas(100000)
+            .setGas(200000)
             .setFunction("getMessage")
             .setQueryPayment(new Hbar(1));
 
@@ -82,7 +82,7 @@ public class ContractCallIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(100000)
+                .setGas(200000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -127,7 +127,7 @@ public class ContractCallIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(100000)
+                .setGas(200000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -172,7 +172,7 @@ public class ContractCallIntegrationTest {
         var contractId = Objects.requireNonNull(
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(100000)
+                .setGas(200000)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
                 .setBytecodeFileId(fileId)
                 .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -216,7 +216,7 @@ public class ContractCallIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -263,7 +263,7 @@ public class ContractCallIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -309,7 +309,7 @@ public class ContractCallIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
