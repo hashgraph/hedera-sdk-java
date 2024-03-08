@@ -142,4 +142,17 @@ message TokenUpdateTransactionBody {
      * transaction will resolve to TOKEN_HAS_NO_PAUSE_KEY
      */
     Key pause_key = 15;
+
+    /**
+     * Metadata of the created token definition
+     */
+    google.protobuf.BytesValue metadata = 16;
+
+    /**
+     * The key which can change the metadata of a token
+     * (token definition, partition definition, and individual NFTs).
+     * If the Token does not have currently a Metadata key,
+     * transaction will resolve to TOKEN_HAS_NO_METADATA_KEY
+     */
+    Key metadata_key = 17;
 }

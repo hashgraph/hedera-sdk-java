@@ -325,6 +325,7 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENREVOKEKYC -> new TokenRevokeKycTransaction(txs);
             case TOKENUNFREEZE -> new TokenUnfreezeTransaction(txs);
             case TOKENUPDATE -> new TokenUpdateTransaction(txs);
+            case TOKEN_UPDATE_NFTS -> new TokenUpdateNftsTransaction(txs);
             case TOKENWIPE -> new TokenWipeTransaction(txs);
             case TOKEN_FEE_SCHEDULE_UPDATE -> new TokenFeeScheduleUpdateTransaction(txs);
             case SCHEDULECREATE -> new ScheduleCreateTransaction(txs);
@@ -399,6 +400,7 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENDELETION ->
                 new TokenDeleteTransaction(body.setTokenDeletion(scheduled.getTokenDeletion()).build());
             case TOKENUPDATE -> new TokenUpdateTransaction(body.setTokenUpdate(scheduled.getTokenUpdate()).build());
+            case TOKEN_UPDATE_NFTS -> new TokenUpdateNftsTransaction(body.setTokenUpdateNfts(scheduled.getTokenUpdateNfts()).build());
             case TOKENMINT -> new TokenMintTransaction(body.setTokenMint(scheduled.getTokenMint()).build());
             case TOKENBURN -> new TokenBurnTransaction(body.setTokenBurn(scheduled.getTokenBurn()).build());
             case TOKENWIPE -> new TokenWipeTransaction(body.setTokenWipe(scheduled.getTokenWipe()).build());

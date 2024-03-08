@@ -1524,7 +1524,27 @@ public enum Status {
     /**
      * An alias that is assigned to an account or contract cannot be assigned to another account or contract.
      */
-    ALIAS_ALREADY_ASSIGNED(ResponseCodeEnum.ALIAS_ALREADY_ASSIGNED);
+    ALIAS_ALREADY_ASSIGNED(ResponseCodeEnum.ALIAS_ALREADY_ASSIGNED),
+
+    /**
+     * A provided metadata key was invalid. Verification includes, for example, checking the size of Ed25519 and ECDSA(secp256k1) public keys.
+     */
+    INVALID_METADATA_KEY(ResponseCodeEnum.INVALID_METADATA_KEY),
+
+    /**
+     * Metadata key is not set on token
+     */
+    TOKEN_HAS_NO_METADATA_KEY(ResponseCodeEnum.TOKEN_HAS_NO_METADATA_KEY),
+
+    /**
+     * Token Metadata is not provided
+     */
+    MISSING_TOKEN_METADATA(ResponseCodeEnum.MISSING_TOKEN_METADATA),
+
+    /**
+     * NFT serial numbers are missing in the TokenUpdateNftsTransactionBody
+     */
+    MISSING_SERIAL_NUMBERS(ResponseCodeEnum.MISSING_SERIAL_NUMBERS);
 
     final ResponseCodeEnum code;
 
@@ -1825,6 +1845,10 @@ public enum Status {
             case TRANSACTION_HAS_UNKNOWN_FIELDS -> TRANSACTION_HAS_UNKNOWN_FIELDS;
             case ACCOUNT_IS_IMMUTABLE -> ACCOUNT_IS_IMMUTABLE;
             case ALIAS_ALREADY_ASSIGNED -> ALIAS_ALREADY_ASSIGNED;
+            case INVALID_METADATA_KEY -> INVALID_METADATA_KEY;
+            case TOKEN_HAS_NO_METADATA_KEY -> TOKEN_HAS_NO_METADATA_KEY;
+            case MISSING_TOKEN_METADATA -> MISSING_TOKEN_METADATA;
+            case MISSING_SERIAL_NUMBERS -> MISSING_SERIAL_NUMBERS;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
