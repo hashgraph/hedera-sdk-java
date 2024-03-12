@@ -30,7 +30,7 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
     // although the tck driver would not call these methods in such way
     private final Map<String, Method> methodMap;
 
-    public AbstractJSONRPC2Service() {
+    protected AbstractJSONRPC2Service() {
         methodMap = new HashMap<>();
         registerMethods();
     }
@@ -59,6 +59,7 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
      * @param messageContext
      * @return JSONRPC2Response - result returned from the JSONRPCMethod or if error is thrown - JSONRPC2Error
      */
+    @SuppressWarnings("java:S1874")
     @Override
     public JSONRPC2Response process(final JSONRPC2Request req, final MessageContext messageContext) {
         try {

@@ -13,10 +13,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface JSONRPC2Method {
-    // TODO enforce the params to be of instance JSONRPC2Param
-    // because if not - will blow up at runtime
     /**
      * Specifies the name of the JSON-RPC method.
+     * the params need to be of instance JSONRPC2Param because if not - will blow up at runtime
      * @return The name of the JSON-RPC method.
      */
     String value();

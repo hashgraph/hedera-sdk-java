@@ -21,12 +21,17 @@ public class SetupParams extends JSONRPC2Param {
 
     @Override
     public SetupParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        String operatorAccountId = (String) jrpcParams.get("operatorAccountId");
-        String operatorPrivateKey = (String) jrpcParams.get("operatorPrivateKey");
-        String nodeIp = (String) jrpcParams.get("nodeIp");
-        String nodeAccountId = (String) jrpcParams.get("nodeAccountId");
-        String mirrorNetworkIp = (String) jrpcParams.get("mirrorNetworkIp");
+        String parsedOperatorAccountId = (String) jrpcParams.get("operatorAccountId");
+        String parsedOperatorPrivateKey = (String) jrpcParams.get("operatorPrivateKey");
+        String parsedNodeIp = (String) jrpcParams.get("nodeIp");
+        String parsedNodeAccountId = (String) jrpcParams.get("nodeAccountId");
+        String parsedMirrorNetworkIp = (String) jrpcParams.get("mirrorNetworkIp");
 
-        return new SetupParams(operatorAccountId, operatorPrivateKey, nodeIp, nodeAccountId, mirrorNetworkIp);
+        return new SetupParams(
+                parsedOperatorAccountId,
+                parsedOperatorPrivateKey,
+                parsedNodeIp,
+                parsedNodeAccountId,
+                parsedMirrorNetworkIp);
     }
 }
