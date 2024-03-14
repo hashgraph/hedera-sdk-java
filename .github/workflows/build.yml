@@ -44,7 +44,7 @@ jobs:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew assemble :sdk:javadoc --scan
 
   unit-tests:
     name: Unit Tests
@@ -76,6 +76,9 @@ jobs:
 
       - name: Compile Code
         run: ./gradlew assemble --scan
+
+      - name: Gradle Dependency Scopes Check
+        run: ./gradlew checkAllModuleInfo --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local
