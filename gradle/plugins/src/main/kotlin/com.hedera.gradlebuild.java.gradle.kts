@@ -33,6 +33,7 @@ testing.suites {
     }
     register<JvmTestSuite>("integrationTest") {
         testType = TestSuiteType.INTEGRATION_TEST
+        targets.all { testTask { group = "build" } }
     }
 }
 

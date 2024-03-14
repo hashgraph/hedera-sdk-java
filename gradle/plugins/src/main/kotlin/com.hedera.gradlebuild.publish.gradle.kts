@@ -25,6 +25,8 @@ java {
     withSourcesJar()
 }
 
+tasks.withType<Jar>().configureEach { setGroup(null) }
+
 val mavenJava = publishing.publications.create<MavenPublication>("mavenJava") {
     from(components["java"])
 
