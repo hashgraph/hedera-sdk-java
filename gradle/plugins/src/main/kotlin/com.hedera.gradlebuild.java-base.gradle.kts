@@ -100,3 +100,18 @@ tasks.withType<AbstractArchiveTask>().configureEach {
     fileMode = 436 // octal: 0664
     dirMode = 509 // octal: 0775
 }
+
+tasks.buildDependents { setGroup(null) }
+
+tasks.buildNeeded { setGroup(null) }
+
+tasks.jar { setGroup(null) }
+
+tasks.test { group = "build" }
+
+tasks.checkAllModuleInfo { group = "build" }
+
+sourceSets.all {
+    // Remove 'classes' tasks from 'build' group to keep it cleaned up
+    tasks.named(classesTaskName) { group = null }
+}
