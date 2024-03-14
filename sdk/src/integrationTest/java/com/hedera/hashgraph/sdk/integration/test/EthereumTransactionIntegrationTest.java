@@ -1,3 +1,5 @@
+package com.hedera.hashgraph.sdk.integration.test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.esaulpaugh.headlong.rlp.RLPEncoder;
