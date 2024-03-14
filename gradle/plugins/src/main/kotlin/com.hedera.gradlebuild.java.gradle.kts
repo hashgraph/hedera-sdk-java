@@ -57,6 +57,15 @@ tasks.withType<Test>().configureEach {
     systemProperty("HEDERA_NETWORK", providers.gradleProperty("HEDERA_NETWORK").getOrElse(""))
 }
 
+tasks.withType<Javadoc>().configureEach {
+    options {
+        this as StandardJavadocDocletOptions
+        encoding = "UTF-8"
+        addStringOption("Xdoclint:all,-missing", "-quiet")
+        addStringOption("Xwerror", "-quiet")
+    }
+}
+
 tasks.jacocoTestReport {
     // make sure to use any/all test coverage data for the report and run all tests before this report is made
     executionData.from(
