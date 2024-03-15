@@ -30,7 +30,7 @@ import io.grpc.inprocess.InProcessChannelBuilder;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;

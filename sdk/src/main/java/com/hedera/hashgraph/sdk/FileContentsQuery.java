@@ -26,10 +26,9 @@ import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nullable;
 
 /**
  * Get the contents of a file. The content field is empty (no bytes) if the

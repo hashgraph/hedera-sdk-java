@@ -24,7 +24,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -74,7 +74,7 @@ public class ContractInfoIntegrationTest {
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
         response = new ContractCreateTransaction()
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -126,7 +126,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -171,7 +171,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -215,7 +215,7 @@ public class ContractInfoIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")

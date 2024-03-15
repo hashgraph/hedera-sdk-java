@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import java8.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
 /**
