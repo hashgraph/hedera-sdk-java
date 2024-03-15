@@ -263,7 +263,7 @@ public class TokenUpdateNftsIntegrationTest {
 
     @Test
     @DisplayName("Cannot update NFT metadata when metadata key was removed")
-    void cannotUpdateNFTMetadataWhenMetadataWasRemoved() throws Exception {
+    void cannotUpdateNFTMetadataWhenMetadataKeyWasRemoved() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var metadataKey = PrivateKey.generateED25519();
