@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk;
 
 import com.google.gson.JsonArray;
@@ -99,11 +118,11 @@ class MirrorNodeService {
             var jsonObject = jsonElement.getAsJsonObject();
             var tokenId = jsonObject.get("token_id").getAsString();
             var tokenBalance = jsonObject.get("balance").getAsLong();
+            var decimals = jsonObject.get("decimals").getAsInt();
 
             return TokenBalance.newBuilder().setTokenId(TokenId.fromString(tokenId).toProtobuf())
                 .setBalance(tokenBalance)
-                // no tokenDecimals :( -- additional query per each token is needed to figure it out
-//                        .setDecimals()
+                .setDecimals(decimals)
                 .build();
         }).collect(Collectors.toList());
 
@@ -132,15 +151,15 @@ class MirrorNodeService {
             var balance = jsonObject.get("balance").getAsLong();
             var kycStatus = jsonObject.get("kyc_status").getAsString();
             var freezeStatus = jsonObject.get("freeze_status").getAsString();
+            var decimals = jsonObject.get("decimals").getAsInt();
             var automaticAssociation = jsonObject.get("automatic_association").getAsBoolean();
 
             return com.hedera.hashgraph.sdk.proto.TokenRelationship.newBuilder()
                 .setTokenId(TokenId.fromString(tokenId).toProtobuf())
-                // no symbol :( -- additional query per each token is needed to figure it out
-//                .setSymbol()
                 .setBalance(balance)
                 .setKycStatus(getTokenKycStatusFromString(kycStatus))
                 .setFreezeStatus(getTokenFreezeStatusFromString(freezeStatus))
+                .setDecimals(decimals)
                 .setAutomaticAssociation(automaticAssociation)
                 .build();
         }).collect(Collectors.toList());

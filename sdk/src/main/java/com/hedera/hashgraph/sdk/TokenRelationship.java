@@ -30,7 +30,6 @@ import javax.annotation.Nullable;
  *
  * See <a href="https://docs.hedera.com/guides/docs/hedera-api/basic-types/tokenrelationship">Hedera Documentation</a>
  */
-// TODO: check com.hedera.hashgraph.sdk.proto.TokenRelationship has field `decimals`, but this class does not !
 public class TokenRelationship {
     /**
      * A unique token id
