@@ -34,7 +34,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class UpdateNftsExample {
+public class UpdateNftsMetadataExample {
 
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
@@ -43,7 +43,7 @@ public class UpdateNftsExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public UpdateNftsExample() {
+    public UpdateNftsMetadataExample() {
     }
 
     public static void main(String[] args) throws Exception {
