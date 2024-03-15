@@ -1,0 +1,37 @@
+
+plugins {
+    id("com.diffplug.spotless") version "6.25.0"
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+description = "Hedera SDK TCK Server"
+group = 'com.hedera.hashgraph.sdk.tck'
+version = '0.0.1'
+
+java {
+    sourceCompatibility = '17'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'com.thetransactioncompany:jsonrpc2-server:2.0'
+    implementation project(':sdk')
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+spotless {
+    java {
+        endWithNewline()
+        palantirJavaFormat()
+        target("**/*.java")
+        toggleOffOn()
+    }
+}
