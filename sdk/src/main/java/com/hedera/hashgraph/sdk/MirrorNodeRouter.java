@@ -27,8 +27,6 @@ class MirrorNodeRouter {
 
     private static final String API_VERSION = "/api/v1";
 
-    private static final String LOCAL_NODE_PORT_NUMBER = "5551";
-
     static final String ACCOUNTS_ROUTE = "accounts";
 
     static final String CONTRACTS_ROUTE = "contracts";
@@ -42,9 +40,7 @@ class MirrorNodeRouter {
     );
 
     static String getMirrorNodeUrl(List<String> mirrorNetwork, LedgerId ledgerId) {
-        Optional<String> mirrorNodeAddress = mirrorNetwork.stream()
-            .map(address -> address.substring(0, address.indexOf(":")))
-            .findFirst();
+        Optional<String> mirrorNodeAddress = mirrorNetwork.stream().findFirst();
 
         if (mirrorNodeAddress.isEmpty()) {
             throw new IllegalArgumentException("Mirror address not found");
@@ -53,10 +49,10 @@ class MirrorNodeRouter {
         String fullMirrorNodeUrl;
 
         if (ledgerId != null) {
-            fullMirrorNodeUrl = "https://" + mirrorNodeAddress.get();
+            fullMirrorNodeUrl = "https://" + mirrorNodeAddress.get().substring(0, mirrorNodeAddress.get().indexOf(":"));
         } else {
             // local node case
-            fullMirrorNodeUrl = "http://" + mirrorNodeAddress.get() + ":" + LOCAL_NODE_PORT_NUMBER;
+            fullMirrorNodeUrl = "http://" + mirrorNodeAddress.get();
         }
 
         return fullMirrorNodeUrl;

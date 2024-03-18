@@ -26,6 +26,7 @@ import java.time.Duration;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 // TODO: we may want to refactor to separate TestClient from TestServer.
@@ -48,10 +49,15 @@ public class TestServer {
         var network = new HashMap<String, AccountId>();
         network.put("in-process:" + name + "[0]", AccountId.fromString("1.1.1"));
         network.put("in-process:" + name + "[1]", AccountId.fromString("2.2.2"));
-        client = Client.forNetwork(network)
-            .setNodeMinBackoff(Duration.ofMillis(500))
-            .setNodeMaxBackoff(Duration.ofMillis(500))
-            .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
+        try {
+            client = Client.forNetwork(network)
+                .setMirrorNetwork(List.of("127.0.0.1:5553"))
+                .setNodeMinBackoff(Duration.ofMillis(500))
+                .setNodeMaxBackoff(Duration.ofMillis(500))
+                .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void close() throws TimeoutException, InterruptedException {

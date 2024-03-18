@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv {
     private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5551";
     private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;

@@ -106,15 +106,20 @@ public class Mocker implements AutoCloseable {
             }
         }
 
-        this.client = Client.forNetwork(network)
-            .setOperator(new AccountId(1800), PRIVATE_KEY)
-            .setMinBackoff(Duration.ofMillis(0))
-            .setMaxBackoff(Duration.ofMillis(0))
-            .setNodeMinBackoff(Duration.ofMillis(0))
-            .setNodeMaxBackoff(Duration.ofMillis(0))
-            .setMinNodeReadmitTime(Duration.ofMillis(0))
-            .setMaxNodeReadmitTime(Duration.ofMillis(0))
-            .setLogger(new Logger(LogLevel.SILENT));
+        try {
+            this.client = Client.forNetwork(network)
+                .setMirrorNetwork(List.of("127.0.0.1:5553"))
+                .setOperator(new AccountId(1800), PRIVATE_KEY)
+                .setMinBackoff(Duration.ofMillis(0))
+                .setMaxBackoff(Duration.ofMillis(0))
+                .setNodeMinBackoff(Duration.ofMillis(0))
+                .setNodeMaxBackoff(Duration.ofMillis(0))
+                .setMinNodeReadmitTime(Duration.ofMillis(0))
+                .setMaxNodeReadmitTime(Duration.ofMillis(0))
+                .setLogger(new Logger(LogLevel.SILENT));
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static Mocker withResponses(List<List<Object>> responses) {
