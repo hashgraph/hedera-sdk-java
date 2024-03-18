@@ -285,7 +285,7 @@ class ClientTest {
         AccountId accountId = AccountId.fromString("0.0.1");
         Duration timeout = Duration.ofSeconds(5);
 
-        Client client = Client.forNetwork(Map.of("127.0.0.2:50211", accountId))
+        Client client = Client.forNetwork(Map.of("1.1.1.1:50211", accountId))
             .setNodeMinBackoff(Duration.ofMillis(0))
             .setNodeMaxBackoff(Duration.ofMillis(0))
             .setMinNodeReadmitTime(Duration.ofMillis(0))
@@ -329,7 +329,7 @@ class ClientTest {
         // is not configurable.
         Duration timeout = Duration.ofSeconds(5);
 
-        Client client = Client.forNetwork(Map.of("127.0.0.2:50211", accountId))
+        Client client = Client.forNetwork(Map.of("1.1.1.1:50211", accountId))
             .setNodeMinBackoff(Duration.ofMillis(0))
             .setNodeMaxBackoff(Duration.ofMillis(0))
             .setMinNodeReadmitTime(Duration.ofMillis(0))
