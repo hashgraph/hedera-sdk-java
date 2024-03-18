@@ -3,7 +3,18 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.FileAppendTransaction;
+import com.hedera.hashgraph.sdk.FileContentsQuery;
+import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.FileInfoQuery;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TopicCreateTransaction;
+import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
+import com.hedera.hashgraph.sdk.TopicInfoQuery;
+import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
 import com.hedera.hashgraph.sdk.Transaction;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
@@ -19,6 +30,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
 import com.hedera.hashgraph.sdk.proto.TransferList;
+import java.util.Objects;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,9 +38,11 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class TransactionIntegrationTest {
+
     @Test
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() throws Exception {
@@ -61,9 +75,276 @@ public class TransactionIntegrationTest {
         testEnv.close(accountId, key);
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
     @Test
-    @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
-    void transactionFromToBytes() throws Exception {
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized and be equal to the original one")
+    void canSerializeDeserializeCompareFields() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
+        var expectedBalance = new Hbar(1L);
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        assertThat(expectedNodeAccountIds).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            accountCreateTransactionDeserialized::getTransactionId);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
+    void canSerializeWithNodeAccountIdsDeserializeCompareFields() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
+        var expectedBalance = new Hbar(1L);
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        assertThat(expectedNodeAccountIds.size()).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds().size());
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            accountCreateTransactionDeserialized::getTransactionId);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized and executed")
+    void canSerializeDeserializeAndExecuteIncompleteTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
+            transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and executed")
+    void canSerializeDeserializeAndExecuteIncompleteTransactionWithNodeAccountIds() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1L));
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
+            transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeEditExecuteCompareFields() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setKey(publicKey);
+
+        var expectedBalance = new Hbar(1L);
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
+            .setInitialBalance(new Hbar(1L))
+            .setNodeAccountIds(nodeAccountIds)
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeEditExecuteCompareFieldsIncompleteTransactionWithNodeAccountIds() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setKey(publicKey);
+
+        var expectedBalance = new Hbar(1L);
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var txReceipt = accountCreateTransactionDeserialized
+            .setInitialBalance(new Hbar(1L))
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
+
+        new AccountDeleteTransaction()
+            .setAccountId(txReceipt.accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("complete frozen and signed transaction can be serialized into bytes, deserialized (x2) and executed")
+    void canFreezeSignSerializeDeserializeReserializeAndExecute() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var adminKey = PrivateKey.generateECDSA();
+        var publicKey = adminKey.getPublicKey();
+
+        var evmAddress = publicKey.toEvmAddress();
+        var initialBalance = new Hbar(1L);
+        var autoRenewPeriod = java.time.Duration.ofSeconds(2592000);
+        var memo = "test account memo";
+        var maxAutomaticTokenAssociations = 4;
+
+        var accountCreateTransaction = new AccountCreateTransaction()
+            .setKey(publicKey)
+            .setInitialBalance(initialBalance)
+            .setReceiverSignatureRequired(true)
+            .setAutoRenewPeriod(autoRenewPeriod)
+            .setAccountMemo(memo)
+            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+            .setDeclineStakingReward(true)
+            .setAlias(evmAddress)
+            .freezeWith(testEnv.client)
+            .sign(adminKey);
+
+        var transactionBytesSerialized = accountCreateTransaction.toBytes();
+        AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = accountCreateTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        AccountCreateTransaction accountCreateTransactionReserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesReserialized);
+
+        var txResponse = accountCreateTransactionReserialized.execute(testEnv.client);
+
+        var accountId = txResponse.getReceipt(testEnv.client).accountId;
+
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client);
+
+        testEnv.close();
+    }
+
+    @Test
+    @DisplayName("complete frozen transaction can be serialized into bytes, deserialized, signature added and executed")
+    void canFreezeSerializeDeserializeAddSignatureAndExecute() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
         var key = PrivateKey.generateED25519();
@@ -95,19 +376,365 @@ public class TransactionIntegrationTest {
 
         var deleteTransaction2 = Transaction.fromBytes(updateBytes);
 
-        response = deleteTransaction2
+        deleteTransaction2
             .addSignature(key.getPublicKey(), sig1)
             .execute(testEnv.client);
-
-        response.getReceipt(testEnv.client);
 
         testEnv.close();
     }
 
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    void canFreezeSignSerializeDeserializeAndCompareFileAppendChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var privateKey = PrivateKey.generateED25519();
+
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
+
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        var fileAppendTransaction = new FileAppendTransaction()
+            .setFileId(fileId)
+            .setContents(Contents.BIG_CONTENTS)
+            .freezeWith(testEnv.client)
+            .sign(privateKey);
+
+        var transactionBytesSerialized = fileAppendTransaction.toBytes();
+        FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteFileAppendChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
+
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        var fileAppendTransaction = new FileAppendTransaction()
+            .setFileId(fileId)
+            .setContents(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = fileAppendTransaction.toBytes();
+        FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        fileAppendTransactionDeserialized
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
+
+        info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(13522);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteFileAppendChunkedTransactionWithNodeAccountIds() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents("[e2e::FileCreateTransaction]")
+            .execute(testEnv.client);
+
+        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(28);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        var fileAppendTransaction = new FileAppendTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setFileId(fileId)
+            .setContents(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = fileAppendTransaction.toBytes();
+        FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        fileAppendTransactionDeserialized
+            .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var contents = new FileContentsQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
+
+        info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
+
+        assertThat(info.fileId).isEqualTo(fileId);
+        assertThat(info.size).isEqualTo(13522);
+        assertThat(info.isDeleted).isFalse();
+        assertThat(info.keys).isNotNull();
+        assertThat(info.keys.getThreshold()).isNull();
+        assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
+
+        new FileDeleteTransaction()
+            .setFileId(fileId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("topic message submit chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    void canFreezeSignSerializeDeserializeAndCompareTopicMessageSubmitChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var privateKey = PrivateKey.generateED25519();
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS)
+            .freezeWith(testEnv.client)
+            .sign(privateKey);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction fileAppendTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
+        assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete topic message submit chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransaction() throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
+
+        for (var resp : responses) {
+            resp.getReceipt(testEnv.client);
+        }
+
+        info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(14);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
+
+    /**
+     * @notice E2E-HIP-745
+     * @url https://hips.hedera.com/hip/hip-745
+     */
+    @Test
+    @DisplayName("incomplete topic message submit chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransactionWithNodeAccountIds()
+        throws Exception {
+        var testEnv = new IntegrationTestEnv(2);
+
+        var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
+
+        var response = new TopicCreateTransaction()
+            .setAdminKey(testEnv.operatorKey)
+            .setTopicMemo("[e2e::TopicCreateTransaction]")
+            .execute(testEnv.client);
+
+        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+
+        Thread.sleep(5000);
+
+        @Var var info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(0);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+            .setNodeAccountIds(nodeAccountIds)
+            .setTopicId(topicId)
+            .setMaxChunks(15)
+            .setMessage(Contents.BIG_CONTENTS);
+
+        var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
+        TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+
+        var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
+
+        for (var resp : responses) {
+            resp.getReceipt(testEnv.client);
+        }
+
+        info = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(testEnv.client);
+
+        assertThat(info.topicId).isEqualTo(topicId);
+        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+        assertThat(info.sequenceNumber).isEqualTo(14);
+        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close();
+    }
 
     // TODO: this test has a bunch of things hard-coded into it, which is kinda dumb, but it's a good idea for a test.
     //       Any way to fix it and bring it back?
-
     @Disabled
     @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
