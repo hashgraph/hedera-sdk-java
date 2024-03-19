@@ -6,7 +6,7 @@ import java.util.List;
 public class ClientHelper {
     public static final String LOCAL_NETWORK_NAME = "localhost";
     private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5551";
 
     public static Client forName(String network) throws InterruptedException {
         if (network.equals(LOCAL_NETWORK_NAME)) {
