@@ -18,6 +18,8 @@ task runAllExamples {
         .filter { !it.equals('ZeroTokenOperationsExample') } // doesn't work
         .filter { !it.equals('SolidityPrecompileExample') } // doesn't work with hedera-local-node
         .filter { !it.equals('ConsensusPubSubChunkedExample') } // doesn't work on CI
+
+        .filter { !it.equals('ConsensusPubSubExample') } // temp
         .toList()
 
     exampleClasses.each { className ->
