@@ -142,6 +142,11 @@ public final class AccountCreateWithHtsExample {
         System.out.println("Current owner account id: " + nftOwnerAccountId);
 
         // Step 6 - Show the new account ID owns the NFT
+
+        // AccountInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         String accountId = new AccountInfoQuery()
             .setAccountId(aliasAccountId)
             .execute(client)
@@ -208,6 +213,11 @@ public final class AccountCreateWithHtsExample {
         tokenTransferSubmit.getReceipt(client);
 
         // Step 4 -  Return the new account ID in the child record
+
+        // AccountBalanceQuery and AccountInfo queries mirror node as well,
+        // wait till mirror node will be updated with the new data
+        Thread.sleep(5000);
+
         String accountId2 = new AccountInfoQuery()
             .setAccountId(aliasAccountId2)
             .execute(client)

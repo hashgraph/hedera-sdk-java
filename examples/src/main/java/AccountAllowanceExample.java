@@ -111,7 +111,11 @@ public class AccountAllowanceExample {
         printBalances();
     }
 
-    private void printBalances() throws PrecheckStatusException, TimeoutException {
+    private void printBalances() throws PrecheckStatusException, TimeoutException, InterruptedException {
+        // AccountBalanceQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         System.out.println(
             "Alice's balance: " +
                 new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
@@ -126,7 +130,8 @@ public class AccountAllowanceExample {
         );
     }
 
-    private void demonstrateAllowances() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    private void demonstrateAllowances()
+        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
         System.out.println("Approving an allowance of 2 Hbar with owner Alice and spender Bob");
 
         new AccountAllowanceApproveTransaction()

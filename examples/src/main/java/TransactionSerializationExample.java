@@ -64,6 +64,10 @@ public class TransactionSerializationExample {
 
         System.out.println("transferred " + amount + "...");
 
+        // AccountBalanceQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)

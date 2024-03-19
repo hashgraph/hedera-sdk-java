@@ -91,6 +91,10 @@ public class ScheduledTransactionMultiSigThresholdExample {
 
         System.out.println("3-of-4 multi-sig account ID: " + multiSigAccountId);
 
+        // AccountBalanceQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         AccountBalance balance = new AccountBalanceQuery()
             .setAccountId(multiSigAccountId)
             .execute(client);

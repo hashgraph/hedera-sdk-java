@@ -85,6 +85,9 @@ public class StakingExample {
 
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
+        // AccountInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);

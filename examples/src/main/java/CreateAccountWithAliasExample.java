@@ -78,6 +78,10 @@ public class CreateAccountWithAliasExample {
          * Step 6
          * Get the `AccountInfo` and show that the account has contractAccountId
          */
+        // AccountInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
