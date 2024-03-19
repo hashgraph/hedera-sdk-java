@@ -108,6 +108,7 @@ public class IntegrationTestEnv {
         client = Client.forNetwork(originalClient.getNetwork());
         client.setMirrorNetwork(originalClient.getMirrorNetwork());
         client.setOperator(Objects.requireNonNull(operatorId), key);
+        client.setLedgerId(originalClient.getLedgerId());
         return this;
     }
 

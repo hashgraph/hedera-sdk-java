@@ -207,7 +207,7 @@ class AccountBalanceIntegrationTest {
         testEnv.close();
     }
 
-    @Test // need to investigate -- it works for localhost, but not for testnet
+    @Test
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
