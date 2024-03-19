@@ -37,6 +37,8 @@ class ContractIdPopulationIntegrationTest {
 
         var contractId = Objects.requireNonNull(receipt.contractId);
 
+        // ContractInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()
@@ -44,8 +46,6 @@ class ContractIdPopulationIntegrationTest {
             .execute(testEnv.client);
 
         var idMirror = ContractId.fromEvmAddress(0, 0, info.contractAccountId);
-
-        Thread.sleep(5000);
 
         var newContractId = idMirror.populateContractNum(testEnv.client);
 
@@ -79,6 +79,8 @@ class ContractIdPopulationIntegrationTest {
 
         var contractId = Objects.requireNonNull(receipt.contractId);
 
+        // ContractInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()
@@ -86,8 +88,6 @@ class ContractIdPopulationIntegrationTest {
             .execute(testEnv.client);
 
         var idMirror = ContractId.fromEvmAddress(0, 0, info.contractAccountId);
-
-        Thread.sleep(5000);
 
         var newContractId = idMirror.populateContractNumAsync(testEnv.client).get();
 

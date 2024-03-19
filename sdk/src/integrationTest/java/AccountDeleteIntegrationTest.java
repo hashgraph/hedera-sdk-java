@@ -30,6 +30,10 @@ class AccountDeleteIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
+        // AccountInfoQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
+
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(testEnv.client);

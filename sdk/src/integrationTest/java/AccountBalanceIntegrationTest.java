@@ -207,7 +207,7 @@ class AccountBalanceIntegrationTest {
         testEnv.close();
     }
 
-    @Test
+    @Test // need to investigate -- it works for localhost, but not for testnet
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
@@ -224,6 +224,10 @@ class AccountBalanceIntegrationTest {
             .execute(testEnv.client);
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+
+        // AccountBalanceQuery queries mirror node as well,
+        // wait till mirror node will update with the new data
+        Thread.sleep(5000);
 
         var query = new AccountBalanceQuery();
         var balance = query
