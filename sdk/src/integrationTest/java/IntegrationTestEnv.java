@@ -20,8 +20,10 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv {
-    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5551";
+    private static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
+    private static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
+    private static final String LOCAL_MIRROR_NODE_REST_API_ENDPOINT = "127.0.0.1:5551";
+    private static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
     private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;
@@ -58,7 +60,7 @@ public class IntegrationTestEnv {
         assertThat(client.getOperatorAccountId()).isNotNull();
         assertThat(client.getOperatorPublicKey()).isNotNull();
 
-        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(LOCAL_CONSENSUS_NODE_ENDPOINT))) {
             isLocalNode = true;
         }
 
@@ -80,11 +82,11 @@ public class IntegrationTestEnv {
             return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new HashMap<String, AccountId>();
-            network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
+            network.put(LOCAL_CONSENSUS_NODE_ENDPOINT, LOCAL_CONSENSUS_NODE_ACCOUNT_ID);
 
             return Client
                 .forNetwork(network)
-                .setMirrorNetwork(List.of(DEFAULT_LOCAL_MIRROR_NODE_ADDRESS));
+                .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_REST_API_ENDPOINT, LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
