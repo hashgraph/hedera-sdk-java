@@ -40,7 +40,11 @@ class MirrorNodeRouter {
     );
 
     static String getMirrorNodeUrl(List<String> mirrorNetwork, LedgerId ledgerId) {
-        Optional<String> mirrorNodeAddress = mirrorNetwork.stream().findFirst();
+        Optional<String> mirrorNodeAddress = mirrorNetwork.stream()
+            // need to filter out address with default grpc port for local node
+            // to ensure the address which is intended for grpc is not used for rest
+            .filter(address -> !address.contains("5600"))
+            .findFirst();
 
         if (mirrorNodeAddress.isEmpty()) {
             throw new IllegalArgumentException("Mirror address not found");
