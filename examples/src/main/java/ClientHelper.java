@@ -28,6 +28,6 @@ public class ClientHelper {
         network.put(LOCAL_CONSENSUS_NODE_ENDPOINT, LOCAL_CONSENSUS_NODE_ACCOUNT_ID);
 
         return Client.forNetwork(network)
-            .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_GRPC_ENDPOINT, LOCAL_MIRROR_NODE_REST_API_ENDPOINT));
+            .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_REST_API_ENDPOINT, LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
     }
 }
