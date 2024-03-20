@@ -90,7 +90,6 @@ class AccountCreateIntegrationTest {
     }
 
     @Test
-    @Disabled // fix query by alias
     @DisplayName("Can create account using aliasKey")
     void canCreateWithAliasKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
@@ -107,7 +106,7 @@ class AccountCreateIntegrationTest {
 
         // AccountInfoQuery queries mirror node as well,
         // wait till mirror node will update with the new data
-//        Thread.sleep(5000);
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(aliasId)

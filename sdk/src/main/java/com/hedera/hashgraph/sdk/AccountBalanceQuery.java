@@ -131,10 +131,9 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
         MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
         MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
-        long accountNum = getNumForQuery(request);
-
+        AccountId accountIdFromConsensusNode = AccountId.fromProtobuf(response.getCryptogetAccountBalance().getAccountID());
         List<TokenBalance> tokenBalanceList = mirrorNodeService
-            .getTokenBalancesForAccount(String.valueOf(accountNum));
+            .getTokenBalancesForAccount(String.valueOf(accountIdFromConsensusNode.num));
 
         var protobufFromConsensusNode = response.getCryptogetAccountBalance();
         var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
@@ -158,22 +157,5 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
         return CryptoServiceGrpc.getCryptoGetBalanceMethod();
-    }
-
-    private long getNumForQuery(com.hedera.hashgraph.sdk.proto.Query request) {
-        switch (request.getCryptogetAccountBalance().getBalanceSourceCase()) {
-            case ACCOUNTID -> {
-                if (this.accountId != null) {
-                    return this.accountId.num;
-                }
-            }
-            case CONTRACTID -> {
-                if (this.contractId != null) {
-                    return this.contractId.num;
-                }
-            }
-        }
-
-        throw new IllegalStateException("Either accountId or contractId should be set!");
     }
 }

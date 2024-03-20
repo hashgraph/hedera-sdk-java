@@ -101,8 +101,9 @@ public final class AccountInfoQuery extends Query<AccountInfo, AccountInfoQuery>
         MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
         MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
+        AccountId accountIdFromConsensusNode = AccountId.fromProtobuf(response.getCryptoGetInfo().getAccountInfo().getAccountID());
         List<TokenRelationship> tokenRelationships = mirrorNodeService
-            .getTokenRelationshipsForAccount(String.valueOf(this.accountId.num));
+            .getTokenRelationshipsForAccount(String.valueOf(accountIdFromConsensusNode.num));
 
         var protobufFromConsensusNode = response.getCryptoGetInfo().getAccountInfo();
         var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()

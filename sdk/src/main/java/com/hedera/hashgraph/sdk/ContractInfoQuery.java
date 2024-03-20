@@ -109,8 +109,9 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
         MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
         MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
+        ContractId contractIdFromConsensusNode = ContractId.fromProtobuf(response.getContractGetInfo().getContractInfo().getContractID());
         List<TokenRelationship> tokenRelationships = mirrorNodeService
-            .getTokenRelationshipsForAccount(String.valueOf(this.contractId.num));
+            .getTokenRelationshipsForAccount(String.valueOf(contractIdFromConsensusNode.num));
 
         var protobufFromConsensusNode = response.getContractGetInfo().getContractInfo();
         var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
