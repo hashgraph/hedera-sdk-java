@@ -90,9 +90,10 @@ public class TransferUsingEvmAddressExample {
          * Step 6
          * Get the `AccountInfo` on the new account and show it is a hollow account by not having a public key
          */
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
+
         AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
@@ -123,9 +124,8 @@ public class TransferUsingEvmAddressExample {
          * Step 9
          * Get the `AccountInfo` of the account and show the account is now a complete account by returning the public key on the account
          */
-
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         AccountInfo accountInfo2 = new AccountInfoQuery()

@@ -25,8 +25,8 @@ class AccountCreateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -57,8 +57,8 @@ class AccountCreateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -104,8 +104,8 @@ class AccountCreateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -133,8 +133,8 @@ class AccountCreateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -178,8 +178,8 @@ class AccountCreateIntegrationTest {
 
         assertThat(accountId).isNotNull();
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -221,8 +221,8 @@ class AccountCreateIntegrationTest {
 
         assertThat(accountId).isNotNull();
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -290,8 +290,8 @@ class AccountCreateIntegrationTest {
 
         assertThat(accountId).isNotNull();
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
@@ -363,8 +363,8 @@ class AccountCreateIntegrationTest {
 
         assertThat(accountId).isNotNull();
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new AccountInfoQuery()

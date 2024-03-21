@@ -252,8 +252,8 @@ public class ScheduleCreateIntegrationTest {
 
         Objects.requireNonNull(scheduleId);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var balanceQuery1 = new AccountBalanceQuery()
@@ -269,8 +269,8 @@ public class ScheduleCreateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var balanceQuery2 = new AccountBalanceQuery()

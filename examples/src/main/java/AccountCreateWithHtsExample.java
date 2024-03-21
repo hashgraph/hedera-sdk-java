@@ -143,8 +143,8 @@ public final class AccountCreateWithHtsExample {
 
         // Step 6 - Show the new account ID owns the NFT
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         String accountId = new AccountInfoQuery()
@@ -214,8 +214,8 @@ public final class AccountCreateWithHtsExample {
 
         // Step 4 -  Return the new account ID in the child record
 
-        // AccountBalanceQuery and AccountInfo queries mirror node as well,
-        // wait till mirror node will be updated with the new data
+        // `AccountBalanceQuery` and `AccountInfoQuery` also query the mirror node.
+        // Wait until the mirror node is updated with the new data.
         Thread.sleep(5000);
 
         String accountId2 = new AccountInfoQuery()

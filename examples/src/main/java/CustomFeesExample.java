@@ -179,8 +179,8 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         Hbar aliceHbar1 = new AccountBalanceQuery()
@@ -197,8 +197,8 @@ public final class CustomFeesExample {
             .execute(client)
             .getRecord(client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         Hbar aliceHbar2 = new AccountBalanceQuery()
@@ -259,8 +259,8 @@ public final class CustomFeesExample {
             .execute(client)
             .getRecord(client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         Map<TokenId, Long> aliceTokens4 = new AccountBalanceQuery()
@@ -297,8 +297,8 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         // wipe token on created accounts

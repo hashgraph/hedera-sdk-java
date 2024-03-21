@@ -104,8 +104,8 @@ public class AutoCreateAccountTransferTransactionExample {
              - The alias property of the account does not have the public address
              - Referred to as a hollow account
          */
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         AccountInfo accountInfo = new AccountInfoQuery()

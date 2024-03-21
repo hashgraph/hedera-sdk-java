@@ -30,8 +30,8 @@ public class AutomaticAssociationTest {
 
         Objects.requireNonNull(accountId);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var accountInfo1 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
@@ -74,8 +74,8 @@ public class AutomaticAssociationTest {
         assertThat(transferRecord.automaticTokenAssociations.get(0).accountId).isEqualTo(accountId);
         assertThat(transferRecord.automaticTokenAssociations.get(0).tokenId).isEqualTo(tokenId1);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var accountInfo2 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
@@ -99,8 +99,8 @@ public class AutomaticAssociationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // AccountInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var accountInfo3 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);

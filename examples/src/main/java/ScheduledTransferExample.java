@@ -101,8 +101,8 @@ public final class ScheduledTransferExample {
         System.out.println("Alice's ID: " + client.getOperatorAccountId());
         System.out.println("Bob's ID: " + bobsId);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         AccountBalance bobsInitialBalance = new AccountBalanceQuery()
@@ -145,8 +145,8 @@ public final class ScheduledTransferExample {
          * Bob's balance should be unchanged.  The transfer has been scheduled, but it hasn't been executed yet
          * because it requires Bob's signature.
          */
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
         AccountBalance bobsBalanceAfterSchedule = new AccountBalanceQuery()
             .setAccountId(bobsId)
@@ -186,8 +186,8 @@ public final class ScheduledTransferExample {
             .execute(client)
             .getReceipt(client);
 
-        // AccountBalanceQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         AccountBalance balanceAfterSigning = new AccountBalanceQuery()

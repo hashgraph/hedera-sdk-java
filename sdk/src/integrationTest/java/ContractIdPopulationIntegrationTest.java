@@ -37,8 +37,8 @@ class ContractIdPopulationIntegrationTest {
 
         var contractId = Objects.requireNonNull(receipt.contractId);
 
-        // ContractInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `ContractInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()
@@ -79,8 +79,8 @@ class ContractIdPopulationIntegrationTest {
 
         var contractId = Objects.requireNonNull(receipt.contractId);
 
-        // ContractInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `ContractInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()

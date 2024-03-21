@@ -35,8 +35,8 @@ public class ContractInfoIntegrationTest {
         assertThat(contractId.hashCode()).isGreaterThan(0);
         assertThat(contractId.compareTo(ContractId.fromBytes(contractId.toBytes()))).isZero();
 
-        // ContractInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `ContractInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()
@@ -86,8 +86,8 @@ public class ContractInfoIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        // ContractInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `ContractInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var info = new ContractInfoQuery()
@@ -148,8 +148,8 @@ public class ContractInfoIntegrationTest {
 
         var cost = infoQuery.getCost(testEnv.client);
 
-        // ContractInfoQuery queries mirror node as well,
-        // wait till mirror node will update with the new data
+        // `ContractInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
         Thread.sleep(5000);
 
         var result = infoQuery
