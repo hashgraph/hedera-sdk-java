@@ -1,5 +1,4 @@
 import com.hedera.hashgraph.sdk.*;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -152,7 +151,7 @@ class AccountCreateIntegrationTest {
         testEnv.close(accountId, key);
     }
 
-    @Test // it is flaky
+    @Test
     @DisplayName("Can create account with alias from admin key")
     void createAccountWithAliasFromAdminKey() throws Exception {
         // Tests the third row of this table
