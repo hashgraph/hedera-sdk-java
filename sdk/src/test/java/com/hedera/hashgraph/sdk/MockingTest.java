@@ -708,7 +708,14 @@ public class MockingTest {
         }
     }
 
+    /**
+     * Method to set up an HTTP mock server for testing purposes.
+     * Used to mock Mirror Node REST API.
+     *
+     * @return The initialized WireMockServer instance.
+     */
     private WireMockServer setupHttpMockServer() {
+        // temp solution for testing
         MirrorNodeRouter.LOCAL_NODE_PORT = "5552";
 
         var wireMockServer = new WireMockServer(5552);
