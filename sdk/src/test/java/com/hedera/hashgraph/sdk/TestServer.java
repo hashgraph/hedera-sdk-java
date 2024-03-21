@@ -51,7 +51,7 @@ public class TestServer {
         network.put("in-process:" + name + "[1]", AccountId.fromString("2.2.2"));
         try {
             client = Client.forNetwork(network)
-                .setMirrorNetwork(List.of("127.0.0.1:5553"))
+                .setMirrorNetwork(List.of("127.0.0.1:5552"))
                 .setNodeMinBackoff(Duration.ofMillis(500))
                 .setNodeMaxBackoff(Duration.ofMillis(500))
                 .setOperator(AccountId.fromString("2.2.2"), PrivateKey.generate());

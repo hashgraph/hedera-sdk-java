@@ -27,6 +27,9 @@ class MirrorNodeRouter {
 
     private static final String API_VERSION = "/api/v1";
 
+    // refactor me
+    static String LOCAL_NODE_PORT = "5551";
+
     static final String ACCOUNTS_ROUTE = "accounts";
 
     static final String CONTRACTS_ROUTE = "contracts";
@@ -41,9 +44,7 @@ class MirrorNodeRouter {
 
     static String getMirrorNodeUrl(List<String> mirrorNetwork, LedgerId ledgerId) {
         Optional<String> mirrorNodeAddress = mirrorNetwork.stream()
-            // need to filter out address with default grpc port for local node
-            // to ensure the address which is intended for grpc is not used for rest
-            .filter(address -> !address.contains("5600"))
+            .map(address -> address.substring(0, address.indexOf(":")))
             .findFirst();
 
         if (mirrorNodeAddress.isEmpty()) {
@@ -53,10 +54,10 @@ class MirrorNodeRouter {
         String fullMirrorNodeUrl;
 
         if (ledgerId != null) {
-            fullMirrorNodeUrl = "https://" + mirrorNodeAddress.get().substring(0, mirrorNodeAddress.get().indexOf(":"));
+            fullMirrorNodeUrl = "https://" + mirrorNodeAddress.get();
         } else {
             // local node case
-            fullMirrorNodeUrl = "http://" + mirrorNodeAddress.get();
+            fullMirrorNodeUrl = "http://" + mirrorNodeAddress.get() + ":" + LOCAL_NODE_PORT;
         }
 
         return fullMirrorNodeUrl;

@@ -108,7 +108,7 @@ public class Mocker implements AutoCloseable {
 
         try {
             this.client = Client.forNetwork(network)
-                .setMirrorNetwork(List.of("127.0.0.1:5553"))
+                .setMirrorNetwork(List.of("127.0.0.1:5552"))
                 .setOperator(new AccountId(1800), PRIVATE_KEY)
                 .setMinBackoff(Duration.ofMillis(0))
                 .setMaxBackoff(Duration.ofMillis(0))

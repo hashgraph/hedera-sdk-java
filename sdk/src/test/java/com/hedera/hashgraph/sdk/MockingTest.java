@@ -709,7 +709,9 @@ public class MockingTest {
     }
 
     private WireMockServer setupHttpMockServer() {
-        var wireMockServer = new WireMockServer(5553);
+        MirrorNodeRouter.LOCAL_NODE_PORT = "5552";
+
+        var wireMockServer = new WireMockServer(5552);
         wireMockServer.start();
 
         wireMockServer.stubFor(get(urlMatching("/api/v1/accounts/[0-9]+/tokens"))
