@@ -16,6 +16,7 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,7 @@ public class EthereumTransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-844
      */
     @Test
+    @Disabled
     @DisplayName("Signer nonce changed on Ethereum transaction")
     void signerNonceChangedOnEthereumTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1);

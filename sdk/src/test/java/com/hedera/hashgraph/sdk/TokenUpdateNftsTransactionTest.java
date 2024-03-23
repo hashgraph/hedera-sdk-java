@@ -90,11 +90,11 @@ public class TokenUpdateNftsTransactionTest {
             .build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdateNfts(transactionBody).build();
-        var tokenUpdateTransaction = new TokenUpdateNftsTransaction(tx);
+        var tokenUpdateNftsTransaction = new TokenUpdateNftsTransaction(tx);
 
-        assertThat(tokenUpdateTransaction.getTokenId()).isEqualTo(testTokenId);
-        assertThat(tokenUpdateTransaction.getMetadata()).isEqualTo(testMetadata);
-        assertThat(tokenUpdateTransaction.getSerials()).isEqualTo(testSerialNumbers);
+        assertThat(tokenUpdateNftsTransaction.getTokenId()).isEqualTo(testTokenId);
+        assertThat(tokenUpdateNftsTransaction.getMetadata()).isEqualTo(testMetadata);
+        assertThat(tokenUpdateNftsTransaction.getSerials()).isEqualTo(testSerialNumbers);
     }
 
     @Test

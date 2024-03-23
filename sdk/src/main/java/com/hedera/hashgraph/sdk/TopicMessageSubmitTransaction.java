@@ -148,15 +148,20 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
             topicId = TopicId.fromProtobuf(body.getTopicID());
         }
 
-        try {
-            for (var i = 0; i < innerSignedTransactions.size(); i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-                data = data.concat(
-                    TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
-                        .getConsensusSubmitMessage().getMessage()
-                );
+        if (!innerSignedTransactions.isEmpty()) {
+            try {
+                for (var i = 0; i < innerSignedTransactions.size();
+                    i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+                    data = data.concat(
+                        TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
+                            .getConsensusSubmitMessage().getMessage()
+                    );
+                }
+            } catch (InvalidProtocolBufferException exc) {
+                throw new IllegalArgumentException(exc.getMessage());
             }
-        } catch (InvalidProtocolBufferException exc) {
-            throw new IllegalArgumentException(exc.getMessage());
+        } else {
+            data = body.getMessage();
         }
     }
 
