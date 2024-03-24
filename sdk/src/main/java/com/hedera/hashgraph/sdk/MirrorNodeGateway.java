@@ -35,6 +35,8 @@ import java.util.List;
 
 class MirrorNodeGateway {
 
+    private final HttpClient httpClient = HttpClient.newHttpClient();
+
     private final String mirrorNodeUrl;
 
     static final Duration MIRROR_NODE_CONNECTION_TIMEOUT = Duration.ofSeconds(30);
@@ -81,7 +83,6 @@ class MirrorNodeGateway {
     }
 
     private String performQueryToMirrorNode(String apiUrl) throws IOException, InterruptedException {
-        HttpClient httpClient = HttpClient.newHttpClient();
         HttpRequest httpRequest = HttpRequest.newBuilder()
             .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
             .uri(URI.create(apiUrl))

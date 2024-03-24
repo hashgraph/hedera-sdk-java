@@ -44,11 +44,13 @@ class MirrorNodeService {
      * @return
      */
     Long getAccountNum(String evmAddress) {
-        JsonObject accountInfoResponse;
+        JsonObject accountInfoResponse = null;
 
         try {
             accountInfoResponse = mirrorNodeGateway.getAccountInfo(evmAddress);
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+           Thread.currentThread().interrupt();
+        } catch (IOException e) {
             throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
         }
 
@@ -64,11 +66,13 @@ class MirrorNodeService {
      * @return
      */
     EvmAddress getAccountEvmAddress(long num) {
-        JsonObject accountInfoResponse;
+        JsonObject accountInfoResponse = null;
 
         try {
             accountInfoResponse = mirrorNodeGateway.getAccountInfo(String.valueOf(num));
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
             throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
         }
 
@@ -85,11 +89,13 @@ class MirrorNodeService {
      * @return
      */
     Long getContractNum(String evmAddress) {
-        JsonObject accountInfoResponse;
+        JsonObject accountInfoResponse = null;
 
         try {
             accountInfoResponse = mirrorNodeGateway.getContractInfo(evmAddress);
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
             throw new RuntimeException("Error, while processing getContractInfo mirror node query", e);
         }
 
@@ -154,7 +160,7 @@ class MirrorNodeService {
             var decimals = jsonObject.get("decimals").getAsInt();
             var automaticAssociation = jsonObject.get("automatic_association").getAsBoolean();
 
-            return com.hedera.hashgraph.sdk.proto.TokenRelationship.newBuilder()
+            return TokenRelationship.newBuilder()
                 .setTokenId(TokenId.fromString(tokenId).toProtobuf())
                 .setBalance(balance)
                 .setKycStatus(getTokenKycStatusFromString(kycStatus))

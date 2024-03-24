@@ -42,6 +42,9 @@ class MirrorNodeRouter {
         ACCOUNT_TOKENS_ROUTE, "/accounts/%s/tokens"
     );
 
+    private MirrorNodeRouter() {
+    }
+
     static String getMirrorNodeUrl(List<String> mirrorNetwork, LedgerId ledgerId) {
         Optional<String> mirrorNodeAddress = mirrorNetwork.stream()
             .map(address -> address.substring(0, address.indexOf(":")))
