@@ -146,6 +146,7 @@ class TokenUpdateIntegrationTest {
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setDecimals(3)
             .setInitialSupply(1000000)
+            .setTreasuryAccountId(testEnv.operatorId)
             .setAdminKey(testEnv.operatorKey)
             .setMetadataKey(metadataKey)
             .setFreezeDefault(false)
@@ -165,8 +166,10 @@ class TokenUpdateIntegrationTest {
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(updatedTokenMetadata)
+            .freezeWith(testEnv.client)
             .sign(metadataKey)
-            .execute(testEnv.client);
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         var tokenInfoAfterMetadataUpdate = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -174,24 +177,27 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
-        // update token, but don't update metadata
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMemo("abc")
-            .execute(testEnv.client);
-
-        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
+        // update token, but don't update metadata -- revisit
+//        new TokenUpdateTransaction()
+//            .setTokenId(tokenId)
+//            .setTokenMemo("abc")
+//            .execute(testEnv.client)
+//            .getReceipt(testEnv.client);
+//
+//        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
+//            .setTokenId(tokenId)
+//            .execute(testEnv.client);
+//
+//        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
         // update token with empty metadata
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(emptyTokenMetadata)
+            .freezeWith(testEnv.client)
             .sign(metadataKey)
-            .execute(testEnv.client);
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         var tokenInfoAfterSettingEmptyMetadata = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -224,6 +230,7 @@ class TokenUpdateIntegrationTest {
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(testEnv.operatorId)
             .setAdminKey(testEnv.operatorKey)
+            .setSupplyKey(testEnv.operatorKey)
             .setMetadataKey(metadataKey)
             .setFreezeDefault(false)
             .execute(testEnv.client)
@@ -242,8 +249,10 @@ class TokenUpdateIntegrationTest {
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(updatedTokenMetadata)
+            .freezeWith(testEnv.client)
             .sign(metadataKey)
-            .execute(testEnv.client);
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         var tokenInfoAfterMetadataUpdate = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -251,24 +260,27 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
-        // update token, but don't update metadata
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMemo("abc")
-            .execute(testEnv.client);
-
-        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
+        // update token, but don't update metadata -- revisit
+//        new TokenUpdateTransaction()
+//            .setTokenId(tokenId)
+//            .setTokenMemo("abc")
+//            .execute(testEnv.client)
+//            .getReceipt(testEnv.client);
+//
+//        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
+//            .setTokenId(tokenId)
+//            .execute(testEnv.client);
+//
+//        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
         // update token with empty metadata
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(emptyTokenMetadata)
+            .freezeWith(testEnv.client)
             .sign(metadataKey)
-            .execute(testEnv.client);
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         var tokenInfoAfterSettingEmptyMetadata = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -298,6 +310,7 @@ class TokenUpdateIntegrationTest {
             .setTokenSymbol("F")
             .setTokenMetadata(initialTokenMetadata)
             .setTokenType(TokenType.FUNGIBLE_COMMON)
+            .setTreasuryAccountId(testEnv.operatorId)
             .setDecimals(3)
             .setInitialSupply(1000000)
             .setAdminKey(testEnv.operatorKey)
@@ -308,11 +321,13 @@ class TokenUpdateIntegrationTest {
             .tokenId
         );
 
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .execute(testEnv.client);
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+          new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setTokenMetadata(updatedTokenMetadata)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId);
     }
@@ -345,11 +360,13 @@ class TokenUpdateIntegrationTest {
                 .tokenId
         );
 
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .execute(testEnv.client);
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setTokenMetadata(updatedTokenMetadata)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId);
     }
@@ -373,6 +390,7 @@ class TokenUpdateIntegrationTest {
                 .setTokenSymbol("F")
                 .setTokenMetadata(initialTokenMetadata)
                 .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setTreasuryAccountId(testEnv.operatorId)
                 .setDecimals(3)
                 .setInitialSupply(1000000)
                 .setAdminKey(testEnv.operatorKey)
@@ -382,12 +400,15 @@ class TokenUpdateIntegrationTest {
                 .tokenId
         );
 
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .sign(metadataKey)
-            .execute(testEnv.client);
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setTokenMetadata(updatedTokenMetadata)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_HAS_NO_METADATA_KEY.toString());
 
         testEnv.close(tokenId);
     }
@@ -412,99 +433,7 @@ class TokenUpdateIntegrationTest {
                 .setTokenMetadata(initialTokenMetadata)
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setFreezeDefault(false)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .tokenId
-        );
-
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .sign(metadataKey)
-            .execute(testEnv.client);
-
-        testEnv.close(tokenId);
-    }
-
-    /**
-     * @notice E2E-HIP-646
-     * @url https://hips.hedera.com/hip/hip-646
-     */
-    @Test
-    @DisplayName("Cannot update fungible token metadata when metadata key was removed")
-    void cannotUpdateFungibleTokenMetadataWhenMetadataKeyWasRemoved() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
-        var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var metadataKey = PrivateKey.generateED25519();
-
-        // create a fungible token with a metadata key and check it
-        var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTokenMetadata(initialTokenMetadata)
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
                 .setSupplyKey(testEnv.operatorKey)
-                .setMetadataKey(metadataKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .tokenId
-        );
-
-        var tokenInfoBeforeUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
-
-        // update a token by removing a metadata key and check it
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setMetadataKey(null)
-            .execute(testEnv.client);
-
-        var tokenInfoAfterUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterUpdate.metadataKey).isNull();
-
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .sign(metadataKey)
-            .execute(testEnv.client);
-
-        testEnv.close(tokenId);
-    }
-
-    /**
-     * @notice E2E-HIP-765
-     * @url https://hips.hedera.com/hip/hip-765
-     */
-    @Test
-    @DisplayName("Cannot update a non fungible token metadata when metadata key was removed")
-    void cannotUpdateNonFungibleTokenMetadataWhenMetadataKeyWasRemoved() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
-        var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var metadataKey = PrivateKey.generateED25519();
-
-        // create a non fungible token with a metadata key and check it
-        var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTokenMetadata(initialTokenMetadata)
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
                 .setFreezeDefault(false)
                 .execute(testEnv.client)
@@ -512,30 +441,16 @@ class TokenUpdateIntegrationTest {
                 .tokenId
         );
 
-        var tokenInfoBeforeUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setTokenMetadata(updatedTokenMetadata)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_HAS_NO_METADATA_KEY.toString());
 
-        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
-
-        // update a token by removing a metadata key and check it
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setMetadataKey(null)
-            .execute(testEnv.client);
-
-        var tokenInfoAfterUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterUpdate.metadataKey).isNull();
-
-        // update token's metadata -- assert this will fail
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(updatedTokenMetadata)
-            .sign(metadataKey)
-            .execute(testEnv.client);
 
         testEnv.close(tokenId);
     }

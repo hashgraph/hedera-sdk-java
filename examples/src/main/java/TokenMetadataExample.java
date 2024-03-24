@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.TokenInfoQuery;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
 import io.github.cdimascio.dotenv.Dotenv;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class TokenMetadataExample {
@@ -20,6 +21,8 @@ public class TokenMetadataExample {
     public TokenMetadataExample() {
     }
 
+    // as per HIP-646 and HIP-765: Updating the metadata field should require a metadataKey (ie HIP-657)
+    // below example is working without the key (its commented)
     public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
@@ -36,12 +39,13 @@ public class TokenMetadataExample {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setTokenMetadata(initialTokenMetadata)
+//                .setTokenMetadata(initialTokenMetadata)
                 .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setTreasuryAccountId(OPERATOR_ID)
                 .setDecimals(3)
                 .setInitialSupply(1000000)
                 .setAdminKey(OPERATOR_KEY)
-                .setMetadataKey(metadataKey)
+//                .setMetadataKey(metadataKey)
                 .setFreezeDefault(false)
                 .execute(client)
                 .getReceipt(client)
@@ -53,21 +57,23 @@ public class TokenMetadataExample {
             .execute(client);
 
         // check that metadata was set correctly
-        System.out.println("Token's metadata after creation= " + tokenInfoAfterCreation.metadata);
+        System.out.println("Token's metadata after creation= " + Arrays.toString(tokenInfoAfterCreation.metadata));
 
         // update token's metadata
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(updatedTokenMetadata)
-            .sign(metadataKey)
-            .execute(client);
+//            .freezeWith(client)
+//            .sign(metadataKey)
+            .execute(client)
+            .getReceipt(client);
 
         var tokenInfoAfterMetadataUpdate = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(client);
 
         // check that metadata was updated correctly
-        System.out.println("Token's metadata after update= " + tokenInfoAfterMetadataUpdate.metadata);
+        System.out.println("Token's metadata after update= " + Arrays.toString(tokenInfoAfterMetadataUpdate.metadata));
 
         client.close();
     }
