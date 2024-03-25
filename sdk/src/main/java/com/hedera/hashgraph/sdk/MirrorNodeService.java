@@ -111,13 +111,16 @@ class MirrorNodeService {
      * @return
      */
     List<TokenBalance> getTokenBalancesForAccount(String idOrAliasOrEvmAddress) {
-        JsonObject accountTokensResponse;
+        JsonObject accountTokensResponse = null;
 
         try {
             accountTokensResponse = mirrorNodeGateway.getAccountTokens(idOrAliasOrEvmAddress);
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Error, while processing getAccountInfo mirror node query", e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
+            throw new RuntimeException("Error, while processing getAccountTokens mirror node query", e);
         }
+
         JsonArray tokens = accountTokensResponse.get("tokens").getAsJsonArray();
 
         List<TokenBalance> tokenBalanceList = tokens.asList().stream().map(jsonElement -> {
@@ -142,10 +145,13 @@ class MirrorNodeService {
      * @return
      */
     List<TokenRelationship> getTokenRelationshipsForAccount(String idOrAliasOrEvmAddress) {
-        JsonObject accountTokensResponse;
+        JsonObject accountTokensResponse = null;
+
         try {
             accountTokensResponse = mirrorNodeGateway.getAccountTokens(idOrAliasOrEvmAddress);
-        } catch (IOException | InterruptedException e) {
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        } catch (IOException e) {
             throw new RuntimeException("Error, while processing getAccountTokens mirror node query", e);
         }
 
