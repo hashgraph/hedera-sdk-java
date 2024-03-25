@@ -160,7 +160,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     /**
      * Metadata of the created token definition
      */
-    private byte[] tokenMetadata = {};
+    private byte[] tokenMetadata = null;
     /**
      * Constructor.
      */
@@ -588,6 +588,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      *
      * @return the metadata
      */
+    @Nullable
     public byte[] getTokenMetadata() {
         return tokenMetadata;
     }
@@ -711,7 +712,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (tokenMemo != null) {
             builder.setMemo(StringValue.of(tokenMemo));
         }
-        builder.setMetadata(BytesValue.of(ByteString.copyFrom(tokenMetadata)));
+        if (tokenMetadata != null) {
+            builder.setMetadata(BytesValue.of(ByteString.copyFrom(tokenMetadata)));
+        }
 
         return builder;
     }

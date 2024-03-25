@@ -178,17 +178,17 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
         // update token, but don't update metadata -- revisit
-//        new TokenUpdateTransaction()
-//            .setTokenId(tokenId)
-//            .setTokenMemo("abc")
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-//
-//        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
-//            .setTokenId(tokenId)
-//            .execute(testEnv.client);
-//
-//        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setTokenMemo("abc")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
         // update token with empty metadata
         new TokenUpdateTransaction()
@@ -260,18 +260,18 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
-        // update token, but don't update metadata -- revisit
-//        new TokenUpdateTransaction()
-//            .setTokenId(tokenId)
-//            .setTokenMemo("abc")
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-//
-//        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
-//            .setTokenId(tokenId)
-//            .execute(testEnv.client);
-//
-//        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
+        // update token, but don't update metadata
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setTokenMemo("abc")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
         // update token with empty metadata
         new TokenUpdateTransaction()
