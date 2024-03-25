@@ -225,6 +225,10 @@ class AccountBalanceIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var query = new AccountBalanceQuery();
         var balance = query
             .setAccountId(testEnv.operatorId)

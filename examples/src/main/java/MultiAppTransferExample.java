@@ -63,7 +63,8 @@ public final class MultiAppTransferExample {
     private MultiAppTransferExample() {
     }
 
-    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InvalidProtocolBufferException {
+    public static void main(String[] args)
+        throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InvalidProtocolBufferException, InterruptedException {
         // the exchange creates an account for the user to transfer funds to
         AccountId exchangeAccountId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
@@ -119,6 +120,10 @@ public final class MultiAppTransferExample {
 
         // (important!) wait for consensus by querying for the receipt
         transactionResponse.getReceipt(client);
+
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(userAccountId)

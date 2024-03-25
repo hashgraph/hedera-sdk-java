@@ -24,6 +24,10 @@ class AccountCreateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(testEnv.client);
@@ -51,6 +55,10 @@ class AccountCreateIntegrationTest {
             .execute(testEnv.client);
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
@@ -95,6 +103,10 @@ class AccountCreateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var info = new AccountInfoQuery()
             .setAccountId(aliasId)
             .execute(testEnv.client);
@@ -119,6 +131,10 @@ class AccountCreateIntegrationTest {
             .execute(testEnv.client);
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
@@ -161,6 +177,10 @@ class AccountCreateIntegrationTest {
 
         assertThat(accountId).isNotNull();
 
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(testEnv.client);
@@ -199,6 +219,10 @@ class AccountCreateIntegrationTest {
             .accountId;
 
         assertThat(accountId).isNotNull();
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
@@ -264,6 +288,10 @@ class AccountCreateIntegrationTest {
             .accountId;
 
         assertThat(accountId).isNotNull();
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(accountId)
@@ -333,6 +361,10 @@ class AccountCreateIntegrationTest {
             .accountId;
 
         assertThat(accountId).isNotNull();
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var info = new AccountInfoQuery()
             .setAccountId(accountId)

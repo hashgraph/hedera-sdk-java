@@ -24,7 +24,9 @@ import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
+import com.hedera.hashgraph.sdk.proto.TokenRelationship;
 import io.grpc.MethodDescriptor;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
@@ -104,7 +106,20 @@ public final class ContractInfoQuery extends Query<ContractInfo, ContractInfoQue
 
     @Override
     ContractInfo mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return ContractInfo.fromProtobuf(response.getContractGetInfo().getContractInfo());
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        ContractId contractIdFromConsensusNode = ContractId.fromProtobuf(response.getContractGetInfo().getContractInfo().getContractID());
+        List<TokenRelationship> tokenRelationships = mirrorNodeService
+            .getTokenRelationshipsForAccount(String.valueOf(contractIdFromConsensusNode.num));
+
+        var protobufFromConsensusNode = response.getContractGetInfo().getContractInfo();
+        var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
+            .clearTokenRelationships()
+            .addAllTokenRelationships(tokenRelationships)
+            .build();
+
+        return ContractInfo.fromProtobuf(protobufUpdatedByMirrorNode);
     }
 
     @Override

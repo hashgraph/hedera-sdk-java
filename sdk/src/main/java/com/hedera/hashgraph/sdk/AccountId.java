@@ -321,7 +321,10 @@ public final class AccountId implements Comparable<AccountId> {
      * @return populated AccountId instance
      */
     public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
-        return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getAccountNum(evmAddress.toString()))
             .thenApply(accountNumFromMirrorNode ->
                 new AccountId(
                     this.shard,
@@ -329,8 +332,10 @@ public final class AccountId implements Comparable<AccountId> {
                     accountNumFromMirrorNode,
                     this.checksum,
                     this.aliasKey,
-                    this.evmAddress));
+                    this.evmAddress)
+        );
     }
+
 
     /**
      * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
@@ -351,7 +356,10 @@ public final class AccountId implements Comparable<AccountId> {
      * @return populated AccountId instance
      */
     public CompletableFuture<AccountId> populateAccountEvmAddressAsync(Client client) {
-        return EntityIdHelper.getEvmAddressFromMirrorNodeAsync(client, num)
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getAccountEvmAddress(num))
             .thenApply(evmAddressFromMirrorNode ->
                 new AccountId(
                     this.shard,

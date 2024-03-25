@@ -20,8 +20,9 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv {
-    private static final String DEFAULT_LOCAL_NODE_ADDRESS = "127.0.0.1:50211";
-    private static final String DEFAULT_LOCAL_MIRROR_NODE_ADDRESS = "127.0.0.1:5600";
+    private static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
+    private static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
+    private static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
     private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;
@@ -58,7 +59,7 @@ public class IntegrationTestEnv {
         assertThat(client.getOperatorAccountId()).isNotNull();
         assertThat(client.getOperatorPublicKey()).isNotNull();
 
-        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(DEFAULT_LOCAL_NODE_ADDRESS))) {
+        if (client.getNetwork().size() > 0 && (client.getNetwork().containsKey(LOCAL_CONSENSUS_NODE_ENDPOINT))) {
             isLocalNode = true;
         }
 
@@ -80,11 +81,11 @@ public class IntegrationTestEnv {
             return Client.forTestnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("localhost")) {
             var network = new HashMap<String, AccountId>();
-            network.put(DEFAULT_LOCAL_NODE_ADDRESS, new AccountId(3));
+            network.put(LOCAL_CONSENSUS_NODE_ENDPOINT, LOCAL_CONSENSUS_NODE_ACCOUNT_ID);
 
             return Client
                 .forNetwork(network)
-                .setMirrorNetwork(List.of(DEFAULT_LOCAL_MIRROR_NODE_ADDRESS));
+                .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
@@ -108,6 +109,7 @@ public class IntegrationTestEnv {
         client = Client.forNetwork(originalClient.getNetwork());
         client.setMirrorNetwork(originalClient.getMirrorNetwork());
         client.setOperator(Objects.requireNonNull(operatorId), key);
+        client.setLedgerId(originalClient.getLedgerId());
         return this;
     }
 
@@ -137,6 +139,10 @@ public class IntegrationTestEnv {
         }
 
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
+            // `AccountBalanceQuery` also queries the mirror node.
+            // Wait until the mirror node updates with the new data.
+            Thread.sleep(5000);
+
             var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
                 .execute(originalClient)
@@ -154,6 +160,10 @@ public class IntegrationTestEnv {
     }
 
     public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var hbarsBalance = new AccountBalanceQuery()
             .setAccountId(newAccountId)
             .execute(originalClient)

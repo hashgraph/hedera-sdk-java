@@ -1,3 +1,6 @@
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
@@ -6,14 +9,9 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.as;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class AutomaticAssociationTest {
     @Test
@@ -31,6 +29,10 @@ public class AutomaticAssociationTest {
             .accountId;
 
         Objects.requireNonNull(accountId);
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var accountInfo1 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
@@ -72,6 +74,10 @@ public class AutomaticAssociationTest {
         assertThat(transferRecord.automaticTokenAssociations.get(0).accountId).isEqualTo(accountId);
         assertThat(transferRecord.automaticTokenAssociations.get(0).tokenId).isEqualTo(tokenId1);
 
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         var accountInfo2 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
         assertThat(accountInfo2.tokenRelationships.size()).isEqualTo(1);
@@ -92,6 +98,10 @@ public class AutomaticAssociationTest {
             .sign(key)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
 
         var accountInfo3 = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
