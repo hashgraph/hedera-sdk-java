@@ -51,7 +51,7 @@ public class TokenUpdateNftsTransaction extends Transaction<TokenUpdateNftsTrans
     /**
      * The new metadata of the NFT(s)
      */
-    private byte[] metadata = {};
+    private byte[] metadata = null;
 
     /**
      * Constructor.
@@ -139,6 +139,7 @@ public class TokenUpdateNftsTransaction extends Transaction<TokenUpdateNftsTrans
      *
      * @return the metadata
      */
+    @Nullable
     public byte[] getMetadata() {
         return metadata;
     }
@@ -185,7 +186,9 @@ public class TokenUpdateNftsTransaction extends Transaction<TokenUpdateNftsTrans
             builder.addSerialNumbers(serial);
         }
 
-        builder.setMetadata(BytesValue.of(ByteString.copyFrom(metadata)));
+        if (metadata != null) {
+            builder.setMetadata(BytesValue.of(ByteString.copyFrom(metadata)));
+        }
 
         return builder;
     }
