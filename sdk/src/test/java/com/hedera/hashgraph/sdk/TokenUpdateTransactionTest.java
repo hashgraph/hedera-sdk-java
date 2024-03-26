@@ -22,6 +22,8 @@ package com.hedera.hashgraph.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.BytesValue;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
@@ -71,6 +73,7 @@ public class TokenUpdateTransactionTest {
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.now();
+    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -97,8 +100,8 @@ public class TokenUpdateTransactionTest {
             .setAutoRenewPeriod(testAutoRenewPeriod).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
             .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
             .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
-            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1)).freeze()
-            .sign(unusedPrivateKey);
+            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1))
+            .setTokenMetadata(testMetadata).freeze().sign(unusedPrivateKey);
     }
 
     @Test
@@ -130,7 +133,8 @@ public class TokenUpdateTransactionTest {
                     .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
             .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
-            .setMetadataKey(testMetadataKey.toProtobufKey()).build();
+            .setMetadataKey(testMetadataKey.toProtobufKey())
+            .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata))).build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);
@@ -152,6 +156,7 @@ public class TokenUpdateTransactionTest {
         assertThat(tokenUpdateTransaction.getFeeScheduleKey()).isEqualTo(testFeeScheduleKey);
         assertThat(tokenUpdateTransaction.getPauseKey()).isEqualTo(testPauseKey);
         assertThat(tokenUpdateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
+        assertThat(tokenUpdateTransaction.getTokenMetadata()).isEqualTo(testMetadata);
     }
 
     @Test
@@ -344,5 +349,17 @@ public class TokenUpdateTransactionTest {
     void getSetMetadataKeyFrozen() {
         var tx = spawnTestTransaction();
         assertThrows(IllegalStateException.class, () -> tx.setMetadataKey(testMetadataKey));
+    }
+
+    @Test
+    void getSetMetadata() {
+        var tx = spawnTestTransaction();
+        assertThat(tx.getTokenMetadata()).isEqualTo(testMetadata);
+    }
+
+    @Test
+    void getSetMetadataFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class, () -> tx.setTokenMetadata(testMetadata));
     }
 }

@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.Iterables;
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
@@ -73,12 +74,12 @@ public class TokenCreateTransactionTest {
     private static final String testTokenName = "test name";
     private static final String testTokenSymbol = "test symbol";
     private static final String testTokenMemo = "test memo";
-    private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.now();
     private static final List<CustomFee> testCustomFees = Collections.singletonList(
         new CustomFixedFee().setFeeCollectorAccountId(AccountId.fromString("0.0.543")).setAmount(3)
             .setDenominatingTokenId(TokenId.fromString("4.3.2")));
+    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -111,7 +112,8 @@ public class TokenCreateTransactionTest {
             .setFreezeKey(testFreezeKey).setWipeKey(testWipeKey).setTokenSymbol(testTokenSymbol).setKycKey(testKycKey)
             .setPauseKey(testPauseKey).setMetadataKey(testMetadataKey).setExpirationTime(validStart)
             .setTreasuryAccountId(testTreasuryAccountId).setTokenName(testTokenName).setTokenMemo(testTokenMemo)
-            .setCustomFees(testCustomFees).setMaxTransactionFee(new Hbar(1)).freeze().sign(unusedPrivateKey);
+            .setCustomFees(testCustomFees).setMaxTransactionFee(new Hbar(1)).setTokenMetadata(testMetadata).freeze()
+            .sign(unusedPrivateKey);
     }
 
     @Test
@@ -131,8 +133,8 @@ public class TokenCreateTransactionTest {
             .setSupplyType(TokenSupplyType.FINITE).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
             .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
             .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
-            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1)).freeze()
-            .sign(unusedPrivateKey);
+            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1))
+            .setTokenMetadata(testMetadata).freeze().sign(unusedPrivateKey);
     }
 
     @Test
@@ -165,7 +167,8 @@ public class TokenCreateTransactionTest {
             .setPauseKey(testPauseKey.toProtobufKey()).setMetadataKey(testMetadataKey.toProtobufKey())
             .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()))
             .setTreasury(testTreasuryAccountId.toProtobuf()).setName(testTokenName).setMemo(testTokenMemo)
-            .addCustomFees(Iterables.getLast(testCustomFees).toProtobuf()).build();
+            .addCustomFees(Iterables.getLast(testCustomFees).toProtobuf())
+            .setMetadata(ByteString.copyFrom(testMetadata)).build();
 
         var tx = TransactionBody.newBuilder().setTokenCreation(transactionBody).build();
         var tokenCreateTransaction = new TokenCreateTransaction(tx);
@@ -191,6 +194,7 @@ public class TokenCreateTransactionTest {
         assertThat(tokenCreateTransaction.getTokenType()).isEqualTo(TokenType.FUNGIBLE_COMMON);
         assertThat(Iterables.getLast(tokenCreateTransaction.getCustomFees()).toBytes()).isEqualTo(
             Iterables.getLast(testCustomFees).toBytes());
+        assertThat(tokenCreateTransaction.getTokenMetadata()).isEqualTo(testMetadata);
     }
 
     @Test
@@ -473,5 +477,17 @@ public class TokenCreateTransactionTest {
     void getSetMaxSupplyFrozen() {
         var tx = spawnTestTransactionFungible();
         assertThrows(IllegalStateException.class, () -> tx.setMaxSupply(testMaxSupply));
+    }
+
+    @Test
+    void getSetMetadata() {
+        var tx = spawnTestTransactionFungible();
+        assertThat(tx.getTokenMetadata()).isEqualTo(testMetadata);
+    }
+
+    @Test
+    void getSetMetadataFrozen() {
+        var tx = spawnTestTransactionFungible();
+        assertThrows(IllegalStateException.class, () -> tx.setTokenMetadata(testMetadata));
     }
 }

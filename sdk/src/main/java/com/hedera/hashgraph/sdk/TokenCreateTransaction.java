@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
@@ -190,7 +191,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * You must set the token supply type to FINITE if you set this field.
      */
     private long maxSupply = 0;
-
+    /**
+     * Metadata of the created token definition.
+     */
+    private byte[] tokenMetadata = {};
     /**
      * Constructor.
      */
@@ -732,6 +736,27 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    /**
+     * Extract the token metadata.
+     *
+     * @return the token metadata
+     */
+    public byte[] getTokenMetadata() {
+        return tokenMetadata;
+    }
+
+    /**
+     * Assign the token metadata.
+     *
+     * @param tokenMetadata the token metadata
+     * @return {@code this}
+     */
+    public TokenCreateTransaction setTokenMetadata(byte[] tokenMetadata) {
+        requireNotFrozen();
+        this.tokenMetadata = tokenMetadata;
+        return this;
+    }
+
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
@@ -799,6 +824,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder.setTokenType(tokenType.code);
         builder.setSupplyType(tokenSupplyType.code);
         builder.setMaxSupply(maxSupply);
+        builder.setMetadata(ByteString.copyFrom(tokenMetadata));
 
         for (var fee : customFees) {
             builder.addCustomFees(fee.toProtobuf());
@@ -857,6 +883,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         tokenType = TokenType.valueOf(body.getTokenType());
         tokenSupplyType = TokenSupplyType.valueOf(body.getSupplyType());
         maxSupply = body.getMaxSupply();
+        tokenMetadata = body.getMetadata().toByteArray();
 
         for (var fee : body.getCustomFeesList()) {
             customFees.add(CustomFee.fromProtobuf(fee));
