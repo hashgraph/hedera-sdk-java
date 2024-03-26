@@ -25,8 +25,64 @@ import org.junit.jupiter.api.Test;
 public class TokenUpdateNftsIntegrationTest {
 
     @Test
-    @DisplayName("Can update NFT metadata")
-    void canUpdateNFTMetadata() throws Exception {
+    @DisplayName("Can update the metadata of the entire NFT collection")
+    void canUpdateNFTMetadataOfEntireCollection() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        var metadataKey = PrivateKey.generateED25519();
+        var nftCount = 4;
+        var initialMetadataList = NftMetadataGenerator.generate(new byte[]{4, 2, 0}, nftCount);
+        var updatedMetadata = new byte[]{6, 9};
+        var updatedMetadataList = NftMetadataGenerator.generate(updatedMetadata, nftCount);
+
+        // create a token with metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        // mint tokens
+        var tokenMintTransactionReceipt = new TokenMintTransaction()
+            .setMetadata(initialMetadataList)
+            .setTokenId(tokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check that metadata was set correctly
+        var nftSerials = tokenMintTransactionReceipt.serials;
+        List<byte[]> metadataListAfterMint = getMetadataList(testEnv.client, tokenId, nftSerials);
+
+        assertThat(metadataListAfterMint.toArray()).isEqualTo(initialMetadataList.toArray());
+
+        // update metadata all minted NFTs
+        new TokenUpdateNftsTransaction()
+            .setTokenId(tokenId)
+            .setSerials(nftSerials)
+            .setMetadata(updatedMetadata)
+            .freezeWith(testEnv.client)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check updated NFTs' metadata
+        List<byte[]> metadataListAfterUpdate = getMetadataList(testEnv.client, tokenId, nftSerials);
+        assertThat(metadataListAfterUpdate.toArray()).isEqualTo(updatedMetadataList.toArray());
+
+        testEnv.close(tokenId);
+    }
+
+    @Test
+    @DisplayName("Can update the metadata of a part of the NFT collection")
+    void canUpdateNFTMetadataOfPartOfCollection() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         var metadataKey = PrivateKey.generateED25519();
@@ -85,6 +141,115 @@ public class TokenUpdateNftsIntegrationTest {
         List<byte[]> metadataList = getMetadataList(testEnv.client, tokenId, nftSerialsSame);
 
         assertThat(metadataList.toArray()).isEqualTo(initialMetadataList.subList(nftCount / 2, nftCount).toArray());
+
+        testEnv.close(tokenId);
+    }
+
+    @Test
+    @DisplayName("Cannot update the metadata when it is not set")
+    void cannotUpdateNFTMetadataWhenItsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        var metadataKey = PrivateKey.generateED25519();
+        var nftCount = 4;
+        var initialMetadataList = NftMetadataGenerator.generate(new byte[]{4, 2, 0}, nftCount);
+
+        // create a token with metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        // mint tokens
+        var tokenMintTransactionReceipt = new TokenMintTransaction()
+            .setMetadata(initialMetadataList)
+            .setTokenId(tokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check that metadata was set correctly
+        var nftSerials = tokenMintTransactionReceipt.serials;
+        List<byte[]> metadataListAfterMint = getMetadataList(testEnv.client, tokenId, nftSerials);
+
+        assertThat(metadataListAfterMint.toArray()).isEqualTo(initialMetadataList.toArray());
+
+        // run `TokenUpdateNftsTransaction` without `setMetadata`
+        new TokenUpdateNftsTransaction()
+            .setTokenId(tokenId)
+            .setSerials(nftSerials)
+            .freezeWith(testEnv.client)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check that NFTs' metadata was not updated
+        List<byte[]> metadataListAfterUpdate = getMetadataList(testEnv.client, tokenId, nftSerials);
+        assertThat(metadataListAfterUpdate.toArray()).isEqualTo(initialMetadataList.toArray());
+
+        testEnv.close(tokenId);
+    }
+
+    @Test
+    @DisplayName("Can erase NFTs metadata")
+    void canEraseNFTsMetadata() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        var metadataKey = PrivateKey.generateED25519();
+        var nftCount = 4;
+        var initialMetadataList = NftMetadataGenerator.generate(new byte[]{4, 2, 0}, nftCount);
+        var emptyMetadata = new byte[]{};
+        var emptyMetadataList = NftMetadataGenerator.generate(emptyMetadata, nftCount);
+
+        // create a token with metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        // mint tokens
+        var tokenMintTransactionReceipt = new TokenMintTransaction()
+            .setMetadata(initialMetadataList)
+            .setTokenId(tokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check that metadata was set correctly
+        var nftSerials = tokenMintTransactionReceipt.serials;
+        List<byte[]> metadataListAfterMint = getMetadataList(testEnv.client, tokenId, nftSerials);
+
+        assertThat(metadataListAfterMint.toArray()).isEqualTo(initialMetadataList.toArray());
+
+        // erase metadata all minted NFTs (update to an empty byte array)
+        new TokenUpdateNftsTransaction()
+            .setTokenId(tokenId)
+            .setSerials(nftSerials)
+            .setMetadata(emptyMetadata)
+            .freezeWith(testEnv.client)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // check that NFTs' metadata was erased
+        List<byte[]> metadataListAfterUpdate = getMetadataList(testEnv.client, tokenId, nftSerials);
+        assertThat(metadataListAfterUpdate.toArray()).isEqualTo(emptyMetadataList.toArray());
 
         testEnv.close(tokenId);
     }
