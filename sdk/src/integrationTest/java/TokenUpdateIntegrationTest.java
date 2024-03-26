@@ -134,7 +134,6 @@ class TokenUpdateIntegrationTest {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
         var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var emptyTokenMetadata = new byte[]{};
         var metadataKey = PrivateKey.generateED25519();
 
         // create a fungible token with metadata and metadata key
@@ -177,34 +176,6 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
-        // update token, but don't update metadata -- revisit
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMemo("abc")
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
-
-        // update token with empty metadata
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(emptyTokenMetadata)
-            .freezeWith(testEnv.client)
-            .sign(metadataKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        var tokenInfoAfterSettingEmptyMetadata = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoAfterSettingEmptyMetadata.metadata).isEqualTo(emptyTokenMetadata);
-
         testEnv.close(tokenId);
     }
 
@@ -218,7 +189,6 @@ class TokenUpdateIntegrationTest {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
         var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var emptyTokenMetadata = new byte[]{};
         var metadataKey = PrivateKey.generateED25519();
 
         // create a non fungible token with metadata and metadata key
@@ -260,6 +230,45 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoAfterMetadataUpdate.metadata).isEqualTo(updatedTokenMetadata);
 
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-646
+     * @url https://hips.hedera.com/hip/hip-646
+     */
+    @Test
+    @DisplayName("Cannot update a fungible token with metadata when it is not set")
+    void cannotUpdateFungibleTokenMetadataWhenItsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a fungible token with metadata and metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterCreation.metadata).isEqualTo(initialTokenMetadata);
+        assertThat(tokenInfoAfterCreation.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
         // update token, but don't update metadata
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -271,9 +280,154 @@ class TokenUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(updatedTokenMetadata);
+        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(initialTokenMetadata);
 
-        // update token with empty metadata
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-765
+     * @url https://hips.hedera.com/hip/hip-765
+     */
+    @Test
+    @DisplayName("Cannot update a non fungible token with metadata when it is not set")
+    void cannotUpdateNonFungibleTokenMetadataWhenItsNotSet() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non fungible token with metadata and metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterCreation.metadata).isEqualTo(initialTokenMetadata);
+        assertThat(tokenInfoAfterCreation.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // update token, but don't update metadata
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setTokenMemo("abc")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterMemoUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterMemoUpdate.metadata).isEqualTo(initialTokenMetadata);
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-646
+     * @url https://hips.hedera.com/hip/hip-646
+     */
+    @Test
+    @DisplayName("Can erase fungible token metadata")
+    void canEraseFungibleTokenMetadata() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+        var emptyTokenMetadata = new byte[]{};
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a fungible token with metadata and metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterCreation.metadata).isEqualTo(initialTokenMetadata);
+        assertThat(tokenInfoAfterCreation.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // erase token metadata (update token with empty metadata)
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setTokenMetadata(emptyTokenMetadata)
+            .freezeWith(testEnv.client)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterSettingEmptyMetadata = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterSettingEmptyMetadata.metadata).isEqualTo(emptyTokenMetadata);
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-765
+     * @url https://hips.hedera.com/hip/hip-765
+     */
+    @Test
+    @DisplayName("Can erase non fungible token metadata")
+    void canEraseNonFungibleTokenMetadata() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+        var emptyTokenMetadata = new byte[]{};
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non fungible token with metadata and metadata key
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setMetadataKey(metadataKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterCreation.metadata).isEqualTo(initialTokenMetadata);
+        assertThat(tokenInfoAfterCreation.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // erase token metadata (update token with empty metadata)
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(emptyTokenMetadata)
