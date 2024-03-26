@@ -1,19 +1,18 @@
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenInfoQuery;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 class TokenUpdateIntegrationTest {
+
     @Test
     @DisplayName("Can update token")
     void canUpdateToken() throws Exception {
@@ -30,6 +29,8 @@ class TokenUpdateIntegrationTest {
             .setWipeKey(testEnv.operatorKey)
             .setKycKey(testEnv.operatorKey)
             .setSupplyKey(testEnv.operatorKey)
+            .setPauseKey(testEnv.operatorKey)
+            .setMetadataKey(testEnv.operatorKey)
             .setFreezeDefault(false)
             .execute(testEnv.client);
 
@@ -54,6 +55,8 @@ class TokenUpdateIntegrationTest {
         assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.pauseKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.metadataKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.defaultFreezeStatus).isNotNull().isFalse();
         assertThat(info.defaultKycStatus).isNotNull().isFalse();
 
@@ -83,6 +86,8 @@ class TokenUpdateIntegrationTest {
         assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.pauseKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+        assertThat(info.metadataKey.toString()).isEqualTo(testEnv.operatorKey.toString());
         assertThat(info.defaultFreezeStatus).isNotNull();
         assertThat(info.defaultFreezeStatus).isFalse();
         assertThat(info.defaultKycStatus).isNotNull();

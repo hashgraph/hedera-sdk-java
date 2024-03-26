@@ -114,6 +114,22 @@ message AccountID {
 }
 
 /**
+ * Identifier for a unique token (or "NFT"), used by both contract and token services.
+ */
+message NftID {
+    /**
+     * The (non-fungible) token of which this NFT is an instance; uppercase for "ID"
+     * for backward compatibility with original definition of this field.
+     */
+    TokenID token_ID = 1;
+
+    /**
+     * The serial number of this NFT within its token type
+     */
+    int64 serial_number = 2;
+}
+
+/**
  * The ID for a file 
  */
 message FileID {
@@ -1150,6 +1166,16 @@ enum HederaFunctionality {
      * Generates a pseudorandom number.
      */
     UtilPrng = 86;
+
+    /**
+     * Get a record for a transaction.
+     */
+    TransactionGetFastRecord = 87;
+
+    /**
+    * Update the metadata of one or more NFT's of a specific token type.
+    */
+    TokenUpdateNfts = 88;
 }
 
 /**

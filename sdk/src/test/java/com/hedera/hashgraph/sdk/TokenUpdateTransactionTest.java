@@ -31,7 +31,7 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -60,6 +60,9 @@ public class TokenUpdateTransactionTest {
     private static final PublicKey testPauseKey = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
         .getPublicKey();
+    private static final PublicKey testMetadataKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
+        .getPublicKey();
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.8.8");
     private static final String testTokenName = "test name";
@@ -75,7 +78,7 @@ public class TokenUpdateTransactionTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
@@ -93,8 +96,9 @@ public class TokenUpdateTransactionTest {
             .setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
             .setAutoRenewPeriod(testAutoRenewPeriod).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
             .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
-            .setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId).setTokenName(testTokenName)
-            .setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1)).freeze().sign(unusedPrivateKey);
+            .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
+            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1)).freeze()
+            .sign(unusedPrivateKey);
     }
 
     @Test
@@ -125,7 +129,8 @@ public class TokenUpdateTransactionTest {
                 com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
                     .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
-            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey()).build();
+            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
+            .setMetadataKey(testMetadataKey.toProtobufKey()).build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);
@@ -146,6 +151,7 @@ public class TokenUpdateTransactionTest {
         assertThat(tokenUpdateTransaction.getTokenMemo()).isEqualTo(testTokenMemo);
         assertThat(tokenUpdateTransaction.getFeeScheduleKey()).isEqualTo(testFeeScheduleKey);
         assertThat(tokenUpdateTransaction.getPauseKey()).isEqualTo(testPauseKey);
+        assertThat(tokenUpdateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
     }
 
     @Test
@@ -326,5 +332,17 @@ public class TokenUpdateTransactionTest {
     void getSetPauseKeyFrozen() {
         var tx = spawnTestTransaction();
         assertThrows(IllegalStateException.class, () -> tx.setPauseKey(testPauseKey));
+    }
+
+    @Test
+    void getSetMetadataKey() {
+        var tokenUpdateTransaction = new TokenUpdateTransaction().setMetadataKey(testMetadataKey);
+        assertThat(tokenUpdateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
+    }
+
+    @Test
+    void getSetMetadataKeyFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class, () -> tx.setMetadataKey(testMetadataKey));
     }
 }

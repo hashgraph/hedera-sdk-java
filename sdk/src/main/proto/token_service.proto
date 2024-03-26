@@ -128,4 +128,9 @@ service TokenService {
 
     //  Unpause the token
     rpc unpauseToken (Transaction) returns (TransactionResponse);
+
+    /**
+     * Updates the NFTs in a collection by TokenID and serial number
+     */
+    rpc updateNfts (Transaction) returns (TransactionResponse);
 }

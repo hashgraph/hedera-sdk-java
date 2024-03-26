@@ -126,6 +126,14 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     @Nullable
     private Key pauseKey = null;
     /**
+     * The new metadata key of the token. The metadata key has the ability to
+     * change the metadata of a token (token definition, partition definition,
+     * and individual NFTs). If the Token does not currently have a Metadata key,
+     * the transaction will resolve to TOKEN_HAS_NO_METADATA_KEY.
+     */
+    @Nullable
+    private Key metadataKey = null;
+    /**
      * The new expiry time of the token. Expiry can be updated even if the
      * admin key is not set. If the provided expiry is earlier than the
      * current token expiry, the transaction will resolve to
@@ -428,6 +436,29 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the metadata key.
+     *
+     * @return                          the metadata key
+     */
+    @Nullable
+    public Key getMetadataKey() {
+        return metadataKey;
+    }
+
+    /**
+     * Assign the metadata key.
+     *
+     * @param key                       the metadata key
+     * @return {@code this}
+     */
+    public TokenUpdateTransaction setMetadataKey(Key key) {
+        requireNotFrozen();
+        Objects.requireNonNull(key);
+        metadataKey = key;
+        return this;
+    }
+
+    /**
      * Extract the expiration time.
      *
      * @return                          the expiration time
@@ -584,6 +615,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (body.hasPauseKey()) {
             pauseKey = Key.fromProtobufKey(body.getPauseKey());
         }
+        if (body.hasMetadataKey()) {
+            metadataKey = Key.fromProtobufKey(body.getMetadataKey());
+        }
         if (body.hasExpiry()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
         }
@@ -635,6 +669,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         if (pauseKey != null) {
             builder.setPauseKey(pauseKey.toProtobufKey());
+        }
+        if (metadataKey != null) {
+            builder.setMetadataKey(metadataKey.toProtobufKey());
         }
         if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));

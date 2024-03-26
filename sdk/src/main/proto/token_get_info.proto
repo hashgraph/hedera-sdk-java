@@ -198,6 +198,17 @@ message TokenInfo {
      * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
      */
     bytes ledger_id = 26;
+
+    /**
+     * Represents the metadata of the token definition.
+     */
+    bytes metadata = 27;
+
+    /**
+     * The key which can change the metadata of a token
+     * (token definition and individual NFTs).
+     */
+    Key metadata_key = 28;
 }
 
 /**

@@ -179,6 +179,13 @@ public class TokenInfo {
     public final Boolean pauseStatus;
 
     /**
+     * The key which can change the metadata of a token
+     * (token definition and individual NFTs).
+     */
+    @Nullable
+    public final Key metadataKey;
+
+    /**
      * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
      */
     public final LedgerId ledgerId;
@@ -209,6 +216,7 @@ public class TokenInfo {
         long maxSupply,
         @Nullable Key pauseKey,
         @Nullable Boolean pauseStatus,
+        @Nullable Key metadataKey,
         LedgerId ledgerId
     ) {
         this.tokenId = tokenId;
@@ -236,6 +244,7 @@ public class TokenInfo {
         this.maxSupply = maxSupply;
         this.pauseKey = pauseKey;
         this.pauseStatus = pauseStatus;
+        this.metadataKey = metadataKey;
         this.ledgerId = ledgerId;
     }
 
@@ -307,6 +316,7 @@ public class TokenInfo {
             info.getMaxSupply(),
             info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
             pauseStatusFromProtobuf(info.getPauseStatus()),
+            info.hasMetadataKey() ? Key.fromProtobufKey(info.getMetadataKey()) : null,
             LedgerId.fromByteString(info.getLedgerId())
         );
     }
@@ -409,6 +419,9 @@ public class TokenInfo {
         if (pauseKey != null) {
             tokenInfoBuilder.setPauseKey(pauseKey.toProtobufKey());
         }
+        if (metadataKey != null) {
+            tokenInfoBuilder.setMetadataKey(metadataKey.toProtobufKey());
+        }
         if (autoRenewAccount != null) {
             tokenInfoBuilder.setAutoRenewAccount(autoRenewAccount.toProtobuf());
         }
@@ -452,6 +465,7 @@ public class TokenInfo {
             .add("maxSupply", maxSupply)
             .add("pauseKey", pauseKey)
             .add("pauseStatus", pauseStatus)
+            .add("metadataKey", metadataKey)
             .add("ledgerId", ledgerId)
             .toString();
     }

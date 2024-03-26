@@ -171,7 +171,7 @@ message ContractFunctionResult {
     repeated ContractNonceInfo contract_nonces = 14;
 
     /**
-     * If not null this field specifies what the value of the signer account nonce is post transaction execution. 
+     * If not null this field specifies what the value of the signer account nonce is post transaction execution.
      * For transactions that don't update the signer nonce, this field should be null.
      */
     google.protobuf.Int64Value signer_nonce = 15;

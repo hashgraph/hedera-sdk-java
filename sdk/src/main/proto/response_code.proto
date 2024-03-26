@@ -1373,4 +1373,23 @@ enum ResponseCodeEnum {
    * An alias that is assigned to an account or contract cannot be assigned to another account or contract.
    */
   ALIAS_ALREADY_ASSIGNED = 332;
+
+  /**
+   * A provided metadata key was invalid. Verification includes, for example, checking the size of Ed25519 and ECDSA(secp256k1) public keys.
+   */
+  INVALID_METADATA_KEY = 333;
+
+  /**
+   * Metadata key is not set on token
+   */
+  TOKEN_HAS_NO_METADATA_KEY = 334;
+
+  /**
+   * Token Metadata is not provided
+   */
+  MISSING_TOKEN_METADATA = 335;
+  /**
+   * NFT serial numbers are missing in the TokenUpdateNftsTransactionBody
+   */
+  MISSING_SERIAL_NUMBERS = 336;
 }
