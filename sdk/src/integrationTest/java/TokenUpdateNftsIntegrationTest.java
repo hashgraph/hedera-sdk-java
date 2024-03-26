@@ -146,7 +146,7 @@ public class TokenUpdateNftsIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot update the metadata when it is not set")
+    @DisplayName("Cannot update NFTs metadata when it is not set")
     void cannotUpdateNFTMetadataWhenItsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
