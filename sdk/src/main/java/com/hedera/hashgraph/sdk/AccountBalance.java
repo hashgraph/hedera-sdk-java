@@ -62,6 +62,7 @@ public class AccountBalance {
 
     AccountBalance(Hbar hbars, Map<TokenId, Long> token, Map<TokenId, Integer> decimal) {
         this.hbars = hbars;
+
         this.tokens = token;
         this.tokenDecimals = decimal;
     }
