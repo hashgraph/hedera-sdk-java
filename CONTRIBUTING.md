@@ -1,6 +1,6 @@
 # Contributing to the Hedera SDK for Java
 
-Thank you for your interest in contributing the Hedera SDK for Java!
+Thank you for your interest in contributing to the Hedera SDK for Java!
 
 We appreciate your interest in helping us and the rest of our community. We welcome bug reports, feature requests, and code contributions.
 
