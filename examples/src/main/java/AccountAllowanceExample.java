@@ -56,7 +56,6 @@ public class AccountAllowanceExample {
 
     private final PrivateKey charlieKey;
     private final AccountId charlieId;
-
     public static void main(String[] args)
         throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
         AccountAllowanceExample example = new AccountAllowanceExample();

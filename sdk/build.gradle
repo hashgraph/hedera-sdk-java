@@ -171,7 +171,7 @@ tasks.withType(Test) {
     // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
 
     // this task will fail on the first failed test
-    failFast = true
+//    failFast = true
 
     // emit logs per passed or failed test
     testLogging {
