@@ -1,6 +1,5 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
@@ -88,7 +87,7 @@ class TokenMintIntegrationTest {
     void cannotMintTokensWhenTokenIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setAmount(10)
                 .execute(testEnv.client)
@@ -231,7 +230,7 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setMetadata(NftMetadataGenerator.generateOneLarge())
                 .setTokenId(tokenId)

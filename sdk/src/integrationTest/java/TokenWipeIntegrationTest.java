@@ -1,6 +1,5 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
@@ -271,7 +270,7 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setTokenId(tokenId)
                 .setAmount(10)
@@ -334,7 +333,7 @@ class TokenWipeIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenWipeTransaction()
                 .setAccountId(accountId)
                 .setAmount(10)

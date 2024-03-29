@@ -1,6 +1,5 @@
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
@@ -81,7 +80,7 @@ class TokenUnfreezeIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUnfreezeTransaction()
                 .setAccountId(accountId)
                 .freezeWith(testEnv.client)
@@ -116,7 +115,7 @@ class TokenUnfreezeIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUnfreezeTransaction()
                 .setTokenId(tokenId)
                 .freezeWith(testEnv.client)
