@@ -72,7 +72,7 @@ class AccountCreateIntegrationTest {
     void canNotCreateAccountWithNoKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
             .setInitialBalance(new Hbar(1))
             .execute(testEnv.client)
             .getReceipt(testEnv.client)).withMessageContaining(Status.KEY_REQUIRED.toString());
