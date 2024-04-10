@@ -68,7 +68,7 @@ public class ContractExecuteIntegrationTest {
     void cannotExecuteContractWhenContractIDIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new ContractExecuteTransaction()
                 .setGas(100000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))

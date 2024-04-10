@@ -47,26 +47,26 @@ public class SystemIntegrationTest {
                 .setContractId(contractId)
                 .setExpirationTime(Instant.now())
                 .execute(testEnv.client);
-        }).withMessageContaining(Status.UNAUTHORIZED.toString());
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new SystemDeleteTransaction()
                 .setFileId(fileId)
                 .setExpirationTime(Instant.now())
                 .execute(testEnv.client);
-        }).withMessageContaining(Status.UNAUTHORIZED.toString());
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new SystemUndeleteTransaction()
                 .setContractId(contractId)
                 .execute(testEnv.client);
-        }).withMessageContaining(Status.UNAUTHORIZED.toString());
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new SystemUndeleteTransaction()
                 .setFileId(fileId)
                 .execute(testEnv.client);
-        }).withMessageContaining(Status.UNAUTHORIZED.toString());
+        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
         testEnv.close();
     }

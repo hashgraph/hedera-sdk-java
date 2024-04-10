@@ -2,6 +2,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
@@ -52,7 +53,7 @@ public class TokenPauseIntegrationTest {
     void cannotPauseWithNoTokenId() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        assertThrows(ReceiptStatusException.class, () -> {
+        assertThrows(PrecheckStatusException.class, () -> {
             new TokenPauseTransaction().execute(testEnv.client).getReceipt(testEnv.client);
         });
 
