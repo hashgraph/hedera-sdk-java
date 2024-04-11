@@ -718,7 +718,6 @@ public abstract class Transaction<T extends Transaction<T>>
     public byte[] toBytes() {
         var list = TransactionList.newBuilder();
 
-
         // If no nodes have been selected yet,
         // the new TransactionBody can be used to build a Transaction protobuf object.
         if (nodeAccountIds.isEmpty()) {
