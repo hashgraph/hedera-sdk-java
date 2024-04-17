@@ -21,8 +21,6 @@ public class TokenMetadataExample {
     public TokenMetadataExample() {
     }
 
-    // as per HIP-646 and HIP-765: Updating the metadata field should require a metadataKey (ie HIP-657)
-    // below example is working without the key (its commented)
     public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
@@ -32,21 +30,18 @@ public class TokenMetadataExample {
 
         var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
         var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var metadataKey = PrivateKey.generateED25519();
 
-        // create a fungible token with metadata and metadata key
+        // create a fungible token with metadata
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-//                .setTokenMetadata(initialTokenMetadata)
+                .setTokenMetadata(initialTokenMetadata)
                 .setTokenType(TokenType.FUNGIBLE_COMMON)
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setDecimals(3)
                 .setInitialSupply(1000000)
                 .setAdminKey(OPERATOR_KEY)
-//                .setMetadataKey(metadataKey)
-                .setFreezeDefault(false)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
@@ -63,8 +58,6 @@ public class TokenMetadataExample {
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(updatedTokenMetadata)
-//            .freezeWith(client)
-//            .sign(metadataKey)
             .execute(client)
             .getReceipt(client);
 
