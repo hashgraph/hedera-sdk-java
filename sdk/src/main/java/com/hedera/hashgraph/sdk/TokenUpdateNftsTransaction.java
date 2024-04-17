@@ -177,7 +177,6 @@ public class TokenUpdateNftsTransaction extends Transaction<TokenUpdateNftsTrans
      */
     TokenUpdateNftsTransactionBody.Builder build() {
         var builder = TokenUpdateNftsTransactionBody.newBuilder();
-
         if (tokenId != null) {
             builder.setToken(tokenId.toProtobuf());
         }
