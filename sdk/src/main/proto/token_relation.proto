@@ -55,19 +55,15 @@ message TokenRelation {
      */
     bool kyc_granted = 5;
     /**
-     * The flag indicating if the token relationship was deleted.
-     */
-    bool deleted = 6;
-    /**
      * The flag indicating if the token relationship was created using automatic association.
      */
-    bool automatic_association = 7;
+    bool automatic_association = 6;
     /**
      * The previous token id of account's association linked list
      */
-    TokenID previous_token = 8;
+    TokenID previous_token = 7;
     /**
      * The next token id of account's association linked list
      */
-    TokenID next_token = 9;
+    TokenID next_token = 8;
 }
