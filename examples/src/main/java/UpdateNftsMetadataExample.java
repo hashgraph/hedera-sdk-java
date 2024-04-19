@@ -47,33 +47,35 @@ public class UpdateNftsMetadataExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public UpdateNftsMetadataExample() {
-    }
+    private static final PrivateKey METADATA_KEY = PrivateKey.generateED25519();
+
+    private static final byte[] INITIAL_METADATA = new byte[]{1};
+
+    private static final byte[] UPDATED_METADATA = new byte[]{1, 2};
+
+    private Client client;
 
     public static void main(String[] args) throws Exception {
-        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        UpdateNftsMetadataExample example = new UpdateNftsMetadataExample();
+
+        // demonstrate with a mutable token (the one that has an admin key)
+        example.updateNftsMetadata(example.getMutableTokenCreateTransaction());
+
+        // demonstrate with an immutable token (the one that doesn't have an admin key)
+        example.updateNftsMetadata(example.getImmutableTokenCreateTransaction());
+
+        example.cleanUp();
+    }
+
+    private UpdateNftsMetadataExample() throws Exception {
+        client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+    }
 
-        var metadataKey = PrivateKey.generateED25519();
-        System.out.println("Generated metadata key: " + metadataKey);
-
-        var initialMetadata = new byte[]{1};
-        var updatedMetadata = new byte[]{1, 2};
-
-        // Create a token with metadata key
-        var tokenCreateTransaction = new TokenCreateTransaction()
-            .setTokenName("Example")
-            .setTokenSymbol("E")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY)
-            .setSupplyKey(OPERATOR_KEY)
-            .setMetadataKey(metadataKey)
-            .freezeWith(client);
-
+    private void updateNftsMetadata(TokenCreateTransaction tokenCreateTransaction) throws Exception {
         var tokenCreateResponse = tokenCreateTransaction.sign(OPERATOR_KEY).execute(client);
         var tokenCreateReceipt = tokenCreateResponse.getReceipt(client);
         System.out.println("Status of token create transaction: " + tokenCreateReceipt.status);
@@ -88,7 +90,7 @@ public class UpdateNftsMetadataExample {
         System.out.println("Token metadata key: " + tokenInfo.metadataKey);
 
         var tokenMintTransaction = new TokenMintTransaction()
-            .setMetadata(List.of(initialMetadata))
+            .setMetadata(List.of(INITIAL_METADATA))
             .setTokenId(tokenId);
 
         tokenMintTransaction.getMetadata().forEach(metadata -> {
@@ -109,9 +111,9 @@ public class UpdateNftsMetadataExample {
         var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(OPERATOR_KEY)
             .setMaxAutomaticTokenAssociations(10)
-	        .execute(client);
+            .execute(client);
 
-	    var newAccountId = accountCreateTransaction.getReceipt(client).accountId;
+        var newAccountId = accountCreateTransaction.getReceipt(client).accountId;
 
         new TokenAssociateTransaction()
             .setAccountId(newAccountId)
@@ -129,11 +131,11 @@ public class UpdateNftsMetadataExample {
         var tokenUpdateNftsTransaction = new TokenUpdateNftsTransaction()
             .setTokenId(tokenId)
             .setSerials(nftSerials)
-            .setMetadata(updatedMetadata)
+            .setMetadata(UPDATED_METADATA)
             .freezeWith(client);
 
         System.out.println("Updated metadata: " + Arrays.toString(tokenUpdateNftsTransaction.getMetadata()));
-        var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(metadataKey).execute(client);
+        var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(METADATA_KEY).execute(client);
         // Get receipt for update nfts metadata transaction
         var tokenUpdateNftsReceipt = tokenUpdateNftsResponse.getReceipt(client);
         System.out.println("Status of token update nfts metadata transaction: " + tokenUpdateNftsReceipt.status);
@@ -142,7 +144,38 @@ public class UpdateNftsMetadataExample {
         getMetadataList(client, tokenId, nftSerials).forEach(metadata -> {
             System.out.println("Metadata after update: " + Arrays.toString(metadata));
         });
+    }
 
+    private TokenCreateTransaction getMutableTokenCreateTransaction() {
+        System.out.println("Creating a mutable token..");
+
+        // Create a mutable token with a metadata key
+        return new TokenCreateTransaction()
+            .setTokenName("Mutable")
+            .setTokenSymbol("MUT")
+            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+            .setTreasuryAccountId(OPERATOR_ID)
+            .setAdminKey(OPERATOR_KEY)
+            .setSupplyKey(OPERATOR_KEY)
+            .setMetadataKey(METADATA_KEY)
+            .freezeWith(client);
+    }
+
+    private TokenCreateTransaction getImmutableTokenCreateTransaction() {
+        System.out.println("Creating an immutable token..");
+
+        // Create an immutable token with a metadata key
+        return new TokenCreateTransaction()
+            .setTokenName("Immutable")
+            .setTokenSymbol("IMUT")
+            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+            .setTreasuryAccountId(OPERATOR_ID)
+            .setSupplyKey(OPERATOR_KEY)
+            .setMetadataKey(METADATA_KEY)
+            .freezeWith(client);
+    }
+
+    private void cleanUp() throws Exception {
         client.close();
     }
 
