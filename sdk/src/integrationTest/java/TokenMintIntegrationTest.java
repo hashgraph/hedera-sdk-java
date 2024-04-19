@@ -231,7 +231,7 @@ class TokenMintIntegrationTest {
                 .tokenId
         );
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
                 .setMetadata(NftMetadataGenerator.generateOneLarge())
                 .setTokenId(tokenId)
