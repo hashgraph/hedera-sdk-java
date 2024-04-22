@@ -98,11 +98,6 @@ class KeyTest {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
             () -> Crypto.recoverPublicKeyECDSAFromSignature(0, BigInteger.valueOf(-1), BigInteger.ONE, Crypto.calcKeccak256(message))
         );
-        // recover public key without message hash
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> Crypto.recoverPublicKeyECDSAFromSignature(0, BigInteger.ONE, BigInteger.ONE, null)
-        );
-
         // calculate recId with wrong message
         var wrongMessage = "Hello".getBytes(UTF_8);
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(

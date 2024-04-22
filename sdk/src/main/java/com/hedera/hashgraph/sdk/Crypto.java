@@ -292,9 +292,6 @@ final class Crypto {
         if (r.signum() < 0 || s.signum() < 0) {
             throw new IllegalArgumentException("'r' and 's' shouldn't be negative.");
         }
-        if (messageHash == null) {
-            throw new IllegalArgumentException("The message hash should not be null.");
-        }
         // 1.1 - 1.3 calculate point R
         ECPoint R = decompressKey(r, (recId & 1) == 1);
         // 1.4 nR should be a point at infinity
