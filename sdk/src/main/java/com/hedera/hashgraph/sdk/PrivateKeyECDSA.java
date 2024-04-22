@@ -240,6 +240,27 @@ public class PrivateKeyECDSA extends PrivateKey {
         return sigBytes;
     }
 
+    public int getRecoveryId(byte[] r, byte[] s, byte[] message) {
+        int recId = -1;
+        var hash = Crypto.calcKeccak256(message);
+        var publicKey = getPublicKey().toBytesRaw();
+        // On this curve, there are only two possible values for the recovery id.
+        for (int i = 0; i < 2; i++) {
+            byte[] k = Crypto.recoverPublicKeyECDSAFromSignature(i, new BigInteger(1, r), new BigInteger(1, s), hash);
+            if (k != null && java.util.Arrays.equals(k, publicKey)) {
+                recId = i;
+                break;
+            }
+        }
+
+        if (recId == -1) {
+            // this should never happen
+            throw new RuntimeException("Unexpected error - could not construct a recoverable key.");
+        }
+
+        return recId;
+    }
+
     @Override
     public byte[] toBytes() {
         return toBytesDER();
@@ -290,4 +311,6 @@ public class PrivateKeyECDSA extends PrivateKey {
     public boolean isECDSA() {
         return true;
     }
+
+
 }
