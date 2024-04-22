@@ -18,6 +18,8 @@ public class TokenMetadataExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
+    private static final PrivateKey ADMIN_KEY = PrivateKey.generateED25519();
+
     private static final PrivateKey METADATA_KEY = PrivateKey.generateED25519();
 
     private static final byte[] INITIAL_TOKEN_METADATA = new byte[]{1, 1, 1, 1, 1};
@@ -55,7 +57,9 @@ public class TokenMetadataExample {
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .setAdminKey(OPERATOR_KEY)
+                .setAdminKey(ADMIN_KEY)
+                .freezeWith(client)
+                .sign(ADMIN_KEY)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
@@ -74,6 +78,8 @@ public class TokenMetadataExample {
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setTokenMetadata(UPDATED_TOKEN_METADATA)
+            .freezeWith(client)
+            .sign(ADMIN_KEY)
             .execute(client)
             .getReceipt(client);
 
@@ -97,8 +103,6 @@ public class TokenMetadataExample {
                 .setMetadataKey(METADATA_KEY)
                 .setDecimals(3)
                 .setInitialSupply(1000000)
-                .freezeWith(client)
-                .sign(OPERATOR_KEY)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
