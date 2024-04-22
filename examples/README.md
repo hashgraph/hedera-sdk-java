@@ -76,7 +76,7 @@
 Running the examples requires `.env` file to exist under [`root project folder`](../):
 
 ```sh
-$ cp .env.sample ../.env
+cp .env.sample ../.env
 ```
 
 The `OPERATOR_ID` and `OPERATOR_KEY` variables should be set in a `.env` file.
@@ -98,13 +98,13 @@ HEDERA_NETWORK=previewnet
 Template:
 
 ```sh
-$ ./gradlew -q example:run<NameOfExample>
+./gradlew -q example:run<NameOfExample>
 ```
 
 Concrete example:
 
 ```sh
-$ ./gradlew -q example:runGenerateKey
+./gradlew -q example:runGenerateKey
 ```
 
 ### Running with Intellij
