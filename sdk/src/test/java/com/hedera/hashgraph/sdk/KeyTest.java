@@ -64,6 +64,21 @@ class KeyTest {
     }
 
     @Test
+    @DisplayName("Calculated recId is either 0 or 1 for ECDSA secp256k1 curve")
+    void calculateRecoveryIdECDSA() {
+        var message = "Hello, World".getBytes(UTF_8);
+        var privateKey = PrivateKey.generateECDSA();
+        var signature = privateKey.sign(message);
+        // wrap in signature object
+        final byte[] r = new byte[32];
+        System.arraycopy(signature, 0, r, 0, 32);
+        final byte[] s = new byte[32];
+        System.arraycopy(signature, 32, s, 0, 32);
+        var recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r,s,message);
+        assertThat(recId).isBetween(0,1);
+    }
+
+    @Test
     @DisplayName("can convert from protobuf ED25519 key to PublicKey")
     void fromProtoKeyEd25519() {
         var keyBytes = Hex.decode("0011223344556677889900112233445566778899001122334455667788990011");
