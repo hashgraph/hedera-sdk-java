@@ -2,7 +2,7 @@
 
 ## Description
 Example Android Application is designed to showcase various functionalities
-and capabilities when working with the Hedera Java SDK.
+and capabilities when working with the Hedera™ Java SDK.
 It operates on a `testnet` environment and offers the following features
 through three distinct tabs:
 - **Private Key tab** allows you to generate ED25519 key pairs by pressing

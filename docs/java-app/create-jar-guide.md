@@ -1,6 +1,6 @@
 ### Creating a fat/uber JAR
 
-To create a fat/uber jar of your Java application that uses the Hedera Java SDK, you need to use the Shadow Gradle plugin:
+To create a fat/uber jar of your Java application that uses the Hedera™ Java SDK, you need to use the Shadow Gradle plugin:
 
 ```groovy
 id "com.github.johnrengelman.shadow"

@@ -4,7 +4,7 @@
 
 To get started with a Java project, you'll need to add the following **three** dependencies:
 
-**1. Hedera Java SDK:**
+**1. Hedera Java™ SDK:**
 
 _Gradle:_
 ```groovy
@@ -95,12 +95,12 @@ _Maven:_
 ## Additional useful information
 ### Fat/uber JAR
 [Creating a fat/uber JAR guide](create-jar-guide.md) covers how to properly set up Shadow Gradle plugin
-to create a fat/uber JAR of your Java application that uses the Hedera Java SDK.
+to create a fat/uber JAR of your Java application that uses the Hedera™ Java SDK.
 
 ## Next steps
-To make it easier to start your Java project using the Hedera Java SDK,
+To make it easier to start your Java project using the Hedera™ Java SDK,
 we recommend checking out the [Java examples](../../examples/README.md).
 These examples show different uses and workflows,
 giving you valuable insights into how you can use the Hedera platform in your projects.
-They will also help you explore the capabilities of the Hedera SDK
+They will also help you explore the capabilities of the Hedera™ Java SDK
 and start your project confidently.

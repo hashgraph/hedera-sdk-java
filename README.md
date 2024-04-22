@@ -16,11 +16,11 @@ You can reference the [migration documentation](docs/sdk/MIGRATING_V1.md).
 
 ## Java app quickstart
 [The Java application quickstart guide](docs/java-app/java-app-quickstart.md) covers how to properly set up the dependencies
-needed to start developing your Java project using the Hedera Java SDK.
+needed to start developing your Java project using the Hedera™ Java SDK.
 
 ## Android app quickstart
 [The Android application quickstart guide](docs/android-app/android-app-quickstart.md) covers how to properly set up the dependencies
-needed to start developing your Android project using the Hedera Java SDK.
+needed to start developing your Android project using the Hedera™ Java SDK.
 
 ## Examples
 This repository includes [Java examples](examples/README.md) and [an Android example](example-android/README.md)
