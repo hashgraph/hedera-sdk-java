@@ -286,10 +286,10 @@ final class Crypto {
      * @return A ECKey containing only the public part, or {@code null} if recovery wasn't possible.
      */
     public static byte[] recoverPublicKeyECDSAFromSignature(int recId, BigInteger r, BigInteger s, byte[] messageHash) {
-        if (recId == 0 || recId == 1) {
+        if (!(recId == 0 || recId == 1)) {
             throw new IllegalArgumentException("Recovery Id must be 0 or 1 for secp256k1.");
         }
-        if (r.signum() >= 0 || s.signum() >= 0) {
+        if (r.signum() < 0 || s.signum() < 0) {
             throw new IllegalArgumentException("'r' and 's' shouldn't be negative.");
         }
         if (messageHash == null) {
