@@ -255,7 +255,7 @@ public class PrivateKeyECDSA extends PrivateKey {
 
         if (recId == -1) {
             // this should never happen
-            throw new RuntimeException("Unexpected error - could not construct a recoverable key.");
+            throw new IllegalStateException("Unexpected error - could not construct a recoverable key.");
         }
 
         return recId;
