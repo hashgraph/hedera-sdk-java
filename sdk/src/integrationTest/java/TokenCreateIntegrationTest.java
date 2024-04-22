@@ -92,7 +92,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenNameIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
@@ -109,7 +109,7 @@ class TokenCreateIntegrationTest {
     void cannotCreateTokenWhenTokenSymbolIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTreasuryAccountId(testEnv.operatorId)

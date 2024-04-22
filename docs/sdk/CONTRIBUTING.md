@@ -78,7 +78,6 @@ Before submitting your pull request, refer to the pull request readiness checkli
 
 * [ ] Includes tests to exercise the new behaviour
 * [ ] Code is documented, especially public and user-facing constructs
-* [ ] Local run of `mvn checkstyle:check` succeeds
 * [ ] Git commit message is detailed and includes context behind the change
 * [ ] If the change is related to an existing Bug Report or Feature Request, please include its issue number
 

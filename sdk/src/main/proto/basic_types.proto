@@ -488,6 +488,21 @@ enum TokenSupplyType {
 }
 
 /**
+ * Types of validation strategies for token keys.
+ */
+enum TokenKeyValidation {
+    /**
+     * Currently the default behaviour. It will perform all token key validations.
+     */
+    FULL_VALIDATION = 0;
+
+    /**
+     * Perform no validations at all for all passed token keys.
+     */
+    NO_VALIDATION = 1;
+}
+
+/**
  * Possible Freeze statuses returned on TokenGetInfoQuery or CryptoGetInfoResponse in
  * TokenRelationship
  */

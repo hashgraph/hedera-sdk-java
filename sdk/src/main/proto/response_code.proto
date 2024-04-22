@@ -1392,4 +1392,9 @@ enum ResponseCodeEnum {
    * NFT serial numbers are missing in the TokenUpdateNftsTransactionBody
    */
   MISSING_SERIAL_NUMBERS = 336;
+
+  /**
+   * Admin key is not set on token
+   */
+  TOKEN_HAS_NO_ADMIN_KEY = 337;
 }
