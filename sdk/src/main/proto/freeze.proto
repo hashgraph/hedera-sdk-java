@@ -26,7 +26,6 @@ option java_package = "com.hedera.hashgraph.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.freeze">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
-import "duration.proto";
 import "timestamp.proto";
 import "basic_types.proto";
 import "freeze_type.proto";

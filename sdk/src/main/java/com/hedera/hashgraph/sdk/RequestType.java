@@ -387,7 +387,17 @@ public enum RequestType {
     /**
      * Generates a pseudorandom number.
      */
-    PRNG(HederaFunctionality.UtilPrng);
+    PRNG(HederaFunctionality.UtilPrng),
+
+    /**
+     * Get a record for a transaction.
+     */
+    TRANSACTION_GET_FAST_RECORD(HederaFunctionality.TransactionGetFastRecord),
+
+    /**
+     * Update the metadata of one or more NFT's of a specific token type.
+     */
+    TOKEN_UPDATE_NFTS(HederaFunctionality.TokenUpdateNfts);
 
     final HederaFunctionality code;
 
@@ -470,6 +480,8 @@ public enum RequestType {
             case EthereumTransaction -> ETHEREUM_TRANSACTION;
             case NodeStakeUpdate -> NODE_STAKE_UPDATE;
             case UtilPrng -> PRNG;
+            case TransactionGetFastRecord -> TRANSACTION_GET_FAST_RECORD;
+            case TokenUpdateNfts -> TOKEN_UPDATE_NFTS;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -550,6 +562,8 @@ public enum RequestType {
             case ETHEREUM_TRANSACTION -> "ETHEREUM_TRANSACTION";
             case NODE_STAKE_UPDATE -> "NODE_STAKE_UPDATE";
             case PRNG -> "PRNG";
+            case TRANSACTION_GET_FAST_RECORD -> "TRANSACTION_GET_FAST_RECORD";
+            case TOKEN_UPDATE_NFTS -> "TOKEN_UPDATE_NFTS";
         };
     }
 }
