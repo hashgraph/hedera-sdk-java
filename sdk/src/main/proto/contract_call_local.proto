@@ -169,6 +169,12 @@ message ContractFunctionResult {
      * This is always empty in a ContractCallLocalResponse#ContractFunctionResult message, since no internal creations can happen in a static EVM call.
      */
     repeated ContractNonceInfo contract_nonces = 14;
+
+    /**
+     * If not null this field specifies what the value of the signer account nonce is post transaction execution.
+     * For transactions that don't update the signer nonce, this field should be null.
+     */
+    google.protobuf.Int64Value signer_nonce = 15;
 }
 
 /**

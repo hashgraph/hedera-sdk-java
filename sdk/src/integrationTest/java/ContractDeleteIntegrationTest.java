@@ -34,7 +34,7 @@ public class ContractDeleteIntegrationTest {
 
         response = new ContractCreateTransaction()
             .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")
@@ -81,7 +81,7 @@ public class ContractDeleteIntegrationTest {
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
         var contractId = Objects.requireNonNull(new ContractCreateTransaction()
-            .setGas(100000)
+            .setGas(200000)
             .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
             .setBytecodeFileId(fileId)
             .setContractMemo("[e2e::ContractCreateTransaction]")

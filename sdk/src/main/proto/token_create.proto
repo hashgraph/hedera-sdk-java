@@ -198,4 +198,15 @@ message TokenCreateTransactionBody {
      * If Empty the token pause status defaults to PauseNotApplicable, otherwise Unpaused.
      */
     Key pause_key = 22;
+
+    /**
+     * Metadata of the created token definition.
+     */
+    bytes metadata = 23;
+
+    /**
+     * The key which can change the metadata of a token
+     * (token definition, partition definition, and individual NFTs).
+     */
+    Key metadata_key = 24;
 }

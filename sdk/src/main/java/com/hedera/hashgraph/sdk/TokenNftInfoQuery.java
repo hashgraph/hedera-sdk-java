@@ -26,13 +26,12 @@ import com.hedera.hashgraph.sdk.proto.ResponseHeader;
 import com.hedera.hashgraph.sdk.proto.TokenGetNftInfoQuery;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
-import java8.util.concurrent.CompletableFuture;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 
 /**
  * A query that returns information about a non-fungible token (NFT).
