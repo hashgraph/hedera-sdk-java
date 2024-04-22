@@ -20,8 +20,8 @@ $ ./gradlew test
 > The tests are only executed if the configuration is provided
 > as an environment variable (see the `onlyIf` block in [`sdk/build.gradle`](../../sdk/build.gradle)).
 > That's why we need to pass the configuration file at the beginning of the command.
-> The `CONFIG_FILE` environment variable is not used, so you can provide any value,
-> but it should not be `null`.
+> **The `CONFIG_FILE` environment variable is not used, so you can provide any value,
+> but it should not be `null`.**
 
 #### Using system properties
 `OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK` must be passed into system properties.\
