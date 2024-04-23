@@ -76,23 +76,23 @@ public class UpdateNftsMetadataExample {
     }
 
     private void updateNftsMetadata(TokenCreateTransaction tokenCreateTransaction) throws Exception {
-        //Create a non-fungible token (NFT) with the metadata key field set
+        // Create a non-fungible token (NFT) with the metadata key field set
         var tokenCreateResponse = tokenCreateTransaction.sign(OPERATOR_KEY).execute(client);
         var tokenCreateReceipt = tokenCreateResponse.getReceipt(client);
         System.out.println("Status of token create transaction: " + tokenCreateReceipt.status);
 
-        //Get the token ID of the token that was created
+        // Get the token ID of the token that was created
         var tokenId = tokenCreateReceipt.tokenId;
         System.out.println("Token id: " + tokenId);
 
-        //Query for the token information stored in consensus node state to see that the metadata key is set
+        // Query for the token information stored in consensus node state to see that the metadata key is set
         var tokenInfo = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(client);
 
         System.out.println("Token metadata key: " + tokenInfo.metadataKey);
 
-        //Mint the first NFT and set the initial metadata for the NFT
+        // Mint the first NFT and set the initial metadata for the NFT
         var tokenMintTransaction = new TokenMintTransaction()
             .setMetadata(List.of(INITIAL_METADATA))
             .setTokenId(tokenId);
@@ -102,7 +102,7 @@ public class UpdateNftsMetadataExample {
         });
 
         var tokenMintResponse = tokenMintTransaction.execute(client);
-        
+
         // Get receipt for mint token transaction
         var tokenMintReceipt = tokenMintResponse.getReceipt(client);
         System.out.println("Status of token mint transaction: " + tokenMintReceipt.status);
@@ -113,24 +113,15 @@ public class UpdateNftsMetadataExample {
             System.out.println("Metadata after mint: " + Arrays.toString(metadata));
         });
 
-        //Create an account to send the NFT to
+        // Create an account to send the NFT to
         var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(OPERATOR_KEY)
-            .setMaxAutomaticTokenAssociations(10)
+            .setMaxAutomaticTokenAssociations(10) // If the account does not have any automatic token association slots open ONLY then associate the NFT to the account
             .execute(client);
 
         var newAccountId = accountCreateTransaction.getReceipt(client).accountId;
 
-        //Associate the NFT to the account only if the account does not have any automatic token association slots open. When we created the account in the previous step we set automatic token associations to 10 so I should have 10 slots open to receive a token
-        //new TokenAssociateTransaction()
-            //.setAccountId(newAccountId)
-            //.setTokenIds(Collections.singletonList(tokenId))
-            //.freezeWith(client)
-            //.sign(OPERATOR_KEY)
-            //.execute(client)
-            //.getReceipt(client);
-
-        //Transfer the NFT to the new account
+        // Transfer the NFT to the new account
         new TransferTransaction()
             .addNftTransfer(tokenId.nft(nftSerials.get(0)), OPERATOR_ID, newAccountId)
             .execute(client);
@@ -144,7 +135,7 @@ public class UpdateNftsMetadataExample {
 
         System.out.println("Updated metadata: " + Arrays.toString(tokenUpdateNftsTransaction.getMetadata()));
         var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(METADATA_KEY).execute(client);
-        
+
         // Get receipt for update nfts metadata transaction
         var tokenUpdateNftsReceipt = tokenUpdateNftsResponse.getReceipt(client);
         System.out.println("Status of token update nfts metadata transaction: " + tokenUpdateNftsReceipt.status);
