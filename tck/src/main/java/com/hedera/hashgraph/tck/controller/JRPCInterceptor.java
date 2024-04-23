@@ -27,7 +27,7 @@ public class JRPCInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    private JSONRPC2Request mapToJSONRPC2Request(final HttpServletRequest httpRequest)
+    JSONRPC2Request mapToJSONRPC2Request(final HttpServletRequest httpRequest)
             throws IOException, JSONRPC2ParseException {
         // Read the JSON-RPC request from the HTTP request body
         BufferedReader reader = httpRequest.getReader();
