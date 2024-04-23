@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.BytesValue;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
@@ -155,7 +157,10 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      */
     @Nullable
     private String tokenMemo = null;
-
+    /**
+     * Metadata of the created token definition
+     */
+    private byte[] tokenMetadata = null;
     /**
      * Constructor.
      */
@@ -579,6 +584,28 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the metadata.
+     *
+     * @return the metadata
+     */
+    @Nullable
+    public byte[] getTokenMetadata() {
+        return tokenMetadata;
+    }
+
+    /**
+     * Assign the metadata.
+     *
+     * @param tokenMetadata the metadata
+     * @return {@code this}
+     */
+    public TokenUpdateTransaction setTokenMetadata(byte[] tokenMetadata) {
+        requireNotFrozen();
+        this.tokenMetadata = tokenMetadata;
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -626,6 +653,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         if (body.hasMemo()) {
             tokenMemo = body.getMemo().getValue();
+        }
+        if (body.hasMetadata()) {
+            tokenMetadata = body.getMetadata().getValue().toByteArray();
         }
     }
 
@@ -681,6 +711,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         if (tokenMemo != null) {
             builder.setMemo(StringValue.of(tokenMemo));
+        }
+        if (tokenMetadata != null) {
+            builder.setMetadata(BytesValue.of(ByteString.copyFrom(tokenMetadata)));
         }
 
         return builder;

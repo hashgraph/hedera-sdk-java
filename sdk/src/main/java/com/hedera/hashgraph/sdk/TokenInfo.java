@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TokenFreezeStatus;
 import com.hedera.hashgraph.sdk.proto.TokenGetInfoResponse;
@@ -179,6 +180,11 @@ public class TokenInfo {
     public final Boolean pauseStatus;
 
     /**
+     * Represents the metadata of the token definition.
+     */
+    public byte[] metadata = {};
+
+    /**
      * The key which can change the metadata of a token
      * (token definition and individual NFTs).
      */
@@ -216,6 +222,7 @@ public class TokenInfo {
         long maxSupply,
         @Nullable Key pauseKey,
         @Nullable Boolean pauseStatus,
+        byte[] metadata,
         @Nullable Key metadataKey,
         LedgerId ledgerId
     ) {
@@ -244,6 +251,7 @@ public class TokenInfo {
         this.maxSupply = maxSupply;
         this.pauseKey = pauseKey;
         this.pauseStatus = pauseStatus;
+        this.metadata = metadata;
         this.metadataKey = metadataKey;
         this.ledgerId = ledgerId;
     }
@@ -316,6 +324,7 @@ public class TokenInfo {
             info.getMaxSupply(),
             info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
             pauseStatusFromProtobuf(info.getPauseStatus()),
+            info.getMetadata().toByteArray(),
             info.hasMetadataKey() ? Key.fromProtobufKey(info.getMetadataKey()) : null,
             LedgerId.fromByteString(info.getLedgerId())
         );
@@ -419,6 +428,9 @@ public class TokenInfo {
         if (pauseKey != null) {
             tokenInfoBuilder.setPauseKey(pauseKey.toProtobufKey());
         }
+        if (metadata != null) {
+            tokenInfoBuilder.setMetadata(ByteString.copyFrom(metadata));
+        }
         if (metadataKey != null) {
             tokenInfoBuilder.setMetadataKey(metadataKey.toProtobufKey());
         }
@@ -465,6 +477,7 @@ public class TokenInfo {
             .add("maxSupply", maxSupply)
             .add("pauseKey", pauseKey)
             .add("pauseStatus", pauseStatus)
+            .add("metadata", metadata)
             .add("metadataKey", metadataKey)
             .add("ledgerId", ledgerId)
             .toString();
