@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
@@ -142,6 +143,12 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     @Nullable
     private Key pauseKey = null;
     /**
+     * The key which can change the metadata of a token
+     * (token definition, partition definition, and individual NFTs).
+     */
+    @Nullable
+    private Key metadataKey = null;
+    /**
      * The default Freeze status (frozen or unfrozen) of Hedera accounts
      * relative to this token. If true, an account must be unfrozen before
      * it can receive the token.
@@ -184,7 +191,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      * You must set the token supply type to FINITE if you set this field.
      */
     private long maxSupply = 0;
-
+    /**
+     * Metadata of the created token definition.
+     */
+    private byte[] tokenMetadata = {};
     /**
      * Constructor.
      */
@@ -488,6 +498,29 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     }
 
     /**
+     * Extract the metadata key.
+     *
+     * @return                          the metadata key
+     */
+    @Nullable
+    public Key getMetadataKey() {
+        return metadataKey;
+    }
+
+    /**
+     * Assign the metadata key.
+     *
+     * @param key                      the metadata key
+     * @return {@code this}
+     */
+    public TokenCreateTransaction setMetadataKey(Key key) {
+        requireNotFrozen();
+        Objects.requireNonNull(key);
+        metadataKey = key;
+        return this;
+    }
+
+    /**
      * Extract the freeze default.
      *
      * @return                          the freeze default
@@ -703,6 +736,27 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         return this;
     }
 
+    /**
+     * Extract the token metadata.
+     *
+     * @return the token metadata
+     */
+    public byte[] getTokenMetadata() {
+        return tokenMetadata;
+    }
+
+    /**
+     * Assign the token metadata.
+     *
+     * @param tokenMetadata the token metadata
+     * @return {@code this}
+     */
+    public TokenCreateTransaction setTokenMetadata(byte[] tokenMetadata) {
+        requireNotFrozen();
+        this.tokenMetadata = tokenMetadata;
+        return this;
+    }
+
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
         if (
@@ -756,6 +810,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (pauseKey != null) {
             builder.setPauseKey(pauseKey.toProtobufKey());
         }
+        if (metadataKey != null) {
+            builder.setMetadataKey(metadataKey.toProtobufKey());
+        }
         builder.setFreezeDefault(freezeDefault);
         if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
@@ -767,6 +824,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         builder.setTokenType(tokenType.code);
         builder.setSupplyType(tokenSupplyType.code);
         builder.setMaxSupply(maxSupply);
+        builder.setMetadata(ByteString.copyFrom(tokenMetadata));
 
         for (var fee : customFees) {
             builder.addCustomFees(fee.toProtobuf());
@@ -811,6 +869,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         if (body.hasPauseKey()) {
             pauseKey = Key.fromProtobufKey(body.getPauseKey());
         }
+        if (body.hasMetadataKey()) {
+            metadataKey = Key.fromProtobufKey(body.getMetadataKey());
+        }
         freezeDefault = body.getFreezeDefault();
         if (body.hasExpiry()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpiry());
@@ -822,6 +883,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
         tokenType = TokenType.valueOf(body.getTokenType());
         tokenSupplyType = TokenSupplyType.valueOf(body.getSupplyType());
         maxSupply = body.getMaxSupply();
+        tokenMetadata = body.getMetadata().toByteArray();
 
         for (var fee : body.getCustomFeesList()) {
             customFees.add(CustomFee.fromProtobuf(fee));

@@ -62,6 +62,9 @@ public class TokenInfoTest {
     private static final PublicKey testPauseKey = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
         .getPublicKey();
+    private static final PublicKey testMetadataKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
+        .getPublicKey();
     private static final TokenId testTokenId = TokenId.fromString("0.6.9");
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.9.0");
@@ -85,6 +88,7 @@ public class TokenInfoTest {
     private static final LedgerId testTokenLedgerId = LedgerId.MAINNET;
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.ofEpochSecond(1554158542);
+    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
 
     @BeforeAll
     public static void beforeAll() {
@@ -101,7 +105,8 @@ public class TokenInfoTest {
             testTreasuryAccountId, testAdminKey, testKycKey, testFreezeKey, testWipeKey, testSupplyKey,
             testFeeScheduleKey, testTokenFreezeStatus, testTokenKycStatus, testTokenIsDeleted, testAutoRenewAccountId,
             testAutoRenewPeriod, testExpirationTime, testTokenMemo, testTokenCustomFees, testTokenType,
-            testTokenSupplyType, testTokenMaxSupply, testPauseKey, testTokenPauseStatus, testTokenLedgerId);
+            testTokenSupplyType, testTokenMaxSupply, testPauseKey, testTokenPauseStatus, testMetadata, testMetadataKey,
+            testTokenLedgerId);
     }
 
     @Test
@@ -144,6 +149,8 @@ public class TokenInfoTest {
         assertThat(tokenInfo.customFees).hasSize(testTokenCustomFees.size());
         assertThat(tokenInfo.pauseKey.toBytes()).isEqualTo(testPauseKey.toBytes());
         assertThat(tokenInfo.pauseStatus).isEqualTo(testTokenPauseStatus);
+        assertThat(tokenInfo.metadata).isEqualTo(testMetadata);
+        assertThat(tokenInfo.metadataKey.toBytes()).isEqualTo(testMetadataKey.toBytes());
         assertThat(tokenInfo.ledgerId).isEqualTo(testTokenLedgerId);
     }
 
@@ -178,6 +185,8 @@ public class TokenInfoTest {
         assertThat(tokenInfo.customFees).hasSize(testTokenCustomFees.size());
         assertThat(tokenInfo.pauseKey.toBytes()).isEqualTo(testPauseKey.toBytes());
         assertThat(tokenInfo.pauseStatus).isEqualTo(testTokenPauseStatus);
+        assertThat(tokenInfo.metadata).isEqualTo(testMetadata);
+        assertThat(tokenInfo.metadataKey.toBytes()).isEqualTo(testMetadataKey.toBytes());
         assertThat(tokenInfo.ledgerId).isEqualTo(testTokenLedgerId);
     }
 
@@ -233,6 +242,10 @@ public class TokenInfoTest {
             testPauseKey.toBytesRaw());
         assertThat(tokenInfoProto.getTokenInfo().getPauseStatus()).isEqualTo(
             TokenInfo.pauseStatusToProtobuf(testTokenPauseStatus));
+        assertThat(tokenInfoProto.getTokenInfo().getMetadata().toByteArray()).isEqualTo(
+            testMetadata);
+        assertThat(tokenInfoProto.getTokenInfo().getMetadataKey().getEd25519().toByteArray()).isEqualTo(
+            testMetadataKey.toBytesRaw());
         assertThat(tokenInfoProto.getTokenInfo().getLedgerId()).isEqualTo(testTokenLedgerId.toByteString());
     }
 
