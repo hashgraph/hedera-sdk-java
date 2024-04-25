@@ -1544,7 +1544,12 @@ public enum Status {
     /**
      * NFT serial numbers are missing in the TokenUpdateNftsTransactionBody
      */
-    MISSING_SERIAL_NUMBERS(ResponseCodeEnum.MISSING_SERIAL_NUMBERS);
+    MISSING_SERIAL_NUMBERS(ResponseCodeEnum.MISSING_SERIAL_NUMBERS),
+
+    /**
+     * Admin key is not set on token
+     */
+    TOKEN_HAS_NO_ADMIN_KEY(ResponseCodeEnum.TOKEN_HAS_NO_ADMIN_KEY);
 
     final ResponseCodeEnum code;
 
@@ -1849,6 +1854,7 @@ public enum Status {
             case TOKEN_HAS_NO_METADATA_KEY -> TOKEN_HAS_NO_METADATA_KEY;
             case MISSING_TOKEN_METADATA -> MISSING_TOKEN_METADATA;
             case MISSING_SERIAL_NUMBERS -> MISSING_SERIAL_NUMBERS;
+            case TOKEN_HAS_NO_ADMIN_KEY -> TOKEN_HAS_NO_ADMIN_KEY;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
