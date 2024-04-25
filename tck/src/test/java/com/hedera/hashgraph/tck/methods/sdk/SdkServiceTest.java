@@ -24,8 +24,7 @@ class SdkServiceTest {
                 "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137",
                 "127.0.0.1:50211",
                 "3",
-                "http://127.0.0.1:5551"
-        );
+                "http://127.0.0.1:5551");
 
         // When
         SetupResponse response = sdkService.setup(params);
@@ -34,17 +33,11 @@ class SdkServiceTest {
         assertEquals("Successfully setup custom client.", response.getMessage());
     }
 
-
     @Test
     void testSetupFail() throws HederaException {
         // Given
-        SetupParams params = new SetupParams(
-            "operatorAccountId",
-            "operatorPrivateKey",
-            "nodeIp",
-            "3asdf",
-            "127.0.0.1:50211"
-        );
+        SetupParams params =
+                new SetupParams("operatorAccountId", "operatorPrivateKey", "nodeIp", "3asdf", "127.0.0.1:50211");
 
         // then
         assertThrows(HederaException.class, () -> sdkService.setup(params));

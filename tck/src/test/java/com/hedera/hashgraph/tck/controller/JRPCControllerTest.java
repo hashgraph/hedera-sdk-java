@@ -1,6 +1,5 @@
 package com.hedera.hashgraph.tck.controller;
 
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -28,6 +27,7 @@ class JRPCControllerTest {
 
     @Mock
     JSONRPC2Request jsonrpcRequest;
+
     @Test
     void handleJSONRPC2RequestValidRequestReturnsExpectedResponse() {
         // given

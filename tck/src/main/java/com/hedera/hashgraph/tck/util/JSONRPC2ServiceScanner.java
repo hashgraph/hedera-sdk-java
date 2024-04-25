@@ -15,7 +15,7 @@ public class JSONRPC2ServiceScanner {
 
     public static void registerServices(Dispatcher dispatcher, ApplicationContext context) {
         String[] serviceNames = context.getBeanNamesForAnnotation(JSONRPC2Service.class);
-        if(serviceNames != null) { // NOSONAR
+        if (serviceNames != null) { // NOSONAR
             for (String serviceName : serviceNames) {
                 Object service = context.getBean(serviceName);
                 dispatcher.register((RequestHandler) service);

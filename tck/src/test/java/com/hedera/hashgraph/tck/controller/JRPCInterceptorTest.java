@@ -1,25 +1,20 @@
 package com.hedera.hashgraph.tck.controller;
 
-import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.MockedConstruction;
-import org.mockito.MockitoAnnotations;
-
-import java.io.BufferedReader;
-import java.io.StringReader;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
+import java.io.StringReader;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 @ExtendWith(MockitoExtension.class)
-public class JRPCInterceptorTest {
+class JRPCInterceptorTest {
 
     @Mock
     HttpServletRequest request;
@@ -30,7 +25,8 @@ public class JRPCInterceptorTest {
     @Test
     void testMapToJSONRPC2Request() throws Exception {
         // given
-        String requestBody = "{\"jsonrpc\": \"2.0\", \"method\": \"testMethod\", \"params\": {\"param1\": \"value1\"}, \"id\": 1}";
+        String requestBody =
+                "{\"jsonrpc\": \"2.0\", \"method\": \"testMethod\", \"params\": {\"param1\": \"value1\"}, \"id\": 1}";
         BufferedReader reader = new BufferedReader(new StringReader(requestBody));
         when(request.getReader()).thenReturn(reader);
 
@@ -48,7 +44,8 @@ public class JRPCInterceptorTest {
     @Test
     void testPreHandle() throws Exception {
         // given
-        String requestBody = "{\"jsonrpc\": \"2.0\", \"method\": \"testMethod\", \"params\": {\"param1\": \"value1\"}, \"id\": 1}";
+        String requestBody =
+                "{\"jsonrpc\": \"2.0\", \"method\": \"testMethod\", \"params\": {\"param1\": \"value1\"}, \"id\": 1}";
         BufferedReader reader = new BufferedReader(new StringReader(requestBody));
         when(request.getReader()).thenReturn(reader);
 
