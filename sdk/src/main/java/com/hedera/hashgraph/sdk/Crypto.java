@@ -272,6 +272,7 @@ final class Crypto {
 
         return out;
     }
+
     /**
      * Given the r and s components of a signature and the hash value of the message, recover and return the public key
      * according to the algorithm in <a href="https://www.secg.org/sec1-v2.pdf">SEC1v2 section 4.1.6.</a>
@@ -285,7 +286,7 @@ final class Crypto {
      * @param messageHash Hash of the data that was signed.
      * @return A ECKey containing only the public part, or {@code null} if recovery wasn't possible.
      */
-    public static byte[] recoverPublicKeyECDSAFromSignature(int recId, BigInteger r, BigInteger s, byte[] messageHash) {
+    static byte[] recoverPublicKeyECDSAFromSignature(int recId, BigInteger r, BigInteger s, byte[] messageHash) {
         if (!(recId == 0 || recId == 1)) {
             throw new IllegalArgumentException("Recovery Id must be 0 or 1 for secp256k1.");
         }

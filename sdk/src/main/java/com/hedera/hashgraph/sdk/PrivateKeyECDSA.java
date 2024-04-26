@@ -311,6 +311,4 @@ public class PrivateKeyECDSA extends PrivateKey {
     public boolean isECDSA() {
         return true;
     }
-
-
 }
