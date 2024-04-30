@@ -22,17 +22,18 @@ pluginManagement {
 }
 
 plugins {
-    id("com.gradle.enterprise")
+    id("com.gradle.develocity")
     id("org.gradle.toolchains.foojay-resolver-convention")
 }
 
 includeBuild(".")
 
 // Enable Gradle Build Scan
-gradleEnterprise {
+develocity {
     buildScan {
-        termsOfServiceUrl = "https://gradle.com/terms-of-service"
-        termsOfServiceAgree = "yes"
+        termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
+        termsOfUseAgree = "yes"
+        publishing.onlyIf { false } // only publish with explicit '--scan'
     }
 }
 

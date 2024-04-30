@@ -136,11 +136,16 @@ spotbugs {
 }
 
 tasks.spotbugsMain {
-    reports.named("html") {
+    reports.register("html") {
         required = true
         outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
         setStylesheet("fancy-hist.xsl")
     }
+}
+
+dependencies {
+    spotbugs("com.github.spotbugs:spotbugs:4.8.4")
+    spotbugs("com.google.code.findbugs:jsr305:3.0.2")
 }
 
 sonarqube {
