@@ -37,8 +37,8 @@ nexusPublishing {
 }
 
 tasks.named("closeSonatypeStagingRepository") {
-    // The publishing of all components to Maven Central (in this case only 'sdk') is
-    // automatically done before close (which is done before release).
+    // The publishing of all components to Maven Central is automatically done before close
+    // (which is done before release).
     dependsOn(":sdk:publishToSonatype")
     dependsOn(":sdk-full:publishToSonatype")
 }
