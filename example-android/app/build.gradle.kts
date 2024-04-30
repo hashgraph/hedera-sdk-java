@@ -40,6 +40,13 @@ android {
 }
 
 dependencies {
+    // Remove when using a published SDK
+    implementation(platform("com.hedera.hashgraph:sdk")) {
+        this as ModuleDependency
+        capabilities { requireCapabilities("com.hedera.hashgraph:sdk-platform") }
+    }
+    // ----
+
     implementation("com.hedera.hashgraph:sdk")
 
     implementation("com.google.android.material:material:1.11.0")
