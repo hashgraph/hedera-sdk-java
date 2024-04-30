@@ -1,3 +1,3 @@
 plugins {
-    id("com.hedera.gradlebuild.root")
+    id("com.hedera.gradle.root")
 }
