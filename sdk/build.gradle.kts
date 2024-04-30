@@ -50,7 +50,7 @@ testModuleInfo {
     runtimeOnly("org.slf4j.simple")
 }
 
-integrationTestModuleInfo {
+testIntegrationModuleInfo {
     runtimeOnly("grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }
