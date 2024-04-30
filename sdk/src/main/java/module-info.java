@@ -19,4 +19,6 @@ module com.hedera.hashgraph.sdk {
     exports com.hedera.hashgraph.sdk;
     exports com.hedera.hashgraph.sdk.logger;
     exports com.hedera.hashgraph.sdk.proto;
+
+    opens com.hedera.hashgraph.sdk;
 }
