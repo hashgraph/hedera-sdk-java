@@ -22,9 +22,9 @@ plugins {
     id("net.ltgt.errorprone")
     id("org.gradlex.java-module-dependencies")
     id("org.gradlex.java-module-versions")
-    id("com.hedera.gradlebuild.base")
-    id("com.hedera.gradlebuild.repositories")
-    id("com.hedera.gradlebuild.patch-modules")
+    id("com.hedera.gradle.base")
+    id("com.hedera.gradle.repositories")
+    id("com.hedera.gradle.patch-modules")
 }
 
 java {

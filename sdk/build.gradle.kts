@@ -1,5 +1,5 @@
 plugins {
-    id("com.hedera.gradlebuild.sdk.java")
+    id("com.hedera.gradle.sdk")
 }
 
 dependencies.constraints {

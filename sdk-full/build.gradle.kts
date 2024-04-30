@@ -1,3 +1,3 @@
 plugins {
-    id("com.hedera.gradlebuild.sdk-full.java")
+    id("com.hedera.gradle.sdk-full")
 }

@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("com.hedera.gradlebuild.java")
+    id("com.hedera.gradle.java")
 }
 
 javaModuleDependencies.moduleNameToGA.put("com.google.protobuf", "com.google.protobuf:protobuf-java")

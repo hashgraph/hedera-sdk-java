@@ -15,7 +15,7 @@
  */
 
 plugins {
-    id("com.hedera.gradlebuild.repositories")
+    id("com.hedera.gradle.repositories")
     id("com.autonomousapps.dependency-analysis")
     id("io.github.gradle-nexus.publish-plugin")
 }

@@ -2,7 +2,7 @@ pluginManagement {
     includeBuild("gradle/plugins")
 }
 plugins {
-    id("com.hedera.gradlebuild.settings")
+    id("com.hedera.gradle.settings")
 }
 
 includeBuild("example-android")

@@ -22,8 +22,8 @@ plugins {
     id("com.google.protobuf")
     id("com.github.spotbugs")
     id("org.sonarqube")
-    id("com.hedera.gradlebuild.java-base")
-    id("com.hedera.gradlebuild.publish")
+    id("com.hedera.gradle.java-base")
+    id("com.hedera.gradle.publish")
 }
 
 @Suppress("UnstableApiUsage")
