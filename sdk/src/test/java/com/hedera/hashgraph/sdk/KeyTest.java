@@ -29,6 +29,7 @@ import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -61,6 +62,47 @@ class KeyTest {
         // muck with the signature a little and make sure it breaks
         signature[5] += 1;
         assertThat(publicKey.verify(message, signature)).isFalse();
+    }
+
+    @Test
+    @DisplayName("Calculated recId is either 0 or 1 for ECDSA secp256k1 curve")
+    void calculateRecoveryIdECDSA() {
+        var message = "Hello, World".getBytes(UTF_8);
+        var privateKey = PrivateKey.generateECDSA();
+        var signature = privateKey.sign(message);
+        // wrap in signature object
+        final byte[] r = new byte[32];
+        System.arraycopy(signature, 0, r, 0, 32);
+        final byte[] s = new byte[32];
+        System.arraycopy(signature, 32, s, 0, 32);
+        var recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r,s,message);
+        assertThat(recId).isBetween(0,1);
+    }
+
+    @Test
+    @DisplayName("Fail to calculate recId for ECDSA with illegal inputs")
+    void failToCalculateRecoveryIdWithIllegalInputDataECDSA() {
+        // create signature
+        var message = "Hello, World".getBytes(UTF_8);
+        var privateKey = PrivateKey.generateECDSA();
+        var signature = privateKey.sign(message);
+        final byte[] r = new byte[32];
+        System.arraycopy(signature, 0, r, 0, 32);
+        final byte[] s = new byte[32];
+        System.arraycopy(signature, 32, s, 0, 32);
+        // recover public key with recId > 1
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+            () -> Crypto.recoverPublicKeyECDSAFromSignature(2, BigInteger.ONE, BigInteger.ONE, Crypto.calcKeccak256(message))
+        );
+        // recover public key with negative 'r' or 's'
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
+            () -> Crypto.recoverPublicKeyECDSAFromSignature(0, BigInteger.valueOf(-1), BigInteger.ONE, Crypto.calcKeccak256(message))
+        );
+        // calculate recId with wrong message
+        var wrongMessage = "Hello".getBytes(UTF_8);
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            () -> ((PrivateKeyECDSA) privateKey).getRecoveryId(r,s,wrongMessage)
+        );
     }
 
     @Test
