@@ -1,3 +1,5 @@
+package com.hedera.hashgraph.sdk.examples;
+
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
