@@ -33,7 +33,15 @@ testing.suites {
     }
     register<JvmTestSuite>("testIntegration") {
         testType = TestSuiteType.INTEGRATION_TEST
-        targets.all { testTask { group = "build" } }
+        targets.all {
+            testTask {
+                group = "build"
+                systemProperty("CONFIG_FILE", providers.gradleProperty("CONFIG_FILE").getOrElse(""))
+                systemProperty("HEDERA_NETWORK", providers.gradleProperty("HEDERA_NETWORK").getOrElse(""))
+                systemProperty("OPERATOR_ID", providers.gradleProperty("OPERATOR_ID").getOrElse(""))
+                systemProperty("OPERATOR_KEY", providers.gradleProperty("OPERATOR_KEY").getOrElse(""))
+            }
+        }
     }
 }
 
