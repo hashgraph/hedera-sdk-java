@@ -31,7 +31,7 @@ testing.suites {
     named<JvmTestSuite>("test") {
         useJUnitJupiter()
     }
-    register<JvmTestSuite>("integrationTest") {
+    register<JvmTestSuite>("testIntegration") {
         testType = TestSuiteType.INTEGRATION_TEST
         targets.all { testTask { group = "build" } }
     }
@@ -70,7 +70,7 @@ tasks.jacocoTestReport {
     // make sure to use any/all test coverage data for the report and run all tests before this report is made
     executionData.from(
         tasks.test.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! },
-        tasks.named("integrationTest").map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! }
+        tasks.named("testIntegration").map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! }
     )
 
     // remove generated proto files from report

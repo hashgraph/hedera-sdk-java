@@ -31,7 +31,7 @@ jobs:
       - name: Compile Tests
         run: ./gradlew compileTestJava
       - name: Compile Integration Tests
-        run: ./gradlew compileIntegrationTestJava
+        run: ./gradlew compileTestIntegrationJava
       - name: Compile Examples
         run: ./gradlew :examples:compileJava
 
