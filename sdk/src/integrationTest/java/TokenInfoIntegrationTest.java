@@ -18,6 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenInfoIntegrationTest {
+
     @Test
     @DisplayName("Can query token info when all keys are different")
     void canQueryTokenInfoWhenAllKeysAreDifferent() throws Exception {
@@ -28,6 +29,8 @@ class TokenInfoIntegrationTest {
         var key3 = PrivateKey.generateED25519();
         var key4 = PrivateKey.generateED25519();
         var key5 = PrivateKey.generateED25519();
+        var key6 = PrivateKey.generateED25519();
+        var key7 = PrivateKey.generateED25519();
 
         var response = new TokenCreateTransaction()
             .setTokenName("ffff")
@@ -40,6 +43,8 @@ class TokenInfoIntegrationTest {
             .setWipeKey(key3)
             .setKycKey(key4)
             .setSupplyKey(key5)
+            .setPauseKey(key6)
+            .setMetadataKey(key7)
             .setFreezeDefault(false)
             .freezeWith(testEnv.client)
             .sign(key1)
@@ -61,11 +66,15 @@ class TokenInfoIntegrationTest {
         assertThat(info.wipeKey).isNotNull();
         assertThat(info.kycKey).isNotNull();
         assertThat(info.supplyKey).isNotNull();
+        assertThat(info.pauseKey).isNotNull();
+        assertThat(info.metadataKey).isNotNull();
         assertThat(info.adminKey.toString()).isEqualTo(key1.getPublicKey().toString());
         assertThat(info.freezeKey.toString()).isEqualTo(key2.getPublicKey().toString());
         assertThat(info.wipeKey.toString()).isEqualTo(key3.getPublicKey().toString());
         assertThat(info.kycKey.toString()).isEqualTo(key4.getPublicKey().toString());
         assertThat(info.supplyKey.toString()).isEqualTo(key5.getPublicKey().toString());
+        assertThat(info.pauseKey.toString()).isEqualTo(key6.getPublicKey().toString());
+        assertThat(info.metadataKey.toString()).isEqualTo(key7.getPublicKey().toString());
         assertThat(info.defaultFreezeStatus).isNotNull();
         assertThat(info.defaultFreezeStatus).isFalse();
         assertThat(info.defaultKycStatus).isNotNull();
@@ -111,6 +120,8 @@ class TokenInfoIntegrationTest {
         assertThat(info.wipeKey).isNull();
         assertThat(info.kycKey).isNull();
         assertThat(info.supplyKey).isNull();
+        assertThat(info.pauseKey).isNull();
+        assertThat(info.metadataKey).isNull();
         assertThat(info.defaultFreezeStatus).isNull();
         assertThat(info.defaultKycStatus).isNull();
         assertThat(info.tokenType).isEqualTo(TokenType.FUNGIBLE_COMMON);
@@ -161,6 +172,8 @@ class TokenInfoIntegrationTest {
         assertThat(info.wipeKey).isNull();
         assertThat(info.kycKey).isNull();
         assertThat(info.supplyKey).isNotNull();
+        assertThat(info.pauseKey).isNull();
+        assertThat(info.metadataKey).isNull();
         assertThat(info.defaultFreezeStatus).isNull();
         assertThat(info.defaultKycStatus).isNull();
         assertThat(info.tokenType).isEqualTo(TokenType.NON_FUNGIBLE_UNIQUE);
