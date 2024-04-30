@@ -1,4 +1,5 @@
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -133,7 +134,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TopicMessageSubmitTransaction()
                     .setMessage(Contents.BIG_CONTENTS)
                     .setMaxChunks(15)
@@ -166,7 +167,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TopicMessageSubmitTransaction()
                     .setTopicId(topicId)
                     .execute(testEnv.client)

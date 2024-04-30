@@ -69,7 +69,7 @@ public class ContractDeleteIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can delete contract which has no admin key")
+    @DisplayName("Cannot delete contract which has no admin key")
     void cannotDeleteContractWhichHasNoAdminKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
@@ -105,6 +105,7 @@ public class ContractDeleteIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new ContractDeleteTransaction()
                 .setContractId(contractId)
+                .setTransferAccountId(testEnv.client.getOperatorAccountId())
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.MODIFYING_IMMUTABLE_CONTRACT.toString());
