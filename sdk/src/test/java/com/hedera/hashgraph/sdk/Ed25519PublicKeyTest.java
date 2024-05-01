@@ -180,7 +180,7 @@ class Ed25519PublicKeyTest {
     }
 
     @Test
-    @DisplayName("public key is is ED25519")
+    @DisplayName("public key is ED25519")
     void keyIsECDSA() {
         PublicKey key = PrivateKey.generateED25519().getPublicKey();
 
@@ -188,7 +188,7 @@ class Ed25519PublicKeyTest {
     }
 
     @Test
-    @DisplayName("public key is is not ECDSA")
+    @DisplayName("public key is not ECDSA")
     void keyIsNotEd25519() {
         PublicKey key = PrivateKey.generateED25519().getPublicKey();
 

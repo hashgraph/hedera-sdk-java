@@ -150,7 +150,7 @@ public class ECDSAPublicKeyTest {
     }
 
     @Test
-    @DisplayName("public key is is ECDSA")
+    @DisplayName("public key is ECDSA")
     void keyIsECDSA() {
         PublicKey key = PrivateKey.generateECDSA().getPublicKey();
 
@@ -158,7 +158,7 @@ public class ECDSAPublicKeyTest {
     }
 
     @Test
-    @DisplayName("public key is is not Ed25519")
+    @DisplayName("public key is not Ed25519")
     void keyIsNotEd25519() {
         PublicKey key = PrivateKey.generateECDSA().getPublicKey();
 
