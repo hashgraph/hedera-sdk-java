@@ -151,20 +151,20 @@ jobs:
       - name: Start the local node
         run: npx @hashgraph/hedera-local start -d --network local
 
-      #- name: Prepare .env for Examples
-      - name: Run Examples
+      - name: Prepare .env for Examples
+      #- name: Run Examples
         env:
             OPERATOR_KEY: '${{ secrets.OPERATOR_KEY }}'
             OPERATOR_ID: '${{ secrets.OPERATOR_ID }}'
             HEDERA_NETWORK: 'localhost'
-        run: ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK  :examples:runAllExamples --scan
-        # run: |
-        #   echo "OPERATOR_KEY=${{ secrets.OPERATOR_KEY }}" > examples/.env
-        #   echo "OPERATOR_ID=${{ secrets.OPERATOR_ID }}" >> examples/.env
-        #   echo "HEDERA_NETWORK=localhost" >> examples/.env
+        #run: ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK  :examples:runAllExamples --scan
+        run: |
+          echo "OPERATOR_KEY=${{ secrets.OPERATOR_KEY }}" > examples/.env
+          echo "OPERATOR_ID=${{ secrets.OPERATOR_ID }}" >> examples/.env
+          echo "HEDERA_NETWORK=localhost" >> examples/.env
 
-      #- name: Run Examples
-      #  run: ./gradlew :examples:runAllExamples --scan
+      - name: Run Examples
+        run: ./gradlew :examples:runAllExamples --scan
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
