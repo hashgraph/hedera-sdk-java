@@ -1,5 +1,5 @@
 # Default code owners for entire repository
-*   @agadzhalov @thenswan @SimiHunjan @hashgraph/release-engineering @hashgraph/release-engineering-managers
+*   @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 #########################
 #####  Core Files  ######
@@ -8,7 +8,7 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @0xivanov @MrValioBg
+/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Legacy Maven project files
 **/pom.xml                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers

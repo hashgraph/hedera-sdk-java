@@ -11,6 +11,7 @@ defaults:
 
 permissions:
   contents: read
+  packages: write
 
 env:
   LC_ALL: C.UTF-8
