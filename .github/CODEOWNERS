@@ -8,33 +8,34 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/.github/workflows/                             @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Legacy Maven project files
-**/pom.xml                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+**/pom.xml                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Gradle project files and inline plugins
-/gradle/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers
-gradlew                                         @hashgraph/release-engineering @hashgraph/release-engineering-managers
-gradlew.bat                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers
-**/build-logic/                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers
-**/gradle.*                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers
-**/*.gradle.*                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/gradle/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+gradlew                                         @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+gradlew.bat                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+**/build-logic/                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+**/gradle.*                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+**/*.gradle.*                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Codacy Tool Configurations
-/config/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers
-.remarkrc                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/config/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+.remarkrc                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
-/CODEOWNERS                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/CODEOWNERS                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Protect the repository root files
-/README.md                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/README.md                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers  @agadzhalov @thenswan @SimiHunjan @0xivanov
 **/LICENSE                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
 
 # CodeCov configuration
-**/codecov.yml                                  @hashgraph/release-engineering @hashgraph/release-engineering-managers
+**/codecov.yml                                  @hashgraph/release-engineering @hashgraph/release-engineering-managers  @agadzhalov @thenswan @SimiHunjan @0xivanov
 
 # Git Ignore definitions
-**/.gitignore                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers
-**/.gitignore.*                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers
+**/.gitignore                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
+**/.gitignore.*                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers @agadzhalov @thenswan @SimiHunjan @0xivanov
