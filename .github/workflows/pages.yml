@@ -10,6 +10,8 @@ defaults:
     shell: bash
 
 permissions:
+  contents: read
+  packages: write
   id-token: write
   pages: write
 
