@@ -743,6 +743,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (tokenMetadata != null) {
             builder.setMetadata(BytesValue.of(ByteString.copyFrom(tokenMetadata)));
         }
+        builder.setKeyVerificationMode(tokenKeyVerificationMode.code);
 
         return builder;
     }
