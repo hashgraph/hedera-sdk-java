@@ -154,8 +154,8 @@ jobs:
       #- name: Prepare .env for Examples
       - name: Run Examples
         env:
-            OPERATOR_KEY: "${{ secrets.OPERATOR_KEY }}"
-            OPERATOR_ID: "${{ secrets.OPERATOR_ID }}"
+            OPERATOR_KEY: "0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4"
+            OPERATOR_ID: "0.0.1022"
             HEDERA_NETWORK: "localhost"
         run: ./gradlew :examples:runAllExamples --scan
         # run: |
