@@ -1,2 +1,41 @@
 # Default code owners for entire repository
-*   @agadzhalov @thenswan @SimiHunjan
+*   @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+#########################
+#####  Core Files  ######
+#########################
+
+# NOTE: Must be placed last to ensure enforcement over all other rules
+
+# Protection Rules for Github Configuration Files and Actions Workflows
+/.github/                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers
+/.github/workflows/                             @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Legacy Maven project files
+**/pom.xml                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Gradle project files and inline plugins
+/gradle/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+gradlew                                         @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+gradlew.bat                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+**/build-logic/                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+**/gradle.*                                     @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+**/*.gradle.*                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Codacy Tool Configurations
+/config/                                        @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+.remarkrc                                       @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
+/CODEOWNERS                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Protect the repository root files
+/README.md                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers  @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+**/LICENSE                                      @hashgraph/release-engineering @hashgraph/release-engineering-managers
+
+# CodeCov configuration
+**/codecov.yml                                  @hashgraph/release-engineering @hashgraph/release-engineering-managers  @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+
+# Git Ignore definitions
+**/.gitignore                                   @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
+**/.gitignore.*                                 @hashgraph/release-engineering @hashgraph/release-engineering-managers @hashgraph/hedera-sdk @hashgraph/hedera-sdk-java-maintainers @hashgraph/hedera-sdk-java-contributors
