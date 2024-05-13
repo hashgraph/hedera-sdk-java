@@ -2,11 +2,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.KeyList;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TokenInfoQuery;
+import com.hedera.hashgraph.sdk.TokenKeyValidation;
 import com.hedera.hashgraph.sdk.TokenType;
 import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
 import java.util.Objects;
@@ -683,5 +687,1601 @@ class TokenUpdateIntegrationTest {
 
 
         testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can make a token immutable when updating keys to an empty KeyList, signing with an Admin Key, and setting the key verification mode to NO_VALIDATION")
+    void canMakeTokenImmutableWhenUpdatingKeysToEmptyKeyListSigningWithAdminKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var emptyKeyList = new KeyList();
+
+        // make a token immutable by removing all of its keys when updating them to an empty KeyList,
+        // signing with an Admin Key, and setting the key verification mode to NO_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(emptyKeyList)
+            .setKycKey(emptyKeyList)
+            .setFreezeKey(emptyKeyList)
+            .setPauseKey(emptyKeyList)
+            .setSupplyKey(emptyKeyList)
+            .setFeeScheduleKey(emptyKeyList)
+            .setMetadataKey(emptyKeyList)
+            .setAdminKey(emptyKeyList)
+            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.adminKey).isNull();
+        assertThat(tokenInfoAfterUpdate.wipeKey).isNull();
+        assertThat(tokenInfoAfterUpdate.kycKey).isNull();
+        assertThat(tokenInfoAfterUpdate.freezeKey).isNull();
+        assertThat(tokenInfoAfterUpdate.pauseKey).isNull();
+        assertThat(tokenInfoAfterUpdate.supplyKey).isNull();
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey).isNull();
+        assertThat(tokenInfoAfterUpdate.metadataKey).isNull();
+
+        testEnv.close(tokenId);
+    }
+
+    // revisit
+    // expected behaviour: use can zero out admin key
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can make a token immutable when updating keys to an unusable key (i.e. all-zeros key), signing with an Admin Key, and setting the key verification mode to NO_VALIDATION")
+    void canMakeTokenImmutableWhenUpdatingKeysToAllZerosKeySigningWithAdminKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // make a token immutable by removing all of its keys when updating them to an unusable key (i.e. all-zeros key),
+        // signing with an Admin Key, and setting the key verification mode to NO_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(unusableKey)
+            .setKycKey(unusableKey)
+            .setFreezeKey(unusableKey)
+            .setPauseKey(unusableKey)
+            .setSupplyKey(unusableKey)
+            .setFeeScheduleKey(unusableKey)
+            .setMetadataKey(unusableKey)
+//            .setAdminKey(unusableKey)
+            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+//        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can remove all of token’s lower-privilege keys when updating keys to an empty KeyList, signing with an Admin Key, and setting the key verification mode to FULL_VALIDATION")
+    void canRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToEmptyKeyListSigningWithAdminKeyWithKeyVerificationSetToFullValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var emptyKeyList = new KeyList();
+
+        // remove all of token’s lower-privilege keys when updating them to an empty KeyList,
+        // signing with an Admin Key, and setting the key verification mode to FULL_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(emptyKeyList)
+            .setKycKey(emptyKeyList)
+            .setFreezeKey(emptyKeyList)
+            .setPauseKey(emptyKeyList)
+            .setSupplyKey(emptyKeyList)
+            .setFeeScheduleKey(emptyKeyList)
+            .setMetadataKey(emptyKeyList)
+            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.wipeKey).isNull();
+        assertThat(tokenInfoAfterUpdate.kycKey).isNull();
+        assertThat(tokenInfoAfterUpdate.freezeKey).isNull();
+        assertThat(tokenInfoAfterUpdate.pauseKey).isNull();
+        assertThat(tokenInfoAfterUpdate.supplyKey).isNull();
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey).isNull();
+        assertThat(tokenInfoAfterUpdate.metadataKey).isNull();
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can remove all of token’s lower-privilege keys when updating keys to an unusable key (i.e. all-zeros key), signing with an Admin Key, and setting the key verification mode to FULL_VALIDATION, and then revert previous keys")
+    void canRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningWithAdminKeyWithKeyVerificationSetToFullValidationAndThenRevertPreviousKeys() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // remove all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key),
+        // signing with an Admin Key, and setting the key verification mode to FULL_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(unusableKey)
+            .setKycKey(unusableKey)
+            .setFreezeKey(unusableKey)
+            .setPauseKey(unusableKey)
+            .setSupplyKey(unusableKey)
+            .setFeeScheduleKey(unusableKey)
+            .setMetadataKey(unusableKey)
+            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
+
+        // set all lower-privilege keys back by signing with an Admin Key, and setting key verification mode to NO_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(wipeKey.getPublicKey())
+            .setKycKey(kycKey.getPublicKey())
+            .setFreezeKey(freezeKey.getPublicKey())
+            .setPauseKey(pauseKey.getPublicKey())
+            .setSupplyKey(supplyKey.getPublicKey())
+            .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+            .setMetadataKey(metadataKey.getPublicKey())
+            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterRevert = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterRevert.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterRevert.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can update all of token’s lower-privilege keys when signing with an Admin Key and new respective lower-privilege key, and setting key verification mode to FULL_VALIDATION")
+    void canUpdateAllLowerPrivilegeKeysWhenSigningWithAdminKeyAndNewLowerPrivilegeKeyWithKeyVerificationSetToFullValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // New Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var newWipeKey = PrivateKey.generateED25519();
+        var newKycKey = PrivateKey.generateED25519();
+        var newFreezeKey = PrivateKey.generateED25519();
+        var newPauseKey = PrivateKey.generateED25519();
+        var newSupplyKey = PrivateKey.generateED25519();
+        var newFeeScheduleKey = PrivateKey.generateED25519();
+        var newMetadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // update all of token’s lower-privilege keys when signing with an Admin Key and new respective lower-privilege key,
+        // and setting key verification mode to FULL_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(newWipeKey.getPublicKey())
+            .setKycKey(newKycKey.getPublicKey())
+            .setFreezeKey(newFreezeKey.getPublicKey())
+            .setPauseKey(newPauseKey.getPublicKey())
+            .setSupplyKey(newSupplyKey.getPublicKey())
+            .setFeeScheduleKey(newFeeScheduleKey.getPublicKey())
+            .setMetadataKey(newMetadataKey.getPublicKey())
+            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(adminKey)
+            .sign(newWipeKey)
+            .sign(newKycKey)
+            .sign(newFreezeKey)
+            .sign(newPauseKey)
+            .sign(newSupplyKey)
+            .sign(newFeeScheduleKey)
+            .sign(newMetadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(newWipeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(newKycKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(newFreezeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(newPauseKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(newSupplyKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(newFeeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(newMetadataKey.getPublicKey().toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot make a token immutable when updating keys to an empty KeyList, signing with a key that is different from an Admin Key, and setting the key verification mode to NO_VALIDATION")
+    void cannotMakeTokenImmutableWhenUpdatingKeysToEmptyKeyListSigningWithDifferentKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var emptyKeyList = new KeyList();
+
+        // make token immutable by removing all of its keys
+        // when updating them to an empty KeyList (trying to remove keys one by one to check all errors),
+        // signing with a key that is different from an Admin Key (implicitly with an operator key),
+        // and setting the key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setAdminKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot make a token immutable when updating keys to an unusable key (i.e. all-zeros key), signing with a key that is different from an Admin Key, and setting the key verification mode to NO_VALIDATION")
+    void cannotMakeTokenImmutableWhenUpdatingKeysToAllZerosKeySigningWithDifferentKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var adminKey = PrivateKey.generateED25519();
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // make token immutable by removing all of its keys
+        // when updating them to an unusable key (i.e. all-zeros key) (trying to remove keys one by one to check all errors),
+        // signing with a key that is different from an Admin Key (implicitly with an operator key),
+        // and setting the key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setAdminKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can remove all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key), signing with a respective lower-privilege key, and setting the key verification mode to NO_VALIDATION")
+    void canRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningWithRespectiveLowerPrivilegeKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // remove all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key),
+        // signing with a respective lower-privilege key, and setting the key verification mode to NO_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(unusableKey)
+            .setKycKey(unusableKey)
+            .setFreezeKey(unusableKey)
+            .setPauseKey(unusableKey)
+            .setSupplyKey(unusableKey)
+            .setFeeScheduleKey(unusableKey)
+            .setMetadataKey(unusableKey)
+            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(wipeKey)
+            .sign(kycKey)
+            .sign(freezeKey)
+            .sign(pauseKey)
+            .sign(supplyKey)
+            .sign(feeScheduleKey)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
+
+        testEnv.close(tokenId);
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Can update all of token’s lower-privilege keys when signing ONLY with an old lower-privilege key, and setting key verification mode to NO_VALIDATION")
+    void canUpdateAllLowerPrivilegeKeysWhenSigningOnlyWithOldLowerPrivilegeKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // New Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var newWipeKey = PrivateKey.generateED25519();
+        var newKycKey = PrivateKey.generateED25519();
+        var newFreezeKey = PrivateKey.generateED25519();
+        var newPauseKey = PrivateKey.generateED25519();
+        var newSupplyKey = PrivateKey.generateED25519();
+        var newFeeScheduleKey = PrivateKey.generateED25519();
+        var newMetadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // update all of token’s lower-privilege keys when signing with an old respective lower-privilege key,
+        // and setting key verification mode to NO_VALIDATION
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setWipeKey(newWipeKey.getPublicKey())
+            .setKycKey(newKycKey.getPublicKey())
+            .setFreezeKey(newFreezeKey.getPublicKey())
+            .setPauseKey(newPauseKey.getPublicKey())
+            .setSupplyKey(newSupplyKey.getPublicKey())
+            .setFeeScheduleKey(newFeeScheduleKey.getPublicKey())
+            .setMetadataKey(newMetadataKey.getPublicKey())
+            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+            .freezeWith(testEnv.client)
+            .sign(wipeKey)
+            .sign(kycKey)
+            .sign(freezeKey)
+            .sign(pauseKey)
+            .sign(supplyKey)
+            .sign(feeScheduleKey)
+            .sign(metadataKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var tokenInfoAfterUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(newWipeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(newKycKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(newFreezeKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(newPauseKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(newSupplyKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(newFeeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(newMetadataKey.getPublicKey().toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot remove all of token’s lower-privilege keys when updating them to an empty KeyList, signing with a respective lower-privilege key, and setting the key verification mode to NO_VALIDATION")
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToEmptyKeyListSigningWithRespectiveLowerPrivilegeKeWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var emptyKeyList = new KeyList();
+
+        // remove all of token’s lower-privilege keys
+        // when updating them to an empty KeyList (trying to remove keys one by one to check all errors),
+        // signing with a respective lower-privilege key,
+        // and setting the key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(wipeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(kycKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(freezeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(pauseKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(supplyKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(feeScheduleKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(emptyKeyList)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot remove all of token’s lower-privilege keys when updating keys to an unusable key (i.e. all-zeros key), signing with a key that is different from a respective lower-privilege key, and setting the key verification mode to NO_VALIDATION")
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningWithDifferentKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // remove all of token’s lower-privilege keys
+        // when updating them to an unusable key (i.e. all-zeros key) (trying to remove keys one by one to check all errors),
+        // signing with a key that is different from a respective lower-privilege key (implicitly with an operator key),
+        // and setting the key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot remove all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key), signing ONLY with an old respective lower-privilege key, and setting the key verification mode to FULL_VALIDATION")
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToFullValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // remove all of token’s lower-privilege keys
+        // when updating them to an unusable key (i.e. all-zeros key) (trying to remove keys one by one to check all errors),
+        // signing ONLY with an old respective lower-privilege key,
+        // and setting the key verification mode to FULL_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(wipeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(kycKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(freezeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(pauseKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(supplyKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(feeScheduleKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot update all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key), signing ONLY with an old respective lower-privilege key, and setting the key verification mode to FULL_VALIDATION")
+    void cannotUpdateAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToFullValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // New Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var newWipeKey = PrivateKey.generateED25519();
+        var newKycKey = PrivateKey.generateED25519();
+        var newFreezeKey = PrivateKey.generateED25519();
+        var newPauseKey = PrivateKey.generateED25519();
+        var newSupplyKey = PrivateKey.generateED25519();
+        var newFeeScheduleKey = PrivateKey.generateED25519();
+        var newMetadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // remove all of token’s lower-privilege keys
+        // when updating them to an unusable key (i.e. all-zeros key) (trying to remove keys one by one to check all errors),
+        // signing ONLY with an old respective lower-privilege key,
+        // and setting the key verification mode to FULL_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(newWipeKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(wipeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(newKycKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(kycKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(newFreezeKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(freezeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(newPauseKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(pauseKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(newSupplyKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(supplyKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(newFeeScheduleKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(feeScheduleKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(newMetadataKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot update all of token’s lower-privilege keys when updating them to a keys with an invalid structure and signing with an old respective lower-privilege and setting key verification mode to NO_VALIDATION")
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToStructurallyInvalidKeysSigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
+        var wipeKey = PrivateKey.generateED25519();
+        var kycKey = PrivateKey.generateED25519();
+        var freezeKey = PrivateKey.generateED25519();
+        var pauseKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+        var feeScheduleKey = PrivateKey.generateED25519();
+        var metadataKey = PrivateKey.generateED25519();
+
+        // create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setWipeKey(wipeKey.getPublicKey())
+                .setKycKey(kycKey.getPublicKey())
+                .setFreezeKey(freezeKey.getPublicKey())
+                .setPauseKey(pauseKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
+                .setMetadataKey(metadataKey.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
+        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
+
+        // This key is truly invalid, as all Ed25519 public keys must be 32 bytes long
+        var structurallyInvalidKey = PublicKey.fromString("000000000000000000000000000000000000000000000000000000000000000000");
+
+        // update all of token’s lower-privilege keys
+        // to a structurally invalid key (trying to update keys one by one to check all errors),
+        // signing with an old respective lower-privilege
+        // and setting key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setWipeKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(wipeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_WIPE_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setKycKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(kycKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_KYC_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFreezeKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(freezeKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_FREEZE_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setPauseKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(pauseKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_PAUSE_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setSupplyKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(supplyKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SUPPLY_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setFeeScheduleKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(feeScheduleKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_CUSTOM_FEE_SCHEDULE_KEY.toString());
+
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setMetadataKey(structurallyInvalidKey)
+                .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(metadataKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_METADATA_KEY.toString());
     }
 }
