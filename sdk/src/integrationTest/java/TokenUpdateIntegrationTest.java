@@ -1632,7 +1632,7 @@ class TokenUpdateIntegrationTest {
      */
     @Test
     @DisplayName("Cannot remove all of token’s lower-privilege keys when updating them to an empty KeyList, signing with a respective lower-privilege key, and setting the key verification mode to NO_VALIDATION")
-    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToEmptyKeyListSigningWithRespectiveLowerPrivilegeKeWithKeyVerificationSetToNoValidation() throws Exception {
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToEmptyKeyListSigningWithRespectiveLowerPrivilegeKeyWithKeyVerificationSetToNoValidation() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
@@ -1884,7 +1884,7 @@ class TokenUpdateIntegrationTest {
      */
     @Test
     @DisplayName("Cannot remove all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key), signing ONLY with an old respective lower-privilege key, and setting the key verification mode to FULL_VALIDATION")
-    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToFullValidation() throws Exception {
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeyWithKeyVerificationSetToFullValidation() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
@@ -2017,7 +2017,7 @@ class TokenUpdateIntegrationTest {
      */
     @Test
     @DisplayName("Cannot update all of token’s lower-privilege keys when updating them to an unusable key (i.e. all-zeros key), signing ONLY with an old respective lower-privilege key, and setting the key verification mode to FULL_VALIDATION")
-    void cannotUpdateAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToFullValidation() throws Exception {
+    void cannotUpdateAllLowerPrivilegeKeysWhenUpdatingKeysToAllZerosKeySigningOnlyWithOldRespectiveLowerPrivilegeKeyWithKeyVerificationSetToFullValidation() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
@@ -2157,7 +2157,7 @@ class TokenUpdateIntegrationTest {
      */
     @Test
     @DisplayName("Cannot update all of token’s lower-privilege keys when updating them to a keys with an invalid structure and signing with an old respective lower-privilege and setting key verification mode to NO_VALIDATION")
-    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToStructurallyInvalidKeysSigningOnlyWithOldRespectiveLowerPrivilegeKeWithKeyVerificationSetToNoValidation() throws Exception {
+    void cannotRemoveAllLowerPrivilegeKeysWhenUpdatingKeysToStructurallyInvalidKeysSigningOnlyWithOldRespectiveLowerPrivilegeKeyWithKeyVerificationSetToNoValidation() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
