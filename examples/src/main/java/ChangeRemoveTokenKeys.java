@@ -35,8 +35,8 @@ public class ChangeRemoveTokenKeys {
         // Admin, Supply, Wipe keys
         var adminKey = PrivateKey.generateED25519();
         var supplyKey = PrivateKey.generateED25519();
+        var newSupplyKey = PrivateKey.generateED25519();
         var wipeKey = PrivateKey.generateED25519();
-
 
         // This HIP introduces ability to remove lower-privilege keys (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token:
         // - using an update with the empty KeyList;
@@ -66,9 +66,12 @@ public class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Admin Key (before removing):" + tokenInfoBefore.adminKey);
-        System.out.println("Supply Key (before removing):" + tokenInfoBefore.supplyKey);
-        System.out.println("Wipe Key (before removing):" + tokenInfoBefore.wipeKey);
+        System.out.println("Admin Key:" + tokenInfoBefore.adminKey);
+        System.out.println("Supply Key:" + tokenInfoBefore.supplyKey);
+        System.out.println("Wipe Key:" + tokenInfoBefore.wipeKey);
+
+        System.out.println("---");
+        System.out.println("Removing Wipe Key...");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -83,7 +86,10 @@ public class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Wipe Key (after removing):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
+        System.out.println("Wipe Key (after removal):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
+
+        System.out.println("---");
+        System.out.println("Removing Admin Key...");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -98,14 +104,36 @@ public class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Admin Key (after removing):" + tokenInfoAfterAdminKeyRemoval.adminKey);
+        System.out.println("Admin Key (after removal):" + tokenInfoAfterAdminKeyRemoval.adminKey);
+
+        System.out.println("---");
+        System.out.println("Updating Supply Key...");
+
+        new TokenUpdateTransaction()
+            .setTokenId(tokenId)
+            .setSupplyKey(newSupplyKey)
+            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
+            .freezeWith(client)
+            .sign(supplyKey)
+            .sign(newSupplyKey)
+            .execute(client)
+            .getReceipt(client);
+
+        var tokenInfoAfterSupplyKeyUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(client);
+
+        System.out.println("Supply Key (after update):" + tokenInfoAfterSupplyKeyUpdate.supplyKey);
+
+        System.out.println("---");
+        System.out.println("Removing Supply Key...");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setSupplyKey(unusableKey)
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
-            .sign(supplyKey)
+            .sign(newSupplyKey)
             .execute(client)
             .getReceipt(client);
 
@@ -113,7 +141,9 @@ public class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Supply Key (after removing):" + tokenInfoAfterSupplyKeyRemoval.supplyKey);
+        var supplyKeyAfterRemoval = (PublicKey) tokenInfoAfterSupplyKeyRemoval.supplyKey;
+
+        System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
 
         client.close();
     }
