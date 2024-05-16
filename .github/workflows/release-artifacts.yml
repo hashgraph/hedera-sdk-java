@@ -44,7 +44,7 @@ jobs:
 
       - name: Retrieve Tag Version
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        id: tag
+        id: workflow_tag
         run: echo "version=${{github.event.inputs.version}}" >> "${GITHUB_OUTPUT}"
 
       - name: Setup Java
@@ -63,9 +63,18 @@ jobs:
         run: echo "version=$(./gradlew -q showVersion | tr -d '[:space:]')" >> "${GITHUB_OUTPUT}"
 
       - name: Validate Release
+        if: ${{ github.event_name == 'push' }}
         run: |
           if [[ "${{ steps.tag.outputs.version }}" != "${{ steps.project.outputs.version }}" ]]; then
             echo "::error file=version.gradle,line=5,title=Version Mismatch::Tag version '${{ steps.tag.outputs.version }}' does not match the Gradle project version '${{ steps.project.outputs.version }}'. Please update the 'version.gradle' file before tagging."
+            exit 1
+          fi
+
+      - name: Validate Release
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [[ "${{ steps.workflow_tag.outputs.version }}" != "${{ steps.project.outputs.version }}" ]]; then
+            echo "::error file=version.gradle,line=5,title=Version Mismatch::Tag version '${{ steps.workflow_tag.outputs.version }}' does not match the Gradle project version '${{ steps.project.outputs.version }}'. Please update the 'version.gradle' file before tagging."
             exit 1
           fi
 
