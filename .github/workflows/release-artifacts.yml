@@ -76,6 +76,7 @@ jobs:
       # This needs clause exists solely to provide a dependency on the previous step. This publish step will not occur
       # until the validate-release step completes successfully.
       - validate-release
+
     steps:
       -   name: Harden Runner
           uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
