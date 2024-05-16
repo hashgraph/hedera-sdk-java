@@ -42,7 +42,7 @@ jobs:
         id: tag
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> "${GITHUB_OUTPUT}"
 
-      - name: Retrieve Tag Version
+      - name: Retrieve Tag Version (dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         id: workflow_tag
         run: echo "version=${{github.event.inputs.version}}" >> "${GITHUB_OUTPUT}"
@@ -70,7 +70,7 @@ jobs:
             exit 1
           fi
 
-      - name: Validate Release
+      - name: Validate Release (dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           if [[ "${{ steps.workflow_tag.outputs.version }}" != "${{ steps.project.outputs.version }}" ]]; then
