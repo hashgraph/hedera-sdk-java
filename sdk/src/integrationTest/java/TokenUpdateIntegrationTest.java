@@ -779,99 +779,6 @@ class TokenUpdateIntegrationTest {
         testEnv.close(tokenId);
     }
 
-    // revisit
-    // expected behaviour: use can zero out admin key
-    /**
-     * @notice E2E-HIP-540
-     * @url https://hips.hedera.com/hip/hip-540
-     */
-    @Test
-    @DisplayName("Can make a token immutable when updating keys to an unusable key (i.e. all-zeros key), signing with an Admin Key, and setting the key verification mode to NO_VALIDATION")
-    void canMakeTokenImmutableWhenUpdatingKeysToUnusableKeySigningWithAdminKeyWithKeyVerificationSetToNoValidation() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-
-        // Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata keys
-        var adminKey = PrivateKey.generateED25519();
-        var wipeKey = PrivateKey.generateED25519();
-        var kycKey = PrivateKey.generateED25519();
-        var freezeKey = PrivateKey.generateED25519();
-        var pauseKey = PrivateKey.generateED25519();
-        var supplyKey = PrivateKey.generateED25519();
-        var feeScheduleKey = PrivateKey.generateED25519();
-        var metadataKey = PrivateKey.generateED25519();
-
-        // Create a non-fungible token
-        var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("Test NFT")
-                .setTokenSymbol("TNFT")
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(adminKey.getPublicKey())
-                .setWipeKey(wipeKey.getPublicKey())
-                .setKycKey(kycKey.getPublicKey())
-                .setFreezeKey(freezeKey.getPublicKey())
-                .setPauseKey(pauseKey.getPublicKey())
-                .setSupplyKey(supplyKey.getPublicKey())
-                .setFeeScheduleKey(feeScheduleKey.getPublicKey())
-                .setMetadataKey(metadataKey.getPublicKey())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .tokenId
-        );
-
-        var tokenInfoBeforeUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.wipeKey.toString()).isEqualTo(wipeKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.kycKey.toString()).isEqualTo(kycKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.freezeKey.toString()).isEqualTo(freezeKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.pauseKey.toString()).isEqualTo(pauseKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.supplyKey.toString()).isEqualTo(supplyKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
-        assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
-
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
-        // Make a token immutable by updating all of its keys to an unusable key (i.e., all-zeros key),
-        // signing with an Admin Key, and setting the key verification mode to NO_VALIDATION
-        new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setWipeKey(unusableKey)
-            .setKycKey(unusableKey)
-            .setFreezeKey(unusableKey)
-            .setPauseKey(unusableKey)
-            .setSupplyKey(unusableKey)
-            .setFeeScheduleKey(unusableKey)
-            .setMetadataKey(unusableKey)
-//            .setAdminKey(unusableKey)
-            .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-
-        var tokenInfoAfterUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
-
-//        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
-
-        testEnv.close(tokenId);
-    }
-
     /**
      * @notice E2E-HIP-540
      * @url https://hips.hedera.com/hip/hip-540
@@ -1442,6 +1349,59 @@ class TokenUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+    }
+
+    /**
+     * @notice E2E-HIP-540
+     * @url https://hips.hedera.com/hip/hip-540
+     */
+    @Test
+    @DisplayName("Cannot update the Admin Key to an unusable key (i.e. all-zeros key), signing with an Admin Key, and setting the key verification mode to NO_VALIDATION")
+    void cannotUpdateAdminKeyToUnusableKeySigningWithAdminKeyWithKeyVerificationSetToNoValidation() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
+        // Admin and supply keys
+        var adminKey = PrivateKey.generateED25519();
+        var supplyKey = PrivateKey.generateED25519();
+
+        // Create a non-fungible token
+        var tokenId = Objects.requireNonNull(
+            new TokenCreateTransaction()
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(adminKey.getPublicKey())
+                .setSupplyKey(supplyKey.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+        );
+
+        var tokenInfoBeforeUpdate = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
+
+        assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
+
+        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
+
+        // Update the Admin Key to an unusable key (i.e., all-zeros key),
+        // signing with an Admin Key, and setting the key verification mode to NO_VALIDATION
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenUpdateTransaction()
+                .setTokenId(tokenId)
+                .setAdminKey(unusableKey)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        testEnv.close(tokenId);
     }
 
     /**
