@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+      inputs:
+        version:
+          type: string
+          description: Fake version
+          required: true
 
 defaults:
   run:
@@ -32,8 +38,14 @@ jobs:
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Retrieve Tag Version
+        if: ${{ github.event_name == 'push' }}
         id: tag
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> "${GITHUB_OUTPUT}"
+
+      - name: Retrieve Tag Version
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: tag
+        run: echo "version=${{github.event.inputs.version}}" >> "${GITHUB_OUTPUT}"
 
       - name: Setup Java
         uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
@@ -110,11 +122,13 @@ jobs:
         run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
 
       - name: Nexus Release
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+        #run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
 
       - name: Nexus Release sdk-full artifacts
         run:  |
          # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
          sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
          git clean -fdx
-         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+         ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+      # ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
