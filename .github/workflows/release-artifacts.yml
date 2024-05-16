@@ -111,3 +111,10 @@ jobs:
 
       - name: Nexus Release
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release sdk-full artifacts
+        run:  |
+         # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
+         sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
+         git clean -fdx
+         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
