@@ -1,16 +1,16 @@
 module com.hedera.hashgraph.sdk {
-    requires transitive com.google.common;
     requires transitive com.google.protobuf;
-    requires transitive headlong;
-    requires transitive io.grpc.stub;
-    requires transitive io.grpc;
-    requires transitive org.bouncycastle.provider;
-    requires transitive org.slf4j;
 
+    requires com.google.common;
     requires com.google.gson;
     requires grpc.protobuf.lite;
+    requires headlong;
+    requires io.grpc.stub;
+    requires io.grpc;
     requires java.net.http;
     requires org.bouncycastle.pkix;
+    requires org.bouncycastle.provider;
+    requires org.slf4j;
 
     requires static com.github.spotbugs.annotations;
     requires static com.google.errorprone.annotations;
