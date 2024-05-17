@@ -8,7 +8,7 @@ on:
       inputs:
         version:
           type: string
-          description: Fake version
+          description: Test Version String (No release to Maven Central)
           required: true
 
 defaults:
@@ -42,7 +42,7 @@ jobs:
         id: tag
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> "${GITHUB_OUTPUT}"
 
-      - name: Retrieve Tag Version (dispatch)
+      - name: Retrieve Tag Version (workflow_dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         id: workflow_tag
         run: echo "version=${{github.event.inputs.version}}" >> "${GITHUB_OUTPUT}"
@@ -70,7 +70,7 @@ jobs:
             exit 1
           fi
 
-      - name: Validate Release (dispatch)
+      - name: Validate Release (workflow_dispatch)
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           if [[ "${{ steps.workflow_tag.outputs.version }}" != "${{github.event.inputs.version}}" ]]; then
@@ -132,13 +132,25 @@ jobs:
         run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
 
       - name: Nexus Release
-        #run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+        if: ${{ github.event_name == 'push' }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
 
       - name: Nexus Release sdk-full artifacts
+        if: ${{ github.event_name == 'push' }}
         run:  |
          # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
          sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
          git clean -fdx
-         ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
-      # ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+         ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release sdk-full artifacts (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
+          sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
+          git clean -fdx
+          ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
