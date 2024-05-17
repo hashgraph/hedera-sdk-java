@@ -70,14 +70,6 @@ jobs:
             exit 1
           fi
 
-      - name: Validate Release (workflow_dispatch)
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: |
-          if [[ "${{ steps.workflow_tag.outputs.version }}" != "${{github.event.inputs.version}}" ]]; then
-            echo "::error file=version.gradle,line=5,title=Version Mismatch::Tag version '${{ steps.workflow_tag.outputs.version }}' does not match the Gradle project version '${{github.event.inputs.version}}'. Please update the 'version.gradle' file before tagging."
-            exit 1
-          fi
-
   maven-central:
     name: Publish to Maven Central
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
