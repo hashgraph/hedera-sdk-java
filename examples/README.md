@@ -10,7 +10,7 @@
 
 ### Transactions
 * [Sign a transaction](../examples/src/main/java/SignTransactionExample.java)
-* [Transaction serialization](../examples/src/main/java/TransactionSerializationExample.java)
+* [Transaction serialization (HIP-745)](../examples/src/main/java/TransactionSerializationExample.java)
 
 ### Schedule Transaction
 * [Sign a scheduled transfer transaction](../examples/src/main/java/ScheduleExample.java)
