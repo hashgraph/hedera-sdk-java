@@ -82,6 +82,10 @@ public final class TransferCryptoExample {
 
         System.out.println("transferred " + amount + "...");
 
+        // `AccountBalanceQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)

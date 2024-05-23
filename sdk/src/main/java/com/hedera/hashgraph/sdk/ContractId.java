@@ -241,8 +241,10 @@ public class ContractId extends Key implements Comparable<ContractId> {
      */
     public CompletableFuture<ContractId> populateContractNumAsync(Client client) {
         EvmAddress address = new EvmAddress(this.evmAddress);
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
-        return EntityIdHelper.getContractNumFromMirrorNodeAsync(client, address.toString())
+        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getContractNum(address.toString()))
             .thenApply(contractNumFromMirrorNode ->
                 new ContractId(this.shard, this.realm, contractNumFromMirrorNode, checksum));
     }

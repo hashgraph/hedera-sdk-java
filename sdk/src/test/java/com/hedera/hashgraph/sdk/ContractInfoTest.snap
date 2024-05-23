@@ -24,7 +24,6 @@ com.hedera.hashgraph.sdk.ContractInfoTest.toProtobuf=[
       "memoizedSerializedSize": 0,
       "isMutable": false
     },
-    "bitField0_": 27,
     "contractID_": {
       "memoizedHashCode": 0,
       "memoizedSerializedSize": 2147483647,
