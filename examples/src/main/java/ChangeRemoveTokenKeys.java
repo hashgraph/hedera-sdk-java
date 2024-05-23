@@ -20,7 +20,7 @@ public class ChangeRemoveTokenKeys {
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "previewnet");
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     private ChangeRemoveTokenKeys() {
     }
