@@ -92,6 +92,10 @@ public final class UpdateAccountPublicKeyExample {
         // Now we fetch the account information to check if the key was changed
         System.out.println(" :: getAccount and check our current key");
 
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(client);

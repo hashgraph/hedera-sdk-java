@@ -24,14 +24,15 @@ import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hedera.hashgraph.sdk.proto.TokenBalance;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
- * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a
- * smaller and faster reply than {@link AccountInfoQuery}.
+ * Get the balance of a Hedera™ crypto-currency account. This returns only the balance, so it is a smaller and faster
+ * reply than {@link AccountInfoQuery}.
  *
  * <p>This query is free.
  */
@@ -74,7 +75,7 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
     /**
      * Extract the contract id.
      *
-     * @return                          the contract id
+     * @return the contract id
      */
     @Nullable
     public ContractId getContractId() {
@@ -127,7 +128,20 @@ public final class AccountBalanceQuery extends Query<AccountBalance, AccountBala
 
     @Override
     AccountBalance mapResponse(Response response, AccountId nodeId, com.hedera.hashgraph.sdk.proto.Query request) {
-        return AccountBalance.fromProtobuf(response.getCryptogetAccountBalance());
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forNetwork(this.mirrorNetworkNodes, this.ledgerId);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        AccountId accountIdFromConsensusNode = AccountId.fromProtobuf(response.getCryptogetAccountBalance().getAccountID());
+        List<TokenBalance> tokenBalanceList = mirrorNodeService
+            .getTokenBalancesForAccount(String.valueOf(accountIdFromConsensusNode.num));
+
+        var protobufFromConsensusNode = response.getCryptogetAccountBalance();
+        var protobufUpdatedByMirrorNode = protobufFromConsensusNode.toBuilder()
+            .clearTokenBalances()
+            .addAllTokenBalances(tokenBalanceList)
+            .build();
+
+        return AccountBalance.fromProtobuf(protobufUpdatedByMirrorNode);
     }
 
     @Override
