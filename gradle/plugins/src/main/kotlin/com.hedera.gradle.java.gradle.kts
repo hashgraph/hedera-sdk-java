@@ -103,11 +103,11 @@ tasks.jacocoTestReport {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.24.3"
+        artifact = "com.google.protobuf:protoc:3.21.9"
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.58.0"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.50.2"
         }
     }
 }
