@@ -27,20 +27,22 @@ moduleInfo {
     version("org.slf4j.simple", "2.0.9")
 
     // Versions only required for tests and examples
+    version("grpc.netty.shaded", "1.57.2")
     version("java.dotenv", "5.3.1")
     version("json.snapshot", "1.0.17")
     version("kotlin.stdlib", "1.9.22")
-    version("org.assertj.core", "3.24.2")
     version("org.apache.commons.lang3", "3.14.0")
-    version("grpc.netty.shaded", "1.57.2")
+    version("org.assertj.core", "3.24.2")
+    version("org.wiremock.standalone", "3.4.2")
 }
 
 testModuleInfo {
+    requires("json.snapshot")
     requires("org.assertj.core")
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("json.snapshot")
+    requires("org.wiremock.standalone")
 
     requiresStatic("java.annotation")
     requiresStatic("com.github.spotbugs.annotations")
