@@ -5,7 +5,7 @@ plugins {
 dependencies.constraints {
     // Define version of protobuf by dependency coordinates as both
     // have the module name: 'com.google.protobuf'
-    val protobufVersion = "3.24.3"
+    val protobufVersion = "3.21.9"
     versions("com.google.protobuf:protobuf-java:$protobufVersion")
     versions("com.google.protobuf:protobuf-javalite:$protobufVersion")
 }
@@ -15,8 +15,8 @@ moduleInfo {
     version("com.google.common", "33.0.0-jre")
     version("com.google.errorprone.annotations", "2.21.1")
     version("com.google.gson", "2.10.1")
-    version("grpc.protobuf.lite", "1.46.0")
-    version("grpc.protobuf", "1.46.0")
+    version("grpc.protobuf.lite", "1.50.2")
+    version("grpc.protobuf", "1.50.2")
     version("headlong", "10.0.0")
     version("io.grpc", "3.2.1")
     version("io.grpc.stub", "1.58.0")
