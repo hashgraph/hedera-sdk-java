@@ -317,6 +317,7 @@ public final class AccountId implements Comparable<AccountId> {
      * automatically since there is no connection between the `num` and the `evmAddress`
      * Async version
      *
+     * @deprecated Use 'populateAccountNum' instead due to its nearly identical operation.
      * @param client
      * @return populated AccountId instance
      */
@@ -352,6 +353,7 @@ public final class AccountId implements Comparable<AccountId> {
      * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
      * Async version
      *
+     * @deprecated Use 'populateAccountEvmAddress' instead due to its nearly identical operation.
      * @param client
      * @return populated AccountId instance
      */

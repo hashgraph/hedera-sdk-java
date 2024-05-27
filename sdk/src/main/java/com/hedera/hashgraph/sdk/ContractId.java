@@ -236,6 +236,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * automatically since there is no connection between the `num` and the `evmAddress`
      * Async version
      *
+     * @deprecated Use 'populateContractNum' instead due to its nearly identical operation.
      * @param client
      * @return populated ContractId instance
      */
