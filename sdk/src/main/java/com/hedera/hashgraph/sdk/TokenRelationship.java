@@ -37,6 +37,10 @@ public class TokenRelationship {
     public final TokenId tokenId;
     /**
      * The Symbol of the token
+     *
+     * @deprecated Not supported by consensus nodes (from hedera-services tag v0.50.x).
+     * Although the Mirror Node REST APIs still contain this feature, there is no straightforward way of integration,
+     * leading to this field being deprecated.
      */
     public final String symbol;
     /**
