@@ -86,6 +86,11 @@ public class StakingWithUpdateExample {
 
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
@@ -104,6 +109,11 @@ public class StakingWithUpdateExample {
 
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
+
+        // `AccountInfoQuery` also queries the mirror node.
+        // Wait until the mirror node updates with the new data.
+        Thread.sleep(5000);
+        
         info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);

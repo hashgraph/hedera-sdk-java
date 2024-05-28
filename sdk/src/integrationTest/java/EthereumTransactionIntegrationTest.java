@@ -11,6 +11,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PrivateKeyECDSA;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import java.math.BigInteger;
 import java.util.List;
@@ -29,7 +30,6 @@ public class EthereumTransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-844
      */
     @Test
-    @Disabled
     @DisplayName("Signer nonce changed on Ethereum transaction")
     void signerNonceChangedOnEthereumTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
@@ -91,6 +91,8 @@ public class EthereumTransactionIntegrationTest {
         final byte[] s = new byte[32];
         System.arraycopy(signedBytes, 32, s, 0, 32);
 
+        final int recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r, s, sequence);
+
         byte[] ethereumData = RLPEncoder.sequence(
             Integers.toBytes(0x02),
             List.of(
@@ -103,7 +105,7 @@ public class EthereumTransactionIntegrationTest {
                 Integers.toBytesUnsigned(BigInteger.ZERO), // value
                 callData,
                 List.of(/*accessList*/),
-                Integers.toBytes(1), // recId
+                Integers.toBytes(recId), // recId
                 r,
                 s));
 

@@ -10,6 +10,8 @@ defaults:
     shell: bash
 
 permissions:
+  contents: read
+  packages: write
   id-token: write
   pages: write
 
@@ -21,6 +23,11 @@ jobs:
     name: Publish
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 

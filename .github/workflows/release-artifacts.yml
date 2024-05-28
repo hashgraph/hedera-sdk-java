@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
+      inputs:
+        version:
+          type: string
+          description: Test Version String (No release to Maven Central)
+          required: true
 
 defaults:
   run:
@@ -11,6 +17,7 @@ defaults:
 
 permissions:
   contents: read
+  packages: write
 
 env:
   LC_ALL: C.UTF-8
@@ -22,12 +29,23 @@ jobs:
     name: Validate Release
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+        with:
+          egress-policy: audit
+
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Retrieve Tag Version
+        if: ${{ github.event_name == 'push' }}
         id: tag
         run: echo "version=${GITHUB_REF#refs/tags/v}" >> "${GITHUB_OUTPUT}"
+
+      - name: Retrieve Tag Version (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        id: workflow_tag
+        run: echo "version=${{github.event.inputs.version}}" >> "${GITHUB_OUTPUT}"
 
       - name: Setup Java
         uses: actions/setup-java@0ab4596768b603586c0de567f2430c30f5b0d2b0 # v3.13.0
@@ -45,6 +63,7 @@ jobs:
         run: echo "version=$(./gradlew -q showVersion | tr -d '[:space:]')" >> "${GITHUB_OUTPUT}"
 
       - name: Validate Release
+        if: ${{ github.event_name == 'push' }}
         run: |
           if [[ "${{ steps.tag.outputs.version }}" != "${{ steps.project.outputs.version }}" ]]; then
             echo "::error file=version.gradle,line=5,title=Version Mismatch::Tag version '${{ steps.tag.outputs.version }}' does not match the Gradle project version '${{ steps.project.outputs.version }}'. Please update the 'version.gradle' file before tagging."
@@ -55,13 +74,20 @@ jobs:
     name: Publish to Maven Central
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     needs:
+      # This needs clause exists solely to provide a dependency on the previous step. This publish step will not occur
+      # until the validate-release step completes successfully.
       - validate-release
+
     steps:
+      -   name: Harden Runner
+          uses: step-security/harden-runner@63c24ba6bd7ba022e95695ff85de572c04a18142 # v2.7.0
+          with:
+            egress-policy: audit
+
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Install GnuPG Tools
-        if: ${{ inputs.dry-run-enabled != true }}
         run: |
           if ! command -v gpg2 >/dev/null 2>&1; then
             echo "::group::Updating APT Repository Indices"
@@ -74,7 +100,7 @@ jobs:
 
       - name: Import GPG key
         id: gpg_key
-        uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6.1.0
+        uses: step-security/ghaction-import-gpg@a7c87df2279f2bf2e69ba8289dfbf35fe05a4e08 # v1.0.0
         with:
           gpg_private_key: ${{ secrets.GPG_KEY_CONTENTS }}
           passphrase: ${{ secrets.GPG_KEY_PASSPHRASE }}
@@ -98,4 +124,25 @@ jobs:
         run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
 
       - name: Nexus Release
+        if: ${{ github.event_name == 'push' }}
         run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release sdk-full artifacts
+        if: ${{ github.event_name == 'push' }}
+        run:  |
+         # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
+         sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
+         git clean -fdx
+         ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
+
+      - name: Nexus Release sdk-full artifacts (workflow_dispatch)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          # This is a temporary fix and should be removed once https://github.com/hashgraph/hedera-sdk-java/pull/1732 is merged
+          sed -i 's#sdk\.gradle#sdk-full.gradle#g' sdk/build.gradle
+          git clean -fdx
+          ./gradlew publishToSonatype closeSonatypeStagingRepository --no-parallel -Dfile.encoding=UTF-8 --scan -PsonatypeUsername=${{ secrets.SONATYPE_USERNAME }} -PsonatypePassword=${{ secrets.SONATYPE_PASSWORD }}
