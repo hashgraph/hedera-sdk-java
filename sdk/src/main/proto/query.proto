@@ -60,6 +60,7 @@ import "token_get_nft_info.proto";
 import "token_get_nft_infos.proto";
 
 import "get_account_details.proto";
+import "node_get_info.proto";
 
 /**
  * A single query, which is sent from the client to a node. This includes all possible queries. Each
@@ -197,5 +198,10 @@ message Query {
          * Gets all information about an account including allowances granted by the account
          */
         GetAccountDetailsQuery accountDetails = 58;
+
+        /**
+         * Get all information about a node
+         */
+        NodeGetInfoQuery nodeGetInfo = 59;
     }
 }

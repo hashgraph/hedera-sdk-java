@@ -164,4 +164,9 @@ message TransactionReceipt {
      * the newly created NFTs
      */
     repeated int64 serialNumbers = 14;
+
+    /**
+     * In the receipt of a NodeCreate, NodeUpdate, NodeDelete, the id of the newly created node.
+     */
+    uint64 node_id = 15;
 }
