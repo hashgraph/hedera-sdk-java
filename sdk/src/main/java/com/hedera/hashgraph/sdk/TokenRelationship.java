@@ -41,7 +41,9 @@ public class TokenRelationship {
      * @deprecated Not supported by consensus nodes (from hedera-services tag v0.50.x).
      * Although the Mirror Node REST APIs still contain this feature, there is no straightforward way of integration,
      * leading to this field being deprecated.
+     * Can be extracted from TokenInfo class.
      */
+    @Deprecated
     public final String symbol;
     /**
      * For token of type FUNGIBLE_COMMON - the balance that the Account holds
