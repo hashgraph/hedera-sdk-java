@@ -4,6 +4,7 @@
 import os
 import subprocess
 import sys
+import re
 
 
 print(">>> Usage: `" + sys.argv[0] + " branch`")
@@ -83,10 +84,26 @@ PROTO_REPLACEMENTS = (
      "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
 )
 
+PROTO_REPLACEMENTS_IMPORTS = (
+    # Match any import statement and captures just the part after the last /
+    # for example, `import "state/common.proto"` -> `import "common.proto"`
+    (r'import ".*\/(.*\.proto)"',
+     r'import "\1"'),
+)
 
 def do_replacements(s, replacements):
     for r in replacements:
         s = s.replace(r[0], r[1])
+    return s
+
+def do_replacements_proto_imports(s, replacements):
+    for r in replacements:
+        # Check if the replacement should be skipped
+        # Skip statements like `import "google/protobuf/wrappers.proto"`
+        # to update imports ONLY referred to hedera protobufs
+        if 'google' in s:
+            continue
+        s = re.sub(r[0], r[1], s)
     return s
 
 
@@ -220,7 +237,9 @@ def do_generate_modified_protos(in_path, out_path):
             # for name in os.listdir(in_path):
             in_file = open(os.path.join(root, name), "r")
             out_file = open(os.path.join(out_path, name), "w")
-            out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
+            file_contents_after_proto_replacements = do_replacements(in_file.read(), PROTO_REPLACEMENTS)
+            file_contents_after_proto_import_replacements = do_replacements_proto_imports(file_contents_after_proto_replacements, PROTO_REPLACEMENTS_IMPORTS)
+            out_file.write(file_contents_after_proto_import_replacements)
             in_file.close()
             out_file.close()
 
