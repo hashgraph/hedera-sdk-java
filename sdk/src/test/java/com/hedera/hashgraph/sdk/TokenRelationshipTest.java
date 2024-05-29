@@ -25,6 +25,7 @@ public class TokenRelationshipTest {
             55,
             true,
             true,
+            4,
             true
         );
     }
