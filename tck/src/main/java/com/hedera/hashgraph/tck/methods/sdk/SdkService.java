@@ -1,13 +1,18 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.HbarUnit;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
+import com.hedera.hashgraph.tck.methods.sdk.param.AccountCreateParams;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
+import com.hedera.hashgraph.tck.methods.sdk.response.AccountCreateResponse;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +64,20 @@ public class SdkService extends AbstractJSONRPC2Service {
         client = null;
         return new SetupResponse("");
     }
+
+    @JSONRPC2Method("createAccount")
+    public AccountCreateResponse createAccount(final AccountCreateParams params) throws HederaException {
+        AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction();
+
+        if (params.getKey() != null) {
+//            accountCreateTransaction.setKey()
+        }
+
+        accountCreateTransaction.setInitialBalance(Hbar.fromTinybars(params.getInitialBalance()));
+
+        return null;
+    }
+
 
     public Client getClient() {
         return this.client;
