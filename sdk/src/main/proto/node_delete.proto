@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package proto;
+
+/*
+ * Hedera Network Services Protobuf
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.addressbook">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "basic_types.proto";
+
+/**
+ * Delete the given node. After deletion, it will be marked as deleted.
+ * But information about it will continue to exist for a year.
+ * For phase 2, this marks the node to be deleted in the merkle tree and will be used to write config.txt and
+ * a-pulbic-NodeAlias.pem file per each node during prepare freeze.
+ * The deleted node will not be deleted until the network is upgraded.
+ * Such a deleted node can never be reused.
+ * The council has to sign this transaction. This is a privileged transaction.
+ */
+message NodeDeleteTransactionBody {
+    /**
+     * The unique id of the node to be deleted. If invalid node is specified, transaction will
+     * result in INVALID_NODE_ID.
+     */
+    uint64 node_id = 1;
+}
