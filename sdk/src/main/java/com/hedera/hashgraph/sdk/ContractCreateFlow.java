@@ -600,12 +600,24 @@ public class ContractCreateFlow {
 
     private ContractCreateTransaction createContractCreateTransaction(FileId fileId) {
         var contractCreateTx = new ContractCreateTransaction()
-            .setBytecodeFileId(fileId)
+            .setBytecodeFileId(fileId);
+        return setupContractCreateTransaction(contractCreateTx);
+    }
+
+    private ContractCreateTransaction createContractCreateTransaction(byte[] bytecode) {
+        var contractCreateTx = new ContractCreateTransaction()
+            .setBytecode(bytecode);
+        return setupContractCreateTransaction(contractCreateTx);
+    }
+
+    private ContractCreateTransaction setupContractCreateTransaction(ContractCreateTransaction contractCreateTx) {
+        contractCreateTx
             .setConstructorParameters(constructorParameters)
             .setGas(gas)
             .setInitialBalance(initialBalance)
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
             .setDeclineStakingReward(declineStakingReward);
+
         if (adminKey != null) {
             contractCreateTx.setAdminKey(adminKey);
         }
@@ -637,6 +649,7 @@ public class ContractCreateFlow {
         } else if (signPublicKey != null && transactionSigner != null) {
             contractCreateTx.signWith(signPublicKey, transactionSigner);
         }
+
         return contractCreateTx;
     }
 
@@ -677,21 +690,29 @@ public class ContractCreateFlow {
         throws PrecheckStatusException, TimeoutException {
         try {
             splitBytecode();
-            var fileId = createFileCreateTransaction(client)
-                .execute(client, timeoutPerTransaction)
-                .getReceipt(client, timeoutPerTransaction)
-                .fileId;
-            Objects.requireNonNull(fileId);
-            if (!appendBytecode.isEmpty()) {
+
+            TransactionResponse contractCreateTxResponse;
+            if (appendBytecode.isEmpty()) {
+                contractCreateTxResponse = createContractCreateTransaction(Hex.decode(createBytecode))
+                    .execute(client, timeoutPerTransaction);
+            } else {
+                var fileId = createFileCreateTransaction(client)
+                    .execute(client, timeoutPerTransaction)
+                    .getReceipt(client, timeoutPerTransaction)
+                    .fileId;
+                Objects.requireNonNull(fileId);
                 createFileAppendTransaction(fileId)
                     .execute(client, timeoutPerTransaction);
+
+                contractCreateTxResponse = createContractCreateTransaction(fileId).execute(client, timeoutPerTransaction);
+                contractCreateTxResponse.getReceipt(client, timeoutPerTransaction);
+
+                new FileDeleteTransaction()
+                    .setFileId(fileId)
+                    .execute(client, timeoutPerTransaction);
             }
-            var response = createContractCreateTransaction(fileId).execute(client, timeoutPerTransaction);
-            response.getReceipt(client, timeoutPerTransaction);
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(client, timeoutPerTransaction);
-            return response;
+
+            return contractCreateTxResponse;
         } catch (ReceiptStatusException e) {
             throw new RuntimeException(e);
         }
