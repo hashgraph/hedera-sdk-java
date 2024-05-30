@@ -78,7 +78,8 @@ import org.bouncycastle.util.encoders.Hex;
 
 // Re-use the WithExecute interface that was generated for Executable
 public class ContractCreateFlow {
-    static final int FILE_CREATE_MAX_BYTES = 2048;
+    static final int FILE_CREATE_MAX_BYTES = 5120;
+    static int CHUNK_SIZE = 5120; // maybe make it configurable?
 
     private String bytecode = "";
     @Nullable
@@ -587,6 +588,7 @@ public class ContractCreateFlow {
 
     private FileAppendTransaction createFileAppendTransaction(FileId fileId) {
         var fileAppendTx = new FileAppendTransaction()
+            .setChunkSize(CHUNK_SIZE)
             .setFileId(fileId)
             .setContents(appendBytecode);
         if (maxChunks != null) {
@@ -693,8 +695,9 @@ public class ContractCreateFlow {
 
             TransactionResponse contractCreateTxResponse;
             if (appendBytecode.isEmpty()) {
-                contractCreateTxResponse = createContractCreateTransaction(Hex.decode(createBytecode))
+                contractCreateTxResponse = createContractCreateTransaction(createBytecode.getBytes())
                     .execute(client, timeoutPerTransaction);
+                contractCreateTxResponse.getReceipt(client, timeoutPerTransaction);
             } else {
                 var fileId = createFileCreateTransaction(client)
                     .execute(client, timeoutPerTransaction)
