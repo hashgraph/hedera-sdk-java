@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.33.0
+
+### Added
+- add `decimal` field to `TokenRelationship` class
+
+### Changed
+- `AccountBalanceQuery`, `AccountInfoQuery`, and `ContractInfoQuery` get part of the data from the Mirror Node REST API (HIP-367)
+- improved documentation in repository
+- updated protobufs
+
+### Fixed
+- undeprecate `AccountBalance.tokens`, `AccountBalance.tokenDecimals`, `AccountInfo.tokenRelationships`, `ContractInfo.tokenRelationships`
+
+
+### Deprecated
+- `TokenRelationship.symbol`, use `TokenInfo.symbol` instead
+- `AccountId.populateAccountNumAsync`, use `AccountId.populateAccountNum` instead
+- `AccountId.populateAccountEvmAddressAsync`, use `AccountId.populateAccountEvmAddress` instead
+- `ContractId.populateContractNumAsync`, use `ContractId.populateContractNum` instead
+
 ## 2.32.0
 
 ### Added
