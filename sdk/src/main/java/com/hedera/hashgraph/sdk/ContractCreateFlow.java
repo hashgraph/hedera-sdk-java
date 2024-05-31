@@ -695,7 +695,7 @@ public class ContractCreateFlow {
 
             TransactionResponse contractCreateTxResponse;
             if (appendBytecode.isEmpty()) {
-                contractCreateTxResponse = createContractCreateTransaction(createBytecode.getBytes())
+                contractCreateTxResponse = createContractCreateTransaction(Hex.decode(createBytecode))
                     .execute(client, timeoutPerTransaction);
                 contractCreateTxResponse.getReceipt(client, timeoutPerTransaction);
             } else {

@@ -32,7 +32,7 @@ public class ContractCreateFlowIntegrationTest {
 
         var receipt = new ContractExecuteTransaction()
             .setContractId(contractId)
-            .setGas(1_000_000)
+            .setGas(10_000_000)
             .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
@@ -58,7 +58,7 @@ public class ContractCreateFlowIntegrationTest {
             .setBytecode(SMART_CONTRACT_BYTECODE_LARGE)
             .setAdminKey(testEnv.operatorKey)
             .setGas(10_000_000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+            .setConstructorParameters(new ContractFunctionParameters())
             .setContractMemo("[e2e::ContractCreateFlow]")
             .execute(testEnv.client);
 
@@ -68,7 +68,8 @@ public class ContractCreateFlowIntegrationTest {
             .setContractId(contractId)
             .setGas(1_500_000)
             .setFunction("returnUint8", new ContractFunctionParameters().addUint8((byte) 0x0))
-            .setQueryPayment(new Hbar(10)).execute(testEnv.client);
+            .setQueryPayment(new Hbar(10))
+            .execute(testEnv.client);
 
         assertThat(contractCallResponse.getUint8(0)).isEqualTo((byte) 0x0);
 
