@@ -53,7 +53,7 @@ jobs:
         run: ./gradlew assemble :sdk:javadoc --scan
 
   unit-tests:
-    name: Unit Tests
+    name: Unit and Integration Tests
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     needs:
       - compile
