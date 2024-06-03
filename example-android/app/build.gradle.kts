@@ -40,13 +40,13 @@ android {
 }
 
 dependencies {
-    // Remove when using a published SDK
+    // Remove the following when using a published SDK and instead...
     implementation(platform("com.hedera.hashgraph:sdk")) {
         this as ModuleDependency
         capabilities { requireCapabilities("com.hedera.hashgraph:sdk-platform") }
     }
-    // ----
 
+    //...add a version to this dependency:
     implementation("com.hedera.hashgraph:sdk")
 
     implementation("com.google.android.material:material:1.11.0")
@@ -63,6 +63,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
-    runtimeOnly("io.grpc:grpc-okhttp:1.61.1")
+    runtimeOnly("io.grpc:grpc-okhttp:1.61.1") {
+        // exclude, because we use 'io.helidon.grpc:io.grpc' instead
+        exclude(group = "io.grpc", module = "*")
+    }
     runtimeOnly("org.slf4j:slf4j-simple:2.0.12")
 }
