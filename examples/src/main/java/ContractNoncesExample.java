@@ -47,7 +47,7 @@ public final class ContractNoncesExample {
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(
         Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "previewnet");
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
     private static final String SMART_CONTRACT_BYTECODE = "6080604052348015600f57600080fd5b50604051601a90603b565b604051809103906000f0801580156035573d6000803e3d6000fd5b50506047565b605c8061009483390190565b603f806100556000396000f3fe6080604052600080fdfea2646970667358221220a20122cbad3457fedcc0600363d6e895f17048f5caa4afdab9e655123737567d64736f6c634300081200336080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122053dfd8835e3dc6fedfb8b4806460b9b7163f8a7248bac510c6d6808d9da9d6d364736f6c63430008120033";
 
     private ContractNoncesExample() {
