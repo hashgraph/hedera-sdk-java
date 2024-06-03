@@ -12,7 +12,7 @@ dependencies.constraints {
 
 moduleInfo {
     version("com.github.spotbugs.annotations", "4.7.3")
-    version("com.google.common", "33.0.0-jre")
+    version("com.google.common", "32.0.1-jre")
     version("com.google.errorprone.annotations", "2.21.1")
     version("com.google.gson", "2.10.1")
     version("grpc.protobuf.lite", "1.50.2")
