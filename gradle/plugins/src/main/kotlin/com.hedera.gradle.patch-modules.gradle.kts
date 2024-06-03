@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import org.gradlex.javaecosystem.capabilities.customrules.AddDependenciesMetadataRule
-import org.gradlex.javaecosystem.capabilities.customrules.RemoveDependenciesMetadataRule
-
 plugins {
     id("java")
-    id("org.gradlex.java-ecosystem-capabilities")
     id("org.gradlex.extra-java-module-info")
+    id("org.gradlex.jvm-dependency-conflict-resolution")
 }
 
 // Do annotation processing on the classpath, because 'Error Prone' has many non-module dependencies
@@ -30,13 +27,14 @@ sourceSets.all {
     }
 }
 
+
 // Fix or enhance the metadata of third-party Modules. This is about the metadata in the
 // repositories: '*.pom' and '*.module' files.
-dependencies.components {
+jvmDependencyConflicts.patch {
+    val grpcModule = "io.helidon.grpc:io.grpc"
     // The following 'io.grpc' libraries are replaced with a singe dependency to
     // 'io.helidon.grpc:io.grpc', which is a re-packaged Modular Jar of all the 'grpc' libraries.
-    val grpcComponents = listOf("io.grpc:grpc-api", "io.grpc:grpc-context", "io.grpc:grpc-core", "io.grpc:grpc-protobuf-lite")
-    val grpcModule = listOf("io.helidon.grpc:io.grpc")
+    val grpcComponents = listOf("io.grpc:grpc-api", "io.grpc:grpc-context", "io.grpc:grpc-core")
 
     // These compile time annotation libraries are not of interest in our setup and are thus removed
     // from the dependencies of all components that bring them in.
@@ -53,33 +51,36 @@ dependencies.components {
             "org.codehaus.mojo:animal-sniffer-annotations"
         )
 
-    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-netty-shaded") {  params(grpcComponents + annotationLibraries) }
-    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-netty-shaded") { params(grpcModule) }
-    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcComponents + annotationLibraries) }
-    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-protobuf-lite") { params(grpcModule) }
-    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-protobuf") { params(grpcComponents + annotationLibraries) }
-    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-protobuf") { params(grpcModule) }
-    withModule<RemoveDependenciesMetadataRule>("io.grpc:grpc-stub") {  params(grpcComponents + annotationLibraries) }
-    withModule<AddDependenciesMetadataRule>("io.grpc:grpc-stub") { params(grpcModule) }
+    module("io.grpc:grpc-netty-shaded") {
+        annotationLibraries.forEach { removeDependency(it) }
+        grpcComponents.forEach { removeDependency(it) }
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-protobuf") {
+        annotationLibraries.forEach { removeDependency(it) }
+        grpcComponents.forEach { removeDependency(it) }
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-protobuf-lite") {
+        annotationLibraries.forEach { removeDependency(it) }
+        grpcComponents.forEach { removeDependency(it) }
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-stub") {
+        annotationLibraries.forEach { removeDependency(it) }
+        grpcComponents.forEach { removeDependency(it) }
+        addApiDependency(grpcModule)
+    }
 
-    withModule<RemoveDependenciesMetadataRule>("com.github.spotbugs:spotbugs-annotations") { params(annotationLibraries) }
-    withModule<RemoveDependenciesMetadataRule>("com.google.guava:guava") { params(annotationLibraries) }
-    withModule<RemoveDependenciesMetadataRule>("io.helidon.grpc:io.grpc") { params(annotationLibraries) }
-    withModule<RemoveDependenciesMetadataRule>("org.jetbrains.kotlin:kotlin-stdlib") {
-        params(listOf("org.jetbrains.kotlin:kotlin-stdlib-common"))
+    module("com.github.spotbugs:spotbugs-annotations") {
+        removeDependency("com.google.code.findbugs:jsr305")
     }
-    withModule<RemoveDependenciesMetadataRule>("junit:junit") {
-        params(listOf("org.hamcrest:hamcrest-core"))
+    module("com.google.guava:guava") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.helidon.grpc:io.grpc") { annotationLibraries.forEach { removeDependency(it) } }
+    module("org.jetbrains.kotlin:kotlin-stdlib") {
+        removeDependency("org.jetbrains.kotlin:kotlin-stdlib-common")
     }
-    withModule<AddDependenciesMetadataRule>("com.google.errorprone:error_prone_core") {
-        params(listOf("javax.annotation:javax.annotation-api"))
-    }
-    withModule<RemoveDependenciesMetadataRule>("io.github.json-snapshot:json-snapshot") {
-        params(listOf("org.junit.platform:junit-platform-runner", "org.junit.jupiter:junit-jupiter-engine", "org.junit.vintage:junit-vintage-engine"))
-    }
-    withModule<AddDependenciesMetadataRule>("io.github.json-snapshot:json-snapshot") {
-        params(listOf("junit:junit:4.13.2"))
-    }
+    module("junit:junit") { removeDependency("org.hamcrest:hamcrest-core") }
 }
 
 // Fix or enhance the 'module-info.class' of third-party Modules. This is about the
