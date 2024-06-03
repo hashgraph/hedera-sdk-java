@@ -49,9 +49,6 @@ tasks.withType<Test>().configureEach {
     // NOTE: Uncomment to enable trace logs in the SDK during tests
     // jvmArgs("-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace")
 
-    // this task will fail on the first failed test
-    failFast = true
-
     // emit logs per passed or failed test
     testLogging {
         exceptionFormat = FULL
