@@ -21,7 +21,6 @@ plugins {
     id("jacoco")
     id("net.ltgt.errorprone")
     id("org.gradlex.java-module-dependencies")
-    id("org.gradlex.java-module-versions")
     id("com.hedera.gradle.base")
     id("com.hedera.gradle.repositories")
     id("com.hedera.gradle.patch-modules")
@@ -38,8 +37,8 @@ jacoco {
     toolVersion = "0.8.8"
 }
 
-javaModuleDependencies {
-    versionsFromPlatformAndConsistentResolution(":sdk", ":sdk")
+jvmDependencyConflicts {
+    consistentResolution.platform(":sdk-dependency-versions")
 }
 
 dependencies {

@@ -41,11 +41,7 @@ android {
 
 dependencies {
     // Remove the following when using a published SDK and instead...
-    implementation(platform("com.hedera.hashgraph:sdk")) {
-        this as ModuleDependency
-        capabilities { requireCapabilities("com.hedera.hashgraph:sdk-platform") }
-    }
-
+    implementation(platform("com.hedera.hashgraph:sdk-dependency-versions"))
     //...add a version to this dependency:
     implementation("com.hedera.hashgraph:sdk")
 
