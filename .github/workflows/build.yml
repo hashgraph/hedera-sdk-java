@@ -89,7 +89,7 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: Start Local Node
-        run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.50.0-alpha.2
+        run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Run Tests
         env:
@@ -148,7 +148,7 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: Start the local node
-        run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.50.0-alpha.2
+        run: npx @hashgraph/hedera-local start -d --network local
 
       - name: Prepare .env for Examples
         run: |
