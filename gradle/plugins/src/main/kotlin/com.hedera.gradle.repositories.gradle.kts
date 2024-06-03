@@ -15,8 +15,8 @@
  */
 
 repositories {
-    mavenCentral()
     maven("https://jitpack.io") {
         content { includeModule("io.github.cdimascio", "java-dotenv") }
     }
+    mavenCentral()
 }
