@@ -97,8 +97,10 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.withType<AbstractArchiveTask>().configureEach {
     isPreserveFileTimestamps = false
     isReproducibleFileOrder = true
-    fileMode = 436 // octal: 0664
-    dirMode = 509 // octal: 0775
+    @Suppress("UnstableApiUsage")
+    filePermissions { unix("0664") }
+    @Suppress("UnstableApiUsage")
+    dirPermissions { unix("0775") }
 }
 
 tasks.buildDependents { setGroup(null) }
