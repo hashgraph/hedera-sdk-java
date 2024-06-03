@@ -37,7 +37,13 @@ public class TokenRelationship {
     public final TokenId tokenId;
     /**
      * The Symbol of the token
+     *
+     * @deprecated Not supported by consensus nodes (from hedera-services tag v0.50.x).
+     * Although the Mirror Node REST APIs still contain this feature, there is no straightforward way of integration,
+     * leading to this field being deprecated.
+     * Can be extracted from TokenInfo class.
      */
+    @Deprecated
     public final String symbol;
     /**
      * For token of type FUNGIBLE_COMMON - the balance that the Account holds
@@ -62,6 +68,10 @@ public class TokenRelationship {
     @Nullable
     public final Boolean freezeStatus;
     /**
+     * The amount of decimal places that this token supports.
+     */
+    public final int decimals;
+    /**
      * Specifies if the relationship is created implicitly.
      * False : explicitly associated,
      * True : implicitly associated.
@@ -74,6 +84,7 @@ public class TokenRelationship {
         long balance,
         @Nullable Boolean kycStatus,
         @Nullable Boolean freezeStatus,
+        int decimals,
         boolean automaticAssociation
     ) {
         this.tokenId = tokenId;
@@ -81,6 +92,7 @@ public class TokenRelationship {
         this.balance = balance;
         this.kycStatus = kycStatus;
         this.freezeStatus = freezeStatus;
+        this.decimals = decimals;
         this.automaticAssociation = automaticAssociation;
     }
 
@@ -119,6 +131,7 @@ public class TokenRelationship {
             tokenRelationship.getBalance(),
             kycStatusFromProtobuf(tokenRelationship.getKycStatus()),
             freezeStatusFromProtobuf(tokenRelationship.getFreezeStatus()),
+            tokenRelationship.getDecimals(),
             tokenRelationship.getAutomaticAssociation()
         );
     }
@@ -166,6 +179,7 @@ public class TokenRelationship {
             .setBalance(balance)
             .setKycStatus(kycStatusToProtobuf(kycStatus))
             .setFreezeStatus(freezeStatusToProtobuf(freezeStatus))
+            .setDecimals(decimals)
             .setAutomaticAssociation(automaticAssociation)
             .build();
     }
@@ -178,6 +192,7 @@ public class TokenRelationship {
             .add("balance", balance)
             .add("kycStatus", kycStatus)
             .add("freezeStatus", freezeStatus)
+            .add("decimals", decimals)
             .add("automaticAssociation", automaticAssociation)
             .toString();
     }

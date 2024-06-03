@@ -397,7 +397,27 @@ public enum RequestType {
     /**
      * Update the metadata of one or more NFT's of a specific token type.
      */
-    TOKEN_UPDATE_NFTS(HederaFunctionality.TokenUpdateNfts);
+    TOKEN_UPDATE_NFTS(HederaFunctionality.TokenUpdateNfts),
+
+    /**
+     * Create a node
+     */
+    NODE_CREATE(HederaFunctionality.NodeCreate),
+
+    /**
+     * Update a node
+     */
+    NODE_UPDATE(HederaFunctionality.NodeUpdate),
+
+    /**
+     * Delete a node
+     */
+    NODE_DELETE(HederaFunctionality.NodeDelete),
+
+    /**
+     * Get Node information
+     */
+    NODE_GET_INFO(HederaFunctionality.NodeGetInfo);
 
     final HederaFunctionality code;
 
@@ -482,6 +502,10 @@ public enum RequestType {
             case UtilPrng -> PRNG;
             case TransactionGetFastRecord -> TRANSACTION_GET_FAST_RECORD;
             case TokenUpdateNfts -> TOKEN_UPDATE_NFTS;
+            case NodeCreate -> NODE_CREATE;
+            case NodeUpdate -> NODE_UPDATE;
+            case NodeDelete -> NODE_DELETE;
+            case NodeGetInfo -> NODE_GET_INFO;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -564,6 +588,10 @@ public enum RequestType {
             case PRNG -> "PRNG";
             case TRANSACTION_GET_FAST_RECORD -> "TRANSACTION_GET_FAST_RECORD";
             case TOKEN_UPDATE_NFTS -> "TOKEN_UPDATE_NFTS";
+            case NODE_CREATE -> "NODE_CREATE";
+            case NODE_UPDATE -> "NODE_UPDATE";
+            case NODE_DELETE -> "NODE_DELETE";
+            case NODE_GET_INFO -> "NODE_GET_INFO";
         };
     }
 }

@@ -1,0 +1,88 @@
+syntax = "proto3";
+
+package proto;
+
+/*
+ * Hedera Network Services Protobuf
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.addressbook">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "basic_types.proto";
+
+/**
+ * A transaction body to add a new node to the network.
+ * After the node is created, the node_id for it is in the receipt.
+ *
+ * This transaction body SHALL be considered a "privileged transaction".
+ *
+ * This message supports a transaction to create a new node in the network.
+ * The transaction, once complete, enables a new consensus node
+ * to join the network, and requires governing council authorization.
+ *
+ * A `NodeCreateTransactionBody` MUST be signed by the governing council.<br/>
+ * The newly created node information will be used to generate config.txt and
+ * a-pulbic-NodeAlias.pem file per each node during phase 2,<br>
+ * not active until next freeze upgrade.
+ */
+message NodeCreateTransactionBody {
+
+    /**
+     * Node account id, mandatory field, ALIAS is not allowed, only ACCOUNT_NUM.
+     * If account_id does not exist, it will reject the transaction.
+     * Multiple nodes can have the same account_id.
+     */
+    AccountID account_id = 1;
+
+    /**
+     * Description of the node with UTF-8 encoding up to 100 bytes, optional field.
+     */
+    string description = 2;
+
+    /**
+     * Ip address and port, mandatory field. Fully qualified domain name is
+     * not allowed here. Maximum number of these endpoints is 10.
+     * The first in the list is used as the Internal IP address in config.txt,
+     * the second in the list is used as the External IP address in config.txt,
+     * the rest of IP addresses are ignored for DAB phase 2.
+     */
+    repeated ServiceEndpoint gossip_endpoint = 3;
+
+    /**
+     * A node's grpc service IP addresses and ports, IP:Port is mandatory,
+     * fully qualified domain name is optional. Maximum number of these endpoints is 8.
+     */
+    repeated ServiceEndpoint service_endpoint = 4;
+
+    /**
+     * The node's X509 certificate used to sign stream files (e.g., record stream
+     * files). Precisely, this field is the DER encoding of gossip X509 certificate.
+     * This is a mandatory field.
+     */
+    bytes gossip_ca_certificate = 5;
+
+    /**
+     * Hash of the node's TLS certificate. Precisely, this field is a string of
+     * hexadecimal characters which translated to binary, are the SHA-384 hash of
+     * the UTF-8 NFKD encoding of the node's TLS cert in PEM format.
+     * Its value can be used to verify the node's certificate it presents
+     * during TLS negotiations.node x509 certificate hash, optional field.
+     */
+    bytes grpc_certificate_hash = 6;
+}

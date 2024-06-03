@@ -226,8 +226,14 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * @param client
      * @return populated ContractId instance
      */
-    public ContractId populateContractNum(Client client) throws InterruptedException, ExecutionException {
-        return populateContractNumAsync(client).get();
+    public ContractId populateContractNum(Client client) {
+        EvmAddress address = new EvmAddress(this.evmAddress);
+        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
+        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
+
+        var contractNum = mirrorNodeService.getContractNum(address.toString());
+
+        return new ContractId(this.shard, this.realm, contractNum, checksum);
     }
 
     /**
@@ -236,9 +242,11 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * automatically since there is no connection between the `num` and the `evmAddress`
      * Async version
      *
+     * @deprecated Use 'populateContractNum' instead due to its nearly identical operation.
      * @param client
      * @return populated ContractId instance
      */
+    @Deprecated
     public CompletableFuture<ContractId> populateContractNumAsync(Client client) {
         EvmAddress address = new EvmAddress(this.evmAddress);
         MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);

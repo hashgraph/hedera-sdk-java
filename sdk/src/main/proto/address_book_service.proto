@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package proto;
+
+/*
+ * Hedera Network Services Protobuf
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.addressbook">>> This comment is special code for setting PBJ Compiler java package
+
+import "query.proto";
+import "response.proto";
+import "transaction_response.proto";
+import "transaction.proto";
+
+/**
+ * Transactions for the AddressBook Service, those HAPI APIs facilitate changes to the nodes used across the Hedera network.
+ * All those transactions needs to be signed by the Hedera Council. Steps needed below:
+ * 1. The node operator creates and signs the transaction with their key (the key on the node operator account)
+ * 2. The node operator hands this transaction to Alex, who then gives it to the council to sign
+ * 3. When signed and submitted, the server will verify that account 2 keys have signed, and the keys on the operator account have signed.
+ * Hedera council should have ability to make all edits in addition to add/remove nodes
+ */
+service AddressBookService {
+    /**
+      * Prepare to add a new node to the network.
+      * When a valid council member initiates a HAPI transaction to add a new node,
+      * then the network should acknowledge the transaction and update the network’s Address Book within 24 hours.
+      * The added node will not be active until the network is upgraded.
+      */
+    rpc createNode (Transaction) returns (TransactionResponse);
+
+    /**
+     * Prepare to delete the node to the network.
+     * The deleted node will not be deleted until the network is upgraded.
+     * Such a deleted node can never be reused.
+     */
+    rpc deleteNode (Transaction) returns (TransactionResponse);
+
+    /**
+     * Prepare to update the node to the network.
+     * The node will not be updated until the network is upgraded.
+     */
+    rpc updateNode (Transaction) returns (TransactionResponse);
+
+    /**
+     * Retrieves the node information by node Id.
+     */
+    rpc getNodeInfo (Query) returns (Response);
+}

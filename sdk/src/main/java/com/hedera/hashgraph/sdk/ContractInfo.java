@@ -104,10 +104,7 @@ public final class ContractInfo {
 
     /**
      * The tokens associated to the contract
-     *
-     * @deprecated use a mirror node query instead
      */
-    @Deprecated
     public final Map<TokenId, TokenRelationship> tokenRelationships;
 
     /**
