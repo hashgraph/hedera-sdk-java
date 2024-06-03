@@ -85,10 +85,6 @@ import "schedule_sign.proto";
 import "node_stake_update.proto";
 import "util_prng.proto";
 
-import "node_create.proto";
-import "node_update.proto";
-import "node_delete.proto";
-
 /**
  * A single transaction. All transaction types are possible here.
  */
@@ -360,20 +356,5 @@ message TransactionBody {
      * Update the metadata of one or more NFT's of a specific token type.
      */
     TokenUpdateNftsTransactionBody token_update_nfts = 53;
-
-    /**
-     * A transaction body for a `createNode` request.
-     */
-    NodeCreateTransactionBody nodeCreate = 54;
-
-    /**
-     * A transaction body for an `updateNode` request.
-     */
-    NodeUpdateTransactionBody nodeUpdate = 55;
-
-    /**
-     * A transaction body for a `deleteNode` request.
-     */
-    NodeDeleteTransactionBody nodeDelete = 56;
   }
 }

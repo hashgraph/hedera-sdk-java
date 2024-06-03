@@ -73,10 +73,6 @@ import "token_update_nfts.proto";
 import "schedule_delete.proto";
 import "util_prng.proto";
 
-import "node_create.proto";
-import "node_update.proto";
-import "node_delete.proto";
-
 /**
  * A schedulable transaction. Note that the global/dynamic system property
  * <tt>scheduling.whitelist</tt> controls which transaction types may be scheduled. As of Hedera
@@ -293,20 +289,5 @@ message SchedulableTransactionBody {
      * Update the metadata of one or more NFT's of a specific token type.
      */
     TokenUpdateNftsTransactionBody token_update_nfts = 41;
-
-    /**
-     * Transaction body for a scheduled transaction to create a new node.
-     */
-    NodeCreateTransactionBody nodeCreate = 42;
-
-    /**
-     * Transaction body for a scheduled transaction to modify an existing node.
-     */
-    NodeUpdateTransactionBody nodeUpdate = 43;
-
-    /**
-     * Transaction body for a scheduled transaction to remove a node.
-     */
-    NodeDeleteTransactionBody nodeDelete = 44;
   }
 }
