@@ -9,5 +9,6 @@ includeBuild("example-android")
 
 include("sdk")
 include("sdk-full")
+include("sdk-dependency-versions")
 include("tck")
 include("examples")
