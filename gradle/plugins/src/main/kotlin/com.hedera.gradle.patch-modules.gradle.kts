@@ -27,14 +27,45 @@ sourceSets.all {
     }
 }
 
+configurations.all {
+    withDependencies {
+        filter { it.group == "io.grpc" }.forEach {
+            (it as ModuleDependency).exclude(group = "io.grpc", module = "grpc-api")
+        }
+    }
+}
 
 // Fix or enhance the metadata of third-party Modules. This is about the metadata in the
 // repositories: '*.pom' and '*.module' files.
 jvmDependencyConflicts.patch {
+    // Replace 'grpcApi' with the full 'grpcModule' in the appropriate places
     val grpcModule = "io.helidon.grpc:io.grpc"
-    // The following 'io.grpc' libraries are replaced with a singe dependency to
-    // 'io.helidon.grpc:io.grpc', which is a re-packaged Modular Jar of all the 'grpc' libraries.
-    val grpcComponents = listOf("io.grpc:grpc-api", "io.grpc:grpc-context", "io.grpc:grpc-core")
+    val grpcApi = "io.grpc:grpc-api"
+
+    module("io.grpc:grpc-netty-shaded") {
+        removeDependency("com.google.errorprone:error_prone_annotations")
+        removeDependency(grpcApi)
+        removeDependency("io.grpc:grpc-context")
+        removeDependency("io.grpc:grpc-core")
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-protobuf") {
+        removeDependency("com.google.code.findbugs:jsr305")
+        removeDependency(grpcApi)
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-protobuf-lite") {
+        removeDependency("com.google.code.findbugs:jsr305")
+        removeDependency(grpcApi)
+        addApiDependency(grpcModule)
+    }
+    module("io.grpc:grpc-stub") {
+        removeDependency(grpcApi)
+        addApiDependency(grpcModule)
+    }
+    module("com.github.spotbugs:spotbugs-annotations") {
+        removeDependency("com.google.code.findbugs:jsr305")
+    }
 
     // These compile time annotation libraries are not of interest in our setup and are thus removed
     // from the dependencies of all components that bring them in.
@@ -51,32 +82,10 @@ jvmDependencyConflicts.patch {
             "org.codehaus.mojo:animal-sniffer-annotations"
         )
 
-    module("io.grpc:grpc-netty-shaded") {
-        annotationLibraries.forEach { removeDependency(it) }
-        grpcComponents.forEach { removeDependency(it) }
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-protobuf") {
-        annotationLibraries.forEach { removeDependency(it) }
-        grpcComponents.forEach { removeDependency(it) }
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-protobuf-lite") {
-        annotationLibraries.forEach { removeDependency(it) }
-        grpcComponents.forEach { removeDependency(it) }
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-stub") {
-        annotationLibraries.forEach { removeDependency(it) }
-        grpcComponents.forEach { removeDependency(it) }
-        addApiDependency(grpcModule)
-    }
-
-    module("com.github.spotbugs:spotbugs-annotations") {
-        removeDependency("com.google.code.findbugs:jsr305")
-    }
     module("com.google.guava:guava") { annotationLibraries.forEach { removeDependency(it) } }
     module("io.helidon.grpc:io.grpc") { annotationLibraries.forEach { removeDependency(it) } }
+
+    // Testing only
     module("org.jetbrains.kotlin:kotlin-stdlib") {
         removeDependency("org.jetbrains.kotlin:kotlin-stdlib-common")
     }
