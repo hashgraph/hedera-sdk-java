@@ -39,6 +39,7 @@ public class NftAllowancesIntegrationTest {
         var receiverKey = PrivateKey.generateED25519();
         var receiverAccountId = new AccountCreateTransaction()
             .setKey(receiverKey)
+            .setMaxAutomaticTokenAssociations(10)
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
             .accountId;

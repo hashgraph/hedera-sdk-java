@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package proto;
+
+/*
+ * Hedera Network Services Protobuf
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import "basic_types.proto";
+
+option java_package = "com.hedera.hashgraph.sdk.proto";
+// <<<pbj.java_package = "com.hedera.hapi.node.state.addressbook">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+/**
+ * Representation of a Node in the network Merkle tree
+ *
+ * A Node is identified by a single uint64 number, which is unique among all nodes.
+ */
+message Node {
+    /**
+     * The unique id of the Node.
+     */
+    uint64 node_id = 1;
+
+    /**
+     * The account is charged for transactions submitted by the node that fail due diligence
+     */
+    AccountID account_id = 2;
+
+    /**
+     * A description of the node, with UTF-8 encoding up to 100 bytes
+     */
+    string description = 3;
+
+    /**
+     * Node Gossip Endpoints, ip address or FQDN and port
+     */
+    repeated ServiceEndpoint gossip_endpoint = 4;
+
+    /**
+     * A node's service Endpoints, ip address or FQDN and port
+     */
+    repeated ServiceEndpoint service_endpoint = 5;
+
+    /**
+     * The node's X509 certificate used to sign stream files (e.g., record stream
+     * files). Precisely, this field is the DER encoding of gossip X509 certificate.
+     */
+    bytes gossip_ca_certificate = 6;
+
+    /**
+     * node x509 certificate hash. Hash of the node's TLS certificate. Precisely, this field is a string of
+     * hexadecimal characters which, translated to binary, are the SHA-384 hash of
+     * the UTF-8 NFKD encoding of the node's TLS cert in PEM format. Its value can be
+     * used to verify the node's certificate it presents during TLS negotiations.
+     */
+    bytes grpc_certificate_hash = 7;
+
+    /**
+     * The consensus weight of this node in the network.
+     */
+    uint64 weight = 8;
+
+    /**
+     * an enum to indicate the status of the node, not used in phase 2
+     */
+    //NodeStatus status = 9;
+
+}
+
+enum NodeStatus {
+    /**
+     * node in this state is deleted
+     */
+    DELETED = 0;
+
+    /**
+     * node in this state is waiting to be added by consensus roster
+     */
+    PENDING_ADDITION = 1;
+
+    /**
+     *  node in this state is waiting to be deleted by consensus roster
+     */
+    PENDING_DELETION = 2;
+
+    /**
+     * node in this state is active on the network and participating
+     * in network consensus.
+     */
+    IN_CONSENSUS = 3;
+}

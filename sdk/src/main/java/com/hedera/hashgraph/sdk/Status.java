@@ -1549,7 +1549,53 @@ public enum Status {
     /**
      * Admin key is not set on token
      */
-    TOKEN_HAS_NO_ADMIN_KEY(ResponseCodeEnum.TOKEN_HAS_NO_ADMIN_KEY);
+    TOKEN_HAS_NO_ADMIN_KEY(ResponseCodeEnum.TOKEN_HAS_NO_ADMIN_KEY),
+
+    /**
+     * The node has been marked as deleted
+     */
+    NODE_DELETED(ResponseCodeEnum.NODE_DELETED),
+
+    /**
+     * A node is not found during update and delete node transaction
+     */
+    INVALID_NODE_ID(ResponseCodeEnum.INVALID_NODE_ID),
+
+    /**
+     * gossip_endpoint has a fully qualified domain name instead of ip
+     */
+    INVALID_GOSSIP_ENDPOINT(ResponseCodeEnum.INVALID_GOSSIP_ENDPOINT),
+
+    /**
+     * The node account_id is invalid
+     */
+    INVALID_NODE_ACCOUNT_ID(ResponseCodeEnum.INVALID_NODE_ACCOUNT_ID),
+
+    /**
+     * The node description is invalid
+     */
+    INVALID_NODE_DESCRIPTION(ResponseCodeEnum.INVALID_NODE_DESCRIPTION),
+
+    /**
+     * service_endpoint is invalid
+     */
+    INVALID_SERVICE_ENDPOINT(ResponseCodeEnum.INVALID_SERVICE_ENDPOINT),
+
+    /**
+     * gossip_ca_certificate is invalid
+     */
+    INVALID_GOSSIP_CAE_CERTIFICATE(ResponseCodeEnum.INVALID_GOSSIP_CAE_CERTIFICATE),
+
+    /**
+     * grpc_certificate_hash is invalid
+     */
+    INVALID_GRPC_CERTIFICATE(ResponseCodeEnum.INVALID_GRPC_CERTIFICATE),
+
+    /**
+     * The maximum automatic associations value is not valid.<br/>
+     * The most common cause for this error is a value less than `-1`.
+     */
+    INVALID_MAX_AUTO_ASSOCIATIONS(ResponseCodeEnum.INVALID_MAX_AUTO_ASSOCIATIONS);
 
     final ResponseCodeEnum code;
 
@@ -1855,6 +1901,15 @@ public enum Status {
             case MISSING_TOKEN_METADATA -> MISSING_TOKEN_METADATA;
             case MISSING_SERIAL_NUMBERS -> MISSING_SERIAL_NUMBERS;
             case TOKEN_HAS_NO_ADMIN_KEY -> TOKEN_HAS_NO_ADMIN_KEY;
+            case NODE_DELETED -> NODE_DELETED;
+            case INVALID_NODE_ID -> INVALID_NODE_ID;
+            case INVALID_GOSSIP_ENDPOINT -> INVALID_GOSSIP_ENDPOINT;
+            case INVALID_NODE_ACCOUNT_ID -> INVALID_NODE_ACCOUNT_ID;
+            case INVALID_NODE_DESCRIPTION -> INVALID_NODE_DESCRIPTION;
+            case INVALID_SERVICE_ENDPOINT -> INVALID_SERVICE_ENDPOINT;
+            case INVALID_GOSSIP_CAE_CERTIFICATE -> INVALID_GOSSIP_CAE_CERTIFICATE;
+            case INVALID_GRPC_CERTIFICATE -> INVALID_GRPC_CERTIFICATE;
+            case INVALID_MAX_AUTO_ASSOCIATIONS -> INVALID_MAX_AUTO_ASSOCIATIONS;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

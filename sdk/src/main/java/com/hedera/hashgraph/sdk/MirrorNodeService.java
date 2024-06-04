@@ -38,10 +38,11 @@ class MirrorNodeService {
     }
 
     /**
-     * Get AccountId num from mirror node using evm address.
+     * Retrieves the account number from the mirror node using the specified EVM address.
      *
-     * @param evmAddress
-     * @return
+     * @param evmAddress the EVM address for which the account number is to be retrieved
+     * @return the account number as a Long
+     * @throws RuntimeException if an error occurs while processing the mirror node query
      */
     Long getAccountNum(String evmAddress) {
         JsonObject accountInfoResponse = null;
@@ -60,10 +61,12 @@ class MirrorNodeService {
     }
 
     /**
-     * Get EvmAddress from mirror node using account num.
+     * Retrieves the Ethereum Virtual Machine (EVM) address for an account using the specified account number.
+     * This method retrieves the account information from the mirror node and extracts the EVM address.
      *
-     * @param num
-     * @return
+     * @param num the account number for which the EVM address is to be retrieved
+     * @return the EVM address as an instance of EvmAddress
+     * @throws RuntimeException if an error occurs while processing the mirror node query
      */
     EvmAddress getAccountEvmAddress(long num) {
         JsonObject accountInfoResponse = null;
@@ -83,10 +86,11 @@ class MirrorNodeService {
     }
 
     /**
-     * Get ContractId num from mirror node using evm address.
+     * Retrieves the contract number from the mirror node using the specified EVM address.
      *
-     * @param evmAddress
-     * @return
+     * @param evmAddress the EVM address for which the contract number is to be retrieved
+     * @return the contract number as a Long
+     * @throws RuntimeException if an error occurs while processing the mirror node query
      */
     Long getContractNum(String evmAddress) {
         JsonObject accountInfoResponse = null;
@@ -105,10 +109,11 @@ class MirrorNodeService {
     }
 
     /**
-     * Build the list of com.hedera.hashgraph.sdk.proto.TokenBalance for a given account.
+     * Retrieves the balances of tokens for an account (as a protobuf).
      *
-     * @param idOrAliasOrEvmAddress
-     * @return
+     * @param idOrAliasOrEvmAddress the ID, alias, or EVM address of the account
+     * @return a list of TokenBalance (as a protobuf) objects representing the token balances of the account
+     * @throws RuntimeException if an error occurs while processing the mirror node query
      */
     List<TokenBalance> getTokenBalancesForAccount(String idOrAliasOrEvmAddress) {
         JsonObject accountTokensResponse = null;
@@ -139,10 +144,11 @@ class MirrorNodeService {
     }
 
     /**
-     * Build the list of com.hedera.hashgraph.sdk.proto.TokenRelationship for a given account.
+     * Retrieves the token relationships for an account (as a protobuf).
      *
-     * @param idOrAliasOrEvmAddress
-     * @return
+     * @param idOrAliasOrEvmAddress the ID, alias, or EVM address of the account
+     * @return a list of TokenRelationship (as a protobuf) objects representing the token relationships of the account
+     * @throws RuntimeException if an error occurs while processing the mirror node query
      */
     List<TokenRelationship> getTokenRelationshipsForAccount(String idOrAliasOrEvmAddress) {
         JsonObject accountTokensResponse = null;

@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.ContractInfoQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import java.util.Objects;
@@ -121,7 +122,7 @@ public class ContractCreateIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
                 .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
