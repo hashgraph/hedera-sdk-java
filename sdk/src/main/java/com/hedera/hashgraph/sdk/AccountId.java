@@ -307,19 +307,8 @@ public final class AccountId implements Comparable<AccountId> {
      * @param client
      * @return populated AccountId instance
      */
-    public AccountId populateAccountNum(Client client) {
-        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
-        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
-        var accountNumFromMirrorNode = mirrorNodeService.getAccountNum(evmAddress.toString());
-
-        return new AccountId(
-            this.shard,
-            this.realm,
-            accountNumFromMirrorNode,
-            this.checksum,
-            this.aliasKey,
-            this.evmAddress
-        );
+    public AccountId populateAccountNum(Client client) throws InterruptedException, ExecutionException {
+        return populateAccountNumAsync(client).get();
     }
 
     /**
@@ -352,19 +341,8 @@ public final class AccountId implements Comparable<AccountId> {
      * @param client
      * @return populated AccountId instance
      */
-    public AccountId populateAccountEvmAddress(Client client) {
-        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
-        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
-        var evmAddressFromMirrorNode = mirrorNodeService.getAccountEvmAddress(num);
-
-        return new AccountId(
-            this.shard,
-            this.realm,
-            this.num,
-            this.checksum,
-            this.aliasKey,
-            evmAddressFromMirrorNode
-        );
+    public AccountId populateAccountEvmAddress(Client client) throws ExecutionException, InterruptedException {
+        return populateAccountEvmAddressAsync(client).get();
     }
 
     /**
