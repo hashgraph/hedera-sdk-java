@@ -30,10 +30,6 @@ class AccountUpdateIntegrationTest {
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        // `AccountInfoQuery` also queries the mirror node.
-        // Wait until the mirror node updates with the new data.
-        Thread.sleep(5000);
-
         @Var var info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(testEnv.client);
