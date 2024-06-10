@@ -42,6 +42,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -558,27 +560,100 @@ public final class Mnemonic {
     }
 
     /**
+     * Converts a derivation path from string to an array of integers.
+     * Note that this expects precisely 5 components in the derivation path,
+     * as per BIP-44:
+     * `m / purpose' / coin_type' / account' / change / address_index`
+     * Takes into account `'` for hardening as per BIP-32,
+     * and does not prescribe which components should be hardened.
+     *
+     * @param derivationPath  the derivation path in BIP-44 format,
+     *                        e.g. "m/44'/60'/0'/0/0"
+     * @return an array of integers designed to be used with PrivateKey#derive
+     */
+    private int[] calculateDerivationPathValues(String derivationPath) {
+        // Parse the derivation path from string into values
+        int[] numbers = new int[5];
+        boolean[] isHardened = new boolean[5];
+        Pattern pattern = Pattern.compile("m/(\\d+'?)/(\\d+'?)/(\\d+'?)/(\\d+'?)/(\\d+'?)");
+        Matcher matcher = pattern.matcher(derivationPath);
+        if (matcher.matches()) {
+            // Extract numbers and use apostrophe to select if is hardened
+            for (int i = 1; i <= 5; i++) {
+                String value = matcher.group(i);
+                if (value.endsWith("'")) {
+                    isHardened[i - 1] = true;
+                    value = value.substring(0, value.length() - 1);
+                } else {
+                    isHardened[i - 1] = false;
+                }
+                numbers[i - 1] = Integer.parseInt(value);
+            }
+        }
+
+        // Derive private key one index at a time
+        int[] values = new int[5];
+        for (int i = 0; i < numbers.length; i++) {
+            values[i] = (isHardened[i] ? Bip32Utils.toHardenedIndex(numbers[i]) : numbers[i]);
+        }
+
+        return values;
+    }
+
+    /**
+     * Common implementation for both `toStandardECDSAsecp256k1PrivateKey`
+     * functions.
+     *
+     * @param passphrase            the passphrase used to protect the
+     *                              mnemonic, use "" for none
+     * @param derivationPathValues  derivation path as an integer array,
+     *                              see: `calculateDerivationPathValues`
+     * @return a private key
+     */
+    private PrivateKey toStandardECDSAsecp256k1PrivateKeyImpl(String passphrase, int[] derivationPathValues) {
+        var seed = this.toSeed(passphrase);
+        PrivateKey derivedKey = PrivateKey.fromSeedECDSAsecp256k1(seed);
+
+        for (int derivationPathValue : derivationPathValues) {
+            derivedKey = derivedKey.derive(derivationPathValue);
+        }
+        return derivedKey;
+    }
+
+    /**
      * Recover an ECDSAsecp256k1 private key from this mnemonic phrase, with an
      * optional passphrase.
+     * Uses the default derivation path of `m/44'/3030'/0'/0/${index}`.
      *
-     * @param passphrase    the passphrase used to protect the mnemonic
+     * @param passphrase    the passphrase used to protect the mnemonic,
+     *                      use "" for none
      * @param index         the derivation index
      * @return the private key
      */
     public PrivateKey toStandardECDSAsecp256k1PrivateKey(String passphrase, int index) {
-        var seed = this.toSeed(passphrase);
-        PrivateKey derivedKey = PrivateKey.fromSeedECDSAsecp256k1(seed);
-
         // Harden the first 3 indexes
-        for (int i : new int[]{
+        final int[] derivationPathValues = new int[]{
             Bip32Utils.toHardenedIndex(44),
             Bip32Utils.toHardenedIndex(3030),
             Bip32Utils.toHardenedIndex(0),
             0,
-            index}) {
-            derivedKey = derivedKey.derive(i);
-        }
+            index
+        };
+        return toStandardECDSAsecp256k1PrivateKeyImpl(passphrase, derivationPathValues);
+    }
 
-        return derivedKey;
+    /**
+     * Recover an ECDSAsecp256k1 private key from this mnemonic phrase and
+     * derivation path, with an optional passphrase.
+     *
+     * @param passphrase      the passphrase used to protect the mnemonic,
+     *                        use "" for none
+     * @param derivationPath  the derivation path in BIP-44 format,
+     *                        e.g. "m/44'/60'/0'/0/0"
+     * @return the private key
+     */
+    public PrivateKey toStandardECDSAsecp256k1PrivateKey(String passphrase, String derivationPath) {
+        final int[] derivationPathValues = calculateDerivationPathValues(derivationPath);
+        return toStandardECDSAsecp256k1PrivateKeyImpl(passphrase, derivationPathValues);
     }
 }
