@@ -276,7 +276,7 @@ class ClientTest {
             .hasMessageEndingWith("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
     }
 
-    @ParameterizedTest
+        @ParameterizedTest
     @CsvSource({
         "onClient",
         "onQuery"
