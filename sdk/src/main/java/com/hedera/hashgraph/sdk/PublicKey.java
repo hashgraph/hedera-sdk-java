@@ -293,4 +293,15 @@ public abstract class PublicKey extends Key {
      * @return                          the EVM address
      */
     public abstract EvmAddress toEvmAddress();
+
+    /**
+     * Returns an "unusable" public key.
+     * “Unusable” refers to a key such as an Ed25519 0x00000... public key,
+     * since it is (presumably) impossible to find the 32-byte string whose SHA-512 hash begins with 32 bytes of zeros.
+     *
+     * @return The "unusable" key
+     */
+    public static PublicKey unusableKey() {
+        return PublicKey.fromStringED25519("0000000000000000000000000000000000000000000000000000000000000000");
+    }
 }

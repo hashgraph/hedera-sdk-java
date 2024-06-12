@@ -162,6 +162,11 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      */
     private byte[] tokenMetadata = null;
     /**
+     * Determines whether the system should check the validity of the passed keys for update.
+     * Defaults to FULL_VALIDATION;
+     */
+    private TokenKeyValidation tokenKeyVerificationMode = TokenKeyValidation.FULL_VALIDATION;
+    /**
      * Constructor.
      */
     public TokenUpdateTransaction() {
@@ -606,6 +611,28 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     }
 
     /**
+     * Extract the key verification mode
+     *
+     * @return the key verification mode
+     */
+    public TokenKeyValidation getKeyVerificationMode() {
+        return tokenKeyVerificationMode;
+    }
+
+    /**
+     * Assign the key verification mode.
+     *
+     * @param tokenKeyVerificationMode the key verification mode
+     * @return {@code this}
+     */
+    public TokenUpdateTransaction setKeyVerificationMode(TokenKeyValidation tokenKeyVerificationMode) {
+        requireNotFrozen();
+        Objects.requireNonNull(tokenKeyVerificationMode);
+        this.tokenKeyVerificationMode = tokenKeyVerificationMode;
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -657,6 +684,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (body.hasMetadata()) {
             tokenMetadata = body.getMetadata().getValue().toByteArray();
         }
+        tokenKeyVerificationMode = TokenKeyValidation.valueOf(body.getKeyVerificationMode());
     }
 
     /**
@@ -715,6 +743,7 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         if (tokenMetadata != null) {
             builder.setMetadata(BytesValue.of(ByteString.copyFrom(tokenMetadata)));
         }
+        builder.setKeyVerificationMode(tokenKeyVerificationMode.code);
 
         return builder;
     }

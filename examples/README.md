@@ -53,6 +53,7 @@
 * [Custom fees (exempt)](../examples/src/main/java/ExemptCustomFeesExample.java)
 * [NFT Allowances](../examples/src/main/java/NftAddRemoveAllowancesExample.java)
 * [Zero token operations](../examples/src/main/java/ZeroTokenOperationsExample.java)
+* [Change Or Remove Existing Keys From A Token (HIP-540)](../examples/src/main/java/ChangeRemoveTokenKeys.java)
 
 ### File Service
 * [Create a file](../examples/src/main/java/CreateFileExample.java)
