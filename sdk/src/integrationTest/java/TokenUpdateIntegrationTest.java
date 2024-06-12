@@ -921,19 +921,17 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update all of token’s lower-privilege keys to an unusable key (i.e., all-zeros key),
         // signing with an Admin Key, and setting the key verification mode to FULL_VALIDATION
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
-            .setWipeKey(unusableKey)
-            .setKycKey(unusableKey)
-            .setFreezeKey(unusableKey)
-            .setPauseKey(unusableKey)
-            .setSupplyKey(unusableKey)
-            .setFeeScheduleKey(unusableKey)
-            .setMetadataKey(unusableKey)
+            .setWipeKey(PublicKey.unusableKey())
+            .setKycKey(PublicKey.unusableKey())
+            .setFreezeKey(PublicKey.unusableKey())
+            .setPauseKey(PublicKey.unusableKey())
+            .setSupplyKey(PublicKey.unusableKey())
+            .setFeeScheduleKey(PublicKey.unusableKey())
+            .setMetadataKey(PublicKey.unusableKey())
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
             .freezeWith(testEnv.client)
             .sign(adminKey)
@@ -944,13 +942,13 @@ class TokenUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
 
         // Set all lower-privilege keys back by signing with an Admin Key,
         // and setting key verification mode to NO_VALIDATION
@@ -1272,8 +1270,6 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Make the token immutable when updating all of its keys to an unusable key (i.e. all-zeros key)
         // (trying to remove keys one by one to check all errors),
         // signing with a key that is different from an Admin Key (implicitly with an operator key),
@@ -1281,7 +1277,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setWipeKey(unusableKey)
+                .setWipeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1290,7 +1286,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setKycKey(unusableKey)
+                .setKycKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1299,7 +1295,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFreezeKey(unusableKey)
+                .setFreezeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1308,7 +1304,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setPauseKey(unusableKey)
+                .setPauseKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1317,7 +1313,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setSupplyKey(unusableKey)
+                .setSupplyKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1326,7 +1322,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFeeScheduleKey(unusableKey)
+                .setFeeScheduleKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1335,7 +1331,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setMetadataKey(unusableKey)
+                .setMetadataKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1344,7 +1340,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setAdminKey(unusableKey)
+                .setAdminKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1386,14 +1382,12 @@ class TokenUpdateIntegrationTest {
 
         assertThat(tokenInfoBeforeUpdate.adminKey.toString()).isEqualTo(adminKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update the Admin Key to an unusable key (i.e., all-zeros key),
         // signing with an Admin Key, and setting the key verification mode to NO_VALIDATION
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setAdminKey(unusableKey)
+                .setAdminKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(adminKey)
@@ -1453,20 +1447,18 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update all of token’s lower-privilege keys to an unusable key (i.e., all-zeros key),
         // when signing with a respective lower-privilege key,
         // and setting the key verification mode to NO_VALIDATION
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
-            .setWipeKey(unusableKey)
-            .setKycKey(unusableKey)
-            .setFreezeKey(unusableKey)
-            .setPauseKey(unusableKey)
-            .setSupplyKey(unusableKey)
-            .setFeeScheduleKey(unusableKey)
-            .setMetadataKey(unusableKey)
+            .setWipeKey(PublicKey.unusableKey())
+            .setKycKey(PublicKey.unusableKey())
+            .setFreezeKey(PublicKey.unusableKey())
+            .setPauseKey(PublicKey.unusableKey())
+            .setSupplyKey(PublicKey.unusableKey())
+            .setFeeScheduleKey(PublicKey.unusableKey())
+            .setMetadataKey(PublicKey.unusableKey())
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(testEnv.client)
             .sign(wipeKey)
@@ -1483,13 +1475,13 @@ class TokenUpdateIntegrationTest {
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(unusableKey.toString());
-        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(unusableKey.toString());
+        assertThat(tokenInfoAfterUpdate.wipeKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.kycKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.freezeKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.pauseKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.supplyKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.feeScheduleKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
+        assertThat(tokenInfoAfterUpdate.metadataKey.toString()).isEqualTo(PublicKey.unusableKey().toString());
 
         testEnv.close(tokenId);
     }
@@ -1871,8 +1863,6 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update all of token’s lower-privilege keys to an unusable key (i.e. all-zeros key)
         // (trying to remove keys one by one to check all errors),
         // signing with a key that is different from a respective lower-privilege key (implicitly with an operator key),
@@ -1880,7 +1870,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setWipeKey(unusableKey)
+                .setWipeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1889,7 +1879,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setKycKey(unusableKey)
+                .setKycKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1898,7 +1888,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFreezeKey(unusableKey)
+                .setFreezeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1907,7 +1897,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setPauseKey(unusableKey)
+                .setPauseKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1916,7 +1906,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setSupplyKey(unusableKey)
+                .setSupplyKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1925,7 +1915,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFeeScheduleKey(unusableKey)
+                .setFeeScheduleKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1934,7 +1924,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setMetadataKey(unusableKey)
+                .setMetadataKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
@@ -1990,8 +1980,6 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update all of token’s lower-privilege keys to an unusable key (i.e., all-zeros key)
         // (trying to remove keys one by one to check all errors),
         // signing ONLY with an old respective lower-privilege key,
@@ -1999,7 +1987,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setWipeKey(unusableKey)
+                .setWipeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(wipeKey)
@@ -2010,7 +1998,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setKycKey(unusableKey)
+                .setKycKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(kycKey)
@@ -2021,7 +2009,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFreezeKey(unusableKey)
+                .setFreezeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(freezeKey)
@@ -2032,7 +2020,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setPauseKey(unusableKey)
+                .setPauseKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(pauseKey)
@@ -2043,7 +2031,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setSupplyKey(unusableKey)
+                .setSupplyKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(supplyKey)
@@ -2054,7 +2042,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFeeScheduleKey(unusableKey)
+                .setFeeScheduleKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(feeScheduleKey)
@@ -2065,7 +2053,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setMetadataKey(unusableKey)
+                .setMetadataKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(metadataKey)
@@ -2132,8 +2120,6 @@ class TokenUpdateIntegrationTest {
         assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
         assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
-
         // Update all of token’s lower-privilege keys to an unusable key (i.e., all-zeros key)
         // (trying to remove keys one by one to check all errors),
         // signing with an old respective lower-privilege key and new respective lower-privilege key,
@@ -2141,7 +2127,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setWipeKey(unusableKey)
+                .setWipeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(wipeKey)
@@ -2153,7 +2139,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setKycKey(unusableKey)
+                .setKycKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(kycKey)
@@ -2165,7 +2151,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFreezeKey(unusableKey)
+                .setFreezeKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(freezeKey)
@@ -2177,7 +2163,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setPauseKey(unusableKey)
+                .setPauseKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(pauseKey)
@@ -2189,7 +2175,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setSupplyKey(unusableKey)
+                .setSupplyKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(supplyKey)
@@ -2201,7 +2187,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setFeeScheduleKey(unusableKey)
+                .setFeeScheduleKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(feeScheduleKey)
@@ -2213,7 +2199,7 @@ class TokenUpdateIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenUpdateTransaction()
                 .setTokenId(tokenId)
-                .setMetadataKey(unusableKey)
+                .setMetadataKey(PublicKey.unusableKey())
                 .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
                 .freezeWith(testEnv.client)
                 .sign(metadataKey)

@@ -41,9 +41,6 @@ public class ChangeRemoveTokenKeys {
         // This HIP introduces ability to remove lower-privilege keys (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token:
         // - using an update with the empty KeyList;
         var emptyKeyList = new KeyList();
-        // - updating with an “invalid” key such as an Ed25519 0x0000000000000000000000000000000000000000000000000000000000000000 public key,
-        // since it is (presumably) impossible to find the 32-byte string whose SHA-512 hash begins with 32 bytes of zeros.
-        var unusableKey = PublicKey.fromString("0000000000000000000000000000000000000000000000000000000000000000");
 
         // create a non-fungible token
         var tokenId = Objects.requireNonNull(
@@ -130,7 +127,7 @@ public class ChangeRemoveTokenKeys {
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
-            .setSupplyKey(unusableKey)
+            .setSupplyKey(PublicKey.unusableKey())
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
             .sign(newSupplyKey)
