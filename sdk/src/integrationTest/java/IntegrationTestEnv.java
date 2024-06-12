@@ -139,10 +139,6 @@ public class IntegrationTestEnv {
         }
 
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
-            // `AccountBalanceQuery` also queries the mirror node.
-            // Wait until the mirror node updates with the new data.
-            Thread.sleep(5000);
-
             var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
                 .execute(originalClient)
@@ -160,10 +156,6 @@ public class IntegrationTestEnv {
     }
 
     public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        // `AccountBalanceQuery` also queries the mirror node.
-        // Wait until the mirror node updates with the new data.
-        Thread.sleep(5000);
-
         var hbarsBalance = new AccountBalanceQuery()
             .setAccountId(newAccountId)
             .execute(originalClient)

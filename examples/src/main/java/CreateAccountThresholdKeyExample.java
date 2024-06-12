@@ -103,10 +103,6 @@ public final class CreateAccountThresholdKeyExample {
         // (important!) wait for the transfer to go to consensus
         transferTransactionResponse.getReceipt(client);
 
-        // `AccountBalanceQuery` also queries the mirror node.
-        // Wait until the mirror node updates with the new data.
-        Thread.sleep(5000);
-
         Hbar balanceAfter = new AccountBalanceQuery()
             .setAccountId(newAccountId)
             .execute(client)
