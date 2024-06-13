@@ -133,7 +133,6 @@ extraJavaModuleInfo {
     module("org.mockito:mockito-core", "org.mockito")
     module("org.mockito:mockito-junit-jupiter", "org.mockito.junit.jupiter")
     module("org.objenesis:objenesis", "org.objenesis")
-    module("org.wiremock:wiremock-standalone", "org.wiremock.standalone")
 }
 
 dependencies {
