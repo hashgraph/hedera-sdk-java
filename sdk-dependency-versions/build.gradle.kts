@@ -25,7 +25,7 @@ dependencies.constraints {
     api("com.github.spotbugs:spotbugs-annotations:4.7.3") {
         because("com.github.spotbugs.annotations")
     }
-    api("com.google.guava:guava:31.1-jre") {
+    api("com.google.guava:guava:32.1.3-jre") {
         because("com.google.common")
     }
     api("com.google.errorprone:error_prone_annotations:2.21.1") {
@@ -40,17 +40,20 @@ dependencies.constraints {
     api("com.google.protobuf:protobuf-javalite:3.21.9") {
         because("com.google.protobuf")
     }
-    api("io.grpc:grpc-protobuf:1.50.2") {
-        because("grpc.protobuf")
+    api("io.grpc:grpc-api:1.64.0") {
+        because("io.grpc.stub")
     }
-    api("io.grpc:grpc-protobuf-lite:1.50.2") {
-        because("grpc.protobuf")
+    api("io.grpc:grpc-inprocess:1.64.0") {
+        because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-stub:1.54.1") {
-        because("grpc.stub")
+    api("io.grpc:grpc-protobuf:1.64.0") {
+        because("io.grpc.protobuf")
     }
-    api("io.helidon.grpc:io.grpc:3.2.1") {
-        because("io.grpc")
+    api("io.grpc:grpc-protobuf-lite:1.64.0") {
+        because("io.grpc.protobuf")
+    }
+    api("io.grpc:grpc-stub:1.64.0") {
+        because("io.grpc.stub")
     }
     api("javax.annotation:javax.annotation-api:1.3.2") {
         because("java.annotation")
@@ -69,8 +72,8 @@ dependencies.constraints {
     }
 
     // Testing
-    api("io.grpc:grpc-netty-shaded:1.57.2") {
-        because("grpc.netty.shaded")
+    api("io.grpc:grpc-netty-shaded:1.64.0") {
+        because("io.grpc.netty.shaded")
     }
     api("io.github.cdimascio:java-dotenv:5.3.1") {
         because("java.dotenv")

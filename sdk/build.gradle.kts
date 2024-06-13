@@ -14,11 +14,11 @@ testModuleInfo {
     requiresStatic("com.github.spotbugs.annotations")
     requiresStatic("com.google.errorprone.annotations")
 
-    runtimeOnly("grpc.netty.shaded")
+    runtimeOnly("io.grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }
 
 testIntegrationModuleInfo {
-    runtimeOnly("grpc.netty.shaded")
+    runtimeOnly("io.grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }

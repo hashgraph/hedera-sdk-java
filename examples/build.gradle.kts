@@ -3,6 +3,6 @@ plugins {
 }
 
 mainModuleInfo {
-    runtimeOnly("grpc.netty.shaded")
+    runtimeOnly("io.grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
 }

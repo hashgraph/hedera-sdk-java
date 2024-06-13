@@ -27,46 +27,9 @@ sourceSets.all {
     }
 }
 
-configurations.all {
-    withDependencies {
-        filter { it.group == "io.grpc" }.forEach {
-            (it as ModuleDependency).exclude(group = "io.grpc", module = "grpc-api")
-        }
-    }
-}
-
 // Fix or enhance the metadata of third-party Modules. This is about the metadata in the
 // repositories: '*.pom' and '*.module' files.
 jvmDependencyConflicts.patch {
-    // Replace 'grpcApi' with the full 'grpcModule' in the appropriate places
-    val grpcModule = "io.helidon.grpc:io.grpc"
-    val grpcApi = "io.grpc:grpc-api"
-
-    module("io.grpc:grpc-netty-shaded") {
-        removeDependency("com.google.errorprone:error_prone_annotations")
-        removeDependency(grpcApi)
-        removeDependency("io.grpc:grpc-context")
-        removeDependency("io.grpc:grpc-core")
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-protobuf") {
-        removeDependency("com.google.code.findbugs:jsr305")
-        removeDependency(grpcApi)
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-protobuf-lite") {
-        removeDependency("com.google.code.findbugs:jsr305")
-        removeDependency(grpcApi)
-        addApiDependency(grpcModule)
-    }
-    module("io.grpc:grpc-stub") {
-        removeDependency(grpcApi)
-        addApiDependency(grpcModule)
-    }
-    module("com.github.spotbugs:spotbugs-annotations") {
-        removeDependency("com.google.code.findbugs:jsr305")
-    }
-
     // These compile time annotation libraries are not of interest in our setup and are thus removed
     // from the dependencies of all components that bring them in.
     val annotationLibraries =
@@ -82,8 +45,15 @@ jvmDependencyConflicts.patch {
             "org.codehaus.mojo:animal-sniffer-annotations"
         )
 
+    module("com.github.spotbugs:spotbugs-annotations") { annotationLibraries.forEach { removeDependency(it) } }
     module("com.google.guava:guava") { annotationLibraries.forEach { removeDependency(it) } }
-    module("io.helidon.grpc:io.grpc") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-api") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-context") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-core") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-netty-shaded") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-protobuf") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-protobuf-lite") { annotationLibraries.forEach { removeDependency(it) } }
+    module("io.grpc:grpc-util") { annotationLibraries.forEach { removeDependency(it) } }
 
     // Testing only
     module("org.jetbrains.kotlin:kotlin-stdlib") {
@@ -119,15 +89,13 @@ extraJavaModuleInfo {
         requires("java.logging")
         requires("jdk.unsupported")
     }
-    module("io.grpc:grpc-netty-shaded", "grpc.netty.shaded") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.logging")
-        requires("jdk.unsupported")
-        ignoreServiceProvider("reactor.blockhound.integration.BlockHoundIntegration")
-    }
-    module("io.grpc:grpc-protobuf-lite", "grpc.protobuf.lite")
-    module("io.grpc:grpc-protobuf", "grpc.protobuf")
+
+    module("io.grpc:grpc-api", "io.grpc")
+    module("io.grpc:grpc-context", "io.grpc.context")
+    module("io.grpc:grpc-core", "io.grpc.internal")
+    module("io.grpc:grpc-inprocess", "io.grpc.inprocess")
+    module("io.grpc:grpc-protobuf-lite", "io.grpc.protobuf.lite")
+    module("io.grpc:grpc-protobuf", "io.grpc.protobuf")
     module("io.grpc:grpc-stub", "io.grpc.stub") {
         exportAllPackages()
         requireAllDefinedDependencies()
@@ -151,6 +119,14 @@ extraJavaModuleInfo {
         requireAllDefinedDependencies()
         requires("java.sql")
     }
+    module("io.grpc:grpc-netty-shaded", "io.grpc.netty.shaded") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        requires("jdk.unsupported")
+        ignoreServiceProvider("reactor.blockhound.integration.BlockHoundIntegration")
+    }
+    module("io.grpc:grpc-util", "io.grpc.util")
     module("io.github.cdimascio:java-dotenv", "java.dotenv")
     module("io.github.json-snapshot:json-snapshot", "json.snapshot")
     module("junit:junit", "junit")
