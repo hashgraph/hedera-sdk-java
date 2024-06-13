@@ -106,7 +106,6 @@ public class ContractCreateIntegrationTest {
         testEnv.close();
     }
 
-    @Disabled // TODO re-activate and fix assertion
     @Test
     @DisplayName("Cannot create contract when gas is not set")
     void cannotCreateContractWhenGasIsNotSet() throws Exception {
