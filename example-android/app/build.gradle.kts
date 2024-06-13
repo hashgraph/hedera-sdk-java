@@ -59,9 +59,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
-    runtimeOnly("io.grpc:grpc-okhttp:1.61.1") {
-        // exclude, because we use 'io.helidon.grpc:io.grpc' instead
-        exclude(group = "io.grpc", module = "*")
-    }
+    runtimeOnly("io.grpc:grpc-okhttp:1.64.0")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.12")
 }

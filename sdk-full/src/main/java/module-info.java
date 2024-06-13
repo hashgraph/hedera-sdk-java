@@ -3,8 +3,9 @@ module com.hedera.hashgraph.sdk.full {
 
     requires com.google.common;
     requires com.google.gson;
-    requires grpc.protobuf;
     requires headlong;
+    requires io.grpc.inprocess;
+    requires io.grpc.protobuf;
     requires io.grpc.stub;
     requires io.grpc;
     requires java.net.http;
