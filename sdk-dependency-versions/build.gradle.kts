@@ -87,9 +87,6 @@ dependencies.constraints {
     api("org.assertj:assertj-core:3.24.2") {
         because("org.assertj.core")
     }
-    api("org.wiremock:wiremock-standalone:3.4.2") {
-        because("org.wiremock.standalone")
-    }
 
     // Examples
     api("org.jetbrains.kotlin:kotlin-stdlib:1.9.22") {

@@ -8,7 +8,6 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-    requires("org.wiremock.standalone")
 
     requiresStatic("java.annotation")
     requiresStatic("com.github.spotbugs.annotations")
