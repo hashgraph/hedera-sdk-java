@@ -89,10 +89,20 @@ extraJavaModuleInfo {
         requires("java.logging")
         requires("jdk.unsupported")
     }
-
-    module("io.grpc:grpc-api", "io.grpc")
+    module("io.grpc:grpc-api", "io.grpc") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+        uses("io.grpc.LoadBalancerProvider")
+        uses("io.grpc.ManagedChannelProvider")
+        uses("io.grpc.NameResolverProvider")
+    }
     module("io.grpc:grpc-context", "io.grpc.context")
-    module("io.grpc:grpc-core", "io.grpc.internal")
+    module("io.grpc:grpc-core", "io.grpc.internal") {
+        exportAllPackages()
+        requireAllDefinedDependencies()
+        requires("java.logging")
+    }
     module("io.grpc:grpc-inprocess", "io.grpc.inprocess")
     module("io.grpc:grpc-protobuf-lite", "io.grpc.protobuf.lite")
     module("io.grpc:grpc-protobuf", "io.grpc.protobuf")
