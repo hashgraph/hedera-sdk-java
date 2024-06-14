@@ -56,9 +56,7 @@ jvmDependencyConflicts.patch {
     module("io.grpc:grpc-util") { annotationLibraries.forEach { removeDependency(it) } }
 
     // Testing only
-    module("org.jetbrains.kotlin:kotlin-stdlib") {
-        removeDependency("org.jetbrains.kotlin:kotlin-stdlib-common")
-    }
+    module("org.jetbrains.kotlin:kotlin-stdlib") { removeDependency("org.jetbrains.kotlin:kotlin-stdlib-common") }
     module("junit:junit") { removeDependency("org.hamcrest:hamcrest-core") }
 }
 
