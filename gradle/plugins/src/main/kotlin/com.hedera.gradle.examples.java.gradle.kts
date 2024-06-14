@@ -29,6 +29,7 @@ tasks.withType<JavaCompile>().configureEach {
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
+    workingDirectory = rootDir
     sources.from(sourceSets.main.get().java.asFileTree)
     rtClasspath.from(configurations.runtimeClasspath.get() + files(tasks.jar))
 }
@@ -36,6 +37,7 @@ tasks.register<RunAllExample>("runAllExamples") {
 tasks.addRule("Pattern: run<Example>: Runs an example.") {
     if (startsWith("run")) {
         tasks.register<JavaExec>(this) {
+            workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
             mainModule = "com.hedera.hashgraph.examples"
             mainClass = "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
@@ -52,6 +54,9 @@ abstract class RunAllExample : DefaultTask() {
 
     @get:InputFiles
     abstract val rtClasspath: ConfigurableFileCollection
+
+    @get:Internal
+    abstract val workingDirectory: RegularFileProperty
 
     @get:Inject
     abstract val exec: ExecOperations
@@ -76,6 +81,7 @@ abstract class RunAllExample : DefaultTask() {
             """.trimIndent());
 
             exec.javaexec {
+                workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
                 mainModule = "com.hedera.hashgraph.examples"
                 mainClass = "com.hedera.hashgraph.sdk.examples.$className"
