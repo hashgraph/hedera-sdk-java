@@ -141,6 +141,9 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
@@ -149,6 +152,9 @@ jobs:
 
       - name: Compile Code
         run: ./gradlew assemble --scan
+
+      - name: Compile Code - Android Example
+        run: ./gradlew -p example-android assemble --scan
 
       - name: Start the local node
         run: npx @hashgraph/hedera-local start -d --network local
