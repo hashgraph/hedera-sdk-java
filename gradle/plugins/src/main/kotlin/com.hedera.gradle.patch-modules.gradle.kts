@@ -74,7 +74,7 @@ extraJavaModuleInfo {
     module("com.google.guava:failureaccess", "com.google.common.util.concurrent.internal")
     module("com.google.guava:guava", "com.google.common") {
         exportAllPackages()
-        requireAllDefinedDependencies()
+        requires("com.google.common.util.concurrent.internal")
         requires("java.logging")
     }
     module("com.google.protobuf:protobuf-java", "com.google.protobuf") {
