@@ -6,7 +6,9 @@ pluginManagement {
     }
 }
 
+// --- Remove to use a published SDK version ---
 includeBuild("..")
+// ---------------------------------------------
 
 rootProject.name = "Android Example"
 

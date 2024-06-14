@@ -40,10 +40,11 @@ android {
 }
 
 dependencies {
-    // Remove the following when using a published SDK and instead...
+    // --- Remove to use a published SDK version ---
     implementation(platform("com.hedera.hashgraph:sdk-dependency-versions"))
-    //...add a version to this dependency:
-    implementation("com.hedera.hashgraph:sdk")
+    // ---------------------------------------------
+
+    implementation("com.hedera.hashgraph:sdk:2.34.0")
 
     implementation("com.google.android.material:material:1.11.0")
 
