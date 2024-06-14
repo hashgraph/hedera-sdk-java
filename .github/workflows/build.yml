@@ -208,8 +208,7 @@ jobs:
             run: npx @hashgraph/hedera-local start -d --network local
 
           - name: Run Tests
-            run: |
-                cd tck && ./gradlew test && cd ..
+            run: ./gradlew :tck:test
 
           - name: Stop the local node
             run: npx @hashgraph/hedera-local stop
