@@ -25,9 +25,6 @@ dependencies.constraints {
     api("com.github.spotbugs:spotbugs-annotations:4.7.3") {
         because("com.github.spotbugs.annotations")
     }
-    api("com.google.guava:guava:32.1.3-jre") {
-        because("com.google.common")
-    }
     api("com.google.errorprone:error_prone_annotations:2.21.1") {
         because("com.google.errorprone.annotations")
     }
