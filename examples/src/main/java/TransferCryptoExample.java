@@ -24,6 +24,7 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionRecord;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
@@ -53,20 +54,7 @@ public final class TransferCryptoExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         AccountId recipientId = AccountId.fromString("0.0.3");
-        Hbar amount = Hbar.fromTinybars(10_000);
-
-        Hbar senderBalanceBefore = new AccountBalanceQuery()
-            .setAccountId(OPERATOR_ID)
-            .execute(client)
-            .hbars;
-
-        Hbar receiptBalanceBefore = new AccountBalanceQuery()
-            .setAccountId(recipientId)
-            .execute(client)
-            .hbars;
-
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
+        Hbar amount = Hbar.fromTinybars(10);
 
         TransactionResponse transactionResponse = new TransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
@@ -78,22 +66,8 @@ public final class TransferCryptoExample {
 
         System.out.println("transaction ID: " + transactionResponse);
 
-        TransactionRecord record = transactionResponse.getRecord(client);
+        TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);
 
-        System.out.println("transferred " + amount + "...");
-
-        Hbar senderBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(OPERATOR_ID)
-            .execute(client)
-            .hbars;
-
-        Hbar receiptBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(recipientId)
-            .execute(client)
-            .hbars;
-
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
-        System.out.println("Transfer memo: " + record.transactionMemo);
+//        TransactionRecord record = transactionResponse.getRecord(client);
     }
 }
