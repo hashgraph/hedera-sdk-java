@@ -112,9 +112,16 @@ tasks.generateProto {
     plugins { plugins.register("grpc") }
 }
 
+tasks.compileJava {
+    options.javaModuleVersion = project.version.toString()
+}
+
 tasks.jar {
     exclude("**/*.proto")
     includeEmptyDirs = false
+    manifest {
+        attributes["Implementation-Version"] = project.version
+    }
 }
 
 sourceSets.all {
