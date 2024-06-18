@@ -60,6 +60,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
-    runtimeOnly("io.grpc:grpc-okhttp:1.64.0")
+    runtimeOnly("io.grpc:grpc-okhttp")
     runtimeOnly("org.slf4j:slf4j-simple:2.0.12")
 }
