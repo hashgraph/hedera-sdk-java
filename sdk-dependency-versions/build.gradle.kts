@@ -38,7 +38,7 @@ dependencies.constraints {
         because("com.google.protobuf")
     }
     api("io.grpc:grpc-api:1.64.0") {
-        because("io.grpc.stub")
+        because("io.grpc")
     }
     api("io.grpc:grpc-inprocess:1.64.0") {
         because("io.grpc.protobuf")
