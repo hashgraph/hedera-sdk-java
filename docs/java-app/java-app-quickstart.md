@@ -25,15 +25,15 @@ _Maven:_
 _Gradle:_
 ```groovy
 // netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded:1.57.2'
+implementation 'io.grpc:grpc-netty-shaded'
 ```
 ```groovy
 // netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty:1.57.2'
+implementation 'io.grpc:grpc-netty'
 ```
 ```groovy
 // okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp:1.57.2'
+implementation 'io.grpc:grpc-okhttp'
 ```
 
 _Maven:_
@@ -42,7 +42,7 @@ _Maven:_
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty-shaded</artifactId>
-  <version>1.57.2</version>
+  <version>1.64.0</version>
 </dependency>
 ```
 ```xml
@@ -50,7 +50,7 @@ _Maven:_
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-netty</artifactId>
-  <version>1.57.2</version>
+  <version>1.64.0</version>
 </dependency>
 ```
 ```xml
@@ -58,7 +58,7 @@ _Maven:_
 <dependency>
   <groupId>io.grpc</groupId>
   <artifactId>grpc-okhttp</artifactId>
-  <version>1.57.2</version>
+  <version>1.64.0</version>
 </dependency>
 ```
 

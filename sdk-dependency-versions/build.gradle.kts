@@ -69,9 +69,6 @@ dependencies.constraints {
     }
 
     // Testing
-    api("io.grpc:grpc-netty-shaded:1.64.0") {
-        because("io.grpc.netty.shaded")
-    }
     api("io.github.cdimascio:java-dotenv:5.3.1") {
         because("java.dotenv")
     }
