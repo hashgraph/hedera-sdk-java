@@ -45,7 +45,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@04b20c065cf1ab708c96e64a8811018d0a1fbc88 # v3.4.1
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
         with:
           cache-read-only: false
 
@@ -80,7 +80,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@04b20c065cf1ab708c96e64a8811018d0a1fbc88 # v3.4.1
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -139,7 +139,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@04b20c065cf1ab708c96e64a8811018d0a1fbc88 # v3.4.1
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -187,7 +187,7 @@ jobs:
                 java-version: 17
 
           - name: Setup Gradle
-            uses: gradle/gradle-build-action@04b20c065cf1ab708c96e64a8811018d0a1fbc88 # v3.4.1
+            uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
           - name: Install Local Node
             run: npm install @hashgraph/hedera-local
