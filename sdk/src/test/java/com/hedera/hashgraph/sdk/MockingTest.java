@@ -19,11 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
-
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountID;
@@ -57,6 +52,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
@@ -80,13 +76,9 @@ public class MockingTest {
         var responses = List.of(responses1);
 
         try (var mocker = Mocker.withResponses(responses)) {
-            var httpMockServer = setupHttpMockServer();
-
             var balance = new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client);
 
             Assertions.assertEquals(balance.hbars, Hbar.fromTinybars(100));
-
-            httpMockServer.stop();
         }
     }
 
@@ -259,8 +251,6 @@ public class MockingTest {
             );
         }
 
-        var httpMockServer = setupHttpMockServer();
-
         Assertions.assertTrue(
             AccountInfoFlow.verifyTransactionSignature(server.client, accountId, properlySignedTx)
         );
@@ -300,7 +290,6 @@ public class MockingTest {
             Assertions.assertEquals(accountId, AccountId.fromProtobuf(queryRequest.getCryptoGetInfo().getAccountID()));
         }
         server.close();
-        httpMockServer.stop();
     }
 
     @Test
@@ -706,27 +695,6 @@ public class MockingTest {
         public void createContract(Transaction request, StreamObserver<TransactionResponse> responseObserver) {
             respondToTransactionFromQueue(request, responseObserver);
         }
-    }
-
-    /**
-     * Method to set up an HTTP mock server for testing purposes.
-     * Used to mock Mirror Node REST API.
-     *
-     * @return The initialized WireMockServer instance.
-     */
-    private WireMockServer setupHttpMockServer() {
-        // temp solution for testing
-        MirrorNodeRouter.LOCAL_NODE_PORT = "5552";
-
-        var wireMockServer = new WireMockServer(5552);
-        wireMockServer.start();
-
-        wireMockServer.stubFor(get(urlMatching("/api/v1/accounts/[0-9]+/tokens"))
-            .willReturn(aResponse().withHeader("Content-Type", "application/json")
-                .withStatus(200)
-                .withBody("{\"tokens\": []}")));
-
-        return wireMockServer;
     }
 }
 

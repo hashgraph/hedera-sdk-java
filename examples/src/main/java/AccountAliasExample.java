@@ -113,10 +113,6 @@ public class AccountAliasExample {
             .execute(client)
             .getReceipt(client);
 
-        // `AccountBalanceQuery` and `AccountInfoQuery` also query the mirror node.
-        // Wait until the mirror node is updated with the new data.
-        Thread.sleep(5000);
-
         AccountBalance balance = new AccountBalanceQuery()
             .setAccountId(aliasAccountId)
             .execute(client);

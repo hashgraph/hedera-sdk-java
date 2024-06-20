@@ -236,15 +236,15 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * automatically since there is no connection between the `num` and the `evmAddress`
      * Async version
      *
+     * @deprecated Use 'populateContractNum' instead due to its nearly identical operation.
      * @param client
      * @return populated ContractId instance
      */
+    @Deprecated
     public CompletableFuture<ContractId> populateContractNumAsync(Client client) {
         EvmAddress address = new EvmAddress(this.evmAddress);
-        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
-        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
 
-        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getContractNum(address.toString()))
+        return EntityIdHelper.getContractNumFromMirrorNodeAsync(client, address.toString())
             .thenApply(contractNumFromMirrorNode ->
                 new ContractId(this.shard, this.realm, contractNumFromMirrorNode, checksum));
     }

@@ -317,14 +317,13 @@ public final class AccountId implements Comparable<AccountId> {
      * automatically since there is no connection between the `num` and the `evmAddress`
      * Async version
      *
+     * @deprecated Use 'populateAccountNum' instead due to its nearly identical operation.
      * @param client
      * @return populated AccountId instance
      */
+    @Deprecated
     public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
-        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
-        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
-
-        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getAccountNum(evmAddress.toString()))
+        return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
             .thenApply(accountNumFromMirrorNode ->
                 new AccountId(
                     this.shard,
@@ -332,10 +331,8 @@ public final class AccountId implements Comparable<AccountId> {
                     accountNumFromMirrorNode,
                     this.checksum,
                     this.aliasKey,
-                    this.evmAddress)
-        );
+                    this.evmAddress));
     }
-
 
     /**
      * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
@@ -352,14 +349,13 @@ public final class AccountId implements Comparable<AccountId> {
      * Populates `evmAddress` field of the `AccountId` extracted from the Mirror Node.
      * Async version
      *
+     * @deprecated Use 'populateAccountEvmAddress' instead due to its nearly identical operation.
      * @param client
      * @return populated AccountId instance
      */
+    @Deprecated
     public CompletableFuture<AccountId> populateAccountEvmAddressAsync(Client client) {
-        MirrorNodeGateway mirrorNodeGateway = MirrorNodeGateway.forClient(client);
-        MirrorNodeService mirrorNodeService = new MirrorNodeService(mirrorNodeGateway);
-
-        return CompletableFuture.supplyAsync(() -> mirrorNodeService.getAccountEvmAddress(num))
+        return EntityIdHelper.getEvmAddressFromMirrorNodeAsync(client, num)
             .thenApply(evmAddressFromMirrorNode ->
                 new AccountId(
                     this.shard,
