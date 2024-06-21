@@ -2,6 +2,7 @@ package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,36 +10,36 @@ import lombok.NoArgsConstructor;
 /**
  * AccountCreateParams for SDK client
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountCreateParams extends JSONRPC2Param {
-    // should be optional
-    private String key;
-    private int initialBalance;
-    private boolean receiverSignatureRequired;
-    private int autoRenewPeriod;
-    private String memo;
-    private int maxAutoTokenAssociations;
-    private String stakedAccountId;
-    private int stakedNodeId;
-    private boolean declineStakingReward;
-    private String alias;
-    private String signerKey;
+    private Optional<String> key;
+    private Optional<Long> initialBalance;
+    private Optional<Boolean> receiverSignatureRequired;
+    private Optional<Long> autoRenewPeriod;
+    private Optional<String> memo;
+    private Optional<Integer> maxAutoTokenAssociations;
+    private Optional<String> stakedAccountId;
+    private Optional<Long> stakedNodeId;
+    private Optional<Boolean> declineStakingReward;
+    private Optional<String> alias;
+    private Optional<String> signerKey;
 
     @Override
     public AccountCreateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        String parsedKey = (String) jrpcParams.get("key");
-        int parsedInitialBalance = (int) jrpcParams.get("initialBalance");
-        boolean parsedReceiverSignatureRequired = (boolean) jrpcParams.get("receiverSignatureRequired");
-        int parsedAutoRenewPeriod = (int) jrpcParams.get("autoRenewPeriod");
-        String parsedMemo = (String) jrpcParams.get("memo");
-        int parsedMaxAutoTokenAssociations = (int) jrpcParams.get("maxAutoTokenAssociations");
-        String parsedStakedAccountId = (String) jrpcParams.get("stakedAccountId");
-        int parsedStakedNodeId = (int) jrpcParams.get("stakedNodeId");
-        boolean parsedDeclineStakingReward = (boolean) jrpcParams.get("declineStakingReward");
-        String parsedAlias = (String) jrpcParams.get("alias");
-        String parsedSignerKey = (String) jrpcParams.get("signerKey");
+        Optional<String> parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
+        Optional<Long> parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
+        Optional<Boolean> parsedReceiverSignatureRequired = Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
+        Optional<Long> parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
+        Optional<String> parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
+        Optional<Integer> parsedMaxAutoTokenAssociations = Optional.ofNullable((Integer) jrpcParams.get("maxAutoTokenAssociations"));
+        Optional<String> parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
+        Optional<Long> parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
+        Optional<Boolean> parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
+        Optional<String> parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
+        Optional<String> parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
 
         return new AccountCreateParams(
             parsedKey,
