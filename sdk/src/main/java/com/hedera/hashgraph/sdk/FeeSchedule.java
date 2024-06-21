@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.checkerframework.checker.units.qual.A;
 import java.time.Instant;
 
 import javax.annotation.Nullable;

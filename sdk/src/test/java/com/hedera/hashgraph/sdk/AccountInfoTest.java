@@ -25,9 +25,10 @@ import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
 import com.hedera.hashgraph.sdk.proto.KeyList;
 import com.hedera.hashgraph.sdk.proto.LiveHash;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.time.Instant;
 
@@ -62,7 +63,7 @@ public class AccountInfoTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

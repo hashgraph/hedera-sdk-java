@@ -27,6 +27,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
+
+import java.lang.module.ModuleDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
@@ -362,8 +364,18 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
      * @return                          the user agent string
      */
     private String getUserAgent() {
+        var theModule = getClass().getModule();
         var thePackage = getClass().getPackage();
-        var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
+        String implementationVersion;
+        if (theModule.getName() == null) {
+            // running on classpath
+            implementationVersion =
+                thePackage != null ? thePackage.getImplementationVersion() : null;
+        } else {
+            // running on module path
+            implementationVersion =
+                theModule.getDescriptor().version().map(ModuleDescriptor.Version::toString).orElse(null);
+        }
         return "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
     }
 }

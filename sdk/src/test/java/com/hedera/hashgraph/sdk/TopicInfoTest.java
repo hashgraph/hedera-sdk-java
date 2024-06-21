@@ -25,9 +25,10 @@ import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.time.Duration;
 import java.time.Instant;
 
@@ -57,7 +58,7 @@ public class TopicInfoTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

@@ -99,13 +99,13 @@ HEDERA_NETWORK=previewnet
 Template:
 
 ```sh
-./gradlew -q example:run<NameOfExample>
+./gradlew -q :examples:run<NameOfExample>
 ```
 
 Concrete example:
 
 ```sh
-./gradlew -q example:runGenerateKey
+./gradlew -q :examples:runGenerateKey
 ```
 
 ### Running with Intellij
