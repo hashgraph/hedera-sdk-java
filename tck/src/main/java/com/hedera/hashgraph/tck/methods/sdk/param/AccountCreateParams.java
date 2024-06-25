@@ -8,7 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * AccountCreateParams for SDK client
+ * AccountCreateParams for account create method
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Getter
@@ -31,27 +31,30 @@ public class AccountCreateParams extends JSONRPC2Param {
     public AccountCreateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
         Optional<String> parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
         Optional<Long> parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
-        Optional<Boolean> parsedReceiverSignatureRequired = Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
+        Optional<Boolean> parsedReceiverSignatureRequired =
+                Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
         Optional<Long> parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
         Optional<String> parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
-        Optional<Integer> parsedMaxAutoTokenAssociations = Optional.ofNullable((Integer) jrpcParams.get("maxAutoTokenAssociations"));
+        Optional<Integer> parsedMaxAutoTokenAssociations =
+                Optional.ofNullable((Integer) jrpcParams.get("maxAutoTokenAssociations"));
         Optional<String> parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
         Optional<Long> parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
-        Optional<Boolean> parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
+        Optional<Boolean> parsedDeclineStakingReward =
+                Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
         Optional<String> parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
         Optional<String> parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
 
         return new AccountCreateParams(
-            parsedKey,
-            parsedInitialBalance,
-            parsedReceiverSignatureRequired,
-            parsedAutoRenewPeriod,
-            parsedMemo,
-            parsedMaxAutoTokenAssociations,
-            parsedStakedAccountId,
-            parsedStakedNodeId,
-            parsedDeclineStakingReward,
-            parsedAlias,
-            parsedSignerKey);
+                parsedKey,
+                parsedInitialBalance,
+                parsedReceiverSignatureRequired,
+                parsedAutoRenewPeriod,
+                parsedMemo,
+                parsedMaxAutoTokenAssociations,
+                parsedStakedAccountId,
+                parsedStakedNodeId,
+                parsedDeclineStakingReward,
+                parsedAlias,
+                parsedSignerKey);
     }
 }

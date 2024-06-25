@@ -1,28 +1,17 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HbarUnit;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
-import com.hedera.hashgraph.tck.methods.sdk.param.AccountCreateParams;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
-import com.hedera.hashgraph.tck.methods.sdk.response.AccountCreateResponse;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
-import com.hedera.hashgraph.tck.util.KeyUtils;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeoutException;
 
 /**
  * SdkService for managing the {@link Client} setup and reset
@@ -70,42 +59,6 @@ public class SdkService extends AbstractJSONRPC2Service {
         client = null;
         return new SetupResponse("");
     }
-
-    @JSONRPC2Method("createAccount")
-    public AccountCreateResponse createAccount(final AccountCreateParams params)
-        throws HederaException, PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction();
-
-        params.getKey().ifPresent(key -> accountCreateTransaction.setKey(KeyUtils.getKeyFromStringDER(key)));
-
-        params.getInitialBalance().ifPresent(initialBalanceTinybars -> accountCreateTransaction.setInitialBalance(Hbar.from(initialBalanceTinybars, HbarUnit.TINYBAR)));
-
-        params.getReceiverSignatureRequired().ifPresent(accountCreateTransaction::setReceiverSignatureRequired);
-
-        params.getAutoRenewPeriod().ifPresent(autoRenewPeriodSeconds -> accountCreateTransaction.setAutoRenewPeriod(
-            Duration.ofSeconds(autoRenewPeriodSeconds)));
-
-        params.getMemo().ifPresent(accountCreateTransaction::setAccountMemo);
-
-        params.getMaxAutoTokenAssociations().ifPresent(accountCreateTransaction::setMaxAutomaticTokenAssociations);
-
-        params.getStakedAccountId().ifPresent(stakedAccountId -> accountCreateTransaction.setStakedAccountId(AccountId.fromString(stakedAccountId)));
-
-        params.getStakedNodeId().ifPresent(accountCreateTransaction::setStakedNodeId);
-
-        params.getDeclineStakingReward().ifPresent(accountCreateTransaction::setDeclineStakingReward);
-
-        params.getAlias().ifPresent(accountCreateTransaction::setAlias);
-
-//        params.get
-
-        TransactionReceipt transactionReceipt = accountCreateTransaction.execute(client).getReceipt(client);
-
-        return new AccountCreateResponse(
-            transactionReceipt.accountId, transactionReceipt.status
-        );
-    }
-
 
     public Client getClient() {
         return this.client;
