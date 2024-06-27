@@ -2,6 +2,8 @@ package com.hedera.hashgraph.tck.methods;
 
 import static com.hedera.hashgraph.tck.methods.JSONRPC2Error.HEDERA_ERROR;
 
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2ParamsException;
 import com.hedera.hashgraph.tck.methods.JSONRPC2Error.ErrorData;
@@ -15,6 +17,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import net.minidev.json.JSONObject;
 
 /**
  * Implements RequestHandler and overrides some of the Dispatcher logic,
@@ -76,8 +79,19 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
         } catch (InvocationTargetException e) {
             // the target is HederaException
             var hederaException = e.getTargetException();
-            var errorData = new ErrorData(hederaException.getMessage(), "");
-            var hederaError = HEDERA_ERROR.setData(errorData);
+            ErrorData errorData;
+            if (hederaException instanceof PrecheckStatusException precheck) {
+                errorData = new ErrorData(precheck.status, precheck.getMessage());
+            } else if (hederaException instanceof ReceiptStatusException receipt) {
+                errorData = new ErrorData(receipt.receipt.status, receipt.getMessage());
+            } else {
+                return new JSONRPC2Response(JSONRPC2Error.INTERNAL_ERROR, req.getID());
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("status", errorData.status().toString());
+            jsonObject.put("message", errorData.message());
+
+            var hederaError = HEDERA_ERROR.setData(jsonObject);
             return new JSONRPC2Response(hederaError, req.getID());
         } catch (Exception e) {
             // other exceptions
