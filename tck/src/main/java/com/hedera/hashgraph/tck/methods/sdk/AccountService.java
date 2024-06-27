@@ -4,8 +4,8 @@ import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HbarUnit;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
@@ -16,24 +16,23 @@ import com.hedera.hashgraph.tck.methods.sdk.param.AccountCreateParamsFromAlias;
 import com.hedera.hashgraph.tck.methods.sdk.response.AccountCreateResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
 import java.time.Duration;
-import java.util.concurrent.TimeoutException;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * AccountCreateService for account related methods
  */
 @JSONRPC2Service
 public class AccountService extends AbstractJSONRPC2Service {
+    private final SdkService sdkService;
 
-    @Autowired
-    private SdkService sdkService;
+    public AccountService(SdkService sdkService) {
+        this.sdkService = sdkService;
+    }
 
     @JSONRPC2Method("createAccount")
-    public AccountCreateResponse createAccount(final AccountCreateParams params)
-            throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    public AccountCreateResponse createAccount(final AccountCreateParams params) throws Exception {
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction();
 
-        params.getKey().ifPresent(key -> accountCreateTransaction.setKey(KeyUtils.getKeyFromStringDER(key)));
+        params.getPublicKey().ifPresent(key -> accountCreateTransaction.setKey(KeyUtils.getKeyFromStringDER(key)));
 
         params.getInitialBalance()
                 .ifPresent(initialBalanceTinybars -> accountCreateTransaction.setInitialBalance(
@@ -42,12 +41,14 @@ public class AccountService extends AbstractJSONRPC2Service {
         params.getReceiverSignatureRequired().ifPresent(accountCreateTransaction::setReceiverSignatureRequired);
 
         params.getAutoRenewPeriod()
-                .ifPresent(autoRenewPeriodSeconds ->
-                        accountCreateTransaction.setAutoRenewPeriod(Duration.ofSeconds(autoRenewPeriodSeconds)));
+                .ifPresent(autoRenewPeriodSeconds -> accountCreateTransaction.setAutoRenewPeriod(
+                        Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
 
         params.getMemo().ifPresent(accountCreateTransaction::setAccountMemo);
 
-        params.getMaxAutoTokenAssociations().ifPresent(accountCreateTransaction::setMaxAutomaticTokenAssociations);
+        params.getMaxAutoTokenAssociations()
+                .ifPresent(autoAssociations ->
+                        accountCreateTransaction.setMaxAutomaticTokenAssociations(autoAssociations.intValue()));
 
         params.getStakedAccountId()
                 .ifPresent(stakedAccountId ->
@@ -59,27 +60,42 @@ public class AccountService extends AbstractJSONRPC2Service {
 
         params.getAlias().ifPresent(accountCreateTransaction::setAlias);
 
+        params.getPrivateKey().ifPresent(pk -> {
+            var privateKey = PrivateKey.fromString(pk);
+            accountCreateTransaction.freezeWith(sdkService.getClient()).sign(privateKey);
+        });
+
         TransactionReceipt transactionReceipt =
                 accountCreateTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
-        return new AccountCreateResponse(transactionReceipt.accountId, transactionReceipt.status);
+        String stringAccountId = "";
+        if (transactionReceipt.status == Status.SUCCESS) {
+            stringAccountId = transactionReceipt.accountId.toString();
+        }
+
+        return new AccountCreateResponse(stringAccountId, transactionReceipt.status);
     }
 
     @JSONRPC2Method("createAccountFromAlias")
-    public TransactionReceipt createAccountFromAlias(final AccountCreateParamsFromAlias params)
-            throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+    public TransactionReceipt createAccountFromAlias(final AccountCreateParamsFromAlias params) throws Exception {
         TransferTransaction transferTransaction = new TransferTransaction();
-        var operator = AccountId.fromString(params.getOperatorID());
+        AccountId operator = new AccountId(0);
+        AccountId alias = new AccountId(0);
+        Hbar amount = Hbar.ZERO;
+        if (params.getOperatorID().isPresent()) {
+            operator = AccountId.fromString(params.getOperatorID().get());
+        }
+        if (params.getAliasAccountID().isPresent()) {
+            alias = AccountId.fromString(params.getAliasAccountID().get());
+        }
+        if (params.getInitialBalance().isPresent()) {
+            amount = Hbar.from(params.getInitialBalance().get());
+        }
 
-        var alias = AccountId.fromString(params.getAliasAccountID());
-        var amount = Hbar.from(params.getInitialBalance());
-
-        TransactionReceipt transactionReceipt = transferTransaction
+        return transferTransaction
                 .addHbarTransfer(operator, amount.negated())
                 .addHbarTransfer(alias, amount)
                 .execute(sdkService.getClient())
                 .getReceipt(sdkService.getClient());
-
-        return transactionReceipt;
     }
 }

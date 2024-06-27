@@ -2,6 +2,7 @@ package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +11,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class GeneratePublicKeyParams extends JSONRPC2Param {
-    private String privateKey;
+    private Optional<String> privateKey;
 
     @Override
     public GeneratePublicKeyParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        String privateKey = (String) jrpcParams.get("privateKey");
+        Optional<String> privateKey = Optional.ofNullable((String) jrpcParams.get("privateKey"));
         return new GeneratePublicKeyParams(privateKey);
     }
 }

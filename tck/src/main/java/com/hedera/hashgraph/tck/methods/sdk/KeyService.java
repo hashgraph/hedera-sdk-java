@@ -10,9 +10,8 @@ import com.hedera.hashgraph.tck.methods.sdk.param.GeneratePublicKeyParams;
 public class KeyService extends AbstractJSONRPC2Service {
     @JSONRPC2Method("generatePublicKey")
     public String generatePublicKey(final GeneratePublicKeyParams params) {
-        var trimmedKey = params.getPrivateKey().trim();
+        var trimmedKey = params.getPrivateKey().orElse("");
         var key = PrivateKey.fromString(trimmedKey);
-
         return key.getPublicKey().toString();
     }
 

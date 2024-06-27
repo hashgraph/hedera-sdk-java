@@ -26,16 +26,17 @@ public class SdkService extends AbstractJSONRPC2Service {
     public SetupResponse setup(final SetupParams params) throws HederaException {
         String clientType;
         try {
-            if (params.getNodeIp() != null
-                    && params.getNodeAccountId() != null
-                    && params.getMirrorNetworkIp() != null) {
+            if (params.getNodeIp().isPresent()
+                    && params.getNodeAccountId().isPresent()
+                    && params.getMirrorNetworkIp().isPresent()) {
                 // Custom client setup
                 Map<String, AccountId> node = new HashMap<>();
-                var nodeId = new AccountId(Integer.parseInt(params.getNodeAccountId()));
-                node.put(params.getNodeIp(), nodeId);
+                var nodeId =
+                        new AccountId(Integer.parseInt(params.getNodeAccountId().get()));
+                node.put(params.getNodeIp().get(), nodeId);
                 client = Client.forNetwork(node);
                 clientType = "custom";
-                client.setMirrorNetwork(List.of(params.getMirrorNetworkIp()));
+                client.setMirrorNetwork(List.of(params.getMirrorNetworkIp().get()));
             } else {
                 // Default to testnet
                 client = Client.forTestnet();
@@ -43,8 +44,8 @@ public class SdkService extends AbstractJSONRPC2Service {
             }
 
             client.setOperator(
-                    AccountId.fromString(params.getOperatorAccountId()),
-                    PrivateKey.fromString(params.getOperatorPrivateKey()));
+                    AccountId.fromString(params.getOperatorAccountId().orElse("")),
+                    PrivateKey.fromString(params.getOperatorPrivateKey().orElse("")));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new HederaException(e);

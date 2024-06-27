@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,11 +21,11 @@ class SdkServiceTest {
     void testSetup() throws HederaException {
         // Given
         SetupParams params = new SetupParams(
-                "0.0.2",
-                "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137",
-                "127.0.0.1:50211",
-                "3",
-                "http://127.0.0.1:5551");
+                Optional.of("0.0.2"),
+                Optional.of("302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"),
+                Optional.of("127.0.0.1:50211"),
+            Optional.of("3"),
+            Optional.of("http://127.0.0.1:5551"));
 
         // When
         SetupResponse response = sdkService.setup(params);
@@ -37,7 +38,7 @@ class SdkServiceTest {
     void testSetupFail() throws HederaException {
         // Given
         SetupParams params =
-                new SetupParams("operatorAccountId", "operatorPrivateKey", "nodeIp", "3asdf", "127.0.0.1:50211");
+                new SetupParams( Optional.of("operatorAccountId"), Optional.of( "operatorPrivateKey"), Optional.of( "nodeIp"), Optional.of( "3asdf"), Optional.of( "127.0.0.1:50211"));
 
         // then
         assertThrows(HederaException.class, () -> sdkService.setup(params));
