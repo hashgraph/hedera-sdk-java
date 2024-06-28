@@ -92,16 +92,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     protected LockableList<Node> nodes = new LockableList<>();
 
     /**
-     * List of mirror network nodes with which execution will be attempted.
-     */
-    protected List<String> mirrorNetworkNodes = new ArrayList<>();
-
-    /**
-     * Current LedgerId of the network with which execution will be attempted.
-     */
-    protected LedgerId ledgerId;
-
-    /**
      * Indicates if the request has been attempted to be sent to all nodes
      */
     protected boolean attemptedAllNodes = false;
@@ -347,9 +337,6 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         if (grpcDeadline == null) {
             grpcDeadline = client.getGrpcDeadline();
         }
-
-        this.mirrorNetworkNodes = client.getMirrorNetwork();
-        this.ledgerId = client.getLedgerId();
     }
 
     private void delay(long delay) {

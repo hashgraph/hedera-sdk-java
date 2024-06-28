@@ -45,7 +45,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e # v3.1.0
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
         with:
           cache-read-only: false
 
@@ -80,7 +80,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e # v3.1.0
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -108,7 +108,7 @@ jobs:
 
       - name: Publish To Codecov
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
-        uses: codecov/codecov-action@e0b68c6749509c5f83f984dd99a76a1c1a231044 # v4.0.1
+        uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
@@ -139,7 +139,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@29c0906b64b8fc82467890bfb7a0a7ef34bda89e # v3.1.0
+        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -161,3 +161,46 @@ jobs:
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
+
+
+
+  tck-unit-tests:
+      name: TCK Unit Tests
+      runs-on: [ self-hosted, Linux, medium, ephemeral ]
+      needs:
+          - compile
+      steps:
+          - name: Checkout Code
+            uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+            with:
+                fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+          - name: Setup NodeJS
+            uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+            with:
+                node-version: 18
+
+          - name: Setup Java
+            uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
+            with:
+                distribution: temurin
+                java-version: 17
+
+          - name: Setup Gradle
+            uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+
+          - name: Install Local Node
+            run: npm install @hashgraph/hedera-local
+
+          - name: Compile Code
+            run: ./gradlew assemble --scan
+
+          - name: Start Local Node
+            run: npx @hashgraph/hedera-local start -d --network local
+
+          - name: Run Tests
+            run: |
+                cd tck && ./gradlew test && cd ..
+
+          - name: Stop the local node
+            run: npx @hashgraph/hedera-local stop

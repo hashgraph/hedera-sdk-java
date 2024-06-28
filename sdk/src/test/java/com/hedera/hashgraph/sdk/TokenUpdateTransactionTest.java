@@ -101,7 +101,7 @@ public class TokenUpdateTransactionTest {
             .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
             .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
             .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1))
-            .setTokenMetadata(testMetadata).freeze().sign(unusedPrivateKey);
+            .setTokenMetadata(testMetadata).setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION).freeze().sign(unusedPrivateKey);
     }
 
     @Test
@@ -134,7 +134,8 @@ public class TokenUpdateTransactionTest {
             .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
             .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
             .setMetadataKey(testMetadataKey.toProtobufKey())
-            .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata))).build();
+            .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata)))
+            .setKeyVerificationMode(com.hedera.hashgraph.sdk.proto.TokenKeyValidation.NO_VALIDATION).build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);
@@ -157,6 +158,7 @@ public class TokenUpdateTransactionTest {
         assertThat(tokenUpdateTransaction.getPauseKey()).isEqualTo(testPauseKey);
         assertThat(tokenUpdateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
         assertThat(tokenUpdateTransaction.getTokenMetadata()).isEqualTo(testMetadata);
+        assertThat(tokenUpdateTransaction.getKeyVerificationMode()).isEqualTo(TokenKeyValidation.NO_VALIDATION);
     }
 
     @Test
@@ -361,5 +363,17 @@ public class TokenUpdateTransactionTest {
     void getSetMetadataFrozen() {
         var tx = spawnTestTransaction();
         assertThrows(IllegalStateException.class, () -> tx.setTokenMetadata(testMetadata));
+    }
+
+    @Test
+    void getSetKeyVerificationMode() {
+        var tx = spawnTestTransaction();
+        assertThat(tx.getKeyVerificationMode()).isEqualTo(TokenKeyValidation.NO_VALIDATION);
+    }
+
+    @Test
+    void getSetKeyVerificationModeFrozen() {
+        var tx = spawnTestTransaction();
+        assertThrows(IllegalStateException.class, () -> tx.setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION));
     }
 }

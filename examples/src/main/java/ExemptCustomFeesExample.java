@@ -172,10 +172,6 @@ public final class ExemptCustomFeesExample {
          * of the token that was created was not charged a custom fee in the transfer
          */
 
-        // `AccountBalanceQuery` also queries the mirror node.
-        // Wait until the mirror node updates with the new data.
-        Thread.sleep(5000);
-
         Long firstAccountBalanceAfter = new AccountBalanceQuery()
             .setAccountId(firstAccountId)
             .execute(client)
