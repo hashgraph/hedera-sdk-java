@@ -571,13 +571,23 @@ public final class Mnemonic {
      *                        e.g. "m/44'/60'/0'/0/0"
      * @return an array of integers designed to be used with PrivateKey#derive
      */
-    private int[] calculateDerivationPathValues(String derivationPath) {
+    private int[] calculateDerivationPathValues(String derivationPath)
+        throws IllegalArgumentException
+    {
+        if (derivationPath == null || derivationPath.isEmpty()) {
+            throw new IllegalArgumentException("Derivation path cannot be null or empty");
+        }
+
         // Parse the derivation path from string into values
-        int[] numbers = new int[5];
-        boolean[] isHardened = new boolean[5];
         Pattern pattern = Pattern.compile("m/(\\d+'?)/(\\d+'?)/(\\d+'?)/(\\d+'?)/(\\d+'?)");
         Matcher matcher = pattern.matcher(derivationPath);
-        if (matcher.matches()) {
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid derivation path format");
+        }
+
+        int[] numbers = new int[5];
+        boolean[] isHardened = new boolean[5];
+        try {
             // Extract numbers and use apostrophe to select if is hardened
             for (int i = 1; i <= 5; i++) {
                 String value = matcher.group(i);
@@ -589,6 +599,8 @@ public final class Mnemonic {
                 }
                 numbers[i - 1] = Integer.parseInt(value);
             }
+        } catch (NumberFormatException nfe) {
+            throw new IllegalArgumentException("Invalid number format in derivation path", nfe);
         }
 
         // Derive private key one index at a time
@@ -652,7 +664,7 @@ public final class Mnemonic {
      *                        e.g. "m/44'/60'/0'/0/0"
      * @return the private key
      */
-    public PrivateKey toStandardECDSAsecp256k1PrivateKey(String passphrase, String derivationPath) {
+    public PrivateKey toStandardECDSAsecp256k1PrivateKeyCustomDerivationPath(String passphrase, String derivationPath) {
         final int[] derivationPathValues = calculateDerivationPathValues(derivationPath);
         return toStandardECDSAsecp256k1PrivateKeyImpl(passphrase, derivationPathValues);
     }
