@@ -194,7 +194,7 @@ public final class TransactionReceiptQuery
     @Override
     ExecutionState getExecutionState(Status status, Response response) {
         switch (status) {
-            case BUSY:
+//            case BUSY:
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
@@ -204,7 +204,8 @@ public final class TransactionReceiptQuery
                 break;
 
             default:
-                return ExecutionState.REQUEST_ERROR;
+//                return ExecutionState.REQUEST_ERROR;
+                return super.getExecutionState(status, response);
         }
 
         var receiptStatus =

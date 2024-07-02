@@ -399,48 +399,54 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
                 throw new TimeoutException();
             }
 
+            Status status = null;
             GrpcRequest grpcRequest = new GrpcRequest(client.network, attempt, currentTimeout);
             Node node = grpcRequest.getNode();
             ResponseT response = null;
 
-            // If we get an unhealthy node here, we've cycled through all the "good" nodes that have failed
-            // and have no choice but to try a bad one.
-            if (!node.isHealthy()) {
-                delay(node.getRemainingTimeForBackoff());
-            }
+            if (attempt == 1) {
+                status = Status.PLATFORM_NOT_ACTIVE;
+            } else {
+                // If we get an unhealthy node here, we've cycled through all the "good" nodes that have failed
+                // and have no choice but to try a bad one.
+                if (!node.isHealthy()) {
+                    delay(node.getRemainingTimeForBackoff());
+                }
 
-            if (node.channelFailedToConnect(timeoutTime)) {
-                logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
-                lastException = grpcRequest.reactToConnectionFailure();
-                continue;
-            }
+                if (node.channelFailedToConnect(timeoutTime)) {
+                    logger.trace("Failed to connect channel for node {} for request #{}", node.getAccountId(), attempt);
+                    lastException = grpcRequest.reactToConnectionFailure();
+                    continue;
+                }
 
-            currentTimeout = Duration.between(Instant.now(), timeoutTime);
-            grpcRequest.setGrpcDeadline(currentTimeout);
+                currentTimeout = Duration.between(Instant.now(), timeoutTime);
+                grpcRequest.setGrpcDeadline(currentTimeout);
 
-            try {
-                response = blockingUnaryCall.apply(grpcRequest);
-                logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
-            } catch (Throwable e) {
-                if (e instanceof StatusRuntimeException) {
-                    StatusRuntimeException statusRuntimeException = (StatusRuntimeException) e;
-                    if (statusRuntimeException.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
-                        throw new TimeoutException();
+                try {
+                    response = blockingUnaryCall.apply(grpcRequest);
+                    logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, response, null);
+                } catch (Throwable e) {
+                    if (e instanceof StatusRuntimeException) {
+                        StatusRuntimeException statusRuntimeException = (StatusRuntimeException) e;
+                        if (statusRuntimeException.getStatus().getCode().equals(Code.DEADLINE_EXCEEDED)) {
+                            throw new TimeoutException();
+                        }
+                    }
+                    lastException = e;
+                    logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
+                }
+
+                if (response == null) {
+                    if (grpcRequest.shouldRetryExceptionally(lastException)) {
+                        continue;
+                    } else {
+                        throw new RuntimeException(lastException);
                     }
                 }
-                lastException = e;
-                logTransaction(this.getTransactionIdInternal(), client, node, false, attempt, null, e);
+
+                status = mapResponseStatus(response);
             }
 
-            if (response == null) {
-                if (grpcRequest.shouldRetryExceptionally(lastException)) {
-                    continue;
-                } else {
-                    throw new RuntimeException(lastException);
-                }
-            }
-
-            var status = mapResponseStatus(response);
             var executionState = getExecutionState(status, response);
             grpcRequest.handleResponse(response, status, executionState);
 

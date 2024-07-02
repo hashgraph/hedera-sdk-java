@@ -66,10 +66,10 @@ public final class CreateAccountExample {
             .execute(client);
 
         // This will wait for the receipt to become available
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
+//        TransactionReceipt receipt = transactionResponse.getReceipt(client);
 
-        AccountId newAccountId = receipt.accountId;
+//        AccountId newAccountId = receipt.accountId;
 
-        System.out.println("account = " + newAccountId);
+//        System.out.println("account = " + newAccountId);
     }
 }
