@@ -1,10 +1,12 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.HbarUnit;
-import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransferTransaction;
@@ -16,6 +18,7 @@ import com.hedera.hashgraph.tck.methods.sdk.param.AccountCreateParamsFromAlias;
 import com.hedera.hashgraph.tck.methods.sdk.response.AccountCreateResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
 import java.time.Duration;
+import java.util.concurrent.TimeoutException;
 
 /**
  * AccountCreateService for account related methods
@@ -29,10 +32,17 @@ public class AccountService extends AbstractJSONRPC2Service {
     }
 
     @JSONRPC2Method("createAccount")
-    public AccountCreateResponse createAccount(final AccountCreateParams params) throws Exception {
+    public AccountCreateResponse createAccount(final AccountCreateParams params)
+            throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction();
 
-        params.getPublicKey().ifPresent(key -> accountCreateTransaction.setKey(KeyUtils.getKeyFromStringDER(key)));
+        params.getKey().ifPresent(key -> {
+            try {
+                accountCreateTransaction.setKey(KeyUtils.getKeyFromStringDER(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         params.getInitialBalance()
                 .ifPresent(initialBalanceTinybars -> accountCreateTransaction.setInitialBalance(
@@ -41,8 +51,8 @@ public class AccountService extends AbstractJSONRPC2Service {
         params.getReceiverSignatureRequired().ifPresent(accountCreateTransaction::setReceiverSignatureRequired);
 
         params.getAutoRenewPeriod()
-                .ifPresent(autoRenewPeriodSeconds -> accountCreateTransaction.setAutoRenewPeriod(
-                        Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
+                .ifPresent(autoRenewPeriodSeconds ->
+                        accountCreateTransaction.setAutoRenewPeriod(Duration.ofSeconds(autoRenewPeriodSeconds)));
 
         params.getMemo().ifPresent(accountCreateTransaction::setAccountMemo);
 
@@ -60,10 +70,9 @@ public class AccountService extends AbstractJSONRPC2Service {
 
         params.getAlias().ifPresent(accountCreateTransaction::setAlias);
 
-        params.getPrivateKey().ifPresent(pk -> {
-            var privateKey = PrivateKey.fromString(pk);
-            accountCreateTransaction.freezeWith(sdkService.getClient()).sign(privateKey);
-        });
+        params.getCommonTransactionParams()
+                .ifPresent(commonTransactionParams ->
+                        commonTransactionParams.fillOutTransaction(accountCreateTransaction, sdkService.getClient()));
 
         TransactionReceipt transactionReceipt =
                 accountCreateTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
@@ -73,11 +82,14 @@ public class AccountService extends AbstractJSONRPC2Service {
             stringAccountId = transactionReceipt.accountId.toString();
         }
 
+        sdkService.getClient().close();
+
         return new AccountCreateResponse(stringAccountId, transactionReceipt.status);
     }
 
     @JSONRPC2Method("createAccountFromAlias")
-    public TransactionReceipt createAccountFromAlias(final AccountCreateParamsFromAlias params) throws Exception {
+    public TransactionReceipt createAccountFromAlias(final AccountCreateParamsFromAlias params)
+            throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         TransferTransaction transferTransaction = new TransferTransaction();
         AccountId operator = new AccountId(0);
         AccountId alias = new AccountId(0);

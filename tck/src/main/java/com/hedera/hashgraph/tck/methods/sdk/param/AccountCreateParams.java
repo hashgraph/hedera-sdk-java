@@ -6,6 +6,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.minidev.json.JSONObject;
 
 /**
  * AccountCreateParams for account create method
@@ -15,11 +16,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountCreateParams extends JSONRPC2Param {
-    private Optional<String> publicKey;
-    private Optional<String> privateKey;
+    private Optional<String> key;
     private Optional<Long> initialBalance;
     private Optional<Boolean> receiverSignatureRequired;
-    private Optional<String> autoRenewPeriod;
+    private Optional<Long> autoRenewPeriod;
     private Optional<String> memo;
     private Optional<Long> maxAutoTokenAssociations;
     private Optional<String> stakedAccountId;
@@ -27,28 +27,31 @@ public class AccountCreateParams extends JSONRPC2Param {
     private Optional<Boolean> declineStakingReward;
     private Optional<String> alias;
     private Optional<String> signerKey;
+    private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
     public AccountCreateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        Optional<String> publicKey = Optional.ofNullable((String) jrpcParams.get("publicKey"));
-        Optional<String> privateKey = Optional.ofNullable((String) jrpcParams.get("privateKey"));
-        Optional<Long> parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
-        Optional<Boolean> parsedReceiverSignatureRequired =
+        var key = Optional.ofNullable((String) jrpcParams.get("key"));
+        var parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
+        var parsedReceiverSignatureRequired =
                 Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
-        Optional<String> parsedAutoRenewPeriod = Optional.ofNullable((String) jrpcParams.get("autoRenewPeriod"));
-        Optional<String> parsedMemo = Optional.ofNullable((String) jrpcParams.get("accountMemo"));
-        Optional<Long> parsedMaxAutoTokenAssociations =
+        var parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
+        var parsedMemo = Optional.ofNullable((String) jrpcParams.get("accountMemo"));
+        var parsedMaxAutoTokenAssociations =
                 Optional.ofNullable((Long) jrpcParams.get("maxAutomaticTokenAssociations"));
-        Optional<String> parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
-        Optional<Long> parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
-        Optional<Boolean> parsedDeclineStakingReward =
-                Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
-        Optional<String> parsedAlias = Optional.ofNullable((String) jrpcParams.get("aliasAccountId"));
-        Optional<String> parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
+        var parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
+        var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
+        var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
+        var parsedAlias = Optional.ofNullable((String) jrpcParams.get("aliasAccountId"));
+        var parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
+        Optional<CommonTransactionParams> commonTransactionParams = Optional.empty();
+        if (jrpcParams.containsKey("commonTransactionParams")) {
+            JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
+            commonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
+        }
 
         return new AccountCreateParams(
-                publicKey,
-                privateKey,
+                key,
                 parsedInitialBalance,
                 parsedReceiverSignatureRequired,
                 parsedAutoRenewPeriod,
@@ -58,6 +61,7 @@ public class AccountCreateParams extends JSONRPC2Param {
                 parsedStakedNodeId,
                 parsedDeclineStakingReward,
                 parsedAlias,
-                parsedSignerKey);
+                parsedSignerKey,
+                commonTransactionParams);
     }
 }

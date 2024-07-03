@@ -31,8 +31,7 @@ public class SdkService extends AbstractJSONRPC2Service {
                     && params.getMirrorNetworkIp().isPresent()) {
                 // Custom client setup
                 Map<String, AccountId> node = new HashMap<>();
-                var nodeId =
-                        new AccountId(Integer.parseInt(params.getNodeAccountId().get()));
+                var nodeId = AccountId.fromString(params.getNodeAccountId().get());
                 node.put(params.getNodeIp().get(), nodeId);
                 client = Client.forNetwork(node);
                 clientType = "custom";
@@ -44,8 +43,8 @@ public class SdkService extends AbstractJSONRPC2Service {
             }
 
             client.setOperator(
-                    AccountId.fromString(params.getOperatorAccountId().orElse("")),
-                    PrivateKey.fromString(params.getOperatorPrivateKey().orElse("")));
+                    AccountId.fromString(params.getOperatorAccountId()),
+                    PrivateKey.fromString(params.getOperatorPrivateKey()));
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new HederaException(e);

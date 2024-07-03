@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2ParamsException;
+import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2RequestException;
 import com.hedera.hashgraph.tck.methods.JSONRPC2Error.ErrorData;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
@@ -76,6 +77,8 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
             }
         } catch (InvalidJSONRPC2ParamsException e) {
             return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
+        } catch (InvalidJSONRPC2RequestException e) {
+            return new JSONRPC2Response(JSONRPC2Error.INVALID_REQUEST, req.getID());
         } catch (InvocationTargetException e) {
             // the target is HederaException
             var hederaException = e.getTargetException();
@@ -84,6 +87,10 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
                 errorData = new ErrorData(precheck.status, precheck.getMessage());
             } else if (hederaException instanceof ReceiptStatusException receipt) {
                 errorData = new ErrorData(receipt.receipt.status, receipt.getMessage());
+            } else if (hederaException instanceof InvalidJSONRPC2ParamsException) {
+                return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
+            } else if (hederaException instanceof InvalidJSONRPC2RequestException) {
+                return new JSONRPC2Response(JSONRPC2Error.INVALID_REQUEST, req.getID());
             } else {
                 return new JSONRPC2Response(JSONRPC2Error.INTERNAL_ERROR, req.getID());
             }
@@ -106,7 +113,7 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
      * @return parsed arguments for the method being called using reflection
      */
     private Object[] getArguments(final Method method, final Map<String, Object> jrpcParams)
-            throws InvalidJSONRPC2ParamsException {
+            throws InvalidJSONRPC2ParamsException, InvalidJSONRPC2RequestException {
         Class<?>[] paramTypes = method.getParameterTypes();
         Object[] args = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
@@ -115,6 +122,8 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
                 if (paramInstance instanceof JSONRPC2Param jsonRpcParam) {
                     args[i] = jsonRpcParam.parse(jrpcParams);
                 }
+            } catch (InvalidJSONRPC2RequestException | IllegalArgumentException e) {
+                throw e;
             } catch (Exception e) {
                 throw new InvalidJSONRPC2ParamsException("Invalid parameters for method %s with args: %s"
                         .formatted(method.getName(), Arrays.toString(args)));

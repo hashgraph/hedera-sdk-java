@@ -1,7 +1,5 @@
 package com.hedera.hashgraph.tck.methods;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.hedera.hashgraph.sdk.Status;
 
 /**
@@ -16,6 +14,5 @@ public class JSONRPC2Error {
     public static final com.thetransactioncompany.jsonrpc2.JSONRPC2Error HEDERA_ERROR =
             new com.thetransactioncompany.jsonrpc2.JSONRPC2Error(HEDERA_STATUS_CODE, "Hedera error");
 
-    @JsonAutoDetect(fieldVisibility = Visibility.ANY)
     public record ErrorData(Status status, String message) {}
 }

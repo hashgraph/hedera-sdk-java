@@ -10,20 +10,21 @@ import lombok.NoArgsConstructor;
 /**
  * AccountCreateParamsFromAlias for account create method
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountCreateParamsFromAlias extends JSONRPC2Param {
-    private Optional<String> operatorID = Optional.empty();
-    private Optional<String> aliasAccountID = Optional.empty();
-    private Optional<Long> initialBalance = Optional.empty();
+    private Optional<String> operatorID;
+    private Optional<String> aliasAccountID;
+    private Optional<Long> initialBalance;
 
     @Override
     public AccountCreateParamsFromAlias parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        Optional<String> operatorID = Optional.ofNullable((String) jrpcParams.get("operator_id"));
-        Optional<String> aliasAccountID =
+        var operatorID = Optional.ofNullable((String) jrpcParams.get("operator_id"));
+        var aliasAccountID =
                 Optional.ofNullable((String) jrpcParams.get("aliasAccountId")).map(s -> s.replaceAll("\"", ""));
-        Optional<Long> initialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
+        var initialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
 
         return new AccountCreateParamsFromAlias(operatorID, aliasAccountID, initialBalance);
     }

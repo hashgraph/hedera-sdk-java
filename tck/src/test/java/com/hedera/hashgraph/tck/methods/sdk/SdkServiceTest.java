@@ -21,11 +21,11 @@ class SdkServiceTest {
     void testSetup() throws HederaException {
         // Given
         SetupParams params = new SetupParams(
-                Optional.of("0.0.2"),
-                Optional.of("302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"),
+                "0.0.2",
+                "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137",
                 Optional.of("127.0.0.1:50211"),
-            Optional.of("3"),
-            Optional.of("http://127.0.0.1:5551"));
+                Optional.of("0.0.3"),
+                Optional.of("http://127.0.0.1:5551"));
 
         // When
         SetupResponse response = sdkService.setup(params);
@@ -37,8 +37,12 @@ class SdkServiceTest {
     @Test
     void testSetupFail() throws HederaException {
         // Given
-        SetupParams params =
-                new SetupParams( Optional.of("operatorAccountId"), Optional.of( "operatorPrivateKey"), Optional.of( "nodeIp"), Optional.of( "3asdf"), Optional.of( "127.0.0.1:50211"));
+        SetupParams params = new SetupParams(
+                "operatorAccountId",
+                "operatorPrivateKey",
+                Optional.of("nodeIp"),
+                Optional.of("3asdf"),
+                Optional.of("127.0.0.1:50211"));
 
         // then
         assertThrows(HederaException.class, () -> sdkService.setup(params));

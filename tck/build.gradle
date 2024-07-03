@@ -25,6 +25,9 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.14.3'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.14.3'
+    implementation group: 'org.bouncycastle', name: 'bcprov-jdk15to18', version: '1.76'
+    implementation group: 'org.bouncycastle', name: 'bcpkix-jdk15to18', version: '1.76'
+
     implementation project(':sdk')
 
 
