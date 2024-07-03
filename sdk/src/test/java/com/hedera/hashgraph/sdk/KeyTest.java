@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.util.List;
 
+import static com.hedera.hashgraph.sdk.Key.fromBytes;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -114,7 +115,7 @@ class KeyTest {
         var cut = PublicKey.fromProtobufKey(protoKey);
 
         assertThat(cut.getClass()).isEqualTo(PublicKeyED25519.class);
-        assertThat(((PublicKey) cut).toBytes()).containsExactly(keyBytes);
+        assertThat(cut.toBytes()).containsExactly(keyBytes);
     }
 
     @Test
@@ -274,5 +275,101 @@ class KeyTest {
 
         keyList.removeAll(List.of(key2, key3));
         assertThat(keyList).isEmpty();
+    }
+
+    @Test
+    @DisplayName("can convert from bytes ED25519 key to Key")
+    void fromBytesEd25519() throws InvalidProtocolBufferException {
+        var keyBytes = Hex.decode("0011223344556677889900112233445566778899001122334455667788990011");
+        var protoKey = Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
+        var bytes = protoKey.toByteArray();
+
+        var cut = fromBytes(bytes);
+
+        assertThat(cut.getClass()).isEqualTo(PublicKeyED25519.class);
+        assertThat(cut.toBytes()).containsExactly(keyBytes);
+    }
+
+    @Test
+    @DisplayName("can convert from bytes ECDSA key to Key")
+    void fromBytesECDSA() throws InvalidProtocolBufferException {
+        var keyBytes = Hex.decode("3a21034e0441201f2bf9c7d9873c2a9dc3fd451f64b7c05e17e4d781d916e3a11dfd99");
+
+        var cut = fromBytes(keyBytes);
+
+        assertThat(cut.getClass()).isEqualTo(PublicKeyECDSA.class);
+        assertThat(cut.toProtobufKey().toByteArray()).containsExactly(keyBytes);
+    }
+
+    @Test
+    @DisplayName("can convert from bytes key list to Key")
+    void fromBytesKeyList() throws InvalidProtocolBufferException {
+        var keyBytes = new byte[][]{
+            Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
+            Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
+        };
+
+        var protoKeyList = KeyList.newBuilder();
+
+        for (byte[] kb : keyBytes) {
+            protoKeyList.addKeys(Key.newBuilder().setEd25519(ByteString.copyFrom(kb)));
+        }
+
+        var protoKey = Key.newBuilder().setKeyList(protoKeyList).build();
+        var bytes = protoKey.toByteArray();
+
+        var cut = fromBytes(bytes);
+
+        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+
+        var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var actual = keyList.toProtobufKey().getKeyList();
+
+        assertThat(actual.getKeysCount()).isEqualTo(2);
+        assertThat(actual.getKeys(0).getEd25519().toByteArray()).containsExactly(keyBytes[0]);
+        assertThat(actual.getKeys(1).getEd25519().toByteArray()).containsExactly(keyBytes[1]);
+    }
+
+    @Test
+    @DisplayName("can convert from bytes threshold key to Key")
+    void fromBytesThresholdKey() throws InvalidProtocolBufferException {
+        var keyBytes = new byte[][]{
+            Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
+            Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
+        };
+
+        var protoKeyList = KeyList.newBuilder();
+
+        for (byte[] kb : keyBytes) {
+            protoKeyList.addKeys(Key.newBuilder().setEd25519(ByteString.copyFrom(kb)));
+        }
+
+        var protoThresholdKey = ThresholdKey.newBuilder().setThreshold(1).setKeys(protoKeyList);
+        var protoKey = Key.newBuilder().setThresholdKey(protoThresholdKey).build();
+        var bytes = protoKey.toByteArray();
+
+        var cut = fromBytes(bytes);
+
+        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+
+        var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var actual = thresholdKey.toProtobufKey().getThresholdKey();
+
+        assertThat(actual.getThreshold()).isEqualTo(1);
+        assertThat(actual.getKeys().getKeysCount()).isEqualTo(2);
+        assertThat(actual.getKeys().getKeys(0).getEd25519().toByteArray()).containsExactly(keyBytes[0]);
+        assertThat(actual.getKeys().getKeys(1).getEd25519().toByteArray()).containsExactly(keyBytes[1]);
+    }
+
+    @Test
+    @DisplayName("Throws given unsupported key")
+    void throwsUnsupportedKeyFromBytes() {
+        byte[] keyBytes = {0, 1, 2};
+        var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
+        var bytes = protoKey.toByteArray();
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
+            () -> fromBytes(bytes)
+        );
     }
 }
