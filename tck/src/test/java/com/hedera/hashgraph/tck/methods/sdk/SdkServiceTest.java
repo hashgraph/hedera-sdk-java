@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
 import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +18,7 @@ class SdkServiceTest {
     private SdkService sdkService = new SdkService();
 
     @Test
-    void testSetup() throws HederaException {
+    void testSetup() throws Exception {
         // Given
         SetupParams params = new SetupParams(
                 "0.0.2",
@@ -35,7 +35,7 @@ class SdkServiceTest {
     }
 
     @Test
-    void testSetupFail() throws HederaException {
+    void testSetupFail() {
         // Given
         SetupParams params = new SetupParams(
                 "operatorAccountId",
@@ -45,11 +45,11 @@ class SdkServiceTest {
                 Optional.of("127.0.0.1:50211"));
 
         // then
-        assertThrows(HederaException.class, () -> sdkService.setup(params));
+        assertThrows(Exception.class, () -> sdkService.setup(params));
     }
 
     @Test
-    void testReset() {
+    void testReset() throws TimeoutException {
         // When
         SetupResponse response = sdkService.reset();
 

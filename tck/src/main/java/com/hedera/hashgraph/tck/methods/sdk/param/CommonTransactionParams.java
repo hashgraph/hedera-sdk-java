@@ -27,26 +27,30 @@ public class CommonTransactionParams {
     private Optional<List<String>> signers;
 
     public static CommonTransactionParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        var maxTransactionFee = Optional.ofNullable((Long) jrpcParams.get("maxTransactionFee"));
-        var validTransactionDuration = Optional.ofNullable((Long) jrpcParams.get("validTransactionDuration"));
-        var memo = Optional.ofNullable((String) jrpcParams.get("memo"));
-        var regenerateTransactionId = Optional.ofNullable((Boolean) jrpcParams.get("regenerateTransactionId"));
+        var parsedMaxTransactionFee = Optional.ofNullable((Long) jrpcParams.get("maxTransactionFee"));
+        var parsedValidTransactionDuration = Optional.ofNullable((Long) jrpcParams.get("validTransactionDuration"));
+        var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
+        var parsedRegenerateTransactionId = Optional.ofNullable((Boolean) jrpcParams.get("regenerateTransactionId"));
 
         // TODO: double check it
         var signers = Optional.ofNullable((List<String>) jrpcParams.get("signers"));
 
         return new CommonTransactionParams(
-                maxTransactionFee, validTransactionDuration, memo, regenerateTransactionId, signers);
+                parsedMaxTransactionFee,
+                parsedValidTransactionDuration,
+                parsedMemo,
+                parsedRegenerateTransactionId,
+                signers);
     }
 
-    public void fillOutTransaction(final Transaction transaction, final Client client) {
-        maxTransactionFee.ifPresent(v -> transaction.setMaxTransactionFee(Hbar.from(v)));
+    public void fillOutTransaction(final Transaction<?> transaction, final Client client) {
+        maxTransactionFee.ifPresent(v -> transaction.setMaxTransactionFee(Hbar.fromTinybars(v)));
         validTransactionDuration.ifPresent(v -> transaction.setTransactionValidDuration(Duration.ofSeconds(v)));
         memo.ifPresent(transaction::setTransactionMemo);
         regenerateTransactionId.ifPresent(transaction::setRegenerateTransactionId);
-        signers.ifPresent(signers -> {
+        signers.ifPresent(s -> {
             transaction.freezeWith(client);
-            signers.forEach(signer -> {
+            s.forEach(signer -> {
                 var pk = PrivateKey.fromString(signer);
                 transaction.sign(pk);
             });

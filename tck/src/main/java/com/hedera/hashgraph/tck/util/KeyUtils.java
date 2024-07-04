@@ -1,12 +1,10 @@
 package com.hedera.hashgraph.tck.util;
 
-import static com.hedera.hashgraph.sdk.Key.fromProtobufKey;
-
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import org.bouncycastle.util.encoders.Hex;
 
 public final class KeyUtils {
 
@@ -39,18 +37,14 @@ public final class KeyUtils {
         }
     }
 
-    // TODO: cover with test(s)
-    public static Key getKeyFromStringDER(String keyStringDER) throws InvalidProtocolBufferException {
+    public static Key getKeyFromString(String keyString) throws InvalidProtocolBufferException {
         try {
-            return PublicKey.fromStringDER(keyStringDER);
+            return PublicKey.fromStringDER(keyString);
         } catch (Exception e) {
             try {
-                return PrivateKey.fromStringDER(keyStringDER);
+                return PrivateKey.fromStringDER(keyString);
             } catch (Exception ex) {
-                com.hedera.hashgraph.sdk.proto.Key protoKey = com.hedera.hashgraph.sdk.proto.Key.getDefaultInstance();
-                com.hedera.hashgraph.sdk.proto.Key something =
-                        protoKey.getParserForType().parseFrom(Hex.decode(keyStringDER));
-                return fromProtobufKey(something);
+                return Key.fromBytes(ByteString.fromHex(keyString).toByteArray());
             }
         }
     }

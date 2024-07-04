@@ -31,27 +31,26 @@ public class AccountCreateParams extends JSONRPC2Param {
 
     @Override
     public AccountCreateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        var key = Optional.ofNullable((String) jrpcParams.get("key"));
+        var parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
         var parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
         var parsedReceiverSignatureRequired =
                 Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
         var parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
-        var parsedMemo = Optional.ofNullable((String) jrpcParams.get("accountMemo"));
-        var parsedMaxAutoTokenAssociations =
-                Optional.ofNullable((Long) jrpcParams.get("maxAutomaticTokenAssociations"));
+        var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
+        var parsedMaxAutoTokenAssociations = Optional.ofNullable((Long) jrpcParams.get("maxAutoTokenAssociations"));
         var parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
         var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
-        var parsedAlias = Optional.ofNullable((String) jrpcParams.get("aliasAccountId"));
+        var parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
         var parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
-        Optional<CommonTransactionParams> commonTransactionParams = Optional.empty();
+        Optional<CommonTransactionParams> parsedCommonTransactionParams = Optional.empty();
         if (jrpcParams.containsKey("commonTransactionParams")) {
             JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
-            commonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
+            parsedCommonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
         }
 
         return new AccountCreateParams(
-                key,
+                parsedKey,
                 parsedInitialBalance,
                 parsedReceiverSignatureRequired,
                 parsedAutoRenewPeriod,
@@ -62,6 +61,6 @@ public class AccountCreateParams extends JSONRPC2Param {
                 parsedDeclineStakingReward,
                 parsedAlias,
                 parsedSignerKey,
-                commonTransactionParams);
+                parsedCommonTransactionParams);
     }
 }
