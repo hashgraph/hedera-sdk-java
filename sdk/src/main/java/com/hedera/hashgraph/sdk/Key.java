@@ -19,6 +19,7 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.asn1.ASN1ObjectIdentifier;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
@@ -94,5 +95,16 @@ public abstract class Key {
      */
     public byte[] toBytes() {
         return toProtobufKey().toByteArray();
+    }
+
+    /**
+     * Create Key from proto.Key byte array
+     *
+     * @param bytes
+     * @return Key representation
+     * @throws InvalidProtocolBufferException
+     */
+    public static Key fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
+        return fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key.parseFrom(bytes));
     }
 }
