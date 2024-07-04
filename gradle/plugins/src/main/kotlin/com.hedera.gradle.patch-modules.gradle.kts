@@ -75,6 +75,20 @@ extraJavaModuleInfo {
         requires("com.google.common.util.concurrent.internal")
         requires("java.logging")
     }
+    module("guava-32.1.3-jre.jar", "com.google.common") {
+        /**
+         * Repetition of the rule above:
+         *
+         * There is an issue when the version is "android", but the selected Jar
+         * with classifier is "jre". If this causes a problem depends on the local
+         * Gradle dependency cache state (most likely).
+         * This is an issue that needs to be investigated and fixed in
+         * https://github.com/gradlex-org/extra-java-module-info
+         */
+        exportAllPackages()
+        requires("com.google.common.util.concurrent.internal")
+        requires("java.logging")
+    }
     module("com.google.protobuf:protobuf-java", "com.google.protobuf") {
         exportAllPackages()
         requireAllDefinedDependencies()
