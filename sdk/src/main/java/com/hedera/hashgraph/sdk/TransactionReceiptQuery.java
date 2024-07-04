@@ -194,18 +194,17 @@ public final class TransactionReceiptQuery
     @Override
     ExecutionState getExecutionState(Status status, Response response) {
         switch (status) {
-//            case BUSY:
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
+            case PLATFORM_NOT_ACTIVE:
                 return ExecutionState.RETRY;
 
             case OK:
                 break;
 
             default:
-//                return ExecutionState.REQUEST_ERROR;
-                return super.getExecutionState(status, response);
+                return ExecutionState.REQUEST_ERROR;
         }
 
         var receiptStatus =
@@ -217,6 +216,7 @@ public final class TransactionReceiptQuery
             case OK:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
+            case PLATFORM_NOT_ACTIVE:
                 return ExecutionState.RETRY;
 
             default:
