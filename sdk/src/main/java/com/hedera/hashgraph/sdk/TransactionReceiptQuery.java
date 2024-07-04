@@ -198,6 +198,7 @@ public final class TransactionReceiptQuery
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
+            case PLATFORM_NOT_ACTIVE:
                 return ExecutionState.RETRY;
 
             case OK:
@@ -216,6 +217,7 @@ public final class TransactionReceiptQuery
             case OK:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
+            case PLATFORM_NOT_ACTIVE:
                 return ExecutionState.RETRY;
 
             default:
