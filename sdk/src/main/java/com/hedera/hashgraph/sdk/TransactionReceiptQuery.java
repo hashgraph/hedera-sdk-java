@@ -194,6 +194,7 @@ public final class TransactionReceiptQuery
     @Override
     ExecutionState getExecutionState(Status status, Response response) {
         switch (status) {
+            case BUSY:
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
