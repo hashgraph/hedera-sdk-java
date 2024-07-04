@@ -38,7 +38,7 @@ jacoco {
 }
 
 jvmDependencyConflicts {
-    consistentResolution.platform(":sdk-dependency-versions")
+    consistentResolution.platform("com.hedera.hashgraph:sdk-dependency-versions")
 }
 
 dependencies {

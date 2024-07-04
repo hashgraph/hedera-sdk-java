@@ -21,6 +21,11 @@ plugins {
     id("com.hedera.gradle.java-base")
 }
 
+javaModuleDependencies {
+    moduleNameToGA.put("com.hedera.hashgraph.sdk", "com.hedera.hashgraph:sdk")
+    moduleNameToGA.put("com.hedera.hashgraph.sdk.full", "com.hedera.hashgraph:sdk-full")
+}
+
 tasks.withType<JavaCompile>().configureEach {
     options.errorprone {
         disable("DefaultPackage")

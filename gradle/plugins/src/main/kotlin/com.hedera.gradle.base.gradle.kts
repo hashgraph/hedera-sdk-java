@@ -15,4 +15,4 @@
  */
 
 group = "com.hedera.hashgraph"
-version = rootProject.layout.projectDirectory.file("version.txt").asFile.readText().trim()
+version = providers.fileContents(rootProject.layout.projectDirectory.file("version.txt")).asText.getOrElse("").trim()
