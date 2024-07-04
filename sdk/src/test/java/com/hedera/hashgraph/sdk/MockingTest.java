@@ -94,7 +94,7 @@ public class MockingTest {
     @CsvSource({"sync", "async"})
     void shouldRetryExceptionallyFunctionsCorrectlyForPlatformNotActiveGetReceipt(String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("executableRetry" + sync, service);
+        var server = new TestServer("getReceiptRetry" + sync, service);
         server.client.setMaxAttempts(3);
 
         service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
@@ -130,7 +130,7 @@ public class MockingTest {
     @CsvSource({"sync", "async"})
     void shouldRetryExceptionallyFunctionsCorrectlyForPlatformNotActiveGetRecord(String sync) throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("executableRetry" + sync, service);
+        var server = new TestServer("getRecordRetry" + sync, service);
         server.client.setMaxAttempts(3);
 
         service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
