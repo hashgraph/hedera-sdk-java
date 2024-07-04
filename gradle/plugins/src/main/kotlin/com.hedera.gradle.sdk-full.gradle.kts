@@ -51,9 +51,12 @@ tasks.named<Jar>("sourcesJar") {
 // 'sdk-full' is an alternative to 'sdk'. They cannot be used together.
 // We express this via capability.
 val sdkCapability = "${project.group}:sdk:${project.version}"
+val sdkFullCapability = "${project.group}:${project.name}:${project.version}"
 configurations.apiElements {
-    outgoing.capability(sdkCapability)
+    outgoing.capability(sdkFullCapability) // The default capability
+    outgoing.capability(sdkCapability) // The 'sdk' capability
 }
 configurations.runtimeElements {
-    outgoing.capability(sdkCapability)
+    outgoing.capability(sdkFullCapability) // The default capability
+    outgoing.capability(sdkCapability) // The 'sdk' capability
 }
