@@ -185,6 +185,7 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
             case UNKNOWN:
             case RECEIPT_NOT_FOUND:
             case RECORD_NOT_FOUND:
+                return ExecutionState.RETRY;
             case OK:
                 // When fetching payment an `OK` in the query header means the cost is in the response
                 if (paymentTransactions == null || paymentTransactions.isEmpty()) {
