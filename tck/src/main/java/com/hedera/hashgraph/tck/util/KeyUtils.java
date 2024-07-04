@@ -23,10 +23,6 @@ public final class KeyUtils {
             this.keyString = keyString;
         }
 
-        public String getKeyString() {
-            return keyString;
-        }
-
         public static KeyType fromString(String keyString) {
             for (KeyType type : KeyType.values()) {
                 if (type.keyString.equals(keyString)) {
