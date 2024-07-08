@@ -32,7 +32,7 @@ tasks:
 
     "test:integration":
         cmds:
-            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK integrationTest {{.CLI_ARGS}}
+            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK testIntegration {{.CLI_ARGS}}
         env:
             OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
             OPERATOR_ID: '0.0.1022'
