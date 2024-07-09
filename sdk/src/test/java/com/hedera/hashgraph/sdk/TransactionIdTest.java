@@ -20,22 +20,16 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.*;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
 import java.time.Instant;
-
-import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TransactionIdTest {
     @BeforeAll
@@ -43,7 +37,7 @@ class TransactionIdTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     public static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }

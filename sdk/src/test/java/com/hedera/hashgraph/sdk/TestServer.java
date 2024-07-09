@@ -22,9 +22,9 @@ package com.hedera.hashgraph.sdk;
 import io.grpc.BindableService;
 import io.grpc.Server;
 import io.grpc.inprocess.InProcessServerBuilder;
-import java.time.Duration;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.concurrent.TimeoutException;
 

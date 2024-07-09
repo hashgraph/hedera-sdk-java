@@ -45,12 +45,12 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
         with:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew assemble :sdk:javadoc --scan
 
   unit-tests:
     name: Unit Tests
@@ -80,13 +80,16 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
 
       - name: Compile Code
         run: ./gradlew assemble --scan
+
+      - name: Gradle Dependency Scopes Check
+        run: ./gradlew checkAllModuleInfo --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local
@@ -138,14 +141,20 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
+
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
 
       - name: Compile Code
         run: ./gradlew assemble --scan
+
+      - name: Compile Code - Android Example
+        run: ./gradlew -p example-android assemble --scan
 
       - name: Start the local node
         run: npx @hashgraph/hedera-local start -d --network local
@@ -187,7 +196,7 @@ jobs:
                 java-version: 17
 
           - name: Setup Gradle
-            uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+            uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
 
           - name: Install Local Node
             run: npm install @hashgraph/hedera-local
@@ -199,8 +208,7 @@ jobs:
             run: npx @hashgraph/hedera-local start -d --network local
 
           - name: Run Tests
-            run: |
-                cd tck && ./gradlew test && cd ..
+            run: ./gradlew :tck:test
 
           - name: Stop the local node
             run: npx @hashgraph/hedera-local stop

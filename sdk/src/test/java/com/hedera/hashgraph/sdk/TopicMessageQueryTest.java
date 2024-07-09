@@ -37,10 +37,8 @@ import io.grpc.Status;
 import io.grpc.StatusRuntimeException;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
-import java.util.function.Consumer;
-import org.apache.commons.lang3.ArrayUtils;
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.junit.AfterClass;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,9 +46,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+
 import java.time.Duration;
 import java.time.Instant;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,6 +57,7 @@ import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -80,7 +79,7 @@ class TopicMessageQueryTest {
         SnapshotMatcher.start();
     }
 
-    @AfterClass
+    @AfterAll
     static void afterAll() {
         SnapshotMatcher.validateSnapshots();
     }
@@ -210,7 +209,7 @@ class TopicMessageQueryTest {
 
         subscribeToMirror(received::add);
 
-        var message = ArrayUtils.addAll(response1.getMessage().toByteArray(), response2.getMessage().toByteArray());
+        var message = combine(response1.getMessage().toByteArray(), response2.getMessage().toByteArray());
         assertThat(errors).isEmpty();
         assertThat(received)
             .hasSize(1)
@@ -461,5 +460,12 @@ class TopicMessageQueryTest {
             assertThat(requests).isEmpty();
             assertThat(responses).isEmpty();
         }
+    }
+
+    private byte[] combine(byte[] array1, byte[] array2) {
+        byte[] joinedArray = new byte[array1.length + array2.length];
+        System.arraycopy(array1, 0, joinedArray, 0, array1.length);
+        System.arraycopy(array2, 0, joinedArray, array1.length, array2.length);
+        return joinedArray;
     }
 }
