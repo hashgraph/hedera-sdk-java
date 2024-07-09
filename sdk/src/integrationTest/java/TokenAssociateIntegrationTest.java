@@ -128,10 +128,6 @@ class TokenAssociateIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // `ContractInfoQuery` also queries the mirror node.
-        // Wait until the mirror node updates with the new data.
-        Thread.sleep(5000);
-
         var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
