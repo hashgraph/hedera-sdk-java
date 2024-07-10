@@ -1,3 +1,5 @@
+package com.hedera.hashgraph.sdk.test.integration;
+
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
