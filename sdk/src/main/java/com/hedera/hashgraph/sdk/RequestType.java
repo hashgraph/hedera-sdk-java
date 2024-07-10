@@ -415,9 +415,9 @@ public enum RequestType {
     NODE_DELETE(HederaFunctionality.NodeDelete),
 
     /**
-     * Get Node information
+     * Transfer one or more token balances held by the requesting account to the treasury for each token type.
      */
-    NODE_GET_INFO(HederaFunctionality.NodeGetInfo);
+    TOKEN_REJECT(HederaFunctionality.TokenReject);
 
     final HederaFunctionality code;
 
@@ -505,7 +505,7 @@ public enum RequestType {
             case NodeCreate -> NODE_CREATE;
             case NodeUpdate -> NODE_UPDATE;
             case NodeDelete -> NODE_DELETE;
-            case NodeGetInfo -> NODE_GET_INFO;
+            case TokenReject -> TOKEN_REJECT;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -591,7 +591,7 @@ public enum RequestType {
             case NODE_CREATE -> "NODE_CREATE";
             case NODE_UPDATE -> "NODE_UPDATE";
             case NODE_DELETE -> "NODE_DELETE";
-            case NODE_GET_INFO -> "NODE_GET_INFO";
+            case TOKEN_REJECT -> "TOKEN_REJECT";
         };
     }
 }

@@ -133,4 +133,21 @@ service TokenService {
      * Updates the NFTs in a collection by TokenID and serial number
      */
     rpc updateNfts (Transaction) returns (TransactionResponse);
+
+    /**
+     * Reject one or more tokens.<br/>
+     * This transaction SHALL transfer the full balance of one or more tokens from the requesting
+     * account to the treasury for each token. This transfer SHALL NOT charge any custom fee or
+     * royalty defined for the token(s) to be rejected.<br/>
+     * <h3>Effects on success</h3>
+     * <ul>
+     *   <li>If the rejected token is fungible/common, the requesting account SHALL have a balance
+     *       of 0 for the rejected token. The treasury balance SHALL increase by the amount that
+     *       the requesting account decreased.</li>
+     *   <li>If the rejected token is non-fungible/unique the requesting account SHALL NOT hold
+     *       the specific serialized token that is rejected. The treasury account SHALL hold each
+     *       specific serialized token that was rejected.</li>
+     * </li>
+     */
+    rpc rejectToken (Transaction) returns (TransactionResponse);
 }
