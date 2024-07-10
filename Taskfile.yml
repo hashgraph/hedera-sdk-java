@@ -49,21 +49,21 @@ tasks:
 
     "update:addressbooks:mainnet":
         cmds:
-            - ./gradlew runGetAddressBook
+            - ./gradlew examples:runGetAddressBook
             - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/mainnet.pb
         env:
             HEDERA_NETWORK: mainnet
 
     "update:addressbooks:testnet":
         cmds:
-            - ./gradlew runGetAddressBook
+            - ./gradlew examples:runGetAddressBook
             - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/testnet.pb
         env:
             HEDERA_NETWORK: testnet
 
     "update:addressbooks:previewnet":
         cmds:
-            - ./gradlew runGetAddressBook
+            - ./gradlew examples:runGetAddressBook
             - mv examples/address-book.proto.bin sdk/src/main/resources/addressbook/previewnet.pb
         env:
             HEDERA_NETWORK: previewnet

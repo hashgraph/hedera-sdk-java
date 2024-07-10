@@ -1,10 +1,8 @@
 syntax = "proto3";
 
-package proto;
+package com.hedera.hapi.node.addressbook;
 
 /*
- * Hedera Network Services Protobuf
- *
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,21 +22,31 @@ option java_package = "com.hedera.hashgraph.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.addressbook">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
-import "basic_types.proto";
-
 /**
- * Delete the given node. After deletion, it will be marked as deleted.
- * But information about it will continue to exist for a year.
- * For phase 2, this marks the node to be deleted in the merkle tree and will be used to write config.txt and
- * a-pulbic-NodeAlias.pem file per each node during prepare freeze.
- * The deleted node will not be deleted until the network is upgraded.
- * Such a deleted node can never be reused.
- * The council has to sign this transaction. This is a privileged transaction.
+ * A transaction body to delete a node from the network address book.
+ *
+ * This transaction body SHALL be considered a "privileged transaction".
+ *
+ * - A `NodeDeleteTransactionBody` MUST be signed by the governing council.
+ * - Upon success, the address book entry SHALL enter a "pending delete"
+ *   state.
+ * - All address book entries pending deletion SHALL be removed from the
+ *   active network configuration during the next `freeze` transaction with
+ *   the field `freeze_type` set to `PREPARE_UPGRADE`.<br/>
+ * - A deleted address book node SHALL be removed entirely from network state.
+ * - A deleted address book node identifier SHALL NOT be reused.
+ *
+ * ### Record Stream Effects
+ * Upon completion the "deleted" `node_id` SHALL be in the transaction
+ * receipt.
  */
 message NodeDeleteTransactionBody {
     /**
-     * The unique id of the node to be deleted. If invalid node is specified, transaction will
-     * result in INVALID_NODE_ID.
+     * A consensus node identifier in the network state.
+     * <p>
+     * The node identified MUST exist in the network address book.<br/>
+     * The node identified MUST NOT be deleted.<br/>
+     * This value is REQUIRED.
      */
     uint64 node_id = 1;
 }
