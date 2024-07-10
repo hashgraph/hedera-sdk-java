@@ -2,12 +2,9 @@ syntax = "proto3";
 
 package proto;
 
-/*-
- * ‌
- * Hedera Network Services Protobuf
- * ​
- * Copyright (C) 2018 - 2021 Hedera Hashgraph, LLC
- * ​
+/*
+ * Copyright (C) 2018-2024 Hedera Hashgraph, LLC
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,7 +16,6 @@ package proto;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ‍
  */
 
 option java_package = "com.hedera.hashgraph.sdk.proto";
@@ -60,7 +56,6 @@ import "token_get_nft_info.proto";
 import "token_get_nft_infos.proto";
 
 import "get_account_details.proto";
-import "node_get_info.proto";
 
 /**
  * A single query, which is sent from the client to a node. This includes all possible queries. Each
@@ -161,18 +156,15 @@ message Query {
          */
         NetworkGetVersionInfoQuery networkGetVersionInfo = 51;
 
-
         /**
          * Get all information about a token
          */
         TokenGetInfoQuery tokenGetInfo = 52;
 
-
         /**
          * Get all information about a scheduled entity
          */
         ScheduleGetInfoQuery scheduleGetInfo = 53;
-
 
         /**
          * Get a list of NFTs associated with the account
@@ -198,10 +190,5 @@ message Query {
          * Gets all information about an account including allowances granted by the account
          */
         GetAccountDetailsQuery accountDetails = 58;
-
-        /**
-         * Get all information about a node
-         */
-        NodeGetInfoQuery nodeGetInfo = 59;
     }
 }

@@ -1552,42 +1552,66 @@ public enum Status {
     TOKEN_HAS_NO_ADMIN_KEY(ResponseCodeEnum.TOKEN_HAS_NO_ADMIN_KEY),
 
     /**
-     * The node has been marked as deleted
+     * A transaction failed because the consensus node identified is
+     * deleted from the address book.
      */
     NODE_DELETED(ResponseCodeEnum.NODE_DELETED),
 
     /**
-     * A node is not found during update and delete node transaction
+     * A transaction failed because the consensus node identified is not valid or
+     * does not exist in state.
      */
     INVALID_NODE_ID(ResponseCodeEnum.INVALID_NODE_ID),
 
     /**
-     * gossip_endpoint has a fully qualified domain name instead of ip
+     * A transaction failed because one or more entries in the list of
+     * service endpoints for the `gossip_endpoint` field is invalid.<br/>
+     * The most common cause for this response is a service endpoint that has
+     * the domain name (DNS) set rather than address and port.
      */
     INVALID_GOSSIP_ENDPOINT(ResponseCodeEnum.INVALID_GOSSIP_ENDPOINT),
 
     /**
-     * The node account_id is invalid
+     * A transaction failed because the node account identifier provided
+     * does not exist or is not valid.<br/>
+     * One common source of this error is providing a node account identifier
+     * using the "alias" form rather than "numeric" form.
      */
     INVALID_NODE_ACCOUNT_ID(ResponseCodeEnum.INVALID_NODE_ACCOUNT_ID),
 
     /**
-     * The node description is invalid
+     * A transaction failed because the description field cannot be encoded
+     * as UTF-8 or is more than 100 bytes when encoded.
      */
     INVALID_NODE_DESCRIPTION(ResponseCodeEnum.INVALID_NODE_DESCRIPTION),
 
     /**
-     * service_endpoint is invalid
+     * A transaction failed because one or more entries in the list of
+     * service endpoints for the `service_endpoint` field is invalid.<br/>
+     * The most common cause for this response is a service endpoint that has
+     * the domain name (DNS) set rather than address and port.
      */
     INVALID_SERVICE_ENDPOINT(ResponseCodeEnum.INVALID_SERVICE_ENDPOINT),
 
     /**
-     * gossip_ca_certificate is invalid
+     * A transaction failed because the TLS certificate provided for the
+     * node is missing or invalid.<br/>
+     * The certificate MUST be a TLS certificate of a type permitted for gossip
+     * signatures.<br/>
+     * The value presented MUST be a UTF-8 NFKD encoding of the TLS
+     * certificate.<br/>
+     * The certificate encoded MUST be in PEM format.<br/>
+     * The `gossip_ca_certificate` field is REQUIRED and MUST NOT be empty.
      */
-    INVALID_GOSSIP_CAE_CERTIFICATE(ResponseCodeEnum.INVALID_GOSSIP_CAE_CERTIFICATE),
+    INVALID_GOSSIP_CA_CERTIFICATE(ResponseCodeEnum.INVALID_GOSSIP_CA_CERTIFICATE),
 
     /**
-     * grpc_certificate_hash is invalid
+     * A transaction failed because the hash provided for the gRPC certificate
+     * is present but invalid.<br/>
+     * The `grpc_certificate_hash` MUST be a SHA-384 hash.<br/>
+     * The input hashed MUST be a UTF-8 NFKD encoding of the actual TLS
+     * certificate.<br/>
+     * The certificate to be encoded MUST be in PEM format.
      */
     INVALID_GRPC_CERTIFICATE(ResponseCodeEnum.INVALID_GRPC_CERTIFICATE),
 
@@ -1595,7 +1619,73 @@ public enum Status {
      * The maximum automatic associations value is not valid.<br/>
      * The most common cause for this error is a value less than `-1`.
      */
-    INVALID_MAX_AUTO_ASSOCIATIONS(ResponseCodeEnum.INVALID_MAX_AUTO_ASSOCIATIONS);
+    INVALID_MAX_AUTO_ASSOCIATIONS(ResponseCodeEnum.INVALID_MAX_AUTO_ASSOCIATIONS),
+
+    /**
+     * The maximum number of nodes allowed in the address book have been created.
+     */
+    MAX_NODES_CREATED(ResponseCodeEnum.MAX_NODES_CREATED),
+
+    /**
+     * In ServiceEndpoint, domain_name and ipAddressV4 are mutually exclusive
+     */
+    IP_FQDN_CANNOT_BE_SET_FOR_SAME_ENDPOINT(ResponseCodeEnum.IP_FQDN_CANNOT_BE_SET_FOR_SAME_ENDPOINT),
+
+    /**
+     * Fully qualified domain name is not allowed in gossip_endpoint
+     */
+    GOSSIP_ENDPOINT_CANNOT_HAVE_FQDN(ResponseCodeEnum.GOSSIP_ENDPOINT_CANNOT_HAVE_FQDN),
+
+    /**
+     * In ServiceEndpoint, domain_name size too large
+     */
+    FQDN_SIZE_TOO_LARGE(ResponseCodeEnum.FQDN_SIZE_TOO_LARGE),
+
+    /**
+     * ServiceEndpoint is invalid
+     */
+    INVALID_ENDPOINT(ResponseCodeEnum.INVALID_ENDPOINT),
+
+    /**
+     * The number of gossip endpoints exceeds the limit
+     */
+    GOSSIP_ENDPOINTS_EXCEEDED_LIMIT(ResponseCodeEnum.GOSSIP_ENDPOINTS_EXCEEDED_LIMIT),
+
+    /**
+     * The transaction attempted to use duplicate `TokenReference`.<br/>
+     * This affects `TokenReject` attempting to reject same token reference more than once.
+     */
+    TOKEN_REFERENCE_REPEATED(ResponseCodeEnum.TOKEN_REFERENCE_REPEATED),
+
+    /**
+     * The account id specified as the owner in `TokenReject` is invalid or does not exist.
+     */
+    INVALID_OWNER_ID(ResponseCodeEnum.INVALID_OWNER_ID),
+
+    /**
+     * The transaction attempted to use more than the allowed number of `TokenReference`.
+     */
+    TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED(ResponseCodeEnum.TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED),
+
+    /**
+     * The number of service endpoints exceeds the limit
+     */
+    SERVICE_ENDPOINTS_EXCEEDED_LIMIT(ResponseCodeEnum.SERVICE_ENDPOINTS_EXCEEDED_LIMIT),
+
+    /**
+     * The IPv4 address is invalid
+     */
+    INVALID_IPV4_ADDRESS(ResponseCodeEnum.INVALID_IPV4_ADDRESS),
+
+    /**
+     * The transaction attempted to use empty `TokenReference` list.
+     */
+    EMPTY_TOKEN_REFERENCE_LIST(ResponseCodeEnum.EMPTY_TOKEN_REFERENCE_LIST),
+
+    /**
+     * The node account is not allowed to be updated
+     */
+    UPDATE_NODE_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.UPDATE_NODE_ACCOUNT_NOT_ALLOWED);
 
     final ResponseCodeEnum code;
 
@@ -1907,9 +1997,22 @@ public enum Status {
             case INVALID_NODE_ACCOUNT_ID -> INVALID_NODE_ACCOUNT_ID;
             case INVALID_NODE_DESCRIPTION -> INVALID_NODE_DESCRIPTION;
             case INVALID_SERVICE_ENDPOINT -> INVALID_SERVICE_ENDPOINT;
-            case INVALID_GOSSIP_CAE_CERTIFICATE -> INVALID_GOSSIP_CAE_CERTIFICATE;
+            case INVALID_GOSSIP_CA_CERTIFICATE -> INVALID_GOSSIP_CA_CERTIFICATE;
             case INVALID_GRPC_CERTIFICATE -> INVALID_GRPC_CERTIFICATE;
             case INVALID_MAX_AUTO_ASSOCIATIONS -> INVALID_MAX_AUTO_ASSOCIATIONS;
+            case MAX_NODES_CREATED -> MAX_NODES_CREATED;
+            case IP_FQDN_CANNOT_BE_SET_FOR_SAME_ENDPOINT -> IP_FQDN_CANNOT_BE_SET_FOR_SAME_ENDPOINT;
+            case GOSSIP_ENDPOINT_CANNOT_HAVE_FQDN -> GOSSIP_ENDPOINT_CANNOT_HAVE_FQDN;
+            case FQDN_SIZE_TOO_LARGE -> FQDN_SIZE_TOO_LARGE;
+            case INVALID_ENDPOINT -> INVALID_ENDPOINT;
+            case GOSSIP_ENDPOINTS_EXCEEDED_LIMIT -> GOSSIP_ENDPOINTS_EXCEEDED_LIMIT;
+            case TOKEN_REFERENCE_REPEATED -> TOKEN_REFERENCE_REPEATED;
+            case INVALID_OWNER_ID -> INVALID_OWNER_ID;
+            case TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED -> TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED;
+            case SERVICE_ENDPOINTS_EXCEEDED_LIMIT -> SERVICE_ENDPOINTS_EXCEEDED_LIMIT;
+            case INVALID_IPV4_ADDRESS -> INVALID_IPV4_ADDRESS;
+            case EMPTY_TOKEN_REFERENCE_LIST -> EMPTY_TOKEN_REFERENCE_LIST;
+            case UPDATE_NODE_ACCOUNT_NOT_ALLOWED -> UPDATE_NODE_ACCOUNT_NOT_ALLOWED;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
