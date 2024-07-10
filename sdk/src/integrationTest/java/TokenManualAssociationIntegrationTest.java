@@ -27,10 +27,10 @@ class TokenManualAssociationIntegrationTest {
     void canManuallyAssociateAccountWithFungibleToken() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var tokenDecimals = 3;
-        var tokenId = EntityCreator.createFungibleToken(testEnv, 3);
+        var tokenId = EntityHelper.createFungibleToken(testEnv, 3);
         var accountKey = PrivateKey.generateED25519();
         var accountMaxAutomaticTokenAssociations = 0;
-        var receiverAccountId = EntityCreator.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
+        var receiverAccountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
 
         new TokenAssociateTransaction()
             .setAccountId(receiverAccountId)
@@ -62,13 +62,13 @@ class TokenManualAssociationIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can Manually associate Account with a Non Fungible Token")
-    void canManuallyAssociateAccountWithNonFungibleToken() throws Exception {
+    @DisplayName("Can Manually associate Account with Nft")
+    void canManuallyAssociateAccountWithNft() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var tokenId = EntityCreator.createNft(testEnv);
+        var tokenId = EntityHelper.createNft(testEnv);
         var accountKey = PrivateKey.generateED25519();
         var accountMaxAutomaticTokenAssociations = 0;
-        var receiverAccountId = EntityCreator.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
+        var receiverAccountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
 
         var mintReceiptToken = new TokenMintTransaction()
             .setTokenId(tokenId)
@@ -101,8 +101,8 @@ class TokenManualAssociationIntegrationTest {
     void canManuallyAssociateContractWithFungibleToken() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
         var tokenDecimals = 3;
-        var tokenId = EntityCreator.createFungibleToken(testEnv, 3);
-        var contractId = EntityCreator.createContract(testEnv, testEnv.operatorKey);
+        var tokenId = EntityHelper.createFungibleToken(testEnv, 3);
+        var contractId = EntityHelper.createContract(testEnv, testEnv.operatorKey);
 
         new TokenAssociateTransaction()
             .setAccountId(new AccountId(contractId.num))
@@ -134,11 +134,11 @@ class TokenManualAssociationIntegrationTest {
     }
 
     @Test
-    @DisplayName("Can Manually associate contract with a Non Fungible Token")
-    void canManuallyAssociateContractWithNonFungibleToken() throws Exception {
+    @DisplayName("Can Manually associate contract with Nft")
+    void canManuallyAssociateContractWithNft() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
-        var tokenId = EntityCreator.createNft(testEnv);
-        var contractId = EntityCreator.createContract(testEnv, testEnv.operatorKey);
+        var tokenId = EntityHelper.createNft(testEnv);
+        var contractId = EntityHelper.createContract(testEnv, testEnv.operatorKey);
 
         new TokenAssociateTransaction()
             .setAccountId(new AccountId(contractId.num))
@@ -174,7 +174,7 @@ class TokenManualAssociationIntegrationTest {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var accountKey = PrivateKey.generateED25519();
         var accountMaxAutomaticTokenAssociations = 0;
-        var accountId = EntityCreator.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
+        var accountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
 
         new TokenAssociateTransaction()
             .setAccountId(accountId)
@@ -192,7 +192,7 @@ class TokenManualAssociationIntegrationTest {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var accountKey = PrivateKey.generateED25519();
         var accountMaxAutomaticTokenAssociations = 0;
-        var accountId = EntityCreator.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
+        var accountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
 
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
@@ -210,10 +210,10 @@ class TokenManualAssociationIntegrationTest {
     void cannotAssociateAccountWhenAccountDoesNotSignTransaction() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var tokenDecimals = 3;
-        var tokenId = EntityCreator.createFungibleToken(testEnv, tokenDecimals);
+        var tokenId = EntityHelper.createFungibleToken(testEnv, tokenDecimals);
         var accountKey = PrivateKey.generateED25519();
         var accountMaxAutomaticTokenAssociations = 0;
-        var accountId = EntityCreator.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
+        var accountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
 
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenAssociateTransaction()
