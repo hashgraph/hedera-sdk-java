@@ -1,5 +1,6 @@
 import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
@@ -192,6 +193,8 @@ public class TokenAutomaticAssociationIntegrationTest {
             .setAccountId(accountId)
             .execute(testEnv.client);
         assertThat(accountInfoBeforeTokenAssociation.maxAutomaticTokenAssociations).isEqualTo(-1);
+
+        testEnv.close(accountId, accountKey);
     }
 
     /**
@@ -248,8 +251,24 @@ public class TokenAutomaticAssociationIntegrationTest {
 
         assertThat(accountId2Balance.tokens.get(tokenId1)).isEqualTo(1000);
         assertThat(accountId2Balance.tokens.get(tokenId2)).isEqualTo(1000);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId1)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close(accountId1, accountKey);
     }
 
+    /**
+     * @notice E2E-HIP-904
+     * @url https://hips.hedera.com/hip/hip-904
+     */
     @Test
     @DisplayName("Unlimited Max Auto Associations allow to transfer Fungible Tokens With Decimals")
     void unlimitedMaxAutoAssociationsAllowToTransferFungibleTokensWithDecimals() throws Exception {
@@ -274,9 +293,24 @@ public class TokenAutomaticAssociationIntegrationTest {
 
         assertThat(receiverAccountBalance.tokens.get(tokenId1)).isEqualTo(1000);
         assertThat(receiverAccountBalance.tokens.get(tokenId2)).isEqualTo(1000);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId1)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close(receiverAccountId, accountKey);
     }
 
-    // Fix this one (test approach in Go)
+    /**
+     * @notice E2E-HIP-904
+     * @url https://hips.hedera.com/hip/hip-904
+     */
     @Test
     @DisplayName("Unlimited Max Auto Associations allow to transfer from Fungible Tokens")
     void unlimitedMaxAutoAssociationsAllowToTransferFromFungibleTokens() throws Exception {
@@ -294,7 +328,7 @@ public class TokenAutomaticAssociationIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        new TransferTransaction()
+        var record = new TransferTransaction()
             .addApprovedTokenTransfer(tokenId1, testEnv.operatorId, -1000)
             .addTokenTransfer(tokenId1, accountId, 1000)
             .addApprovedTokenTransfer(tokenId2, testEnv.operatorId, -1000)
@@ -302,7 +336,8 @@ public class TokenAutomaticAssociationIntegrationTest {
             .setTransactionId(TransactionId.generate(spenderAccountId))
             .freezeWith(testEnv.client)
             .sign(spenderAccountKey)
-            .execute(testEnv.client);
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         var accountBalance = new AccountBalanceQuery()
             .setAccountId(accountId)
@@ -310,5 +345,212 @@ public class TokenAutomaticAssociationIntegrationTest {
 
         assertThat(accountBalance.tokens.get(tokenId1)).isEqualTo(1000);
         assertThat(accountBalance.tokens.get(tokenId2)).isEqualTo(1000);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId1)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close(accountId, accountKey);
+    }
+
+    /**
+     * @notice E2E-HIP-904
+     * @url https://hips.hedera.com/hip/hip-904
+     */
+    @Test
+    @DisplayName("Unlimited Max Auto Associations allow to transfer Non Fungible Tokens")
+    void unlimitedMaxAutoAssociationsAllowToTransferNonFungibleTokens() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var tokenId1 = EntityCreator.createNft(testEnv);
+        var tokenId2 = EntityCreator.createNft(testEnv);
+        var accountKey = PrivateKey.generateED25519();
+        var accountId1 = EntityCreator.createAccount(testEnv, accountKey, -1);
+        var accountId2 = EntityCreator.createAccount(testEnv, accountKey, 100);
+
+        var mintReceiptToken1 = new TokenMintTransaction()
+            .setTokenId(tokenId1)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var mintReceiptToken2 = new TokenMintTransaction()
+            .setTokenId(tokenId2)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var nftSerials = mintReceiptToken2.serials;
+
+        new AccountUpdateTransaction()
+            .setAccountId(accountId2)
+            .setMaxAutomaticTokenAssociations(-1)
+            .freezeWith(testEnv.client)
+            .sign(accountKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // transfer nft1 to both receivers, 2 for each
+        new TransferTransaction()
+            .addNftTransfer(tokenId1.nft(nftSerials.get(0)), testEnv.operatorId, accountId1)
+            .addNftTransfer(tokenId1.nft(nftSerials.get(1)), testEnv.operatorId, accountId1)
+            .addNftTransfer(tokenId1.nft(nftSerials.get(2)), testEnv.operatorId, accountId2)
+            .addNftTransfer(tokenId1.nft(nftSerials.get(3)), testEnv.operatorId, accountId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // transfer nft2 to both receivers, 2 for each
+        new TransferTransaction()
+            .addNftTransfer(tokenId2.nft(nftSerials.get(0)), testEnv.operatorId, accountId1)
+            .addNftTransfer(tokenId2.nft(nftSerials.get(1)), testEnv.operatorId, accountId1)
+            .addNftTransfer(tokenId2.nft(nftSerials.get(2)), testEnv.operatorId, accountId2)
+            .addNftTransfer(tokenId2.nft(nftSerials.get(3)), testEnv.operatorId, accountId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        // verify the balance of the receivers is 2
+        var accountId1Balance = new AccountBalanceQuery()
+            .setAccountId(accountId1)
+            .execute(testEnv.client);
+
+        assertThat(accountId1Balance.tokens.get(tokenId1)).isEqualTo(2);
+        assertThat(accountId1Balance.tokens.get(tokenId2)).isEqualTo(2);
+
+        var accountId2Balance = new AccountBalanceQuery()
+            .setAccountId(accountId2)
+            .execute(testEnv.client);
+
+        assertThat(accountId2Balance.tokens.get(tokenId1)).isEqualTo(2);
+        assertThat(accountId2Balance.tokens.get(tokenId2)).isEqualTo(2);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId1)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close(accountId1, accountKey);
+    }
+
+    /**
+     * @notice E2E-HIP-904
+     * @url https://hips.hedera.com/hip/hip-904
+     */
+    @Test
+    @DisplayName("Unlimited Max Auto Associations allow to transfer from Non Fungible Tokens")
+    void unlimitedMaxAutoAssociationsAllowToTransferFromNonFungibleTokens() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var tokenId1 = EntityCreator.createNft(testEnv);
+        var tokenId2 = EntityCreator.createNft(testEnv);
+        var accountKey = PrivateKey.generateED25519();
+        var accountId = EntityCreator.createAccount(testEnv, accountKey, -1);
+        var spenderAccountKey = PrivateKey.generateED25519();
+        var spenderAccountId = EntityCreator.createAccount(testEnv, spenderAccountKey, -1);
+
+        var mintReceiptToken1 = new TokenMintTransaction()
+            .setTokenId(tokenId1)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var mintReceiptToken2 = new TokenMintTransaction()
+            .setTokenId(tokenId2)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var nftSerials = mintReceiptToken2.serials;
+
+        new AccountAllowanceApproveTransaction()
+            .approveTokenNftAllowanceAllSerials(tokenId1, testEnv.operatorId, spenderAccountId)
+            .approveTokenNftAllowanceAllSerials(tokenId2, testEnv.operatorId, spenderAccountId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TransferTransaction()
+            .addApprovedNftTransfer(tokenId1.nft(nftSerials.get(0)), testEnv.operatorId, accountId)
+            .addApprovedNftTransfer(tokenId1.nft(nftSerials.get(1)), testEnv.operatorId, accountId)
+            .addApprovedNftTransfer(tokenId2.nft(nftSerials.get(0)), testEnv.operatorId, accountId)
+            .addApprovedNftTransfer(tokenId2.nft(nftSerials.get(1)), testEnv.operatorId, accountId)
+            .setTransactionId(TransactionId.generate(spenderAccountId))
+            .freezeWith(testEnv.client)
+            .sign(spenderAccountKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        var accountBalance = new AccountBalanceQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
+
+        assertThat(accountBalance.tokens.get(tokenId1)).isEqualTo(2);
+        assertThat(accountBalance.tokens.get(tokenId2)).isEqualTo(2);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId1)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId2)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        testEnv.close(accountId, accountKey);
+    }
+
+    /**
+     * @notice E2E-HIP-904
+     * @url https://hips.hedera.com/hip/hip-904
+     */
+    @Test
+    @DisplayName("Test Unlimited Max Auto Associations Fails With Invalid Values")
+    void unlimitedMaxAutoAssociationsFailsWithInvalidValues() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        var accountKey = PrivateKey.generateED25519();
+
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
+           new AccountCreateTransaction()
+               .setKey(accountKey)
+               .setMaxAutomaticTokenAssociations(-2)
+               .execute(testEnv.client);
+        }).withMessageContaining("INVALID_MAX_AUTO_ASSOCIATIONS");
+
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
+            new AccountCreateTransaction()
+                .setKey(accountKey)
+                .setMaxAutomaticTokenAssociations(-1000)
+                .execute(testEnv.client);
+        }).withMessageContaining("INVALID_MAX_AUTO_ASSOCIATIONS");
+
+        var accountId = EntityCreator.createAccount(testEnv, accountKey, 100);
+
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
+            new AccountUpdateTransaction()
+                .setAccountId(accountId)
+                .setMaxAutomaticTokenAssociations(-2)
+                .freezeWith(testEnv.client)
+                .sign(accountKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining("INVALID_MAX_AUTO_ASSOCIATIONS");
+
+        assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
+            new AccountUpdateTransaction()
+                .setAccountId(accountId)
+                .setMaxAutomaticTokenAssociations(-1000)
+                .freezeWith(testEnv.client)
+                .sign(accountKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining("INVALID_MAX_AUTO_ASSOCIATIONS");
     }
 }
