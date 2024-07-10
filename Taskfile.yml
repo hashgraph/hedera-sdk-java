@@ -32,7 +32,7 @@ tasks:
 
     "test:integration":
         cmds:
-            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK integrationTest {{.CLI_ARGS}}
+            - ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK testIntegration {{.CLI_ARGS}}
         env:
             OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
             OPERATOR_ID: '0.0.1022'
@@ -79,16 +79,3 @@ tasks:
             -   task: "update:proto"
             -   task: "update:snapshots"
             -   task: "update:addressbooks"
-
-    publish:
-        env:
-            FILES: "sdk/src/main/java/com/hedera/hashgraph/sdk/*.java"
-        preconditions:
-            - git diff-index --quiet HEAD
-        cmds:
-            - git clean -ffdx
-            - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-            - perl -p -i -e "s#sdk\.gradle#sdk-full.gradle#g" sdk/build.gradle
-            - git clean -ffdx
-            - ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository
-            - git restore sdk

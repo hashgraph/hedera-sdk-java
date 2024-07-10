@@ -7,7 +7,7 @@ JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.ne
 ### Building
 
 ```sh
-./gradlew compileJava
+./gradlew assemble
 ```
 
 ### Unit Tests
@@ -18,24 +18,21 @@ JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.ne
 
 ### Integration Tests
 
-> The tests are only executed if the configuration is provided
-> as an environment variable (see the `onlyIf` block in [`sdk/build.gradle`](../../sdk/build.gradle)).
+> The tests are only executed if the configuration is provided.
 > That's why we need to pass the configuration file at the beginning of the command.
-> **The `CONFIG_FILE` environment variable is not used, so you can provide any value,
-> but it should not be `null`.**
 
-#### Using system properties
-`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK` must be passed into system properties.\
+#### Using Gradle properties
+`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK` must be passed as Gradle properties (`-P` parameters).\
 `HEDERA_NETWORK` can be set to `localhost`, `testnet` or `previewnet`.
 
 ```sh
-CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="<network>"
+./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="<network>"
 ```
 
 #### Using configuration file
 
 ```sh
-CONFIG_FILE=whatever ./gradlew integrationTest -PCONFIG_FILE="<ConfigurationFilePath>"
+./gradlew testIntegration -PCONFIG_FILE="<ConfigurationFilePath>"
 ```
 
 An example configuration file can be found in the repo here:
@@ -79,18 +76,17 @@ The format of the configuration file should be as follows:
 
 Running test class:
 ```sh
-CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
+./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
 ```
 
 Running test function:
 ```sh
-CONFIG_FILE=whatever ./gradlew integrationTest -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
+./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
 ```
 
 #### Running with Intellij IDEA
 1. Create a new Gradle run configuration (easiest way is to run test class or individual test function from the IDE).
-2. Update "Run" configuration to pass the required system properties (`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK`).
-3. Update "Environment variables" to pass the `CONFIG_FILE=whatever`.
+2. Update "Run" configuration to pass the required Gradle properties (`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK`).
 <img src="../assets/intellij-integration-tests.png">
 
 ## Maintaining generated files

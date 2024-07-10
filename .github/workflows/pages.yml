@@ -38,13 +38,13 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@66535aaf56f831b35e3a8481c9c99b665b84dd45 # v3.4.2
+        uses: gradle/actions/setup-gradle@dbbdc275be76ac10734476cc723d82dfe7ec6eda # v3.4.2
 
       - name: Compile SDK
         run: ./gradlew compileJava --scan
 
       - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc -Dfile.encoding=UTF-8 --scan
+        run: ./gradlew sdk:javadoc --scan
 
       - name: Pages
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
