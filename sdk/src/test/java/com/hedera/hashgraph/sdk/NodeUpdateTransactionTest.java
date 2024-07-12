@@ -140,7 +140,7 @@ public class NodeUpdateTransactionTest {
     }
 
     @Test
-    void constructTokenUpdateTransactionFromTransactionBodyProtobuf() {
+    void constructNodeUpdateTransactionFromTransactionBodyProtobuf() {
         var transactionBodyBuilder = NodeUpdateTransactionBody.newBuilder();
 
         transactionBodyBuilder.setNodeId(TEST_NODE_ID);
