@@ -90,7 +90,9 @@ class AddressBookQueryMockTest {
                             .setLeft((byte) 0x02)
                             .setRight((byte) 0x03)
                     )
-            ).setPort(PORT_NODE_PLAIN);
+            )
+            .setDomainName("unit.test.com")
+            .setPort(PORT_NODE_PLAIN);
     }
 
     @Test

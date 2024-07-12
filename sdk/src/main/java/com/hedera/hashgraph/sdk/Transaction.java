@@ -328,6 +328,7 @@ public abstract class Transaction<T extends Transaction<T>>
             case FILECREATE -> new FileCreateTransaction(txs);
             case FILEDELETE -> new FileDeleteTransaction(txs);
             case FILEUPDATE -> new FileUpdateTransaction(txs);
+            case NODECREATE -> new NodeCreateTransaction(txs);
             case SYSTEMDELETE -> new SystemDeleteTransaction(txs);
             case SYSTEMUNDELETE -> new SystemUndeleteTransaction(txs);
             case FREEZE -> new FreezeTransaction(txs);
@@ -397,6 +398,7 @@ public abstract class Transaction<T extends Transaction<T>>
             case FILECREATE -> new FileCreateTransaction(body.setFileCreate(scheduled.getFileCreate()).build());
             case FILEDELETE -> new FileDeleteTransaction(body.setFileDelete(scheduled.getFileDelete()).build());
             case FILEUPDATE -> new FileUpdateTransaction(body.setFileUpdate(scheduled.getFileUpdate()).build());
+            case NODECREATE -> new NodeCreateTransaction(body.setNodeCreate(scheduled.getNodeCreate()).build());
             case SYSTEMDELETE -> new SystemDeleteTransaction(body.setSystemDelete(scheduled.getSystemDelete()).build());
             case SYSTEMUNDELETE ->
                 new SystemUndeleteTransaction(body.setSystemUndelete(scheduled.getSystemUndelete()).build());
