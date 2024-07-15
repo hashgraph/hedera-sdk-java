@@ -236,18 +236,6 @@ public class TokenRejectFlow {
     }
 
     /**
-     * Create a new transaction receipt query.
-     *
-     * @param response the transaction response
-     * @return the receipt query
-     */
-    TransactionReceiptQuery createTransactionReceiptQuery(TransactionResponse response) {
-        return new TransactionReceiptQuery()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setTransactionId(response.transactionId);
-    }
-
-    /**
      * Execute the transactions in the flow with the passed in client.
      *
      * @param client the client with the transaction to execute
@@ -302,7 +290,7 @@ public class TokenRejectFlow {
      */
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
         return createTokenRejectTransaction().executeAsync(client, timeoutPerTransaction)
-            .thenCompose(tokenRejectResponse -> createTransactionReceiptQuery(tokenRejectResponse).executeAsync(client, timeoutPerTransaction))
+            .thenCompose(tokenRejectResponse -> tokenRejectResponse.getReceiptQuery().executeAsync(client, timeoutPerTransaction))
             .thenCompose(receipt -> createTokenDissociateTransaction().executeAsync(client, timeoutPerTransaction));
     }
 
