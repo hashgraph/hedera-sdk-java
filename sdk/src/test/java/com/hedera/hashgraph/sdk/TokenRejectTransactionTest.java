@@ -50,7 +50,7 @@ public class TokenRejectTransactionTest {
         new NftId(TokenId.fromString("4.5.6"), 2),
         new NftId(TokenId.fromString("7.8.9"), 3));
 
-    final Instant validStart = Instant.ofEpochSecond(1554158542);
+    final Instant TEST_VALID_START = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
@@ -70,7 +70,7 @@ public class TokenRejectTransactionTest {
     private TokenRejectTransaction spawnTestTransaction() {
         return new TokenRejectTransaction().setNodeAccountIds(
                 Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
             .setOwnerId(TEST_OWNER_ID).setTokenIds(TEST_TOKEN_IDS).setNftIds(TEST_NFT_IDS)
             .setMaxTransactionFee(new Hbar(1)).freeze().sign(TEST_PRIVATE_KEY);
     }
@@ -93,7 +93,7 @@ public class TokenRejectTransactionTest {
     }
 
     @Test
-    void constructTokenUpdateTransactionFromTransactionBodyProtobuf() {
+    void constructTokenRejectTransactionFromTransactionBodyProtobuf() {
         var transactionBodyBuilder = TokenRejectTransactionBody.newBuilder();
 
         transactionBodyBuilder.setOwner(TEST_OWNER_ID.toProtobuf());
@@ -116,13 +116,13 @@ public class TokenRejectTransactionTest {
 
 
     @Test
-    void getSetAccountId() {
+    void getSetOwnerId() {
         var transaction = new TokenRejectTransaction().setOwnerId(TEST_OWNER_ID);
         assertThat(transaction.getOwnerId()).isEqualTo(TEST_OWNER_ID);
     }
 
     @Test
-    void getSetAccountIdFrozen() {
+    void getSetOwnerIdFrozen() {
         var transaction = spawnTestTransaction();
         assertThrows(IllegalStateException.class, () -> transaction.setOwnerId(TEST_OWNER_ID));
     }
