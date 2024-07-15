@@ -115,7 +115,7 @@ public class TokenRejectFlowIntegrationTest {
 
         assertThat(treasuryAccountBalance.tokens.get(ftTokenId)).isEqualTo(1_000_000);
 
-        // verify the allowance - should be 0, because TokenRejectFlow dissociates
+        // verify the tokens are not associated with the receiver
         assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addTokenTransfer(ftTokenId, testEnv.operatorId, -10)
@@ -180,7 +180,7 @@ public class TokenRejectFlowIntegrationTest {
 
         assertThat(nftTokenIdNftInfo.get(0).accountId).isEqualTo(testEnv.operatorId);
 
-        // verify the allowance - should be 0, because TokenRejectFlow dissociates
+        // verify the tokens are not associated with the receiver
         assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addNftTransfer(nftTokenId.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
