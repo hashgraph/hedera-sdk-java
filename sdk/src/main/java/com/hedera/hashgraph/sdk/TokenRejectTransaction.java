@@ -219,6 +219,10 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
                 token.validateChecksum(client);
             }
         }
+
+        for (var nftId : nftIds) {
+            nftId.tokenId.validateChecksum(client);
+        }
     }
 
     @Override
