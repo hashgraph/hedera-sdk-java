@@ -23,6 +23,7 @@ _Maven:_
 **2. gRPC implementation** _(select one of the following)_**:**
 
 _Gradle:_
+> It is automatically aligned with the `grpc-api` version Hedera™ Java SDK use.
 ```groovy
 // netty transport (for high throughput applications)
 implementation 'io.grpc:grpc-netty-shaded'
@@ -93,10 +94,6 @@ _Maven:_
 ```
 
 ## Additional useful information
-### Fat/uber JAR
-[Creating a fat/uber JAR guide](create-jar-guide.md) covers how to properly set up Shadow Gradle plugin
-to create a fat/uber JAR of your Java application that uses the Hedera™ Java SDK.
-
 ## Next steps
 To make it easier to start your Java project using the Hedera™ Java SDK,
 we recommend checking out the [Java examples](../../examples/README.md).
