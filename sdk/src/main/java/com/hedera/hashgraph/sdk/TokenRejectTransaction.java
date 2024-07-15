@@ -88,6 +88,7 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
      * Extract the Account ID of the Owner.
      * @return the Account ID of the Owner.
      */
+    @Nullable
     public AccountId getOwnerId() {
         return ownerId;
     }
