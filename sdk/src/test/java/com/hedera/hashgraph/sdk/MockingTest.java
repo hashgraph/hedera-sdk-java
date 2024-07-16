@@ -35,20 +35,21 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.Transaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
+import com.hedera.hashgraph.sdk.proto.TransactionGetRecordResponse;
 import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
+import com.hedera.hashgraph.sdk.proto.TransactionRecord;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import java.util.List;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import java.time.Duration;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -86,6 +87,98 @@ public class MockingTest {
         char[] chars = new char[size];
         Arrays.fill(chars, 'A');
         return new String(chars);
+    }
+
+    @ParameterizedTest(name = "[{0}] Executable retries on gRPC error with PLATFORM_NOT_ACTIVE when getting receipt")
+    @CsvSource({"sync", "async"})
+    void shouldRetryExceptionallyFunctionsCorrectlyForPlatformNotActiveGetReceipt(String sync) throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("getReceiptRetry" + sync, service);
+        server.client.setMaxAttempts(3);
+
+        service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
+        service.buffer.enqueueResponse(TestResponse.transactionOk());
+
+        com.hedera.hashgraph.sdk.TransactionResponse transactionResponse;
+        if (sync.equals("sync")) {
+            transactionResponse = new AccountCreateTransaction().execute(server.client);
+        } else {
+            transactionResponse = new AccountCreateTransaction().executeAsync(server.client).get();
+        }
+
+        service.buffer
+            .enqueueResponse(TestResponse.query(
+                Response.newBuilder().setTransactionGetReceipt(
+                    TransactionGetReceiptResponse.newBuilder()
+                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE))
+                        .setReceipt(TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build())
+                        .build()
+                ).build()
+            ))
+            .enqueueResponse(TestResponse.receipt(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE))
+            .enqueueResponse(TestResponse.successfulReceipt());
+
+        if (sync.equals("sync")) {
+            transactionResponse.getReceipt(server.client);
+        } else {
+            transactionResponse.getReceiptAsync(server.client).get();
+        }
+    }
+
+    @ParameterizedTest(name = "[{0}] Executable retries on gRPC error with PLATFORM_NOT_ACTIVE when getting record")
+    @CsvSource({"sync", "async"})
+    void shouldRetryExceptionallyFunctionsCorrectlyForPlatformNotActiveGetRecord(String sync) throws Exception {
+        var service = new TestCryptoService();
+        var server = new TestServer("getRecordRetry" + sync, service);
+        server.client.setMaxAttempts(3);
+
+        service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
+        service.buffer.enqueueResponse(TestResponse.transactionOk());
+
+        com.hedera.hashgraph.sdk.TransactionResponse transactionResponse;
+        if (sync.equals("sync")) {
+            transactionResponse = new AccountCreateTransaction().execute(server.client);
+        } else {
+            transactionResponse = new AccountCreateTransaction().executeAsync(server.client).get();
+        }
+
+        service.buffer
+            .enqueueResponse(TestResponse.successfulReceipt()) // for inner getReceipt
+            .enqueueResponse(TestResponse.successfulReceipt()) // for inner getCost
+            .enqueueResponse(TestResponse.query(
+                Response.newBuilder().setTransactionGetRecord(
+                    TransactionGetRecordResponse.newBuilder()
+                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE).build())
+                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
+                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build()
+                        ).build()
+                    ).build()
+                ).build()
+            ))
+            .enqueueResponse(TestResponse.query(
+                Response.newBuilder().setTransactionGetRecord(
+                    TransactionGetRecordResponse.newBuilder()
+                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
+                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.PLATFORM_NOT_ACTIVE).build()
+                        ).build()
+                    ).build()
+                ).build()
+            ))
+            .enqueueResponse(TestResponse.query(
+                Response.newBuilder().setTransactionGetRecord(
+                    TransactionGetRecordResponse.newBuilder()
+                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
+                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build()
+                        ).build()
+                    ).build()
+                ).build()
+            ));
+
+        if (sync.equals("sync")) {
+            transactionResponse.getRecord(server.client);
+        } else {
+            transactionResponse.getRecordAsync(server.client).get();
+        }
     }
 
     @ParameterizedTest(name = "[{0}, {1}] ContractCreateFlow functions")
@@ -650,6 +743,11 @@ public class MockingTest {
 
         @Override
         public void getTransactionReceipts(Query request, StreamObserver<Response> responseObserver) {
+            respondToQueryFromQueue(request, responseObserver);
+        }
+
+        @Override
+        public void getTxRecordByTxID(Query request, StreamObserver<Response> responseObserver) {
             respondToQueryFromQueue(request, responseObserver);
         }
 
