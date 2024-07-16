@@ -416,6 +416,7 @@ public final class Client implements AutoCloseable {
             addressBook.nodeAddresses,
             isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
         ));
+        network.setAddressBook(addressBook);
         return this;
     }
 
