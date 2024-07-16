@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,11 @@ class AccountCreateParamsTest {
         commonParamsJson.put("validTransactionDuration", 120L);
         commonParamsJson.put("memo", "commonMemo");
         commonParamsJson.put("regenerateTransactionId", true);
-        commonParamsJson.put("signers", List.of("signer1", "signer2"));
+        JSONArray signersArray = new JSONArray();
+        signersArray.add(
+                "302e020100300506032b657004220420c1ed50ed4b024f5df25992d1fc4b8c5b4e3c3db63a5ff5fa05857f5b4b90f3bc");
+        signersArray.add("test");
+        commonParamsJson.put("signers", signersArray);
 
         jrpcParams.put("commonTransactionParams", commonParamsJson);
 
@@ -58,7 +63,11 @@ class AccountCreateParamsTest {
         assertEquals(Optional.of(120L), commonParams.getValidTransactionDuration());
         assertEquals(Optional.of("commonMemo"), commonParams.getMemo());
         assertEquals(Optional.of(true), commonParams.getRegenerateTransactionId());
-        assertEquals(Optional.of(List.of("signer1", "signer2")), commonParams.getSigners());
+        assertEquals(
+                Optional.of(List.of(
+                        "302e020100300506032b657004220420c1ed50ed4b024f5df25992d1fc4b8c5b4e3c3db63a5ff5fa05857f5b4b90f3bc",
+                        "test")),
+                commonParams.getSigners());
     }
 
     @Test
@@ -110,25 +119,5 @@ class AccountCreateParamsTest {
         assertEquals(Optional.empty(), params.getAlias());
         assertEquals(Optional.empty(), params.getSignerKey());
         assertEquals(Optional.empty(), params.getCommonTransactionParams());
-    }
-
-    @Test
-    void testCommonTransactionParamsParse() {
-        Map<String, Object> jrpcParams = new HashMap<>();
-        jrpcParams.put("transactionId", "txId");
-        jrpcParams.put("maxTransactionFee", 100L);
-        jrpcParams.put("validTransactionDuration", 120L);
-        jrpcParams.put("memo", "commonMemo");
-        jrpcParams.put("regenerateTransactionId", true);
-        jrpcParams.put("signers", List.of("signer1", "signer2"));
-
-        CommonTransactionParams params = CommonTransactionParams.parse(jrpcParams);
-
-        assertEquals(Optional.of("txId"), params.getTransactionId());
-        assertEquals(Optional.of(100L), params.getMaxTransactionFee());
-        assertEquals(Optional.of(120L), params.getValidTransactionDuration());
-        assertEquals(Optional.of("commonMemo"), params.getMemo());
-        assertEquals(Optional.of(true), params.getRegenerateTransactionId());
-        assertEquals(Optional.of(List.of("signer1", "signer2")), params.getSigners());
     }
 }
