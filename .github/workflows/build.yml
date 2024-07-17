@@ -153,7 +153,7 @@ jobs:
       - name: Build SDK
         run: ./gradlew assemble --scan
 
-      - name: Compile Code - Android Example
+      - name: Build Android Example
         run: ./gradlew -p example-android assemble --scan
 
       - name: Start the local node
