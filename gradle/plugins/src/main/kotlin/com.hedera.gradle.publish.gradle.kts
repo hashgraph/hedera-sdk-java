@@ -67,11 +67,11 @@ val mavenJava = publishing.publications.create<MavenPublication>("mavenJava") {
 
         developers {
             developer {
-                name = "Ryan Leckey"
+                name = "Nikita Lebedev"
             }
 
             developer {
-                name = "Daniel Akhterov"
+                name = "Ivan Asenov"
             }
         }
     }
