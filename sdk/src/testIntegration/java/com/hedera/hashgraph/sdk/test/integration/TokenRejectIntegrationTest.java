@@ -832,12 +832,12 @@ public class TokenRejectIntegrationTest {
         assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TokenRejectTransaction()
                 .setOwnerId(receiverAccountId)
-                .setTokenIds(List.of(ftTokenId, ftTokenId))
+                .addTokenId(ftTokenId)
                 .freezeWith(testEnv.client)
                 .sign(receiverAccountKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining("TOKEN_REFERENCE_REPEATED");
+        }).withMessageContaining("INSUFFICIENT_TOKEN_BALANCE");
 
         // same test for nft
 
