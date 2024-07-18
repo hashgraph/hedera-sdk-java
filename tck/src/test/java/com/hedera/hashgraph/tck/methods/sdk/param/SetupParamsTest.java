@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class SetupParamsTest {
@@ -24,8 +25,8 @@ class SetupParamsTest {
         // Then
         assertEquals("testAccountId", result.getOperatorAccountId());
         assertEquals("testPrivateKey", result.getOperatorPrivateKey());
-        assertEquals("testNodeIp", result.getNodeIp());
-        assertEquals("testNodeAccountId", result.getNodeAccountId());
-        assertEquals("testMirrorNetworkIp", result.getMirrorNetworkIp());
+        assertEquals(Optional.of("testNodeIp"), result.getNodeIp());
+        assertEquals(Optional.of("testNodeAccountId"), result.getNodeAccountId());
+        assertEquals(Optional.of("testMirrorNetworkIp"), result.getMirrorNetworkIp());
     }
 }

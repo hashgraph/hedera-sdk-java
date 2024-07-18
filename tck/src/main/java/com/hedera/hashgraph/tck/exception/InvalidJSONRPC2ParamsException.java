@@ -1,7 +1,8 @@
 package com.hedera.hashgraph.tck.exception;
 
 /**
- * Thrown when the server cannot parse the given parameters
+ * Thrown when the server cannot parse the given parameters.
+ * This error should be thrown from the param parser
  */
 public class InvalidJSONRPC2ParamsException extends Exception {
 

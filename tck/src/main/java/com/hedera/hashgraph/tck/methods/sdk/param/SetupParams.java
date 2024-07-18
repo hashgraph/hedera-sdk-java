@@ -2,6 +2,7 @@ package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,23 +10,24 @@ import lombok.NoArgsConstructor;
 /**
  * SetupParams for SDK client
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class SetupParams extends JSONRPC2Param {
     private String operatorAccountId;
     private String operatorPrivateKey;
-    private String nodeIp;
-    private String nodeAccountId;
-    private String mirrorNetworkIp;
+    private Optional<String> nodeIp;
+    private Optional<String> nodeAccountId;
+    private Optional<String> mirrorNetworkIp;
 
     @Override
     public SetupParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
-        String parsedOperatorAccountId = (String) jrpcParams.get("operatorAccountId");
-        String parsedOperatorPrivateKey = (String) jrpcParams.get("operatorPrivateKey");
-        String parsedNodeIp = (String) jrpcParams.get("nodeIp");
-        String parsedNodeAccountId = (String) jrpcParams.get("nodeAccountId");
-        String parsedMirrorNetworkIp = (String) jrpcParams.get("mirrorNetworkIp");
+        var parsedOperatorAccountId = (String) jrpcParams.get("operatorAccountId");
+        var parsedOperatorPrivateKey = (String) jrpcParams.get("operatorPrivateKey");
+        var parsedNodeIp = Optional.ofNullable((String) jrpcParams.get("nodeIp"));
+        var parsedNodeAccountId = Optional.ofNullable((String) jrpcParams.get("nodeAccountId"));
+        var parsedMirrorNetworkIp = Optional.ofNullable((String) jrpcParams.get("mirrorNetworkIp"));
 
         return new SetupParams(
                 parsedOperatorAccountId,

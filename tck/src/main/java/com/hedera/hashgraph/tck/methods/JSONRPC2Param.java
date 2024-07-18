@@ -14,5 +14,5 @@ import java.util.Map;
  *
  */
 public abstract class JSONRPC2Param {
-    public abstract JSONRPC2Param parse(final Map<String, Object> jrpcParams) throws ClassCastException;
+    public abstract JSONRPC2Param parse(final Map<String, Object> jrpcParams) throws Exception;
 }
