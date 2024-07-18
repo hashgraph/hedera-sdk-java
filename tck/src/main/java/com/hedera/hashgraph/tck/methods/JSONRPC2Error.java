@@ -1,5 +1,7 @@
 package com.hedera.hashgraph.tck.methods;
 
+import com.hedera.hashgraph.sdk.Status;
+
 /**
  * Custom JSON-RPC error definitions
  */
@@ -12,5 +14,5 @@ public class JSONRPC2Error {
     public static final com.thetransactioncompany.jsonrpc2.JSONRPC2Error HEDERA_ERROR =
             new com.thetransactioncompany.jsonrpc2.JSONRPC2Error(HEDERA_STATUS_CODE, "Hedera error");
 
-    public record ErrorData(String status, String message) {}
+    public record ErrorData(Status status, String message) {}
 }
