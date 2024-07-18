@@ -108,7 +108,7 @@ class HederaTrustManager implements X509TrustManager {
                 throw new IllegalStateException("Failed to find SHA-384 digest for certificate hashing", e);
             }
 
-            if (this.certHash.equals(Hex.toHexString(certHashBytes))) {
+            if (this.certHash.equalsIgnoreCase(Hex.toHexString(certHashBytes))) {
                 return;
             }
         }
