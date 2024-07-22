@@ -17,7 +17,6 @@
  * limitations under the License.
  *
  */
-
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.protobuf.InvalidProtocolBufferException;
