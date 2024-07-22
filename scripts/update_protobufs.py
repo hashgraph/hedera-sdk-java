@@ -12,8 +12,8 @@ if len(sys.argv) > 2:
     exit()
 
 if len(sys.argv) == 1:
-    print(">>> Usage: `" + sys.argv[0] + " branch`")
-    print(">>> Where \"branch\" is a valid branch in the Hedera Protobufs git repo")
+    print(">>> Usage: `" + sys.argv[0] + " ref`")
+    print(">>> Where \"ref\" is a valid branch or tag in the Hedera Protobufs git repo")
 
 print("\n\n")
 
