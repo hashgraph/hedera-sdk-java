@@ -1,15 +1,16 @@
 ## Get started
 
-> Please note that the minimal Android SDK level required for using the Hedera SDK in an Android project is **26**.
+> Please note that the minimal Android SDK level required for using the Hedera™ Java SDK in an Android project is **26**.
 
 To get started with an Android project, you'll need to add the following **two** dependencies:
 
 1. **Hedera™ Java SDK:**
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:2.29.0'
+implementation 'com.hedera.hashgraph:sdk:2.36.0-beta.1'
 ```
 
 2. **gRPC implementation:**
+> It is automatically aligned with the `grpc-api` version Hedera™ Java SDK use.
 ```groovy
 // okhttp transport (for lighter-weight applications or Android
 runtimeOnly("io.grpc:grpc-okhttp")

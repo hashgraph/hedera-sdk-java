@@ -13,7 +13,7 @@ JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.ne
 ### Unit Tests
 
 ```sh
-./gradlew test
+./gradlew :sdk:test
 ```
 
 ### Integration Tests
@@ -26,13 +26,13 @@ JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.ne
 `HEDERA_NETWORK` can be set to `localhost`, `testnet` or `previewnet`.
 
 ```sh
-./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="<network>"
+./gradlew :sdk:testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="<network>"
 ```
 
 #### Using configuration file
 
 ```sh
-./gradlew testIntegration -PCONFIG_FILE="<ConfigurationFilePath>"
+./gradlew :sdk:testIntegration -PCONFIG_FILE="<ConfigurationFilePath>"
 ```
 
 An example configuration file can be found in the repo here:
@@ -76,12 +76,12 @@ The format of the configuration file should be as follows:
 
 Running test class:
 ```sh
-./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
+./gradlew :sdk:testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
 ```
 
 Running test function:
 ```sh
-./gradlew testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
+./gradlew :sdk:testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
 ```
 
 #### Running with Intellij IDEA

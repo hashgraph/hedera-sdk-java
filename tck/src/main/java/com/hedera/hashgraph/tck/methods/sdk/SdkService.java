@@ -5,7 +5,6 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
-import com.hedera.hashgraph.tck.exception.HederaException;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
@@ -23,34 +22,27 @@ public class SdkService extends AbstractJSONRPC2Service {
     private Client client;
 
     @JSONRPC2Method("setup")
-    public SetupResponse setup(final SetupParams params) throws HederaException {
+    public SetupResponse setup(final SetupParams params) throws Exception {
         String clientType;
-        try {
-            if (params.getNodeIp() != null
-                    && params.getNodeAccountId() != null
-                    && params.getMirrorNetworkIp() != null) {
-                // Custom client setup
-                Map<String, AccountId> node = new HashMap<>();
-                var nodeId = new AccountId(Integer.parseInt(params.getNodeAccountId()));
-                node.put(params.getNodeIp(), nodeId);
-                client = Client.forNetwork(node);
-                clientType = "custom";
-                client.setMirrorNetwork(List.of(params.getMirrorNetworkIp()));
-            } else {
-                // Default to testnet
-                client = Client.forTestnet();
-                clientType = "testnet";
-            }
-
-            client.setOperator(
-                    AccountId.fromString(params.getOperatorAccountId()),
-                    PrivateKey.fromString(params.getOperatorPrivateKey()));
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new HederaException(e);
-        } catch (Exception e) {
-            throw new HederaException(e);
+        if (params.getNodeIp().isPresent()
+                && params.getNodeAccountId().isPresent()
+                && params.getMirrorNetworkIp().isPresent()) {
+            // Custom client setup
+            Map<String, AccountId> node = new HashMap<>();
+            var nodeId = AccountId.fromString(params.getNodeAccountId().get());
+            node.put(params.getNodeIp().get(), nodeId);
+            client = Client.forNetwork(node);
+            clientType = "custom";
+            client.setMirrorNetwork(List.of(params.getMirrorNetworkIp().get()));
+        } else {
+            // Default to testnet
+            client = Client.forTestnet();
+            clientType = "testnet";
         }
+
+        client.setOperator(
+                AccountId.fromString(params.getOperatorAccountId()),
+                PrivateKey.fromString(params.getOperatorPrivateKey()));
         return new SetupResponse("Successfully setup " + clientType + " client.");
     }
 
