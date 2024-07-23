@@ -45,6 +45,7 @@ public final class EntityHelper {
             .setSupplyKey(testEnv.operatorKey)
             .setMetadataKey(testEnv.operatorKey)
             .setWipeKey(testEnv.operatorKey)
+            .setPauseKey(testEnv.operatorKey)
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
             .tokenId;
@@ -75,6 +76,7 @@ public final class EntityHelper {
             .setFreezeKey(testEnv.operatorKey)
             .setSupplyKey(testEnv.operatorKey)
             .setMetadataKey(testEnv.operatorKey)
+            .setPauseKey(testEnv.operatorKey)
             .execute(testEnv.client)
             .getReceipt(testEnv.client)
             .tokenId;
