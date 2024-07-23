@@ -54,6 +54,7 @@
 * [NFT Allowances](../examples/src/main/java/com/hedera/hashgraph/sdk/examples/NftAddRemoveAllowancesExample.java)
 * [Zero token operations](../examples/src/main/java/com/hedera/hashgraph/sdk/examples/ZeroTokenOperationsExample.java)
 * [Change Or Remove Existing Keys From A Token (HIP-540)](../examples/src/main/java/com/hedera/hashgraph/sdk/examples/ChangeRemoveTokenKeys.java)
+* [Reject A Token (HIP-904)](../examples/src/main/java/com/hedera/hashgraph/sdk/examples/TokenRejectExample.java)
 
 ### File Service
 * [Create a file](../examples/src/main/java/com/hedera/hashgraph/sdk/examples/CreateFileExample.java)
