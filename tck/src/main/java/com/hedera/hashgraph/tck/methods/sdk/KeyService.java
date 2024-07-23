@@ -82,8 +82,8 @@ public class KeyService extends AbstractJSONRPC2Service {
                             .toStringDER();
                 }
                 var publicKey = params.getType().equals(ED25519_PUBLIC_KEY)
-                        ? PrivateKey.generateED25519().toStringDER()
-                        : PrivateKey.generateECDSA().toStringDER();
+                        ? PrivateKey.generateED25519().getPublicKey().toStringDER()
+                        : PrivateKey.generateECDSA().getPublicKey().toStringDER();
                 if (isList) {
                     response.getPrivateKeys().add(publicKey);
                 }
