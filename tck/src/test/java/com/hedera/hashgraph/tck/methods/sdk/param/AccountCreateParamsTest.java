@@ -25,7 +25,6 @@ class AccountCreateParamsTest {
         jrpcParams.put("stakedNodeId", 5L);
         jrpcParams.put("declineStakingReward", true);
         jrpcParams.put("alias", "alias");
-        jrpcParams.put("signerKey", "signerKey");
 
         JSONObject commonParamsJson = new JSONObject();
         commonParamsJson.put("transactionId", "txId");
@@ -53,7 +52,6 @@ class AccountCreateParamsTest {
         assertEquals(Optional.of(5L), params.getStakedNodeId());
         assertEquals(Optional.of(true), params.getDeclineStakingReward());
         assertEquals(Optional.of("alias"), params.getAlias());
-        assertEquals(Optional.of("signerKey"), params.getSignerKey());
 
         assertTrue(params.getCommonTransactionParams().isPresent());
         CommonTransactionParams commonParams =
@@ -87,7 +85,6 @@ class AccountCreateParamsTest {
         assertEquals(Optional.empty(), params.getStakedNodeId());
         assertEquals(Optional.empty(), params.getDeclineStakingReward());
         assertEquals(Optional.empty(), params.getAlias());
-        assertEquals(Optional.empty(), params.getSignerKey());
         assertEquals(Optional.empty(), params.getCommonTransactionParams());
     }
 
@@ -117,7 +114,6 @@ class AccountCreateParamsTest {
         assertEquals(Optional.empty(), params.getStakedNodeId());
         assertEquals(Optional.empty(), params.getDeclineStakingReward());
         assertEquals(Optional.empty(), params.getAlias());
-        assertEquals(Optional.empty(), params.getSignerKey());
         assertEquals(Optional.empty(), params.getCommonTransactionParams());
     }
 }

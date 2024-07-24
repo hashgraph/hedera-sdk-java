@@ -99,7 +99,7 @@ class KeyServiceTest {
         GenerateKeyResponse response = keyService.generateKey(params);
 
         assertNotNull(response.getKey());
-        assertTrue(response.getKey().contains("302e020100300506032b657004220420"));
+        assertTrue(response.getKey().contains("302a300506032b6570032100"));
     }
 
     @Test
