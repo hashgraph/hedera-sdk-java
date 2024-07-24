@@ -7,13 +7,13 @@ import sys
 import re
 
 
-print(">>> Usage: `" + sys.argv[0] + " branch`")
-print(">>> Where \"branch\" is a valid branch in the Hedera Protobufs git repo")
-
-if len(sys.argv) != 2:
+if len(sys.argv) > 2:
     print(">>> Incorrect number of arguments.  Exiting.")
     exit()
 
+if len(sys.argv) == 1:
+    print(">>> Usage: `" + sys.argv[0] + " ref`")
+    print(">>> Where \"ref\" is a valid branch or tag in the Hedera Protobufs git repo")
 
 print("\n\n")
 
@@ -32,7 +32,7 @@ go_to_script_dir()
 
 PROTO_GIT_REMOTE = "https://github.com/hashgraph/hedera-protobufs.git"
 PROTO_GIT_PATH = os.path.join("hedera-protos-git")
-PROTO_GIT_BRANCH = sys.argv[1]
+PROTO_GIT_REF = sys.argv[1] if len(sys.argv)>1   else ""
 
 
 PROTO_IN_PATH = os.path.join(PROTO_GIT_PATH, "services")
@@ -135,8 +135,11 @@ def ensure_protobufs():
         print(">>> No protobufs detected")
         run_command("git", "clone", PROTO_GIT_REMOTE, PROTO_GIT_PATH)
     os.chdir(PROTO_GIT_PATH)
-    run_command("git", "switch", PROTO_GIT_BRANCH)
-    run_command("git", "pull", "--rebase")
+    checkout_ref = PROTO_GIT_REF if PROTO_GIT_REF else get_latest_tag()
+    print(f">>> Checking out {checkout_ref}")
+    run_command("git", "checkout", checkout_ref)
+    if is_branch(checkout_ref):
+        run_command("git", "pull", "--rebase")
     go_to_script_dir()
 
 def run_command(*command):
@@ -151,9 +154,19 @@ def cmd_to_str(command):
         s += (c + " ")
     return s[0:-1]
 
+def is_branch(ref):
+    result = subprocess.run(['git', 'branch', '--list', ref], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        print(f">>> Error checking for branch {ref}: {result.stderr.decode().strip()}")
+        return False
+    return len(result.stdout.strip()) > 0
 
-
-
+def get_latest_tag():
+    result = subprocess.run(['git', '-c', 'versionsort.suffix=-alpha', '-c', 'versionsort.suffix=-beta', '-c', 'versionsort.suffix=-rc', 'tag', '-l', '--sort=version:refname'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        print(f">>> Error getting latest tag: {result.stderr.decode().strip()}")
+        return ""
+    return result.stdout.decode().strip().split('\n')[-1]
 
 
 def generate_RequestType():
