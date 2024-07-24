@@ -100,7 +100,8 @@ tasks.jacocoTestReport {
 // https://github.com/google/protobuf-gradle-plugin
 protobuf {
     protoc {
-        artifact = "com.google.protobuf:protoc:3.21.9"
+        // shouldn't be updated for now (breaking changes after 4.x.x)
+        artifact = "com.google.protobuf:protoc:3.25.3"
     }
     plugins {
         id("grpc") {
