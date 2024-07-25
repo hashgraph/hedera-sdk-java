@@ -51,7 +51,7 @@ public class LedgerId {
      *
      * @param idBytes                   the id (0=mainnet, 1=testnet, 2=previewnet, ...)
      */
-    LedgerId(byte[] idBytes) {
+    protected LedgerId(byte[] idBytes) {
         this.idBytes = idBytes;
     }
 
@@ -146,7 +146,7 @@ public class LedgerId {
      *
      * @return                          is it one of the three standard networks
      */
-    boolean isKnownNetwork() {
+    protected boolean isKnownNetwork() {
         return isMainnet() || isTestnet() || isPreviewnet();
     }
 
