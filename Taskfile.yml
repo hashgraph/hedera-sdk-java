@@ -44,8 +44,10 @@ tasks:
             - ./gradlew clean test
 
     "update:proto":
+        vars:
+            proto: '{{.proto | default  }}'
         cmds:
-            - ./scripts/update_protobufs.py main
+            - ./scripts/update_protobufs.py {{.proto}}
 
     "update:addressbooks:mainnet":
         cmds:

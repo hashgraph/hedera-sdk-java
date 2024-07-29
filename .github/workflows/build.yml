@@ -1,4 +1,4 @@
-name: Build
+name: PR Checks
 
 on:
   push:
@@ -26,8 +26,8 @@ env:
   GRADLE_CACHE_PASSWORD: ${{ secrets.GRADLE_CACHE_PASSWORD }}
 
 jobs:
-  compile:
-    name: Code Compiles
+  build:
+    name: Build
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     steps:
       - name: Harden Runner
@@ -49,14 +49,14 @@ jobs:
         with:
           cache-read-only: false
 
-      - name: Compile SDK & Javadoc
+      - name: Build SDK & Javadoc
         run: ./gradlew assemble :sdk:javadoc --scan
 
-  unit-tests:
-    name: Unit Tests
+  test:
+    name: Unit and Integration Tests
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     needs:
-      - compile
+      - build
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
@@ -85,7 +85,7 @@ jobs:
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
 
-      - name: Compile Code
+      - name: Build SDK
         run: ./gradlew assemble --scan
 
       - name: Gradle Dependency Scopes Check
@@ -94,7 +94,7 @@ jobs:
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local
 
-      - name: Run Tests
+      - name: Run Unit and Integration Tests
         env:
           OPERATOR_KEY: '0xa608e2130a0a3cb34f86e757303c862bee353d9ab77ba4387ec084f881d420d4'
           OPERATOR_ID: '0.0.1022'
@@ -109,18 +109,18 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info --scan
 
-      - name: Publish To Codecov
+      - name: Upload coverage to Codecov
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
         uses: codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673 # v4.5.0
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
 
-  example-tests:
-    name: Example Code Tests
+  run-examples:
+    name: Run Examples
     runs-on: [ self-hosted, Linux, medium, ephemeral ]
     needs:
-      - compile
+      - build
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
@@ -150,10 +150,10 @@ jobs:
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
 
-      - name: Compile Code
+      - name: Build SDK
         run: ./gradlew assemble --scan
 
-      - name: Compile Code - Android Example
+      - name: Build Android Example
         run: ./gradlew -p example-android assemble --scan
 
       - name: Start the local node
@@ -171,13 +171,11 @@ jobs:
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
 
-
-
-  tck-unit-tests:
-      name: TCK Unit Tests
+  test-tck:
+      name: TCK Tests
       runs-on: [ self-hosted, Linux, medium, ephemeral ]
       needs:
-          - compile
+          - build
       steps:
           - name: Checkout Code
             uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -201,13 +199,13 @@ jobs:
           - name: Install Local Node
             run: npm install @hashgraph/hedera-local
 
-          - name: Compile Code
+          - name: Build TCK
             run: ./gradlew assemble --scan
 
           - name: Start Local Node
             run: npx @hashgraph/hedera-local start -d --network local
 
-          - name: Run Tests
+          - name: Run TCK Unit Tests
             run: ./gradlew :tck:test
 
           - name: Stop the local node
