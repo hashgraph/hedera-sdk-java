@@ -100,14 +100,14 @@ public class KeyService extends AbstractJSONRPC2Service {
                             .getPublicKey()
                             .toStringDER();
                 }
-                var publicKey = params.getType().equals(ED25519_PUBLIC_KEY)
-                        ? PrivateKey.generateED25519().getPublicKey().toStringDER()
-                        : PrivateKey.generateECDSA().getPublicKey().toStringDER();
+                var pKey = params.getType().equals(ED25519_PUBLIC_KEY)
+                        ? PrivateKey.generateED25519()
+                        : PrivateKey.generateECDSA();
                 if (isList) {
-                    response.getPrivateKeys().add(publicKey);
+                    response.getPrivateKeys().add(pKey.toStringDER());
                 }
 
-                return publicKey;
+                return pKey.getPublicKey().toStringDER();
 
             case LIST_KEY, THRESHOLD_KEY:
                 KeyList keyList = new KeyList();
