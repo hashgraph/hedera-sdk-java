@@ -345,7 +345,7 @@ class Ed25519PrivateKeyTest {
         assertThat(Hex.toHexString(signature)).isEqualTo(SIG_STR);
     }
     @Test
-    @DisplayName("private key is is ECDSA")
+    @DisplayName("private key is ECDSA")
     void keyIsECDSA() {
         PrivateKey key = PrivateKey.generateED25519();
 
@@ -353,7 +353,7 @@ class Ed25519PrivateKeyTest {
     }
 
     @Test
-    @DisplayName("private key is is not Ed25519")
+    @DisplayName("private key is not Ed25519")
     void keyIsNotEd25519() {
         PrivateKey key = PrivateKey.generateED25519();
 

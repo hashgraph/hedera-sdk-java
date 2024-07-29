@@ -118,7 +118,7 @@ public class ECDSAPrivateKeyTest {
     }
 
     @Test
-    @DisplayName("private key is is ECDSA")
+    @DisplayName("private key is ECDSA")
     void keyIsECDSA() {
         PrivateKey key = PrivateKey.generateECDSA();
 
@@ -126,7 +126,7 @@ public class ECDSAPrivateKeyTest {
     }
 
     @Test
-    @DisplayName("private key is is not Ed25519")
+    @DisplayName("private key is not Ed25519")
     void keyIsNotEd25519() {
         PrivateKey key = PrivateKey.generateECDSA();
 

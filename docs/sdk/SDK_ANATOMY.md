@@ -172,7 +172,7 @@ The `Query` class implements most of the abstract methods from `Executable`, _ex
 
 Query also adds some abstract methods of its own:
 * `RequestT onMakeRequest(queryBuilder, queryHeader)`: because every type of `Query` proto message has a `QueryHeader` inside of it, this method has to place the `QueryHeader` inside of the internal `Query` message in addition to generally preparing the builder to build the request message.
-* `ResponseHeader mapResponseHeader(Response)`: the same nested-header pattern is repeated here for the `Response` proto message.  This method fetches the `ResponseHeader` message from the the particular query response message.  This method seems to be used for `Query`'s implementation of `mapResponseStatus` to check the `precheckStatus`.  It doesn't look like it's used for anything else.
+* `ResponseHeader mapResponseHeader(Response)`: the same nested-header pattern is repeated here for the `Response` proto message.  This method fetches the `ResponseHeader` message from the particular query response message.  This method seems to be used for `Query`'s implementation of `mapResponseStatus` to check the `precheckStatus`.  It doesn't look like it's used for anything else.
 * `QueryHeader mapRequestHeader(proto.Query)`: this actually fetches the header from _this_ request.  I see it used for `toString()`, but nothing else.
 * `void validateChecksums(client)`: checks whether checksums on entity IDs in the query are valid for the ledger that `client` is configured for (EG testnet or mainnet).
 
