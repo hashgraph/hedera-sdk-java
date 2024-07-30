@@ -45,7 +45,6 @@ public class AccountCreateParams extends JSONRPC2Param {
     private Optional<Long> stakedNodeId;
     private Optional<Boolean> declineStakingReward;
     private Optional<String> alias;
-    private Optional<String> signerKey;
     private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
@@ -61,7 +60,6 @@ public class AccountCreateParams extends JSONRPC2Param {
         var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
         var parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
-        var parsedSignerKey = Optional.ofNullable((String) jrpcParams.get("signerKey"));
         Optional<CommonTransactionParams> parsedCommonTransactionParams = Optional.empty();
         if (jrpcParams.containsKey("commonTransactionParams")) {
             JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
@@ -79,7 +77,6 @@ public class AccountCreateParams extends JSONRPC2Param {
                 parsedStakedNodeId,
                 parsedDeclineStakingReward,
                 parsedAlias,
-                parsedSignerKey,
                 parsedCommonTransactionParams);
     }
 }
