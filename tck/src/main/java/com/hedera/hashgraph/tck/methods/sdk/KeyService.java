@@ -83,16 +83,18 @@ public class KeyService extends AbstractJSONRPC2Service {
     private String processKeyRecursively(
             final GenerateKeyParams params, final GenerateKeyResponse response, boolean isList)
             throws InvalidJSONRPC2RequestException, InvalidProtocolBufferException {
+        String privateKeyString;
+        PrivateKey privateKey;
         switch (params.getType()) {
             case ED25519_PRIVATE_KEY, ECDSA_SECP256K1_PRIVATE_KEY:
-                var privateKey = params.getType().equals(ED25519_PRIVATE_KEY)
+                privateKeyString = params.getType().equals(ED25519_PRIVATE_KEY)
                         ? PrivateKey.generateED25519().toStringDER()
                         : PrivateKey.generateECDSA().toStringDER();
                 if (isList) {
-                    response.getPrivateKeys().add(privateKey);
+                    response.getPrivateKeys().add(privateKeyString);
                 }
 
-                return privateKey;
+                return privateKeyString;
 
             case ED25519_PUBLIC_KEY, ECDSA_SECP256K1_PUBLIC_KEY:
                 if (params.getFromKey().isPresent()) {
@@ -100,14 +102,14 @@ public class KeyService extends AbstractJSONRPC2Service {
                             .getPublicKey()
                             .toStringDER();
                 }
-                var pKey = params.getType().equals(ED25519_PUBLIC_KEY)
+                privateKey = params.getType().equals(ED25519_PUBLIC_KEY)
                         ? PrivateKey.generateED25519()
                         : PrivateKey.generateECDSA();
                 if (isList) {
-                    response.getPrivateKeys().add(pKey.toStringDER());
+                    response.getPrivateKeys().add(privateKey.toStringDER());
                 }
 
-                return pKey.getPublicKey().toStringDER();
+                return privateKey.getPublicKey().toStringDER();
 
             case LIST_KEY, THRESHOLD_KEY:
                 KeyList keyList = new KeyList();
