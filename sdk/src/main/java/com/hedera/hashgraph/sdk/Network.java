@@ -19,10 +19,14 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
+
 import com.google.common.io.ByteStreams;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 
+import java.util.Set;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -167,9 +171,14 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
 
     static HashMap<String, AccountId> addressBookToNetwork(Collection<NodeAddress> addressBook, int desiredPort) {
         var network = new HashMap<String, AccountId>();
+        boolean wellKnownPorts = addressBook.stream()
+            .map(NodeAddress::getAddresses)
+            .flatMap(Collection::stream)
+            .map(Endpoint::getPort)
+            .allMatch(Set.of(PORT_NODE_TLS, PORT_NODE_PLAIN)::contains);
         for (var nodeAddress : addressBook) {
             for (var endpoint : nodeAddress.addresses) {
-                if (endpoint.port == desiredPort) {
+                if (!wellKnownPorts || endpoint.port == desiredPort) {
                     network.put(endpoint.toString(), nodeAddress.accountId);
                 }
             }
