@@ -579,8 +579,8 @@ public class TokenRejectIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot remove allowance when executing TokenReject transaction for Fungible Token")
-    void cannotRemoveAllowanceWhenExecutingTokenRejectForFt() throws Exception {
+    @DisplayName("Can remove allowance when executing TokenReject transaction for FT and NFT")
+    void canRemoveAllowanceWhenExecutingTokenRejectForFtAndNft() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
         var ftTokenId = EntityHelper.createFungibleToken(testEnv, 3);
         var receiverAccountKey = PrivateKey.generateED25519();
@@ -622,7 +622,7 @@ public class TokenRejectIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // verify that spender still has the allowance, but doesn't have available balance
+        // verify the allowance - should be 0 , because the receiver is no longer the owner
         assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addApprovedTokenTransfer(ftTokenId, receiverAccountId, -5)
@@ -632,24 +632,9 @@ public class TokenRejectIntegrationTest {
                 .sign(spenderAccountKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining("INSUFFICIENT_TOKEN_BALANCE");
+        }).withMessageContaining("SPENDER_DOES_NOT_HAVE_ALLOWANCE");
 
-        new TokenDeleteTransaction()
-            .setTokenId(ftTokenId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        testEnv.close(receiverAccountId, receiverAccountKey);
-    }
-
-    @Test
-    @DisplayName("Can remove allowance when executing TokenReject transaction for NFT")
-    void cannotRemoveAllowanceWhenExecutingTokenRejectForNft() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var receiverAccountKey = PrivateKey.generateED25519();
-        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, -1);
-        var spenderAccountKey = PrivateKey.generateED25519();
-        var spenderAccountId = EntityHelper.createAccount(testEnv, spenderAccountKey, -1);
+        // same test for nft
 
         var nftTokenId = EntityHelper.createNft(testEnv);
 
@@ -697,7 +682,7 @@ public class TokenRejectIntegrationTest {
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
-        // verify that spender doesn't have the allowance
+        // verify the allowance - should be 0 , because the receiver is no longer the owner
         assertThatExceptionOfType(Exception.class).isThrownBy(() -> {
             new TransferTransaction()
                 .addApprovedNftTransfer(nftTokenId.nft(nftSerials.get(1)), receiverAccountId, spenderAccountId)
@@ -708,6 +693,11 @@ public class TokenRejectIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining("SPENDER_DOES_NOT_HAVE_ALLOWANCE");
+
+        new TokenDeleteTransaction()
+            .setTokenId(ftTokenId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         new TokenDeleteTransaction()
             .setTokenId(nftTokenId)
