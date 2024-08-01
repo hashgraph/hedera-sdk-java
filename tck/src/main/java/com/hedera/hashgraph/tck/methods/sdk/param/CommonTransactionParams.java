@@ -23,6 +23,7 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,7 @@ public class CommonTransactionParams {
     }
 
     public void fillOutTransaction(final Transaction<?> transaction, final Client client) {
+        transactionId.ifPresent(txId -> transaction.setTransactionId(TransactionId.fromString(txId)));
         maxTransactionFee.ifPresent(maxFee -> transaction.setMaxTransactionFee(Hbar.fromTinybars(maxFee)));
         validTransactionDuration.ifPresent(
                 validDuration -> transaction.setTransactionValidDuration(Duration.ofSeconds(validDuration)));
