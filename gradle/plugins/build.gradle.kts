@@ -25,7 +25,7 @@ plugins {
 repositories.gradlePluginPortal()
 
 dependencies {
-    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:1.32.0")
+    implementation("com.autonomousapps:dependency-analysis-gradle-plugin:1.33.0")
     implementation("com.github.spotbugs.snom:spotbugs-gradle-plugin:6.0.12")
     implementation("com.google.protobuf:protobuf-gradle-plugin:0.9.4")
     implementation("io.github.gradle-nexus:publish-plugin:1.3.0")
