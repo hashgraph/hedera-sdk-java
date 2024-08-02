@@ -44,6 +44,7 @@ import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -73,6 +74,7 @@ public class ContractHelper {
     final Map<Integer, Hbar> stepPayableAmounts = new HashMap<>();
     final Map<Integer, List<PrivateKey>> stepSigners = new HashMap<>();
     final Map<Integer, AccountId> stepFeePayers = new HashMap<>();
+    final Map<Integer, Consumer<String>> stepLogic = new HashMap<>();
 
     public static String getBytecodeHex(String filename) throws IOException {
         try (Reader reader = new InputStreamReader(
@@ -135,6 +137,11 @@ public class ContractHelper {
     public ContractHelper setFeePayerForStep(int stepIndex, AccountId feePayerAccount, PrivateKey feePayerKey) {
         stepFeePayers.put(stepIndex, feePayerAccount);
         return addSignerForStep(stepIndex, feePayerKey);
+    }
+
+    public ContractHelper setStepLogic(int stepIndex, Consumer<String> stepLogic) {
+        this.stepLogic.put(stepIndex, stepLogic);
+        return this;
     }
 
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
@@ -207,8 +214,15 @@ public class ContractHelper {
                 if (record.receipt.status != Status.SUCCESS) {
                     throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
                 }
+
                 ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
                 System.out.println("gas used: " + functionResult.gasUsed);
+
+                var currentStepLogic = stepLogic.get(stepIndex);
+                if (currentStepLogic != null) {
+                    currentStepLogic.accept(functionResult.getAddress(1));
+                }
+
                 if (getResultValidator(stepIndex).apply(functionResult)) {
                     System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
                 } else {
