@@ -53,7 +53,7 @@ public final class CreateAccountExample {
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(newPublicKey)
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client);
 
         // This will wait for the receipt to become available

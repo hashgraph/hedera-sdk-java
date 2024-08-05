@@ -22,7 +22,8 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
 
 public final class AccountCreateWithHtsExample {
 
@@ -163,7 +164,7 @@ public final class AccountCreateWithHtsExample {
             .setTokenSymbol("H542")
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
-            .setInitialSupply(10000) // Total supply = 10000 / 10 ^ 2
+            .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
             .setDecimals(2)
             .setAutoRenewAccountId(OPERATOR_ID)
             .freezeWith(client);

@@ -64,7 +64,7 @@ public final class CreateStatefulContractExample {
 
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
             .setBytecodeFileId(newFileId)
-            .setGas(500000)
+            .setGas(500_000)
             .setConstructorParameters(
                 new ContractFunctionParameters()
                     .addString("hello from hedera!"))
@@ -78,7 +78,7 @@ public final class CreateStatefulContractExample {
 
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("get_message")
             .setQueryPayment(new Hbar(1))
             .execute(client);
@@ -92,7 +92,7 @@ public final class CreateStatefulContractExample {
 
         TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("set_message", new ContractFunctionParameters()
                 .addString("hello from hedera again!"))
             .execute(client);
@@ -104,7 +104,7 @@ public final class CreateStatefulContractExample {
         // now query contract
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("get_message")
             .setQueryPayment(new Hbar(1))
             .execute(client);

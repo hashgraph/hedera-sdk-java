@@ -57,12 +57,12 @@ public class ConsensusPubSubWithSubmitKeyExample {
     }
 
     public static void main(String[] args) throws Exception {
-        new ConsensusPubSubWithSubmitKeyExample(5, 2000).execute();
+        new ConsensusPubSubWithSubmitKeyExample(5, 2_000).execute();
     }
 
     public void execute() throws Exception {
         createTopicWithSubmitKey();
-        Thread.sleep(5000);
+        Thread.sleep(5_000);
 
         subscribeToTopic();
 
@@ -141,6 +141,6 @@ public class ConsensusPubSubWithSubmitKeyExample {
             Thread.sleep(millisBetweenMessages);
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(10_000);
     }
 }

@@ -68,7 +68,7 @@ public class FileAppendChunkedExample {
             .setFileId(newFileId)
             .setContents(contents.toString())
             .setMaxChunks(40)
-            .setMaxTransactionFee(new Hbar(1000))
+            .setMaxTransactionFee(new Hbar(1_000))
             .freezeWith(client)
             .execute(client)
             .getReceipt(client);

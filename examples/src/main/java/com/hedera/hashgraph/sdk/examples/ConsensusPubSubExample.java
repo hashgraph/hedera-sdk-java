@@ -74,7 +74,7 @@ class ConsensusPubSubExample {
                 .execute(client)
                 .getReceipt(client);
 
-            Thread.sleep(2500);
+            Thread.sleep(2_500);
         }
 
         boolean allMessagesReceived = messagesLatch.await(30, TimeUnit.SECONDS);

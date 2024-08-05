@@ -55,7 +55,7 @@ public final class ContractNoncesExample {
         FileId newFileId = fileCreateTxReceipt.fileId;
 
         TransactionResponse contractCreateTxResponse = new ContractCreateTransaction().setAdminKey(OPERATOR_KEY)
-            .setGas(100000).setBytecodeFileId(newFileId)
+            .setGas(100_000).setBytecodeFileId(newFileId)
             .setContractMemo("[e2e::ContractADeploysContractBInConstructor]").execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);

@@ -20,21 +20,7 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenWipeTransaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -71,7 +57,7 @@ public final class TransferTokensExample {
         @Var TransactionResponse response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(key1.getPublicKey())
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client);
 
         // This will wait for the receipt to become available
@@ -84,7 +70,7 @@ public final class TransferTokensExample {
         response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
             .setKey(key2.getPublicKey())
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client);
 
         // This will wait for the receipt to become available
@@ -99,7 +85,7 @@ public final class TransferTokensExample {
             .setTokenName("ffff")
             .setTokenSymbol("F")
             .setDecimals(3)
-            .setInitialSupply(1000000)
+            .setInitialSupply(1_000_000)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAdminKey(OPERATOR_KEY.getPublicKey())
             .setFreezeKey(OPERATOR_KEY.getPublicKey())

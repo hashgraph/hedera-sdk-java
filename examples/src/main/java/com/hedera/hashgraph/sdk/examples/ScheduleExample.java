@@ -55,7 +55,7 @@ public final class ScheduleExample {
 
         AccountId newAccountId = new AccountCreateTransaction()
             .setKey(KeyList.of(key1.getPublicKey(), key2.getPublicKey()))
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client)
             .getReceipt(client)
             .accountId;
