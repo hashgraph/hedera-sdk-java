@@ -1685,7 +1685,40 @@ public enum Status {
     /**
      * The node account is not allowed to be updated
      */
-    UPDATE_NODE_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.UPDATE_NODE_ACCOUNT_NOT_ALLOWED);
+    UPDATE_NODE_ACCOUNT_NOT_ALLOWED(ResponseCodeEnum.UPDATE_NODE_ACCOUNT_NOT_ALLOWED),
+
+    /**
+     * The token has no metadata or supply key
+     */
+    TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY(ResponseCodeEnum.TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY),
+
+    /**
+     * The transaction attempted to the use an empty List of `PendingAirdropId`.
+     */
+    EMPTY_PENDING_AIRDROP_ID_LIST(ResponseCodeEnum.EMPTY_PENDING_AIRDROP_ID_LIST),
+
+    /**
+     * The transaction attempted to the same `PendingAirdropId` twice.
+     */
+    PENDING_AIRDROP_ID_REPEATED(ResponseCodeEnum.PENDING_AIRDROP_ID_REPEATED),
+
+    /**
+     * The transaction attempted to use more than the allowed number of `PendingAirdropId`.
+     */
+    MAX_PENDING_AIRDROP_ID_EXCEEDED(ResponseCodeEnum.MAX_PENDING_AIRDROP_ID_EXCEEDED),
+
+    /**
+     * A pending airdrop already exists for the specified NFT.
+     */
+    PENDING_NFT_AIRDROP_ALREADY_EXISTS(ResponseCodeEnum.PENDING_NFT_AIRDROP_ALREADY_EXISTS),
+
+    /**
+     * The identified account is sender for one or more pending airdrop(s)
+     * and cannot be deleted.<br/>
+     * Requester should cancel all pending airdrops before resending
+     * this transaction.
+     */
+    ACCOUNT_HAS_PENDING_AIRDROPS(ResponseCodeEnum.ACCOUNT_HAS_PENDING_AIRDROPS);
 
     final ResponseCodeEnum code;
 
@@ -2013,6 +2046,12 @@ public enum Status {
             case INVALID_IPV4_ADDRESS -> INVALID_IPV4_ADDRESS;
             case EMPTY_TOKEN_REFERENCE_LIST -> EMPTY_TOKEN_REFERENCE_LIST;
             case UPDATE_NODE_ACCOUNT_NOT_ALLOWED -> UPDATE_NODE_ACCOUNT_NOT_ALLOWED;
+            case TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY -> TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY;
+            case EMPTY_PENDING_AIRDROP_ID_LIST -> EMPTY_PENDING_AIRDROP_ID_LIST;
+            case PENDING_AIRDROP_ID_REPEATED -> PENDING_AIRDROP_ID_REPEATED;
+            case MAX_PENDING_AIRDROP_ID_EXCEEDED -> MAX_PENDING_AIRDROP_ID_EXCEEDED;
+            case PENDING_NFT_AIRDROP_ALREADY_EXISTS -> PENDING_NFT_AIRDROP_ALREADY_EXISTS;
+            case ACCOUNT_HAS_PENDING_AIRDROPS -> ACCOUNT_HAS_PENDING_AIRDROPS;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
