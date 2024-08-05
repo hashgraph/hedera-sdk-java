@@ -84,7 +84,7 @@ public final class ZeroTokenOperationsExample {
 
         // Configure steps in ContractHelper
         contractHelper
-            .setPayableAmountForStep(0, Hbar.from(40)) // is 40 Hbar needed?
+            .setPayableAmountForStep(0, Hbar.from(40))
             .addSignerForStep(1, alicePrivateKey);
 
         // step 0 creates a fungible token
@@ -100,7 +100,6 @@ public final class ZeroTokenOperationsExample {
         System.out.println("Attempting to execute step 6");
 
         TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
-            .setMaxTransactionFee(new Hbar(50))
             .setTokenName("Black Sea LimeChain Token")
             .setTokenSymbol("BSL")
             .setTreasuryAccountId(OPERATOR_ID)
