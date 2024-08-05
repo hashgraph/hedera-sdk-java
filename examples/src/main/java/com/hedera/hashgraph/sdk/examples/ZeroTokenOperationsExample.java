@@ -126,5 +126,7 @@ public final class ZeroTokenOperationsExample {
             "step 6 completed, and returned valid result. TransactionId: " + transferReceiptRecord.transactionId);
 
         System.out.println("All steps completed with valid results.");
+
+        client.close();
     }
 }

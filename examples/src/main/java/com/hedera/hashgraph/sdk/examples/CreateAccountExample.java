@@ -73,5 +73,7 @@ public final class CreateAccountExample {
         AccountId newAccountId = receipt.accountId;
 
         System.out.println("account = " + newAccountId);
+
+        client.close();
     }
 }

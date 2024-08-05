@@ -107,5 +107,7 @@ public class CreateAccountWithAliasExample {
         } else {
             throw new Exception("The new account doesn't have alias");
         }
+
+        client.close();
     }
 }

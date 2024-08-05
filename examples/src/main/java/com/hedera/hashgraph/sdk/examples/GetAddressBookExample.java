@@ -29,6 +29,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Get the network address book for inspecting the node public keys, among other things
@@ -43,7 +44,7 @@ public final class GetAddressBookExample {
     private GetAddressBookExample() {
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException {
+    public static void main(String[] args) throws InterruptedException, IOException, TimeoutException {
         // NEW (Feb 25 2022): you can now fetch the address book for free from a mirror node with AddressBookQuery
 
         System.out.println("Getting address book for " + HEDERA_NETWORK);
@@ -53,6 +54,8 @@ public final class GetAddressBookExample {
         NodeAddressBook addressBook = new AddressBookQuery()
             .setFileId(FileId.ADDRESS_BOOK)
             .execute(client);
+
+        client.close();
 
         System.out.println(addressBook);
 

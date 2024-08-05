@@ -166,5 +166,7 @@ public class ScheduleMultiSigTransactionExample {
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
             .execute(client);
+
+        client.close();
     }
 }

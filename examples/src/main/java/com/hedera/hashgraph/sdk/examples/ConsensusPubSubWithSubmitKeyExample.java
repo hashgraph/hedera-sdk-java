@@ -78,6 +78,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
         subscribeToTopic();
 
         publishMessagesToTopic();
+
+        client.close();
     }
 
     private void setupClient() throws InterruptedException {

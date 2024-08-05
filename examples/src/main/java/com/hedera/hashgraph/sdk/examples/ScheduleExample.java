@@ -112,5 +112,7 @@ public final class ScheduleExample {
         System.out.println("The following link should query the mirror node for the scheduled transaction");
 
         System.out.println("https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId);
+
+        client.close();
     }
 }

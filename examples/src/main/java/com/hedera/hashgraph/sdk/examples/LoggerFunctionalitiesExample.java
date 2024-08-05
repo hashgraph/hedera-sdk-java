@@ -83,5 +83,7 @@ public class LoggerFunctionalitiesExample {
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
             .execute(client);
+
+        client.close();
     }
 }

@@ -105,5 +105,7 @@ public final class MultiSigOfflineExample {
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
         System.out.println(receipt.status);
+
+        client.close();
     }
 }

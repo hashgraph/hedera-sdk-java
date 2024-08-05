@@ -93,5 +93,7 @@ public final class ContractNoncesExample {
             throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
+
+        client.close();
     }
 }

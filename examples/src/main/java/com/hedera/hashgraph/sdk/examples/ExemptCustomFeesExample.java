@@ -192,5 +192,7 @@ public final class ExemptCustomFeesExample {
         System.out.println("First account balance after TransferTransaction: " + firstAccountBalanceAfter);
         System.out.println("Second account balance after TransferTransaction: " + secondAccountBalanceAfter);
         System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
+
+        client.close();
     }
 }

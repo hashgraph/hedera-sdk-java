@@ -106,5 +106,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         } else {
             throw new Exception("The new account doesn't have alias");
         }
+
+        client.close();
     }
 }

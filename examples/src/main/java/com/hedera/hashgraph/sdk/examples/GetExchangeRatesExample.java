@@ -58,6 +58,8 @@ public final class GetExchangeRatesExample {
             .setFileId(FileId.fromString("0.0.112"))
             .execute(client);
 
+        client.close();
+
         byte[] fileContents = fileContentsByteString.toByteArray();
 
         ExchangeRates exchangeRateSet = ExchangeRates.fromBytes(fileContents);

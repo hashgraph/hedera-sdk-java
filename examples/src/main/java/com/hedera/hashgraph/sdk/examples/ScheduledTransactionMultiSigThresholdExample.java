@@ -146,6 +146,7 @@ public class ScheduledTransactionMultiSigThresholdExample {
             .execute(client);
         System.out.println(recordScheduledTx);
 
+        client.close();
     }
 
 }

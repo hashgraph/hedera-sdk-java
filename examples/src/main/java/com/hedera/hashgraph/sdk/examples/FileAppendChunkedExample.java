@@ -94,5 +94,7 @@ public class FileAppendChunkedExample {
             .execute(client);
 
         System.out.println("File size according to `FileInfoQuery`: " + info.size);
+
+        client.close();
     }
 }

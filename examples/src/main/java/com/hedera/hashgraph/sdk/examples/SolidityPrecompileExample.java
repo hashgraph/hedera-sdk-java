@@ -131,5 +131,7 @@ public class SolidityPrecompileExample {
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 16, client);
 
         System.out.println("All steps completed with valid results.");
+
+        client.close();
     }
 }

@@ -85,5 +85,7 @@ public final class DeleteAccountExample {
             .sign(newKey)
             .execute(client)
             .getReceipt(client);
+
+        client.close();
     }
 }

@@ -159,5 +159,7 @@ public class AutoCreateAccountTransferTransactionExample {
             .execute(client);
 
         System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+
+        client.close();
     }
 }

@@ -89,5 +89,6 @@ public class SignTransactionExample {
 
         System.out.println(receipt.status);
 
+        client.close();
     }
 }

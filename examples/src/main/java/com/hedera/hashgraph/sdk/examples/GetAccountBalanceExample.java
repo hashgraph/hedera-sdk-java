@@ -51,5 +51,7 @@ public final class GetAccountBalanceExample {
             .hbars;
 
         System.out.println("balance = " + balance);
+
+        client.close();
     }
 }

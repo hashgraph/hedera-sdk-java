@@ -348,5 +348,7 @@ public final class NftAddRemoveAllowancesExample {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
+        client.close();
     }
 }

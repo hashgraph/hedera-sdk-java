@@ -70,5 +70,7 @@ public final class CreateFileExample {
         FileId newFileId = receipt.fileId;
 
         System.out.println("file: " + newFileId);
+
+        client.close();
     }
 }

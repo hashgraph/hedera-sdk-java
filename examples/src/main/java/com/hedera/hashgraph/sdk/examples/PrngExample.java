@@ -54,5 +54,7 @@ public final class PrngExample {
         TransactionRecord record = transactionResponse.getRecord(client);
 
         System.out.println("generated random number = " + record.prngNumber);
+
+        client.close();
     }
 }

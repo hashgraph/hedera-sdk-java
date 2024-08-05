@@ -58,5 +58,7 @@ public final class GetAccountInfoExample {
         System.out.println("info.key                          = " + info.key);
         System.out.println("info.isReceiverSignatureRequired  = " + info.isReceiverSignatureRequired);
         System.out.println("info.expirationTime               = " + info.expirationTime);
+
+        client.close();
     }
 }

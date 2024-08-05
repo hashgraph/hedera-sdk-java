@@ -87,5 +87,6 @@ public final class DeleteFileExample {
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
 
+        client.close();
     }
 }

@@ -129,5 +129,7 @@ public final class CreateStatefulContractExample {
 
         String message2 = contractUpdateResult.getString(0);
         System.out.println("contract returned message: " + message2);
+
+        client.close();
     }
 }

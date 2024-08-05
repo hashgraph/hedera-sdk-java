@@ -224,5 +224,7 @@ public final class TransferTokensExample {
             .getReceipt(client);
 
         System.out.println("Deleted accountId2" + accountId2);
+
+        client.close();
     }
 }

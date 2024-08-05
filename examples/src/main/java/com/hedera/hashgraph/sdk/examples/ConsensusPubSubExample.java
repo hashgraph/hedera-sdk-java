@@ -89,6 +89,9 @@ class ConsensusPubSubExample {
         }
 
         boolean allMessagesReceived = messagesLatch.await(30, TimeUnit.SECONDS);
+
+        client.close();
+
         if (!allMessagesReceived) {
             throw new TimeoutException("Not all topic messages were received!");
         }

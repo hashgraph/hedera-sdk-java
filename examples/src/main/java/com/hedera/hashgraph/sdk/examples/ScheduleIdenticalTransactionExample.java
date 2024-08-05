@@ -191,5 +191,7 @@ public class ScheduleIdenticalTransactionExample {
         thresholdDeleteTx
             .execute(client)
             .getReceipt(client);
+
+        client.close();
     }
 }

@@ -69,6 +69,8 @@ public final class CreateTopicExample {
         TransactionReceipt sendReceipt = sendResponse.getReceipt(client);
 
         System.out.println("topic sequence number = " + sendReceipt.topicSequenceNumber);
+
+        client.close();
     }
 
 }

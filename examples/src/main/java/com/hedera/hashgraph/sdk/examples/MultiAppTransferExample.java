@@ -134,6 +134,8 @@ public final class MultiAppTransferExample {
 
         System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
+
+        client.close();
     }
 
     private static byte[] exchangeSignsTransaction(byte[] transactionData) throws InvalidProtocolBufferException {

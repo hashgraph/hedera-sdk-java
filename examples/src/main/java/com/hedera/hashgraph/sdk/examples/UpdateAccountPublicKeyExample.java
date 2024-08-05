@@ -99,5 +99,7 @@ public final class UpdateAccountPublicKeyExample {
             .execute(client);
 
         System.out.println("key = " + info.key);
+
+        client.close();
     }
 }

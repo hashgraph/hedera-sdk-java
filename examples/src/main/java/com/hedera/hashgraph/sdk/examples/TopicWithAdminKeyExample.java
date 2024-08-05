@@ -76,6 +76,8 @@ class TopicWithAdminKeyExample {
         createTopicWithAdminKey();
 
         updateTopicAdminKeyAndMemo();
+
+        hapiClient.close();
     }
 
     private void setupHapiClient() throws InterruptedException {

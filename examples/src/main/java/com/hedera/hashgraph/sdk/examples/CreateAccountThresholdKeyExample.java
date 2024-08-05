@@ -111,5 +111,7 @@ public final class CreateAccountThresholdKeyExample {
             .hbars;
 
         System.out.println("account balance after transfer: " + balanceAfter);
+
+        client.close();
     }
 }

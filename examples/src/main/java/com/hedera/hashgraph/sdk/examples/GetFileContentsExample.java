@@ -77,5 +77,7 @@ public final class GetFileContentsExample {
 
         // Prints query results to console
         System.out.println("File content query results: " + contents.toStringUtf8());
+
+        client.close();
     }
 }
