@@ -23,7 +23,6 @@ import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class PrngExample {
 
@@ -37,8 +36,7 @@ public final class PrngExample {
     private PrngExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

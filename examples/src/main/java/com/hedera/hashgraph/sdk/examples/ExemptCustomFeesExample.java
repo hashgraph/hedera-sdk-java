@@ -21,10 +21,9 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.List;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 /*
     Example for HIP-573: Blanket exemptions for custom fee collectors
@@ -49,7 +48,7 @@ public final class ExemptCustomFeesExample {
     private ExemptCustomFeesExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 

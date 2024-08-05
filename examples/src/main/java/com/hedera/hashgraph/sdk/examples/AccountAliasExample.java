@@ -19,22 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class AccountAliasExample {
 
@@ -45,8 +33,7 @@ public class AccountAliasExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

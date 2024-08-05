@@ -20,13 +20,10 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
-
-import java.time.Instant;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class ScheduleExample {
 
@@ -40,8 +37,7 @@ public final class ScheduleExample {
     private ScheduleExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

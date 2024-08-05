@@ -19,23 +19,11 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicInfo;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Arrays;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -67,12 +55,11 @@ class TopicWithAdminKeyExample {
         setupHapiClient();
     }
 
-    public static void main(String[] args)
-        throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         new TopicWithAdminKeyExample().execute();
     }
 
-    public void execute() throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
+    public void execute() throws Exception {
         createTopicWithAdminKey();
 
         updateTopicAdminKeyAndMemo();
@@ -115,7 +102,7 @@ class TopicWithAdminKeyExample {
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
 
-    private void updateTopicAdminKeyAndMemo() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    private void updateTopicAdminKeyAndMemo() throws Exception {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
         PrivateKey[] newAdminKeys = new PrivateKey[4];

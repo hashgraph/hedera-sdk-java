@@ -19,20 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionRecord;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class TransferCryptoExample {
 
@@ -46,8 +36,7 @@ public final class TransferCryptoExample {
     private TransferCryptoExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

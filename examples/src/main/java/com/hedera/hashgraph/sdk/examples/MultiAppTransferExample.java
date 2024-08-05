@@ -20,21 +20,10 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class MultiAppTransferExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -65,7 +54,7 @@ public final class MultiAppTransferExample {
     private MultiAppTransferExample() {
     }
 
-    public static void main(String[] args) throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InvalidProtocolBufferException {
+    public static void main(String[] args) throws Exception {
         // the exchange creates an account for the user to transfer funds to
         AccountId exchangeAccountId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)

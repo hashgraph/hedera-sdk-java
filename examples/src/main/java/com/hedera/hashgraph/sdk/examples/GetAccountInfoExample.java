@@ -19,17 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class GetAccountInfoExample {
 
@@ -43,7 +36,7 @@ public final class GetAccountInfoExample {
     private GetAccountInfoExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

@@ -22,9 +22,7 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class TransferUsingEvmAddressExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -56,7 +54,7 @@ public class TransferUsingEvmAddressExample {
         - Sign the transaction with ECDSA private key
         - Get the `AccountInfo` of the account and show the account is now a complete account by returning the public key on the account
     */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for by this account and be signed by this key

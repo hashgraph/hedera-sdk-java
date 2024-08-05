@@ -19,20 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
@@ -50,8 +37,7 @@ public final class CreateSimpleContractExample {
     private CreateSimpleContractExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);

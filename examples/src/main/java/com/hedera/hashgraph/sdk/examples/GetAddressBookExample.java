@@ -26,10 +26,8 @@ import com.hedera.hashgraph.sdk.NodeAddressBook;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Get the network address book for inspecting the node public keys, among other things
@@ -44,7 +42,7 @@ public final class GetAddressBookExample {
     private GetAddressBookExample() {
     }
 
-    public static void main(String[] args) throws InterruptedException, IOException, TimeoutException {
+    public static void main(String[] args) throws Exception {
         // NEW (Feb 25 2022): you can now fetch the address book for free from a mirror node with AddressBookQuery
 
         System.out.println("Getting address book for " + HEDERA_NETWORK);

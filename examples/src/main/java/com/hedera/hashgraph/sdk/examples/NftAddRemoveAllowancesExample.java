@@ -21,12 +21,11 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.List;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 /*
     Example for HIP-336.
@@ -51,8 +50,7 @@ public final class NftAddRemoveAllowancesExample {
     private NftAddRemoveAllowancesExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

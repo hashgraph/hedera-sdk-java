@@ -19,18 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -56,16 +45,14 @@ public class AccountAllowanceExample {
     private final PrivateKey charlieKey;
     private final AccountId charlieId;
 
-    public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         AccountAllowanceExample example = new AccountAllowanceExample();
         example.demonstrateAllowances();
         example.cleanUp();
         System.out.println("End of example");
     }
 
-    private AccountAllowanceExample()
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+    private AccountAllowanceExample() throws Exception {
         client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

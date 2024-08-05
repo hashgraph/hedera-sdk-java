@@ -21,32 +21,13 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCreateFlow;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -98,7 +79,7 @@ public class ContractHelper {
         String filename,
         ContractFunctionParameters constructorParameters,
         Client client
-    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
+    ) throws Exception {
         contractId = Objects.requireNonNull(new ContractCreateFlow()
             .setBytecode(getBytecodeHex(filename))
             .setMaxChunks(30)

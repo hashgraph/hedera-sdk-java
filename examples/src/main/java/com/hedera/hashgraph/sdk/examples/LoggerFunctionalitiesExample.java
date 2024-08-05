@@ -25,7 +25,6 @@ import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class LoggerFunctionalitiesExample {
 
@@ -34,7 +33,7 @@ public class LoggerFunctionalitiesExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         var debugLogger = new Logger(LogLevel.DEBUG);
         var infoLogger = new Logger(LogLevel.INFO);
 

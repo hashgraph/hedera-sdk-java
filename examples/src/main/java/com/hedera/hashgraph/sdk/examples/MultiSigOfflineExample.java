@@ -20,24 +20,11 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class MultiSigOfflineExample {
 
@@ -51,8 +38,7 @@ public final class MultiSigOfflineExample {
     private MultiSigOfflineExample() {
     }
 
-    public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InvalidProtocolBufferException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for

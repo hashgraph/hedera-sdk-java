@@ -23,11 +23,9 @@ import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class GetAccountBalanceExample {
 
@@ -40,7 +38,7 @@ public final class GetAccountBalanceExample {
     private GetAccountBalanceExample() {
     }
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Because AccountBalanceQuery is a free query, we can make it without setting an operator on the client.
