@@ -23,6 +23,8 @@ import com.google.common.io.ByteStreams;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -156,6 +158,44 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
         }
 
         return this;
+    }
+
+    void setAddressBook(NodeAddressBook addressBook) {
+        Map<AccountId, NodeAddress> newAddressBook = addressBook.getNodeAddresses().stream()
+            .filter(nodeAddress -> Objects.nonNull(nodeAddress.getAccountId()))
+            .collect(Collectors.toMap(NodeAddress::getAccountId, Function.identity(),
+                /*
+                * Here we index by AccountId ignoring any subsequent entries with the same AccountId.
+                *
+                * Currently, this seems to be needed when reloading predefined address book for testnet which contains
+                * multiple entries with the same AccountId.
+                *
+                * If it becomes necessary to better handle such cases, either the one-to-one mapping from AccountId to
+                * single NodeAddress should be abandoned or NodeAddresses with the same AccountId may need to be merged.
+                * */
+                (a, b) -> a));
+        /*
+        * Here we preserve the certificate hash in the case where one is previously defined and no new one is provided.
+        *
+        * Currently, this seems to be needed since the downloaded address book lacks the certificate hash. However,
+        * it is expected the certificate hash will be provided in the future in which case this workaround will no
+        * longer be necessary.
+        * */
+        if (null != this.addressBook) {
+            for (Map.Entry<AccountId, NodeAddress> entry : newAddressBook.entrySet()) {
+                NodeAddress previous = this.addressBook.get(entry.getKey());
+                if (null != previous) {
+                    ByteString certHash = entry.getValue().getCertHash();
+                    if (null == certHash || certHash.isEmpty()) {
+                        entry.getValue().setCertHash(previous.certHash);
+                    }
+                }
+            }
+        }
+        this.addressBook = newAddressBook;
+        for (var node : nodes) {
+            node.setAddressBookEntry(this.addressBook.get(node.getAccountId()));
+        }
     }
 
     @Nullable
