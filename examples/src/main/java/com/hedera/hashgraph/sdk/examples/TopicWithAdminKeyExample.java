@@ -51,6 +51,8 @@ class TopicWithAdminKeyExample {
 
     private PrivateKey[] initialAdminKeys;
 
+    private PrivateKey[] newAdminKeys;
+
     private TopicWithAdminKeyExample() throws InterruptedException {
         setupHapiClient();
     }
@@ -64,7 +66,7 @@ class TopicWithAdminKeyExample {
 
         updateTopicAdminKeyAndMemo();
 
-        hapiClient.close();
+        cleanUp();
     }
 
     private void setupHapiClient() throws InterruptedException {
@@ -105,7 +107,7 @@ class TopicWithAdminKeyExample {
     private void updateTopicAdminKeyAndMemo() throws Exception {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
-        PrivateKey[] newAdminKeys = new PrivateKey[4];
+        newAdminKeys = new PrivateKey[4];
         Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
 
         KeyList thresholdKey = KeyList.withThreshold(3);
@@ -138,5 +140,20 @@ class TopicWithAdminKeyExample {
 
         TopicInfo topicInfo = new TopicInfoQuery().setTopicId(topicId).execute(hapiClient);
         System.out.println(topicInfo);
+    }
+
+    private void cleanUp() throws Exception {
+        var topicDeleteTransaction = new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .freezeWith(hapiClient);
+
+        Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
+            System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
+            topicDeleteTransaction.sign(k);
+        });
+
+        topicDeleteTransaction.execute(hapiClient).getReceipt(hapiClient);
+
+        hapiClient.close();
     }
 }

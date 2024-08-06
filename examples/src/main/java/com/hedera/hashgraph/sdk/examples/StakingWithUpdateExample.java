@@ -100,6 +100,15 @@ public class StakingWithUpdateExample {
 
         System.out.println("staking info: " + info.stakingInfo);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(newKey)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

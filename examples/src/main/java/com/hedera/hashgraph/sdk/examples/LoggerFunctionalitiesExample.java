@@ -52,36 +52,70 @@ public class LoggerFunctionalitiesExample {
             .setTransactionMemo("")
             .execute(client);
 
-        new TopicCreateTransaction()
+        var topicId1 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Set the level of the `infoLogger` from `info` to `error`
         infoLogger.setLevel(LogLevel.ERROR);
 
         // This should not display any logs because currently there are no `warn` logs predefined in the SDK
-        new TopicCreateTransaction()
+        var topicId2 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Silence the `debugLogger` - no logs should be shown
         // This can also be achieved by calling `.setLevel(LogLevel.Silent)`
         debugLogger.setSilent(true);
 
-        new TopicCreateTransaction()
+        var topicId3 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Unsilence the `debugLogger` - applies back the old log level before silencing
         debugLogger.setSilent(false);
 
-        new TopicCreateTransaction()
+        var topicId4 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
-            .execute(client);
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
+
+        // Clean up
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId1)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId2)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId3)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId4)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

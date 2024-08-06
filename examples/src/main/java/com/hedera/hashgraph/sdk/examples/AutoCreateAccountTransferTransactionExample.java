@@ -22,9 +22,7 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class AutoCreateAccountTransferTransactionExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -141,6 +139,7 @@ public class AutoCreateAccountTransferTransactionExample {
          *     - To enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction
          */
         TransactionReceipt receipt2 = new TopicCreateTransaction()
+            .setAdminKey(publicKey)
             .setTransactionId(TransactionId.generate(newAccountId))
             .setTopicMemo("Memo")
             .freezeWith(client)
@@ -159,6 +158,22 @@ public class AutoCreateAccountTransferTransactionExample {
             .execute(client);
 
         System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setTransferAccountId(OPERATOR_ID)
+            .setAccountId(newAccountId)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(receipt2.topicId)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

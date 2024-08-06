@@ -192,6 +192,30 @@ public final class ExemptCustomFeesExample {
         System.out.println("Second account balance after TransferTransaction: " + secondAccountBalanceAfter);
         System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(firstAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(secondAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(thirdAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

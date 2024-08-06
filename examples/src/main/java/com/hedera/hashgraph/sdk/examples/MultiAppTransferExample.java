@@ -124,6 +124,23 @@ public final class MultiAppTransferExample {
         System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(exchangeAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(exchangeKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(userAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(userKey)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 

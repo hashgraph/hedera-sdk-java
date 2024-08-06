@@ -59,8 +59,8 @@ public class SignTransactionExample {
 
         @Var
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
-
-        System.out.println("account id = " + receipt.accountId);
+        var accountId = receipt.accountId;
+        System.out.println("account id = " + accountId);
 
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
@@ -76,6 +76,16 @@ public class SignTransactionExample {
         receipt = result.getReceipt(client);
 
         System.out.println(receipt.status);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(user1Key)
+            .sign(user2Key)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

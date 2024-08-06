@@ -155,6 +155,8 @@ public class ScheduleIdenticalTransactionExample {
 
         System.out.println(new ScheduleInfoQuery().setScheduleId(scheduleID).execute(client));
 
+        // Clean up
+
         AccountDeleteTransaction thresholdDeleteTx = new AccountDeleteTransaction()
             .setAccountId(thresholdAccount)
             .setTransferAccountId(OPERATOR_ID)
@@ -176,5 +178,9 @@ public class ScheduleIdenticalTransactionExample {
             .getReceipt(client);
 
         client.close();
+
+        for (Client loopClient : clients) {
+            loopClient.close();
+        }
     }
 }

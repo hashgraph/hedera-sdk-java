@@ -124,6 +124,17 @@ public class ScheduledTransactionMultiSigThresholdExample {
             .execute(client);
         System.out.println(recordScheduledTx);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(multiSigAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKeys[0])
+            .sign(privateKeys[1])
+            .sign(privateKeys[2])
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 

@@ -85,6 +85,7 @@ public class ContractHelper {
             .setMaxChunks(30)
             .setGas(8_000_000)
             .setConstructorParameters(constructorParameters)
+            .setAdminKey(client.getOperatorPublicKey())
             .execute(client)
             .getReceipt(client)
             .contractId);

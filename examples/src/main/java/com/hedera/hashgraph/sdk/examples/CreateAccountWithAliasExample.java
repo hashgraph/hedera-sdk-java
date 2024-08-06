@@ -108,6 +108,13 @@ public class CreateAccountWithAliasExample {
             throw new Exception("The new account doesn't have alias");
         }
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

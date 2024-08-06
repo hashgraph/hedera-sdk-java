@@ -97,6 +97,16 @@ public final class CreateAccountThresholdKeyExample {
 
         System.out.println("account balance after transfer: " + balanceAfter);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setTransferAccountId(OPERATOR_ID)
+            .setAccountId(newAccountId)
+            .freezeWith(client)
+            .sign(privateKeys[0])
+            .sign(privateKeys[1])
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

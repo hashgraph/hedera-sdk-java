@@ -88,6 +88,15 @@ public final class UpdateAccountPublicKeyExample {
 
         System.out.println("key = " + info.key);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(key2)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

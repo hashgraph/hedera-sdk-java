@@ -106,6 +106,15 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
             throw new Exception("The new account doesn't have alias");
         }
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(adminKey)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

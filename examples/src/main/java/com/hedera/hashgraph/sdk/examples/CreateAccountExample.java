@@ -63,6 +63,15 @@ public final class CreateAccountExample {
 
         System.out.println("account = " + newAccountId);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setTransferAccountId(OPERATOR_ID)
+            .setAccountId(newAccountId)
+            .freezeWith(client)
+            .sign(newKey)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

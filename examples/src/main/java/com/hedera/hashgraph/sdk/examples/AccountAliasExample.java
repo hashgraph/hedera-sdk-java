@@ -126,6 +126,16 @@ public class AccountAliasExample {
         System.out.println("The alias key: " + info.aliasKey);
 
         System.out.println("Example complete!");
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(info.accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

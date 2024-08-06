@@ -58,6 +58,7 @@ public final class ConsensusPubSubChunkedExample {
         // make a new topic ID to use
         TopicId newTopicId = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
             .setSubmitKey(submitKey)
             .execute(client)
             .getReceipt(client)
@@ -114,8 +115,15 @@ public final class ConsensusPubSubChunkedExample {
 
         boolean largeMessageReceived = largeMessageLatch.await(60, TimeUnit.SECONDS);
 
+        // Clean up
+        new TopicDeleteTransaction()
+            .setTopicId(newTopicId)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
 
+        // Edge case
         if (!largeMessageReceived) {
             throw new TimeoutException("Large topic message was not received!");
         }

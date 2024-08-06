@@ -62,13 +62,14 @@ public class ConsensusPubSubWithSubmitKeyExample {
 
     public void execute() throws Exception {
         createTopicWithSubmitKey();
+
         Thread.sleep(5_000);
 
         subscribeToTopic();
 
         publishMessagesToTopic();
 
-        client.close();
+        cleanUp();
     }
 
     private void setupClient() throws InterruptedException {
@@ -92,6 +93,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
@@ -142,5 +144,14 @@ public class ConsensusPubSubWithSubmitKeyExample {
         }
 
         Thread.sleep(10_000);
+    }
+
+    private void cleanUp() throws Exception {
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

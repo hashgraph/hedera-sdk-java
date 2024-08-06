@@ -46,7 +46,10 @@ public final class CreateTopicExample {
         // Create three accounts, Alice, Bob, and Charlie.  Alice will be the treasury for our example token.
         // Fees only apply in transactions not involving the treasury, so we need two other accounts.
 
-        TransactionResponse createResponse = new TopicCreateTransaction().execute(client);
+        TransactionResponse createResponse = new TopicCreateTransaction()
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .execute(client);
+
         TransactionReceipt createReceipt = createResponse.getReceipt(client);
 
         System.out.println("topic id = " + createReceipt.topicId);
@@ -59,6 +62,12 @@ public final class CreateTopicExample {
         TransactionReceipt sendReceipt = sendResponse.getReceipt(client);
 
         System.out.println("topic sequence number = " + sendReceipt.topicSequenceNumber);
+
+        // Clean up
+        new TopicDeleteTransaction()
+            .setTopicId(createReceipt.topicId)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

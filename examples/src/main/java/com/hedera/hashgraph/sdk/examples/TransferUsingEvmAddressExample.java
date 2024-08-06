@@ -120,7 +120,8 @@ public class TransferUsingEvmAddressExample {
          * Use the hollow account as a transaction fee payer in a HAPI transaction
          */
         client.setOperator(newAccountId, privateKey);
-        PublicKey newPublicKey = PrivateKey.generateED25519().getPublicKey();
+        PrivateKey newPrivateKey = PrivateKey.generateED25519();
+        PublicKey newPublicKey = newPrivateKey.getPublicKey();
 
         AccountCreateTransaction transaction = new AccountCreateTransaction()
             .setKey(newPublicKey)
@@ -133,6 +134,7 @@ public class TransferUsingEvmAddressExample {
         AccountCreateTransaction transactionSign = transaction.sign(privateKey);
         TransactionResponse transactionSubmit = transactionSign.execute(client);
         TransactionReceipt status = transactionSubmit.getReceipt(client);
+        var accountId = status.accountId;
         System.out.println(status);
 
         /*
@@ -144,6 +146,26 @@ public class TransferUsingEvmAddressExample {
             .execute(client);
 
         System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+
+        // Clean up
+
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(newPrivateKey)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

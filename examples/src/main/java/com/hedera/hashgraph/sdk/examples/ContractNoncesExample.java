@@ -67,7 +67,7 @@ public final class ContractNoncesExample {
 
         System.out.println("contractNonces = " + contractNonces);
 
-        // now delete the contract
+        // Clean up
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(contractId)
             .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)

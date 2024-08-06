@@ -77,6 +77,7 @@ public final class NftAddRemoveAllowancesExample {
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(OPERATOR_KEY)
             .setSupplyKey(OPERATOR_KEY)
+            .setWipeKey(OPERATOR_KEY)
             .freezeWith(client)
             .execute(client)
             .getReceipt(client);
@@ -204,6 +205,7 @@ public final class NftAddRemoveAllowancesExample {
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(OPERATOR_KEY)
             .setSupplyKey(OPERATOR_KEY)
+            .setWipeKey(OPERATOR_KEY)
             .freezeWith(client)
             .execute(client)
             .getReceipt(client);
@@ -346,6 +348,69 @@ public final class NftAddRemoveAllowancesExample {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
+
+        // Clean up
+
+        new TokenWipeTransaction()
+            .setTokenId(nftTokenId)
+            .addSerial(1)
+            .setAccountId(receiverAccountId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenWipeTransaction()
+            .setTokenId(nftTokenId2)
+            .addSerial(1)
+            .addSerial(3)
+            .setAccountId(receiverAccountId2)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(spenderAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(spenderKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(receiverAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(receiverKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(delegatingSpenderAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(delegatingSpenderKey2)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(receiverAccountId2)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(receiverKey2)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(nftTokenId)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(nftTokenId2)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

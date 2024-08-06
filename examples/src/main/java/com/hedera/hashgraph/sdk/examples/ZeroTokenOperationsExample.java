@@ -128,6 +128,22 @@ public final class ZeroTokenOperationsExample {
 
         System.out.println("All steps completed with valid results.");
 
+        // Clean up
+
+        new AccountDeleteTransaction()
+            .setAccountId(aliceAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new ContractDeleteTransaction()
+            .setContractId(contractHelper.contractId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

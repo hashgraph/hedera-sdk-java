@@ -63,6 +63,8 @@ public final class CreateStatefulContractExample {
         System.out.println("contract bytecode file: " + newFileId);
 
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
+            // set an admin key so we can delete the contract later
+            .setAdminKey(OPERATOR_KEY)
             .setBytecodeFileId(newFileId)
             .setGas(500_000)
             .setConstructorParameters(
@@ -115,6 +117,19 @@ public final class CreateStatefulContractExample {
 
         String message2 = contractUpdateResult.getString(0);
         System.out.println("contract returned message: " + message2);
+
+        // now delete the contract
+        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
+            .setContractId(newContractId)
+            .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
+            .setMaxTransactionFee(new Hbar(1))
+            .execute(client)
+            .getReceipt(client);
+
+        if (contractDeleteResult.status != Status.SUCCESS) {
+            throw new Exception("error deleting contract: " + contractDeleteResult.status);
+        }
+        System.out.println("Contract successfully deleted");
 
         client.close();
     }

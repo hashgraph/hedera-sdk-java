@@ -19,17 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenKeyValidation;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.util.Objects;
 
 public class ChangeRemoveTokenKeys {
@@ -162,6 +154,9 @@ public class ChangeRemoveTokenKeys {
         var supplyKeyAfterRemoval = (PublicKey) tokenInfoAfterSupplyKeyRemoval.supplyKey;
 
         System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
+
+        // Clean up
+        // Can't delete a token as it is immutable
 
         client.close();
     }

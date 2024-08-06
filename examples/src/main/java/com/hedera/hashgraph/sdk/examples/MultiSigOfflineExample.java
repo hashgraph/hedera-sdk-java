@@ -65,8 +65,9 @@ public final class MultiSigOfflineExample {
 
         @Var
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
+        var newAccountId = receipt.accountId;
 
-        System.out.println("account id = " + receipt.accountId);
+        System.out.println("account id = " + newAccountId);
 
         // create a transfer from new account to 0.0.3
         TransferTransaction transferTransaction = new TransferTransaction()
@@ -91,6 +92,16 @@ public final class MultiSigOfflineExample {
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
         System.out.println(receipt.status);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(user1Key)
+            .sign(user2Key)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

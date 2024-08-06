@@ -78,7 +78,7 @@ public final class TransferTokensExample {
 
         AccountId accountId2 = Objects.requireNonNull(receipt.accountId);
 
-        System.out.println("accountId2 = " + accountId1);
+        System.out.println("accountId2 = " + accountId2);
 
         response = new TokenCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -170,6 +170,8 @@ public final class TransferTokensExample {
             .getReceipt(client);
 
         System.out.println("Sent 10 tokens from account " + accountId2 + " to account " + accountId1 + " on token " + tokenId);
+
+        // Clean up
 
         new TokenWipeTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))

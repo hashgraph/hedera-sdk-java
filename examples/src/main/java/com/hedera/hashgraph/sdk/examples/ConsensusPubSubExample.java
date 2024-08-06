@@ -48,6 +48,7 @@ class ConsensusPubSubExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()
+            .setAdminKey(OPERATOR_KEY.getPublicKey())
             .execute(client);
 
         TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);
@@ -56,7 +57,7 @@ class ConsensusPubSubExample {
 
         System.out.println("New topic created: " + topicId);
 
-        Thread.sleep(5000);
+        Thread.sleep(5_000);
 
         new TopicMessageQuery()
             .setTopicId(topicId)
@@ -78,6 +79,12 @@ class ConsensusPubSubExample {
         }
 
         boolean allMessagesReceived = messagesLatch.await(30, TimeUnit.SECONDS);
+
+        // Clean up
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
 

@@ -60,6 +60,12 @@ public final class CreateFileExample {
 
         System.out.println("file: " + newFileId);
 
+        // Clean up
+        new FileDeleteTransaction()
+            .setFileId(newFileId)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

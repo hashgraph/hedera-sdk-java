@@ -109,6 +109,15 @@ public final class ScheduleExample {
 
         System.out.println("https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(key1)
+            .sign(key2)
+            .execute(client);
+
         client.close();
     }
 }

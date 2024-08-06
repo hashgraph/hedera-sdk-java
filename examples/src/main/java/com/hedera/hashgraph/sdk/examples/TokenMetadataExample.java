@@ -19,14 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -110,6 +105,14 @@ public class TokenMetadataExample {
 
         // check that metadata was updated correctly
         System.out.println("Mutable token's metadata after update: " + Arrays.toString(tokenInfoAfterMetadataUpdate.metadata));
+
+        // Clean up
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId)
+            .freezeWith(client)
+            .sign(ADMIN_KEY)
+            .execute(client)
+            .getReceipt(client);
     }
 
     private void updateImmutableTokenMetadata() throws Exception {
@@ -153,6 +156,8 @@ public class TokenMetadataExample {
 
         // check that metadata was updated correctly
         System.out.println("Immutable token's metadata after update: " + Arrays.toString(tokenInfoAfterMetadataUpdate.metadata));
+
+        // Clean up impossible as token is immutable
     }
 
     private void cleanUp() throws Exception {

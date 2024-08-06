@@ -81,6 +81,12 @@ public class FileAppendChunkedExample {
 
         System.out.println("File size according to `FileInfoQuery`: " + info.size);
 
+        // Clean up
+        new FileDeleteTransaction()
+            .setFileId(newFileId)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }

@@ -67,6 +67,12 @@ public final class GetFileContentsExample {
         // Prints query results to console
         System.out.println("File content query results: " + contents.toStringUtf8());
 
+        // Clean up
+        new FileDeleteTransaction()
+            .setFileId(newFileId)
+            .execute(client)
+            .getReceipt(client);
+
         client.close();
     }
 }
