@@ -19,17 +19,13 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 /*
 This example just instantiates the solidity contract
@@ -64,7 +60,6 @@ public class SolidityPrecompileExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // We need a new account for the contract to interact with in some of its steps
-
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
@@ -76,7 +71,6 @@ public class SolidityPrecompileExample {
         );
 
         // Instantiate ContractHelper
-
         ContractHelper contractHelper = new ContractHelper(
             "precompile-example/PrecompileExample.json",
             new ContractFunctionParameters()
@@ -85,8 +79,40 @@ public class SolidityPrecompileExample {
             client
         );
 
-        // Configure steps in ContracHelper
+        // Update the signer to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(OPERATOR_ID)
+            .setKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+            .execute(client)
+            .getReceipt(client);
 
+        // Update the Alice account to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(aliceAccountId)
+            .setKey(KeyList.of(alicePublicKey, contractHelper.contractId).setThreshold(1))
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        Consumer<String> additionalLogic = tokenAddress -> {
+            try {
+                var tokenUpdateTransactionReceipt = new TokenUpdateTransaction()
+                    .setTokenId(TokenId.fromSolidityAddress(tokenAddress))
+                    .setAdminKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+                    .setSupplyKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+                    .freezeWith(client)
+                    .sign(alicePrivateKey)
+                    .execute(client)
+                    .getReceipt(client);
+
+                System.out.println("Status of Token Update Transaction: " + tokenUpdateTransactionReceipt.status);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        // Configure steps in ContractHelper
         contractHelper
             .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
@@ -103,6 +129,7 @@ public class SolidityPrecompileExample {
             // Because we're setting the adminKey for the created NFT token to Alice's key,
             // Alice must sign the ContractExecuteTransaction.
             .addSignerForStep(11, alicePrivateKey)
+            .setStepLogic(11, additionalLogic)
             // and Alice must sign for minting because her key is the supply key.
             .addSignerForStep(12, alicePrivateKey)
             .setParameterSupplierForStep(12, () -> {
