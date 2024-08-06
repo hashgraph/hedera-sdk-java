@@ -43,6 +43,7 @@ public class TransactionReceiptTest {
             ScheduleId.fromString("1.1.1"),
             TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
             List.of(1L, 2L, 3L),
+            1,
             new ArrayList<>(),
             new ArrayList<>()
         );

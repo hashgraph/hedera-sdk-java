@@ -29,10 +29,13 @@ import java.util.Objects;
  * Utility class used internally by the sdk.
  */
 public class Endpoint implements Cloneable {
+
     @Nullable
     IPv4Address address = null;
 
     int port;
+
+    String domainName = "";
 
     /**
      * Constructor.
@@ -55,7 +58,8 @@ public class Endpoint implements Cloneable {
 
         return new Endpoint()
             .setAddress(IPv4Address.fromProtobuf(serviceEndpoint.getIpAddressV4()))
-            .setPort(port);
+            .setPort(port)
+            .setDomainName(serviceEndpoint.getDomainName());
     }
 
     /**
@@ -100,6 +104,26 @@ public class Endpoint implements Cloneable {
     }
 
     /**
+     * Extract the domain name.
+     *
+     * @return                          the domain name
+     */
+    public String getDomainName() {
+        return domainName;
+    }
+
+    /**
+     * Assign the desired domain name.
+     *
+     * @param domainName                      the desired domain name
+     * @return {@code this}
+     */
+    public Endpoint setDomainName(String domainName) {
+        this.domainName = domainName;
+        return this;
+    }
+
+    /**
      * Create the protobuf.
      *
      * @return                          the protobuf representation
@@ -111,9 +135,12 @@ public class Endpoint implements Cloneable {
             builder.setIpAddressV4(address.toProtobuf());
         }
 
+        builder.setDomainName(domainName);
+
         return builder.setPort(port).build();
     }
 
+    // TODO: revisit there is `domainName` added
     @Override
     public String toString() {
         return Objects.requireNonNull(address) +
