@@ -81,7 +81,7 @@ public final class ConsensusPubSubChunkedExample {
             });
 
         // get a large file to send
-        String bigContents = readResources("large_message.txt");
+        String bigContents = readResources("util/large_message.txt");
 
         System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
 

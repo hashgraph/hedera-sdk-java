@@ -38,7 +38,7 @@ public final class CreateSimpleContractExample {
     }
 
     public static void main(String[] args) throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
+        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 

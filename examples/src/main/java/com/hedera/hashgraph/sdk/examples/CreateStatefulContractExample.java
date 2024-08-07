@@ -37,7 +37,7 @@ public final class CreateStatefulContractExample {
     }
 
     public static void main(String[] args) throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("stateful.json");
+        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 

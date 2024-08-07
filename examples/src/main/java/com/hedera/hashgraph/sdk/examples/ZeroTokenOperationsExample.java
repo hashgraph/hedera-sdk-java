@@ -60,7 +60,7 @@ public final class ZeroTokenOperationsExample {
         AccountId aliceAccountId = response.getReceipt(client).accountId;
 
         ContractHelper contractHelper = new ContractHelper(
-            "precompile-example/ZeroTokenOperations.json",
+            "contracts/precompile/ZeroTokenOperations.json",
             new ContractFunctionParameters()
                 .addAddress(OPERATOR_ID.toSolidityAddress())
                 .addAddress(aliceAccountId.toSolidityAddress()),
