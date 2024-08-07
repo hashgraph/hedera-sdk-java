@@ -19,20 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
@@ -50,9 +37,8 @@ public final class CreateSimpleContractExample {
     private CreateSimpleContractExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
+    public static void main(String[] args) throws Exception {
+        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
@@ -60,10 +46,12 @@ public final class CreateSimpleContractExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // create the contract's bytecode file
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY)
+            .setKeys(operatorPublicKey)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
@@ -76,10 +64,10 @@ public final class CreateSimpleContractExample {
 
         // create the contract itself
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
-            .setGas(500000)
+            .setGas(500_000)
             .setBytecodeFileId(newFileId)
             // set an admin key so we can delete the contract later
-            .setAdminKey(OPERATOR_KEY)
+            .setAdminKey(operatorPublicKey)
             .setMaxTransactionFee(new Hbar(16))
             .execute(client);
 
@@ -93,7 +81,7 @@ public final class CreateSimpleContractExample {
         System.out.println("new contract ID: " + newContractId);
 
         ContractFunctionResult contractCallResult = new ContractCallQuery()
-            .setGas(500000)
+            .setGas(500_000)
             .setContractId(newContractId)
             .setFunction("greet")
             .setQueryPayment(new Hbar(1))
@@ -118,5 +106,7 @@ public final class CreateSimpleContractExample {
             throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
+
+        client.close();
     }
 }

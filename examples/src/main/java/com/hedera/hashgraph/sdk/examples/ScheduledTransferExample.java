@@ -19,21 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ScheduleCreateTransaction;
-import com.hedera.hashgraph.sdk.ScheduleId;
-import com.hedera.hashgraph.sdk.ScheduleInfo;
-import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
-import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -50,8 +36,7 @@ public final class ScheduledTransferExample {
     private ScheduledTransferExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -85,13 +70,14 @@ public final class ScheduledTransferExample {
          * executed immediately.
          */
 
-        PrivateKey bobsKey = PrivateKey.generateED25519();
+        PrivateKey bobsPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobsPublicKey = bobsPrivateKey.getPublicKey();
         AccountId bobsId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
-            .setKey(bobsKey)
+            .setKey(bobsPublicKey)
             .setInitialBalance(new Hbar(10))
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -174,7 +160,7 @@ public final class ScheduledTransferExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -195,7 +181,7 @@ public final class ScheduledTransferExample {
             .setTransferAccountId(client.getOperatorAccountId())
             .setAccountId(bobsId)
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client);
 

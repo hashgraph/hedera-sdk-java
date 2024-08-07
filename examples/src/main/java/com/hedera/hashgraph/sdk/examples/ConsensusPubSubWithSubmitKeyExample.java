@@ -19,24 +19,13 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.time.Instant;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.TimeoutException;
 
 /**
  * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
@@ -58,7 +47,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
     private final int millisBetweenMessages;
     private Client client;
     private TopicId topicId;
-    private PrivateKey submitKey;
+    private PrivateKey submitPrivateKey;
+    private PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
     public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages)
         throws InterruptedException {
@@ -67,17 +57,20 @@ public class ConsensusPubSubWithSubmitKeyExample {
         setupClient();
     }
 
-    public static void main(String[] args) throws TimeoutException, InterruptedException, PrecheckStatusException, ReceiptStatusException {
-        new ConsensusPubSubWithSubmitKeyExample(5, 2000).execute();
+    public static void main(String[] args) throws Exception {
+        new ConsensusPubSubWithSubmitKeyExample(5, 2_000).execute();
     }
 
-    public void execute() throws TimeoutException, InterruptedException, PrecheckStatusException, ReceiptStatusException {
+    public void execute() throws Exception {
         createTopicWithSubmitKey();
-        Thread.sleep(5000);
+
+        Thread.sleep(5_000);
 
         subscribeToTopic();
 
         publishMessagesToTopic();
+
+        cleanUp();
     }
 
     private void setupClient() throws InterruptedException {
@@ -94,19 +87,20 @@ public class ConsensusPubSubWithSubmitKeyExample {
      * Create a new topic with that key as the topic's submitKey; required to sign all future
      * ConsensusMessageSubmitTransactions for that topic.
      */
-    private void createTopicWithSubmitKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    private void createTopicWithSubmitKey() throws Exception {
         // Generate a Ed25519 private, public key pair
-        submitKey = PrivateKey.generateED25519();
-        PublicKey submitPublicKey = submitKey.getPublicKey();
+        submitPrivateKey = PrivateKey.generateED25519();
+        PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
+            .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
 
         topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
-        System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
+        System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitPrivateKey);
     }
 
     /**
@@ -127,7 +121,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
     /**
      * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
      */
-    private void publishMessagesToTopic() throws TimeoutException, InterruptedException, PrecheckStatusException, ReceiptStatusException {
+    private void publishMessagesToTopic() throws Exception {
         Random r = new Random();
         for (int i = 0; i < messagesToPublish; i++) {
             String message = "random message " + r.nextLong();
@@ -141,7 +135,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
 
                 // The transaction is automatically signed by the payer.
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.
-                .sign(submitKey)
+                .sign(submitPrivateKey)
 
                 .execute(client)
                 .transactionId
@@ -150,6 +144,15 @@ public class ConsensusPubSubWithSubmitKeyExample {
             Thread.sleep(millisBetweenMessages);
         }
 
-        Thread.sleep(10000);
+        Thread.sleep(10_000);
+    }
+
+    private void cleanUp() throws Exception {
+        new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

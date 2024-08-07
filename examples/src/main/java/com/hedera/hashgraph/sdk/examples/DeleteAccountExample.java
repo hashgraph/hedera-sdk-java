@@ -19,22 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class DeleteAccountExample {
 
@@ -48,8 +36,7 @@ public final class DeleteAccountExample {
     private DeleteAccountExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -57,15 +44,15 @@ public final class DeleteAccountExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey newKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newKey.getPublicKey();
+        PrivateKey newPrivateKey = PrivateKey.generateED25519();
+        PublicKey newPublicKey = newPrivateKey.getPublicKey();
 
-        System.out.println("private key = " + newKey);
+        System.out.println("private key = " + newPrivateKey);
         System.out.println("public key = " + newPublicKey);
 
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             // The only _required_ property here is `key`
-            .setKey(newKey)
+            .setKey(newPublicKey)
             .setInitialBalance(new Hbar(2))
             .execute(client);
 
@@ -82,8 +69,10 @@ public final class DeleteAccountExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(newKey)
+            .sign(newPrivateKey)
             .execute(client)
             .getReceipt(client);
+
+        client.close();
     }
 }

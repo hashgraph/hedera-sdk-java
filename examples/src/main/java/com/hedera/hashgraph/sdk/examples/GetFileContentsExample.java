@@ -20,21 +20,11 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class GetFileContentsExample {
     // see `.env.sample` in the repository root for how to specify these values
@@ -47,20 +37,21 @@ public final class GetFileContentsExample {
     private GetFileContentsExample() {
     }
 
-    public static void main(String[] args)
-        throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // Content to be stored in the file
         byte[] fileContents = "Hedera is great!".getBytes(StandardCharsets.UTF_8);
 
         // Create the new file and set its properties
         TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
-            .setKeys(OPERATOR_KEY) // The public key of the owner of the file
+            .setKeys(operatorPublicKey) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
@@ -77,5 +68,13 @@ public final class GetFileContentsExample {
 
         // Prints query results to console
         System.out.println("File content query results: " + contents.toStringUtf8());
+
+        // Clean up
+        new FileDeleteTransaction()
+            .setFileId(newFileId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

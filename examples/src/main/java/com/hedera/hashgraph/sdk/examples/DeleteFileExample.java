@@ -19,22 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class DeleteFileExample {
 
@@ -48,20 +36,21 @@ public final class DeleteFileExample {
     private DeleteFileExample() {
     }
 
-    public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
-            .setKeys(OPERATOR_KEY)
+            .setKeys(operatorPublicKey)
             .setContents(fileContents)
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
@@ -86,6 +75,8 @@ public final class DeleteFileExample {
             .execute(client);
 
         // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
+        // double check this comment
 
+        client.close();
     }
 }

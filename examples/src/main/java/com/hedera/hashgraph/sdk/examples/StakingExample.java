@@ -19,19 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class StakingExample {
 
@@ -45,8 +36,7 @@ public class StakingExample {
     private StakingExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -54,10 +44,11 @@ public class StakingExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Create Alice account
-        PrivateKey newKey = PrivateKey.generateED25519();
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
-        System.out.println("private key: " + newKey);
-        System.out.println("public key: " + newKey.getPublicKey());
+        System.out.println("private key: " + alicePrivateKey);
+        System.out.println("public key: " + alicePublicKey);
 
         // Create an account and stake to an acount ID
         // In this case we're staking to account ID 3 which happens to be
@@ -65,7 +56,7 @@ public class StakingExample {
         // If you really want to stake to node 0, you should use
         // `.setStakedNodeId()` instead
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(newKey)
+            .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
             .setStakedAccountId(AccountId.fromString("0.0.3"))
             .execute(client)
@@ -77,12 +68,8 @@ public class StakingExample {
         // Show the required key used to sign the account update transaction to
         // stake the accounts hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different
-        System.out.println(
-            "key required to update staking information: " + newKey.getPublicKey()
-        );
-        System.out.println(
-            "fee payer aka operator key: " + client.getOperatorPublicKey()
-        );
+        System.out.println("key required to update staking information: " + alicePublicKey);
+        System.out.println("fee payer aka operator key: " + client.getOperatorPublicKey());
 
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
@@ -91,6 +78,15 @@ public class StakingExample {
             .execute(client);
 
         System.out.println("staking info: " + info.stakingInfo);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
     }

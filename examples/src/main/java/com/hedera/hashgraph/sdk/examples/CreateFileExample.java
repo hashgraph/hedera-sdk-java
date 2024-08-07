@@ -19,20 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class CreateFileExample {
 
@@ -46,13 +36,14 @@ public final class CreateFileExample {
     private CreateFileExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
@@ -60,7 +51,7 @@ public final class CreateFileExample {
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY.getPublicKey())
+            .setKeys(operatorPublicKey)
             .setContents(fileContents)
             // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
             .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
@@ -70,5 +61,13 @@ public final class CreateFileExample {
         FileId newFileId = receipt.fileId;
 
         System.out.println("file: " + newFileId);
+
+        // Clean up
+        new FileDeleteTransaction()
+            .setFileId(newFileId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

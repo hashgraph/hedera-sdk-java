@@ -21,10 +21,10 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.List;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 /*
     Example for HIP-573: Blanket exemptions for custom fee collectors
@@ -49,9 +49,11 @@ public final class ExemptCustomFeesExample {
     private ExemptCustomFeesExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         /*
          * Step 1
@@ -59,9 +61,10 @@ public final class ExemptCustomFeesExample {
          */
 
         PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
         AccountId firstAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(firstAccountPrivateKey)
+            .setKey(firstAccountPublicKey)
             .freezeWith(client)
             .sign(firstAccountPrivateKey)
             .execute(client)
@@ -69,9 +72,10 @@ public final class ExemptCustomFeesExample {
             .accountId;
 
         PrivateKey secondAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey secondAccountPublicKey = secondAccountPrivateKey.getPublicKey();
         AccountId secondAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(secondAccountPrivateKey)
+            .setKey(secondAccountPublicKey)
             .freezeWith(client)
             .sign(secondAccountPrivateKey)
             .execute(client)
@@ -79,9 +83,10 @@ public final class ExemptCustomFeesExample {
             .accountId;
 
         PrivateKey thirdAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey thirdAccountPublicKey = thirdAccountPrivateKey.getPublicKey();
         AccountId thirdAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(thirdAccountPrivateKey)
+            .setKey(thirdAccountPublicKey)
             .freezeWith(client)
             .sign(thirdAccountPrivateKey)
             .execute(client)
@@ -120,9 +125,9 @@ public final class ExemptCustomFeesExample {
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAutoRenewAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY)
-            .setFreezeKey(OPERATOR_KEY)
-            .setWipeKey(OPERATOR_KEY)
+            .setAdminKey(operatorPublicKey)
+            .setFreezeKey(operatorPublicKey)
+            .setWipeKey(operatorPublicKey)
             .setInitialSupply(100_000_000)
             .setDecimals(2)
             .setCustomFees(List.of(fee1, fee2, fee3))
@@ -192,5 +197,53 @@ public final class ExemptCustomFeesExample {
         System.out.println("First account balance after TransferTransaction: " + firstAccountBalanceAfter);
         System.out.println("Second account balance after TransferTransaction: " + secondAccountBalanceAfter);
         System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
+
+        // Clean up
+
+        Map<TokenId, Long> firstAccountTokensBeforeWipe = new AccountBalanceQuery()
+            .setAccountId(firstAccountId)
+            .execute(client)
+            .tokens;
+        System.out.println("First account token balance (before wipe): " + firstAccountTokensBeforeWipe.get(tokenId));
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAmount(firstAccountTokensBeforeWipe.get(tokenId))
+            .setAccountId(firstAccountId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(firstAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(firstAccountPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(secondAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(secondAccountPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(thirdAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(thirdAccountPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(tokenId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

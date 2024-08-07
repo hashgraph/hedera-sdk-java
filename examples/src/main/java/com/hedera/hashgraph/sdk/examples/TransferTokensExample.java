@@ -20,21 +20,7 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenGrantKycTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenWipeTransaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -59,19 +45,23 @@ public final class TransferTokensExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Generate a Ed25519 private, public key pair
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        System.out.println("private key = " + key1);
-        System.out.println("public key = " + key1.getPublicKey());
-        System.out.println("private key = " + key2);
-        System.out.println("public key = " + key2.getPublicKey());
+        // Generate a Ed25519 private, public key pair
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
+
+        System.out.println("private key = " + privateKey1);
+        System.out.println("public key = " + publicKey1);
+        System.out.println("private key = " + privateKey2);
+        System.out.println("public key = " + publicKey2);
 
         @Var TransactionResponse response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
-            .setKey(key1.getPublicKey())
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setKey(publicKey1)
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client);
 
         // This will wait for the receipt to become available
@@ -83,8 +73,8 @@ public final class TransferTokensExample {
 
         response = new AccountCreateTransaction()
             // The only _required_ property here is `key`
-            .setKey(key2.getPublicKey())
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setKey(publicKey2)
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client);
 
         // This will wait for the receipt to become available
@@ -92,20 +82,20 @@ public final class TransferTokensExample {
 
         AccountId accountId2 = Objects.requireNonNull(receipt.accountId);
 
-        System.out.println("accountId2 = " + accountId1);
+        System.out.println("accountId2 = " + accountId2);
 
         response = new TokenCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setTokenName("ffff")
             .setTokenSymbol("F")
             .setDecimals(3)
-            .setInitialSupply(1000000)
+            .setInitialSupply(1_000_000)
             .setTreasuryAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
-            .setFreezeKey(OPERATOR_KEY.getPublicKey())
-            .setWipeKey(OPERATOR_KEY.getPublicKey())
-            .setKycKey(OPERATOR_KEY.getPublicKey())
-            .setSupplyKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
+            .setFreezeKey(operatorPublicKey)
+            .setWipeKey(operatorPublicKey)
+            .setKycKey(operatorPublicKey)
+            .setSupplyKey(operatorPublicKey)
             .setFreezeDefault(false)
             .execute(client);
 
@@ -118,7 +108,7 @@ public final class TransferTokensExample {
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(key1)
+            .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
 
@@ -130,7 +120,7 @@ public final class TransferTokensExample {
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(key2)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
@@ -168,7 +158,7 @@ public final class TransferTokensExample {
             .addTokenTransfer(tokenId, accountId1, -10)
             .addTokenTransfer(tokenId, accountId2, 10)
             .freezeWith(client)
-            .sign(key1)
+            .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
 
@@ -179,11 +169,13 @@ public final class TransferTokensExample {
             .addTokenTransfer(tokenId, accountId2, -10)
             .addTokenTransfer(tokenId, accountId1, 10)
             .freezeWith(client)
-            .sign(key2)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
         System.out.println("Sent 10 tokens from account " + accountId2 + " to account " + accountId1 + " on token " + tokenId);
+
+        // Clean up
 
         new TokenWipeTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -208,7 +200,7 @@ public final class TransferTokensExample {
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(key1)
+            .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
 
@@ -219,10 +211,12 @@ public final class TransferTokensExample {
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(key2)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
         System.out.println("Deleted accountId2" + accountId2);
+
+        client.close();
     }
 }

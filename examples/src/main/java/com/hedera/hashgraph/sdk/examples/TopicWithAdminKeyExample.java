@@ -19,23 +19,11 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicInfo;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
-import java.util.Arrays;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
@@ -61,21 +49,28 @@ class TopicWithAdminKeyExample {
     @Nullable
     private TopicId topicId;
 
-    private PrivateKey[] initialAdminKeys;
+    private PrivateKey[] initialAdminPrivateKeys;
+
+    private PublicKey[] initialAdminPublicKeys;
+
+    private PrivateKey[] newAdminKeys;
+
+    private PublicKey[] newAdminPublicKeys;
 
     private TopicWithAdminKeyExample() throws InterruptedException {
         setupHapiClient();
     }
 
-    public static void main(String[] args)
-        throws ReceiptStatusException, TimeoutException, PrecheckStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         new TopicWithAdminKeyExample().execute();
     }
 
-    public void execute() throws ReceiptStatusException, TimeoutException, PrecheckStatusException {
+    public void execute() throws Exception {
         createTopicWithAdminKey();
 
         updateTopicAdminKeyAndMemo();
+
+        cleanUp();
     }
 
     private void setupHapiClient() throws InterruptedException {
@@ -89,11 +84,12 @@ class TopicWithAdminKeyExample {
     private void createTopicWithAdminKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         // Generate the initial keys that are part of the adminKey's thresholdKey.
         // 3 ED25519 keys part of a 2-of-3 threshold key.
-        initialAdminKeys = new PrivateKey[3];
-        Arrays.setAll(initialAdminKeys, i -> PrivateKey.generate());
-
+        initialAdminPrivateKeys = new PrivateKey[3];
+        initialAdminPublicKeys = new PublicKey[3];
+        Arrays.setAll(initialAdminPrivateKeys, i -> PrivateKey.generate());
+        Arrays.setAll(initialAdminPublicKeys, i -> initialAdminPrivateKeys[i].getPublicKey());
         KeyList thresholdKey = KeyList.withThreshold(2);
-        Collections.addAll(thresholdKey, initialAdminKeys);
+        Collections.addAll(thresholdKey, initialAdminPublicKeys);
 
         Transaction<?> transaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
@@ -101,7 +97,7 @@ class TopicWithAdminKeyExample {
             .freezeWith(hapiClient);
 
         // Sign the transaction with 2 of 3 keys that are part of the adminKey threshold key.
-        Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
+        Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicCreateTransaction with key " + k);
             transaction.sign(k);
         });
@@ -113,14 +109,15 @@ class TopicWithAdminKeyExample {
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
     }
 
-    private void updateTopicAdminKeyAndMemo() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    private void updateTopicAdminKeyAndMemo() throws Exception {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
-        PrivateKey[] newAdminKeys = new PrivateKey[4];
+        newAdminKeys = new PrivateKey[4];
+        newAdminPublicKeys = new PublicKey[4];
         Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
-
+        Arrays.setAll(newAdminPublicKeys, i -> newAdminKeys[i].getPublicKey());
         KeyList thresholdKey = KeyList.withThreshold(3);
-        Collections.addAll(thresholdKey, newAdminKeys);
+        Collections.addAll(thresholdKey, newAdminPublicKeys);
 
         Transaction<?> transaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
@@ -129,7 +126,7 @@ class TopicWithAdminKeyExample {
             .freezeWith(hapiClient);
 
         // Sign with the initial adminKey. 2 of the 3 keys already part of the topic's adminKey.
-        Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
+        Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicUpdateTransaction with initial admin key " + k);
             transaction.sign(k);
         });
@@ -149,5 +146,20 @@ class TopicWithAdminKeyExample {
 
         TopicInfo topicInfo = new TopicInfoQuery().setTopicId(topicId).execute(hapiClient);
         System.out.println(topicInfo);
+    }
+
+    private void cleanUp() throws Exception {
+        var topicDeleteTransaction = new TopicDeleteTransaction()
+            .setTopicId(topicId)
+            .freezeWith(hapiClient);
+
+        Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
+            System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
+            topicDeleteTransaction.sign(k);
+        });
+
+        topicDeleteTransaction.execute(hapiClient).getReceipt(hapiClient);
+
+        hapiClient.close();
     }
 }

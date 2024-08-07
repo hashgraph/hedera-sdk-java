@@ -19,21 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class UpdateAccountPublicKeyExample {
 
@@ -47,8 +36,7 @@ public final class UpdateAccountPublicKeyExample {
     private UpdateAccountPublicKeyExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -59,30 +47,32 @@ public final class UpdateAccountPublicKeyExample {
 
         // First, we create a new account so we don't affect our account
 
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
 
         TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
-            .setKey(key1.getPublicKey())
+            .setKey(publicKey1)
             .setInitialBalance(new Hbar(1))
             .execute(client);
 
         System.out.println("transaction ID: " + acctTransactionResponse);
         AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
         System.out.println("account = " + accountId);
-        System.out.println("key = " + key1.getPublicKey());
+        System.out.println("key = " + privateKey1.getPublicKey());
         // Next, we update the key
 
         System.out.println(" :: update public key of account " + accountId);
-        System.out.println("set key = " + key2.getPublicKey());
+        System.out.println("set key = " + privateKey2.getPublicKey());
 
         TransactionResponse accountUpdateTransactionResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
-            .setKey(key2.getPublicKey())
+            .setKey(publicKey2)
             .freezeWith(client)
             // sign with the previous key and the new key
-            .sign(key1)
-            .sign(key2)
+            .sign(privateKey1)
+            .sign(privateKey2)
             // execute will implicitly sign with the operator
             .execute(client);
 
@@ -99,5 +89,16 @@ public final class UpdateAccountPublicKeyExample {
             .execute(client);
 
         System.out.println("key = " + info.key);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKey2)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

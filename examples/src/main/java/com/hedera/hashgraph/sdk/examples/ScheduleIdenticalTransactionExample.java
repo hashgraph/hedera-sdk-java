@@ -20,23 +20,7 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ScheduleCreateTransaction;
-import com.hedera.hashgraph.sdk.ScheduleId;
-import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
-import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
@@ -54,8 +38,7 @@ public class ScheduleIdenticalTransactionExample {
     private ScheduleIdenticalTransactionExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -65,8 +48,8 @@ public class ScheduleIdenticalTransactionExample {
         System.out.println("threshold key example");
         System.out.println("Keys:");
 
-        PrivateKey[] privKeys = new PrivateKey[3];
-        PublicKey[] pubKeys = new PublicKey[3];
+        PrivateKey[] privateKeys = new PrivateKey[3];
+        PublicKey[] publicKeys = new PublicKey[3];
         Client[] clients = new Client[3];
         AccountId[] accounts = new AccountId[3];
 
@@ -75,16 +58,18 @@ public class ScheduleIdenticalTransactionExample {
 
         // Loop to generate keys, clients, and accounts
         for (int i = 0; i < 3 ; i++) {
-            PrivateKey newKey = PrivateKey.generateED25519();
-            privKeys[i] = newKey;
-            pubKeys[i] = newKey.getPublicKey();
+            PrivateKey newPrivateKey = PrivateKey.generateED25519();
+            PublicKey newPublicKey = newPrivateKey.getPublicKey();
+
+            privateKeys[i] = newPrivateKey;
+            publicKeys[i] = newPublicKey;
 
             System.out.println("Key #" + i + ":");
-            System.out.println("private = " + privKeys[i]);
-            System.out.println("public = " + pubKeys[i]);
+            System.out.println("private = " + privateKeys[i]);
+            System.out.println("public = " + publicKeys[i]);
 
             TransactionResponse createResponse = new AccountCreateTransaction()
-                .setKey(newKey)
+                .setKey(newPublicKey)
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
@@ -92,7 +77,7 @@ public class ScheduleIdenticalTransactionExample {
             TransactionReceipt transactionReceipt = createResponse.getReceipt(client);
 
             Client newClient = ClientHelper.forName(HEDERA_NETWORK);
-            newClient.setOperator(Objects.requireNonNull(transactionReceipt.accountId), newKey);
+            newClient.setOperator(Objects.requireNonNull(transactionReceipt.accountId), newPrivateKey);
             clients[i] = newClient;
             accounts[i] = transactionReceipt.accountId;
 
@@ -102,7 +87,7 @@ public class ScheduleIdenticalTransactionExample {
         // A threshold key with a threshold of 2 and length of 3 requires
         // at least 2 of the 3 keys to sign anything modifying the account
         KeyList keyList = KeyList.withThreshold(2);
-        Collections.addAll(keyList, pubKeys);
+        Collections.addAll(keyList, publicKeys);
 
         // We are using all of these keys, so the scheduled transaction doesn't automatically go through
         // It works perfectly fine with just one key
@@ -172,18 +157,20 @@ public class ScheduleIdenticalTransactionExample {
 
         System.out.println(new ScheduleInfoQuery().setScheduleId(scheduleID).execute(client));
 
+        // Clean up
+
         AccountDeleteTransaction thresholdDeleteTx = new AccountDeleteTransaction()
             .setAccountId(thresholdAccount)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client);
 
         for (int i = 0; i < 3; i++) {
-            thresholdDeleteTx.sign(privKeys[i]);
+            thresholdDeleteTx.sign(privateKeys[i]);
             new AccountDeleteTransaction()
                 .setAccountId(accounts[i])
                 .setTransferAccountId(OPERATOR_ID)
                 .freezeWith(client)
-                .sign(privKeys[i])
+                .sign(privateKeys[i])
                 .execute(client)
                 .getReceipt(client);
         }
@@ -191,5 +178,11 @@ public class ScheduleIdenticalTransactionExample {
         thresholdDeleteTx
             .execute(client)
             .getReceipt(client);
+
+        client.close();
+
+        for (Client loopClient : clients) {
+            loopClient.close();
+        }
     }
 }

@@ -19,13 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
@@ -33,8 +27,8 @@ import java.util.Objects;
 
 /*
 This example just instantiates the solidity contract
-defined in examples/src/main/resources/precompile-example/PrecompileExample.sol, which has been
-compiled into examples/src/main/resources/precompile-example/PrecompileExample.json.
+defined in resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.sol, which has been
+compiled into resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.json.
 
 You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
 
@@ -78,7 +72,7 @@ public class SolidityPrecompileExample {
         // Instantiate ContractHelper
 
         ContractHelper contractHelper = new ContractHelper(
-            "precompile-example/PrecompileExample.json",
+            "contracts/precompile/PrecompileExample.json",
             new ContractFunctionParameters()
                 .addAddress(OPERATOR_ID.toSolidityAddress())
                 .addAddress(aliceAccountId.toSolidityAddress()),
@@ -131,5 +125,23 @@ public class SolidityPrecompileExample {
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 16, client);
 
         System.out.println("All steps completed with valid results.");
+
+        // Clean up
+
+        new AccountDeleteTransaction()
+            .setAccountId(aliceAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new ContractDeleteTransaction()
+            .setContractId(contractHelper.contractId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

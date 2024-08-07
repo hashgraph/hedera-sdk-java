@@ -20,17 +20,7 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.BufferedReader;
@@ -55,20 +45,24 @@ public final class ConsensusPubSubChunkedExample {
     private ConsensusPubSubChunkedExample() {
     }
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException, InvalidProtocolBufferException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // generate a submit key to use with the topic
-        PrivateKey submitKey = PrivateKey.generateED25519();
+        PrivateKey submitPrivateKey = PrivateKey.generateED25519();
+        PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
         // make a new topic ID to use
         TopicId newTopicId = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
-            .setSubmitKey(submitKey)
+            .setAdminKey(operatorPublicKey)
+            .setSubmitKey(submitPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
@@ -79,7 +73,7 @@ public final class ConsensusPubSubChunkedExample {
 
         // Let's wait a bit
         System.out.println("wait 10s to propagate to the mirror ...");
-        Thread.sleep(10000);
+        Thread.sleep(10_000);
 
         // setup a mirror client to print out messages as we receive them
         new TopicMessageQuery()
@@ -90,7 +84,7 @@ public final class ConsensusPubSubChunkedExample {
             });
 
         // get a large file to send
-        String bigContents = readResources("large_message.txt");
+        String bigContents = readResources("util/large_message.txt");
 
         System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
 
@@ -116,13 +110,23 @@ public final class ConsensusPubSubChunkedExample {
         System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
 
         // sign with that submit key
-        transaction.sign(submitKey);
+        transaction.sign(submitPrivateKey);
 
         // now actually submit the transaction
         // get the receipt to ensure there were no errors
         transaction.execute(client).getReceipt(client);
 
         boolean largeMessageReceived = largeMessageLatch.await(60, TimeUnit.SECONDS);
+
+        // Clean up
+        new TopicDeleteTransaction()
+            .setTopicId(newTopicId)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        // Edge case
         if (!largeMessageReceived) {
             throw new TimeoutException("Large topic message was not received!");
         }

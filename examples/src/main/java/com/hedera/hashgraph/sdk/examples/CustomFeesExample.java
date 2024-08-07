@@ -19,37 +19,13 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.CustomFee;
-import com.hedera.hashgraph.sdk.CustomFixedFee;
-import com.hedera.hashgraph.sdk.CustomFractionalFee;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenDissociateTransaction;
-import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenInfo;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
-import com.hedera.hashgraph.sdk.TokenWipeTransaction;
-import com.hedera.hashgraph.sdk.TransactionRecord;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class CustomFeesExample {
 
@@ -63,8 +39,7 @@ public final class CustomFeesExample {
     private CustomFeesExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -74,32 +49,35 @@ public final class CustomFeesExample {
         // Create three accounts, Alice, Bob, and Charlie.  Alice will be the treasury for our example token.
         // Fees only apply in transactions not involving the treasury, so we need two other accounts.
 
-        PrivateKey aliceKey = PrivateKey.generateED25519();
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(aliceKey)
+            .setKey(alicePublicKey)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
 
-        PrivateKey bobKey = PrivateKey.generateED25519();
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
         AccountId bobId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(bobKey)
+            .setKey(bobPublicKey)
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
 
-        PrivateKey charlieKey = PrivateKey.generateED25519();
+        PrivateKey charliePrivateKey = PrivateKey.generateED25519();
+        PublicKey charliePublicKey = charliePrivateKey.getPublicKey();
         AccountId charlieId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(charlieKey)
+            .setKey(charliePublicKey)
             .freezeWith(client)
-            .sign(charlieKey)
+            .sign(charliePrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -132,15 +110,15 @@ public final class CustomFeesExample {
         TokenId tokenId = new TokenCreateTransaction()
             .setTokenName("Example Token")
             .setTokenSymbol("EX")
-            .setAdminKey(aliceKey)
-            .setSupplyKey(aliceKey)
-            .setFeeScheduleKey(aliceKey)
-            .setWipeKey(aliceKey)
+            .setAdminKey(alicePublicKey)
+            .setSupplyKey(alicePublicKey)
+            .setFeeScheduleKey(alicePublicKey)
+            .setWipeKey(alicePublicKey)
             .setTreasuryAccountId(aliceId)
             .setCustomFees(hbarFeeList)
             .setInitialSupply(100)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client)
             .tokenId;
@@ -160,7 +138,7 @@ public final class CustomFeesExample {
             .setAccountId(bobId)
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -168,7 +146,7 @@ public final class CustomFeesExample {
             .setAccountId(charlieId)
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
-            .sign(charlieKey)
+            .sign(charliePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -177,7 +155,7 @@ public final class CustomFeesExample {
             .addTokenTransfer(tokenId, bobId, 100)
             .addTokenTransfer(tokenId, aliceId, -100)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -191,7 +169,7 @@ public final class CustomFeesExample {
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getRecord(client);
 
@@ -228,7 +206,7 @@ public final class CustomFeesExample {
             .setTokenId(tokenId)
             .setCustomFees(fractionalFeeList)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -249,7 +227,7 @@ public final class CustomFeesExample {
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getRecord(client);
 
@@ -283,7 +261,7 @@ public final class CustomFeesExample {
             .setWipeKey(OPERATOR_KEY)
             .setTreasuryAccountId(client.getOperatorAccountId())
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -338,7 +316,7 @@ public final class CustomFeesExample {
             .setAccountId(charlieId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
-            .sign(charlieKey)
+            .sign(charliePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -346,7 +324,7 @@ public final class CustomFeesExample {
             .setAccountId(bobId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -354,7 +332,7 @@ public final class CustomFeesExample {
             .setAccountId(aliceId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 

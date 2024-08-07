@@ -25,7 +25,6 @@ import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class LoggerFunctionalitiesExample {
 
@@ -34,7 +33,7 @@ public class LoggerFunctionalitiesExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         var debugLogger = new Logger(LogLevel.DEBUG);
         var infoLogger = new Logger(LogLevel.INFO);
 
@@ -46,6 +45,7 @@ public class LoggerFunctionalitiesExample {
         var privateKey = PrivateKey.generateED25519();
         var publicKey = privateKey.getPublicKey();
         var aliasAccountId = publicKey.toAccountId(0, 0);
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         new TransferTransaction()
             .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(-10))
@@ -53,35 +53,71 @@ public class LoggerFunctionalitiesExample {
             .setTransactionMemo("")
             .execute(client);
 
-        new TopicCreateTransaction()
+        var topicId1 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(operatorPublicKey)
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Set the level of the `infoLogger` from `info` to `error`
         infoLogger.setLevel(LogLevel.ERROR);
 
         // This should not display any logs because currently there are no `warn` logs predefined in the SDK
-        new TopicCreateTransaction()
+        var topicId2 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(operatorPublicKey)
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Silence the `debugLogger` - no logs should be shown
         // This can also be achieved by calling `.setLevel(LogLevel.Silent)`
         debugLogger.setSilent(true);
 
-        new TopicCreateTransaction()
+        var topicId3 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topic memo")
-            .execute(client);
+            .setAdminKey(operatorPublicKey)
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
 
         // Unsilence the `debugLogger` - applies back the old log level before silencing
         debugLogger.setSilent(false);
 
-        new TopicCreateTransaction()
+        var topicId4 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
-            .execute(client);
+            .setAdminKey(operatorPublicKey)
+            .execute(client)
+            .getReceipt(client)
+            .topicId;
+
+        // Clean up
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId1)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId2)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId3)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicId4)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

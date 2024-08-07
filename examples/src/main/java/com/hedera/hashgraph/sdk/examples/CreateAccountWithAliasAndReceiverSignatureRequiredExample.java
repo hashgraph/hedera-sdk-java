@@ -44,8 +44,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
     - Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
     - Get the `AccountInfo` and show that the account has contractAccountId
     */
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -56,13 +55,14 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Step 1
          * Create an ED25519 admin private key and ECSDA private key
          */
-        PrivateKey adminKey = PrivateKey.generateED25519();
+        PrivateKey adminPrivateKey = PrivateKey.generateED25519();
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
          * Step 2
-         * Extract the ECDSA public key
+         * Extract the admin public key and ECDSA public key
          */
+        PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
         PublicKey publicKey = privateKey.getPublicKey();
 
         /*
@@ -80,7 +80,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setInitialBalance(Hbar.fromTinybars(100))
-            .setKey(adminKey)
+            .setKey(adminPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);
 
@@ -88,7 +88,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Step 5
          * Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
          */
-        accountCreateTransaction.sign(adminKey).sign(privateKey);
+        accountCreateTransaction.sign(adminPrivateKey).sign(privateKey);
         AccountId newAccountId = accountCreateTransaction.execute(client).getReceipt(client).accountId;
 
         System.out.println("New account ID: " + newAccountId);
@@ -106,5 +106,16 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         } else {
             throw new Exception("The new account doesn't have alias");
         }
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(adminPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

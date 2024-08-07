@@ -98,5 +98,7 @@ public class TransactionSerializationExample {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
         System.out.println("Transfer memo: " + record.transactionMemo);
+
+        client.close();
     }
 }

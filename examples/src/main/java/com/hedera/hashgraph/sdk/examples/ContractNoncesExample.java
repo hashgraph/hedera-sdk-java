@@ -19,22 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.ContractNonceInfo;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -53,35 +40,43 @@ public final class ContractNoncesExample {
     private ContractNoncesExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        TransactionResponse fileCreateTxResponse = new FileCreateTransaction().setKeys(OPERATOR_KEY)
-            .setContents(SMART_CONTRACT_BYTECODE).setMaxTransactionFee(new Hbar(2)) // 2 HBAR
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
+            .setKeys(operatorPublicKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
             .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
 
-        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction().setAdminKey(OPERATOR_KEY)
-            .setGas(100000).setBytecodeFileId(newFileId)
-            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]").execute(client);
+        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
+            .setAdminKey(operatorPublicKey)
+            .setGas(100_000)
+            .setBytecodeFileId(newFileId)
+            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
+            .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
 
         ContractId contractId = contractCreateTxReceipt.contractId;
 
-        List<ContractNonceInfo> contractNonces = contractCreateTxResponse.getRecord(
-            client).contractFunctionResult.contractNonces;
+        List<ContractNonceInfo> contractNonces = contractCreateTxResponse.
+            getRecord(client)
+            .contractFunctionResult
+            .contractNonces;
 
         System.out.println("contractNonces = " + contractNonces);
 
-        // now delete the contract
+        // Clean up
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(contractId)
             .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)
@@ -93,5 +88,7 @@ public final class ContractNoncesExample {
             throw new Exception("error deleting contract: " + contractDeleteResult.status);
         }
         System.out.println("Contract successfully deleted");
+
+        client.close();
     }
 }

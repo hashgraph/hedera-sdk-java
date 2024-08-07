@@ -21,32 +21,13 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCreateFlow;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionRecord;
+import com.hedera.hashgraph.sdk.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeoutException;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -59,7 +40,7 @@ which is assumed to have functions named "step0()" through "stepN()".
 
 Each of these step functions is assumed to take no function parameters, and to return a Hedera ResponseCode
 which ought to be SUCCESS -- in other words, an int32 with value 22.
-See examples/src/main/resources/precompile-example/HederaResponseCodes.sol
+See resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/HederaResponseCodes.sol
 
 If a step takes function parameters, or if its ContractFunctionResult should be validated with a different method,
 the user can specify a supplier for a particular step with setParameterSupplier(stepIndex, parametersSupplier),
@@ -98,12 +79,13 @@ public class ContractHelper {
         String filename,
         ContractFunctionParameters constructorParameters,
         Client client
-    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
+    ) throws Exception {
         contractId = Objects.requireNonNull(new ContractCreateFlow()
             .setBytecode(getBytecodeHex(filename))
             .setMaxChunks(30)
             .setGas(8_000_000)
             .setConstructorParameters(constructorParameters)
+            .setAdminKey(client.getOperatorPublicKey())
             .execute(client)
             .getReceipt(client)
             .contractId);

@@ -20,13 +20,10 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
-
-import java.time.Instant;
-
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.time.Instant;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public final class ScheduleExample {
 
@@ -40,8 +37,7 @@ public final class ScheduleExample {
     private ScheduleExample() {
     }
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -49,17 +45,19 @@ public final class ScheduleExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
 
-        System.out.println("private key 1 = " + key1);
-        System.out.println("public key 1 = " + key1.getPublicKey());
-        System.out.println("private key 2 = " + key2);
-        System.out.println("public key 2 = " + key2.getPublicKey());
+        System.out.println("private key 1 = " + privateKey1);
+        System.out.println("public key 1 = " + publicKey1);
+        System.out.println("private key 2 = " + privateKey2);
+        System.out.println("public key 2 = " + publicKey2);
 
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(KeyList.of(key1.getPublicKey(), key2.getPublicKey()))
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setKey(KeyList.of(publicKey1, publicKey2))
+            .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -88,7 +86,7 @@ public final class ScheduleExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(key1)
+            .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
 
@@ -101,7 +99,7 @@ public final class ScheduleExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(key2)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
@@ -112,5 +110,16 @@ public final class ScheduleExample {
         System.out.println("The following link should query the mirror node for the scheduled transaction");
 
         System.out.println("https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId);
+
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(newAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKey1)
+            .sign(privateKey2)
+            .execute(client);
+
+        client.close();
     }
 }

@@ -20,22 +20,11 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 public class SignTransactionExample {
 
@@ -49,20 +38,21 @@ public class SignTransactionExample {
     private SignTransactionExample() {
     }
 
-    public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        PrivateKey user1Key = PrivateKey.generateED25519();
-        PrivateKey user2Key = PrivateKey.generateED25519();
+        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
+        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
+        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
+        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
 
         KeyList keylist = new KeyList();
-        keylist.add(user1Key);
-        keylist.add(user2Key);
+        keylist.add(user1PublicKey);
+        keylist.add(user2PublicKey);
 
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
@@ -71,8 +61,8 @@ public class SignTransactionExample {
 
         @Var
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
-
-        System.out.println("account id = " + receipt.accountId);
+        var accountId = receipt.accountId;
+        System.out.println("account id = " + accountId);
 
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
@@ -81,13 +71,24 @@ public class SignTransactionExample {
             .freezeWith(client);
 
         transferTransaction.signWithOperator(client);
-        user1Key.signTransaction(transferTransaction);
-        user2Key.signTransaction(transferTransaction);
+        user1PrivateKey.signTransaction(transferTransaction);
+        user2PrivateKey.signTransaction(transferTransaction);
 
         TransactionResponse result = transferTransaction.execute(client);
         receipt = result.getReceipt(client);
 
         System.out.println(receipt.status);
 
+        // Clean up
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(user1PrivateKey)
+            .sign(user2PrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }

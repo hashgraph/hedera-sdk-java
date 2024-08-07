@@ -19,20 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -49,15 +36,16 @@ public final class CreateStatefulContractExample {
     private CreateStatefulContractExample() {
     }
 
-    public static void main(String[] args)
-        throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("stateful.json");
+    public static void main(String[] args) throws Exception {
+        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
 
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         // default max fee for all transactions executed by this client
         client.setDefaultMaxTransactionFee(new Hbar(100));
@@ -66,7 +54,7 @@ public final class CreateStatefulContractExample {
         // create the contract's bytecode file
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY)
+            .setKeys(operatorPublicKey)
             .setContents(byteCodeHex)
             .execute(client);
 
@@ -77,8 +65,10 @@ public final class CreateStatefulContractExample {
         System.out.println("contract bytecode file: " + newFileId);
 
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
+            // set an admin key so we can delete the contract later
+            .setAdminKey(operatorPublicKey)
             .setBytecodeFileId(newFileId)
-            .setGas(500000)
+            .setGas(500_000)
             .setConstructorParameters(
                 new ContractFunctionParameters()
                     .addString("hello from hedera!"))
@@ -92,7 +82,7 @@ public final class CreateStatefulContractExample {
 
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("get_message")
             .setQueryPayment(new Hbar(1))
             .execute(client);
@@ -106,7 +96,7 @@ public final class CreateStatefulContractExample {
 
         TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("set_message", new ContractFunctionParameters()
                 .addString("hello from hedera again!"))
             .execute(client);
@@ -118,7 +108,7 @@ public final class CreateStatefulContractExample {
         // now query contract
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(500000)
+            .setGas(500_000)
             .setFunction("get_message")
             .setQueryPayment(new Hbar(1))
             .execute(client);
@@ -129,5 +119,20 @@ public final class CreateStatefulContractExample {
 
         String message2 = contractUpdateResult.getString(0);
         System.out.println("contract returned message: " + message2);
+
+        // now delete the contract
+        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
+            .setContractId(newContractId)
+            .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
+            .setMaxTransactionFee(new Hbar(1))
+            .execute(client)
+            .getReceipt(client);
+
+        if (contractDeleteResult.status != Status.SUCCESS) {
+            throw new Exception("error deleting contract: " + contractDeleteResult.status);
+        }
+        System.out.println("Contract successfully deleted");
+
+        client.close();
     }
 }

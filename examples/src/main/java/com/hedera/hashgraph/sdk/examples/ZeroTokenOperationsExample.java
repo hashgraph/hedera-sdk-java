@@ -22,7 +22,8 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Objects;
 
 public final class ZeroTokenOperationsExample {
 
@@ -59,7 +60,7 @@ public final class ZeroTokenOperationsExample {
         AccountId aliceAccountId = response.getReceipt(client).accountId;
 
         ContractHelper contractHelper = new ContractHelper(
-            "precompile-example/ZeroTokenOperations.json",
+            "contracts/precompile/ZeroTokenOperations.json",
             new ContractFunctionParameters()
                 .addAddress(OPERATOR_ID.toSolidityAddress())
                 .addAddress(aliceAccountId.toSolidityAddress()),
@@ -88,7 +89,7 @@ public final class ZeroTokenOperationsExample {
             .setTokenName("Black Sea LimeChain Token")
             .setTokenSymbol("BSL")
             .setTreasuryAccountId(OPERATOR_ID)
-            .setInitialSupply(10000) // Total supply = 10000 / 10 ^ 2
+            .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
             .setDecimals(2)
             .setAutoRenewAccountId(OPERATOR_ID)
             .freezeWith(client);
@@ -126,5 +127,23 @@ public final class ZeroTokenOperationsExample {
             "step 6 completed, and returned valid result. TransactionId: " + transferReceiptRecord.transactionId);
 
         System.out.println("All steps completed with valid results.");
+
+        // Clean up
+
+        new AccountDeleteTransaction()
+            .setAccountId(aliceAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new ContractDeleteTransaction()
+            .setContractId(contractHelper.contractId)
+            .setTransferAccountId(OPERATOR_ID)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
     }
 }
