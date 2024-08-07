@@ -45,16 +45,18 @@ public final class ScheduleExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
 
-        System.out.println("private key 1 = " + key1);
-        System.out.println("public key 1 = " + key1.getPublicKey());
-        System.out.println("private key 2 = " + key2);
-        System.out.println("public key 2 = " + key2.getPublicKey());
+        System.out.println("private key 1 = " + privateKey1);
+        System.out.println("public key 1 = " + publicKey1);
+        System.out.println("private key 2 = " + privateKey2);
+        System.out.println("public key 2 = " + publicKey2);
 
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(KeyList.of(key1.getPublicKey(), key2.getPublicKey()))
+            .setKey(KeyList.of(publicKey1, publicKey2))
             .setInitialBalance(Hbar.fromTinybars(1_000))
             .execute(client)
             .getReceipt(client)
@@ -84,7 +86,7 @@ public final class ScheduleExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(key1)
+            .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
 
@@ -97,7 +99,7 @@ public final class ScheduleExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(key2)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
@@ -114,8 +116,8 @@ public final class ScheduleExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(key1)
-            .sign(key2)
+            .sign(privateKey1)
+            .sign(privateKey2)
             .execute(client);
 
         client.close();

@@ -44,10 +44,11 @@ public class StakingWithUpdateExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Create Alice account
-        PrivateKey newKey = PrivateKey.generateED25519();
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
-        System.out.println("private key: " + newKey);
-        System.out.println("public key: " + newKey.getPublicKey());
+        System.out.println("private key: " + alicePrivateKey);
+        System.out.println("public key: " + alicePublicKey);
 
         // Create an account and stake to an acount ID
         // In this case we're staking to account ID 3 which happens to be
@@ -55,7 +56,7 @@ public class StakingWithUpdateExample {
         // If you really want to stake to node 0, you should use
         // `.setStakedNodeId()` instead
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(newKey)
+            .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
             .setStakedAccountId(AccountId.fromString("0.0.3"))
             .execute(client)
@@ -67,12 +68,8 @@ public class StakingWithUpdateExample {
         // Show the required key used to sign the account update transaction to
         // stake the accounts hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different
-        System.out.println(
-            "key required to update staking information: " + newKey.getPublicKey()
-        );
-        System.out.println(
-            "fee payer aka operator key: " + client.getOperatorPublicKey()
-        );
+        System.out.println("key required to update staking information: " + alicePrivateKey.getPublicKey());
+        System.out.println("fee payer aka operator key: " + client.getOperatorPublicKey());
 
         // Query the account info, it should show the staked account ID
         // to be 0.0.3 just like what we set it to
@@ -89,7 +86,7 @@ public class StakingWithUpdateExample {
             .setAccountId(newAccountId)
             .clearStakedAccountId()
             .freezeWith(client)
-            .sign(newKey)
+            .sign(alicePrivateKey)
             .execute(client);
 
         // Query the account info, it should show the staked account ID
@@ -105,7 +102,7 @@ public class StakingWithUpdateExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(newKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 

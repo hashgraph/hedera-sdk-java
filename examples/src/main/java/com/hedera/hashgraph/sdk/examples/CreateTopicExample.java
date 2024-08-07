@@ -43,11 +43,13 @@ public final class CreateTopicExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // Create three accounts, Alice, Bob, and Charlie.  Alice will be the treasury for our example token.
         // Fees only apply in transactions not involving the treasury, so we need two other accounts.
 
         TransactionResponse createResponse = new TopicCreateTransaction()
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client);
 
         TransactionReceipt createReceipt = createResponse.getReceipt(client);

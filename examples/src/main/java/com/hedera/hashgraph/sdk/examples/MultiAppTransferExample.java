@@ -34,9 +34,11 @@ public final class MultiAppTransferExample {
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     // the exchange should possess this key, we're only generating it for demonstration purposes
-    private static final PrivateKey exchangeKey = PrivateKey.generateED25519();
+    private static final PrivateKey exchangePrivateKey = PrivateKey.generateED25519();
+    private static final PublicKey exchangePublicKey = exchangePrivateKey.getPublicKey();
     // this is the only key we should actually possess
-    private static final PrivateKey userKey = PrivateKey.generateED25519();
+    private static final PrivateKey userPrivateKey = PrivateKey.generateED25519();
+    private static final PublicKey userPublicKey = userPrivateKey.getPublicKey();
     private static final Client client;
 
     static {
@@ -59,11 +61,11 @@ public final class MultiAppTransferExample {
         AccountId exchangeAccountId = new AccountCreateTransaction()
             // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
             .setReceiverSignatureRequired(true)
-            .setKey(exchangeKey)
+            .setKey(exchangePublicKey)
             // The owner key has to sign this transaction
             // when setReceiverSignatureRequired is true
             .freezeWith(client)
-            .sign(exchangeKey)
+            .sign(exchangePrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -74,7 +76,7 @@ public final class MultiAppTransferExample {
         // the user with a balance of 5 h
         AccountId userAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(5))
-            .setKey(userKey)
+            .setKey(userPublicKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -90,7 +92,7 @@ public final class MultiAppTransferExample {
             .setTransactionMemo("https://some-exchange.com/user1/account1")
             // NOTE: to manually sign, you must freeze the Transaction first
             .freezeWith(client)
-            .sign(userKey);
+            .sign(userPrivateKey);
 
         // the exchange must sign the transaction in order for it to be accepted by the network
         // assume this is some REST call to the exchange API server
@@ -129,7 +131,7 @@ public final class MultiAppTransferExample {
             .setAccountId(exchangeAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(exchangeKey)
+            .sign(exchangePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -137,7 +139,7 @@ public final class MultiAppTransferExample {
             .setAccountId(userAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(userKey)
+            .sign(userPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -145,6 +147,6 @@ public final class MultiAppTransferExample {
     }
 
     private static byte[] exchangeSignsTransaction(byte[] transactionData) throws InvalidProtocolBufferException {
-        return Transaction.fromBytes(transactionData).sign(exchangeKey).toBytes();
+        return Transaction.fromBytes(transactionData).sign(exchangePrivateKey).toBytes();
     }
 }

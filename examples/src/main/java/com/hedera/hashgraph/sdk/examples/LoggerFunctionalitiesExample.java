@@ -45,6 +45,7 @@ public class LoggerFunctionalitiesExample {
         var privateKey = PrivateKey.generateED25519();
         var publicKey = privateKey.getPublicKey();
         var aliasAccountId = publicKey.toAccountId(0, 0);
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         new TransferTransaction()
             .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(-10))
@@ -55,7 +56,7 @@ public class LoggerFunctionalitiesExample {
         var topicId1 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
@@ -67,7 +68,7 @@ public class LoggerFunctionalitiesExample {
         var topicId2 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
@@ -79,7 +80,7 @@ public class LoggerFunctionalitiesExample {
         var topicId3 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topic memo")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
@@ -90,7 +91,7 @@ public class LoggerFunctionalitiesExample {
         var topicId4 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;

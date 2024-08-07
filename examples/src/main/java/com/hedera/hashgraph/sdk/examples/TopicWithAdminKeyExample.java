@@ -49,9 +49,13 @@ class TopicWithAdminKeyExample {
     @Nullable
     private TopicId topicId;
 
-    private PrivateKey[] initialAdminKeys;
+    private PrivateKey[] initialAdminPrivateKeys;
+
+    private PublicKey[] initialAdminPublicKeys;
 
     private PrivateKey[] newAdminKeys;
+
+    private PublicKey[] newAdminPublicKeys;
 
     private TopicWithAdminKeyExample() throws InterruptedException {
         setupHapiClient();
@@ -80,11 +84,12 @@ class TopicWithAdminKeyExample {
     private void createTopicWithAdminKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         // Generate the initial keys that are part of the adminKey's thresholdKey.
         // 3 ED25519 keys part of a 2-of-3 threshold key.
-        initialAdminKeys = new PrivateKey[3];
-        Arrays.setAll(initialAdminKeys, i -> PrivateKey.generate());
-
+        initialAdminPrivateKeys = new PrivateKey[3];
+        initialAdminPublicKeys = new PublicKey[3];
+        Arrays.setAll(initialAdminPrivateKeys, i -> PrivateKey.generate());
+        Arrays.setAll(initialAdminPublicKeys, i -> initialAdminPrivateKeys[i].getPublicKey());
         KeyList thresholdKey = KeyList.withThreshold(2);
-        Collections.addAll(thresholdKey, initialAdminKeys);
+        Collections.addAll(thresholdKey, initialAdminPublicKeys);
 
         Transaction<?> transaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
@@ -92,7 +97,7 @@ class TopicWithAdminKeyExample {
             .freezeWith(hapiClient);
 
         // Sign the transaction with 2 of 3 keys that are part of the adminKey threshold key.
-        Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
+        Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicCreateTransaction with key " + k);
             transaction.sign(k);
         });
@@ -108,10 +113,11 @@ class TopicWithAdminKeyExample {
         // Generate the new keys that are part of the adminKey's thresholdKey.
         // 4 ED25519 keys part of a 3-of-4 threshold key.
         newAdminKeys = new PrivateKey[4];
+        newAdminPublicKeys = new PublicKey[4];
         Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
-
+        Arrays.setAll(newAdminPublicKeys, i -> newAdminKeys[i].getPublicKey());
         KeyList thresholdKey = KeyList.withThreshold(3);
-        Collections.addAll(thresholdKey, newAdminKeys);
+        Collections.addAll(thresholdKey, newAdminPublicKeys);
 
         Transaction<?> transaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
@@ -120,7 +126,7 @@ class TopicWithAdminKeyExample {
             .freezeWith(hapiClient);
 
         // Sign with the initial adminKey. 2 of the 3 keys already part of the topic's adminKey.
-        Arrays.stream(initialAdminKeys, 0, 2).forEach(k -> {
+        Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicUpdateTransaction with initial admin key " + k);
             transaction.sign(k);
         });

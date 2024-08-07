@@ -47,9 +47,10 @@ public class TokenRejectExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // create a treasury account
-        var treasuryAccountPrivateKey = PrivateKey.generateED25519();
+        PrivateKey treasuryAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey treasuryAccountPublicKey = treasuryAccountPrivateKey.getPublicKey();
         var treasuryAccountId = new AccountCreateTransaction()
-            .setKey(treasuryAccountPrivateKey.getPublicKey())
+            .setKey(treasuryAccountPublicKey)
             .setMaxAutomaticTokenAssociations(100)
             .freezeWith(client)
             .sign(treasuryAccountPrivateKey)
@@ -58,9 +59,10 @@ public class TokenRejectExample {
             .accountId;
 
         // create a receiver account with unlimited max auto associations
-        var receiverAccountPrivateKey = PrivateKey.generateED25519();
+        PrivateKey receiverAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey receiverAccountPublicKey = receiverAccountPrivateKey.getPublicKey();
         var receiverAccountId = new AccountCreateTransaction()
-            .setKey(receiverAccountPrivateKey.getPublicKey())
+            .setKey(receiverAccountPublicKey)
             .setMaxAutomaticTokenAssociations(-1)
             .freezeWith(client)
             .sign(receiverAccountPrivateKey)
@@ -78,7 +80,7 @@ public class TokenRejectExample {
             .setMaxSupply(1_000_000)
             .setTreasuryAccountId(treasuryAccountId)
             .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(treasuryAccountPrivateKey.getPublicKey())
+            .setAdminKey(treasuryAccountPublicKey)
             .freezeWith(client)
             .sign(treasuryAccountPrivateKey)
             .execute(client)
@@ -93,8 +95,8 @@ public class TokenRejectExample {
             .setTreasuryAccountId(treasuryAccountId)
             .setSupplyType(TokenSupplyType.FINITE)
             .setMaxSupply(3)
-            .setAdminKey(treasuryAccountPrivateKey.getPublicKey())
-            .setSupplyKey(treasuryAccountPrivateKey.getPublicKey())
+            .setAdminKey(treasuryAccountPublicKey)
+            .setSupplyKey(treasuryAccountPublicKey)
             .freezeWith(client)
             .sign(treasuryAccountPrivateKey)
             .execute(client)

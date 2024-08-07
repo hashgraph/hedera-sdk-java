@@ -51,6 +51,8 @@ public class CreateAccountWithAliasExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         /*
          * Step 1
          * Create an ECSDA private key
@@ -76,7 +78,7 @@ public class CreateAccountWithAliasExample {
          */
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setInitialBalance(Hbar.fromTinybars(100))
-            .setKey(OPERATOR_KEY)
+            .setKey(operatorPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);
 

@@ -45,6 +45,8 @@ public final class CreateStatefulContractExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // default max fee for all transactions executed by this client
         client.setDefaultMaxTransactionFee(new Hbar(100));
         client.setDefaultMaxQueryPayment(new Hbar(10));
@@ -52,7 +54,7 @@ public final class CreateStatefulContractExample {
         // create the contract's bytecode file
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY)
+            .setKeys(operatorPublicKey)
             .setContents(byteCodeHex)
             .execute(client);
 
@@ -64,7 +66,7 @@ public final class CreateStatefulContractExample {
 
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
             // set an admin key so we can delete the contract later
-            .setAdminKey(OPERATOR_KEY)
+            .setAdminKey(operatorPublicKey)
             .setBytecodeFileId(newFileId)
             .setGas(500_000)
             .setConstructorParameters(

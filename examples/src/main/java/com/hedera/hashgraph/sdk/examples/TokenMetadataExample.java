@@ -34,9 +34,13 @@ public class TokenMetadataExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final PrivateKey ADMIN_KEY = PrivateKey.generateED25519();
+    private static final PrivateKey ADMIN_KEY_PRIVATE = PrivateKey.generateED25519();
 
-    private static final PrivateKey METADATA_KEY = PrivateKey.generateED25519();
+    private static final PublicKey ADMIN_KEY_PUBLIC = ADMIN_KEY_PRIVATE.getPublicKey();
+
+    private static final PrivateKey METADATA_KEY_PRIVATE = PrivateKey.generateED25519();
+
+    private static final PublicKey METADATA_KEY_PUBLIC = METADATA_KEY_PRIVATE.getPublicKey();
 
     private static final byte[] INITIAL_TOKEN_METADATA = new byte[]{1, 1, 1, 1, 1};
 
@@ -72,10 +76,10 @@ public class TokenMetadataExample {
                 .setTokenType(TokenType.FUNGIBLE_COMMON) // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765)
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setDecimals(3)
-                .setInitialSupply(1000000)
-                .setAdminKey(ADMIN_KEY)
+                .setInitialSupply(1_000_000)
+                .setAdminKey(ADMIN_KEY_PUBLIC)
                 .freezeWith(client)
-                .sign(ADMIN_KEY)
+                .sign(ADMIN_KEY_PRIVATE)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
@@ -95,7 +99,7 @@ public class TokenMetadataExample {
             .setTokenId(tokenId)
             .setTokenMetadata(UPDATED_TOKEN_METADATA)
             .freezeWith(client)
-            .sign(ADMIN_KEY)
+            .sign(ADMIN_KEY_PRIVATE)
             .execute(client)
             .getReceipt(client);
 
@@ -110,7 +114,7 @@ public class TokenMetadataExample {
         new TokenDeleteTransaction()
             .setTokenId(tokenId)
             .freezeWith(client)
-            .sign(ADMIN_KEY)
+            .sign(ADMIN_KEY_PRIVATE)
             .execute(client)
             .getReceipt(client);
     }
@@ -124,9 +128,9 @@ public class TokenMetadataExample {
                 .setTokenMetadata(INITIAL_TOKEN_METADATA)
                 .setTokenType(TokenType.FUNGIBLE_COMMON) // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765)
                 .setTreasuryAccountId(OPERATOR_ID)
-                .setMetadataKey(METADATA_KEY)
+                .setMetadataKey(METADATA_KEY_PUBLIC)
                 .setDecimals(3)
-                .setInitialSupply(1000000)
+                .setInitialSupply(1_000_000)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
@@ -146,7 +150,7 @@ public class TokenMetadataExample {
             .setTokenId(tokenId)
             .setTokenMetadata(UPDATED_TOKEN_METADATA)
             .freezeWith(client)
-            .sign(METADATA_KEY)
+            .sign(METADATA_KEY_PRIVATE)
             .execute(client)
             .getReceipt(client);
 

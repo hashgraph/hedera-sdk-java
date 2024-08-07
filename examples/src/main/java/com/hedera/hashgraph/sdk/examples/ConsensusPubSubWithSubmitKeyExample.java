@@ -47,7 +47,8 @@ public class ConsensusPubSubWithSubmitKeyExample {
     private final int millisBetweenMessages;
     private Client client;
     private TopicId topicId;
-    private PrivateKey submitKey;
+    private PrivateKey submitPrivateKey;
+    private PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
     public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages)
         throws InterruptedException {
@@ -88,18 +89,18 @@ public class ConsensusPubSubWithSubmitKeyExample {
      */
     private void createTopicWithSubmitKey() throws Exception {
         // Generate a Ed25519 private, public key pair
-        submitKey = PrivateKey.generateED25519();
-        PublicKey submitPublicKey = submitKey.getPublicKey();
+        submitPrivateKey = PrivateKey.generateED25519();
+        PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
 
         topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
-        System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitKey);
+        System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitPrivateKey);
     }
 
     /**
@@ -134,7 +135,7 @@ public class ConsensusPubSubWithSubmitKeyExample {
 
                 // The transaction is automatically signed by the payer.
                 // Due to the topic having a submitKey requirement, additionally sign the transaction with that key.
-                .sign(submitKey)
+                .sign(submitPrivateKey)
 
                 .execute(client)
                 .transactionId

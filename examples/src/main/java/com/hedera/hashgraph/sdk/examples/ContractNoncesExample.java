@@ -47,23 +47,32 @@ public final class ContractNoncesExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        TransactionResponse fileCreateTxResponse = new FileCreateTransaction().setKeys(OPERATOR_KEY)
-            .setContents(SMART_CONTRACT_BYTECODE).setMaxTransactionFee(new Hbar(2)) // 2 HBAR
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
+            .setKeys(operatorPublicKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
             .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
 
-        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction().setAdminKey(OPERATOR_KEY)
-            .setGas(100_000).setBytecodeFileId(newFileId)
-            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]").execute(client);
+        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
+            .setAdminKey(operatorPublicKey)
+            .setGas(100_000)
+            .setBytecodeFileId(newFileId)
+            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
+            .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
 
         ContractId contractId = contractCreateTxReceipt.contractId;
 
-        List<ContractNonceInfo> contractNonces = contractCreateTxResponse.getRecord(
-            client).contractFunctionResult.contractNonces;
+        List<ContractNonceInfo> contractNonces = contractCreateTxResponse.
+            getRecord(client)
+            .contractFunctionResult
+            .contractNonces;
 
         System.out.println("contractNonces = " + contractNonces);
 

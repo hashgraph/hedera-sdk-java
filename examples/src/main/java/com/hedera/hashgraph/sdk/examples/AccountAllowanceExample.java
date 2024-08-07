@@ -36,13 +36,16 @@ public class AccountAllowanceExample {
 
     private final Client client;
 
-    private final PrivateKey aliceKey;
+    private final PrivateKey alicePrivateKey;
+    private final PublicKey alicePublicKey;
     private final AccountId aliceId;
 
-    private final PrivateKey bobKey;
+    private final PrivateKey bobPrivateKey;
+    private final PublicKey bobPublicKey;
     private final AccountId bobId;
 
-    private final PrivateKey charlieKey;
+    private final PrivateKey charliePrivateKey;
+    private final PublicKey charliePublicKey;
     private final AccountId charlieId;
 
     public static void main(String[] args) throws Exception {
@@ -62,12 +65,17 @@ public class AccountAllowanceExample {
 
         System.out.println("Generating accounts for example...");
 
-        aliceKey = PrivateKey.generateED25519();
-        bobKey = PrivateKey.generateED25519();
-        charlieKey = PrivateKey.generateED25519();
+        alicePrivateKey = PrivateKey.generateED25519();
+        alicePublicKey = alicePrivateKey.getPublicKey();
+
+        bobPrivateKey = PrivateKey.generateED25519();
+        bobPublicKey = bobPrivateKey.getPublicKey();
+
+        charliePrivateKey = PrivateKey.generateED25519();
+        charliePublicKey = charliePrivateKey.getPublicKey();
 
         aliceId = new AccountCreateTransaction()
-            .setKey(aliceKey)
+            .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
             .getReceipt(client)
@@ -75,7 +83,7 @@ public class AccountAllowanceExample {
         Objects.requireNonNull(aliceId);
 
         bobId = new AccountCreateTransaction()
-            .setKey(bobKey)
+            .setKey(bobPublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
             .getReceipt(client)
@@ -83,7 +91,7 @@ public class AccountAllowanceExample {
         Objects.requireNonNull(bobId);
 
         charlieId = new AccountCreateTransaction()
-            .setKey(charlieKey)
+            .setKey(charliePublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
             .getReceipt(client)
@@ -118,7 +126,7 @@ public class AccountAllowanceExample {
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.from(2))
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -134,7 +142,7 @@ public class AccountAllowanceExample {
             // use setTransactionId() to set the account ID that will pay the fee for the transaction.
             .setTransactionId(TransactionId.generate(bobId))
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -151,7 +159,7 @@ public class AccountAllowanceExample {
                 .addHbarTransfer(charlieId, Hbar.from(2))
                 .setTransactionId(TransactionId.generate(bobId))
                 .freezeWith(client)
-                .sign(bobKey)
+                .sign(bobPrivateKey)
                 .execute(client)
                 .getReceipt(client);
 
@@ -167,7 +175,7 @@ public class AccountAllowanceExample {
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -179,7 +187,7 @@ public class AccountAllowanceExample {
             .addHbarTransfer(charlieId, Hbar.from(2))
             .setTransactionId(TransactionId.generate(bobId))
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -192,7 +200,7 @@ public class AccountAllowanceExample {
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
     }
@@ -204,7 +212,7 @@ public class AccountAllowanceExample {
             .setAccountId(aliceId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(aliceKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -212,7 +220,7 @@ public class AccountAllowanceExample {
             .setAccountId(bobId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(bobKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -220,7 +228,7 @@ public class AccountAllowanceExample {
             .setAccountId(charlieId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(charlieKey)
+            .sign(charliePrivateKey)
             .execute(client)
             .getReceipt(client);
 

@@ -52,14 +52,17 @@ public final class ConsensusPubSubChunkedExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // generate a submit key to use with the topic
-        PrivateKey submitKey = PrivateKey.generateED25519();
+        PrivateKey submitPrivateKey = PrivateKey.generateED25519();
+        PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
         // make a new topic ID to use
         TopicId newTopicId = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
-            .setSubmitKey(submitKey)
+            .setAdminKey(operatorPublicKey)
+            .setSubmitKey(submitPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
@@ -107,7 +110,7 @@ public final class ConsensusPubSubChunkedExample {
         System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
 
         // sign with that submit key
-        transaction.sign(submitKey);
+        transaction.sign(submitPrivateKey);
 
         // now actually submit the transaction
         // get the receipt to ensure there were no errors

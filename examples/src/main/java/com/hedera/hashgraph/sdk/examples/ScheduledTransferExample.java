@@ -70,13 +70,14 @@ public final class ScheduledTransferExample {
          * executed immediately.
          */
 
-        PrivateKey bobsKey = PrivateKey.generateED25519();
+        PrivateKey bobsPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobsPublicKey = bobsPrivateKey.getPublicKey();
         AccountId bobsId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
-            .setKey(bobsKey)
+            .setKey(bobsPublicKey)
             .setInitialBalance(new Hbar(10))
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -159,7 +160,7 @@ public final class ScheduledTransferExample {
         new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -180,7 +181,7 @@ public final class ScheduledTransferExample {
             .setTransferAccountId(client.getOperatorAccountId())
             .setAccountId(bobsId)
             .freezeWith(client)
-            .sign(bobsKey)
+            .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client);
 

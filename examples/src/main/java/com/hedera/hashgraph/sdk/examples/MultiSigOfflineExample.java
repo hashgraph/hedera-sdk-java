@@ -45,18 +45,20 @@ public final class MultiSigOfflineExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        PrivateKey user1Key = PrivateKey.generateED25519();
-        PrivateKey user2Key = PrivateKey.generateED25519();
+        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
+        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
+        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
+        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
 
-        System.out.println("private key for user 1 = " + user1Key);
-        System.out.println("public key for user 1 = " + user1Key.getPublicKey());
-        System.out.println("private key for user 2 = " + user2Key);
-        System.out.println("public key for user 2 = " + user2Key.getPublicKey());
+        System.out.println("private key for user 1 = " + user1PrivateKey);
+        System.out.println("public key for user 1 = " + user1PublicKey);
+        System.out.println("private key for user 2 = " + user2PrivateKey);
+        System.out.println("public key for user 2 = " + user2PublicKey);
 
         // create a multi-sig account
         KeyList keylist = new KeyList();
-        keylist.add(user1Key);
-        keylist.add(user2Key);
+        keylist.add(user1PublicKey);
+        keylist.add(user2PublicKey);
 
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
@@ -81,13 +83,13 @@ public final class MultiSigOfflineExample {
         Transaction<?> transactionToExecute = Transaction.fromBytes(transactionBytes);
 
         // ask users to sign and return signature
-        byte[] user1Signature = user1Key.signTransaction(Transaction.fromBytes(transactionBytes));
-        byte[] user2Signature = user2Key.signTransaction(Transaction.fromBytes(transactionBytes));
+        byte[] user1Signature = user1PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
+        byte[] user2Signature = user2PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
 
         // recreate the transaction from bytes
         transactionToExecute.signWithOperator(client);
-        transactionToExecute.addSignature(user1Key.getPublicKey(), user1Signature);
-        transactionToExecute.addSignature(user2Key.getPublicKey(), user2Signature);
+        transactionToExecute.addSignature(user1PrivateKey.getPublicKey(), user1Signature);
+        transactionToExecute.addSignature(user2PrivateKey.getPublicKey(), user2Signature);
 
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
@@ -98,8 +100,8 @@ public final class MultiSigOfflineExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(user1Key)
-            .sign(user2Key)
+            .sign(user1PrivateKey)
+            .sign(user2PrivateKey)
             .execute(client)
             .getReceipt(client);
 

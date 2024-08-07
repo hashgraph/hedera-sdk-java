@@ -43,12 +43,14 @@ public final class DeleteFileExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
-            .setKeys(OPERATOR_KEY)
+            .setKeys(operatorPublicKey)
             .setContents(fileContents)
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);

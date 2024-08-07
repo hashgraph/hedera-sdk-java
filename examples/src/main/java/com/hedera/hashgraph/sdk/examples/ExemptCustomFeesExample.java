@@ -53,15 +53,18 @@ public final class ExemptCustomFeesExample {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         /*
          * Step 1
          * Create accounts A, B, and C
          */
 
         PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
         AccountId firstAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(firstAccountPrivateKey)
+            .setKey(firstAccountPublicKey)
             .freezeWith(client)
             .sign(firstAccountPrivateKey)
             .execute(client)
@@ -69,9 +72,10 @@ public final class ExemptCustomFeesExample {
             .accountId;
 
         PrivateKey secondAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey secondAccountPublicKey = secondAccountPrivateKey.getPublicKey();
         AccountId secondAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(secondAccountPrivateKey)
+            .setKey(secondAccountPublicKey)
             .freezeWith(client)
             .sign(secondAccountPrivateKey)
             .execute(client)
@@ -79,9 +83,10 @@ public final class ExemptCustomFeesExample {
             .accountId;
 
         PrivateKey thirdAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey thirdAccountPublicKey = thirdAccountPrivateKey.getPublicKey();
         AccountId thirdAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(10))
-            .setKey(thirdAccountPrivateKey)
+            .setKey(thirdAccountPublicKey)
             .freezeWith(client)
             .sign(thirdAccountPrivateKey)
             .execute(client)
@@ -120,9 +125,9 @@ public final class ExemptCustomFeesExample {
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAutoRenewAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY)
-            .setFreezeKey(OPERATOR_KEY)
-            .setWipeKey(OPERATOR_KEY)
+            .setAdminKey(operatorPublicKey)
+            .setFreezeKey(operatorPublicKey)
+            .setWipeKey(operatorPublicKey)
             .setInitialSupply(100_000_000)
             .setDecimals(2)
             .setCustomFees(List.of(fee1, fee2, fee3))

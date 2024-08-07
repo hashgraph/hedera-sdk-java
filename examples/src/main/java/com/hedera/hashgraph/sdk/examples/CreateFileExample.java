@@ -43,13 +43,15 @@ public final class CreateFileExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY.getPublicKey())
+            .setKeys(operatorPublicKey)
             .setContents(fileContents)
             // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
             .setMaxTransactionFee(new Hbar(2)) // 2 HBAR

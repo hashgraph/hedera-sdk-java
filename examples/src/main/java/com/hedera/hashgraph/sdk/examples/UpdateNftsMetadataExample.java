@@ -19,20 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.NftId;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +35,11 @@ public class UpdateNftsMetadataExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final PrivateKey METADATA_KEY = PrivateKey.generateED25519();
+    private static final PublicKey OPERATOR_KEY_PUBLIC = OPERATOR_KEY.getPublicKey();
+
+    private static final PrivateKey METADATA_KEY_PRIVATE = PrivateKey.generateED25519();
+
+    private static final PublicKey METADATA_KEY_PUBLIC = METADATA_KEY_PRIVATE.getPublicKey();
 
     private static final byte[] INITIAL_METADATA = new byte[]{1};
 
@@ -114,7 +107,7 @@ public class UpdateNftsMetadataExample {
 
         // Create an account to send the NFT to
         var accountCreateTransaction = new AccountCreateTransaction()
-            .setKey(OPERATOR_KEY)
+            .setKey(OPERATOR_KEY_PUBLIC)
             .setMaxAutomaticTokenAssociations(10) // If the account does not have any automatic token association slots open ONLY then associate the NFT to the account
             .execute(client);
 
@@ -133,7 +126,7 @@ public class UpdateNftsMetadataExample {
             .freezeWith(client);
 
         System.out.println("Updated metadata: " + Arrays.toString(tokenUpdateNftsTransaction.getMetadata()));
-        var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(METADATA_KEY).execute(client);
+        var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(METADATA_KEY_PRIVATE).execute(client);
 
         // Get receipt for update nfts metadata transaction
         var tokenUpdateNftsReceipt = tokenUpdateNftsResponse.getReceipt(client);
@@ -154,9 +147,9 @@ public class UpdateNftsMetadataExample {
             .setTokenSymbol("MUT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY)
-            .setSupplyKey(OPERATOR_KEY)
-            .setMetadataKey(METADATA_KEY)
+            .setAdminKey(OPERATOR_KEY_PUBLIC)
+            .setSupplyKey(OPERATOR_KEY_PUBLIC)
+            .setMetadataKey(METADATA_KEY_PUBLIC)
             .freezeWith(client);
     }
 
@@ -169,8 +162,8 @@ public class UpdateNftsMetadataExample {
             .setTokenSymbol("IMUT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(OPERATOR_ID)
-            .setSupplyKey(OPERATOR_KEY)
-            .setMetadataKey(METADATA_KEY)
+            .setSupplyKey(OPERATOR_KEY_PUBLIC)
+            .setMetadataKey(METADATA_KEY_PUBLIC)
             .freezeWith(client);
     }
 

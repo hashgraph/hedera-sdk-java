@@ -44,12 +44,14 @@ public final class GetFileContentsExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         // Content to be stored in the file
         byte[] fileContents = "Hedera is great!".getBytes(StandardCharsets.UTF_8);
 
         // Create the new file and set its properties
         TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
-            .setKeys(OPERATOR_KEY) // The public key of the owner of the file
+            .setKeys(operatorPublicKey) // The public key of the owner of the file
             .setContents(fileContents) // Contents of the file
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);

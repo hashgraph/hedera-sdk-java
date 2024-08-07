@@ -45,12 +45,14 @@ public class SignTransactionExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        PrivateKey user1Key = PrivateKey.generateED25519();
-        PrivateKey user2Key = PrivateKey.generateED25519();
+        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
+        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
+        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
+        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
 
         KeyList keylist = new KeyList();
-        keylist.add(user1Key);
-        keylist.add(user2Key);
+        keylist.add(user1PublicKey);
+        keylist.add(user2PublicKey);
 
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
@@ -69,8 +71,8 @@ public class SignTransactionExample {
             .freezeWith(client);
 
         transferTransaction.signWithOperator(client);
-        user1Key.signTransaction(transferTransaction);
-        user2Key.signTransaction(transferTransaction);
+        user1PrivateKey.signTransaction(transferTransaction);
+        user2PrivateKey.signTransaction(transferTransaction);
 
         TransactionResponse result = transferTransaction.execute(client);
         receipt = result.getReceipt(client);
@@ -82,8 +84,8 @@ public class SignTransactionExample {
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(user1Key)
-            .sign(user2Key)
+            .sign(user1PrivateKey)
+            .sign(user2PrivateKey)
             .execute(client)
             .getReceipt(client);
 

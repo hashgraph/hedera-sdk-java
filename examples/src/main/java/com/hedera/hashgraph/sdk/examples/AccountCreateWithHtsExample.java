@@ -46,9 +46,16 @@ public final class AccountCreateWithHtsExample {
 
         client.setDefaultMaxTransactionFee(new Hbar(10));
 
-        PrivateKey supplyKey = PrivateKey.generateECDSA();
-        PrivateKey freezeKey = PrivateKey.generateECDSA();
-        PrivateKey wipeKey = PrivateKey.generateECDSA();
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        PrivateKey supplyPrivateKey = PrivateKey.generateECDSA();
+        PublicKey supplyPublicKey = supplyPrivateKey.getPublicKey();
+
+        PrivateKey freezePrivateKey = PrivateKey.generateECDSA();
+        PublicKey freezePublicKey = freezePrivateKey.getPublicKey();
+
+        PrivateKey wipePrivateKey = PrivateKey.generateECDSA();
+        PublicKey wipePublicKey = wipePrivateKey.getPublicKey();
 
         System.out.println("Example 1");
 
@@ -72,10 +79,10 @@ public final class AccountCreateWithHtsExample {
             .setMaxSupply(CIDs.length)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(OPERATOR_KEY)
-            .setFreezeKey(freezeKey)
-            .setWipeKey(wipeKey)
-            .setSupplyKey(supplyKey)
+            .setAdminKey(operatorPublicKey)
+            .setFreezeKey(freezePublicKey)
+            .setWipeKey(wipePublicKey)
+            .setSupplyKey(supplyPublicKey)
             .freezeWith(client);
 
         // Sign the transaction with the operator key
@@ -98,7 +105,7 @@ public final class AccountCreateWithHtsExample {
                 .setMetadata(List.of(nftMetadata))
                 .freezeWith(client);
 
-            TokenMintTransaction mintTxSign = mintTx.sign(supplyKey);
+            TokenMintTransaction mintTxSign = mintTx.sign(supplyPrivateKey);
             TransactionResponse mintTxSubmit = mintTxSign.execute(client);
 
             nftCollection[i] = mintTxSubmit.getReceipt(client);
@@ -168,8 +175,8 @@ public final class AccountCreateWithHtsExample {
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAutoRenewAccountId(OPERATOR_ID)
-            .setAdminKey(OPERATOR_KEY)
-            .setWipeKey(wipeKey)
+            .setAdminKey(operatorPublicKey)
+            .setWipeKey(wipePrivateKey)
             .freezeWith(client);
 
         // Sign the transaction with the operator key
@@ -239,7 +246,7 @@ public final class AccountCreateWithHtsExample {
             .addSerial(exampleNftId)
             .setAccountId(accountId1)
             .freezeWith(client)
-            .sign(wipeKey)
+            .sign(wipePrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -257,7 +264,7 @@ public final class AccountCreateWithHtsExample {
             .setAmount(accountId2TokensBeforeWipe.get(tokenId))
             .setAccountId(accountId2)
             .freezeWith(client)
-            .sign(wipeKey)
+            .sign(wipePrivateKey)
             .execute(client)
             .getReceipt(client);
 

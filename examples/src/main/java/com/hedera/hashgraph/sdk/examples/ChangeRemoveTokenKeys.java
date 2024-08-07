@@ -46,10 +46,17 @@ public class ChangeRemoveTokenKeys {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Admin, Supply, Wipe keys
-        var adminKey = PrivateKey.generateED25519();
-        var supplyKey = PrivateKey.generateED25519();
-        var newSupplyKey = PrivateKey.generateED25519();
-        var wipeKey = PrivateKey.generateED25519();
+        PrivateKey adminPrivateKey = PrivateKey.generateED25519();
+        PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
+
+        PrivateKey supplyPrivateKey = PrivateKey.generateED25519();
+        PublicKey supplyPublicKey = supplyPrivateKey.getPublicKey();
+
+        PrivateKey newSupplyPrivateKey = PrivateKey.generateED25519();
+        PublicKey newSupplyPublicKey = newSupplyPrivateKey.getPublicKey();
+
+        PrivateKey wipePrivateKey = PrivateKey.generateED25519();
+        PublicKey wipePublicKey = wipePrivateKey.getPublicKey();
 
         // This HIP introduces ability to remove lower-privilege keys (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token:
         // - using an update with the empty KeyList;
@@ -62,11 +69,11 @@ public class ChangeRemoveTokenKeys {
                 .setTokenSymbol("ENFT")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(OPERATOR_ID)
-                .setAdminKey(adminKey.getPublicKey())
-                .setWipeKey(wipeKey.getPublicKey())
-                .setSupplyKey(supplyKey.getPublicKey())
+                .setAdminKey(adminPublicKey)
+                .setWipeKey(wipePublicKey)
+                .setSupplyKey(supplyPublicKey)
                 .freezeWith(client)
-                .sign(adminKey)
+                .sign(adminPrivateKey)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
@@ -88,7 +95,7 @@ public class ChangeRemoveTokenKeys {
             .setWipeKey(emptyKeyList)
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION) // it is by default, but we set explicitly for illustration
             .freezeWith(client)
-            .sign(adminKey)
+            .sign(adminPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -106,7 +113,7 @@ public class ChangeRemoveTokenKeys {
             .setAdminKey(emptyKeyList)
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
-            .sign(adminKey)
+            .sign(adminPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -121,11 +128,11 @@ public class ChangeRemoveTokenKeys {
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
-            .setSupplyKey(newSupplyKey)
+            .setSupplyKey(newSupplyPublicKey)
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
             .freezeWith(client)
-            .sign(supplyKey)
-            .sign(newSupplyKey)
+            .sign(supplyPrivateKey)
+            .sign(newSupplyPrivateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -143,7 +150,7 @@ public class ChangeRemoveTokenKeys {
             .setSupplyKey(PublicKey.unusableKey())
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
-            .sign(newSupplyKey)
+            .sign(newSupplyPrivateKey)
             .execute(client)
             .getReceipt(client);
 

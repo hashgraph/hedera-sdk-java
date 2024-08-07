@@ -47,8 +47,10 @@ class ConsensusPubSubExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
         TransactionResponse transactionResponse = new TopicCreateTransaction()
-            .setAdminKey(OPERATOR_KEY.getPublicKey())
+            .setAdminKey(operatorPublicKey)
             .execute(client);
 
         TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);

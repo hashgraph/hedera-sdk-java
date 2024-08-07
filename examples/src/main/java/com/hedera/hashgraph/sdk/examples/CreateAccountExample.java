@@ -44,10 +44,10 @@ public final class CreateAccountExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         // Generate a Ed25519 private, public key pair
-        PrivateKey newKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newKey.getPublicKey();
+        PrivateKey newPrivateKey = PrivateKey.generateED25519();
+        PublicKey newPublicKey = newPrivateKey.getPublicKey();
 
-        System.out.println("private key = " + newKey);
+        System.out.println("private key = " + newPrivateKey);
         System.out.println("public key = " + newPublicKey);
 
         TransactionResponse transactionResponse = new AccountCreateTransaction()
@@ -68,7 +68,7 @@ public final class CreateAccountExample {
             .setTransferAccountId(OPERATOR_ID)
             .setAccountId(newAccountId)
             .freezeWith(client)
-            .sign(newKey)
+            .sign(newPrivateKey)
             .execute(client)
             .getReceipt(client);
 
