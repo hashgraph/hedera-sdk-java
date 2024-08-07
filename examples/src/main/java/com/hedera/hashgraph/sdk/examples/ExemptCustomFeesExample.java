@@ -23,6 +23,7 @@ import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /*
@@ -193,21 +194,43 @@ public final class ExemptCustomFeesExample {
         System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
 
         // Clean up
+
+        Map<TokenId, Long> firstAccountTokensBeforeWipe = new AccountBalanceQuery()
+            .setAccountId(firstAccountId)
+            .execute(client)
+            .tokens;
+        System.out.println("First account token balance (before wipe): " + firstAccountTokensBeforeWipe.get(tokenId));
+
+        new TokenWipeTransaction()
+            .setTokenId(tokenId)
+            .setAmount(firstAccountTokensBeforeWipe.get(tokenId))
+            .setAccountId(firstAccountId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
         new AccountDeleteTransaction()
             .setAccountId(firstAccountId)
             .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(firstAccountPrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
             .setAccountId(secondAccountId)
             .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(secondAccountPrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
             .setAccountId(thirdAccountId)
             .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(thirdAccountPrivateKey)
             .execute(client)
             .getReceipt(client);
 
