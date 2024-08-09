@@ -1,3 +1,22 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountId;
@@ -15,11 +34,11 @@ import java.util.Objects;
  *
  * Class access modifier should be default (simplicity and accessibility).
  */
-class ExampleExample {
+class ExampleTemplate {
 
     // Config and util variables below
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
@@ -34,29 +53,34 @@ class ExampleExample {
     // There should be only `main` method for simplicity
     // throws only `Exception` for simplicity
     public static void main(String[] args) throws Exception {
-        // Client set up
+        /*
+         * Step 0:
+         * Create and configure SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
 
         // Steps with comments, for example:
 
         /*
-         * Step 1
-         * Create an ECSDA private key
+         * Step 1:
+         * Create an ECSDA private key.
          */
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 2
-         * Extract the ECDSA public key
+         * Step 2:
+         * Extract the ECDSA public key.
          */
         PublicKey publicKey = privateKey.getPublicKey();
 
-        // Clean up
+        /*
+         * Clean up:
+         */
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

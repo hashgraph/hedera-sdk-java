@@ -22,11 +22,9 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
 /**
  * An example of HCS topic management using a threshold key as the adminKey and going through a key rotation to a new
@@ -37,129 +35,150 @@ import java.util.concurrent.TimeoutException;
  */
 class TopicWithAdminKeyExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private Client hapiClient;
-
-    @Nullable
-    private TopicId topicId;
-
-    private PrivateKey[] initialAdminPrivateKeys;
-
-    private PublicKey[] initialAdminPublicKeys;
-
-    private PrivateKey[] newAdminKeys;
-
-    private PublicKey[] newAdminPublicKeys;
-
-    private TopicWithAdminKeyExample() throws InterruptedException {
-        setupHapiClient();
-    }
-
     public static void main(String[] args) throws Exception {
-        new TopicWithAdminKeyExample().execute();
-    }
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-    public void execute() throws Exception {
-        createTopicWithAdminKey();
-
-        updateTopicAdminKeyAndMemo();
-
-        cleanUp();
-    }
-
-    private void setupHapiClient() throws InterruptedException {
-        hapiClient = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this
-        // account and be signed by this key
-        hapiClient.setOperator(OPERATOR_ID, OPERATOR_KEY);
-    }
-
-    private void createTopicWithAdminKey() throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        // Generate the initial keys that are part of the adminKey's thresholdKey.
-        // 3 ED25519 keys part of a 2-of-3 threshold key.
-        initialAdminPrivateKeys = new PrivateKey[3];
-        initialAdminPublicKeys = new PublicKey[3];
+        /*
+         * Step 1:
+         * Generate the initial keys that are part of the adminKey's thresholdKey.
+         * Three ED25519 keys part of a 2-of-3 threshold key.
+         */
+        PrivateKey[] initialAdminPrivateKeys = new PrivateKey[3];
+        PublicKey[] initialAdminPublicKeys = new PublicKey[3];
         Arrays.setAll(initialAdminPrivateKeys, i -> PrivateKey.generate());
         Arrays.setAll(initialAdminPublicKeys, i -> initialAdminPrivateKeys[i].getPublicKey());
+
+        /*
+         * Step 2:
+         * Create the threshold key.
+         */
         KeyList thresholdKey = KeyList.withThreshold(2);
         Collections.addAll(thresholdKey, initialAdminPublicKeys);
 
-        Transaction<?> transaction = new TopicCreateTransaction()
+        /*
+         * Step 3:
+         * Create the topic create transaction with threshold key.
+         */
+        Transaction<?> topicCreateTransaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
-            .freezeWith(hapiClient);
+            .freezeWith(client);
 
-        // Sign the transaction with 2 of 3 keys that are part of the adminKey threshold key.
+        /*
+         * Step 4:
+         * Sign the topic create transaction with 2 of 3 keys that are part of the adminKey threshold key.
+         */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicCreateTransaction with key " + k);
-            transaction.sign(k);
+            topicCreateTransaction.sign(k);
         });
 
-        TransactionResponse transactionResponse = transaction.execute(hapiClient);
-
-        topicId = transactionResponse.getReceipt(hapiClient).topicId;
-
+        /*
+         * Step 5:
+         * Execute the topic create transaction.
+         */
+        TransactionResponse transactionResponse = topicCreateTransaction.execute(client);
+        TopicId topicId = transactionResponse.getReceipt(client).topicId;
         System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
-    }
 
-    private void updateTopicAdminKeyAndMemo() throws Exception {
-        // Generate the new keys that are part of the adminKey's thresholdKey.
-        // 4 ED25519 keys part of a 3-of-4 threshold key.
-        newAdminKeys = new PrivateKey[4];
-        newAdminPublicKeys = new PublicKey[4];
+        /*
+         * Step 6:
+         * Generate the new keys that are part of the adminKey's thresholdKey.
+         * Four ED25519 keys part of a 3-of-4 threshold key.
+         */
+        PrivateKey[] newAdminKeys = new PrivateKey[4];
+        PublicKey[] newAdminPublicKeys = new PublicKey[4];
         Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
         Arrays.setAll(newAdminPublicKeys, i -> newAdminKeys[i].getPublicKey());
-        KeyList thresholdKey = KeyList.withThreshold(3);
-        Collections.addAll(thresholdKey, newAdminPublicKeys);
 
-        Transaction<?> transaction = new TopicUpdateTransaction()
+        /*
+         * Step 7:
+         * Create the new threshold key.
+         */
+        KeyList newThresholdKey = KeyList.withThreshold(3);
+        Collections.addAll(newThresholdKey, newAdminPublicKeys);
+
+        /*
+         * Step 8:
+         * Create the topic update transaction with the new threshold key.
+         */
+        Transaction<?> topicUpdatetransaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
             .setTopicMemo("updated demo topic")
-            .setAdminKey(thresholdKey)
-            .freezeWith(hapiClient);
+            .setAdminKey(newThresholdKey)
+            .freezeWith(client);
 
-        // Sign with the initial adminKey. 2 of the 3 keys already part of the topic's adminKey.
+        /*
+         * Step 9:
+         * Sign the topic update transaction with the initial adminKey.
+         * 2 of the 3 keys already part of the topic's adminKey.
+         */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing ConsensusTopicUpdateTransaction with initial admin key " + k);
-            transaction.sign(k);
+            topicUpdatetransaction.sign(k);
         });
 
-        // Sign with the new adminKey. 3 of 4 keys already part of the topic's adminKey.
+        /*
+         * Step 9:
+         * Sign the topic update transaction with the new adminKey.
+         * 3 of 4 keys already part of the topic's adminKey.
+         */
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
             System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
-            transaction.sign(k);
+            topicUpdatetransaction.sign(k);
         });
 
-        TransactionResponse transactionResponse = transaction.execute(hapiClient);
+        /*
+         * Step 10:
+         * Execute the topic update transaction.
+         */
+        TransactionResponse transactionResponse2 = topicUpdatetransaction.execute(client);
 
         // Retrieve results post-consensus.
-        transactionResponse.getReceipt(hapiClient);
-
+        transactionResponse2.getReceipt(client);
         System.out.println("Updated topic " + topicId + " with 3-of-4 threshold key as adminKey");
 
-        TopicInfo topicInfo = new TopicInfoQuery().setTopicId(topicId).execute(hapiClient);
+        /*
+         * Step 11:
+         * Query the topic info and output it.
+         */
+        TopicInfo topicInfo = new TopicInfoQuery()
+            .setTopicId(topicId)
+            .execute(client);
         System.out.println(topicInfo);
-    }
 
-    private void cleanUp() throws Exception {
+        /*
+         * Clean up:
+         * Delete created topic.
+         */
         var topicDeleteTransaction = new TopicDeleteTransaction()
             .setTopicId(topicId)
-            .freezeWith(hapiClient);
+            .freezeWith(client);
 
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
             System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
             topicDeleteTransaction.sign(k);
         });
 
-        topicDeleteTransaction.execute(hapiClient).getReceipt(hapiClient);
+        topicDeleteTransaction.execute(client).getReceipt(client);
 
-        hapiClient.close();
+        client.close();
+
+        System.out.println("Example complete!");
     }
 }

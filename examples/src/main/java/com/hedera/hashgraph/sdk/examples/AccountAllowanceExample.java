@@ -23,58 +23,58 @@ import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-public class AccountAllowanceExample {
+/**
+ * Approve allowance is a transaction that allows a token owner to delegate a token spender to spend
+ * a specified token amount on behalf of the token owner. This can be done for HBAR, non-fungible,
+ * and fungible tokens. The owner grants the token allowance to the spender, who can then transfer tokens
+ * from the owner's account to another recipient, paying for the transaction fees themselves.
+ *
+ * On the other hand, delete allowance is a transaction that removes one or more non-fungible
+ * approved allowances from an owner's account. This operation removes the allowances granted to
+ * specific non-fungible token serial numbers. HBAR and fungible token allowances can be removed by
+ * setting the amount to zero in CryptoApproveAllowance.
+ */
+class AccountAllowanceExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private final Client client;
-
-    private final PrivateKey alicePrivateKey;
-    private final PublicKey alicePublicKey;
-    private final AccountId aliceId;
-
-    private final PrivateKey bobPrivateKey;
-    private final PublicKey bobPublicKey;
-    private final AccountId bobId;
-
-    private final PrivateKey charliePrivateKey;
-    private final PublicKey charliePublicKey;
-    private final AccountId charlieId;
-
     public static void main(String[] args) throws Exception {
-        AccountAllowanceExample example = new AccountAllowanceExample();
-        example.demonstrateAllowances();
-        example.cleanUp();
-        System.out.println("End of example");
-    }
-
-    private AccountAllowanceExample() throws Exception {
-        client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-        Objects.requireNonNull(client.getOperatorAccountId());
 
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys for accounts.
+         */
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
+
+        PrivateKey charliePrivateKey = PrivateKey.generateED25519();
+        PublicKey charliePublicKey = charliePrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * Create accounts for this example.
+         */
         System.out.println("Generating accounts for example...");
 
-        alicePrivateKey = PrivateKey.generateED25519();
-        alicePublicKey = alicePrivateKey.getPublicKey();
-
-        bobPrivateKey = PrivateKey.generateED25519();
-        bobPublicKey = bobPrivateKey.getPublicKey();
-
-        charliePrivateKey = PrivateKey.generateED25519();
-        charliePublicKey = charliePrivateKey.getPublicKey();
-
-        aliceId = new AccountCreateTransaction()
+        AccountId aliceId = new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
@@ -82,7 +82,7 @@ public class AccountAllowanceExample {
             .accountId;
         Objects.requireNonNull(aliceId);
 
-        bobId = new AccountCreateTransaction()
+        AccountId bobId = new AccountCreateTransaction()
             .setKey(bobPublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
@@ -90,7 +90,7 @@ public class AccountAllowanceExample {
             .accountId;
         Objects.requireNonNull(bobId);
 
-        charlieId = new AccountCreateTransaction()
+        AccountId charlieId = new AccountCreateTransaction()
             .setKey(charliePublicKey)
             .setInitialBalance(Hbar.from(5))
             .execute(client)
@@ -102,10 +102,6 @@ public class AccountAllowanceExample {
         System.out.println("Bob ID: " + bobId);
         System.out.println("Charlie ID: " + charlieId);
 
-        printBalances();
-    }
-
-    private void printBalances() throws PrecheckStatusException, TimeoutException {
         System.out.println(
             "Alice's balance: " +
                 new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
@@ -118,9 +114,11 @@ public class AccountAllowanceExample {
             "Charlie's balance: " +
                 new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
         );
-    }
 
-    private void demonstrateAllowances() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
+        /*
+         * Step 3:
+         * Approve an allowance of 2 Hbar with owner Alice and spender Bob.
+         */
         System.out.println("Approving an allowance of 2 Hbar with owner Alice and spender Bob");
 
         new AccountAllowanceApproveTransaction()
@@ -130,8 +128,24 @@ public class AccountAllowanceExample {
             .execute(client)
             .getReceipt(client);
 
-        printBalances();
+        System.out.println(
+            "Alice's balance: " +
+                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
+        );
+        System.out.println(
+            "Bob's balance: " +
+                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
+        );
+        System.out.println(
+            "Charlie's balance: " +
+                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
+        );
 
+        /*
+         * Step 4:
+         * Demonstrate allowance -- transfer 1 Hbar from Alice to Charlie, but the transaction is signed _only_ by Bob
+         * (Bob is dipping into his allowance from Alice).
+         */
         System.out.println("Transferring 1 Hbar from Alice to Charlie, but the transaction is signed _only_ by Bob (Bob is dipping into his allowance from Alice)");
 
         new TransferTransaction()
@@ -146,10 +160,26 @@ public class AccountAllowanceExample {
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Transfer succeeded.  Bob should now have 1 Hbar left in his allowance.");
+        System.out.println("Transfer succeeded. Bob should now have 1 Hbar left in his allowance.");
 
-        printBalances();
+        System.out.println(
+            "Alice's balance: " +
+                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
+        );
+        System.out.println(
+            "Bob's balance: " +
+                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
+        );
+        System.out.println(
+            "Charlie's balance: " +
+                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
+        );
 
+        /*
+         * Step 5:
+         * Demonstrate the absence of an allowance -- attempt to transfer 2 Hbar from Alice to Charlie using Bob's allowance.
+         * This should fail, because there is only 1 Hbar left in Bob's allowance.
+         */
         try {
             System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance.");
             System.out.println("This should fail, because there is only 1 Hbar left in Bob's allowance.");
@@ -170,6 +200,10 @@ public class AccountAllowanceExample {
             System.out.println(error.getMessage());
         }
 
+        /*
+         * Step 6:
+         * Demonstrate update of an allowance -- adjust Bob's allowance to 3 Hbar.
+         */
         System.out.println("Adjusting Bob's allowance to 3 Hbar.");
 
         new AccountAllowanceApproveTransaction()
@@ -179,6 +213,10 @@ public class AccountAllowanceExample {
             .execute(client)
             .getReceipt(client);
 
+        /*
+         * Step 7:
+         * Demonstrate allowance -- transfer 2 Hbar from Alice to Charlie using Bob's allowance again.
+         */
         System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again.");
         System.out.println("This time it should succeed.");
 
@@ -193,8 +231,23 @@ public class AccountAllowanceExample {
 
         System.out.println("Transfer succeeded.");
 
-        printBalances();
+        System.out.println(
+            "Alice's balance: " +
+                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
+        );
+        System.out.println(
+            "Bob's balance: " +
+                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
+        );
+        System.out.println(
+            "Charlie's balance: " +
+                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
+        );
 
+        /*
+         * Clean up:
+         * Delete allowance and created accounts.
+         */
         System.out.println("Deleting Bob's allowance");
 
         new AccountAllowanceApproveTransaction()
@@ -203,10 +256,6 @@ public class AccountAllowanceExample {
             .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
-    }
-
-    private void cleanUp() throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
-        System.out.println("Cleaning up...");
 
         new AccountDeleteTransaction()
             .setAccountId(aliceId)
@@ -233,5 +282,7 @@ public class AccountAllowanceExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

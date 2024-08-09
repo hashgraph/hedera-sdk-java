@@ -27,28 +27,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public final class CustomFeesExample {
+/**
+ * How to set and receive custom fees.
+ */
+class CustomFeesExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CustomFeesExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Create three accounts, Alice, Bob, and Charlie.  Alice will be the treasury for our example token.
-        // Fees only apply in transactions not involving the treasury, so we need two other accounts.
-
+        /*
+         * Step 1:
+         * Create three accounts: Alice, Bob, and Charlie.
+         * Alice will be the treasury for our example token.
+         * Fees only apply in transactions not involving the treasury, so we need two other accounts.
+         */
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceId = new AccountCreateTransaction()
@@ -86,30 +93,35 @@ public final class CustomFeesExample {
         System.out.println("Bob: " + bobId);
         System.out.println("Charlie: " + charlieId);
 
-        // Let's start with a custom fee list of 1 fixed fee.  A custom fee list can be a list of up to
-        // 10 custom fees, where each fee is a fixed fee or a fractional fee.
-        // This fixed fee will mean that every time Bob transfers any number of tokens to Charlie,
-        // Alice will collect 1 Hbar from each account involved in the transaction who is SENDING
-        // the Token (in this case, Bob).
-
+        /*
+         * Step 2:
+         * Create a custom fee list of 1 fixed fee. A custom fee list can be a list of up to
+         * 10 custom fees, where each fee is a fixed fee or a fractional fee.
+         * This fixed fee will mean that every time Bob transfers any number of tokens to Charlie,
+         * Alice will collect 1 Hbar from each account involved in the transaction who is SENDING
+         * the Token (in this case, Bob).
+         *
+         * In this example the fee is in Hbar, but you can charge a fixed fee in a token if you'd like.
+         * E.g., you can make it so that each time an account transfers Foo tokens,
+         * they must pay a fee in Bar tokens to the fee collecting account.
+         * To charge a fixed fee in tokens, instead of calling `setHbarAmount()`, call
+         * `setDenominatingTokenId(tokenForFee)` and `setAmount(tokenFeeAmount)`.
+         */
         CustomFixedFee customHbarFee = new CustomFixedFee()
             .setHbarAmount(new Hbar(1))
             .setFeeCollectorAccountId(aliceId);
         List<CustomFee> hbarFeeList = Collections.singletonList(customHbarFee);
 
-        // In this example the fee is in Hbar, but you can charge a fixed fee in a token if you'd like.
-        // EG, you can make it so that each time an account transfers Foo tokens,
-        // they must pay a fee in Bar tokens to the fee collecting account.
-        // To charge a fixed fee in tokens, instead of calling setHbarAmount(), call
-        // setDenominatingTokenId(tokenForFee) and setAmount(tokenFeeAmount).
-
-        // Setting the feeScheduleKey to Alice's key will enable Alice to change the custom
-        // fees list on this token later using the TokenFeeScheduleUpdateTransaction.
-        // We will create an initial supply of 100 of these tokens.
-
+        /*
+         * Step 3:
+         * Create a fungible token.
+         * Setting the `feeScheduleKey` to Alice's key will enable Alice to change the custom
+         * fees list on this token later using the `TokenFeeScheduleUpdateTransaction`.
+         * We will create an initial supply of 100 of these tokens.
+         */
         TokenId tokenId = new TokenCreateTransaction()
-            .setTokenName("Example Token")
-            .setTokenSymbol("EX")
+            .setTokenName("Example Fungible Token")
+            .setTokenSymbol("EFT")
             .setAdminKey(alicePublicKey)
             .setSupplyKey(alicePublicKey)
             .setFeeScheduleKey(alicePublicKey)
@@ -132,8 +144,10 @@ public final class CustomFeesExample {
         System.out.println("Custom Fees according to TokenInfoQuery:");
         System.out.println(tokenInfo1.customFees);
 
-        // We must associate the token with Bob and Charlie before they can trade in it.
-
+        /*
+         * Step 4:
+         * Associate the token with Bob and Charlie before they can trade in it.
+         */
         new TokenAssociateTransaction()
             .setAccountId(bobId)
             .setTokenIds(Collections.singletonList(tokenId))
@@ -150,7 +164,10 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
-        // give all 100 tokens to Bob
+        /*
+         * Step 5:
+         * Transfer all 100 tokens to Bob.
+         */
         new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, 100)
             .addTokenTransfer(tokenId, aliceId, -100)
@@ -159,12 +176,20 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
+        /*
+         * Step 6:
+         * Check Alice's Hbar balance.
+         */
         Hbar aliceHbar1 = new AccountBalanceQuery()
             .setAccountId(aliceId)
             .execute(client)
             .hbars;
-        System.out.println("Alice's Hbar balance before Bob transfers 20 tokens to Charlie: " + aliceHbar1);
+        System.out.println("Alice's Hbar balance before : " + aliceHbar1);
 
+        /*
+         * Step 7:
+         * Transfer 20 tokens from Bob to Charlie.
+         */
         TransactionRecord record1 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
@@ -173,6 +198,11 @@ public final class CustomFeesExample {
             .execute(client)
             .getRecord(client);
 
+        /*
+         * Step 8:
+         * Check Alice's Hbar balance. It should increase, because of the fee taken from the
+         * transfer in the previous step.
+         */
         Hbar aliceHbar2 = new AccountBalanceQuery()
             .setAccountId(aliceId)
             .execute(client)
@@ -182,17 +212,20 @@ public final class CustomFeesExample {
         System.out.println("Assessed fees according to transaction record:");
         System.out.println(record1.assessedCustomFees);
 
-        // Let's use the TokenUpdateFeeScheduleTransaction with Alice's key to change the custom fees on our token.
-        // TokenUpdateFeeScheduleTransaction will replace the list of fees that apply to the token with
-        // an entirely new list.  Let's charge a 10% fractional fee.  This means that when Bob attempts to transfer
-        // 20 tokens to Charlie, 10% of the tokens he attempts to transfer (2 in this case) will be transferred to
-        // Alice instead.
-
-        // Fractional fees default to FeeAssessmentMethod.INCLUSIVE, which is the behavior described above.
-        // If you set the assessment method to EXCLUSIVE, then when Bob attempts to transfer 20 tokens to Charlie,
-        // Charlie will receive all 20 tokens, and Bob will be charged an _additional_ 10% fee which
-        // will be transferred to Alice.
-
+        /*
+         * Step 9:
+         * Use the `TokenUpdateFeeScheduleTransaction` with Alice's key to change the custom fees on our token.
+         *
+         * `TokenUpdateFeeScheduleTransaction` will replace the list of fees that apply to the token with
+         * an entirely new list. Let's charge a 10% fractional fee. This means that when Bob attempts to transfer
+         * 20 tokens to Charlie, 10% of the tokens he attempts to transfer (2 in this case) will be transferred to
+         * Alice instead.
+         *
+         * Fractional fees default to `FeeAssessmentMethod.INCLUSIVE`, which is the behavior described above.
+         * If you set the assessment method to `EXCLUSIVE`, then when Bob attempts to transfer 20 tokens to Charlie,
+         * Charlie will receive all 20 tokens, and Bob will be charged an _additional_ 10% fee which
+         * will be transferred to Alice.
+         */
         CustomFractionalFee customFractionalFee = new CustomFractionalFee()
             .setNumerator(1)
             .setDenominator(10)
@@ -217,12 +250,20 @@ public final class CustomFeesExample {
         System.out.println("Custom Fees according to TokenInfoQuery:");
         System.out.println(tokenInfo2.customFees);
 
+        /*
+         * Step 10:
+         * Check Alice's token balance.
+         */
         Map<TokenId, Long> aliceTokens3 = new AccountBalanceQuery()
             .setAccountId(aliceId)
             .execute(client)
             .tokens;
         System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3);
 
+        /*
+         * Step 11:
+         * Transfer 20 tokens from Bob to Charlie.
+         */
         TransactionRecord record2 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
@@ -231,6 +272,11 @@ public final class CustomFeesExample {
             .execute(client)
             .getRecord(client);
 
+        /*
+         * Step 12:
+         * Check Alice's token balance. It should increase, because of the fee taken from the
+         * transfer in the previous step.
+         */
         Map<TokenId, Long> aliceTokens4 = new AccountBalanceQuery()
             .setAccountId(aliceId)
             .execute(client)
@@ -242,9 +288,12 @@ public final class CustomFeesExample {
         System.out.println("Assessed fees according to transaction record:");
         System.out.println(record2.assessedCustomFees);
 
-        // clean up
+        /*
+         * Clean up:
+         * Delete created accounts and tokens.
+         */
 
-        // move token to operator account
+        // Move token to operator account.
         new TokenAssociateTransaction()
             .setAccountId(client.getOperatorAccountId())
             .setTokenIds(Collections.singletonList(tokenId))
@@ -265,7 +314,7 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
-        // wipe token on created accounts
+        // Wipe token on created accounts.
         Map<TokenId, Long> charlieTokensBeforeWipe = new AccountBalanceQuery()
             .setAccountId(charlieId)
             .execute(client)
@@ -311,7 +360,7 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
-        // delete accounts and token
+        // Delete created accounts.
         new AccountDeleteTransaction()
             .setAccountId(charlieId)
             .setTransferAccountId(client.getOperatorAccountId())
@@ -336,6 +385,7 @@ public final class CustomFeesExample {
             .execute(client)
             .getReceipt(client);
 
+        // Delete created token.
         new TokenDeleteTransaction()
             .setTokenId(tokenId)
             .freezeWith(client)
@@ -344,5 +394,7 @@ public final class CustomFeesExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

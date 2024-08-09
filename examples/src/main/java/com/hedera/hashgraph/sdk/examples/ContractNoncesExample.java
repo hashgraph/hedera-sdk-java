@@ -25,39 +25,55 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.List;
 import java.util.Objects;
 
-public final class ContractNoncesExample {
+/**
+ * HIP-729: Contract Accounts Nonce Externalization.
+ * A deployed contract A should have a nonce value that reflects the number
+ * of other contracts that were created since A’s creation.
+ * <p>
+ * To validate this behaviour, we deploy contract, which deploys another contract in its constructor.
+ */
+class ContractNoncesExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
-    private static final AccountId OPERATOR_ID = AccountId.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
+    // TODO: find this contract (.sol and .json) and add to the resources folder, then fetch it from there (.json)
     private static final String SMART_CONTRACT_BYTECODE = "6080604052348015600f57600080fd5b50604051601a90603b565b604051809103906000f0801580156035573d6000803e3d6000fd5b50506047565b605c8061009483390190565b603f806100556000396000f3fe6080604052600080fdfea2646970667358221220a20122cbad3457fedcc0600363d6e895f17048f5caa4afdab9e655123737567d64736f6c634300081200336080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122053dfd8835e3dc6fedfb8b4806460b9b7163f8a7248bac510c6d6808d9da9d6d364736f6c63430008120033";
 
-    private ContractNoncesExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
+        /*
+         * Step 1:
+         * Create a file with smart contract bytecode.
+         */
         TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             .setKeys(operatorPublicKey)
             .setContents(SMART_CONTRACT_BYTECODE)
-            .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
+            .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
 
+        /*
+         * Step 2:
+         * Create a smart contract.
+         */
         TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .setGas(100_000)
@@ -69,6 +85,11 @@ public final class ContractNoncesExample {
 
         ContractId contractId = contractCreateTxReceipt.contractId;
 
+        /*
+         * Step 3:
+         * Get a record from a contract create transaction to check contracts nonces.
+         * We expect to see `nonce=2` as we deploy a contract that creates another contract in its constructor.
+         */
         List<ContractNonceInfo> contractNonces = contractCreateTxResponse.
             getRecord(client)
             .contractFunctionResult
@@ -76,7 +97,10 @@ public final class ContractNoncesExample {
 
         System.out.println("contractNonces = " + contractNonces);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created contract.
+         */
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(contractId)
             .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)
@@ -90,5 +114,7 @@ public final class ContractNoncesExample {
         System.out.println("Contract successfully deleted");
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

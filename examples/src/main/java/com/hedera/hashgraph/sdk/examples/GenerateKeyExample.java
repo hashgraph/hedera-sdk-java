@@ -22,9 +22,10 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
+/**
+ * How to generate ED25519 private and public key pair.
+ */
 class GenerateKeyExample {
-    private GenerateKeyExample() {
-    }
 
     public static void main(String[] args) {
         PrivateKey privateKey = PrivateKey.generateED25519();

@@ -26,25 +26,33 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-public final class MultiSigOfflineExample {
+/**
+ * How to sign a transaction with multi-sig account.
+ */
+class MultiSigOfflineExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private MultiSigOfflineExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys for accounts.
+         */
         PrivateKey user1PrivateKey = PrivateKey.generateED25519();
         PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
         PrivateKey user2PrivateKey = PrivateKey.generateED25519();
@@ -55,7 +63,10 @@ public final class MultiSigOfflineExample {
         System.out.println("private key for user 2 = " + user2PrivateKey);
         System.out.println("public key for user 2 = " + user2PublicKey);
 
-        // create a multi-sig account
+        /*
+         * Step 2:
+         * Create a Multi-sig account.
+         */
         KeyList keylist = new KeyList();
         keylist.add(user1PublicKey);
         keylist.add(user2PublicKey);
@@ -71,31 +82,50 @@ public final class MultiSigOfflineExample {
 
         System.out.println("account id = " + newAccountId);
 
-        // create a transfer from new account to 0.0.3
+        /*
+         * Step 2:
+         * Create a transfer from new account to account with id `0.0.3`.
+         */
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
             .addHbarTransfer(new AccountId(3), new Hbar(1))
             .freezeWith(client);
 
-        // convert transaction to bytes to send to signatories
+        /*
+         * Step 3:
+         * Convert transaction to bytes to send to signatories.
+         */
         byte[] transactionBytes = transferTransaction.toBytes();
         Transaction<?> transactionToExecute = Transaction.fromBytes(transactionBytes);
 
-        // ask users to sign and return signature
+        /*
+         * Step 4:
+         * Ask users to sign and return signature.
+         */
         byte[] user1Signature = user1PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
         byte[] user2Signature = user2PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
 
-        // recreate the transaction from bytes
+        /*
+         * Step 5:
+         * Recreate the transaction from bytes.
+         */
         transactionToExecute.signWithOperator(client);
         transactionToExecute.addSignature(user1PrivateKey.getPublicKey(), user1Signature);
         transactionToExecute.addSignature(user2PrivateKey.getPublicKey(), user2Signature);
 
+        /*
+         * Step 6:
+         * Execute recreated transaction.
+         */
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
         System.out.println(receipt.status);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -106,5 +136,7 @@ public final class MultiSigOfflineExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

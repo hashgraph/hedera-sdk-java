@@ -26,34 +26,50 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-public class SignTransactionExample {
+/**
+ * How to sign a transaction with a multi-sig account.
+ */
+class SignTransactionExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private SignTransactionExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys pairs for a Key List.
+         */
         PrivateKey user1PrivateKey = PrivateKey.generateED25519();
         PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
         PrivateKey user2PrivateKey = PrivateKey.generateED25519();
         PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
 
+        /*
+         * Step 2:
+         * Create a Key List from keys generated in previous step.
+         */
         KeyList keylist = new KeyList();
         keylist.add(user1PublicKey);
         keylist.add(user2PublicKey);
 
+        /*
+         * Step 3:
+         * Create a new account with a Key List created in a previous step.
+         */
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
             .setKey(keylist)
@@ -64,22 +80,37 @@ public class SignTransactionExample {
         var accountId = receipt.accountId;
         System.out.println("account id = " + accountId);
 
+        /*
+         * Step 4:
+         * Create a transfer transaction and freeze it with a client.
+         */
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
             .addHbarTransfer(new AccountId(3), new Hbar(1))
             .freezeWith(client);
 
+        /*
+         * Step 5:
+         * Sign the transfer transaction with all respective keys (from a Key List).
+         */
         transferTransaction.signWithOperator(client);
         user1PrivateKey.signTransaction(transferTransaction);
         user2PrivateKey.signTransaction(transferTransaction);
 
+        /*
+         * Step 6:
+         * Execute the transfer transaction and output its status.
+         */
         TransactionResponse result = transferTransaction.execute(client);
         receipt = result.getReceipt(client);
 
         System.out.println(receipt.status);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -90,5 +121,7 @@ public class SignTransactionExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

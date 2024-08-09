@@ -25,30 +25,39 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-public final class ZeroTokenOperationsExample {
+class ZeroTokenOperationsExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private ZeroTokenOperationsExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         client.setDefaultMaxTransactionFee(new Hbar(10));
 
+        /*
+         * Step 1:
+         * Generate an ED25519 key pair for an account.
+         */
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
+        /*
+         * Step 2:
+         * Create a new account for the contract to interact with in some of its steps.
+         */
         AccountCreateTransaction transaction = new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
@@ -59,6 +68,10 @@ public final class ZeroTokenOperationsExample {
         TransactionResponse response = transaction.execute(client);
         AccountId aliceAccountId = response.getReceipt(client).accountId;
 
+        /*
+         * Step 3:
+         * Instantiate `ContractHelper`.
+         */
         ContractHelper contractHelper = new ContractHelper(
             "contracts/precompile/ZeroTokenOperations.json",
             new ContractFunctionParameters()
@@ -67,29 +80,39 @@ public final class ZeroTokenOperationsExample {
             client
         );
 
-        // Configure steps in ContractHelper
+        /*
+         * Step 4:
+         * Configure steps in `ContractHelper`.
+         */
         contractHelper
             .setPayableAmountForStep(0, Hbar.from(20))
             .addSignerForStep(1, alicePrivateKey);
 
-        // step 0 creates a fungible token
-        // step 1 Associate with account
-        // step 2 transfer the token by passing a zero value
-        // step 3 mint the token by passing a zero value
-        // step 4 burn the token by passing a zero value
-        // step 5 wipe the token by passing a zero value
-
+         /*
+         * Step 5:
+         * Execute steps in `ContractHelper`.
+         * - step 0 creates a fungible token;
+         * - step 1 Associate with account;
+         * - step 2 transfer the token by passing a zero value;
+         * - step 3 mint the token by passing a zero value;
+         * - step 4 burn the token by passing a zero value;
+         * - step 5 wipe the token by passing a zero value.
+        */
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 5, client);
 
-        // step 6 use SDK and transfer passing a zero value
-        // Create Fungible Token
+        /*
+         * Step 6:
+         * Create and execute a transfer transaction with a zero value.
+         */
+        // Create a Fungible Token.
         System.out.println("Attempting to execute step 6");
 
         TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
             .setTokenName("Black Sea LimeChain Token")
             .setTokenSymbol("BSL")
             .setTreasuryAccountId(OPERATOR_ID)
-            .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
+            // Total supply = 10000 / 10 ^ 2.
+            .setInitialSupply(10_000)
             .setDecimals(2)
             .setAutoRenewAccountId(OPERATOR_ID)
             .freezeWith(client);
@@ -100,7 +123,7 @@ public final class ZeroTokenOperationsExample {
         TokenId tokenId = responseTokenCreate.getReceipt(client).tokenId;
 
         // Associate Token with Account.
-        // Accounts on hedera have to opt in to receive any types of token that aren't HBAR.
+        // Accounts on hedera have to opt in to receive any types of token that aren't Hbar.
         TokenAssociateTransaction tokenAssociateTransaction = new TokenAssociateTransaction()
             .setAccountId(aliceAccountId)
             .setTokenIds(Collections.singletonList(tokenId))
@@ -109,18 +132,20 @@ public final class ZeroTokenOperationsExample {
         TokenAssociateTransaction signedTxForAssociateToken = tokenAssociateTransaction.sign(alicePrivateKey);
         TransactionResponse txResponseAssociatedToken = signedTxForAssociateToken.execute(client);
 
-        Status status = txResponseAssociatedToken.getReceipt(client).status;
+        txResponseAssociatedToken.getReceipt(client);
 
-        //Transfer token
+        //Transfer token.
         TransferTransaction transferToken = new TransferTransaction()
-            .addTokenTransfer(tokenId, OPERATOR_ID, 0) // deduct 0 tokens
-            .addTokenTransfer(tokenId, aliceAccountId, 0) // increase balance by 0
+            // Deduct 0 tokens.
+            .addTokenTransfer(tokenId, OPERATOR_ID, 0)
+            // Increase balance by 0.
+            .addTokenTransfer(tokenId, aliceAccountId, 0)
             .freezeWith(client);
 
         TransferTransaction signedTransferTokenTX = transferToken.signWithOperator(client);
         TransactionResponse txResponseTransferToken = signedTransferTokenTX.execute(client);
 
-        //Verify the transaction reached consensus
+        // Verify the transaction reached consensus.
         TransactionRecord transferReceiptRecord = txResponseTransferToken.getRecord(client);
 
         System.out.println(
@@ -128,8 +153,10 @@ public final class ZeroTokenOperationsExample {
 
         System.out.println("All steps completed with valid results.");
 
-        // Clean up
-
+        /*
+         * Clean up:
+         * Delete created account and contract.
+         */
         new AccountDeleteTransaction()
             .setAccountId(aliceAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -145,5 +172,7 @@ public final class ZeroTokenOperationsExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

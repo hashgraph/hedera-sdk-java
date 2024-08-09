@@ -24,54 +24,67 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class CreateAccountExample {
+/**
+ * How to create a Hedera account.
+ */
+class CreateAccountExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateAccountExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Generate a Ed25519 private, public key pair
-        PrivateKey newPrivateKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newPrivateKey.getPublicKey();
+        /*
+         * Step 1:
+         * Generate ED25519 private and public key pair for the account.
+         */
+        PrivateKey privateKey = PrivateKey.generateED25519();
+        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("private key = " + privateKey);
+        System.out.println("public key = " + publicKey);
 
-        System.out.println("private key = " + newPrivateKey);
-        System.out.println("public key = " + newPublicKey);
-
+        /*
+         * Step 2:
+         * Create a new account.
+         */
         TransactionResponse transactionResponse = new AccountCreateTransaction()
-            // The only _required_ property here is `key`
-            .setKey(newPublicKey)
-            .setInitialBalance(Hbar.fromTinybars(1_000))
+            // The only _required_ property here is `key`.
+            .setKey(publicKey)
+            .setInitialBalance(new Hbar(1))
             .execute(client);
 
         // This will wait for the receipt to become available
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
-
         AccountId newAccountId = receipt.accountId;
-
         System.out.println("account = " + newAccountId);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setTransferAccountId(OPERATOR_ID)
             .setAccountId(newAccountId)
             .freezeWith(client)
-            .sign(newPrivateKey)
+            .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

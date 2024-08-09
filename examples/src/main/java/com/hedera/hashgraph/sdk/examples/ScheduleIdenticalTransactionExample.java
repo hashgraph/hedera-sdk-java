@@ -26,28 +26,35 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-public class ScheduleIdenticalTransactionExample {
+/**
+ * How to schedule identical transactions.
+ */
+class ScheduleIdenticalTransactionExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private ScheduleIdenticalTransactionExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        System.out.println("threshold key example");
+        /*
+         * Step 1:
+         * Create key pairs, clients and accounts.
+         */
+        System.out.println("Threshold key example.");
         System.out.println("Keys:");
-
         PrivateKey[] privateKeys = new PrivateKey[3];
         PublicKey[] publicKeys = new PublicKey[3];
         Client[] clients = new Client[3];
@@ -56,7 +63,6 @@ public class ScheduleIdenticalTransactionExample {
         @Var
         ScheduleId scheduleID = null;
 
-        // Loop to generate keys, clients, and accounts
         for (int i = 0; i < 3 ; i++) {
             PrivateKey newPrivateKey = PrivateKey.generateED25519();
             PublicKey newPublicKey = newPrivateKey.getPublicKey();
@@ -73,7 +79,7 @@ public class ScheduleIdenticalTransactionExample {
                 .setInitialBalance(new Hbar(1))
                 .execute(client);
 
-            // Make sure the transaction succeeded
+            // Make sure the transaction succeeded.
             TransactionReceipt transactionReceipt = createResponse.getReceipt(client);
 
             Client newClient = ClientHelper.forName(HEDERA_NETWORK);
@@ -82,15 +88,22 @@ public class ScheduleIdenticalTransactionExample {
             accounts[i] = transactionReceipt.accountId;
 
             System.out.println("account = " + accounts[i]);
-        }   // Loop to generate keys, clients, and accounts
+        }
 
-        // A threshold key with a threshold of 2 and length of 3 requires
-        // at least 2 of the 3 keys to sign anything modifying the account
+        /*
+         * Step 2:
+         * Create a threshold key with a threshold of 2 and length of 3 requires
+         * (at least 2 of the 3 keys to sign anything modifying the account).
+         */
         KeyList keyList = KeyList.withThreshold(2);
         Collections.addAll(keyList, publicKeys);
 
-        // We are using all of these keys, so the scheduled transaction doesn't automatically go through
-        // It works perfectly fine with just one key
+        /*
+         * Step 3:
+         * Create a new account with the Key List from previous step.
+         */
+        // We are using all of these keys, so the scheduled transaction doesn't automatically go through.
+        // It works perfectly fine with just one key.
         TransactionResponse createResponse = new AccountCreateTransaction()
             // The key that must sign each transfer out of the account. If receiverSigRequired is true, then
             // it must also sign any transfer into the account.
@@ -98,17 +111,20 @@ public class ScheduleIdenticalTransactionExample {
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
-        // Make sure the transaction succeeded
+        // Make sure the transaction succeeded.
         TransactionReceipt receipt = createResponse.getReceipt(client);
 
         AccountId thresholdAccount = receipt.accountId;
         System.out.println("threshold account = " + thresholdAccount);
 
+        /*
+         * Step 4:
+         * Each `loopClient` creates an identical transaction, sending 1 Hbar to each of the created accounts,
+         * sent from the threshold Account.
+         */
         for (Client loopClient : clients) {
             AccountId operatorId = loopClient.getOperatorAccountId();
 
-            // Each loopClient creates an identical transaction, sending 1 hbar to each of the created accounts,
-            // sent from the threshold Account
             TransferTransaction tx = new TransferTransaction();
             for (AccountId account : accounts) {
                 tx.addHbarTransfer(account, new Hbar(1));
@@ -129,7 +145,7 @@ public class ScheduleIdenticalTransactionExample {
 
             System.out.println("operator [" + operatorId + "]: scheduleID = " + loopReceipt.scheduleId);
 
-            // Save the schedule ID, so that it can be asserted for each loopClient submission
+            // Save the schedule ID, so that it can be asserted for each loopClient submission.
             if (scheduleID == null) {
                 scheduleID = loopReceipt.scheduleId;
             }
@@ -138,7 +154,7 @@ public class ScheduleIdenticalTransactionExample {
                 throw new Exception("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.scheduleId);
             }
 
-            // If the status return by the receipt is related to already created, execute a schedule sign transaction
+            // If the status return by the receipt is related to already created, execute a schedule sign transaction.
             if (loopReceipt.status == Status.IDENTICAL_SCHEDULE_ALREADY_CREATED) {
                 TransactionResponse signTransaction = new ScheduleSignTransaction()
                     .setScheduleId(scheduleID)
@@ -157,8 +173,10 @@ public class ScheduleIdenticalTransactionExample {
 
         System.out.println(new ScheduleInfoQuery().setScheduleId(scheduleID).execute(client));
 
-        // Clean up
-
+        /*
+         * Clean up:
+         * Delete created accounts and close created clients.
+         */
         AccountDeleteTransaction thresholdDeleteTx = new AccountDeleteTransaction()
             .setAccountId(thresholdAccount)
             .setTransferAccountId(OPERATOR_ID)
@@ -184,5 +202,7 @@ public class ScheduleIdenticalTransactionExample {
         for (Client loopClient : clients) {
             loopClient.close();
         }
+
+        System.out.println("Example complete!");
     }
 }

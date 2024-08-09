@@ -26,6 +26,9 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
@@ -34,62 +37,40 @@ import java.util.Random;
  * Subscribes to the topic (no key required).
  * Publishes a number of messages to the topic signed by the submitKey.
  */
-public class ConsensusPubSubWithSubmitKeyExample {
+class ConsensusPubSubWithSubmitKeyExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private final int messagesToPublish;
-    private final int millisBetweenMessages;
-    private Client client;
-    private TopicId topicId;
-    private PrivateKey submitPrivateKey;
-    private PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+    private static final int TOTAL_MESSAGES = 5;
 
-    public ConsensusPubSubWithSubmitKeyExample(int messagesToPublish, int millisBetweenMessages)
-        throws InterruptedException {
-        this.messagesToPublish = messagesToPublish;
-        this.millisBetweenMessages = millisBetweenMessages;
-        setupClient();
-    }
+    private static final CountDownLatch MESSAGES_LATCH = new CountDownLatch(TOTAL_MESSAGES);
 
     public static void main(String[] args) throws Exception {
-        new ConsensusPubSubWithSubmitKeyExample(5, 2_000).execute();
-    }
-
-    public void execute() throws Exception {
-        createTopicWithSubmitKey();
-
-        Thread.sleep(5_000);
-
-        subscribeToTopic();
-
-        publishMessagesToTopic();
-
-        cleanUp();
-    }
-
-    private void setupClient() throws InterruptedException {
-        client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this
-        // account and be signed by this key
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-    }
 
-    /**
-     * Generate a brand new ED25519 key pair.
-     * <p>
-     * Create a new topic with that key as the topic's submitKey; required to sign all future
-     * ConsensusMessageSubmitTransactions for that topic.
-     */
-    private void createTopicWithSubmitKey() throws Exception {
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        /*
+         * Step 1:
+         * Generate a brand new ED25519 key pair.
+         * Create a new topic with that key as the topic's submitKey; required to sign all future
+         * ConsensusMessageSubmitTransactions for that topic.
+         */
         // Generate a Ed25519 private, public key pair
-        submitPrivateKey = PrivateKey.generateED25519();
+        PrivateKey submitPrivateKey = PrivateKey.generateED25519();
         PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
         TransactionResponse transactionResponse = new TopicCreateTransaction()
@@ -98,16 +79,20 @@ public class ConsensusPubSubWithSubmitKeyExample {
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
-
-        topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
+        TopicId topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
         System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitPrivateKey);
-    }
 
-    /**
-     * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
-     * Hedera mirror node.
-     */
-    private void subscribeToTopic() {
+        /*
+         * Step 2:
+         * Sleep for 5 seconds (wait to propagate to the mirror).
+         */
+        Thread.sleep(5_000);
+
+        /*
+         * Step 3:
+         * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
+         * Hedera mirror node.
+         */
         new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
@@ -115,15 +100,15 @@ public class ConsensusPubSubWithSubmitKeyExample {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
 
                 System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
+                MESSAGES_LATCH.countDown();
             });
-    }
 
-    /**
-     * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
-     */
-    private void publishMessagesToTopic() throws Exception {
+        /*
+         * Step 4:
+         * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
+         */
         Random r = new Random();
-        for (int i = 0; i < messagesToPublish; i++) {
+        for (int i = 0; i < TOTAL_MESSAGES; i++) {
             String message = "random message " + r.nextLong();
 
             System.out.println("Publishing message: " + message);
@@ -141,18 +126,28 @@ public class ConsensusPubSubWithSubmitKeyExample {
                 .transactionId
                 .getReceipt(client);
 
-            Thread.sleep(millisBetweenMessages);
+            Thread.sleep(2_000);
         }
 
-        Thread.sleep(10_000);
-    }
+        // Wait 60 seconds to receive all the messages. Fail if not received.
+        boolean allMessagesReceived = MESSAGES_LATCH.await(60, TimeUnit.SECONDS);
 
-    private void cleanUp() throws Exception {
+        /*
+         * Clean up:
+         * Delete created topic.
+         */
         new TopicDeleteTransaction()
             .setTopicId(topicId)
             .execute(client)
             .getReceipt(client);
 
         client.close();
+
+        // Fail if messages weren't received.
+        if (!allMessagesReceived) {
+            throw new TimeoutException("Not all topic messages were received!");
+        }
+
+        System.out.println("Example complete!");
     }
 }

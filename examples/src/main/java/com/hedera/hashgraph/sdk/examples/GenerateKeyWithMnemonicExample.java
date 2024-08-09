@@ -23,9 +23,10 @@ import com.hedera.hashgraph.sdk.Mnemonic;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
+/**
+ * How to generate ED25519 key with mnemonic phrase.
+ */
 class GenerateKeyWithMnemonicExample {
-    private GenerateKeyWithMnemonicExample() {
-    }
 
     public static void main(String[] args) {
         Mnemonic mnemonic = Mnemonic.generate24();

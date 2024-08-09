@@ -28,27 +28,42 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+/**
+ * An example of a public HCS topic where anyone submit messages on the topic.
+ * <p>
+ * Subscribes to the topic (no key required).
+ * Publishes a number of messages to the topic (no key required).
+ */
 class ConsensusPubSubExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
+    // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     private static final int TOTAL_MESSAGES = 5;
-    private static final CountDownLatch messagesLatch = new CountDownLatch(TOTAL_MESSAGES);
 
-    private ConsensusPubSubExample() {
-    }
+    private static final CountDownLatch MESSAGES_LATCH = new CountDownLatch(TOTAL_MESSAGES);
 
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
+        /*
+         * Step 1:
+         * Create a new topic.
+         */
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .execute(client);
@@ -59,17 +74,29 @@ class ConsensusPubSubExample {
 
         System.out.println("New topic created: " + topicId);
 
+        /*
+         * Step 2:
+         * Sleep for 5 seconds (wait to propagate to the mirror).
+         */
         Thread.sleep(5_000);
 
+        /*
+         * Step 3:
+         * Set up a mirror client to print out messages as we receive them.
+         */
         new TopicMessageQuery()
             .setTopicId(topicId)
             .subscribe(client, resp -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
 
                 System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
-                messagesLatch.countDown();
+                MESSAGES_LATCH.countDown();
             });
 
+        /*
+         * Step 4:
+         * Submit messages to the topic created in previous steps.
+         */
         for (int i = 0; i <= TOTAL_MESSAGES; i++) {
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
@@ -80,9 +107,13 @@ class ConsensusPubSubExample {
             Thread.sleep(2_500);
         }
 
-        boolean allMessagesReceived = messagesLatch.await(30, TimeUnit.SECONDS);
+        // Wait 30 seconds to receive all the messages. Fail if not received.
+        boolean allMessagesReceived = MESSAGES_LATCH.await(30, TimeUnit.SECONDS);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created topic.
+         */
         new TopicDeleteTransaction()
             .setTopicId(topicId)
             .execute(client)
@@ -90,8 +121,11 @@ class ConsensusPubSubExample {
 
         client.close();
 
+        // Fail if messages weren't received.
         if (!allMessagesReceived) {
             throw new TimeoutException("Not all topic messages were received!");
         }
+
+        System.out.println("Example complete!");
     }
 }

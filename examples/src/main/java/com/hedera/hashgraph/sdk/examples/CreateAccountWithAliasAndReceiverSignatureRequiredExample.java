@@ -24,69 +24,65 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
-    // see `.env.sample` in the repository root for how to specify these values
+/**
+ * How to create a Hedera account with alias and receiver signature required.
+ */
+class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateAccountWithAliasAndReceiverSignatureRequiredExample() {
-    }
-
-    /*
-    ## Example 1:
-    - Create an ED25519 admin private key and ECSDA private key
-    - Extract the ECDSA public key
-    - Extract the Ethereum public address
-    - Use the `AccountCreateTransaction` and populate `setAlias(evmAddress)` field with the Ethereum public address and the `setReceiverSignatureRequired` to true
-    - Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
-    - Get the `AccountInfo` and show that the account has contractAccountId
-    */
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         /*
-         * Step 1
-         * Create an ED25519 admin private key and ECSDA private key
+         * Step 1:
+         * Generate an ED25519 admin private key and ECSDA private key.
          */
         PrivateKey adminPrivateKey = PrivateKey.generateED25519();
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 2
-         * Extract the admin public key and ECDSA public key
+         * Step 2:
+         * Extract the admin public key and ECDSA public key.
          */
         PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
         PublicKey publicKey = privateKey.getPublicKey();
 
         /*
-         * Step 3
-         * Extract the Ethereum public address
+         * Step 3:
+         * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
         System.out.println(evmAddress);
 
         /*
-         * Step 4
+         * Step 4:
          * Use the `AccountCreateTransaction` and populate `setAlias(evmAddress)` field with the Ethereum public address
-         * and the `setReceiverSignatureRequired` to `true`
+         * and the `setReceiverSignatureRequired` to `true`.
          */
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
-            .setInitialBalance(Hbar.fromTinybars(100))
+            .setInitialBalance(new Hbar(1))
             .setKey(adminPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);
 
         /*
-         * Step 5
-         * Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key
+         * Step 5:
+         * Sign the `AccountCreateTransaction` transaction with both the new private key and the admin key.
          */
         accountCreateTransaction.sign(adminPrivateKey).sign(privateKey);
         AccountId newAccountId = accountCreateTransaction.execute(client).getReceipt(client).accountId;
@@ -94,8 +90,8 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         System.out.println("New account ID: " + newAccountId);
 
          /*
-         * Step 6
-         * Get the `AccountInfo` and show that the account has contractAccountId
+         * Step 6:
+         * Get the `AccountInfo` and show that the account has `contractAccountId`.
          */
         AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
@@ -107,7 +103,10 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
             throw new Exception("The new account doesn't have alias");
         }
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -117,5 +116,7 @@ public class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

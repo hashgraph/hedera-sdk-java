@@ -24,47 +24,61 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class DeleteAccountExample {
+/**
+ * How to delete a Hedera account.
+ *
+ * TODO: delete this example as it is a duplicate of `CreateAccountExample`?
+ */
+class DeleteAccountExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private DeleteAccountExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Generate a Ed25519 private, public key pair
+        /*
+         * Step 1:
+         * Generate ED25519 private and public key pair for the account.
+         */
         PrivateKey newPrivateKey = PrivateKey.generateED25519();
         PublicKey newPublicKey = newPrivateKey.getPublicKey();
-
         System.out.println("private key = " + newPrivateKey);
         System.out.println("public key = " + newPublicKey);
 
+        /*
+         * Step 2:
+         * Create a new account.
+         */
         TransactionResponse transactionResponse = new AccountCreateTransaction()
-            // The only _required_ property here is `key`
+            // The only _required_ property here is `key`.
             .setKey(newPublicKey)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(new Hbar(1))
             .execute(client);
 
-        // This will wait for the receipt to become available
+        // This will wait for the receipt to become available.
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
-
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
-
         System.out.println("account = " + newAccountId);
 
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
-            // note the transaction ID has to use the ID of the account being deleted
+            // Note: the transaction ID has to use the ID of the account being deleted.
             .setTransactionId(TransactionId.generate(newAccountId))
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -74,5 +88,7 @@ public final class DeleteAccountExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

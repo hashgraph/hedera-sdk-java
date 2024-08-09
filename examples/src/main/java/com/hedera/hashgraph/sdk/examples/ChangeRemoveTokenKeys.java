@@ -24,9 +24,19 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public class ChangeRemoveTokenKeys {
+/**
+ * HIP-540: Change Or Remove Existing Keys From A Token.
+ * All entities across Hedera have opt-in administrative keys (or simply admin keys).
+ * Currently, the Consensus Service and File service allow these keys to be removed
+ * by an update that sets them to an empty KeyList, which is a sentinel value for immutability.
+ * However the Hedera Token Service does not provide such a feature consistently.
+ * We should enable existing admin keys for tokens created with the Hedera Token Service
+ * to be able to sign an update transaction that changes or permanently removes any key
+ * (Admin, Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from the token.
+ */
+class ChangeRemoveTokenKeys {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
@@ -35,17 +45,19 @@ public class ChangeRemoveTokenKeys {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private ChangeRemoveTokenKeys() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Admin, Supply, Wipe keys
+        /*
+         * Step 1:
+         * Generate keys for future token.
+         */
         PrivateKey adminPrivateKey = PrivateKey.generateED25519();
         PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
 
@@ -58,11 +70,10 @@ public class ChangeRemoveTokenKeys {
         PrivateKey wipePrivateKey = PrivateKey.generateED25519();
         PublicKey wipePublicKey = wipePrivateKey.getPublicKey();
 
-        // This HIP introduces ability to remove lower-privilege keys (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token:
-        // - using an update with the empty KeyList;
-        var emptyKeyList = new KeyList();
-
-        // create a non-fungible token
+        /*
+         * Step 2:
+         * Create a non-fungible token and check its keys.
+         */
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("Example NFT")
@@ -87,13 +98,22 @@ public class ChangeRemoveTokenKeys {
         System.out.println("Supply Key:" + tokenInfoBefore.supplyKey);
         System.out.println("Wipe Key:" + tokenInfoBefore.wipeKey);
 
-        System.out.println("---");
+        /*
+         * Step 3:
+         * Remove Wipe Key from a token and check that its removed.
+         */
         System.out.println("Removing Wipe Key...");
+
+        // This HIP introduces ability to remove lower-privilege keys
+        // (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token
+        // using an update with the empty KeyList.
+        var emptyKeyList = new KeyList();
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setWipeKey(emptyKeyList)
-            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION) // it is by default, but we set explicitly for illustration
+            // it is set by default, but we set it here explicitly for illustration
+            .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
             .freezeWith(client)
             .sign(adminPrivateKey)
             .execute(client)
@@ -105,7 +125,10 @@ public class ChangeRemoveTokenKeys {
 
         System.out.println("Wipe Key (after removal):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
 
-        System.out.println("---");
+        /*
+         * Step 4:
+         * Remove Admin Key from a token and check that its removed.
+         */
         System.out.println("Removing Admin Key...");
 
         new TokenUpdateTransaction()
@@ -123,7 +146,10 @@ public class ChangeRemoveTokenKeys {
 
         System.out.println("Admin Key (after removal):" + tokenInfoAfterAdminKeyRemoval.adminKey);
 
-        System.out.println("---");
+        /*
+         * Step 5:
+         * Update Supply Key and check that its updated.
+         */
         System.out.println("Updating Supply Key...");
 
         new TokenUpdateTransaction()
@@ -142,7 +168,10 @@ public class ChangeRemoveTokenKeys {
 
         System.out.println("Supply Key (after update):" + tokenInfoAfterSupplyKeyUpdate.supplyKey);
 
-        System.out.println("---");
+        /*
+         * Step 6:
+         * Remove Supply Key (update to unusable key).
+         */
         System.out.println("Removing Supply Key...");
 
         new TokenUpdateTransaction()
@@ -162,9 +191,12 @@ public class ChangeRemoveTokenKeys {
 
         System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
 
-        // Clean up
-        // Can't delete a token as it is immutable
-
+        /*
+         * Clean up:
+         * Can't delete a token as it is immutable.
+         */
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

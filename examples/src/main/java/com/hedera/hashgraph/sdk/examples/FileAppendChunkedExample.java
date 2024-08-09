@@ -25,33 +25,45 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-public class FileAppendChunkedExample {
+/**
+ * How to append to already created file.
+ */
+class FileAppendChunkedExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private FileAppendChunkedExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
+        /*
+         * Step 1:
+         * Submit the file create transaction.
+         */
+        // The file is required to be a byte array,
+        // you can easily use the bytes of a file instead.
+        String fileContents = "Hedera hashgraph is great!";
+
         TransactionResponse transactionResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file
+            // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
-            .setContents("Hello from Hedera.")
-            // The default max fee of 1 HBAR is not enough to make a file ( starts around 1.1 HBAR )
-            .setMaxTransactionFee(new Hbar(2)) // 2 HBAR
+            .setContents(fileContents)
+            // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
+            .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
@@ -59,12 +71,19 @@ public class FileAppendChunkedExample {
 
         System.out.println("fileId: " + newFileId);
 
+        /*
+         * Step 2:
+         * Create new file contents that will be appended to a file.
+         */
         StringBuilder contents = new StringBuilder();
-
         for (int i = 0; i <= 4096 * 9; i++) {
             contents.append("1");
         }
 
+        /*
+         * Step 3:
+         * Append new file contents to a file.
+         */
         TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
             .setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId))
             .setFileId(newFileId)
@@ -83,12 +102,17 @@ public class FileAppendChunkedExample {
 
         System.out.println("File size according to `FileInfoQuery`: " + info.size);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created file.
+         */
         new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client)
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

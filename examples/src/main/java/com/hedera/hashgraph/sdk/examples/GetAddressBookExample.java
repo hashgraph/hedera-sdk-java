@@ -25,41 +25,46 @@ import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.NodeAddressBook;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.ByteArrayInputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 
 /**
- * Get the network address book for inspecting the node public keys, among other things
+ * How to get the network address book.
+ * Also, how to inspect node public keys, etc.
  */
-public final class GetAddressBookExample {
+class GetAddressBookExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetAddressBookExample() {
-    }
-
     public static void main(String[] args) throws Exception {
-        // NEW (Feb 25 2022): you can now fetch the address book for free from a mirror node with AddressBookQuery
-
-        System.out.println("Getting address book for " + HEDERA_NETWORK);
-
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
+
+        /*
+         * Step 1:
+         * Fetch the address book.
+         * Note: from Feb 25 2022 you can now fetch the address book for free from a mirror node with `AddressBookQuery`.
+         */
+        System.out.println("Getting address book for " + HEDERA_NETWORK);
 
         NodeAddressBook addressBook = new AddressBookQuery()
             .setFileId(FileId.ADDRESS_BOOK)
             .execute(client);
 
-        client.close();
-
         System.out.println(addressBook);
 
+        /*
+         * Clean up:
+         */
         Files.deleteIfExists(FileSystems.getDefault().getPath("address-book.proto.bin"));
+        client.close();
 
-        Files.copy(new ByteArrayInputStream(addressBook.toBytes().toByteArray()),
-            FileSystems.getDefault().getPath("address-book.proto.bin"));
+        System.out.println("Example complete!");
     }
 }

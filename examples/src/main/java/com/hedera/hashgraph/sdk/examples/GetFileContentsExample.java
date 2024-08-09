@@ -26,42 +26,58 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-public final class GetFileContentsExample {
-    // see `.env.sample` in the repository root for how to specify these values
+/**
+ * How to get file contents.
+ *
+ * TODO: possible duplicate of `CreateFileExample` and `DeleteFileExample`.
+ */
+class GetFileContentsExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetFileContentsExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        // Content to be stored in the file
+        /*
+         * Step 1:
+         * Submit the file create transaction.
+         */
+        // Content to be stored in the file.
         byte[] fileContents = "Hedera is great!".getBytes(StandardCharsets.UTF_8);
 
-        // Create the new file and set its properties
+        // Create the new file and set its properties.
         TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
-            .setKeys(operatorPublicKey) // The public key of the owner of the file
-            .setContents(fileContents) // Contents of the file
+            // The public key of the owner of the file.
+            .setKeys(operatorPublicKey)
+            // Contents of the file.
+            .setContents(fileContents)
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
         FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);
 
-        //Print the file ID to console
+        // Print File ID to the console.
         System.out.println("The new file ID is " + newFileId.toString());
 
-        // Get file contents
+        /*
+         * Step 2:
+         * Get file contents and print them.
+         */
         ByteString contents = new FileContentsQuery()
             .setFileId(newFileId)
             .execute(client);
@@ -69,12 +85,17 @@ public final class GetFileContentsExample {
         // Prints query results to console
         System.out.println("File content query results: " + contents.toStringUtf8());
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created file.
+         */
         new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client)
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

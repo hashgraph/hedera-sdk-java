@@ -24,35 +24,47 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class PrngExample {
+/**
+ * How to generate random number.
+ */
+class PrngExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private PrngExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        /*
+         * Step 1:
+         * Execute `PrngTransaction` and retrieve the result (random number) from the transaction record.
+         */
         TransactionResponse transactionResponse = new PrngTransaction()
-            // The only _required_ property here is `key`
+            // The only _required_ property here is `key`.
             .setRange(100)
             .execute(client);
 
-        // This will wait for the receipt to become available
+        // This will wait for the receipt to become available.
         TransactionRecord record = transactionResponse.getRecord(client);
 
         System.out.println("generated random number = " + record.prngNumber);
 
+        /*
+         * Clean up:
+         */
         client.close();
+        System.out.println("Example complete!");
     }
 }

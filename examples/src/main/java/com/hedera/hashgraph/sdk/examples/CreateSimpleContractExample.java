@@ -25,61 +25,71 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-public final class CreateSimpleContractExample {
+/**
+ * How to create a simple stateless smart contract and call its function.
+ */
+class CreateSimpleContractExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateSimpleContractExample() {
-    }
-
     public static void main(String[] args) throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
-
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        // create the contract's bytecode file
+        /*
+         * Step 1:
+         * Create a file with smart contract bytecode.
+         */
+        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
+
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file
+            // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
-
         TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
-        System.out.println("contract bytecode file: " + newFileId);
+        System.out.println("Contract bytecode file: " + newFileId);
 
-        // create the contract itself
+        /*
+         * Step 2:
+         * Create a smart contract.
+         */
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
             .setGas(500_000)
             .setBytecodeFileId(newFileId)
-            // set an admin key so we can delete the contract later
+            // Set an admin key, so we can delete the contract later.
             .setAdminKey(operatorPublicKey)
             .setMaxTransactionFee(new Hbar(16))
             .execute(client);
 
-
         TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
-
         System.out.println(contractReceipt);
 
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
+        System.out.println("New contract ID: " + newContractId);
 
-        System.out.println("new contract ID: " + newContractId);
-
+        /*
+         * Step 3:
+         * Call smart contract function.
+         */
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setGas(500_000)
             .setContractId(newContractId)
@@ -94,7 +104,10 @@ public final class CreateSimpleContractExample {
         String message = contractCallResult.getString(0);
         System.out.println("contract message: " + message);
 
-        // now delete the contract
+        /*
+         * Clean up:
+         * Delete created contract.
+         */
         TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
@@ -108,5 +121,7 @@ public final class CreateSimpleContractExample {
         System.out.println("Contract successfully deleted");
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

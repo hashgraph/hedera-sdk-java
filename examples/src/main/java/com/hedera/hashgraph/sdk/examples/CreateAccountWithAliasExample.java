@@ -24,67 +24,63 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public class CreateAccountWithAliasExample {
-    // see `.env.sample` in the repository root for how to specify these values
+/**
+ * How to create a Hedera account with alias.
+ */
+class CreateAccountWithAliasExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateAccountWithAliasExample() {
-    }
-
-    /*
-    ## Example 1:
-    - Create a ECSDA private key
-    - Extract the ECDSA public key
-    - Extract the Ethereum public address
-    - Use the `AccountCreateTransaction` and populate `setAlias(evmAddress)` field with the Ethereum public address
-    - Sign the `AccountCreateTransaction` transaction with the new private key
-    - Get the `AccountInfo` and show that the account has contractAccountId
-    */
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         /*
-         * Step 1
-         * Create an ECSDA private key
+         * Step 1:
+         * Generate an ECSDA private key.
          */
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 2
-         * Extract the ECDSA public key
+         * Step 2:
+         * Extract the ECDSA public key.
          */
         PublicKey publicKey = privateKey.getPublicKey();
 
         /*
-         * Step 3
-         * Extract the Ethereum public address
+         * Step 3:
+         * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
         System.out.println(evmAddress);
 
         /*
-         * Step 4
-         * Use the `AccountCreateTransaction` and set the EVM address field to the Ethereum public address
+         * Step 4:
+         * Use the `AccountCreateTransaction` and set the EVM address field to the Ethereum public address.
          */
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
-            .setInitialBalance(Hbar.fromTinybars(100))
+            .setInitialBalance(new Hbar(1))
             .setKey(operatorPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);
 
         /*
-         * Step 5
-         * Sign the `AccountCreateTransaction` transaction using an existing Hedera account and key paying for the transaction fee
+         * Step 5:
+         * Sign the `AccountCreateTransaction` transaction using an existing Hedera account and key paying for the transaction fee.
          */
         accountCreateTransaction.sign(privateKey);
         TransactionResponse response = accountCreateTransaction.execute(client);
@@ -97,8 +93,8 @@ public class CreateAccountWithAliasExample {
         System.out.println("New account ID: " + newAccountId);
 
          /*
-         * Step 6
-         * Get the `AccountInfo` and show that the account has contractAccountId
+         * Step 6:
+         * Get the `AccountInfo` and show that the account has `contractAccountId`.
          */
         AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
@@ -110,7 +106,10 @@ public class CreateAccountWithAliasExample {
             throw new Exception("The new account doesn't have alias");
         }
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -118,5 +117,7 @@ public class CreateAccountWithAliasExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

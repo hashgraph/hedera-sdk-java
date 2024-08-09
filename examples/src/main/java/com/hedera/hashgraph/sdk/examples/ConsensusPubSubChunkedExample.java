@@ -34,31 +34,44 @@ import java.util.concurrent.TimeoutException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class ConsensusPubSubChunkedExample {
+/**
+ * This example demonstrates sending a large message (involving `ChunkedTransaction`) to the topic and then receiving it.
+ */
+class ConsensusPubSubChunkedExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
+    // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final CountDownLatch largeMessageLatch = new CountDownLatch(1);
-
-    private ConsensusPubSubChunkedExample() {
-    }
+    private static final CountDownLatch LARGE_MESSAGE_LATCH = new CountDownLatch(1);
 
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        // generate a submit key to use with the topic
+        /*
+         * Step 1:
+         * Generate a submit key to use with the topic.
+         */
         PrivateKey submitPrivateKey = PrivateKey.generateED25519();
         PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
-        // make a new topic ID to use
+        /*
+         * Step 2:
+         * Create a new topic.
+         */
         TopicId newTopicId = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setAdminKey(operatorPublicKey)
@@ -71,54 +84,67 @@ public final class ConsensusPubSubChunkedExample {
 
         System.out.println("for topic " + newTopicId);
 
-        // Let's wait a bit
+        /*
+         * Step 3:
+         * Sleep for 10 seconds (wait to propagate to the mirror).
+         */
         System.out.println("wait 10s to propagate to the mirror ...");
         Thread.sleep(10_000);
 
-        // setup a mirror client to print out messages as we receive them
+        /*
+         * Step 4:
+         * Set up a mirror client to print out messages as we receive them.
+         */
         new TopicMessageQuery()
             .setTopicId(newTopicId)
             .subscribe(client, topicMessage -> {
                 System.out.println("at " + topicMessage.consensusTimestamp + " ( seq = " + topicMessage.sequenceNumber + " ) received topic message of " + topicMessage.contents.length + " bytes");
-                largeMessageLatch.countDown();
+                LARGE_MESSAGE_LATCH.countDown();
             });
 
-        // get a large file to send
+        /*
+         * Step 5:
+         * Send message (a large one) to the topic created in previous steps.
+         */
+        // Get a large file to send.
         String bigContents = readResources("util/large_message.txt");
 
         System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
 
-        // prepare a message send transaction that requires a submit key from "somewhere else"
+        // Prepare a message send transaction that requires a submit key from "somewhere else".
         @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
             .setMaxChunks(15) // this is 10 by default
             .setTopicId(newTopicId)
             .setMessage(bigContents)
-            // sign with the operator or "sender" of the message
-            // this is the party who will be charged the transaction fee
+            // Sign with the operator or "sender" of the message,
+            // this is the party who will be charged the transaction fee.
             .signWithOperator(client);
 
-        // serialize to bytes so we can be signed "somewhere else" by the submit key
+        // Serialize to bytes, so we can be signed "somewhere else" by the submit key.
         byte[] transactionBytes = transaction.toBytes();
 
-        // now pretend we sent those bytes across the network
-        // parse them into a transaction so we can sign as the submit key
+        // Now pretend we sent those bytes across the network.
+        // Parse them into a transaction, so we can sign as the submit key.
         transaction = Transaction.fromBytes(transactionBytes);
 
-        // view out the message size from the parsed transaction
-        // this can be useful to display what we are about to sign
+        // View out the message size from the parsed transaction.
+        // This can be useful to display what we are about to sign.
         long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
         System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
 
-        // sign with that submit key
+        // Sign with that submit key.
         transaction.sign(submitPrivateKey);
 
-        // now actually submit the transaction
-        // get the receipt to ensure there were no errors
+        // Now actually submit the transaction and get the receipt to ensure there were no errors.
         transaction.execute(client).getReceipt(client);
 
-        boolean largeMessageReceived = largeMessageLatch.await(60, TimeUnit.SECONDS);
+        // Wait 60 seconds to receive the message. Fail if not received.
+        boolean largeMessageReceived = LARGE_MESSAGE_LATCH.await(60, TimeUnit.SECONDS);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created topic.
+         */
         new TopicDeleteTransaction()
             .setTopicId(newTopicId)
             .execute(client)
@@ -126,12 +152,15 @@ public final class ConsensusPubSubChunkedExample {
 
         client.close();
 
-        // Edge case
+        // Fail if message wasn't received.
         if (!largeMessageReceived) {
             throw new TimeoutException("Large topic message was not received!");
         }
+
+        System.out.println("Example complete!");
     }
 
+    // TODO: check if it will possible to optimize it
     private static String readResources(String filename) {
         InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();

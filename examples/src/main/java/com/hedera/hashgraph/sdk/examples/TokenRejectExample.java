@@ -26,9 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TokenRejectExample {
+/**
+ * How to reject a token (part of HIP-904).
+ */
+class TokenRejectExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
@@ -37,18 +40,29 @@ public class TokenRejectExample {
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private TokenRejectExample() {}
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // create a treasury account
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys for accounts.
+         */
         PrivateKey treasuryAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey treasuryAccountPublicKey = treasuryAccountPrivateKey.getPublicKey();
+        PrivateKey receiverAccountPrivateKey = PrivateKey.generateED25519();
+        PublicKey receiverAccountPublicKey = receiverAccountPrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * Create accounts for this example.
+         */
+        // Create a treasury account.
         var treasuryAccountId = new AccountCreateTransaction()
             .setKey(treasuryAccountPublicKey)
             .setMaxAutomaticTokenAssociations(100)
@@ -58,9 +72,7 @@ public class TokenRejectExample {
             .getReceipt(client)
             .accountId;
 
-        // create a receiver account with unlimited max auto associations
-        PrivateKey receiverAccountPrivateKey = PrivateKey.generateED25519();
-        PublicKey receiverAccountPublicKey = receiverAccountPrivateKey.getPublicKey();
+        // Create a receiver account with unlimited max auto associations (-1).
         var receiverAccountId = new AccountCreateTransaction()
             .setKey(receiverAccountPublicKey)
             .setMaxAutomaticTokenAssociations(-1)
@@ -70,7 +82,11 @@ public class TokenRejectExample {
             .getReceipt(client)
             .accountId;
 
-        // create a fungible token
+        /*
+         * Step 3:
+         * Create tokens for this example.
+         */
+        // Create a Fungible Token.
         var fungibleTokenId = new TokenCreateTransaction()
             .setTokenName("Example Fungible Token")
             .setTokenSymbol("EFT")
@@ -87,7 +103,7 @@ public class TokenRejectExample {
             .getReceipt(client)
             .tokenId;
 
-        // create NFT
+        // Create NFT.
         var nonFungibleTokenId = new TokenCreateTransaction()
             .setTokenName("Example NFT")
             .setTokenSymbol("ENFT")
@@ -103,7 +119,10 @@ public class TokenRejectExample {
             .getReceipt(client)
             .tokenId;
 
-        // mint 3 NFTs
+        /*
+         * Step 4:
+         * Mint three NFTs.
+         */
         var mintReceiptNftToken = new TokenMintTransaction()
             .setTokenId(nonFungibleTokenId)
             .setMetadata(generateNftMetadata((byte) 3))
@@ -114,7 +133,10 @@ public class TokenRejectExample {
 
         var nftSerials = mintReceiptNftToken.serials;
 
-        // transfer the tokens to the receiver
+        /*
+         * Step 5:
+         * Transfer tokens to the receiver.
+         */
         new TransferTransaction()
             .addTokenTransfer(fungibleTokenId, treasuryAccountId, -1_000)
             .addTokenTransfer(fungibleTokenId, receiverAccountId, 1_000)
@@ -126,6 +148,10 @@ public class TokenRejectExample {
             .execute(client)
             .getReceipt(client);
 
+        /*
+         * Step 6:
+         * Check receiver account balance.
+         */
         var receiverAccountBalance = new AccountBalanceQuery()
             .setAccountId(receiverAccountId)
             .execute(client);
@@ -135,7 +161,10 @@ public class TokenRejectExample {
 
         System.out.println("Receiver rejects example fungible tokens...");
 
-        // reject the fungible token
+        /*
+         * Step 7:
+         * Reject the fungible token.
+         */
         new TokenRejectTransaction()
             .setOwnerId(receiverAccountId)
             .addTokenId(fungibleTokenId)
@@ -146,7 +175,10 @@ public class TokenRejectExample {
 
         System.out.println("Receiver rejects example NFTs...");
 
-        // execute the token reject flow
+        /*
+         * Step 8:
+         * Execute the token reject flow -- reject NFTs.
+         */
         new TokenRejectFlow()
             .setOwnerId(receiverAccountId)
             .setNftIds(List.of(
@@ -159,6 +191,10 @@ public class TokenRejectExample {
             .execute(client)
             .getReceipt(client);
 
+        /*
+         * Step 9:
+         * Check receiver account balance after token reject.
+         */
         var receiverAccountBalanceAfterTokenReject = new AccountBalanceQuery()
             .setAccountId(receiverAccountId)
             .execute(client);
@@ -166,6 +202,10 @@ public class TokenRejectExample {
         System.out.println("Receiver account has (after executing TokenReject): " + receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) + " example fungible tokens.");
         System.out.println("Receiver account has (after executing TokenRejectFlow): " + receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) + " example NFTs.");
 
+        /*
+         * Step 10:
+         * Check treasury account balance after token reject.
+         */
         var treasuryAccountBalance = new AccountBalanceQuery()
             .setAccountId(treasuryAccountId)
             .execute(client);
@@ -173,8 +213,10 @@ public class TokenRejectExample {
         System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
         System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
 
-        // clean up
-
+        /*
+         * Clean up:
+         * Delete created accounts and tokens.
+         */
         new AccountDeleteTransaction()
             .setAccountId(treasuryAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -204,6 +246,8 @@ public class TokenRejectExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 
     private static List<byte[]> generateNftMetadata(byte metadataCount) {

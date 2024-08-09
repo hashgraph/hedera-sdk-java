@@ -26,40 +26,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/*
-    Example for HIP-573: Blanket exemptions for custom fee collectors
-    1. Create accounts A, B, and C
-    2. Create a fungible token that has three fractional fees
-    Fee #1 sends 1/100 of the transferred value to collector 0.0.A.
-    Fee #2 sends 2/100 of the transferred value to collector 0.0.B.
-    Fee #3 sends 3/100 of the transferred value to collector 0.0.C.
-    3. Collector 0.0.B sends 10_000 units of the token to 0.0.A.
-    4. Get the transaction fee for that transfer transaction
-    5. Show that the fee collector accounts in the custom fee list of the token
-    that was created was not charged a custom fee in the transfer
-*/
-public final class ExemptCustomFeesExample {
+/**
+ * HIP-573: Blanket exemptions for custom fee collectors.
+ */
+class ExemptCustomFeesExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private ExemptCustomFeesExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         /*
-         * Step 1
-         * Create accounts A, B, and C
+         * Step 1:
+         * Create accounts A, B, and C.
          */
-
         PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
         AccountId firstAccountId = new AccountCreateTransaction()
@@ -94,13 +89,12 @@ public final class ExemptCustomFeesExample {
             .accountId;
 
         /*
-         * Step 2
-         * 2. Create a fungible token that has three fractional fees
-         * Fee #1 sends 1/100 of the transferred value to collector 0.0.A.
-         * Fee #2 sends 2/100 of the transferred value to collector 0.0.B.
-         * Fee #3 sends 3/100 of the transferred value to collector 0.0.C.
+         * Step 2:
+         * Create a fungible token that has three fractional fees:
+         * - fee #1 sends 1/100 of the transferred value to collector 0.0.A.;
+         * - fee #2 sends 2/100 of the transferred value to collector 0.0.B.;
+         * - fee #3 sends 3/100 of the transferred value to collector 0.0.C.
          */
-
         CustomFractionalFee fee1 = new CustomFractionalFee()
             .setFeeCollectorAccountId(firstAccountId)
             .setNumerator(1)
@@ -143,10 +137,9 @@ public final class ExemptCustomFeesExample {
         System.out.println("TokenId: " + tokenId);
 
         /*
-         * Step 3
+         * Step 3:
          * Collector 0.0.B sends 10_000 units of the token to 0.0.A.
          */
-
         // Send 10_000 units from the operator to the second account
         new TransferTransaction()
             .addTokenTransfer(tokenId, OPERATOR_ID, -10_000)
@@ -162,23 +155,20 @@ public final class ExemptCustomFeesExample {
             .sign(secondAccountPrivateKey)
             .execute(client);
 
-
         /*
-         * Step 4
-         * Get the transaction fee for that transfer transaction
+         * Step 4:
+         * Get the transaction fee for that transfer transaction.
          */
-
         Hbar transactionFee = tokenTransferResponse
             .getRecord(client)
             .transactionFee;
         System.out.println("Txfee: " + transactionFee);
 
         /*
-         * Step 5
+         * Step 5:
          * Show that the fee collector accounts in the custom fee list
-         * of the token that was created was not charged a custom fee in the transfer
+         * of the token that was created was not charged a custom fee in the transfer.
          */
-
         Long firstAccountBalanceAfter = new AccountBalanceQuery()
             .setAccountId(firstAccountId)
             .execute(client)
@@ -198,8 +188,10 @@ public final class ExemptCustomFeesExample {
         System.out.println("Second account balance after TransferTransaction: " + secondAccountBalanceAfter);
         System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
 
-        // Clean up
-
+        /*
+         * Clean up:
+         * Delete created accounts and token.
+         */
         Map<TokenId, Long> firstAccountTokensBeforeWipe = new AccountBalanceQuery()
             .setAccountId(firstAccountId)
             .execute(client)

@@ -25,110 +25,123 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * HIP-646: Fungible Token Metadata Field.
+ * Addition of the metadata field to Fungible Tokens (FT),
+ * taking after the Non-Fungible Token (NFT) metadata field which was added in HIP-17.
+ * <p>
+ * HIP-765: NFT Collection Token Metadata Field
+ * Addition of the metadata field to Non-Fungible Token Class,
+ * taking after the individual Non-Fungible Token (NFT) metadata field, which was added in HIP-17.
+ * <p>
+ * How to set and update token's metadata.
+ */
 public class TokenMetadataExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final PrivateKey ADMIN_KEY_PRIVATE = PrivateKey.generateED25519();
-
-    private static final PublicKey ADMIN_KEY_PUBLIC = ADMIN_KEY_PRIVATE.getPublicKey();
-
-    private static final PrivateKey METADATA_KEY_PRIVATE = PrivateKey.generateED25519();
-
-    private static final PublicKey METADATA_KEY_PUBLIC = METADATA_KEY_PRIVATE.getPublicKey();
-
-    private static final byte[] INITIAL_TOKEN_METADATA = new byte[]{1, 1, 1, 1, 1};
-
-    private static final byte[] UPDATED_TOKEN_METADATA = new byte[]{2, 2, 2, 2, 2};
-
-    private Client client;
-
     public static void main(String[] args) throws Exception {
-        TokenMetadataExample example = new TokenMetadataExample();
-
-        example.updateMutableTokenMetadata();
-
-        example.updateImmutableTokenMetadata();
-
-        example.cleanUp();
-    }
-
-    private TokenMetadataExample() throws Exception {
-        client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-    }
 
-    private void updateMutableTokenMetadata() throws Exception {
-        // create a mutable fungible token with a metadata, but without a metadata key
-        var tokenId = Objects.requireNonNull(
+        /*
+         * Step 1:
+         * Generate keys for future tokens.
+         */
+        PrivateKey adminPrivateKey = PrivateKey.generateED25519();
+        PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
+
+        PrivateKey metadataPrivateKey = PrivateKey.generateED25519();
+        PublicKey metadataPublicKey = metadataPrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * The beginning of the first example (mutable token's metadata).
+         * Create a mutable fungible token with a metadata, but without a metadata key.
+         */
+        System.out.println("Example №1 (mutable token's metadata).");
+        byte[] initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+        var tokenIdMutable = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setTokenMetadata(INITIAL_TOKEN_METADATA)
-                .setTokenType(TokenType.FUNGIBLE_COMMON) // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765)
+                .setTokenMetadata(initialTokenMetadata)
+                // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setDecimals(3)
                 .setInitialSupply(1_000_000)
-                .setAdminKey(ADMIN_KEY_PUBLIC)
+                .setAdminKey(adminPublicKey)
                 .freezeWith(client)
-                .sign(ADMIN_KEY_PRIVATE)
+                .sign(adminPrivateKey)
                 .execute(client)
                 .getReceipt(client)
                 .tokenId
         );
 
-        System.out.println("Created a mutable token: " + tokenId);
+        System.out.println("Created a mutable token: " + tokenIdMutable);
 
-        var tokenInfoAfterCreation = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        /*
+         * Step 3:
+         * Query and output mutable token info after its creation.
+         */
+        var mutableTokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenIdMutable)
             .execute(client);
 
-        // check that metadata was set correctly
-        System.out.println("Mutable token's metadata after creation: " + Arrays.toString(tokenInfoAfterCreation.metadata));
+        // Check that metadata was set correctly.
+        System.out.println("Mutable token's metadata after creation: " + Arrays.toString(mutableTokenInfoAfterCreation.metadata));
 
-        // update token's metadata
+        /*
+         * Step 4:
+         * Update mutable token's metadata.
+         */
+        byte[] updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(UPDATED_TOKEN_METADATA)
+            .setTokenId(tokenIdMutable)
+            .setTokenMetadata(updatedTokenMetadata)
             .freezeWith(client)
-            .sign(ADMIN_KEY_PRIVATE)
+            .sign(adminPrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterMetadataUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        /*
+         * Step 5:
+         * Query and output mutable token info after its metadata was updated.
+         */
+        var mutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
+            .setTokenId(tokenIdMutable)
             .execute(client);
 
         // check that metadata was updated correctly
-        System.out.println("Mutable token's metadata after update: " + Arrays.toString(tokenInfoAfterMetadataUpdate.metadata));
+        System.out.println("Mutable token's metadata after update: " + Arrays.toString(mutableTokenInfoAfterMetadataUpdate.metadata));
 
-        // Clean up
-        new TokenDeleteTransaction()
-            .setTokenId(tokenId)
-            .freezeWith(client)
-            .sign(ADMIN_KEY_PRIVATE)
-            .execute(client)
-            .getReceipt(client);
-    }
-
-    private void updateImmutableTokenMetadata() throws Exception {
-        // create an immutable fungible token with a metadata key and a metadata
-        var tokenId = Objects.requireNonNull(
+        /*
+         * Step 6:
+         * The beginning of the second example (immutable token's metadata).
+         * Create an immutable fungible token with a metadata key and a metadata.
+         */
+        System.out.println("Example №2 (immutable token's metadata).");
+        var tokenIdImmutable = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
-                .setTokenMetadata(INITIAL_TOKEN_METADATA)
+                .setTokenMetadata(initialTokenMetadata)
                 .setTokenType(TokenType.FUNGIBLE_COMMON) // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765)
                 .setTreasuryAccountId(OPERATOR_ID)
-                .setMetadataKey(METADATA_KEY_PUBLIC)
+                .setMetadataKey(metadataPublicKey)
                 .setDecimals(3)
                 .setInitialSupply(1_000_000)
                 .execute(client)
@@ -136,35 +149,55 @@ public class TokenMetadataExample {
                 .tokenId
         );
 
-        System.out.println("Created an immutable token: " + tokenId);
+        System.out.println("Created an immutable token: " + tokenIdImmutable);
 
-        var tokenInfoAfterCreation = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        /*
+         * Step 7:
+         * Query and output immutable token info after its creation.
+         */
+        var immutableTokenInfoAfterCreation = new TokenInfoQuery()
+            .setTokenId(tokenIdImmutable)
             .execute(client);
 
-        // check that metadata was set correctly
-        System.out.println("Immutable token's metadata after creation: " + Arrays.toString(tokenInfoAfterCreation.metadata));
+        // Check that metadata was set correctly.
+        System.out.println("Immutable token's metadata after creation: " + Arrays.toString(immutableTokenInfoAfterCreation.metadata));
 
-        // update token's metadata
+        /*
+         * Step 8:
+         * Update immutable token's metadata.
+         */
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(UPDATED_TOKEN_METADATA)
+            .setTokenId(tokenIdImmutable)
+            .setTokenMetadata(updatedTokenMetadata)
             .freezeWith(client)
-            .sign(METADATA_KEY_PRIVATE)
+            .sign(metadataPrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterMetadataUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        /*
+         * Step 5:
+         * Query and output immutable token info after its metadata was updated.
+         */
+        var immutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
+            .setTokenId(tokenIdImmutable)
             .execute(client);
 
-        // check that metadata was updated correctly
-        System.out.println("Immutable token's metadata after update: " + Arrays.toString(tokenInfoAfterMetadataUpdate.metadata));
+        // Check that metadata was updated correctly.
+        System.out.println("Immutable token's metadata after update: " + Arrays.toString(immutableTokenInfoAfterMetadataUpdate.metadata));
 
-        // Clean up impossible as token is immutable
-    }
+        /*
+         * Clean up:
+         * Delete created mutable token.
+         */
+        new TokenDeleteTransaction()
+            .setTokenId(tokenIdMutable)
+            .freezeWith(client)
+            .sign(adminPrivateKey)
+            .execute(client)
+            .getReceipt(client);
 
-    private void cleanUp() throws Exception {
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

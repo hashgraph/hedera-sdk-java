@@ -24,34 +24,44 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class UpdateAccountPublicKeyExample {
+/**
+ * How to update account's key.
+ */
+class UpdateAccountPublicKeyExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private UpdateAccountPublicKeyExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         client.setDefaultMaxTransactionFee(new Hbar(10));
 
-        // First, we create a new account so we don't affect our account
-
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys for accounts.
+         */
         PrivateKey privateKey1 = PrivateKey.generateED25519();
         PublicKey publicKey1 = privateKey1.getPublicKey();
         PrivateKey privateKey2 = PrivateKey.generateED25519();
         PublicKey publicKey2 = privateKey2.getPublicKey();
 
+        /*
+         * Step 2:
+         * Create a new account.
+         */
         TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
             .setKey(publicKey1)
             .setInitialBalance(new Hbar(1))
@@ -61,8 +71,11 @@ public final class UpdateAccountPublicKeyExample {
         AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
         System.out.println("account = " + accountId);
         System.out.println("key = " + privateKey1.getPublicKey());
-        // Next, we update the key
 
+        /*
+         * Step 2:
+         * Update account's key.
+         */
         System.out.println(" :: update public key of account " + accountId);
         System.out.println("set key = " + privateKey2.getPublicKey());
 
@@ -70,18 +83,21 @@ public final class UpdateAccountPublicKeyExample {
             .setAccountId(accountId)
             .setKey(publicKey2)
             .freezeWith(client)
-            // sign with the previous key and the new key
+            // Sign with the previous key and the new key.
             .sign(privateKey1)
             .sign(privateKey2)
-            // execute will implicitly sign with the operator
+            // Execute will implicitly sign with the operator.
             .execute(client);
 
         System.out.println("transaction ID: " + accountUpdateTransactionResponse);
 
-        // (important!) wait for the transaction to complete by querying the receipt
+        // (Important!) Wait for the transaction to complete by querying the receipt.
         accountUpdateTransactionResponse.getReceipt(client);
 
-        // Now we fetch the account information to check if the key was changed
+        /*
+         * Step 3:
+         * Get account info to confirm the key was changed.
+         */
         System.out.println(" :: getAccount and check our current key");
 
         AccountInfo info = new AccountInfoQuery()
@@ -90,7 +106,10 @@ public final class UpdateAccountPublicKeyExample {
 
         System.out.println("key = " + info.key);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -100,5 +119,7 @@ public final class UpdateAccountPublicKeyExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

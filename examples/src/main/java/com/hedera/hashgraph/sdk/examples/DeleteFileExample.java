@@ -24,59 +24,69 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
+/**
+ * How to delete a file.
+ *
+ * TODO: delete this example as it is a duplicate of `CreateFileExample`?
+ */
 public final class DeleteFileExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private DeleteFileExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
+        /*
+         * Step 1:
+         * Submit the file create transaction.
+         */
         // The file is required to be a byte array,
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
         TransactionResponse transactionResponse = new FileCreateTransaction()
+            // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(fileContents)
+            // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
             .setMaxTransactionFee(new Hbar(2))
             .execute(client);
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(receipt.fileId);
+        FileId newFileId = receipt.fileId;
 
         System.out.println("file: " + newFileId);
 
-        // now delete the file
+        /*
+         * Clean up:
+         * Delete created file.
+         */
         TransactionResponse fileDeleteTransactionResponse = new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client);
 
-        // if this doesn't throw then the transaction was a success
+        // If this doesn't throw then the transaction was a success.
         fileDeleteTransactionResponse.getReceipt(client);
 
         System.out.println("File deleted successfully.");
 
-        new FileInfoQuery()
-            .setFileId(newFileId)
-            .execute(client);
-
-        // note the above fileInfo will fail with FILE_DELETED due to a known issue on Hedera
-        // double check this comment
-
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

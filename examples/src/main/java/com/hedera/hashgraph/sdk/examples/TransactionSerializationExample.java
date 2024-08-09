@@ -19,72 +19,93 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionRecord;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
+
 import java.util.Objects;
 
-public class TransactionSerializationExample {
+/**
+ * HIP-745: Optionally send transaction data without required transaction fields.
+ * How to serialize incomplete transaction, deserialize it, complete and execute.
+ */
+class TransactionSerializationExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    public TransactionSerializationExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        /*
+         * Step 1:
+         * Check Hbar balance of the sender and recipient.
+         */
         AccountId recipientId = AccountId.fromString("0.0.3");
-        Hbar amount = Hbar.fromTinybars(10_000);
-
         Hbar senderBalanceBefore = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)
             .hbars;
 
-        Hbar receiptBalanceBefore = new AccountBalanceQuery()
+        Hbar recipientBalanceBefore = new AccountBalanceQuery()
             .setAccountId(recipientId)
             .execute(client)
             .hbars;
 
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
+        System.out.println("" + recipientId + " balance = " + recipientBalanceBefore);
 
+        /*
+         * Step 2:
+         * Create the transfer transaction with adding only Hbar transfer which credits the operator.
+         */
+        Hbar transferAmount = Hbar.fromTinybars(10_000);
         var transferTransaction = new TransferTransaction()
-            // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
-            // both sides is equivalent
-            .addHbarTransfer(OPERATOR_ID, amount.negated());
+            // `.addSender` and `.addRecipient` can be called as many times as you want as long as the total sum from
+            // both sides is equivalent.
+            .addHbarTransfer(OPERATOR_ID, transferAmount.negated());
 
+        /*
+         * Step 3:
+         * Serialize the transfer transaction.
+         */
         var transactionBytes = transferTransaction.toBytes();
 
+        /*
+         * Step 4:
+         * Deserialize the transfer transaction.
+         */
         TransferTransaction transferTransactionDeserialized = (TransferTransaction) Transaction.fromBytes(transactionBytes);
 
+        /*
+         * Step 5:
+         * Complete the transfer transaction-- add Hbar transfer which debits Hbar to the recipient.
+         * And execute the transfer transaction.
+         */
         var transactionResponse = transferTransactionDeserialized
-            .addHbarTransfer(recipientId, amount)
+            .addHbarTransfer(recipientId, transferAmount)
             .setTransactionMemo("transfer test")
             .execute(client);
 
         System.out.println("transaction ID: " + transactionResponse);
-
         TransactionRecord record = transactionResponse.getRecord(client);
+        System.out.println("transferred " + transferAmount + "...");
 
-        System.out.println("transferred " + amount + "...");
-
+        /*
+         * Step 6:
+         * Check Hbar balance of the sender and recipient after transfer transaction was executed.
+         */
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)
@@ -99,6 +120,10 @@ public class TransactionSerializationExample {
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
         System.out.println("Transfer memo: " + record.transactionMemo);
 
+        /*
+         * Clean up:
+         */
         client.close();
+        System.out.println("Example complete!");
     }
 }

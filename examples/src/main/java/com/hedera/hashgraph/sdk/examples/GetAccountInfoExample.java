@@ -24,34 +24,46 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class GetAccountInfoExample {
+/**
+ * How to get information about Hedera account.
+ */
+class GetAccountInfoExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetAccountInfoExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
+        /*
+         * Step 1:
+         * Execute `AccountBalanceQuery` and output `OPERATOR_ID` account info.
+         */
         AccountInfo info = new AccountInfoQuery()
-            .setAccountId(client.getOperatorAccountId())
-            .setQueryPayment(new Hbar(1))
+            .setAccountId(OPERATOR_ID)
+            .setMaxQueryPayment(new Hbar(1))
             .execute(client);
 
         System.out.println("info.key                          = " + info.key);
         System.out.println("info.isReceiverSignatureRequired  = " + info.isReceiverSignatureRequired);
         System.out.println("info.expirationTime               = " + info.expirationTime);
 
+        /*
+         * Clean up:
+         */
         client.close();
+        System.out.println("Example complete!");
     }
 }

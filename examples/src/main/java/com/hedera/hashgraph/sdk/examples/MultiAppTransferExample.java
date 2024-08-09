@@ -19,51 +19,56 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.*;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class MultiAppTransferExample {
-    // see `.env.sample` in the repository root for how to specify these values
+/**
+ * How to transfer Hbar to an account with the receiver signature enabled.
+ */
+class MultiAppTransferExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // the exchange should possess this key, we're only generating it for demonstration purposes
-    private static final PrivateKey exchangePrivateKey = PrivateKey.generateED25519();
-    private static final PublicKey exchangePublicKey = exchangePrivateKey.getPublicKey();
-    // this is the only key we should actually possess
-    private static final PrivateKey userPrivateKey = PrivateKey.generateED25519();
-    private static final PublicKey userPublicKey = userPrivateKey.getPublicKey();
-    private static final Client client;
-
-    static {
-        try {
-            client = ClientHelper.forName(HEDERA_NETWORK);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-    }
-
-    private MultiAppTransferExample() {
-    }
-
     public static void main(String[] args) throws Exception {
-        // the exchange creates an account for the user to transfer funds to
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and be signed by this key.
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        /*
+         * Step 1:
+         * Generate ED25519 private and public keys for accounts.
+         */
+        // The exchange should possess this key, we're only generating it for demonstration purposes.
+        PrivateKey exchangePrivateKey = PrivateKey.generateED25519();
+        PublicKey exchangePublicKey = exchangePrivateKey.getPublicKey();
+
+        // This is the only key we should actually possess.
+        PrivateKey userPrivateKey = PrivateKey.generateED25519();
+        PublicKey userPublicKey = userPrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * Create exchange and receiver accounts.
+         */
+        // The exchange creates an account for the user to transfer funds to.
         AccountId exchangeAccountId = new AccountCreateTransaction()
-            // the exchange only accepts transfers that it validates through a side channel (e.g. REST API)
+            // The exchange only accepts transfers that it validates through a side channel (e.g. REST API).
             .setReceiverSignatureRequired(true)
             .setKey(exchangePublicKey)
-            // The owner key has to sign this transaction
-            // when setReceiverSignatureRequired is true
+            // The owner key has to sign this transaction when setReceiverSignatureRequired is true.
             .freezeWith(client)
             .sign(exchangePrivateKey)
             .execute(client)
@@ -72,8 +77,7 @@ public final class MultiAppTransferExample {
 
         assert exchangeAccountId != null;
 
-        // for the purpose of this example we create an account for
-        // the user with a balance of 5 h
+        // For the purpose of this example we create an account for the user with a balance of 5 Hbar.
         AccountId userAccountId = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(5))
             .setKey(userPublicKey)
@@ -83,36 +87,41 @@ public final class MultiAppTransferExample {
 
         assert userAccountId != null;
 
-        // next we make a transfer from the user account to the
-        // exchange account, this requires signing by both parties
+        /*
+         * Step 3:
+         * Make a transfer from the user account to the exchange account, this requires signing by both parties.
+         */
         TransferTransaction transferTxn = new TransferTransaction()
             .addHbarTransfer(userAccountId, new Hbar(2).negated())
             .addHbarTransfer(exchangeAccountId, new Hbar(2))
-            // the exchange-provided memo required to validate the transaction
+            // The exchange-provided memo required to validate the transaction.
             .setTransactionMemo("https://some-exchange.com/user1/account1")
             // NOTE: to manually sign, you must freeze the Transaction first
             .freezeWith(client)
             .sign(userPrivateKey);
 
-        // the exchange must sign the transaction in order for it to be accepted by the network
-        // assume this is some REST call to the exchange API server
-        byte[] signedTxnBytes = exchangeSignsTransaction(transferTxn.toBytes());
+        // The exchange must sign the transaction in order for it to be accepted by the network
+        // (assume this is some REST call to the exchange API server).
+        byte[] signedTxnBytes = Transaction.fromBytes(transferTxn.toBytes()).sign(exchangePrivateKey).toBytes();
 
-        // parse the transaction bytes returned from the exchange
+        // Parse the transaction bytes returned from the exchange.
         Transaction<?> signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
 
-        // get the amount we are about to transfer
-        // we built this with +2, -2
+        // Get the amount we are about to transfer (we built this with +2, -2).
         Hbar transferAmount = ((TransferTransaction) signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
         System.out.println("about to transfer " + transferAmount + "...");
 
-        // we now execute the signed transaction and wait for it to be accepted
+        // We now execute the signed transaction and wait for it to be accepted.
         TransactionResponse transactionResponse = signedTransferTxn.execute(client);
 
-        // (important!) wait for consensus by querying for the receipt
+        // (Important!) Wait for consensus by querying for the receipt.
         transactionResponse.getReceipt(client);
 
+        /*
+         * Step 4:
+         * Query user and exchange account balance to validate the transfer was successfully complete.
+         */
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(userAccountId)
             .execute(client)
@@ -126,7 +135,10 @@ public final class MultiAppTransferExample {
         System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
         System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created accounts.
+         */
         new AccountDeleteTransaction()
             .setAccountId(exchangeAccountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -144,9 +156,7 @@ public final class MultiAppTransferExample {
             .getReceipt(client);
 
         client.close();
-    }
 
-    private static byte[] exchangeSignsTransaction(byte[] transactionData) throws InvalidProtocolBufferException {
-        return Transaction.fromBytes(transactionData).sign(exchangePrivateKey).toBytes();
+        System.out.println("Example complete!");
     }
 }

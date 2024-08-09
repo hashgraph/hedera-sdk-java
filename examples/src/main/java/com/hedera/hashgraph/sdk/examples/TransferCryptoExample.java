@@ -24,28 +24,35 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class TransferCryptoExample {
+/**
+ * How to transfer Hbar between accounts.
+ */
+class TransferCryptoExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private TransferCryptoExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         AccountId recipientId = AccountId.fromString("0.0.3");
-        Hbar amount = Hbar.fromTinybars(10_000);
 
+        /*
+         * Step 1:
+         * Check Hbar balance of the sender and recipient.
+         */
         Hbar senderBalanceBefore = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)
@@ -59,20 +66,27 @@ public final class TransferCryptoExample {
         System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
         System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
 
+        /*
+         * Step 2:
+         * Execute the transfer transaction to send Hbars from operator to the recipient.
+         */
+        Hbar transferAmount = Hbar.fromTinybars(10_000);
         TransactionResponse transactionResponse = new TransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
-            // both sides is equivalent
-            .addHbarTransfer(OPERATOR_ID, amount.negated())
-            .addHbarTransfer(recipientId, amount)
+            // both sides is equivalent.
+            .addHbarTransfer(OPERATOR_ID, transferAmount.negated())
+            .addHbarTransfer(recipientId, transferAmount)
             .setTransactionMemo("transfer test")
             .execute(client);
 
         System.out.println("transaction ID: " + transactionResponse);
-
         TransactionRecord record = transactionResponse.getRecord(client);
+        System.out.println("transferred " + transferAmount + "...");
 
-        System.out.println("transferred " + amount + "...");
-
+        /*
+         * Step 6:
+         * Check Hbar balance of the sender and recipient after transfer transaction was executed.
+         */
         Hbar senderBalanceAfter = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)
@@ -87,6 +101,10 @@ public final class TransferCryptoExample {
         System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
         System.out.println("Transfer memo: " + record.transactionMemo);
 
+        /*
+         * Clean up:
+         */
         client.close();
+        System.out.println("Example complete!");
     }
 }

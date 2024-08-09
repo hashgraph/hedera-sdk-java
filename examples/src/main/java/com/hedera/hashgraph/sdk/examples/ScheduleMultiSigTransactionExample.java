@@ -27,35 +27,45 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-public class ScheduleMultiSigTransactionExample {
+/**
+ * How to schedule a transaction with a multi-sig account.
+ */
+class ScheduleMultiSigTransactionExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    ScheduleMultiSigTransactionExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        AccountId operatorId = Objects.requireNonNull(client.getOperatorAccountId());
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        // Generate 3 random keys
+        /*
+         * Step 1:
+         * Generate 3 ED25519 private keys.
+         */
         PrivateKey key1 = PrivateKey.generateED25519();
         PrivateKey key2 = PrivateKey.generateED25519();
         PrivateKey key3 = PrivateKey.generateED25519();
 
-        // Create a keylist from those keys. This key will be used as the new account's key
-        // The reason we want to use a `KeyList` is to simulate a multi-party system where
-        // multiple keys are required to sign.
+        /*
+         * Step 2:
+         * Create a Key List from keys generated in previous step. This key will be used as the new account's key
+         * The reason we want to use a `KeyList` is to simulate a multi-party system where
+         * multiple keys are required to sign.
+         */
         KeyList keyList = new KeyList();
 
         keyList.add(key1.getPublicKey());
@@ -70,36 +80,43 @@ public class ScheduleMultiSigTransactionExample {
         System.out.println("key3 public = " + key3.getPublicKey());
         System.out.println("keyList = " + keyList);
 
-        // Creat the account with the `KeyList`
+        /*
+         * Step 3:
+         * Create a new account with a Key List created in a previous step.
+         */
         TransactionResponse response = new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            // The only _required_ property here is `key`
+            // The only _required_ property here is `key`.
             .setKey(keyList)
             .setInitialBalance(new Hbar(10))
             .execute(client);
 
-        // This will wait for the receipt to become available
+        // This will wait for the receipt to become available.
         @Var TransactionReceipt receipt = response.getReceipt(client);
 
         AccountId accountId = Objects.requireNonNull(receipt.accountId);
 
         System.out.println("accountId = " + accountId);
 
+        /*
+         * Step 4:
+         * Create a new scheduled transaction for transferring Hbars.
+         */
         // Generate a `TransactionId`. This id is used to query the inner scheduled transaction
-        // after we expect it to have been executed
-        TransactionId transactionId = TransactionId.generate(operatorId);
+        // after we expect it to have been executed.
+        TransactionId transactionId = TransactionId.generate(OPERATOR_ID);
 
         System.out.println("transactionId for scheduled transaction = " + transactionId);
 
         // Create a transfer transaction with 2/3 signatures.
         @Var TransferTransaction transfer = new TransferTransaction()
             .addHbarTransfer(accountId, new Hbar(1).negated())
-            .addHbarTransfer(operatorId, new Hbar(1));
+            .addHbarTransfer(OPERATOR_ID, new Hbar(1));
 
-        // Schedule the transactoin
+        // Schedule the transaction.
         ScheduleCreateTransaction scheduled = transfer.schedule()
-            .setPayerAccountId(client.getOperatorAccountId())
-            .setAdminKey(client.getOperatorPublicKey())
+            .setPayerAccountId(OPERATOR_ID)
+            .setAdminKey(operatorPublicKey)
             .freezeWith(client)
             .sign(key2);
 
@@ -110,7 +127,10 @@ public class ScheduleMultiSigTransactionExample {
 
         System.out.println("scheduleId = " + scheduleId);
 
-        // Get the schedule info to see if `signatories` is populated with 2/3 signatures
+        /*
+         * Step 5:
+         * Get the schedule info to see if `signatories` is populated with 2/3 signatures.
+         */
         ScheduleInfo info = new ScheduleInfoQuery()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
@@ -122,7 +142,7 @@ public class ScheduleMultiSigTransactionExample {
 
         Map<AccountId, Hbar> transfers = transfer.getHbarTransfers();
 
-        // Make sure the transfer transaction is what we expect
+        // Make sure the transfer transaction is what we expect.
         if (transfers.size() != 2) {
             throw new Exception("more transfers than expected");
         }
@@ -131,14 +151,17 @@ public class ScheduleMultiSigTransactionExample {
             throw new Exception("transfer for " + accountId + " is not what is expected " + transfers.get(accountId));
         }
 
-        if (!transfers.get(operatorId).equals(new Hbar(1))) {
-            throw new Exception("transfer for " + operatorId + " is not what is expected " + transfers.get(operatorId));
+        if (!transfers.get(OPERATOR_ID).equals(new Hbar(1))) {
+            throw new Exception("transfer for " + OPERATOR_ID + " is not what is expected " + transfers.get(OPERATOR_ID));
         }
 
         System.out.println("sending schedule sign transaction");
 
-        // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
-        // since all 3 signatures have been provided.
+        /*
+         * Step 6:
+         * Send this last signature to Hedera. This last signature _should_ mean the transaction executes
+         * since all 3 signatures have been provided.
+         */
         new ScheduleSignTransaction()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
@@ -147,13 +170,19 @@ public class ScheduleMultiSigTransactionExample {
             .execute(client)
             .getReceipt(client);
 
-        // Query the schedule info again
+        /*
+         * Step 7:
+         * Query the schedule info again.
+         */
         new ScheduleInfoQuery()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
             .setScheduleId(scheduleId)
             .execute(client);
 
-        // Clean up
+        /*
+         * Clean up:
+         * Delete created account.
+         */
         new AccountDeleteTransaction()
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
@@ -164,5 +193,7 @@ public class ScheduleMultiSigTransactionExample {
             .execute(client);
 
         client.close();
+
+        System.out.println("Example complete!");
     }
 }

@@ -25,36 +25,48 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
 
-public final class GetExchangeRatesExample {
-    // see `.env.sample` in the repository root for how to specify these values
+/**
+ * How to get exchange rates info from the Hedera network.
+ */
+class GetExchangeRatesExample {
+
+    // See `.env.sample` in the `examples` folder root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private GetExchangeRatesExample() {
-    }
-
     public static void main(String[] args) throws Exception {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and be signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Get contents of file 0.0.112
+        /*
+         * Step 1:
+         * Get contents of file `0.0.112`. It is a system file, where exchange rate is stored.
+         */
         ByteString fileContentsByteString = new FileContentsQuery()
             .setFileId(FileId.fromString("0.0.112"))
             .execute(client);
 
-        client.close();
-
+        /*
+         * Step 2:
+         * Parse file contents to an `ExchangeRates` object.
+         */
         byte[] fileContents = fileContentsByteString.toByteArray();
-
         ExchangeRates exchangeRateSet = ExchangeRates.fromBytes(fileContents);
 
-        // Prints query results to console
+        /*
+         * Step 3:
+         * Print the info.
+         */
         System.out.println("Current numerator: " + exchangeRateSet.currentRate.cents);
         System.out.println("Current denominator: " + exchangeRateSet.currentRate.hbars);
         System.out.println("Current expiration time: " + exchangeRateSet.currentRate.expirationTime.toString());
@@ -64,5 +76,11 @@ public final class GetExchangeRatesExample {
         System.out.println("Next denominator: " + exchangeRateSet.nextRate.hbars);
         System.out.println("Next expiration time: " + exchangeRateSet.nextRate.expirationTime.toString());
         System.out.println("Next Exchange Rate: " + exchangeRateSet.nextRate.exchangeRateInCents);
+
+        /*
+         * Clean up:
+         */
+        client.close();
+        System.out.println("Example complete!");
     }
 }
