@@ -72,16 +72,15 @@ class ConsensusPubSubChunkedExample {
          * Step 2:
          * Create a new topic.
          */
-        TopicId newTopicId = new TopicCreateTransaction()
+        TopicId newTopicId = Objects.requireNonNull(
+            new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client)
             .getReceipt(client)
-            .topicId;
-
-        assert newTopicId != null;
-
+            .topicId
+        );
         System.out.println("for topic " + newTopicId);
 
         /*
