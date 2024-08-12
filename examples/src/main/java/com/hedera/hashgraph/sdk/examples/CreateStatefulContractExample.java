@@ -137,17 +137,12 @@ class CreateStatefulContractExample {
          * Clean up:
          * Delete created contract.
          */
-        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
+        new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
             .setMaxTransactionFee(new Hbar(1))
             .execute(client)
             .getReceipt(client);
-
-        if (contractDeleteResult.status != Status.SUCCESS) {
-            throw new Exception("error deleting contract: " + contractDeleteResult.status);
-        }
-        System.out.println("Contract successfully deleted");
 
         client.close();
 

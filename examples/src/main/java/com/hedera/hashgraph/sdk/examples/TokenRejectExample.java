@@ -87,13 +87,14 @@ class TokenRejectExample {
          * Create tokens for this example.
          */
         // Create a Fungible Token.
+        final int FUNGIBLE_TOKEN_SUPPLY = 1_000_000;
         var fungibleTokenId = new TokenCreateTransaction()
             .setTokenName("Example Fungible Token")
             .setTokenSymbol("EFT")
             .setTokenMemo("I was created for demo")
             .setDecimals(0)
-            .setInitialSupply(1_000_000)
-            .setMaxSupply(1_000_000)
+            .setInitialSupply(FUNGIBLE_TOKEN_SUPPLY)
+            .setMaxSupply(FUNGIBLE_TOKEN_SUPPLY)
             .setTreasuryAccountId(treasuryAccountId)
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(treasuryAccountPublicKey)
@@ -156,8 +157,17 @@ class TokenRejectExample {
             .setAccountId(receiverAccountId)
             .execute(client);
 
-        System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
-        System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        if (receiverAccountBalance.tokens.get(fungibleTokenId) == 1_000) {
+            System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
+        } else {
+            throw new Exception("Failed to transfer Fungible Token to the receiver account.");
+        }
+
+        if (receiverAccountBalance.tokens.get(nonFungibleTokenId) == 3) {
+            System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        } else {
+            throw new Exception("Failed to transfer NFT to the receiver account.");
+        }
 
         System.out.println("Receiver rejects example fungible tokens...");
 
@@ -199,8 +209,17 @@ class TokenRejectExample {
             .setAccountId(receiverAccountId)
             .execute(client);
 
-        System.out.println("Receiver account has (after executing TokenReject): " + receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) + " example fungible tokens.");
-        System.out.println("Receiver account has (after executing TokenRejectFlow): " + receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        if (receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) == 0) {
+            System.out.println("Receiver account has (after executing TokenReject): " + receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) + " example fungible tokens.");
+        } else {
+            throw new Exception("Failed to reject Fungible Token.");
+        }
+
+        if (receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) == null) {
+            System.out.println("Receiver account has (after executing TokenRejectFlow): " + receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        } else {
+            throw new Exception("Failed to reject NFT.");
+        }
 
         /*
          * Step 10:
@@ -210,8 +229,17 @@ class TokenRejectExample {
             .setAccountId(treasuryAccountId)
             .execute(client);
 
-        System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
-        System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        if (treasuryAccountBalance.tokens.get(fungibleTokenId) == FUNGIBLE_TOKEN_SUPPLY) {
+            System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
+        } else {
+            throw new Exception("Failed to transfer Fungible Token to the treasury account during token rejection.");
+        }
+
+        if (treasuryAccountBalance.tokens.get(nonFungibleTokenId) == 3) {
+            System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
+        } else {
+            throw new Exception("Failed to transfer NFT to the treasury account during token rejection.");
+        }
 
         /*
          * Clean up:

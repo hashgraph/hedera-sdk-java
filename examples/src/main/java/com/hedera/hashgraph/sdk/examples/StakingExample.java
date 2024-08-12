@@ -65,10 +65,11 @@ class StakingExample {
          * If you really want to stake to node 0, you should use
          * `.setStakedNodeId()` instead.
          */
+        AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
-            .setStakedAccountId(AccountId.fromString("0.0.3"))
+            .setStakedAccountId(stakedAccountId)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -84,13 +85,17 @@ class StakingExample {
         /*
          * Step 3:
          * Query the account info, it should show the staked account ID
-         * to be 0.0.3 just like what we set it to,
+         * to be 0.0.3 just like what we set it to.
          */
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
-        System.out.println("staking info: " + info.stakingInfo);
+        if (info.stakingInfo.stakedAccountId.equals(stakedAccountId)) {
+            System.out.println("staking info: " + info.stakingInfo);
+        } else {
+            throw new Exception("Staked account ID was not set correctly.");
+        }
 
         /*
          * Clean up:

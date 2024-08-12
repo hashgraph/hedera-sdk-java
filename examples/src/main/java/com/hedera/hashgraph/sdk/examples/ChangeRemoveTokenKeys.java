@@ -94,9 +94,15 @@ class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Admin Key:" + tokenInfoBefore.adminKey);
-        System.out.println("Supply Key:" + tokenInfoBefore.supplyKey);
-        System.out.println("Wipe Key:" + tokenInfoBefore.wipeKey);
+        if (tokenInfoBefore.adminKey != null &&
+            tokenInfoBefore.supplyKey != null &&
+            tokenInfoBefore.wipeKey != null) {
+            System.out.println("Admin Key:" + tokenInfoBefore.adminKey);
+            System.out.println("Supply Key:" + tokenInfoBefore.supplyKey);
+            System.out.println("Wipe Key:" + tokenInfoBefore.wipeKey);
+        } else {
+            throw new Exception("The required keys are not set correctly.");
+        }
 
         /*
          * Step 3:
@@ -123,7 +129,11 @@ class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Wipe Key (after removal):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
+        if (tokenInfoAfterWipeKeyRemoval.wipeKey == null) {
+            System.out.println("Wipe Key (after removal):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
+        } else {
+            throw new Exception("Wipe key was not removed after removal operation.");
+        }
 
         /*
          * Step 4:
@@ -144,7 +154,11 @@ class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Admin Key (after removal):" + tokenInfoAfterAdminKeyRemoval.adminKey);
+        if (tokenInfoAfterAdminKeyRemoval.adminKey == null) {
+            System.out.println("Admin Key (after removal):" + tokenInfoAfterAdminKeyRemoval.adminKey);
+        } else {
+            throw new Exception("Admin key was not removed after removal operation.");
+        }
 
         /*
          * Step 5:
@@ -166,7 +180,11 @@ class ChangeRemoveTokenKeys {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Supply Key (after update):" + tokenInfoAfterSupplyKeyUpdate.supplyKey);
+        if (tokenInfoAfterSupplyKeyUpdate.supplyKey.equals(newSupplyPublicKey)) {
+            System.out.println("Supply Key (after update):" + tokenInfoAfterSupplyKeyUpdate.supplyKey);
+        } else {
+            throw new Exception("Supply key was not updated correctly.");
+        }
 
         /*
          * Step 6:
@@ -189,7 +207,11 @@ class ChangeRemoveTokenKeys {
 
         var supplyKeyAfterRemoval = (PublicKey) tokenInfoAfterSupplyKeyRemoval.supplyKey;
 
-        System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
+        if (supplyKeyAfterRemoval.equals(PublicKey.unusableKey())) {
+            System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
+        } else {
+            throw new Exception("Supply key was not removed after removal operation.");
+        }
 
         /*
          * Clean up:

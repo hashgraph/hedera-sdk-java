@@ -73,6 +73,16 @@ class FileAppendChunkedExample {
 
         /*
          * Step 2:
+         * Query file info to check its size after creation.
+         */
+        FileInfo fileInfoAfterCreate = new FileInfoQuery()
+            .setFileId(newFileId)
+            .execute(client);
+
+        System.out.println("File size according to `FileInfoQuery` (after create): " + fileInfoAfterCreate.size);
+
+        /*
+         * Step 3:
          * Create new file contents that will be appended to a file.
          */
         StringBuilder contents = new StringBuilder();
@@ -81,7 +91,7 @@ class FileAppendChunkedExample {
         }
 
         /*
-         * Step 3:
+         * Step 4:
          * Append new file contents to a file.
          */
         TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
@@ -96,11 +106,19 @@ class FileAppendChunkedExample {
 
         System.out.println(fileAppendReceipt.toString());
 
-        FileInfo info = new FileInfoQuery()
+        /*
+         * Step 5:
+         * Query file info to check its size after append.
+         */
+        FileInfo fileInfoAfterAppend = new FileInfoQuery()
             .setFileId(newFileId)
             .execute(client);
 
-        System.out.println("File size according to `FileInfoQuery`: " + info.size);
+        if (fileInfoAfterCreate.size < fileInfoAfterAppend.size) {
+            System.out.println("File size according to `FileInfoQuery` (after append): " + fileInfoAfterAppend.size);
+        } else {
+            throw new Exception("File append was unsuccessful");
+        }
 
         /*
          * Clean up:

@@ -56,10 +56,11 @@ class CustomFeesExample {
          * Alice will be the treasury for our example token.
          * Fees only apply in transactions not involving the treasury, so we need two other accounts.
          */
+        Hbar initialBalance = new Hbar(10);
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(alicePublicKey)
             .freezeWith(client)
             .sign(alicePrivateKey)
@@ -70,7 +71,7 @@ class CustomFeesExample {
         PrivateKey bobPrivateKey = PrivateKey.generateED25519();
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
         AccountId bobId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(bobPublicKey)
             .freezeWith(client)
             .sign(bobPrivateKey)
@@ -81,7 +82,7 @@ class CustomFeesExample {
         PrivateKey charliePrivateKey = PrivateKey.generateED25519();
         PublicKey charliePublicKey = charliePrivateKey.getPublicKey();
         AccountId charlieId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(charliePublicKey)
             .freezeWith(client)
             .sign(charliePrivateKey)
@@ -184,7 +185,11 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .hbars;
-        System.out.println("Alice's Hbar balance before : " + aliceHbar1);
+        if (aliceHbar1.equals(initialBalance)) {
+            System.out.println("Alice's Hbar balance before : " + aliceHbar1);
+        } else {
+            throw new Exception("Alice's account initial balance was not set correctly.");
+        }
 
         /*
          * Step 7:
@@ -207,7 +212,11 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .hbars;
-        System.out.println("Alices's Hbar balance after Bob transfers 20 tokens to Charlie: " + aliceHbar2);
+        if (aliceHbar2.equals(new Hbar(11))) {
+            System.out.println("Alice's Hbar balance after Bob transfers 20 tokens to Charlie: " + aliceHbar2);
+        } else {
+            throw new Exception("Custom fee was not set correctly.");
+        }
 
         System.out.println("Assessed fees according to transaction record:");
         System.out.println(record1.assessedCustomFees);
@@ -258,7 +267,11 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .tokens;
-        System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3);
+        if (aliceTokens3.get(tokenId) == 0) {
+            System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3.get(tokenId));
+        } else {
+            throw new Exception("Alice's account initial token balance is not zero.");
+        }
 
         /*
          * Step 11:
@@ -281,7 +294,11 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .tokens;
-        System.out.println("Alices's token balance after Bob transfers 20 tokens to Charlie: " + aliceTokens4);
+        if (aliceTokens4.get(tokenId) == 2) {
+            System.out.println("Alice's token balance after Bob transfers 20 tokens to Charlie: " + aliceTokens4.get(tokenId));
+        } else {
+            throw new Exception("Custom fractional fee was not set correctly");
+        }
 
         System.out.println("Token transfers according to transaction record:");
         System.out.println(record2.tokenTransfers);

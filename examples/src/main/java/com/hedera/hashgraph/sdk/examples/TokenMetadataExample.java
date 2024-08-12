@@ -102,7 +102,11 @@ public class TokenMetadataExample {
             .execute(client);
 
         // Check that metadata was set correctly.
-        System.out.println("Mutable token's metadata after creation: " + Arrays.toString(mutableTokenInfoAfterCreation.metadata));
+        if (Arrays.equals(mutableTokenInfoAfterCreation.metadata, initialTokenMetadata)) {
+            System.out.println("Mutable token's metadata after creation: " + Arrays.toString(mutableTokenInfoAfterCreation.metadata));
+        } else {
+            throw new Exception("Mutable token's metadata was not set correctly.");
+        }
 
         /*
          * Step 4:
@@ -125,8 +129,12 @@ public class TokenMetadataExample {
             .setTokenId(tokenIdMutable)
             .execute(client);
 
-        // check that metadata was updated correctly
-        System.out.println("Mutable token's metadata after update: " + Arrays.toString(mutableTokenInfoAfterMetadataUpdate.metadata));
+        // Check that metadata was updated correctly.
+        if (Arrays.equals(mutableTokenInfoAfterMetadataUpdate.metadata, updatedTokenMetadata)) {
+            System.out.println("Mutable token's metadata after update: " + Arrays.toString(mutableTokenInfoAfterMetadataUpdate.metadata));
+        } else {
+            throw new Exception("Mutable token's metadata was not updated correctly.");
+        }
 
         /*
          * Step 6:
@@ -139,7 +147,8 @@ public class TokenMetadataExample {
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenMetadata(initialTokenMetadata)
-                .setTokenType(TokenType.FUNGIBLE_COMMON) // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765)
+                // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setMetadataKey(metadataPublicKey)
                 .setDecimals(3)
@@ -160,7 +169,11 @@ public class TokenMetadataExample {
             .execute(client);
 
         // Check that metadata was set correctly.
-        System.out.println("Immutable token's metadata after creation: " + Arrays.toString(immutableTokenInfoAfterCreation.metadata));
+        if (Arrays.equals(immutableTokenInfoAfterCreation.metadata, initialTokenMetadata)) {
+            System.out.println("Immutable token's metadata after creation: " + Arrays.toString(immutableTokenInfoAfterCreation.metadata));
+        } else {
+            throw new Exception("Immutable token's metadata was not set correctly.");
+        }
 
         /*
          * Step 8:
@@ -183,7 +196,11 @@ public class TokenMetadataExample {
             .execute(client);
 
         // Check that metadata was updated correctly.
-        System.out.println("Immutable token's metadata after update: " + Arrays.toString(immutableTokenInfoAfterMetadataUpdate.metadata));
+        if (Arrays.equals(immutableTokenInfoAfterMetadataUpdate.metadata, updatedTokenMetadata)) {
+            System.out.println("Immutable token's metadata after update: " + Arrays.toString(immutableTokenInfoAfterMetadataUpdate.metadata));
+        } else {
+            throw new Exception("Immutable token's metadata was not updated correctly.");
+        }
 
         /*
          * Clean up:
