@@ -123,7 +123,7 @@ class ConsensusPubSubWithSubmitKeyExample {
          * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
          */
         Random r = new Random();
-        for (int i = 0; i < TOTAL_MESSAGES; i++) {
+        for (int i = 0; i <= TOTAL_MESSAGES; i++) {
             String message = "random message " + r.nextLong();
 
             System.out.println("Publishing message: " + message);
@@ -145,7 +145,7 @@ class ConsensusPubSubWithSubmitKeyExample {
         }
 
         // Wait 60 seconds to receive all the messages. Fail if not received.
-        boolean allMessagesReceived = MESSAGES_LATCH.await(180, TimeUnit.SECONDS);
+        boolean allMessagesReceived = MESSAGES_LATCH.await(60, TimeUnit.SECONDS);
 
         /*
          * Clean up:
