@@ -96,7 +96,7 @@ abstract class RunAllExample : DefaultTask() {
                 mainClass = "com.hedera.hashgraph.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
-                // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+                // jvmArgs("-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace")
             }
         }
     }

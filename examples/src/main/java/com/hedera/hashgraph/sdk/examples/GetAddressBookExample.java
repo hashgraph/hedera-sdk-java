@@ -23,6 +23,8 @@ import com.hedera.hashgraph.sdk.AddressBookQuery;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.NodeAddressBook;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.file.FileSystems;
@@ -34,10 +36,18 @@ import java.nio.file.Files;
  */
 class GetAddressBookExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify these values
-    // or set environment variables with the same names
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    // See `.env.sample` in the `examples` folder root for how to specify values below
+    // or set environment variables with the same names.
+
+    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
+    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
+    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
+    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
+    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
         /*
@@ -45,6 +55,8 @@ class GetAddressBookExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         /*
          * Step 1:

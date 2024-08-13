@@ -51,8 +51,8 @@ import java.util.Map;
  */
 class ConstructClientExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify these values
-    // or set environment variables with the same names
+    // See `.env.sample` in the `examples` folder root for how to specify values below
+    // or set environment variables with the same names.
     @Nullable
     private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 
