@@ -53,6 +53,8 @@ class ScheduleExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Schedule Transaction Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -65,22 +67,19 @@ class ScheduleExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys for accounts.
+         * Generate ED25519 key pairs for accounts.
          */
+        System.out.println("Generating ED25519 key pairs for accounts...");
         PrivateKey privateKey1 = PrivateKey.generateED25519();
         PublicKey publicKey1 = privateKey1.getPublicKey();
         PrivateKey privateKey2 = PrivateKey.generateED25519();
         PublicKey publicKey2 = privateKey2.getPublicKey();
 
-        System.out.println("private key 1 = " + privateKey1);
-        System.out.println("public key 1 = " + publicKey1);
-        System.out.println("private key 2 = " + privateKey2);
-        System.out.println("public key 2 = " + publicKey2);
-
         /*
          * Step 1:
          * Create a new Hedera account.
          */
+        System.out.println("Creating new account...");
         AccountId newAccountId = new AccountCreateTransaction()
             .setKey(KeyList.of(publicKey1, publicKey2))
             .setInitialBalance(Hbar.fromTinybars(1_000))
@@ -88,13 +87,13 @@ class ScheduleExample {
             .getReceipt(client)
             .accountId;
         Objects.requireNonNull(newAccountId);
-
-        System.out.println("new account = " + newAccountId);
+        System.out.println("Created new account with ID: " + newAccountId);
 
         /*
          * Step 2:
          * Schedule a transfer transaction.
          */
+        System.out.println("Scheduling token transfer...");
         TransactionResponse response = new TransferTransaction()
             .addHbarTransfer(newAccountId, Hbar.from(1).negated())
             .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1))
@@ -105,24 +104,28 @@ class ScheduleExample {
             .setWaitForExpiry(true)
             .execute(client);
 
-        System.out.println("scheduled transaction ID = " + response.transactionId);
+        System.out.println("Scheduled transaction ID: " + response.transactionId);
 
         ScheduleId scheduleId = Objects.requireNonNull(response.getReceipt(client).scheduleId);
-        System.out.println("schedule ID = " + scheduleId);
+        System.out.println("Schedule ID for the transaction above: " + scheduleId);
 
         TransactionRecord record = response.getRecord(client);
-        System.out.println("record = " + record);
+        System.out.println("Scheduled transaction record: " + record);
 
         /*
          * Step 3:
          * Sign the schedule transaction with the first key.
          */
-        new ScheduleSignTransaction()
+        System.out.println("Appending private key #1 signature to a schedule transaction...");
+        var txScheduleSign1Receipt = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKey1)
             .execute(client)
             .getReceipt(client);
+
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #1) " +
+            "was complete with status: " + txScheduleSign1Receipt.status);
 
         /*
          * Step 4:
@@ -132,25 +135,28 @@ class ScheduleExample {
             .setScheduleId(scheduleId)
             .execute(client);
 
-        System.out.println("schedule info = " + info);
+        System.out.println("Schedule info: " + info);
 
         /*
          * Step 5:
          * Sign the schedule transaction with the second key.
          */
-        new ScheduleSignTransaction()
+        System.out.println("Appending private key #2 signature to a schedule transaction...");
+        var txScheduleSign2Receipt = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
+            "was complete with status: " + txScheduleSign2Receipt.status);
+
         TransactionId transactionId = response.transactionId;
         String validMirrorTransactionId = transactionId.accountId.toString() + "-" + transactionId.validStart.getEpochSecond() + "-" + transactionId.validStart.getNano();
-
         // TODO: double check this
-        System.out.println("The following link should query the mirror node for the scheduled transaction");
-        System.out.println("https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId);
+        String mirrorNodeUrl = "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId;
+        System.out.println("The following link should query the mirror node for the scheduled transaction: " + mirrorNodeUrl);
 
         /*
          * Clean up:
@@ -166,6 +172,6 @@ class ScheduleExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Schedule Transaction Example Complete!");
     }
 }

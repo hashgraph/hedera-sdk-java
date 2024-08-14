@@ -53,6 +53,8 @@ class TransactionSerializationExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Transaction Serialization (HIP-745) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -78,13 +80,14 @@ class TransactionSerializationExample {
             .execute(client)
             .hbars;
 
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
-        System.out.println("" + recipientId + " balance = " + recipientBalanceBefore);
+        System.out.println("Sender (" + OPERATOR_ID + ") balance before transfer: " + senderBalanceBefore);
+        System.out.println("Recipient (" + recipientId + ") balance before transfer: " + recipientBalanceBefore);
 
         /*
          * Step 2:
          * Create the transfer transaction with adding only Hbar transfer which credits the operator.
          */
+        System.out.println("Creating the transfer transaction...");
         Hbar transferAmount = Hbar.fromTinybars(10_000);
         var transferTransaction = new TransferTransaction()
             // `.addSender` and `.addRecipient` can be called as many times as you want as long as the total sum from
@@ -95,12 +98,14 @@ class TransactionSerializationExample {
          * Step 3:
          * Serialize the transfer transaction.
          */
+        System.out.println("Serializing the transfer transaction...");
         var transactionBytes = transferTransaction.toBytes();
 
         /*
          * Step 4:
          * Deserialize the transfer transaction.
          */
+        System.out.println("Deserializing the transfer transaction...");
         TransferTransaction transferTransactionDeserialized = (TransferTransaction) Transaction.fromBytes(transactionBytes);
 
         /*
@@ -108,14 +113,16 @@ class TransactionSerializationExample {
          * Complete the transfer transaction-- add Hbar transfer which debits Hbar to the recipient.
          * And execute the transfer transaction.
          */
+        System.out.println("Completing and executing the transfer transaction...");
         var transactionResponse = transferTransactionDeserialized
             .addHbarTransfer(recipientId, transferAmount)
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        System.out.println("transaction ID: " + transactionResponse);
+        System.out.println("Transaction info: " + transactionResponse);
         TransactionRecord record = transactionResponse.getRecord(client);
-        System.out.println("transferred " + transferAmount + "...");
+        System.out.println("Transferred " + transferAmount);
+        System.out.println("Transfer memo: " + record.transactionMemo);
 
         /*
          * Step 6:
@@ -131,9 +138,8 @@ class TransactionSerializationExample {
             .execute(client)
             .hbars;
 
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
-        System.out.println("Transfer memo: " + record.transactionMemo);
+        System.out.println("Sender (" + OPERATOR_ID + ") balance after transfer: " + senderBalanceAfter);
+        System.out.println("Recipient (" + recipientId + ") balance after transfer: " + receiptBalanceAfter);
 
         /*
          * Clean up:

@@ -72,6 +72,8 @@ class AccountAliasExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Account Alias Example (HIP-32) Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -84,8 +86,9 @@ class AccountAliasExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys.
+         * Generate ED25519 key pair.
          */
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey privateKey = PrivateKey.generateED25519();
         PublicKey publicKey = privateKey.getPublicKey();
 
@@ -104,7 +107,7 @@ class AccountAliasExample {
          * If the shard and realm are known, you may use `PublicKey.fromString().toAccountId()` to construct the
          * `aliasKey` `AccountId`.
          */
-        System.out.println("\"Creating\" a new account.");
+        System.out.println("\"Creating\" new account...");
 
         // Assuming that the target shard and realm are known.
         // For now, they are virtually always 0 and 0.
@@ -125,8 +128,7 @@ class AccountAliasExample {
          * Transfer will actually create an actual Hedera account,
          * deducting the creation fee from the amount transferred.
          */
-        System.out.println("Transferring Hbar to the new account.");
-
+        System.out.println("Transferring Hbar to the new account...");
         new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, new Hbar(1).negated())
             .addHbarTransfer(aliasAccountId, new Hbar(1))
@@ -154,7 +156,6 @@ class AccountAliasExample {
             .execute(client);
 
         System.out.println("Info about the new account: " + info);
-
         System.out.println("The normal account ID: " + info.accountId);
         System.out.println("The alias key: " + info.aliasKey);
 
@@ -172,6 +173,6 @@ class AccountAliasExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Account Alias Example (HIP-32) Complete!");
     }
 }

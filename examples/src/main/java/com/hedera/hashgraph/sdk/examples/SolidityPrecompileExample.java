@@ -62,6 +62,8 @@ class SolidityPrecompileExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Solidity Precompile Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -74,8 +76,9 @@ class SolidityPrecompileExample {
 
         /*
          * Step 1:
-         * Generate an ED25519 key pair for an account.
+         * Generate ED25519 key pair for an account.
          */
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
@@ -83,6 +86,7 @@ class SolidityPrecompileExample {
          * Step 2:
          * Create a new account for the contract to interact with in some of its steps.
          */
+        System.out.println("Creating Alice account...");
         AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.fromTinybars(1000))
@@ -90,11 +94,13 @@ class SolidityPrecompileExample {
             .getReceipt(client)
             .accountId
         );
+        System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*
          * Step 3:
          * Instantiate `ContractHelper`.
          */
+        System.out.println("Instantiating `ContractHelper`...");
         ContractHelper contractHelper = new ContractHelper(
             "contracts/precompile/PrecompileExample.json",
             new ContractFunctionParameters()
@@ -107,6 +113,7 @@ class SolidityPrecompileExample {
          * Step 4:
          * Configure steps in `ContractHelper`.
          */
+        System.out.println("Configuring steps in `ContractHelper`...");
         contractHelper
             .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
@@ -152,6 +159,7 @@ class SolidityPrecompileExample {
          * - step 15 approves an NFT allowance with operator as the owner and Alice as the spender;
          * - step 16 burn some NFTs.
          */
+        System.out.println("Executing steps in `ContractHelper`.");
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 16, client);
 
         System.out.println("All steps completed with valid results.");
@@ -176,6 +184,6 @@ class SolidityPrecompileExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Solidity Precompile Example Complete!");
     }
 }

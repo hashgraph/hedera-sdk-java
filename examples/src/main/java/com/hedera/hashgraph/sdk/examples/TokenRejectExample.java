@@ -54,6 +54,8 @@ class TokenRejectExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Token Reject (HIP-904) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,8 +68,9 @@ class TokenRejectExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys for accounts.
+         * Generate ED25519 key pairs for accounts.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey treasuryAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey treasuryAccountPublicKey = treasuryAccountPrivateKey.getPublicKey();
         PrivateKey receiverAccountPrivateKey = PrivateKey.generateED25519();
@@ -77,6 +80,7 @@ class TokenRejectExample {
          * Step 2:
          * Create accounts for this example.
          */
+        System.out.println("Creating treasury and receiver accounts...");
         // Create a treasury account.
         var treasuryAccountId = new AccountCreateTransaction()
             .setKey(treasuryAccountPublicKey)
@@ -101,6 +105,7 @@ class TokenRejectExample {
          * Step 3:
          * Create tokens for this example.
          */
+        System.out.println("Creating FT and NFT...");
         // Create a Fungible Token.
         final int FUNGIBLE_TOKEN_SUPPLY = 1_000_000;
         var fungibleTokenId = new TokenCreateTransaction()
@@ -139,6 +144,7 @@ class TokenRejectExample {
          * Step 4:
          * Mint three NFTs.
          */
+        System.out.println("Minting three NFTs...");
         var mintReceiptNftToken = new TokenMintTransaction()
             .setTokenId(nonFungibleTokenId)
             .setMetadata(generateNftMetadata((byte) 3))
@@ -153,6 +159,7 @@ class TokenRejectExample {
          * Step 5:
          * Transfer tokens to the receiver.
          */
+        System.out.println("Transferring tokens to the receiver...");
         new TransferTransaction()
             .addTokenTransfer(fungibleTokenId, treasuryAccountId, -1_000)
             .addTokenTransfer(fungibleTokenId, receiverAccountId, 1_000)
@@ -175,21 +182,20 @@ class TokenRejectExample {
         if (receiverAccountBalance.tokens.get(fungibleTokenId) == 1_000) {
             System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
         } else {
-            throw new Exception("Failed to transfer Fungible Token to the receiver account.");
+            throw new Exception("Failed to transfer Fungible Token to the receiver account!");
         }
 
         if (receiverAccountBalance.tokens.get(nonFungibleTokenId) == 3) {
             System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
         } else {
-            throw new Exception("Failed to transfer NFT to the receiver account.");
+            throw new Exception("Failed to transfer NFT to the receiver account!");
         }
-
-        System.out.println("Receiver rejects example fungible tokens...");
 
         /*
          * Step 7:
          * Reject the fungible token.
          */
+        System.out.println("Receiver rejects example fungible tokens...");
         new TokenRejectTransaction()
             .setOwnerId(receiverAccountId)
             .addTokenId(fungibleTokenId)
@@ -198,12 +204,11 @@ class TokenRejectExample {
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Receiver rejects example NFTs...");
-
         /*
          * Step 8:
          * Execute the token reject flow -- reject NFTs.
          */
+        System.out.println("Receiver rejects example NFTs...");
         new TokenRejectFlow()
             .setOwnerId(receiverAccountId)
             .setNftIds(List.of(
@@ -225,15 +230,15 @@ class TokenRejectExample {
             .execute(client);
 
         if (receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) == 0) {
-            System.out.println("Receiver account has (after executing TokenReject): " + receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) + " example fungible tokens.");
+            System.out.println("Receiver account has (after rejecting tokens): " + receiverAccountBalanceAfterTokenReject.tokens.get(fungibleTokenId) + " example fungible tokens.");
         } else {
-            throw new Exception("Failed to reject Fungible Token.");
+            throw new Exception("Failed to reject Fungible Token!");
         }
 
         if (receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) == null) {
-            System.out.println("Receiver account has (after executing TokenRejectFlow): " + receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) + " example NFTs.");
+            System.out.println("Receiver account has (after rejecting tokens): " + receiverAccountBalanceAfterTokenReject.tokens.get(nonFungibleTokenId) + " example NFTs.");
         } else {
-            throw new Exception("Failed to reject NFT.");
+            throw new Exception("Failed to reject NFT!");
         }
 
         /*
@@ -247,13 +252,13 @@ class TokenRejectExample {
         if (treasuryAccountBalance.tokens.get(fungibleTokenId) == FUNGIBLE_TOKEN_SUPPLY) {
             System.out.println("Treasury account has: " + treasuryAccountBalance.tokens.get(fungibleTokenId) + " example fungible tokens.");
         } else {
-            throw new Exception("Failed to transfer Fungible Token to the treasury account during token rejection.");
+            throw new Exception("Failed to transfer Fungible Token to the treasury account during token rejection!");
         }
 
         if (treasuryAccountBalance.tokens.get(nonFungibleTokenId) == 3) {
             System.out.println("Receiver account has: " + receiverAccountBalance.tokens.get(nonFungibleTokenId) + " example NFTs.");
         } else {
-            throw new Exception("Failed to transfer NFT to the treasury account during token rejection.");
+            throw new Exception("Failed to transfer NFT to the treasury account during token rejection!");
         }
 
         /*
@@ -290,7 +295,7 @@ class TokenRejectExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Token Reject (HIP-904) Example Complete!");
     }
 
     private static List<byte[]> generateNftMetadata(byte metadataCount) {

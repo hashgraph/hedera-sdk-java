@@ -59,6 +59,8 @@ class AccountCreateWithHtsExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Account Auto-Creation Via HTS Assets (HIP-542) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -73,8 +75,9 @@ class AccountCreateWithHtsExample {
 
         /*
          * Step 1:
-         * Generate keys for future tokens.
+         * Generate ECDSA keys pairs for future tokens.
          */
+        System.out.println("Generating ECDSA key pairs...");
         PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
         PrivateKey supplyPrivateKey = PrivateKey.generateECDSA();
@@ -91,7 +94,7 @@ class AccountCreateWithHtsExample {
          * The beginning of the first example (with NFT).
          * Create an NFT using the Hedera Token Service.
          */
-        System.out.println("Example №1 (NFT).");
+        System.out.println("The beginning of the first example (with NFT)...");
 
         // IPFS content identifiers for the NFT metadata.
         String[] CIDs = new String[] {
@@ -101,6 +104,8 @@ class AccountCreateWithHtsExample {
             "Qmd3kGgSrAwwSrhesYcY7K54f3qD7MDo38r7Po2dChtQx5",
             "QmWgkKz3ozgqtnvbCLeh7EaR1H8u5Sshx3ZJzxkcrT3jbw",
         };
+
+        System.out.println("Creating NFT using the Hedera Token Service...");
 
         TokenCreateTransaction nftCreateTx = new TokenCreateTransaction()
             .setTokenName("HIP-542 Example Collection")
@@ -126,12 +131,14 @@ class AccountCreateWithHtsExample {
         // Get transaction receipt information.
         TransactionReceipt nftCreateRx = nftCreateSubmit.getReceipt(client);
         TokenId nftTokenId = nftCreateRx.tokenId;
-        System.out.println("Created NFT with token id: " + nftTokenId);
+
+        System.out.println("Created NFT with token ID: " + nftTokenId);
 
         /*
          * Step 3:
          * Mint NFTs.
          */
+        System.out.println("Minting NFTs...");
         TransactionReceipt[] nftCollection = new TransactionReceipt[CIDs.length];
         for (int i = 0; i < CIDs.length; i++) {
             byte[] nftMetadata = CIDs[i].getBytes();
@@ -145,7 +152,7 @@ class AccountCreateWithHtsExample {
 
             nftCollection[i] = mintTxSubmit.getReceipt(client);
 
-            System.out.println("Created NFT " + nftTokenId + " with serial: " + nftCollection[i].serials.get(0));
+            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftCollection[i].serials.get(0));
         }
 
         long exampleNftId = nftCollection[0].serials.get(0);
@@ -154,22 +161,24 @@ class AccountCreateWithHtsExample {
          * Step 4:
          * Create an ECDSA public key alias.
          */
-        System.out.println("Creating a new account...");
-
         PrivateKey privateKey = PrivateKey.generateECDSA();
         PublicKey publicKey = privateKey.getPublicKey();
+
+        System.out.println("\"Creating\" new account...");
 
         // Assuming that the target shard and realm are known.
         // For now they are virtually always 0 and 0.
         AccountId aliasAccountId = publicKey.toAccountId(0, 0);
 
         System.out.println("New account ID: " + aliasAccountId);
-        System.out.println("Just the aliasKey: " + aliasAccountId.aliasKey);
+        System.out.println("The alias key: " + aliasAccountId.aliasKey);
 
         /*
          * Step 5:
          * Transfer the NFT to the public key alias using the transfer transaction.
          */
+        System.out.println("Transferring Hbar to the the new account...");
+
         TransferTransaction nftTransferTx = new TransferTransaction()
             .addNftTransfer(nftTokenId.nft(exampleNftId), OPERATOR_ID, aliasAccountId)
             .freezeWith(client);
@@ -192,7 +201,8 @@ class AccountCreateWithHtsExample {
             .execute(client);
 
         String nftOwnerAccountId = nftInfo.get(0).accountId.toString();
-        System.out.println("Current owner account id: " + nftOwnerAccountId);
+
+        System.out.println("Current owner account ID: " + nftOwnerAccountId);
 
         /*
          * Step 7:
@@ -203,16 +213,16 @@ class AccountCreateWithHtsExample {
             .execute(client)
             .accountId.toString();
 
-        System.out.println("The normal account ID of the given alias: " + accountIdString);
+        System.out.println("The \"normal\" account ID of the given alias: " + accountIdString);
 
         /*
          * Step 8:
          * Validate that account ID value from the child record is equal to normal account ID value from the query.
          */
         if (nftOwnerAccountId.equals(accountIdString)) {
-            System.out.println("The NFT owner accountId matches the accountId created with the HTS.");
+            System.out.println("The NFT owner account ID matches the account ID created with the HTS! (Success)");
         } else {
-            throw new Exception("The two account IDs does not match.");
+            throw new Exception("The two account IDs does not match! (Error)");
         }
 
         /*
@@ -220,7 +230,8 @@ class AccountCreateWithHtsExample {
          * The beginning of the second example (with Fungible Token).
          * Create a fungible HTS token using the Hedera Token Service.
          */
-        System.out.println("Example №2 (Fungible Token).");
+        System.out.println("The beginning of the second example (with Fungible Token).");
+        System.out.println("Creating Fungible Token using the Hedera Token Service...");
 
         TokenCreateTransaction tokenCreateTx = new TokenCreateTransaction()
             .setTokenName("HIP-542 Token")
@@ -243,28 +254,30 @@ class AccountCreateWithHtsExample {
         // Get transaction receipt information.
         TransactionReceipt tokenCreateRx = tokenCreateSubmit.getReceipt(client);
         TokenId tokenId = tokenCreateRx.tokenId;
-        System.out.println("Created token with token id: " + tokenId);
+
+        System.out.println("Created fungible token with ID: " + tokenId);
 
         /*
          * Step 10:
          * Create an ECDSA public key alias.
          */
-        System.out.println("Creating a new account...");
-
         PrivateKey privateKey2 = PrivateKey.generateECDSA();
         PublicKey publicKey2 = privateKey2.getPublicKey();
 
+        System.out.println("\"Creating\" new account...");
         // Assuming that the target shard and realm are known.
         // For now, they are virtually always 0 and 0.
         AccountId aliasAccountId2 = publicKey2.toAccountId(0, 0);
 
         System.out.println("New account ID: " + aliasAccountId2);
-        System.out.println("Just the aliasKey: " + aliasAccountId2.aliasKey);
+        System.out.println("The alias key: " + aliasAccountId2.aliasKey);
 
         /*
          * Step 11:
          * Transfer the fungible token to the public key alias.
          */
+        System.out.println("Transferring Hbar to the the new account...");
+
         TransferTransaction tokenTransferTx = new TransferTransaction()
             .addTokenTransfer(tokenId, OPERATOR_ID, -10)
             .addTokenTransfer(tokenId, aliasAccountId2, 10)
@@ -288,7 +301,7 @@ class AccountCreateWithHtsExample {
             .execute(client)
             .accountId.toString();
 
-        System.out.println("The normal account ID of the given alias: " + accountId2String);
+        System.out.println("The \"normal\" account ID of the given alias: " + accountId2String);
 
         /*
          * Step 13:
@@ -304,9 +317,9 @@ class AccountCreateWithHtsExample {
          */
         int tokenBalanceAccountId2 = accountBalances.tokens.get(tokenId).intValue();
         if (tokenBalanceAccountId2 == 10) {
-            System.out.println("Account is created successfully using HTS 'TransferTransaction'");
+            System.out.println("New account was created using HTS TransferTransaction! (Success)");
         } else {
-            throw new Exception("Creating account with HTS using public key alias failed");
+            throw new Exception("Creating account with HTS using public key alias failed! (Error)");
         }
 
         /*
@@ -330,8 +343,6 @@ class AccountCreateWithHtsExample {
             .setAccountId(accountId2)
             .execute(client)
             .tokens;
-
-        System.out.println("Account Id 2 token balance (before wipe): " + accountId2TokensBeforeWipe.get(tokenId));
 
         new TokenWipeTransaction()
             .setTokenId(tokenId)
@@ -374,6 +385,6 @@ class AccountCreateWithHtsExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Account Auto-Creation Via HTS Assets (HIP-542) Example Complete!");
     }
 }

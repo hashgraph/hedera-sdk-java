@@ -66,6 +66,8 @@ class ConsensusPubSubWithSubmitKeyExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Consensus Service Submit Message To The Private Topic And Subscribe Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -80,14 +82,18 @@ class ConsensusPubSubWithSubmitKeyExample {
 
         /*
          * Step 1:
-         * Generate a brand new ED25519 key pair.
-         * Create a new topic with that key as the topic's submitKey; required to sign all future
-         * ConsensusMessageSubmitTransactions for that topic.
+         * Generate ED25519 key pair (Submit Key to use with the topic).
          */
-        // Generate a Ed25519 private, public key pair
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey submitPrivateKey = PrivateKey.generateED25519();
         PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
+        /*
+         * Step 2:
+         * Create a new topic with that key as the topic's submitKey; required to sign all future
+         * ConsensusMessageSubmitTransactions for that topic.
+         */
+        System.out.println("Creating new topic...");
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setAdminKey(operatorPublicKey)
@@ -95,38 +101,41 @@ class ConsensusPubSubWithSubmitKeyExample {
             .execute(client);
 
         TopicId topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
-        System.out.println("Created new topic " + topicId + " with ED25519 submitKey of " + submitPrivateKey);
-
-        /*
-         * Step 2:
-         * Sleep for 5 seconds (wait to propagate to the mirror).
-         */
-        Thread.sleep(5_000);
+        System.out.println("Created topic with ID: " + topicId + " and public ED25519 submit key: " + submitPrivateKey);
 
         /*
          * Step 3:
+         * Sleep for 5 seconds (wait to propagate to the mirror).
+         */
+        System.out.println("Wait 5 seconds (to ensure data propagated to mirror nodes) ...");
+        Thread.sleep(5_000);
+
+        /*
+         * Step 4:
          * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
          * Hedera mirror node.
          */
+        System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
             .setTopicId(topicId)
             .setStartTime(Instant.ofEpochSecond(0))
             .subscribe(client, (resp) -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
-
-                System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
+                System.out.println("Topic message received!" +
+                    " | Time: " + resp.consensusTimestamp +
+                    " | Content: " + messageAsString);
                 MESSAGES_LATCH.countDown();
             });
 
         /*
-         * Step 4:
+         * Step 5:
          * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
          */
         Random r = new Random();
         for (int i = 0; i <= TOTAL_MESSAGES; i++) {
             String message = "random message " + r.nextLong();
 
-            System.out.println("Publishing message: " + message);
+            System.out.println("Publishing message to the topic: " + message);
 
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
@@ -160,9 +169,9 @@ class ConsensusPubSubWithSubmitKeyExample {
 
         // Fail if messages weren't received.
         if (!allMessagesReceived) {
-            throw new TimeoutException("Not all topic messages were received!");
+            throw new TimeoutException("Not all topic messages were received! (Fail)");
         }
 
-        System.out.println("Example complete!");
+        System.out.println("Consensus Service Submit Message To The Private Topic And Subscribe Example Complete!");
     }
 }

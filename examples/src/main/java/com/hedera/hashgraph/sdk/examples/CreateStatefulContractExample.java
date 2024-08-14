@@ -52,6 +52,8 @@ class CreateStatefulContractExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Stateful Contract Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -71,7 +73,9 @@ class CreateStatefulContractExample {
          * Step 1:
          * Create a file with smart contract bytecode.
          */
+        System.out.println("Creating new bytecode file...");
         String byteCodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
+
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
@@ -81,7 +85,7 @@ class CreateStatefulContractExample {
         TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
-        System.out.println("Contract bytecode file: " + newFileId);
+        System.out.println("Created new bytecode file with ID: " + newFileId);
 
         /*
          * Step 2:
@@ -99,12 +103,13 @@ class CreateStatefulContractExample {
 
         TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
-        System.out.println("New contract ID: " + newContractId);
+        System.out.println("Created new contract with ID: " + newContractId);
 
         /*
          * Step 3:
          * Call smart contract function.
          */
+        System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(500_000)
@@ -113,12 +118,13 @@ class CreateStatefulContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
+            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);
-        System.out.println("contract returned message: " + message);
+        System.out.println("Contract call result (\"get_message\" function returned): " + message);
 
+        System.out.println("Calling contract function \"set_message\"...");
         TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(500_000)
@@ -134,6 +140,7 @@ class CreateStatefulContractExample {
          * Step 3:
          * Call smart contract function.
          */
+        System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()
             .setGas(500_000)
             .setContractId(newContractId)
@@ -142,11 +149,11 @@ class CreateStatefulContractExample {
             .execute(client);
 
         if (contractUpdateResult.errorMessage != null) {
-            throw new Exception("error calling contract: " + contractUpdateResult.errorMessage);
+            throw new Exception("Error calling contract function \"get_message\": " + contractUpdateResult.errorMessage);
         }
 
         String message2 = contractUpdateResult.getString(0);
-        System.out.println("contract returned message: " + message2);
+        System.out.println("Contract call result (\"get_message\" function returned): " + message2);
 
         /*
          * Clean up:
@@ -161,6 +168,6 @@ class CreateStatefulContractExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Stateful Contract Example Complete!");
     }
 }

@@ -64,6 +64,8 @@ class ConsensusPubSubChunkedExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Consensus Service Submit Large Message And Subscribe Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -78,8 +80,9 @@ class ConsensusPubSubChunkedExample {
 
         /*
          * Step 1:
-         * Generate a submit key to use with the topic.
+         * Generate ED25519 key pair (Submit Key to use with the topic).
          */
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey submitPrivateKey = PrivateKey.generateED25519();
         PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
 
@@ -87,6 +90,8 @@ class ConsensusPubSubChunkedExample {
          * Step 2:
          * Create a new topic.
          */
+        System.out.println("Creating new topic...");
+
         TopicId newTopicId = Objects.requireNonNull(
             new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
@@ -96,23 +101,27 @@ class ConsensusPubSubChunkedExample {
             .getReceipt(client)
             .topicId
         );
-        System.out.println("for topic " + newTopicId);
+        System.out.println("Created new topic with ID: " + newTopicId);
 
         /*
          * Step 3:
          * Sleep for 10 seconds (wait to propagate to the mirror).
          */
-        System.out.println("wait 10s to propagate to the mirror ...");
+        System.out.println("Wait 10 seconds (to ensure data propagated to mirror nodes) ...");
         Thread.sleep(10_000);
 
         /*
          * Step 4:
          * Set up a mirror client to print out messages as we receive them.
          */
+        System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
             .setTopicId(newTopicId)
             .subscribe(client, topicMessage -> {
-                System.out.println("at " + topicMessage.consensusTimestamp + " ( seq = " + topicMessage.sequenceNumber + " ) received topic message of " + topicMessage.contents.length + " bytes");
+                System.out.println("Topic message received!" +
+                    " | Time: " + topicMessage.consensusTimestamp +
+                    " | Sequence No.: " + topicMessage.sequenceNumber +
+                    " | Size: " + topicMessage.contents.length + " bytes.");
                 LARGE_MESSAGE_LATCH.countDown();
             });
 
@@ -123,11 +132,9 @@ class ConsensusPubSubChunkedExample {
         // Get a large file to send.
         String bigContents = readResources("util/large_message.txt");
 
-        System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
-
         // Prepare a message send transaction that requires a submit key from "somewhere else".
         @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
-            .setMaxChunks(15) // this is 10 by default
+            .setMaxChunks(15) // This is 10 by default.
             .setTopicId(newTopicId)
             .setMessage(bigContents)
             // Sign with the operator or "sender" of the message,
@@ -144,7 +151,7 @@ class ConsensusPubSubChunkedExample {
         // View out the message size from the parsed transaction.
         // This can be useful to display what we are about to sign.
         long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
-        System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
+        System.out.println("Preparing to submit a message to the created topic (size of the message: " + transactionMessageSize + " bytes)...");
 
         // Sign with that submit key.
         transaction.sign(submitPrivateKey);
@@ -168,10 +175,10 @@ class ConsensusPubSubChunkedExample {
 
         // Fail if message wasn't received.
         if (!largeMessageReceived) {
-            throw new TimeoutException("Large topic message was not received!");
+            throw new TimeoutException("Large topic message was not received! (Fail)");
         }
 
-        System.out.println("Example complete!");
+        System.out.println("Consensus Service Submit Large Message And Subscribe Example Complete!");
     }
 
     // TODO: check if it will possible to optimize it

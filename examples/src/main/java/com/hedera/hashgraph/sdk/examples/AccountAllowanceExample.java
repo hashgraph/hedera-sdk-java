@@ -60,6 +60,8 @@ class AccountAllowanceExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Account Allowance Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -72,8 +74,9 @@ class AccountAllowanceExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys for accounts.
+         * Generate ED25519 key pairs for accounts.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
@@ -87,7 +90,7 @@ class AccountAllowanceExample {
          * Step 2:
          * Create accounts for this example.
          */
-        System.out.println("Generating accounts for example...");
+        System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
 
         AccountId aliceId = new AccountCreateTransaction()
             .setKey(alicePublicKey)
@@ -113,9 +116,9 @@ class AccountAllowanceExample {
             .accountId;
         Objects.requireNonNull(charlieId);
 
-        System.out.println("Alice ID: " + aliceId);
-        System.out.println("Bob ID: " + bobId);
-        System.out.println("Charlie ID: " + charlieId);
+        System.out.println("Alice's account ID: " + aliceId);
+        System.out.println("Bob's account ID: " + bobId);
+        System.out.println("Charlie's account ID: " + charlieId);
 
         System.out.println(
             "Alice's balance: " +
@@ -134,7 +137,7 @@ class AccountAllowanceExample {
          * Step 3:
          * Approve an allowance of 2 Hbar with owner Alice and spender Bob.
          */
-        System.out.println("Approving an allowance of 2 Hbar with owner Alice and spender Bob");
+        System.out.println("Approving an allowance of 2 Hbar with owner Alice and spender Bob...");
 
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.from(2))
@@ -161,7 +164,8 @@ class AccountAllowanceExample {
          * Demonstrate allowance -- transfer 1 Hbar from Alice to Charlie, but the transaction is signed _only_ by Bob
          * (Bob is dipping into his allowance from Alice).
          */
-        System.out.println("Transferring 1 Hbar from Alice to Charlie, but the transaction is signed _only_ by Bob (Bob is dipping into his allowance from Alice)");
+        System.out.println("Transferring 1 Hbar from Alice to Charlie, " +
+            "but the transaction is signed only by Bob (Bob is dipping into his allowance from Alice)...");
 
         new TransferTransaction()
             // "addApproved*Transfer()" means that the transfer has been approved by an allowance
@@ -196,8 +200,8 @@ class AccountAllowanceExample {
          * This should fail, because there is only 1 Hbar left in Bob's allowance.
          */
         try {
-            System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance.");
-            System.out.println("This should fail, because there is only 1 Hbar left in Bob's allowance.");
+            System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance... " +
+                "(this should fail, because there is only 1 Hbar left in Bob's allowance).");
 
             new TransferTransaction()
                 .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
@@ -208,18 +212,16 @@ class AccountAllowanceExample {
                 .execute(client)
                 .getReceipt(client);
 
-            System.out.println("The transfer succeeded.  This should not happen.");
-
+            throw new Exception("This transfer shouldn't have succeeded!");
         } catch (Throwable error) {
-            System.out.println("The transfer failed as expected.");
-            System.out.println(error.getMessage());
+            System.out.println("This transfer failed as expected: " + error.getMessage());
         }
 
         /*
          * Step 6:
          * Demonstrate update of an allowance -- adjust Bob's allowance to 3 Hbar.
          */
-        System.out.println("Adjusting Bob's allowance to 3 Hbar.");
+        System.out.println("Adjusting Bob's allowance to 3 Hbar...");
 
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
@@ -232,8 +234,8 @@ class AccountAllowanceExample {
          * Step 7:
          * Demonstrate allowance -- transfer 2 Hbar from Alice to Charlie using Bob's allowance again.
          */
-        System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again.");
-        System.out.println("This time it should succeed.");
+        System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again... " +
+            "(this time it should succeed).");
 
         new TransferTransaction()
             .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
@@ -263,8 +265,6 @@ class AccountAllowanceExample {
          * Clean up:
          * Delete allowance and created accounts.
          */
-        System.out.println("Deleting Bob's allowance");
-
         new AccountAllowanceApproveTransaction()
             .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
             .freezeWith(client)
@@ -298,6 +298,6 @@ class AccountAllowanceExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Account Allowance Example Complete!");
     }
 }

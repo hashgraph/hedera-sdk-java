@@ -63,6 +63,8 @@ class ConsensusPubSubExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Consensus Service Submit Message To The Public Topic And Subscribe Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -79,6 +81,8 @@ class ConsensusPubSubExample {
          * Step 1:
          * Create a new topic.
          */
+        System.out.println("Creating new topic...");
+
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .execute(client);
@@ -87,24 +91,27 @@ class ConsensusPubSubExample {
 
         TopicId topicId = Objects.requireNonNull(transactionReceipt.topicId);
 
-        System.out.println("New topic created: " + topicId);
+        System.out.println("Created new topic with ID: " + topicId);
 
         /*
          * Step 2:
          * Sleep for 5 seconds (wait to propagate to the mirror).
          */
+        System.out.println("Wait 5 seconds (to ensure data propagated to mirror nodes) ...");
         Thread.sleep(5_000);
 
         /*
          * Step 3:
          * Set up a mirror client to print out messages as we receive them.
          */
+        System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
             .setTopicId(topicId)
             .subscribe(client, resp -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
-
-                System.out.println(resp.consensusTimestamp + " received topic message: " + messageAsString);
+                System.out.println("Topic message received!" +
+                    " | Time: " + resp.consensusTimestamp +
+                    " | Content: " + messageAsString);
                 MESSAGES_LATCH.countDown();
             });
 
@@ -113,9 +120,13 @@ class ConsensusPubSubExample {
          * Submit messages to the topic created in previous steps.
          */
         for (int i = 0; i <= TOTAL_MESSAGES; i++) {
+            String message = "message #" + i;
+
+            System.out.println("Publishing message to the topic: " + message);
+
             new TopicMessageSubmitTransaction()
                 .setTopicId(topicId)
-                .setMessage("hello, HCS! " + i)
+                .setMessage(message)
                 .execute(client)
                 .getReceipt(client);
 
@@ -138,9 +149,9 @@ class ConsensusPubSubExample {
 
         // Fail if messages weren't received.
         if (!allMessagesReceived) {
-            throw new TimeoutException("Not all topic messages were received!");
+            throw new TimeoutException("Not all topic messages were received! (Fail)");
         }
 
-        System.out.println("Example complete!");
+        System.out.println("Consensus Service Submit Message To The Public Topic And Subscribe Example Complete!");
     }
 }

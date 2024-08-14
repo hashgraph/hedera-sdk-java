@@ -54,6 +54,8 @@ public final class DeleteFileExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Delete File Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -74,6 +76,7 @@ public final class DeleteFileExample {
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
+        System.out.println("Creating new file...");
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
@@ -85,7 +88,7 @@ public final class DeleteFileExample {
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         FileId newFileId = receipt.fileId;
 
-        System.out.println("file: " + newFileId);
+        System.out.println("Created new file with ID: " + newFileId);
 
         /*
          * Clean up:
@@ -102,6 +105,6 @@ public final class DeleteFileExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Delete File Example Complete!");
     }
 }

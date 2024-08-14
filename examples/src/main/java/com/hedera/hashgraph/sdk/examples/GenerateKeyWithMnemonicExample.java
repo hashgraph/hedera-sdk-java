@@ -29,20 +29,34 @@ import com.hedera.hashgraph.sdk.PublicKey;
 class GenerateKeyWithMnemonicExample {
 
     public static void main(String[] args) {
-        Mnemonic mnemonic = Mnemonic.generate24();
-        PrivateKey privateKey = mnemonic.toStandardEd25519PrivateKey("", 0);
-        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("Generate ED25519 Key With Mnemonic Phrase Example Start!");
 
+        System.out.println("Generating random 24-word mnemonic from the BIP-39 standard English word list...");
+        Mnemonic mnemonic24 = Mnemonic.generate24();
+        System.out.println("Generated 24-word mnemonic: " + mnemonic24);
+
+        System.out.println("Recovering an ED25519 private key from the 24-word mnemonic phrase above...");
+        PrivateKey privateKey24 = mnemonic24.toStandardEd25519PrivateKey("", 0);
+        System.out.println("Recovered ED25519 private key: " + privateKey24);
+
+        System.out.println("Deriving a public key from the above private key...");
+        PublicKey publicKey24 = privateKey24.getPublicKey();
+        System.out.println("Public key: " + publicKey24);
+
+        System.out.println("---");
+
+        System.out.println("Generating random 12-word mnemonic from the BIP-39 standard English word list...");
         Mnemonic mnemonic12 = Mnemonic.generate12();
+        System.out.println("Generated 12-word mnemonic: " + mnemonic12);
+
+        System.out.println("Recovering an ED25519 private key from the 12-word mnemonic phrase above...");
         PrivateKey privateKey12 = mnemonic12.toStandardEd25519PrivateKey("", 0);
+        System.out.println("Recovered ED25519 private key: " + privateKey12);
+
+        System.out.println("Deriving a public key from the above private key...");
         PublicKey publicKey12 = privateKey12.getPublicKey();
+        System.out.println("Public key: " + publicKey12);
 
-        System.out.println("mnemonic 24 word = " + mnemonic);
-        System.out.println("private key = " + privateKey);
-        System.out.println("public key = " + publicKey);
-
-        System.out.println("mnemonic 12 word = " + mnemonic12);
-        System.out.println("private key = " + privateKey12);
-        System.out.println("public key = " + publicKey12);
+        System.out.println("Generate ED25519 Key With Mnemonic Phrase Example Complete!");
     }
 }

@@ -59,6 +59,8 @@ class ChangeRemoveTokenKeys {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Change Or Remove Existing Keys From A Token (HIP-540) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -71,8 +73,9 @@ class ChangeRemoveTokenKeys {
 
         /*
          * Step 1:
-         * Generate keys for future token.
+         * Generate ED25519 key pairs for future token.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey adminPrivateKey = PrivateKey.generateED25519();
         PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
 
@@ -89,6 +92,7 @@ class ChangeRemoveTokenKeys {
          * Step 2:
          * Create a non-fungible token and check its keys.
          */
+        System.out.println("Creating NFT using the Hedera Token Service...");
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("Example NFT")
@@ -112,18 +116,18 @@ class ChangeRemoveTokenKeys {
         if (tokenInfoBefore.adminKey != null &&
             tokenInfoBefore.supplyKey != null &&
             tokenInfoBefore.wipeKey != null) {
-            System.out.println("Admin Key:" + tokenInfoBefore.adminKey);
-            System.out.println("Supply Key:" + tokenInfoBefore.supplyKey);
-            System.out.println("Wipe Key:" + tokenInfoBefore.wipeKey);
+            System.out.println("Admin public key in the newly created token: " + tokenInfoBefore.adminKey);
+            System.out.println("Supply public key in the newly created token: " + tokenInfoBefore.supplyKey);
+            System.out.println("Wipe public key in the newly created token: " + tokenInfoBefore.wipeKey);
         } else {
-            throw new Exception("The required keys are not set correctly.");
+            throw new Exception("The required keys are not set correctly! (Fail)");
         }
 
         /*
          * Step 3:
          * Remove Wipe Key from a token and check that its removed.
          */
-        System.out.println("Removing Wipe Key...");
+        System.out.println("Removing the Wipe Key...(updating to an empty Key List).");
 
         // This HIP introduces ability to remove lower-privilege keys
         // (Wipe, KYC, Freeze, Pause, Supply, Fee Schedule, Metadata) from a Token
@@ -133,7 +137,7 @@ class ChangeRemoveTokenKeys {
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
             .setWipeKey(emptyKeyList)
-            // it is set by default, but we set it here explicitly for illustration
+            // It is set by default, but we set it here explicitly for illustration.
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
             .freezeWith(client)
             .sign(adminPrivateKey)
@@ -145,16 +149,16 @@ class ChangeRemoveTokenKeys {
             .execute(client);
 
         if (tokenInfoAfterWipeKeyRemoval.wipeKey == null) {
-            System.out.println("Wipe Key (after removal):" + tokenInfoAfterWipeKeyRemoval.wipeKey);
+            System.out.println("Token Wipe Public Key (after removal): " + tokenInfoAfterWipeKeyRemoval.wipeKey);
         } else {
-            throw new Exception("Wipe key was not removed after removal operation.");
+            throw new Exception("Token Wipe Key was not removed after removal operation! (Fail)");
         }
 
         /*
          * Step 4:
          * Remove Admin Key from a token and check that its removed.
          */
-        System.out.println("Removing Admin Key...");
+        System.out.println("Removing the Admin Key...(updating to an empty Key List).");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -170,16 +174,16 @@ class ChangeRemoveTokenKeys {
             .execute(client);
 
         if (tokenInfoAfterAdminKeyRemoval.adminKey == null) {
-            System.out.println("Admin Key (after removal):" + tokenInfoAfterAdminKeyRemoval.adminKey);
+            System.out.println("Token Admin Public Key (after removal): " + tokenInfoAfterAdminKeyRemoval.adminKey);
         } else {
-            throw new Exception("Admin key was not removed after removal operation.");
+            throw new Exception("Token Admin Key was not removed after removal operation! (Fail)");
         }
 
         /*
          * Step 5:
          * Update Supply Key and check that its updated.
          */
-        System.out.println("Updating Supply Key...");
+        System.out.println("Updating the Supply Key...(to the new key).");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -196,16 +200,16 @@ class ChangeRemoveTokenKeys {
             .execute(client);
 
         if (tokenInfoAfterSupplyKeyUpdate.supplyKey.equals(newSupplyPublicKey)) {
-            System.out.println("Supply Key (after update):" + tokenInfoAfterSupplyKeyUpdate.supplyKey);
+            System.out.println("Token Supply Public Key (after update): " + tokenInfoAfterSupplyKeyUpdate.supplyKey);
         } else {
-            throw new Exception("Supply key was not updated correctly.");
+            throw new Exception("Token Supply Key was not updated correctly! (Fail)");
         }
 
         /*
          * Step 6:
-         * Remove Supply Key (update to unusable key).
+         * Remove Supply Key (update to the unusable key).
          */
-        System.out.println("Removing Supply Key...");
+        System.out.println("Removing the Supply Key...(updating to the unusable key).");
 
         new TokenUpdateTransaction()
             .setTokenId(tokenId)
@@ -223,9 +227,9 @@ class ChangeRemoveTokenKeys {
         var supplyKeyAfterRemoval = (PublicKey) tokenInfoAfterSupplyKeyRemoval.supplyKey;
 
         if (supplyKeyAfterRemoval.equals(PublicKey.unusableKey())) {
-            System.out.println("Supply Key (after removal):" + supplyKeyAfterRemoval.toStringRaw());
+            System.out.println("Token Supply Public Key (after removal): " + supplyKeyAfterRemoval.toStringRaw());
         } else {
-            throw new Exception("Supply key was not removed after removal operation.");
+            throw new Exception("Token Supply key was not removed after removal operation! (Fail)");
         }
 
         /*
@@ -234,6 +238,6 @@ class ChangeRemoveTokenKeys {
          */
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Change Or Remove Existing Keys From A Token (HIP-540) Example Complete!");
     }
 }

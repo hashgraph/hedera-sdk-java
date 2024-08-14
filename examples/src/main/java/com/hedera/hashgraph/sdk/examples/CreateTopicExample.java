@@ -52,6 +52,8 @@ class CreateTopicExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Consensus Service Submit Message To The Public Topic Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -68,24 +70,27 @@ class CreateTopicExample {
          * Step 1:
          * Create a new topic.
          */
+        System.out.println("Creating new topic...");
+
         TransactionResponse createResponse = new TopicCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .execute(client);
 
         TransactionReceipt createReceipt = createResponse.getReceipt(client);
-        System.out.println("topic id = " + createReceipt.topicId);
+        System.out.println("Created new topic with ID: " + createReceipt.topicId);
 
         /*
          * Step 2:
          * Submit message to the topic created in previous step.
          */
+        System.out.println("Publishing message to the topic...");
         TransactionResponse sendResponse = new TopicMessageSubmitTransaction()
             .setTopicId(createReceipt.topicId)
             .setMessage("Hello World")
             .execute(client);
 
         TransactionReceipt sendReceipt = sendResponse.getReceipt(client);
-        System.out.println("topic sequence number = " + sendReceipt.topicSequenceNumber);
+        System.out.println("Topic sequence number: " + sendReceipt.topicSequenceNumber);
 
         /*
          * Clean up:
@@ -98,6 +103,6 @@ class CreateTopicExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Consensus Service Submit Message To The Public Topic Example Complete!");
     }
 }

@@ -56,6 +56,8 @@ class GetFileContentsExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Get File Contents Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -76,6 +78,7 @@ class GetFileContentsExample {
         byte[] fileContents = "Hedera is great!".getBytes(StandardCharsets.UTF_8);
 
         // Create the new file and set its properties.
+        System.out.println("Creating new file...");
         TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
             // The public key of the owner of the file.
             .setKeys(operatorPublicKey)
@@ -85,9 +88,7 @@ class GetFileContentsExample {
             .execute(client);
 
         FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);
-
-        // Print File ID to the console.
-        System.out.println("The new file ID is " + newFileId.toString());
+        System.out.println("Created new file with ID: " + newFileId);
 
         /*
          * Step 2:
@@ -97,8 +98,8 @@ class GetFileContentsExample {
             .setFileId(newFileId)
             .execute(client);
 
-        // Prints query results to console
-        System.out.println("File content query results: " + contents.toStringUtf8());
+        // Prints query results to console.
+        System.out.println("File contents: " + contents.toStringUtf8());
 
         /*
          * Clean up:
@@ -111,6 +112,6 @@ class GetFileContentsExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Get File Contents Example Complete!");
     }
 }

@@ -54,6 +54,8 @@ class DeleteAccountExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Delete Account Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -70,13 +72,14 @@ class DeleteAccountExample {
          */
         PrivateKey newPrivateKey = PrivateKey.generateED25519();
         PublicKey newPublicKey = newPrivateKey.getPublicKey();
-        System.out.println("private key = " + newPrivateKey);
-        System.out.println("public key = " + newPublicKey);
+        System.out.println("Future account private key: " + newPrivateKey);
+        System.out.println("Future account public key: " + newPublicKey);
 
         /*
          * Step 2:
          * Create a new account.
          */
+        System.out.println("Creating new account...");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             // The only _required_ property here is `key`.
             .setKey(newPublicKey)
@@ -86,7 +89,7 @@ class DeleteAccountExample {
         // This will wait for the receipt to become available.
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
-        System.out.println("account = " + newAccountId);
+        System.out.println("Created new account with ID: " + newAccountId);
 
         /*
          * Clean up:
@@ -104,6 +107,6 @@ class DeleteAccountExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Delete Account Example Complete!");
     }
 }

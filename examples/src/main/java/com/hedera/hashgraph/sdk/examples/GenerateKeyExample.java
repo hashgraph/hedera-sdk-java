@@ -28,10 +28,16 @@ import com.hedera.hashgraph.sdk.PublicKey;
 class GenerateKeyExample {
 
     public static void main(String[] args) {
-        PrivateKey privateKey = PrivateKey.generateED25519();
-        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("Generate ED25519 Private And Public Key Pair Example Start!");
 
-        System.out.println("private = " + privateKey);
-        System.out.println("public = " + publicKey);
+        System.out.println("Generating the ED25519 private key...");
+        PrivateKey privateKey = PrivateKey.generateED25519();
+        System.out.println("Private Key: " + privateKey);
+
+        System.out.println("Deriving a public key from the above private key");
+        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("Public key: " + publicKey);
+
+        System.out.println("Generate ED25519 Private And Public Key Pair Example Complete!");
     }
 }

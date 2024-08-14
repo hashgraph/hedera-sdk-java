@@ -58,6 +58,8 @@ class TopicWithAdminKeyExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Topic With Admin (Threshold) Key Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -73,6 +75,7 @@ class TopicWithAdminKeyExample {
          * Generate the initial keys that are part of the adminKey's thresholdKey.
          * Three ED25519 keys part of a 2-of-3 threshold key.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey[] initialAdminPrivateKeys = new PrivateKey[3];
         PublicKey[] initialAdminPublicKeys = new PublicKey[3];
         Arrays.setAll(initialAdminPrivateKeys, i -> PrivateKey.generate());
@@ -82,13 +85,16 @@ class TopicWithAdminKeyExample {
          * Step 2:
          * Create the threshold key.
          */
+        System.out.println("Creating a Key List (threshold key)...");
         KeyList thresholdKey = KeyList.withThreshold(2);
         Collections.addAll(thresholdKey, initialAdminPublicKeys);
+        System.out.println("Created a Key List: " + thresholdKey);
 
         /*
          * Step 3:
          * Create the topic create transaction with threshold key.
          */
+        System.out.println("Creating topic create transaction...");
         Transaction<?> topicCreateTransaction = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
@@ -99,7 +105,7 @@ class TopicWithAdminKeyExample {
          * Sign the topic create transaction with 2 of 3 keys that are part of the adminKey threshold key.
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
-            System.out.println("Signing ConsensusTopicCreateTransaction with key " + k);
+            System.out.println("Signing topic create transaction with key " + k);
             topicCreateTransaction.sign(k);
         });
 
@@ -109,13 +115,14 @@ class TopicWithAdminKeyExample {
          */
         TransactionResponse transactionResponse = topicCreateTransaction.execute(client);
         TopicId topicId = transactionResponse.getReceipt(client).topicId;
-        System.out.println("Created new topic " + topicId + " with 2-of-3 threshold key as adminKey.");
+        System.out.println("Created new topic (" + topicId + ") with 2-of-3 threshold key as admin key.");
 
         /*
          * Step 6:
          * Generate the new keys that are part of the adminKey's thresholdKey.
          * Four ED25519 keys part of a 3-of-4 threshold key.
          */
+        System.out.println("Generating new ED25519 key pairs...");
         PrivateKey[] newAdminKeys = new PrivateKey[4];
         PublicKey[] newAdminPublicKeys = new PublicKey[4];
         Arrays.setAll(newAdminKeys, i -> PrivateKey.generate());
@@ -125,13 +132,16 @@ class TopicWithAdminKeyExample {
          * Step 7:
          * Create the new threshold key.
          */
+        System.out.println("Creating new Key List (threshold key)...");
         KeyList newThresholdKey = KeyList.withThreshold(3);
         Collections.addAll(newThresholdKey, newAdminPublicKeys);
+        System.out.println("Created new Key List: " + thresholdKey);
 
         /*
          * Step 8:
          * Create the topic update transaction with the new threshold key.
          */
+        System.out.println("Creating topic update transaction...");
         Transaction<?> topicUpdatetransaction = new TopicUpdateTransaction()
             .setTopicId(topicId)
             .setTopicMemo("updated demo topic")
@@ -144,7 +154,7 @@ class TopicWithAdminKeyExample {
          * 2 of the 3 keys already part of the topic's adminKey.
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
-            System.out.println("Signing ConsensusTopicUpdateTransaction with initial admin key " + k);
+            System.out.println("Signing topic update transaction with initial admin key " + k);
             topicUpdatetransaction.sign(k);
         });
 
@@ -154,7 +164,7 @@ class TopicWithAdminKeyExample {
          * 3 of 4 keys already part of the topic's adminKey.
          */
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
-            System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
+            System.out.println("Signing topic update transaction with new admin key " + k);
             topicUpdatetransaction.sign(k);
         });
 
@@ -166,7 +176,7 @@ class TopicWithAdminKeyExample {
 
         // Retrieve results post-consensus.
         transactionResponse2.getReceipt(client);
-        System.out.println("Updated topic " + topicId + " with 3-of-4 threshold key as adminKey");
+        System.out.println("Updated topic (" + topicId + ") with 3-of-4 threshold key as admin key.");
 
         /*
          * Step 11:
@@ -175,7 +185,7 @@ class TopicWithAdminKeyExample {
         TopicInfo topicInfo = new TopicInfoQuery()
             .setTopicId(topicId)
             .execute(client);
-        System.out.println(topicInfo);
+        System.out.println("Topic info: " + topicInfo);
 
         /*
          * Clean up:
@@ -186,7 +196,6 @@ class TopicWithAdminKeyExample {
             .freezeWith(client);
 
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
-            System.out.println("Signing ConsensusTopicUpdateTransaction with new admin key " + k);
             topicDeleteTransaction.sign(k);
         });
 
@@ -194,6 +203,6 @@ class TopicWithAdminKeyExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Topic With Admin (Threshold) Key Example Complete!");
     }
 }

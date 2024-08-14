@@ -54,6 +54,8 @@ class ScheduleIdenticalTransactionExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Schedule Identical Transaction Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -68,8 +70,6 @@ class ScheduleIdenticalTransactionExample {
          * Step 1:
          * Create key pairs, clients and accounts.
          */
-        System.out.println("Threshold key example.");
-        System.out.println("Keys:");
         PrivateKey[] privateKeys = new PrivateKey[3];
         PublicKey[] publicKeys = new PublicKey[3];
         Client[] clients = new Client[3];
@@ -79,16 +79,18 @@ class ScheduleIdenticalTransactionExample {
         ScheduleId scheduleID = null;
 
         for (int i = 0; i < 3 ; i++) {
+            System.out.println("Generating ED25519 key pair...");
+
             PrivateKey newPrivateKey = PrivateKey.generateED25519();
             PublicKey newPublicKey = newPrivateKey.getPublicKey();
 
             privateKeys[i] = newPrivateKey;
             publicKeys[i] = newPublicKey;
 
-            System.out.println("Key #" + i + ":");
-            System.out.println("private = " + privateKeys[i]);
-            System.out.println("public = " + publicKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Private key: " + privateKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Public key: " + publicKeys[i]);
 
+            System.out.println("Creating new account...");
             TransactionResponse createResponse = new AccountCreateTransaction()
                 .setKey(newPublicKey)
                 .setInitialBalance(new Hbar(1))
@@ -102,16 +104,20 @@ class ScheduleIdenticalTransactionExample {
             clients[i] = newClient;
             accounts[i] = transactionReceipt.accountId;
 
-            System.out.println("account = " + accounts[i]);
+            System.out.println("Created new account with ID: " + accounts[i]);
+            System.out.println("---");
         }
 
         /*
          * Step 2:
          * Create a threshold key with a threshold of 2 and length of 3 requires
-         * (at least 2 of the 3 keys to sign anything modifying the account).
+         * (at least 2 of 3 keys to sign anything modifying the account).
          */
+        System.out.println("Creating a Key List..." +
+            "(with threshold, it will require 2 of 3 keys we generated to sign on anything modifying this account).");
         KeyList keyList = KeyList.withThreshold(2);
         Collections.addAll(keyList, publicKeys);
+        System.out.println("Created a Key List: " + keyList);
 
         /*
          * Step 3:
@@ -119,6 +125,7 @@ class ScheduleIdenticalTransactionExample {
          */
         // We are using all of these keys, so the scheduled transaction doesn't automatically go through.
         // It works perfectly fine with just one key.
+        System.out.println("Creating new account...(with the above Key List as an account key).");
         TransactionResponse createResponse = new AccountCreateTransaction()
             // The key that must sign each transfer out of the account. If receiverSigRequired is true, then
             // it must also sign any transfer into the account.
@@ -130,7 +137,9 @@ class ScheduleIdenticalTransactionExample {
         TransactionReceipt receipt = createResponse.getReceipt(client);
 
         AccountId thresholdAccount = receipt.accountId;
-        System.out.println("threshold account = " + thresholdAccount);
+        System.out.println("Created new account with ID: " + thresholdAccount);
+
+        System.out.println("\n---\n");
 
         /*
          * Step 4:
@@ -140,12 +149,14 @@ class ScheduleIdenticalTransactionExample {
         for (Client loopClient : clients) {
             AccountId operatorId = loopClient.getOperatorAccountId();
 
+            System.out.println("Creating transfer transaction...");
             TransferTransaction tx = new TransferTransaction();
             for (AccountId account : accounts) {
                 tx.addHbarTransfer(account, new Hbar(1));
             }
             tx.addHbarTransfer(Objects.requireNonNull(thresholdAccount), new Hbar(3).negated());
 
+            System.out.println("Scheduling created transfer transaction...");
             ScheduleCreateTransaction scheduledTx = new ScheduleCreateTransaction()
                 .setScheduledTransaction(tx);
 
@@ -153,12 +164,13 @@ class ScheduleIdenticalTransactionExample {
 
             TransactionResponse response = scheduledTx.execute(loopClient);
 
+            System.out.println("Executing scheduled transaction...");
             TransactionReceipt loopReceipt = new TransactionReceiptQuery()
                 .setTransactionId(response.transactionId)
                 .setNodeAccountIds(Collections.singletonList(response.nodeId))
                 .execute(loopClient);
 
-            System.out.println("operator [" + operatorId + "]: scheduleID = " + loopReceipt.scheduleId);
+            System.out.println("Operator (ID: " + operatorId + ") | Schedule ID: " + loopReceipt.scheduleId);
 
             // Save the schedule ID, so that it can be asserted for each loopClient submission.
             if (scheduleID == null) {
@@ -166,11 +178,12 @@ class ScheduleIdenticalTransactionExample {
             }
 
             if (!scheduleID.equals(Objects.requireNonNull(loopReceipt.scheduleId))) {
-                throw new Exception("invalid generated schedule id, expected " + scheduleID + ", got " + loopReceipt.scheduleId);
+                throw new Exception("Invalid generated schedule ID! Expected " + scheduleID + ", got " + loopReceipt.scheduleId);
             }
 
             // If the status return by the receipt is related to already created, execute a schedule sign transaction.
             if (loopReceipt.status == Status.IDENTICAL_SCHEDULE_ALREADY_CREATED) {
+                System.out.println("Appending signature to a schedule transaction...");
                 TransactionResponse signTransaction = new ScheduleSignTransaction()
                     .setScheduleId(scheduleID)
                     .setNodeAccountIds(Collections.singletonList(createResponse.nodeId))
@@ -180,13 +193,27 @@ class ScheduleIdenticalTransactionExample {
                 TransactionReceipt signReceipt = new TransactionReceiptQuery()
                     .setTransactionId(signTransaction.transactionId)
                     .execute(client);
+
+                System.out.println("A transaction that appends signature to a schedule transaction " +
+                    "was complete with status: " + signReceipt.status);
+
                 if (signReceipt.status != Status.SUCCESS && signReceipt.status != Status.SCHEDULE_ALREADY_EXECUTED) {
                     throw new Exception("Bad status while getting receipt of schedule sign with operator " + operatorId + ": " + signReceipt.status);
                 }
             }
+            System.out.println("---");
         }
 
-        System.out.println(new ScheduleInfoQuery().setScheduleId(scheduleID).execute(client));
+        System.out.println("\n---\n");
+
+        /*
+         * Step 5:
+         * Query the state of a schedule transaction.
+         */
+        ScheduleInfo postTransactionInfo = new ScheduleInfoQuery()
+            .setScheduleId(scheduleID)
+            .execute(client);
+        System.out.println("Scheduled transaction info: " + postTransactionInfo);
 
         /*
          * Clean up:
@@ -218,6 +245,6 @@ class ScheduleIdenticalTransactionExample {
             loopClient.close();
         }
 
-        System.out.println("Example complete!");
+        System.out.println("Schedule Identical Transaction Example Complete!");
     }
 }

@@ -52,6 +52,8 @@ class PrngExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Prng Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,6 +68,7 @@ class PrngExample {
          * Step 1:
          * Execute `PrngTransaction` and retrieve the result (random number) from the transaction record.
          */
+        System.out.println("Executing Prng Transaction (range: 100)...");
         TransactionResponse transactionResponse = new PrngTransaction()
             // The only _required_ property here is `key`.
             .setRange(100)
@@ -73,13 +76,12 @@ class PrngExample {
 
         // This will wait for the receipt to become available.
         TransactionRecord record = transactionResponse.getRecord(client);
-
-        System.out.println("generated random number = " + record.prngNumber);
+        System.out.println("Prng transaction response (random number): " + record.prngNumber);
 
         /*
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+        System.out.println("Prng Example Complete!");
     }
 }

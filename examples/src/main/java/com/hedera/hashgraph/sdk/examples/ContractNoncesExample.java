@@ -60,6 +60,8 @@ class ContractNoncesExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Contract Nonces (HIP-729) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -71,6 +73,8 @@ class ContractNoncesExample {
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        System.out.println("Creating new contract...");
 
         /*
          * Step 1:
@@ -99,6 +103,7 @@ class ContractNoncesExample {
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
 
         ContractId contractId = contractCreateTxReceipt.contractId;
+        System.out.println("Created new contract with ID: " + contractId);
 
         /*
          * Step 3:
@@ -110,7 +115,7 @@ class ContractNoncesExample {
             .contractFunctionResult
             .contractNonces;
 
-        System.out.println("contractNonces = " + contractNonces);
+        System.out.println("Contract nonces: " + contractNonces);
 
         /*
          * Clean up:
@@ -125,6 +130,6 @@ class ContractNoncesExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Contract Nonces (HIP-729) Example Complete!");
     }
 }

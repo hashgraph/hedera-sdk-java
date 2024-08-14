@@ -43,6 +43,8 @@ public class LoggerFunctionalitiesExample {
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Logger Functionalities Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -75,6 +77,7 @@ public class LoggerFunctionalitiesExample {
          * Step 4:
          * "Create" account.
          */
+        System.out.println("\"Creating\" new account...");
         var aliasAccountId = publicKey.toAccountId(0, 0);
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
@@ -82,6 +85,7 @@ public class LoggerFunctionalitiesExample {
          * Step 4:
          * Transfer 10 tinybars from operator's account to newly created account to init it on Hedera network.
          */
+        System.out.println("Transferring Hbar to the the new account...");
         new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.fromTinybars(-10))
             .addHbarTransfer(aliasAccountId, Hbar.fromTinybars(10))
@@ -92,6 +96,7 @@ public class LoggerFunctionalitiesExample {
          * Step 5:
          * Create a topic with attached info logger.
          */
+        System.out.println("Creating new topic...(with attached info logger).");
         var topicId1 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
@@ -111,6 +116,7 @@ public class LoggerFunctionalitiesExample {
          * Create a topic with attached info logger.
          * This should not display any logs because currently there are no `warn` logs predefined in the SDK.
          */
+        System.out.println("Creating new topic...(with attached info logger).");
         var topicId2 = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
@@ -131,6 +137,7 @@ public class LoggerFunctionalitiesExample {
          * Create a topic with attached debug logger.
          * This should not display any logs because logger was silenced.
          */
+        System.out.println("Creating new topic...(with attached debug logger).");
         var topicId3 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topic memo")
@@ -150,6 +157,7 @@ public class LoggerFunctionalitiesExample {
          * Create a topic with attached debug logger.
          * Should produce logs.
          */
+        System.out.println("Creating new topic...(with attached debug logger).");
         var topicId4 = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
@@ -184,6 +192,6 @@ public class LoggerFunctionalitiesExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Logger Functionalities Example Complete!");
     }
 }

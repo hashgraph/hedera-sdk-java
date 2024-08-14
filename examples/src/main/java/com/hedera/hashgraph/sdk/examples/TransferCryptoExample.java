@@ -52,6 +52,8 @@ class TransferCryptoExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Transfer Crypto Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -73,18 +75,19 @@ class TransferCryptoExample {
             .execute(client)
             .hbars;
 
-        Hbar receiptBalanceBefore = new AccountBalanceQuery()
+        Hbar recipientBalanceBefore = new AccountBalanceQuery()
             .setAccountId(recipientId)
             .execute(client)
             .hbars;
 
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceBefore);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceBefore);
+        System.out.println("Sender (" + OPERATOR_ID + ") balance before transfer: " + senderBalanceBefore);
+        System.out.println("Recipient (" + recipientId + ") balance before transfer: " + recipientBalanceBefore);
 
         /*
          * Step 2:
          * Execute the transfer transaction to send Hbars from operator to the recipient.
          */
+        System.out.println("Executing the transfer transaction...");
         Hbar transferAmount = Hbar.fromTinybars(10_000);
         TransactionResponse transactionResponse = new TransferTransaction()
             // .addSender and .addRecipient can be called as many times as you want as long as the total sum from
@@ -94,9 +97,10 @@ class TransferCryptoExample {
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        System.out.println("transaction ID: " + transactionResponse);
+        System.out.println("Transaction info: " + transactionResponse);
         TransactionRecord record = transactionResponse.getRecord(client);
-        System.out.println("transferred " + transferAmount + "...");
+        System.out.println("Transferred " + transferAmount);
+        System.out.println("Transfer memo: " + record.transactionMemo);
 
         /*
          * Step 6:
@@ -112,9 +116,8 @@ class TransferCryptoExample {
             .execute(client)
             .hbars;
 
-        System.out.println("" + OPERATOR_ID + " balance = " + senderBalanceAfter);
-        System.out.println("" + recipientId + " balance = " + receiptBalanceAfter);
-        System.out.println("Transfer memo: " + record.transactionMemo);
+        System.out.println("Sender (" + OPERATOR_ID + ") balance after transfer: " + senderBalanceAfter);
+        System.out.println("Recipient (" + recipientId + ") balance after transfer: " + receiptBalanceAfter);
 
         /*
          * Clean up:

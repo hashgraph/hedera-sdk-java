@@ -52,6 +52,8 @@ class UpdateAccountPublicKeyExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Update Account Public Key Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,8 +68,9 @@ class UpdateAccountPublicKeyExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys for accounts.
+         * Generate ED25519 key pairs for accounts.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey privateKey1 = PrivateKey.generateED25519();
         PublicKey publicKey1 = privateKey1.getPublicKey();
         PrivateKey privateKey2 = PrivateKey.generateED25519();
@@ -77,23 +80,20 @@ class UpdateAccountPublicKeyExample {
          * Step 2:
          * Create a new account.
          */
+        System.out.println("Creating new account...");
         TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
             .setKey(publicKey1)
             .setInitialBalance(new Hbar(1))
             .execute(client);
 
-        System.out.println("transaction ID: " + acctTransactionResponse);
         AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
-        System.out.println("account = " + accountId);
-        System.out.println("key = " + privateKey1.getPublicKey());
+        System.out.println("Created new account with ID: " + accountId + " and public key: " + publicKey1);
 
         /*
          * Step 2:
          * Update account's key.
          */
-        System.out.println(" :: update public key of account " + accountId);
-        System.out.println("set key = " + privateKey2.getPublicKey());
-
+        System.out.println("Updating public key of new account...(Setting key: " + publicKey2 + ").");
         TransactionResponse accountUpdateTransactionResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(publicKey2)
@@ -104,8 +104,6 @@ class UpdateAccountPublicKeyExample {
             // Execute will implicitly sign with the operator.
             .execute(client);
 
-        System.out.println("transaction ID: " + accountUpdateTransactionResponse);
-
         // (Important!) Wait for the transaction to complete by querying the receipt.
         accountUpdateTransactionResponse.getReceipt(client);
 
@@ -113,13 +111,11 @@ class UpdateAccountPublicKeyExample {
          * Step 3:
          * Get account info to confirm the key was changed.
          */
-        System.out.println(" :: getAccount and check our current key");
-
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(client);
 
-        System.out.println("key = " + info.key);
+        System.out.println("New account public key: " + info.key);
 
         /*
          * Clean up:
@@ -135,6 +131,6 @@ class UpdateAccountPublicKeyExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Update Account Public Key Example Complete!");
     }
 }

@@ -52,6 +52,8 @@ class GetAccountInfoExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Get Account Info Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -71,14 +73,14 @@ class GetAccountInfoExample {
             .setMaxQueryPayment(new Hbar(1))
             .execute(client);
 
-        System.out.println("info.key                          = " + info.key);
-        System.out.println("info.isReceiverSignatureRequired  = " + info.isReceiverSignatureRequired);
-        System.out.println("info.expirationTime               = " + info.expirationTime);
+        System.out.println("Operator's account public key: " + info.key);
+        System.out.println("Operator's account require receiver signature: " + info.isReceiverSignatureRequired);
+        System.out.println("Operator's account expiration time: " + info.expirationTime);
 
         /*
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+        System.out.println("Get Account Info Example Complete!");
     }
 }

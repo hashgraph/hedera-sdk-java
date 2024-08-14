@@ -52,6 +52,8 @@ class GetAccountBalanceExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Get Account Balance Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -70,12 +72,12 @@ class GetAccountBalanceExample {
             .execute(client)
             .hbars;
 
-        System.out.println("balance = " + balance);
+        System.out.println("Operator's Hbar account balance: " + balance);
 
         /*
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+        System.out.println("Get Account Balance Example Complete!");
     }
 }

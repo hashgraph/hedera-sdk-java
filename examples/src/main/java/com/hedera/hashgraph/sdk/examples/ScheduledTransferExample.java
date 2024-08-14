@@ -74,6 +74,8 @@ class ScheduledTransferExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Scheduled Transfer Transaction Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -84,10 +86,14 @@ class ScheduledTransferExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
+        System.out.println("In this example Alice's account ID would be equal to the Operator's account ID: "
+            + client.getOperatorAccountId());
+
         /*
          * Step 1:
-         * Generate ED25519 private and public key pair for Bob's account.
+         * Generate ED25519 key pair for Bob's account.
          */
+        System.out.println("Generating ED25519 key pair for Bob's account...");
         PrivateKey bobsPrivateKey = PrivateKey.generateED25519();
         PublicKey bobsPublicKey = bobsPrivateKey.getPublicKey();
 
@@ -95,6 +101,7 @@ class ScheduledTransferExample {
          * Step 2:
          * Create Bob's account with receiver signature property enabled.
          */
+        System.out.println("Create Bob's account...(with receiver signature property enabled).");
         AccountId bobsId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setKey(bobsPublicKey)
@@ -105,19 +112,16 @@ class ScheduledTransferExample {
             .getReceipt(client)
             .accountId;
         Objects.requireNonNull(bobsId);
+        System.out.println("Created Bob's account with ID: " + bobsId);
 
         /*
          * Step 3:
          * Check Bob's initial balance.
          */
-        System.out.println("Alice's ID: " + client.getOperatorAccountId());
-        System.out.println("Bob's ID: " + bobsId);
-
         AccountBalance bobsInitialBalance = new AccountBalanceQuery()
             .setAccountId(bobsId)
             .execute(client);
-        System.out.println("Bob's initial balance:");
-        System.out.println(bobsInitialBalance);
+        System.out.println("Bob's initial account balance: " + bobsInitialBalance);
 
         /*
          * Step 4:
@@ -126,8 +130,7 @@ class ScheduledTransferExample {
         TransferTransaction transferToSchedule = new TransferTransaction()
             .addHbarTransfer(client.getOperatorAccountId(), new Hbar(-1))
             .addHbarTransfer(bobsId, new Hbar(1));
-        System.out.println("Transfer to be scheduled:");
-        System.out.println(transferToSchedule);
+        System.out.println("Scheduling token transfer: " + transferToSchedule);
 
         /*
          * Step 5:
@@ -153,7 +156,7 @@ class ScheduledTransferExample {
             .getReceipt(client)
             .scheduleId;
         Objects.requireNonNull(scheduleId);
-        System.out.println("The scheduleId is: " + scheduleId);
+        System.out.println("Schedule ID for the transaction above: " + scheduleId);
 
         /*
          * Step 6:
@@ -163,8 +166,7 @@ class ScheduledTransferExample {
         AccountBalance bobsBalanceAfterSchedule = new AccountBalanceQuery()
             .setAccountId(bobsId)
             .execute(client);
-        System.out.println("Bob's balance after scheduling the transfer (should be unchanged):");
-        System.out.println(bobsBalanceAfterSchedule);
+        System.out.println("Bob's balance after scheduling the transfer (should be unchanged): " + bobsBalanceAfterSchedule);
 
         /*
          * Step 7:
@@ -175,8 +177,7 @@ class ScheduledTransferExample {
         ScheduleInfo scheduledTransactionInfo = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(client);
-        System.out.println("Info about scheduled transaction:");
-        System.out.println(scheduledTransactionInfo);
+        System.out.println("Scheduled transaction info: " + scheduledTransactionInfo);
 
         //`getScheduledTransaction()` will return an SDK Transaction object identical to the transaction
         // that was scheduled, which Bob can then inspect like a normal transaction.
@@ -185,22 +186,24 @@ class ScheduledTransferExample {
         // We happen to know that this transaction is (or certainly ought to be) a TransferTransaction.
         if (scheduledTransaction instanceof TransferTransaction) {
             TransferTransaction scheduledTransfer = (TransferTransaction) scheduledTransaction;
-            System.out.println("The scheduled transfer transaction from Bob's POV:");
-            System.out.println(scheduledTransfer);
+            System.out.println("The scheduled transfer transaction from Bob's POV: " + scheduledTransfer);
         } else {
-            throw new Exception("The scheduled transaction was not a transfer transaction.");
+            throw new Exception("The scheduled transaction was not a transfer transaction! (Fail)");
         }
 
         /*
          * Step 8:
-         * Appends Bob's signature to a schedule transaction.
+         * Appends Bob's signature to a schedule transaction, i.e. Bob signs the scheduled transaction.
          */
-        new ScheduleSignTransaction()
+        System.out.println("Appending Bob's signature to a schedule transaction...");
+        var scheduleSignTransactionReceipt = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(bobsPrivateKey)
             .execute(client)
             .getReceipt(client);
+        System.out.println("A transaction that appends Bob's signature to a schedule transfer transaction " +
+            "was complete with status: " + scheduleSignTransactionReceipt.status);
 
         /*
          * Step 9:
@@ -209,8 +212,7 @@ class ScheduledTransferExample {
         AccountBalance balanceAfterSigning = new AccountBalanceQuery()
             .setAccountId(bobsId)
             .execute(client);
-        System.out.println("Bob's balance after signing the scheduled transaction:");
-        System.out.println(balanceAfterSigning);
+        System.out.println("Bob's balance after signing the scheduled transaction: " + balanceAfterSigning);
 
         /*
          * Step 10:
@@ -219,8 +221,7 @@ class ScheduledTransferExample {
         ScheduleInfo postTransactionInfo = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(client);
-        System.out.println("Info on the scheduled transaction, executedAt should no longer be null:");
-        System.out.println(postTransactionInfo);
+        System.out.println("Scheduled transaction info (`executedAt` should no longer be `null`): " + postTransactionInfo);
 
         /*
          * Clean up:
@@ -236,6 +237,6 @@ class ScheduledTransferExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Scheduled Transfer Transaction Example Complete!");
     }
 }

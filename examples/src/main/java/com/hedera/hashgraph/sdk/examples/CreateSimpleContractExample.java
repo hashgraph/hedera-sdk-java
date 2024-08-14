@@ -53,6 +53,8 @@ class CreateSimpleContractExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Simple Contract Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -69,6 +71,7 @@ class CreateSimpleContractExample {
          * Step 1:
          * Create a file with smart contract bytecode.
          */
+        System.out.println("Creating new bytecode file...");
         String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
 
         TransactionResponse fileTransactionResponse = new FileCreateTransaction()
@@ -81,12 +84,13 @@ class CreateSimpleContractExample {
         TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
 
-        System.out.println("Contract bytecode file: " + newFileId);
+        System.out.println("Created new bytecode file with ID: " + newFileId);
 
         /*
          * Step 2:
          * Create a smart contract.
          */
+        System.out.println("Creating new contract...");
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
             .setGas(500_000)
             .setBytecodeFileId(newFileId)
@@ -96,15 +100,14 @@ class CreateSimpleContractExample {
             .execute(client);
 
         TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
-        System.out.println(contractReceipt);
-
         ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
-        System.out.println("New contract ID: " + newContractId);
+        System.out.println("Created new contract with ID: " + newContractId);
 
         /*
          * Step 3:
          * Call smart contract function.
          */
+        System.out.println("Calling contract function \"greet\"...");
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setGas(500_000)
             .setContractId(newContractId)
@@ -113,11 +116,11 @@ class CreateSimpleContractExample {
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
+            throw new Exception("Error calling contract function \"greet\": " + contractCallResult.errorMessage);
         }
 
         String message = contractCallResult.getString(0);
-        System.out.println("contract message: " + message);
+        System.out.println("Contract call result (\"greet\" function returned): " + message);
 
         /*
          * Clean up:
@@ -132,6 +135,6 @@ class CreateSimpleContractExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Simple Contract Example Complete!");
     }
 }

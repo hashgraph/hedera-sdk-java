@@ -52,6 +52,8 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Account With Alias And Receiver Signature Required Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -81,13 +83,14 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println(evmAddress);
+        System.out.println("EVM address of the new account: " + evmAddress);
 
         /*
          * Step 4:
          * Use the `AccountCreateTransaction` and populate `setAlias(evmAddress)` field with the Ethereum public address
          * and the `setReceiverSignatureRequired` to `true`.
          */
+        System.out.println("Creating new account...(with alias and receiver signature required).");
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setInitialBalance(new Hbar(1))
@@ -102,7 +105,7 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         accountCreateTransaction.sign(adminPrivateKey).sign(privateKey);
         AccountId newAccountId = accountCreateTransaction.execute(client).getReceipt(client).accountId;
 
-        System.out.println("New account ID: " + newAccountId);
+        System.out.println("Created account with ID: " + newAccountId);
 
          /*
          * Step 6:
@@ -113,9 +116,9 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
             .execute(client);
 
         if (accountInfo.contractAccountId != null) {
-            System.out.println("The new account has alias " + accountInfo.contractAccountId);
+            System.out.println("The newly account has alias: " + accountInfo.contractAccountId);
         } else {
-            throw new Exception("The new account doesn't have alias");
+            throw new Exception("The newly account doesn't have alias! (Fail)");
         }
 
         /*
@@ -132,6 +135,6 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Account With Alias And Receiver Signature Required Example Complete!");
     }
 }

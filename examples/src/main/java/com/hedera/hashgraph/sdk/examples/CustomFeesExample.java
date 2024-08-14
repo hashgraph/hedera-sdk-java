@@ -55,6 +55,8 @@ class CustomFeesExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Custom Fees Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -71,6 +73,8 @@ class CustomFeesExample {
          * Alice will be the treasury for our example token.
          * Fees only apply in transactions not involving the treasury, so we need two other accounts.
          */
+        System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
+
         Hbar initialBalance = new Hbar(10);
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
@@ -105,9 +109,9 @@ class CustomFeesExample {
             .getReceipt(client)
             .accountId;
 
-        System.out.println("Alice: " + aliceId);
-        System.out.println("Bob: " + bobId);
-        System.out.println("Charlie: " + charlieId);
+        System.out.println("Alice's account ID: " + aliceId);
+        System.out.println("Bob's account ID: " + bobId);
+        System.out.println("Charlie's account ID: " + charlieId);
 
         /*
          * Step 2:
@@ -135,6 +139,8 @@ class CustomFeesExample {
          * fees list on this token later using the `TokenFeeScheduleUpdateTransaction`.
          * We will create an initial supply of 100 of these tokens.
          */
+        System.out.println("Creating new Fungible Token using the Hedera Token Service...");
+
         TokenId tokenId = new TokenCreateTransaction()
             .setTokenName("Example Fungible Token")
             .setTokenSymbol("EFT")
@@ -151,19 +157,18 @@ class CustomFeesExample {
             .getReceipt(client)
             .tokenId;
 
-        System.out.println("Token: " + tokenId);
-
         TokenInfo tokenInfo1 = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Custom Fees according to TokenInfoQuery:");
-        System.out.println(tokenInfo1.customFees);
+        System.out.println("Created new fungible token with ID: " + tokenId + " and custom fees: " + tokenInfo1.customFees);
 
         /*
          * Step 4:
          * Associate the token with Bob and Charlie before they can trade in it.
          */
+        System.out.println("Associate created fungible token with Bob's and Charlie's accounts...");
+
         new TokenAssociateTransaction()
             .setAccountId(bobId)
             .setTokenIds(Collections.singletonList(tokenId))
@@ -184,6 +189,8 @@ class CustomFeesExample {
          * Step 5:
          * Transfer all 100 tokens to Bob.
          */
+        System.out.println("Transferring all 100 tokens from Alice to Bob...");
+
         new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, 100)
             .addTokenTransfer(tokenId, aliceId, -100)
@@ -200,16 +207,19 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .hbars;
+
         if (aliceHbar1.equals(initialBalance)) {
-            System.out.println("Alice's Hbar balance before : " + aliceHbar1);
+            System.out.println("Alice's Hbar balance before: " + aliceHbar1);
         } else {
-            throw new Exception("Alice's account initial balance was not set correctly.");
+            throw new Exception("Alice's account initial balance was not set correctly! (Fail)");
         }
 
         /*
          * Step 7:
          * Transfer 20 tokens from Bob to Charlie.
          */
+        System.out.println("Transferring 20 tokens from Bob to Charlie...");
+
         TransactionRecord record1 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
@@ -227,14 +237,14 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .hbars;
+
         if (aliceHbar2.equals(new Hbar(11))) {
-            System.out.println("Alice's Hbar balance after Bob transfers 20 tokens to Charlie: " + aliceHbar2);
+            System.out.println("Alice's Hbar balance after Bob transferred 20 tokens to Charlie: " + aliceHbar2);
         } else {
-            throw new Exception("Custom fee was not set correctly.");
+            throw new Exception("Custom fee was not set correctly! (Fail)");
         }
 
-        System.out.println("Assessed fees according to transaction record:");
-        System.out.println(record1.assessedCustomFees);
+        System.out.println("Assessed fees: " + record1.assessedCustomFees);
 
         /*
          * Step 9:
@@ -259,6 +269,8 @@ class CustomFeesExample {
             .setFeeCollectorAccountId(aliceId);
         List<CustomFee> fractionalFeeList = Collections.singletonList(customFractionalFee);
 
+        System.out.println("Updating the custom fees for a fungible token...");
+
         new TokenFeeScheduleUpdateTransaction()
             .setTokenId(tokenId)
             .setCustomFees(fractionalFeeList)
@@ -271,8 +283,7 @@ class CustomFeesExample {
             .setTokenId(tokenId)
             .execute(client);
 
-        System.out.println("Custom Fees according to TokenInfoQuery:");
-        System.out.println(tokenInfo2.customFees);
+        System.out.println("Updated custom fees: " + tokenInfo2.customFees);
 
         /*
          * Step 10:
@@ -285,13 +296,15 @@ class CustomFeesExample {
         if (aliceTokens3.get(tokenId) == 0) {
             System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3.get(tokenId));
         } else {
-            throw new Exception("Alice's account initial token balance is not zero.");
+            throw new Exception("Alice's account initial token balance is not zero! (Fail)");
         }
 
         /*
          * Step 11:
          * Transfer 20 tokens from Bob to Charlie.
          */
+        System.out.println("Transferring 20 tokens from Bob to Charlie...");
+
         TransactionRecord record2 = new TransferTransaction()
             .addTokenTransfer(tokenId, bobId, -20)
             .addTokenTransfer(tokenId, charlieId, 20)
@@ -309,16 +322,15 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .tokens;
+
         if (aliceTokens4.get(tokenId) == 2) {
             System.out.println("Alice's token balance after Bob transfers 20 tokens to Charlie: " + aliceTokens4.get(tokenId));
         } else {
-            throw new Exception("Custom fractional fee was not set correctly");
+            throw new Exception("Custom fractional fee was not set correctly! (Fail)");
         }
 
-        System.out.println("Token transfers according to transaction record:");
-        System.out.println(record2.tokenTransfers);
-        System.out.println("Assessed fees according to transaction record:");
-        System.out.println(record2.assessedCustomFees);
+        System.out.println("Token transfers: " + record2.tokenTransfers);
+        System.out.println("Assessed fees: " + record2.assessedCustomFees);
 
         /*
          * Clean up:
@@ -351,7 +363,6 @@ class CustomFeesExample {
             .setAccountId(charlieId)
             .execute(client)
             .tokens;
-        System.out.println("Charlie's token balance (before wipe): " + charlieTokensBeforeWipe.get(tokenId));
 
         new TokenWipeTransaction()
             .setTokenId(tokenId)
@@ -366,7 +377,6 @@ class CustomFeesExample {
             .setAccountId(bobId)
             .execute(client)
             .tokens;
-        System.out.println("Bob's token balance (before wipe): " + bobTokensBeforeWipe.get(tokenId));
 
         new TokenWipeTransaction()
             .setTokenId(tokenId)
@@ -381,7 +391,6 @@ class CustomFeesExample {
             .setAccountId(aliceId)
             .execute(client)
             .tokens;
-        System.out.println("Alice's token balance (before wipe): " + aliceTokensBeforeWipe.get(tokenId));
 
         new TokenWipeTransaction()
             .setTokenId(tokenId)
@@ -427,6 +436,6 @@ class CustomFeesExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Custom Fees Example Complete!");
     }
 }

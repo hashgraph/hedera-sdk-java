@@ -57,6 +57,8 @@ public class AutoCreateAccountTransferTransactionExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Auto Create Account Via Transfer Transaction (HIP-583) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -84,7 +86,7 @@ public class AutoCreateAccountTransferTransactionExample {
          * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println(evmAddress);
+        System.out.println("EVM address of the new account: " + evmAddress);
 
         /*
          * Step 4:
@@ -106,6 +108,7 @@ public class AutoCreateAccountTransferTransactionExample {
          * Sign the `TransferTransaction` transaction using an existing Hedera account
          * and key paying for the transaction fee.
          */
+        System.out.println("Transferring Hbar to the the new account...");
         TransactionResponse response = transferTransaction.execute(client);
 
         /*
@@ -119,7 +122,7 @@ public class AutoCreateAccountTransferTransactionExample {
             .execute(client);
 
         AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println(newAccountId);
+        System.out.println("The \"normal\" account ID of the given alias: " + newAccountId);
 
         /*
          * Step 7:
@@ -136,9 +139,9 @@ public class AutoCreateAccountTransferTransactionExample {
             .execute(client);
 
         if (((KeyList) accountInfo.key).isEmpty()) {
-            System.out.println("The newly created account is a hollow account.");
+            System.out.println("The newly created account is a hollow account! (Success)");
         } else {
-            throw new Exception("The newly created account is not a hollow account.");
+            throw new Exception("The newly created account is not a hollow account! (Fail)");
         }
 
         /*
@@ -147,6 +150,7 @@ public class AutoCreateAccountTransferTransactionExample {
          * Sign with the private key that corresponds to the public key on the hollow account.
          * (to enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction).
          */
+        System.out.println("Creating new topic...");
         TransactionReceipt receipt2 = new TopicCreateTransaction()
             .setAdminKey(publicKey)
             .setTransactionId(TransactionId.generate(newAccountId))
@@ -155,7 +159,7 @@ public class AutoCreateAccountTransferTransactionExample {
             .sign(privateKey)
             .execute(client)
             .getReceipt(client);
-        System.out.println("Topic id = " + receipt2.topicId);
+        System.out.println("Created new topic with ID: " + receipt2.topicId);
 
         /*
          * Step 9:
@@ -188,6 +192,6 @@ public class AutoCreateAccountTransferTransactionExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Auto Create Account Via Transfer Transaction (HIP-583) Example Complete!");
     }
 }

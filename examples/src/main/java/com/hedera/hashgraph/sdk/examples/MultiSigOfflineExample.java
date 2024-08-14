@@ -25,6 +25,7 @@ import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
 
@@ -54,6 +55,8 @@ class MultiSigOfflineExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Multi Sig Offline Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -68,24 +71,31 @@ class MultiSigOfflineExample {
          * Step 1:
          * Generate ED25519 private and public keys for accounts.
          */
-        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
-        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
-        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
-        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
+        System.out.println("Generating ED25519 private and public keys for accounts...");
 
-        System.out.println("private key for user 1 = " + user1PrivateKey);
-        System.out.println("public key for user 1 = " + user1PublicKey);
-        System.out.println("private key for user 2 = " + user2PrivateKey);
-        System.out.println("public key for user 2 = " + user2PublicKey);
+        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
+        System.out.println("ED25519 private key for user 1: " + user1PrivateKey);
+
+        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
+        System.out.println("ED25519 public key for user 1: " + user1PublicKey);
+
+        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
+        System.out.println("ED25519 private key for user 2: " + user2PrivateKey);
+
+        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
+        System.out.println("ED25519 public key for user 2: " + user2PublicKey);
 
         /*
          * Step 2:
          * Create a Multi-sig account.
          */
+        System.out.println("Creating new Key List..");
         KeyList keylist = new KeyList();
         keylist.add(user1PublicKey);
         keylist.add(user2PublicKey);
+        System.out.println("Created Key List: " + keylist);
 
+        System.out.println("Creating a new account...");
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
             .setKey(keylist)
@@ -95,12 +105,13 @@ class MultiSigOfflineExample {
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
         var newAccountId = receipt.accountId;
 
-        System.out.println("account id = " + newAccountId);
+        System.out.println("Created new account with ID: " + newAccountId);
 
         /*
          * Step 2:
-         * Create a transfer from new account to account with id `0.0.3`.
+         * Create a transfer from new account to the account with ID `0.0.3`.
          */
+        System.out.println("Transferring 1 Hbar from new account to the account with ID `0.0.3`...");
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
@@ -111,6 +122,7 @@ class MultiSigOfflineExample {
          * Step 3:
          * Convert transaction to bytes to send to signatories.
          */
+        System.out.println("Converting transaction to bytes to send to signatories...");
         byte[] transactionBytes = transferTransaction.toBytes();
         Transaction<?> transactionToExecute = Transaction.fromBytes(transactionBytes);
 
@@ -119,12 +131,15 @@ class MultiSigOfflineExample {
          * Ask users to sign and return signature.
          */
         byte[] user1Signature = user1PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
+        System.out.println("User 1 signed transaction. Signature: " + Arrays.toString(user1Signature));
         byte[] user2Signature = user2PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
+        System.out.println("User 2 signed transaction. Signature: " + Arrays.toString(user2Signature));
 
         /*
          * Step 5:
          * Recreate the transaction from bytes.
          */
+        System.out.println("Adding user's signatures to the transaction...");
         transactionToExecute.signWithOperator(client);
         transactionToExecute.addSignature(user1PrivateKey.getPublicKey(), user1Signature);
         transactionToExecute.addSignature(user2PrivateKey.getPublicKey(), user2Signature);
@@ -133,9 +148,10 @@ class MultiSigOfflineExample {
          * Step 6:
          * Execute recreated transaction.
          */
+        System.out.println("Executing transfer transaction...");
         TransactionResponse result = transactionToExecute.execute(client);
         receipt = result.getReceipt(client);
-        System.out.println(receipt.status);
+        System.out.println("Transfer transaction was complete with status: " + receipt.status);
 
         /*
          * Clean up:
@@ -152,6 +168,6 @@ class MultiSigOfflineExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Multi Sig Offline Example Complete!");
     }
 }

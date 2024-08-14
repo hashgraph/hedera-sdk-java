@@ -50,6 +50,8 @@ class GetAddressBookExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Get Address Book Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -63,13 +65,13 @@ class GetAddressBookExample {
          * Fetch the address book.
          * Note: from Feb 25 2022 you can now fetch the address book for free from a mirror node with `AddressBookQuery`.
          */
-        System.out.println("Getting address book for " + HEDERA_NETWORK);
+        System.out.println("Getting address book for " + HEDERA_NETWORK + "...");
 
         NodeAddressBook addressBook = new AddressBookQuery()
             .setFileId(FileId.ADDRESS_BOOK)
             .execute(client);
 
-        System.out.println(addressBook);
+        System.out.println("Address book for " + HEDERA_NETWORK + ": " + addressBook);
 
         /*
          * Clean up:
@@ -77,6 +79,6 @@ class GetAddressBookExample {
         Files.deleteIfExists(FileSystems.getDefault().getPath("address-book.proto.bin"));
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Get Address Book Example Complete!");
     }
 }

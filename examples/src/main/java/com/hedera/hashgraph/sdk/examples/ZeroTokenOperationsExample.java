@@ -50,6 +50,8 @@ class ZeroTokenOperationsExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Zero Token Operations Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,6 +68,7 @@ class ZeroTokenOperationsExample {
          * Step 1:
          * Generate an ED25519 key pair for an account.
          */
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
@@ -73,6 +76,7 @@ class ZeroTokenOperationsExample {
          * Step 2:
          * Create a new account for the contract to interact with in some of its steps.
          */
+        System.out.println("Creating Alice account...");
         AccountCreateTransaction transaction = new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(10))
@@ -82,11 +86,13 @@ class ZeroTokenOperationsExample {
 
         TransactionResponse response = transaction.execute(client);
         AccountId aliceAccountId = response.getReceipt(client).accountId;
+        System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*
          * Step 3:
          * Instantiate `ContractHelper`.
          */
+        System.out.println("Instantiating `ContractHelper`...");
         ContractHelper contractHelper = new ContractHelper(
             "contracts/precompile/ZeroTokenOperations.json",
             new ContractFunctionParameters()
@@ -99,6 +105,7 @@ class ZeroTokenOperationsExample {
          * Step 4:
          * Configure steps in `ContractHelper`.
          */
+        System.out.println("Configuring steps in `ContractHelper`...");
         contractHelper
             .setPayableAmountForStep(0, Hbar.from(20))
             .addSignerForStep(1, alicePrivateKey);
@@ -113,15 +120,14 @@ class ZeroTokenOperationsExample {
          * - step 4 burn the token by passing a zero value;
          * - step 5 wipe the token by passing a zero value.
         */
+        System.out.println("Executing steps in `ContractHelper`.");
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 5, client);
 
         /*
          * Step 6:
          * Create and execute a transfer transaction with a zero value.
          */
-        // Create a Fungible Token.
-        System.out.println("Attempting to execute step 6");
-
+        System.out.println("Creating a Fungible Token...");
         TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
             .setTokenName("Black Sea LimeChain Token")
             .setTokenSymbol("BSL")
@@ -136,9 +142,11 @@ class ZeroTokenOperationsExample {
         TransactionResponse responseTokenCreate = tokenCreateTransaction.execute(client);
 
         TokenId tokenId = responseTokenCreate.getReceipt(client).tokenId;
+        System.out.println("Created token with ID: " + tokenId);
 
         // Associate Token with Account.
         // Accounts on hedera have to opt in to receive any types of token that aren't Hbar.
+        System.out.println("Associate Token with Alice's account...");
         TokenAssociateTransaction tokenAssociateTransaction = new TokenAssociateTransaction()
             .setAccountId(aliceAccountId)
             .setTokenIds(Collections.singletonList(tokenId))
@@ -146,10 +154,11 @@ class ZeroTokenOperationsExample {
 
         TokenAssociateTransaction signedTxForAssociateToken = tokenAssociateTransaction.sign(alicePrivateKey);
         TransactionResponse txResponseAssociatedToken = signedTxForAssociateToken.execute(client);
+        var txReceipt = txResponseAssociatedToken.getReceipt(client);
+        System.out.println("Alice association transaction was complete with status: " + txReceipt.status);
 
-        txResponseAssociatedToken.getReceipt(client);
-
-        //Transfer token.
+        // Transfer token.
+        System.out.println("Transferring zero tokens from operator's account to Alice's account...");
         TransferTransaction transferToken = new TransferTransaction()
             // Deduct 0 tokens.
             .addTokenTransfer(tokenId, OPERATOR_ID, 0)
@@ -188,6 +197,6 @@ class ZeroTokenOperationsExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Zero Token Operations Example Complete!");
     }
 }

@@ -53,6 +53,8 @@ class GetExchangeRatesExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Get Exchange Rates Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -65,8 +67,9 @@ class GetExchangeRatesExample {
 
         /*
          * Step 1:
-         * Get contents of file `0.0.112`. It is a system file, where exchange rate is stored.
+         * Get contents of the file `0.0.112`. It is a system file, where exchange rate is stored.
          */
+        System.out.println("Getting contents of the file `0.0.112`...");
         ByteString fileContentsByteString = new FileContentsQuery()
             .setFileId(FileId.fromString("0.0.112"))
             .execute(client);
@@ -86,7 +89,6 @@ class GetExchangeRatesExample {
         System.out.println("Current denominator: " + exchangeRateSet.currentRate.hbars);
         System.out.println("Current expiration time: " + exchangeRateSet.currentRate.expirationTime.toString());
         System.out.println("Current Exchange Rate: " + exchangeRateSet.currentRate.exchangeRateInCents);
-
         System.out.println("Next numerator: " + exchangeRateSet.nextRate.cents);
         System.out.println("Next denominator: " + exchangeRateSet.nextRate.hbars);
         System.out.println("Next expiration time: " + exchangeRateSet.nextRate.expirationTime.toString());
@@ -96,6 +98,6 @@ class GetExchangeRatesExample {
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+        System.out.println("Get Exchange Rates Example Complete!");
     }
 }

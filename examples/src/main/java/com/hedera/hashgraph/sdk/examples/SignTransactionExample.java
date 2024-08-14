@@ -54,6 +54,8 @@ class SignTransactionExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Sign Transaction Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,8 +68,9 @@ class SignTransactionExample {
 
         /*
          * Step 1:
-         * Generate ED25519 private and public keys pairs for a Key List.
+         * Generate ED25519 key pairs for a Key List.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey user1PrivateKey = PrivateKey.generateED25519();
         PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
         PrivateKey user2PrivateKey = PrivateKey.generateED25519();
@@ -77,14 +80,17 @@ class SignTransactionExample {
          * Step 2:
          * Create a Key List from keys generated in previous step.
          */
+        System.out.println("Creating a Key List...");
         KeyList keylist = new KeyList();
         keylist.add(user1PublicKey);
         keylist.add(user2PublicKey);
+        System.out.println("Created a Key List: " + keylist);
 
         /*
          * Step 3:
          * Create a new account with a Key List created in a previous step.
          */
+        System.out.println("Creating new account...");
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
             .setInitialBalance(new Hbar(2))
             .setKey(keylist)
@@ -93,12 +99,13 @@ class SignTransactionExample {
         @Var
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
         var accountId = receipt.accountId;
-        System.out.println("account id = " + accountId);
+        System.out.println("Created new account with ID: " + accountId);
 
         /*
          * Step 4:
          * Create a transfer transaction and freeze it with a client.
          */
+        System.out.println("Creating a transfer transaction...");
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
@@ -109,6 +116,7 @@ class SignTransactionExample {
          * Step 5:
          * Sign the transfer transaction with all respective keys (from a Key List).
          */
+        System.out.println("Signing the transfer transaction...");
         transferTransaction.signWithOperator(client);
         user1PrivateKey.signTransaction(transferTransaction);
         user2PrivateKey.signTransaction(transferTransaction);
@@ -117,10 +125,11 @@ class SignTransactionExample {
          * Step 6:
          * Execute the transfer transaction and output its status.
          */
+        System.out.println("Executing the transfer transaction...");
         TransactionResponse result = transferTransaction.execute(client);
         receipt = result.getReceipt(client);
 
-        System.out.println(receipt.status);
+        System.out.println("The transfer transaction was complete with status: " + receipt.status);
 
         /*
          * Clean up:
@@ -137,6 +146,6 @@ class SignTransactionExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Sign Transaction Example Complete!");
     }
 }

@@ -53,6 +53,8 @@ class CreateAccountThresholdKeyExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Account With Threshold Key Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -78,9 +80,9 @@ class CreateAccountThresholdKeyExample {
             publicKeys[i] = key.getPublicKey();
         }
 
-        System.out.println("public keys: ");
-        for (Key key : publicKeys) {
-            System.out.println(key);
+        System.out.println("Generating public keys...");
+        for (Key publicKey : publicKeys) {
+            System.out.println("Generated public key: " + publicKey);
         }
 
         /*
@@ -94,6 +96,7 @@ class CreateAccountThresholdKeyExample {
          * Step 2:
          * Create a new account setting a Key List from a previous step as an account's key.
          */
+        System.out.println("Creating new account...");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             .setKey(transactionKey)
             .setInitialBalance(new Hbar(1))
@@ -101,18 +104,19 @@ class CreateAccountThresholdKeyExample {
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
-        System.out.println("account = " + newAccountId);
+        System.out.println("Created account with ID: " + newAccountId);
 
         /*
          * Step 2:
          * Create a transfer transaction from a newly created account to demonstrate the signing process (threshold).
          */
+        System.out.println("Transferring 1 Hbar from a newly created account...");
         TransactionResponse transferTransactionResponse = new TransferTransaction()
             .addHbarTransfer(newAccountId, new Hbar(1).negated())
             .addHbarTransfer(new AccountId(3), new Hbar(1))
-            // To manually sign, you must explicitly build the Transaction
+            // To manually sign, you must explicitly build the Transaction.
             .freezeWith(client)
-            // we sign with 2 of the 3 keys
+            // We sign with 2 of the 3 keys.
             .sign(privateKeys[0])
             .sign(privateKeys[1])
             .execute(client);
@@ -125,7 +129,7 @@ class CreateAccountThresholdKeyExample {
             .execute(client)
             .hbars;
 
-        System.out.println("Account balance after transfer: " + accountBalanceAfterTransfer);
+        System.out.println("New account's Hbar balance after transfer: " + accountBalanceAfterTransfer);
 
         /*
          * Clean up:
@@ -142,6 +146,6 @@ class CreateAccountThresholdKeyExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Account With Threshold Key Example Complete!");
     }
 }

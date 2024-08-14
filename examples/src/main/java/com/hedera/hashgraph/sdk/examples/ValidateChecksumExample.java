@@ -103,6 +103,8 @@ class ValidateChecksumExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Validate Checksum Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -129,14 +131,14 @@ class ValidateChecksumExample {
                 // Throws `IllegalArgumentException` if incorrectly formatted.
                 AccountId id = AccountId.fromString(inString);
 
-                System.out.println("The ID with no checksum is " + id.toString());
-                System.out.println("The ID with the correct checksum is " + id.toStringWithChecksum(client));
+                System.out.println("The ID with no checksum is: " + id.toString());
+                System.out.println("The ID with the correct checksum is: " + id.toStringWithChecksum(client));
 
                 if (id.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
                     continue;
                 }
-                System.out.println("The checksum entered was " + id.getChecksum());
+                System.out.println("The checksum entered was: " + id.getChecksum());
 
                 // Throws `BadEntityIdException` if checksum is incorrect.
                 id.validateChecksum(client);
@@ -148,7 +150,6 @@ class ValidateChecksumExample {
 
                 // Exit the loop.
                 break;
-
             } catch (IllegalArgumentException exc) {
                 System.out.println(exc.getMessage());
             } catch (BadEntityIdException exc) {
@@ -208,6 +209,6 @@ class ValidateChecksumExample {
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+        System.out.println("Validate Checksum Example Complete!");
     }
 }

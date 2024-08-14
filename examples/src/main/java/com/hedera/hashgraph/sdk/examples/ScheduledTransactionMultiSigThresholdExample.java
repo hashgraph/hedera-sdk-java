@@ -53,6 +53,8 @@ class ScheduledTransactionMultiSigThresholdExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Scheduled Transaction Multi-Sig With Threshold Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -65,30 +67,35 @@ class ScheduledTransactionMultiSigThresholdExample {
 
         /*
          * Step 1:
-         * Generate four new Ed25519 private and public key pairs.
+         * Generate four ED25519 key pairs.
          */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey[] privateKeys = new PrivateKey[4];
         PublicKey[] publicKeys = new PublicKey[4];
         for (int i = 0; i < 4; i++) {
             PrivateKey key = PrivateKey.generateED25519();
             privateKeys[i] = key;
             publicKeys[i] = key.getPublicKey();
-            System.out.println("public key " + (i + 1) + ": " + publicKeys[i]);
-            System.out.println("private key " + (i + 1) + ": " + privateKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Private key: " + privateKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Public key: " + publicKeys[i]);
         }
 
         /*
          * Step 2:
          * Create a Key List with threshold
-         * (require 3 of the 4 keys we generated to sign on anything modifying this account).
+         * (require 3 of 4 keys we generated to sign on anything modifying this account).
          */
+        System.out.println("Creating a Key List..." +
+            "(with threshold, it will require 3 of 4 keys we generated to sign on anything modifying this account).");
         KeyList transactionKey = KeyList.withThreshold(3);
         Collections.addAll(transactionKey, publicKeys);
+        System.out.println("Created a Key List: " + transactionKey);
 
         /*
          * Step 3:
          * Create a new account with a Key List from previous step.
          */
+        System.out.println("Creating new account...(with the above Key List as an account key).");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             .setKey(transactionKey)
             .setInitialBalance(Hbar.fromTinybars(1))
@@ -99,7 +106,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         TransactionReceipt txAccountCreateReceipt = transactionResponse.getReceipt(client);
         AccountId multiSigAccountId = Objects.requireNonNull(txAccountCreateReceipt.accountId);
 
-        System.out.println("3-of-4 multi-sig account ID: " + multiSigAccountId);
+        System.out.println("Created new account with ID: " + multiSigAccountId);
 
         /*
          * Step 4:
@@ -108,12 +115,13 @@ class ScheduledTransactionMultiSigThresholdExample {
         AccountBalance balance = new AccountBalanceQuery()
             .setAccountId(multiSigAccountId)
             .execute(client);
-        System.out.println("Balance of account " + multiSigAccountId + ": " + balance.hbars.toTinybars() + " tinybar.");
+        System.out.println("Balance of a newly created account with ID " + multiSigAccountId + ": " + balance.hbars.toTinybars() + " tinybar.");
 
         /*
          * Step 5:
          * Schedule crypto transfer from multi-sig account to operator account.
          */
+        System.out.println("Scheduling crypto transfer from multi-sig account to operator account...");
         TransactionResponse transferToSchedule = new TransferTransaction()
             .addHbarTransfer(multiSigAccountId, Hbar.fromTinybars(-1))
             .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.fromTinybars(1))
@@ -128,7 +136,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         ScheduleId scheduleId = Objects.requireNonNull(txScheduleReceipt.scheduleId);
         System.out.println("Schedule ID: " + scheduleId);
         TransactionId scheduledTxId = Objects.requireNonNull(txScheduleReceipt.scheduledTransactionId);
-        System.out.println("Scheduled tx ID: " + scheduledTxId);
+        System.out.println("Scheduled transaction ID: " + scheduledTxId);
 
         // Add second signature.
         TransactionResponse txScheduleSign1 = new ScheduleSignTransaction()
@@ -138,7 +146,8 @@ class ScheduledTransactionMultiSigThresholdExample {
             .execute(client);
 
         TransactionReceipt txScheduleSign1Receipt = txScheduleSign1.getReceipt(client);
-        System.out.println("1. ScheduleSignTransaction status: " + txScheduleSign1Receipt.status);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
+            "was complete with status: " + txScheduleSign1Receipt.status);
 
         // Add third signature.
         TransactionResponse txScheduleSign2 = new ScheduleSignTransaction()
@@ -148,7 +157,8 @@ class ScheduledTransactionMultiSigThresholdExample {
             .execute(client);
 
         TransactionReceipt txScheduleSign2Receipt = txScheduleSign2.getReceipt(client);
-        System.out.println("2. ScheduleSignTransaction status: " + txScheduleSign2Receipt.status);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #3) " +
+            "was complete with status: " + txScheduleSign2Receipt.status);
 
         /*
          * Step 6:
@@ -157,7 +167,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         ScheduleInfo scheduleInfo = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(client);
-        System.out.println(scheduleInfo);
+        System.out.println("Schedule info: " + scheduleInfo);
 
         /*
          * Step 7:
@@ -166,7 +176,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         TransactionRecord recordScheduledTx = new TransactionRecordQuery()
             .setTransactionId(scheduledTxId)
             .execute(client);
-        System.out.println(recordScheduledTx);
+        System.out.println("Triggered scheduled transaction info: " + recordScheduledTx);
 
         /*
          * Clean up:
@@ -184,6 +194,6 @@ class ScheduledTransactionMultiSigThresholdExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Scheduled Transaction Multi-Sig With Threshold Example Complete!");
     }
 }

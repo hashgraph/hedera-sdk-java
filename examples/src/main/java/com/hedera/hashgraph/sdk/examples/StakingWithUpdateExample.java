@@ -52,6 +52,8 @@ class StakingWithUpdateExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Staking With Update Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -66,11 +68,9 @@ class StakingWithUpdateExample {
          * Step 1:
          * Generate an ED25519 key pair for an account.
          */
+        System.out.println("Generating ED25519 key pair...");
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
-
-        System.out.println("private key: " + alicePrivateKey);
-        System.out.println("public key: " + alicePublicKey);
 
         /*
          * Step 2:
@@ -80,6 +80,7 @@ class StakingWithUpdateExample {
          * If you really want to stake to node 0, you should use
          * `.setStakedNodeId()` instead.
          */
+        System.out.println("Creating new account with staked account ID...");
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
             .setKey(alicePublicKey)
@@ -90,12 +91,13 @@ class StakingWithUpdateExample {
             .accountId;
         Objects.requireNonNull(newAccountId);
 
-        System.out.println("new account ID: " + newAccountId);
+        System.out.println("Created new account with ID: " + newAccountId);
+
         // Show the required key used to sign the account update transaction to
         // stake the accounts Hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different.
-        System.out.println("key required to update staking information: " + alicePrivateKey.getPublicKey());
-        System.out.println("fee payer aka operator key: " + client.getOperatorPublicKey());
+        System.out.println("Key required to update staking information: " + alicePublicKey);
+        System.out.println("Fee payer / operator key: " + client.getOperatorPublicKey());
 
         /*
          * Step 3:
@@ -107,16 +109,17 @@ class StakingWithUpdateExample {
             .execute(client);
 
         if (info.stakingInfo.stakedAccountId.equals(stakedAccountId)) {
-            System.out.println("staking info: " + info.stakingInfo);
+            System.out.println("New account staking info: " + info.stakingInfo);
         } else {
-            throw new Exception("Staked account ID was not set correctly.");
+            throw new Exception("Staked account ID was not set correctly! (Fail)");
         }
 
         /*
          * Step 4:
-         * Use the `AccountUpdateTransaction` to unstake the account's Hbars.
+         * Use the `AccountUpdateTransaction` to unstake the account's Hbar.
          * If this succeeds then we should no longer have a staked account ID.
          */
+        System.out.println("Updating the new account...(unstake Hbar).");
         new AccountUpdateTransaction()
             .setAccountId(newAccountId)
             .clearStakedAccountId()
@@ -135,9 +138,9 @@ class StakingWithUpdateExample {
             .execute(client);
 
         if (info.stakingInfo.stakedAccountId == null) {
-            System.out.println("staking info: " + info.stakingInfo);
+            System.out.println("New account staking info: " + info.stakingInfo);
         } else {
-            throw new Exception("Staked account ID was not set correctly.");
+            throw new Exception("Staked account ID was not set correctly! (Fail)");
         }
 
         /*
@@ -154,6 +157,6 @@ class StakingWithUpdateExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Staking With Update Example Complete!");
     }
 }

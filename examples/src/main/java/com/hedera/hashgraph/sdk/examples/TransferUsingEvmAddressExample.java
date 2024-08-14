@@ -53,6 +53,8 @@ class TransferUsingEvmAddressExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Transfer Using Evm Address Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -80,7 +82,7 @@ class TransferUsingEvmAddressExample {
          * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println("Corresponding evm address: " + evmAddress);
+        System.out.println("EVM address of the new account: " + evmAddress);
 
         /*
          * Step 4:
@@ -88,6 +90,7 @@ class TransferUsingEvmAddressExample {
          *    - the `from` field should be a complete account that has a public address;
          *    - the `to` field should be to a public address (to create a new account).
          */
+        System.out.println("Transferring Hbar to the the new account...");
         TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())
             .addHbarTransfer(evmAddress, Hbar.from(10))
@@ -106,7 +109,7 @@ class TransferUsingEvmAddressExample {
             .execute(client);
 
         AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println(newAccountId);
+        System.out.println("The \"normal\" account ID of the given alias: " + newAccountId);
 
         /*
          * Step 6:
@@ -116,16 +119,18 @@ class TransferUsingEvmAddressExample {
             .setAccountId(newAccountId)
             .execute(client);
 
-        System.out.println("accountInfo: " + accountInfo);
+        System.out.println("New account info: " + accountInfo);
 
         /*
          * Step 7:
          * Use the hollow account as a transaction fee payer in a HAPI transaction.
          */
+        System.out.println("Setting new account as client's operator...");
         client.setOperator(newAccountId, privateKey);
         PrivateKey newPrivateKey = PrivateKey.generateED25519();
         PublicKey newPublicKey = newPrivateKey.getPublicKey();
 
+        System.out.println("Creating new account...");
         AccountCreateTransaction transaction = new AccountCreateTransaction()
             .setKey(newPublicKey)
             .freezeWith(client);
@@ -138,7 +143,7 @@ class TransferUsingEvmAddressExample {
         TransactionResponse transactionSubmit = transactionSign.execute(client);
         TransactionReceipt status = transactionSubmit.getReceipt(client);
         var accountId = status.accountId;
-        System.out.println(status);
+        System.out.println("Created new account with ID: " + accountId);
 
         /*
          * Step 9:
@@ -148,7 +153,7 @@ class TransferUsingEvmAddressExample {
             .setAccountId(newAccountId)
             .execute(client);
 
-        System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+        System.out.println("The public key of the newly created (and now complete) account: " + accountInfo2.key);
 
         /*
          * Clean up:
@@ -174,6 +179,6 @@ class TransferUsingEvmAddressExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Transfer Using Evm Address Example Complete!");
     }
 }

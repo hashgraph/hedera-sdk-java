@@ -68,6 +68,8 @@ class ExampleTemplate {
     // There should be only `main` method for simplicity
     // throws only `Exception` for simplicity
     public static void main(String[] args) throws Exception {
+        System.out.println("Example Start!");
+
         /*
          * Step 0:
          * Create and configure SDK Client.
@@ -96,6 +98,7 @@ class ExampleTemplate {
          * Clean up:
          */
         client.close();
-        System.out.println("Example complete!");
+
+        System.out.println("Example Complete!");
     }
 }

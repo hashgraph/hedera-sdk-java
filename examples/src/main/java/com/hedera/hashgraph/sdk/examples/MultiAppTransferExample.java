@@ -52,6 +52,8 @@ class MultiAppTransferExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("MultiApp Transfer Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -78,6 +80,7 @@ class MultiAppTransferExample {
          * Step 2:
          * Create exchange and receiver accounts.
          */
+        System.out.println("Creating exchange and receiver accounts...");
         // The exchange creates an account for the user to transfer funds to.
         AccountId exchangeAccountId = Objects.requireNonNull(
             new AccountCreateTransaction()
@@ -125,7 +128,7 @@ class MultiAppTransferExample {
         // Get the amount we are about to transfer (we built this with +2, -2).
         Hbar transferAmount = ((TransferTransaction) signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
-        System.out.println("about to transfer " + transferAmount + "...");
+        System.out.println("Transferring " + transferAmount + " from the user account to the exchange account...");
 
         // We now execute the signed transaction and wait for it to be accepted.
         TransactionResponse transactionResponse = signedTransferTxn.execute(client);
@@ -147,8 +150,8 @@ class MultiAppTransferExample {
             .execute(client)
             .hbars;
 
-        System.out.println("" + userAccountId + " balance = " + senderBalanceAfter);
-        System.out.println("" + exchangeAccountId + " balance = " + receiptBalanceAfter);
+        System.out.println("User account (" + userAccountId + ") balance: " + senderBalanceAfter);
+        System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + receiptBalanceAfter);
 
         /*
          * Clean up:
@@ -172,6 +175,6 @@ class MultiAppTransferExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("MultiApp Transfer Example Complete!");
     }
 }

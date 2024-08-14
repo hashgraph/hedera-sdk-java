@@ -52,6 +52,8 @@ class CreateFileExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create File Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -72,6 +74,7 @@ class CreateFileExample {
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
+        System.out.println("Creating new file...");
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
@@ -83,7 +86,7 @@ class CreateFileExample {
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         FileId newFileId = receipt.fileId;
 
-        System.out.println("file: " + newFileId);
+        System.out.println("Created new file with ID: " + newFileId);
 
         /*
          * Clean up:
@@ -96,6 +99,6 @@ class CreateFileExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create File Example Complete!");
     }
 }

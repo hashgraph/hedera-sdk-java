@@ -28,6 +28,8 @@ import java.util.Objects;
 
 /**
  * How to create a Hedera account with alias.
+ *
+ * TODO: possible duplicate of `CreateAccountWithAliasAndReceiverSignatureRequiredExample`?
  */
 class CreateAccountWithAliasExample {
 
@@ -52,6 +54,8 @@ class CreateAccountWithAliasExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Account With Alias Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -81,7 +85,7 @@ class CreateAccountWithAliasExample {
          * Extract the Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println(evmAddress);
+        System.out.println("EVM address of the new account: " + evmAddress);
 
         /*
          * Step 4:
@@ -105,7 +109,7 @@ class CreateAccountWithAliasExample {
             .execute(client)
             .accountId;
 
-        System.out.println("New account ID: " + newAccountId);
+        System.out.println("Created account with ID: " + newAccountId);
 
          /*
          * Step 6:
@@ -116,9 +120,9 @@ class CreateAccountWithAliasExample {
             .execute(client);
 
         if (accountInfo.contractAccountId != null) {
-            System.out.println("The new account has alias " + accountInfo.contractAccountId);
+            System.out.println("The newly account has alias: " + accountInfo.contractAccountId);
         } else {
-            throw new Exception("The new account doesn't have alias");
+            throw new Exception("The newly account doesn't have alias! (Fail)");
         }
 
         /*
@@ -133,6 +137,6 @@ class CreateAccountWithAliasExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Account With Alias Example Complete!");
     }
 }

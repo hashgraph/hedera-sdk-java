@@ -52,6 +52,8 @@ class CreateAccountExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Create Account Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -68,13 +70,14 @@ class CreateAccountExample {
          */
         PrivateKey privateKey = PrivateKey.generateED25519();
         PublicKey publicKey = privateKey.getPublicKey();
-        System.out.println("private key = " + privateKey);
-        System.out.println("public key = " + publicKey);
+        System.out.println("Future account private key: " + privateKey);
+        System.out.println("Future account public key: " + publicKey);
 
         /*
          * Step 2:
          * Create a new account.
          */
+        System.out.println("Creating new account...");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             // The only _required_ property here is `key`.
             .setKey(publicKey)
@@ -84,7 +87,7 @@ class CreateAccountExample {
         // This will wait for the receipt to become available
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         AccountId newAccountId = receipt.accountId;
-        System.out.println("account = " + newAccountId);
+        System.out.println("Created account with ID: " + newAccountId);
 
         /*
          * Clean up:
@@ -100,6 +103,6 @@ class CreateAccountExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Create Account Example Complete!");
     }
 }

@@ -53,6 +53,8 @@ class FileAppendChunkedExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Big File Append Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -73,6 +75,7 @@ class FileAppendChunkedExample {
         // you can easily use the bytes of a file instead.
         String fileContents = "Hedera hashgraph is great!";
 
+        System.out.println("Creating new file...");
         TransactionResponse transactionResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
@@ -84,7 +87,7 @@ class FileAppendChunkedExample {
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(receipt.fileId);
 
-        System.out.println("fileId: " + newFileId);
+        System.out.println("Created new file with ID: " + newFileId);
 
         /*
          * Step 2:
@@ -93,8 +96,7 @@ class FileAppendChunkedExample {
         FileInfo fileInfoAfterCreate = new FileInfoQuery()
             .setFileId(newFileId)
             .execute(client);
-
-        System.out.println("File size according to `FileInfoQuery` (after create): " + fileInfoAfterCreate.size);
+        System.out.println("Created file size after create (according to `FileInfoQuery`): " + fileInfoAfterCreate.size + " bytes.");
 
         /*
          * Step 3:
@@ -109,7 +111,8 @@ class FileAppendChunkedExample {
          * Step 4:
          * Append new file contents to a file.
          */
-        TransactionReceipt fileAppendReceipt = new FileAppendTransaction()
+        System.out.println("Appending new contents to the created file...");
+        new FileAppendTransaction()
             .setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId))
             .setFileId(newFileId)
             .setContents(contents.toString())
@@ -118,8 +121,6 @@ class FileAppendChunkedExample {
             .freezeWith(client)
             .execute(client)
             .getReceipt(client);
-
-        System.out.println(fileAppendReceipt.toString());
 
         /*
          * Step 5:
@@ -130,9 +131,9 @@ class FileAppendChunkedExample {
             .execute(client);
 
         if (fileInfoAfterCreate.size < fileInfoAfterAppend.size) {
-            System.out.println("File size according to `FileInfoQuery` (after append): " + fileInfoAfterAppend.size);
+            System.out.println("File size after append (according to `FileInfoQuery`): " + fileInfoAfterAppend.size + " bytes.");
         } else {
-            throw new Exception("File append was unsuccessful");
+            throw new Exception("File append was unsuccessful! (Fail)");
         }
 
         /*
@@ -146,6 +147,6 @@ class FileAppendChunkedExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Big File Append Example Complete!");
     }
 }

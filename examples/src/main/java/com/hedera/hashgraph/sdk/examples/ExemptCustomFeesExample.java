@@ -54,6 +54,8 @@ class ExemptCustomFeesExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Exempt Custom Fees Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -70,6 +72,7 @@ class ExemptCustomFeesExample {
          * Step 1:
          * Create accounts A, B, and C.
          */
+        System.out.println("Creating new accounts...");
         PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
         AccountId firstAccountId = new AccountCreateTransaction()
@@ -128,6 +131,7 @@ class ExemptCustomFeesExample {
             .setDenominator(100)
             .setAllCollectorsAreExempt(true);
 
+        System.out.println("Creating new Fungible Token using the Hedera Token Service...");
         TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
             .setTokenName("HIP-573 Token")
             .setTokenSymbol("H573")
@@ -149,13 +153,14 @@ class ExemptCustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .tokenId;
-        System.out.println("TokenId: " + tokenId);
+        System.out.println("Created new fungible token with ID: " + tokenId);
 
         /*
          * Step 3:
          * Collector 0.0.B sends 10_000 units of the token to 0.0.A.
+         * TODO: revisit this doc
          */
-        // Send 10_000 units from the operator to the second account
+        System.out.println("Transferring 10_000 units of the fungible token from the operator to the second account...");
         new TransferTransaction()
             .addTokenTransfer(tokenId, OPERATOR_ID, -10_000)
             .addTokenTransfer(tokenId, secondAccountId, 10_000)
@@ -163,6 +168,7 @@ class ExemptCustomFeesExample {
             .sign(OPERATOR_KEY)
             .execute(client);
 
+        System.out.println("Transferring 10_000 units of the fungible token from the second to the first account...");
         TransactionResponse tokenTransferResponse = new TransferTransaction()
             .addTokenTransfer(tokenId, secondAccountId, -10_000)
             .addTokenTransfer(tokenId, firstAccountId, 10_000)
@@ -177,7 +183,7 @@ class ExemptCustomFeesExample {
         Hbar transactionFee = tokenTransferResponse
             .getRecord(client)
             .transactionFee;
-        System.out.println("Txfee: " + transactionFee);
+        System.out.println("Transaction fee for the transfer above: " + transactionFee);
 
         /*
          * Step 5:
@@ -199,9 +205,9 @@ class ExemptCustomFeesExample {
             .execute(client)
             .tokens.get(tokenId);
 
-        System.out.println("First account balance after TransferTransaction: " + firstAccountBalanceAfter);
-        System.out.println("Second account balance after TransferTransaction: " + secondAccountBalanceAfter);
-        System.out.println("Third account balance after TransferTransaction: " + thirdAccountBalanceAfter);
+        System.out.println("First account balance after transferring the fungible token: " + firstAccountBalanceAfter);
+        System.out.println("Second account balance after transferring the fungible token: " + secondAccountBalanceAfter);
+        System.out.println("Third account balance after transferring the fungible token: " + thirdAccountBalanceAfter);
 
         /*
          * Clean up:
@@ -211,7 +217,6 @@ class ExemptCustomFeesExample {
             .setAccountId(firstAccountId)
             .execute(client)
             .tokens;
-        System.out.println("First account token balance (before wipe): " + firstAccountTokensBeforeWipe.get(tokenId));
 
         new TokenWipeTransaction()
             .setTokenId(tokenId)
@@ -252,5 +257,7 @@ class ExemptCustomFeesExample {
             .getReceipt(client);
 
         client.close();
+
+        System.out.println("Exempt Custom Fees Example Complete!");
     }
 }

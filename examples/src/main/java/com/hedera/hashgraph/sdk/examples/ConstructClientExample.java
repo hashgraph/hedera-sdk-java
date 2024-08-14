@@ -59,6 +59,8 @@ class ConstructClientExample {
     private static final String HEDERA_NETWORK = "testnet";
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Construct Client Example Start!");
+
         // Here's the simplest way to construct a client.
         // These clients' networks are filled with default lists of nodes that are baked into the SDK.
         // Their operators are not yet set, and trying to use them now will result in exceptions.
@@ -109,6 +111,6 @@ class ConstructClientExample {
         namedNetworkClient.close();
         customClient.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Construct Client Example Complete!");
     }
 }

@@ -55,6 +55,8 @@ class UpdateNftsMetadataExample {
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Update Nfts Metadata Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
@@ -69,8 +71,9 @@ class UpdateNftsMetadataExample {
 
         /*
          * Step 1:
-         * Generate keys for future tokens.
+         * Generate ED25519 key pair (metadata key).
          */
+        System.out.println("Generating ED25519 key pair...(metadata key).");
         PrivateKey metadataPrivateKey = PrivateKey.generateED25519();
         PublicKey metadataPublicKey = metadataPrivateKey.getPublicKey();
 
@@ -79,8 +82,9 @@ class UpdateNftsMetadataExample {
          * The beginning of the first example (mutable token's metadata).
          * Create a non-fungible token (NFT) with the metadata key field set.
          */
-        System.out.println("Example №1 (mutable token's metadata).");
+        System.out.println("The beginning of the first example (mutable token's metadata).");
         byte[] initialMetadata = new byte[]{1};
+        System.out.println("Creating mutable NFT with the metadata key field set...");
         var mutableTokenCreateTransaction = new TokenCreateTransaction()
             .setTokenName("Mutable")
             .setTokenSymbol("MUT")
@@ -93,11 +97,9 @@ class UpdateNftsMetadataExample {
 
         var mutableTokenCreateResponse = mutableTokenCreateTransaction.sign(OPERATOR_KEY).execute(client);
         var mutableTokenCreateReceipt = mutableTokenCreateResponse.getReceipt(client);
-        System.out.println("Status of token create transaction: " + mutableTokenCreateReceipt.status);
-
         // Get the token ID of the token that was created.
         var mutableTokenId = mutableTokenCreateReceipt.tokenId;
-        System.out.println("Token id: " + mutableTokenId);
+        System.out.println("Created mutable NFT with token ID: " + mutableTokenId);
 
         /*
          * Step 3:
@@ -107,25 +109,26 @@ class UpdateNftsMetadataExample {
             .setTokenId(mutableTokenId)
             .execute(client);
 
-        System.out.println("Token metadata key: " + mutableTokenInfo.metadataKey);
+        System.out.println("Mutable NFT metadata key: " + mutableTokenInfo.metadataKey);
 
         /*
          * Step 4:
          * Mint the first NFT and set the initial metadata for the NFT.
          */
+        System.out.println("Minting NFTs...");
         var mutableTokenMintTransaction = new TokenMintTransaction()
             .setMetadata(List.of(initialMetadata))
             .setTokenId(mutableTokenId);
 
         mutableTokenMintTransaction.getMetadata().forEach(metadata -> {
-            System.out.println("Set metadata: " + Arrays.toString(metadata));
+            System.out.println("Setting metadata: " + Arrays.toString(metadata));
         });
 
         var mutableTokenMintResponse = mutableTokenMintTransaction.execute(client);
 
         // Get receipt for mint token transaction.
         var mutableTokenMintReceipt = mutableTokenMintResponse.getReceipt(client);
-        System.out.println("Status of token mint transaction: " + mutableTokenMintReceipt.status);
+        System.out.println("Mint transaction was complete with status: " + mutableTokenMintReceipt.status);
 
         var mutableNftSerials = mutableTokenMintReceipt.serials;
         // Check that metadata on the NFT was set correctly.
@@ -137,6 +140,7 @@ class UpdateNftsMetadataExample {
          * Step 5:
          * Create an account to send the NFT to.
          */
+        System.out.println("Creating new account...");
         var accountCreateTransaction = new AccountCreateTransaction()
             .setKey(operatorKeyPublic)
             // If the account does not have any automatic token association
@@ -145,11 +149,13 @@ class UpdateNftsMetadataExample {
             .execute(client);
 
         var newAccountId = accountCreateTransaction.getReceipt(client).accountId;
+        System.out.println("Created new account with ID: " + newAccountId);
 
         /*
          * Step 6:
          * Transfer the NFT to the new account.
          */
+        System.out.println("Transferring the NFT to the new account...");
         new TransferTransaction()
             .addNftTransfer(mutableTokenId.nft(mutableNftSerials.get(0)), OPERATOR_ID, newAccountId)
             .execute(client);
@@ -159,22 +165,23 @@ class UpdateNftsMetadataExample {
          * Update NFTs' metadata.
          */
         byte[] updatedMetadata = new byte[]{1, 2};
+        System.out.println("Updating NFTs' metadata...");
         var tokenUpdateNftsTransaction = new TokenUpdateNftsTransaction()
             .setTokenId(mutableTokenId)
             .setSerials(mutableNftSerials)
             .setMetadata(updatedMetadata)
             .freezeWith(client);
 
-        System.out.println("Updated metadata: " + Arrays.toString(tokenUpdateNftsTransaction.getMetadata()));
+        System.out.println("Updated NFTs' metadata: " + Arrays.toString(tokenUpdateNftsTransaction.getMetadata()));
         var tokenUpdateNftsResponse = tokenUpdateNftsTransaction.sign(metadataPrivateKey).execute(client);
 
         // Get receipt for update NFTs metadata transaction.
         var tokenUpdateNftsReceipt = tokenUpdateNftsResponse.getReceipt(client);
-        System.out.println("Status of token update nfts metadata transaction: " + tokenUpdateNftsReceipt.status);
+        System.out.println("Token update nfts metadata transaction was complete with status: " + tokenUpdateNftsReceipt.status);
 
         // Check that metadata for the NFT was updated correctly.
         getMetadataList(client, mutableTokenId, mutableNftSerials).forEach(metadata -> {
-            System.out.println("Metadata after update: " + Arrays.toString(metadata));
+            System.out.println("NFTs' metadata after update: " + Arrays.toString(metadata));
         });
 
         /*
@@ -182,7 +189,8 @@ class UpdateNftsMetadataExample {
          * The beginning of the second example (immutable token's metadata).
          * Create a non-fungible token (NFT) with the metadata key field set.
          */
-        System.out.println("Example №2 (immutable token's metadata).");
+        System.out.println("The beginning of the second example (immutable token's metadata).");
+        System.out.println("Creating immutable NFT with the metadata key field set...");
         var immutableTokenCreateTransaction = new TokenCreateTransaction()
             .setTokenName("Immutable")
             .setTokenSymbol("IMUT")
@@ -194,11 +202,9 @@ class UpdateNftsMetadataExample {
 
         var immutableTokenCreateResponse = immutableTokenCreateTransaction.sign(OPERATOR_KEY).execute(client);
         var immutableTokenCreateReceipt = immutableTokenCreateResponse.getReceipt(client);
-        System.out.println("Status of token create transaction: " + immutableTokenCreateReceipt.status);
-
         // Get the token ID of the token that was created.
         var immutableTokenId = immutableTokenCreateReceipt.tokenId;
-        System.out.println("Token id: " + immutableTokenId);
+        System.out.println("Created immutable NFT with token ID: " + immutableTokenId);
 
         /*
          * Step 9:
@@ -208,25 +214,26 @@ class UpdateNftsMetadataExample {
             .setTokenId(immutableTokenId)
             .execute(client);
 
-        System.out.println("Token metadata key: " + immutableTokenInfo.metadataKey);
+        System.out.println("Immutable NFT metadata key: " + immutableTokenInfo.metadataKey);
 
         /*
          * Step 10:
          * Mint the first NFT and set the initial metadata for the NFT.
          */
+        System.out.println("Minting NFTs...");
         var immutableTokenMintTransaction = new TokenMintTransaction()
             .setMetadata(List.of(initialMetadata))
             .setTokenId(immutableTokenId);
 
         immutableTokenMintTransaction.getMetadata().forEach(metadata -> {
-            System.out.println("Set metadata: " + Arrays.toString(metadata));
+            System.out.println("Setting metadata: " + Arrays.toString(metadata));
         });
 
         var immutableTokenMintResponse = immutableTokenMintTransaction.execute(client);
 
         // Get receipt for mint token transaction.
         var immutableTokenMintReceipt = immutableTokenMintResponse.getReceipt(client);
-        System.out.println("Status of token mint transaction: " + immutableTokenMintReceipt.status);
+        System.out.println("Mint transaction was complete with status: " + immutableTokenMintReceipt.status);
 
         var immutableNftSerials = immutableTokenMintReceipt.serials;
         // Check that metadata on the NFT was set correctly.
@@ -238,6 +245,7 @@ class UpdateNftsMetadataExample {
          * Step 11:
          * Create an account to send the NFT to.
          */
+        System.out.println("Creating new account...");
         var newAccountCreateTransaction = new AccountCreateTransaction()
             .setKey(operatorKeyPublic)
             // If the account does not have any automatic token association
@@ -246,11 +254,13 @@ class UpdateNftsMetadataExample {
             .execute(client);
 
         var newAccountId2 = newAccountCreateTransaction.getReceipt(client).accountId;
+        System.out.println("Created new account with ID: " + newAccountId2);
 
         /*
          * Step 12:
          * Transfer the NFT to the new account.
          */
+        System.out.println("Transferring the NFT to the new account...");
         new TransferTransaction()
             .addNftTransfer(immutableTokenId.nft(immutableNftSerials.get(0)), OPERATOR_ID, newAccountId2)
             .execute(client);
@@ -259,22 +269,23 @@ class UpdateNftsMetadataExample {
          * Step 13:
          * Update NFTs' metadata.
          */
+        System.out.println("Updating NFTs' metadata...");
         var immutableTokenUpdateNftsTransaction = new TokenUpdateNftsTransaction()
             .setTokenId(immutableTokenId)
             .setSerials(immutableNftSerials)
             .setMetadata(updatedMetadata)
             .freezeWith(client);
 
-        System.out.println("Updated metadata: " + Arrays.toString(immutableTokenUpdateNftsTransaction.getMetadata()));
+        System.out.println("Updated NFTs' metadata: " + Arrays.toString(immutableTokenUpdateNftsTransaction.getMetadata()));
         var immutableTokenUpdateNftsResponse = immutableTokenUpdateNftsTransaction.sign(metadataPrivateKey).execute(client);
 
         // Get receipt for update NFTs metadata transaction.
         var immutableTokenUpdateNftsReceipt = immutableTokenUpdateNftsResponse.getReceipt(client);
-        System.out.println("Status of token update nfts metadata transaction: " + immutableTokenUpdateNftsReceipt.status);
+        System.out.println("Token update nfts metadata transaction was complete with status: " + immutableTokenUpdateNftsReceipt.status);
 
         // Check that metadata for the NFT was updated correctly.
         getMetadataList(client, immutableTokenId, immutableNftSerials).forEach(metadata -> {
-            System.out.println("Metadata after update: " + Arrays.toString(metadata));
+            System.out.println("NFTs' metadata after update: " + Arrays.toString(metadata));
         });
 
         /*
@@ -288,7 +299,7 @@ class UpdateNftsMetadataExample {
 
         client.close();
 
-        System.out.println("Example complete!");
+        System.out.println("Update Nfts Metadata Example Complete!");
     }
 
     private static List<byte[]> getMetadataList(Client client, TokenId tokenId, List<Long> nftSerials) {
