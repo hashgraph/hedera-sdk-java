@@ -30,32 +30,40 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * HIP-336: Approval and Allowance API for Tokens.
- * Describes the addition of Services APIs to approve and exercise allowances to a third party account.
- * The allowances grant another account the right to transfer hbar, fungible and non-fungible tokens from your account.
- *
- * TODO: double check this example (case with delegating spender): rewrite code, logs and docs
+ * How to grant another account the right to transfer hbar, fungible and non-fungible tokens from your account (HIP-336).
  */
+// TODO: double check this example (case with delegating spender): rewrite code, logs and docs
 class NftAddRemoveAllowancesExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -66,7 +74,7 @@ class NftAddRemoveAllowancesExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -188,8 +196,8 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 6:
-         * Send NFT with serial number 1 from operator's to receiver account.
-         * This transaction should be executed on behalf of the spender and should end up with `SUCCESS`.
+         * Send NFT with serial #1 from operator's to receiver account.
+         * This transaction should be executed on behalf of the spender and should end up with SUCCESS.
          */
         // Generate TransactionId from spender's account id in order,
         // for the transaction to be executed on behalf of the spender.
@@ -218,8 +226,8 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 8:
-         * Send NFT with serial number 2 from operator's to receiver account.
-         * Spender does not have an allowance to send serial 2, should end up with `SPENDER_DOES_NOT_HAVE_ALLOWANCE`.
+         * Send NFT with serial #2 from operator's to receiver account.
+         * Spender does not have an allowance to send serial #2, should end up with SPENDER_DOES_NOT_HAVE_ALLOWANCE.
          */
         TransactionId onBehalfOfTransactionId2 = TransactionId.generate(spenderAccountId);
 
@@ -368,7 +376,7 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 15:
-         * Give `delegatingSpender` allowance for NFT with serial number 3 on behalf of spender account which has `approveForAll` rights.
+         * Give delegatingSpender allowance for NFT with serial #3 on behalf of spender account which has approveForAll rights.
          */
         System.out.println("Approving delegate spender account allowance for NFT (serial #3) on behalf of spender account which has `approveForAll` rights...");
         TransactionReceipt approveDelegateAllowanceReceipt = new AccountAllowanceApproveTransaction()
@@ -381,9 +389,9 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 16:
-         * Send NFT with serial number 3 from operator's to receiver account.
-         * This transaction should be executed on behalf of the `spenderAccountId2`,
-         * which has an allowance to send serial 3, and should end up with `SUCCESS`.
+         * Send NFT with serial #3 from operator's to receiver account.
+         * This transaction should be executed on behalf of the spenderAccountId2,
+         * which has an allowance to send serial #3, and should end up with SUCCESS.
          */
         // Generate TransactionId from spender's account id in order,
         // for the transaction to be executed on behalf of the spender.
@@ -400,9 +408,9 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 17:
-         * Send NFT with serial number 1 from operator's to receiver account.
-         * This transaction should be executed on behalf of the `delegatingSpender`,
-         * which has an allowance to send serial 1, and should end up with `SUCCESS`.
+         * Send NFT with serial #1 from operator's to receiver account.
+         * This transaction should be executed on behalf of the delegatingSpender,
+         * which has an allowance to send serial #1, and should end up with SUCCESS.
          */
         // Generate TransactionId from spender's account id in order,
         // for the transaction to be executed on behalf of the spender.
@@ -419,7 +427,7 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 18:
-         * Remove `delegatingSpender` allowance for all of NFT serials.
+         * Remove delegatingSpender allowance for all of NFT serials.
          */
         TransactionReceipt deleteAllowanceReceipt2 = new AccountAllowanceApproveTransaction()
             .deleteTokenNftAllowanceAllSerials(nftTokenId2, OPERATOR_ID, delegatingSpenderAccountId)
@@ -429,8 +437,8 @@ class NftAddRemoveAllowancesExample {
 
         /*
          * Step 19:
-         * Send NFT with serial number 2 from operator's to receiver account.
-         * Spender does not have an allowance to send serial 2, should end up with `SPENDER_DOES_NOT_HAVE_ALLOWANCE`.
+         * Send NFT with serial #2 from operator's to receiver account.
+         * Spender does not have an allowance to send serial #2, should end up with SPENDER_DOES_NOT_HAVE_ALLOWANCE.
          */
         // Generate TransactionId from spender's account id in order,
         // for the transaction to be executed on behalf of the spender.

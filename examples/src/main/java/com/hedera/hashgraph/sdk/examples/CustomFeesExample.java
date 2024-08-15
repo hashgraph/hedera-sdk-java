@@ -34,24 +34,35 @@ import java.util.Objects;
  */
 class CustomFeesExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -62,7 +73,7 @@ class CustomFeesExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -70,6 +81,7 @@ class CustomFeesExample {
         /*
          * Step 1:
          * Create three accounts: Alice, Bob, and Charlie.
+         *
          * Alice will be the treasury for our example token.
          * Fees only apply in transactions not involving the treasury, so we need two other accounts.
          */
@@ -115,8 +127,10 @@ class CustomFeesExample {
 
         /*
          * Step 2:
-         * Create a custom fee list of 1 fixed fee. A custom fee list can be a list of up to
-         * 10 custom fees, where each fee is a fixed fee or a fractional fee.
+         * Create a custom fee list of 1 fixed fee.
+         *
+         * A custom fee list can be a list of up to 10 custom fees,
+         * where each fee is a fixed fee or a fractional fee.
          * This fixed fee will mean that every time Bob transfers any number of tokens to Charlie,
          * Alice will collect 1 Hbar from each account involved in the transaction who is SENDING
          * the Token (in this case, Bob).
@@ -124,8 +138,8 @@ class CustomFeesExample {
          * In this example the fee is in Hbar, but you can charge a fixed fee in a token if you'd like.
          * E.g., you can make it so that each time an account transfers Foo tokens,
          * they must pay a fee in Bar tokens to the fee collecting account.
-         * To charge a fixed fee in tokens, instead of calling `setHbarAmount()`, call
-         * `setDenominatingTokenId(tokenForFee)` and `setAmount(tokenFeeAmount)`.
+         * To charge a fixed fee in tokens, instead of calling setHbarAmount(), call
+         * setDenominatingTokenId(tokenForFee) and setAmount(tokenFeeAmount).
          */
         CustomFixedFee customHbarFee = new CustomFixedFee()
             .setHbarAmount(new Hbar(1))
@@ -135,8 +149,9 @@ class CustomFeesExample {
         /*
          * Step 3:
          * Create a fungible token.
-         * Setting the `feeScheduleKey` to Alice's key will enable Alice to change the custom
-         * fees list on this token later using the `TokenFeeScheduleUpdateTransaction`.
+         *
+         * Setting the feeScheduleKey to Alice's key will enable Alice to change the custom
+         * fees list on this token later using the TokenFeeScheduleUpdateTransaction.
          * We will create an initial supply of 100 of these tokens.
          */
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
@@ -165,7 +180,7 @@ class CustomFeesExample {
 
         /*
          * Step 4:
-         * Associate the token with Bob and Charlie before they can trade in it.
+         * Associate the token with Bob and Charlie before they can transfer and receive it.
          */
         System.out.println("Associate created fungible token with Bob's and Charlie's accounts...");
 
@@ -230,8 +245,9 @@ class CustomFeesExample {
 
         /*
          * Step 8:
-         * Check Alice's Hbar balance. It should increase, because of the fee taken from the
-         * transfer in the previous step.
+         * Check Alice's Hbar balance.
+         *
+         * It should increase, because of the fee taken from the transfer in the previous step.
          */
         Hbar aliceHbar2 = new AccountBalanceQuery()
             .setAccountId(aliceId)
@@ -248,16 +264,16 @@ class CustomFeesExample {
 
         /*
          * Step 9:
-         * Use the `TokenUpdateFeeScheduleTransaction` with Alice's key to change the custom fees on our token.
+         * Use the TokenUpdateFeeScheduleTransaction with Alice's key to change the custom fees on our token.
          *
-         * `TokenUpdateFeeScheduleTransaction` will replace the list of fees that apply to the token with
+         * TokenUpdateFeeScheduleTransaction will replace the list of fees that apply to the token with
          * an entirely new list. Let's charge a 10% fractional fee. This means that when Bob attempts to transfer
          * 20 tokens to Charlie, 10% of the tokens he attempts to transfer (2 in this case) will be transferred to
          * Alice instead.
          *
-         * Fractional fees default to `FeeAssessmentMethod.INCLUSIVE`, which is the behavior described above.
-         * If you set the assessment method to `EXCLUSIVE`, then when Bob attempts to transfer 20 tokens to Charlie,
-         * Charlie will receive all 20 tokens, and Bob will be charged an _additional_ 10% fee which
+         * Fractional fees default to FeeAssessmentMethod.INCLUSIVE, which is the behavior described above.
+         * If you set the assessment method to EXCLUSIVE, then when Bob attempts to transfer 20 tokens to Charlie,
+         * Charlie will receive all 20 tokens, and Bob will be charged an additional 10% fee which
          * will be transferred to Alice.
          */
         CustomFractionalFee customFractionalFee = new CustomFractionalFee()

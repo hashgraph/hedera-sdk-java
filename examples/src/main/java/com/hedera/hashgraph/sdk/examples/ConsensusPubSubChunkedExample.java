@@ -37,30 +37,41 @@ import java.util.concurrent.TimeoutException;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
- * This example demonstrates sending a large message (involving `ChunkedTransaction`) to the topic and then receiving it.
+ * How to send large message to the private HCS topic and how to subscribe to the topic to receive it.
  */
 class ConsensusPubSubChunkedExample {
 
     private static final CountDownLatch LARGE_MESSAGE_LATCH = new CountDownLatch(1);
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -71,7 +82,7 @@ class ConsensusPubSubChunkedExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -88,7 +99,7 @@ class ConsensusPubSubChunkedExample {
 
         /*
          * Step 2:
-         * Create a new topic.
+         * Create new HCS topic.
          */
         System.out.println("Creating new topic...");
 
@@ -101,18 +112,20 @@ class ConsensusPubSubChunkedExample {
             .getReceipt(client)
             .topicId
         );
+
         System.out.println("Created new topic with ID: " + newTopicId);
 
         /*
          * Step 3:
-         * Sleep for 10 seconds (wait to propagate to the mirror).
+         * Wait 10 seconds (to ensure data propagated to mirror nodes).
          */
         System.out.println("Wait 10 seconds (to ensure data propagated to mirror nodes) ...");
         Thread.sleep(10_000);
 
         /*
          * Step 4:
-         * Set up a mirror client to print out messages as we receive them.
+         * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
+         * Hedera mirror node.
          */
         System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
@@ -127,14 +140,16 @@ class ConsensusPubSubChunkedExample {
 
         /*
          * Step 5:
-         * Send message (a large one) to the topic created in previous steps.
+         * Send large message to the topic created previously.
          */
         // Get a large file to send.
         String bigContents = readResources("util/large_message.txt");
 
         // Prepare a message send transaction that requires a submit key from "somewhere else".
         @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
-            .setMaxChunks(15) // This is 10 by default.
+            // This is value 10 by default,
+            // increasing so large message will "fit".
+            .setMaxChunks(15)
             .setTopicId(newTopicId)
             .setMessage(bigContents)
             // Sign with the operator or "sender" of the message,
@@ -153,7 +168,7 @@ class ConsensusPubSubChunkedExample {
         long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
         System.out.println("Preparing to submit a message to the created topic (size of the message: " + transactionMessageSize + " bytes)...");
 
-        // Sign with that submit key.
+        // Sign with that Submit Key.
         transaction.sign(submitPrivateKey);
 
         // Now actually submit the transaction and get the receipt to ensure there were no errors.

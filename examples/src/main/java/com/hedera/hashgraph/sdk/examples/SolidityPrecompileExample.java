@@ -39,26 +39,38 @@ import java.util.Objects;
  * When this example spits out a raw response code,
  * you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
+// TODO: update description
 class SolidityPrecompileExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -69,14 +81,14 @@ class SolidityPrecompileExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         /*
          * Step 1:
-         * Generate ED25519 key pair for an account.
+         * Generate ED25519 key pair.
          */
         System.out.println("Generating ED25519 key pair...");
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
@@ -98,7 +110,7 @@ class SolidityPrecompileExample {
 
         /*
          * Step 3:
-         * Instantiate `ContractHelper`.
+         * Instantiate ContractHelper.
          */
         System.out.println("Instantiating `ContractHelper`...");
         ContractHelper contractHelper = new ContractHelper(
@@ -111,7 +123,7 @@ class SolidityPrecompileExample {
 
         /*
          * Step 4:
-         * Configure steps in `ContractHelper`.
+         * Configure steps in ContractHelper.
          */
         System.out.println("Configuring steps in `ContractHelper`...");
         contractHelper
@@ -119,26 +131,22 @@ class SolidityPrecompileExample {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
             }).setPayableAmountForStep(1, Hbar.from(20))
-            // step 3 associates Alice with the token, which requires Alice's signature
+            // Step 3 associates Alice with the token, which requires Alice's signature.
             .addSignerForStep(3, alicePrivateKey)
             .addSignerForStep(5, alicePrivateKey)
-            .setParameterSupplierForStep(11, () -> {
-                return new ContractFunctionParameters()
-                    // when contracts work with a public key, they handle the raw bytes of the public key
-                    .addBytes(alicePublicKey.toBytesRaw());
-            }).setPayableAmountForStep(11, Hbar.from(40))
+            .setParameterSupplierForStep(11, () -> new ContractFunctionParameters()
+                // When contracts work with a public key, they handle the raw bytes of the public key.
+                .addBytes(alicePublicKey.toBytesRaw())).setPayableAmountForStep(11, Hbar.from(40))
             // Because we're setting the adminKey for the created NFT token to Alice's key,
             // Alice must sign the ContractExecuteTransaction.
             .addSignerForStep(11, alicePrivateKey)
-            // and Alice must sign for minting because her key is the supply key.
+            // And Alice must sign for minting because her key is the supply key.
             .addSignerForStep(12, alicePrivateKey)
-            .setParameterSupplierForStep(12, () -> {
-                return new ContractFunctionParameters()
-                    // add three metadatas
-                    .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}});
-            }) // and alice must sign to become associated with the token.
+            .setParameterSupplierForStep(12, () -> new ContractFunctionParameters()
+                // Add three metadatas. Alice must sign to become associated with the token.
+                .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}}))
             .addSignerForStep(13, alicePrivateKey)
-            // Alice must sign to burn the token because her key is the supply key
+            // Alice must sign to burn the token because her key is the supply key.
             .addSignerForStep(16, alicePrivateKey);
 
 

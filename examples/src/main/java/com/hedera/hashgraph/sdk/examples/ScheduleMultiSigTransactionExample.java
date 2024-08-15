@@ -34,24 +34,35 @@ import java.util.Objects;
  */
 class ScheduleMultiSigTransactionExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -62,7 +73,7 @@ class ScheduleMultiSigTransactionExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -71,7 +82,7 @@ class ScheduleMultiSigTransactionExample {
 
         /*
          * Step 1:
-         * Generate 3 ED25519 private keys.
+         * Generate three ED25519 private keys.
          */
         System.out.println("Generating ED25519 private keys...");
         PrivateKey key1 = PrivateKey.generateED25519();
@@ -80,7 +91,9 @@ class ScheduleMultiSigTransactionExample {
 
         /*
          * Step 2:
-         * Create a Key List from keys generated in previous step. This key will be used as the new account's key
+         * Create a Key List from keys generated in previous step.
+         *
+         * This key will be used as the new account's key.
          * The reason we want to use a `KeyList` is to simulate a multi-party system where
          * multiple keys are required to sign.
          */
@@ -98,7 +111,7 @@ class ScheduleMultiSigTransactionExample {
         System.out.println("Creating new account...");
         TransactionResponse response = new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            // The only _required_ property here is `key`.
+            // The only required property here is `key`.
             .setKey(keyList)
             .setInitialBalance(new Hbar(10))
             .execute(client);
@@ -112,7 +125,7 @@ class ScheduleMultiSigTransactionExample {
          * Step 4:
          * Create a new scheduled transaction for transferring Hbars.
          */
-        // Generate a `TransactionId`. This id is used to query the inner scheduled transaction
+        // Generate a TransactionId. This id is used to query the inner scheduled transaction
         // after we expect it to have been executed.
         TransactionId transactionId = TransactionId.generate(OPERATOR_ID);
 
@@ -133,14 +146,14 @@ class ScheduleMultiSigTransactionExample {
             .sign(key2);
 
         receipt = scheduled.execute(client).getReceipt(client);
-        // Get the schedule ID from the receipt
+        // Get the schedule ID from the receipt.
         ScheduleId scheduleId = Objects.requireNonNull(receipt.scheduleId);
 
         System.out.println("Schedule ID: " + scheduleId);
 
         /*
          * Step 5:
-         * Get the schedule info to see if `signatories` is populated with 2/3 signatures.
+         * Get the schedule info to see if signatories is populated with 2/3 signatures.
          */
         ScheduleInfo info = new ScheduleInfoQuery()
             .setNodeAccountIds(Collections.singletonList(response.nodeId))
@@ -169,8 +182,9 @@ class ScheduleMultiSigTransactionExample {
 
         /*
          * Step 6:
-         * Send this last signature to Hedera. This last signature _should_ mean the transaction executes
-         * since all 3 signatures have been provided.
+         * Send this last signature to Hedera.
+         *
+         * This last signature should mean the transaction executes since all 3 signatures have been provided.
          */
         System.out.println("Appending private key #3 signature to a schedule transaction..." +
             "(This last signature should mean the transaction executes since all 3 signatures have been provided)");

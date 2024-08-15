@@ -33,11 +33,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * An example of an HCS topic that utilizes a submitKey to limit who can submit messages on the topic.
+ * How to operate with a private HCS topic.
  * <p>
- * Creates a new HCS topic with a single ED25519 submitKey.
- * Subscribes to the topic (no key required).
- * Publishes a number of messages to the topic signed by the submitKey.
+ * Create a new HCS topic with a single ED25519 Submit Key,
+ * publish a number of messages to the topic signed by the Submit Key
+ * and subscribe to the topic (no key required).
  */
 class ConsensusPubSubWithSubmitKeyExample {
 
@@ -45,24 +45,35 @@ class ConsensusPubSubWithSubmitKeyExample {
 
     private static final CountDownLatch MESSAGES_LATCH = new CountDownLatch(TOTAL_MESSAGES);
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -73,7 +84,7 @@ class ConsensusPubSubWithSubmitKeyExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -90,10 +101,10 @@ class ConsensusPubSubWithSubmitKeyExample {
 
         /*
          * Step 2:
-         * Create a new topic with that key as the topic's submitKey; required to sign all future
+         * Create new HCS topic with the key right above as the topic's Submit Key required to sign all future
          * ConsensusMessageSubmitTransactions for that topic.
          */
-        System.out.println("Creating new topic...");
+        System.out.println("Creating new HCS topic...");
         TransactionResponse transactionResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setAdminKey(operatorPublicKey)
@@ -105,7 +116,7 @@ class ConsensusPubSubWithSubmitKeyExample {
 
         /*
          * Step 3:
-         * Sleep for 5 seconds (wait to propagate to the mirror).
+         * Wait 5 seconds (to ensure data propagated to mirror nodes).
          */
         System.out.println("Wait 5 seconds (to ensure data propagated to mirror nodes) ...");
         Thread.sleep(5_000);
@@ -129,7 +140,7 @@ class ConsensusPubSubWithSubmitKeyExample {
 
         /*
          * Step 5:
-         * Publish a list of messages to a topic, signing each transaction with the topic's submitKey.
+         * Publish a list of messages to a topic, signing each transaction with the topic's Submit Key.
          */
         Random r = new Random();
         for (int i = 0; i <= TOTAL_MESSAGES; i++) {

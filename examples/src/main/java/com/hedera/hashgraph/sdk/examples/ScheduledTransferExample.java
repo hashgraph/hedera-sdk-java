@@ -27,6 +27,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 
 /**
+ * How to schedule a transfer transaction.
+ * <p>
  * A scheduled transaction is a transaction that has been proposed by an account,
  * but which requires more signatures before it will actually execute on the Hedera network.
  * <p>
@@ -53,24 +55,35 @@ import java.util.Objects;
  */
 class ScheduledTransferExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -81,7 +94,7 @@ class ScheduledTransferExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -91,7 +104,7 @@ class ScheduledTransferExample {
 
         /*
          * Step 1:
-         * Generate ED25519 key pair for Bob's account.
+         * Generate ED25519 key pair.
          */
         System.out.println("Generating ED25519 key pair for Bob's account...");
         PrivateKey bobsPrivateKey = PrivateKey.generateED25519();
@@ -136,17 +149,17 @@ class ScheduledTransferExample {
          * Step 5:
          * Create a scheduled transaction from a transfer transaction.
          *
-         * The `payerAccountId` is the account that will be charged the fee
+         * The payerAccountId is the account that will be charged the fee
          * for executing the scheduled transaction if/when it is executed.
          * That fee is separate from the fee that we will pay to execute the
-         * `ScheduleCreateTransaction` itself.
+         * ScheduleCreateTransaction itself.
          *
-         * To clarify: Alice pays a fee to execute the `ScheduleCreateTransaction`,
+         * To clarify: Alice pays a fee to execute the ScheduleCreateTransaction,
          * which creates the scheduled transaction on the Hedera network.
          * She specifies when creating the scheduled transaction that Bob will pay
          * the fee for the scheduled transaction when it is executed.
          *
-         * If `payerAccountId` is not specified, the account who creates the scheduled transaction
+         * If payerAccountId is not specified, the account who creates the scheduled transaction
          * will be charged for executing the scheduled transaction.
          */
         ScheduleId scheduleId = new ScheduleCreateTransaction()
@@ -171,6 +184,7 @@ class ScheduledTransferExample {
         /*
          * Step 7:
          * Query the state of a schedule transaction.
+         *
          * Once Alice has communicated the scheduleId to Bob, Bob can query for information about the
          * scheduled transaction.
          */
@@ -179,7 +193,7 @@ class ScheduledTransferExample {
             .execute(client);
         System.out.println("Scheduled transaction info: " + scheduledTransactionInfo);
 
-        //`getScheduledTransaction()` will return an SDK Transaction object identical to the transaction
+        // getScheduledTransaction() will return an SDK Transaction object identical to the transaction
         // that was scheduled, which Bob can then inspect like a normal transaction.
         Transaction<?> scheduledTransaction = scheduledTransactionInfo.getScheduledTransaction();
 

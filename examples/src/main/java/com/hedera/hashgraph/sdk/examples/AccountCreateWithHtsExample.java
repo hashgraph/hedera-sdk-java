@@ -29,33 +29,44 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * HIP-542: support auto-creation via HTS assets by charging the account creation fee to the payer
- * of the triggering CryptoTransfer.
- * This means a new alias may be given anywhere in the transaction;
- * both in the hbar transfer list, or in an HTS token transfer list. In the latter case,
+ * How to use auto account creation via HTS assets (HIP-542).
+ * <p>
+ * This means a new alias may be given anywhere in the transaction--
+ * both in the Hbar transfer list, or in an HTS token transfer list. In the latter case,
  * the assessed creation fee will include at least one auto-association slot,
  * since the new account must be associated to its originating HTS assets.
  */
 class AccountCreateWithHtsExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -66,7 +77,7 @@ class AccountCreateWithHtsExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
@@ -75,7 +86,7 @@ class AccountCreateWithHtsExample {
 
         /*
          * Step 1:
-         * Generate ECDSA keys pairs for future tokens.
+         * Generate ECDSA keys pairs.
          */
         System.out.println("Generating ECDSA key pairs...");
         PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
@@ -92,7 +103,8 @@ class AccountCreateWithHtsExample {
         /*
          * Step 2:
          * The beginning of the first example (with NFT).
-         * Create an NFT using the Hedera Token Service.
+         *
+         * Create NFT using the Hedera Token Service.
          */
         System.out.println("The beginning of the first example (with NFT)...");
 
@@ -277,7 +289,6 @@ class AccountCreateWithHtsExample {
          * Transfer the fungible token to the public key alias.
          */
         System.out.println("Transferring Hbar to the the new account...");
-
         TransferTransaction tokenTransferTx = new TransferTransaction()
             .addTokenTransfer(tokenId, OPERATOR_ID, -10)
             .addTokenTransfer(tokenId, aliasAccountId2, 10)

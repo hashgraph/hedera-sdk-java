@@ -29,32 +29,43 @@ import java.util.Collections;
 import java.util.Objects;
 
 /**
- * An example of HCS topic management using a threshold key as the adminKey and going through a key rotation to a new
+ * How to create and manage HCS topic using a threshold key as the adminKey and going through a key rotation to a new
  * set of keys.
  * <p>
- * Creates a new HCS topic with a 2-of-3 threshold key for the adminKey.
- * Updates the HCS topic to a 3-of-4 threshold key for the adminKey.
+ * Create a new HCS topic with a 2-of-3 threshold key for the Admin Key and
+ * update the HCS topic to a 3-of-4 threshold key for the adminKey.
  */
 class TopicWithAdminKeyExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
@@ -65,14 +76,15 @@ class TopicWithAdminKeyExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         /*
          * Step 1:
-         * Generate the initial keys that are part of the adminKey's thresholdKey.
+         * Generate the initial key pairs that are part of the Admin Key's Threshold Key.
+         *
          * Three ED25519 keys part of a 2-of-3 threshold key.
          */
         System.out.println("Generating ED25519 key pairs...");
@@ -83,7 +95,7 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 2:
-         * Create the threshold key.
+         * Create the Threshold Key.
          */
         System.out.println("Creating a Key List (threshold key)...");
         KeyList thresholdKey = KeyList.withThreshold(2);
@@ -92,7 +104,7 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 3:
-         * Create the topic create transaction with threshold key.
+         * Create the topic create transaction with Threshold Key.
          */
         System.out.println("Creating topic create transaction...");
         Transaction<?> topicCreateTransaction = new TopicCreateTransaction()
@@ -102,7 +114,7 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 4:
-         * Sign the topic create transaction with 2 of 3 keys that are part of the adminKey threshold key.
+         * Sign the topic create transaction with 2 of 3 keys that are part of the Admin Key Threshold Key.
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing topic create transaction with key " + k);
@@ -119,7 +131,8 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 6:
-         * Generate the new keys that are part of the adminKey's thresholdKey.
+         * Generate the new key pairs that are part of the Admin Key's Threshold Key.
+         *
          * Four ED25519 keys part of a 3-of-4 threshold key.
          */
         System.out.println("Generating new ED25519 key pairs...");
@@ -150,8 +163,9 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 9:
-         * Sign the topic update transaction with the initial adminKey.
-         * 2 of the 3 keys already part of the topic's adminKey.
+         * Sign the topic update transaction with the initial Admin Key.
+         *
+         * 2 of the 3 keys already part of the topic's Admin Key.
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing topic update transaction with initial admin key " + k);
@@ -160,8 +174,8 @@ class TopicWithAdminKeyExample {
 
         /*
          * Step 9:
-         * Sign the topic update transaction with the new adminKey.
-         * 3 of 4 keys already part of the topic's adminKey.
+         * Sign the topic update transaction with the new Admin Key.
+         * 3 of 4 keys already part of the topic's Admin Key.
          */
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
             System.out.println("Signing topic update transaction with new admin key " + k);

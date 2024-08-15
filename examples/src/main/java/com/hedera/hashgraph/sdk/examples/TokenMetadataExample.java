@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
+ * How to set and update token's metadata.
+ * <p>
  * HIP-646: Fungible Token Metadata Field.
  * Addition of the metadata field to Fungible Tokens (FT),
  * taking after the Non-Fungible Token (NFT) metadata field which was added in HIP-17.
@@ -35,46 +37,56 @@ import java.util.Objects;
  * HIP-765: NFT Collection Token Metadata Field
  * Addition of the metadata field to Non-Fungible Token Class,
  * taking after the individual Non-Fungible Token (NFT) metadata field, which was added in HIP-17.
- * <p>
- * How to set and update token's metadata.
  */
 public class TokenMetadataExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify values below
-    // or set environment variables with the same names.
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-    // Operator's account ID.
-    // Used to sign and pay for operations on Hedera.
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
-    // Operator's private key.
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // `HEDERA_NETWORK` defaults to `testnet` if not specified in dotenv file
-    // Networks can be: `localhost`, `testnet`, `previewnet`, `mainnet`.
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    // `SDK_LOG_LEVEL` defaults to `SILENT` if not specified in dotenv file
-    // Log levels can be: `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR`, `SILENT`.
-    // Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-    // for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
         System.out.println("Token Metadata (HIP-646 and HIP-765) Example Start!");
+
         /*
          * Step 0:
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         /*
          * Step 1:
-         * Generate ED25519 key pairs for future tokens.
+         * Generate ED25519 key pairs.
          */
         PrivateKey adminPrivateKey = PrivateKey.generateED25519();
         PublicKey adminPublicKey = adminPrivateKey.getPublicKey();
@@ -85,7 +97,8 @@ public class TokenMetadataExample {
         /*
          * Step 2:
          * The beginning of the first example (mutable token's metadata).
-         * Create a mutable fungible token with a metadata, but without a metadata key.
+         *
+         * Create a mutable fungible token with a metadata, but without a Metadata Key.
          */
         System.out.println("The beginning of the first example (mutable token's metadata).");
         byte[] initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
@@ -113,7 +126,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 3:
-         * Query and output mutable token info after its creation.
+         * Query and output mutable Fungible Token info after its creation.
          */
         var mutableTokenInfoAfterCreation = new TokenInfoQuery()
             .setTokenId(tokenIdMutable)
@@ -128,7 +141,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 4:
-         * Update mutable token's metadata.
+         * Update mutable Fungible Token metadata.
          */
         byte[] updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
         System.out.println("Updating mutable Fungible Token metadata...");
@@ -142,7 +155,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 5:
-         * Query and output mutable token info after its metadata was updated.
+         * Query and output mutable Fungible Token info after its metadata was updated.
          */
         var mutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
             .setTokenId(tokenIdMutable)
@@ -158,7 +171,8 @@ public class TokenMetadataExample {
         /*
          * Step 6:
          * The beginning of the second example (immutable token's metadata).
-         * Create an immutable fungible token with a metadata key and a metadata.
+         *
+         * Create an immutable Fungible Token with a metadata key and a metadata.
          */
         System.out.println("The beginning of the second example (immutable token's metadata).");
 
@@ -183,7 +197,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 7:
-         * Query and output immutable token info after its creation.
+         * Query and output immutable Fungible Token info after its creation.
          */
         var immutableTokenInfoAfterCreation = new TokenInfoQuery()
             .setTokenId(tokenIdImmutable)
@@ -198,7 +212,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 8:
-         * Update immutable token's metadata.
+         * Update immutable Fungible Token metadata.
          */
         System.out.println("Updating immutable Fungible Token metadata...");
         new TokenUpdateTransaction()
@@ -211,7 +225,7 @@ public class TokenMetadataExample {
 
         /*
          * Step 5:
-         * Query and output immutable token info after its metadata was updated.
+         * Query and output immutable Fungible Token info after its metadata was updated.
          */
         var immutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
             .setTokenId(tokenIdImmutable)

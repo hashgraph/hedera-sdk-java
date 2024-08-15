@@ -33,13 +33,26 @@ import java.util.Objects;
  */
 public class LoggerFunctionalitiesExample {
 
-    // See `.env.sample` in the `examples` folder root for how to specify these values
-    // or set environment variables with the same names
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     public static void main(String[] args) throws Exception {
@@ -50,7 +63,7 @@ public class LoggerFunctionalitiesExample {
          * Create and configure the SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and be signed by this key.
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         /*
@@ -107,14 +120,15 @@ public class LoggerFunctionalitiesExample {
 
         /*
          * Step 6:
-         * Set the level of the `infoLogger` from `info` to `error`.
+         * Set the level of the infoLogger from info to error.
          */
         infoLogger.setLevel(LogLevel.ERROR);
 
         /*
          * Step 7:
          * Create a topic with attached info logger.
-         * This should not display any logs because currently there are no `warn` logs predefined in the SDK.
+         *
+         * This should not display any logs because currently there are no warn logs predefined in the SDK.
          */
         System.out.println("Creating new topic...(with attached info logger).");
         var topicId2 = new TopicCreateTransaction()
@@ -127,8 +141,9 @@ public class LoggerFunctionalitiesExample {
 
         /*
          * Step 8:
-         * Silence the `debugLogger` - no logs should be shown.
-         * This can also be achieved by calling `.setLevel(LogLevel.Silent)`.
+         * Silence the debugLogger - no logs should be shown.
+         *
+         * This can also be achieved by calling .setLevel(LogLevel.Silent).
          */
         debugLogger.setSilent(true);
 
@@ -148,13 +163,14 @@ public class LoggerFunctionalitiesExample {
 
         /*
          * Step 10:
-         * Unsilence the `debugLogger` - applies back the old log level before silencing.
+         * Unsilence the debugLogger - applies back the old log level before silencing.
          */
         debugLogger.setSilent(false);
 
         /*
          * Step 11:
          * Create a topic with attached debug logger.
+         *
          * Should produce logs.
          */
         System.out.println("Creating new topic...(with attached debug logger).");

@@ -23,7 +23,7 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
 
 /**
- * How to generate ED25519 private and public key pair.
+ * How to generate ED25519 key pair.
  */
 class GenerateKeyExample {
 
