@@ -75,22 +75,33 @@
 ## Usage
 
 ### Configuration
-Running the examples requires `.env` file to exist in the [`examples`](.) folder:
+Running the examples requires `.env` file to exist in the [`examples`](.) folder if running with Gradle:
 
 ```sh
 cp .env.sample .env
 ```
+And in the root project folder if running with Intellij IDEA:
+```sh
+cp .env.sample ../.env
+```
 
 The `OPERATOR_ID` and `OPERATOR_KEY` variables should be set in a `.env` file.
-Optionally, you can set the `HEDERA_NETWORK` variable to `testnet`, `previewnet`, or `mainnet`
-for configuring the network. If the `HEDERA_NETWORK` is not set, it will default to `testnet`.\
+Optionally, you can set the `HEDERA_NETWORK` and `SDK_LOG_LEVEL` variables:
+- You can set the `HEDERA_NETWORK` to `localhost`, `testnet`, `previewnet` or `mainnet`
+for configuring the network. If the `HEDERA_NETWORK` is not set, it will default to `testnet`.
+- You can set the `SDK_LOG_LEVEL` to `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR` or `SILENT`
+for configuring the logging. If the `SDK_LOG_LEVEL` is not set, it will default to `SILENT`.
+Important pre-requisite to see logs: set simple logger log level to same level as the `SDK_LOG_LEVEL`,
+for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`.
+
 Therefore, the format of the configuration file should be as follows:
 
 ```.properties
 OPERATOR_ID=0.0.102...
 OPERATOR_KEY=0xeae...
-# Optionally set HEDERA_NETWORK
+# Optionally set HEDERA_NETWORK and SDK_LOG_LEVEL
 HEDERA_NETWORK=previewnet
+SDK_LOG_LEVEL=WARN
 ```
 
 ### Running with Gradle
