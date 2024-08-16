@@ -141,11 +141,11 @@ class ConsensusPubSubExample {
                 .execute(client)
                 .getReceipt(client);
 
-            Thread.sleep(2_500);
+            Thread.sleep(2_000);
         }
 
-        // Wait 30 seconds to receive all the messages. Fail if not received.
-        boolean allMessagesReceived = MESSAGES_LATCH.await(30, TimeUnit.SECONDS);
+        // Wait 60 seconds to receive all the messages. Fail if not received.
+        boolean allMessagesReceived = MESSAGES_LATCH.await(60, TimeUnit.SECONDS);
 
         /*
          * Clean up:

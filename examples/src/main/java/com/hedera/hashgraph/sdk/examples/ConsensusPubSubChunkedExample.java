@@ -119,8 +119,8 @@ class ConsensusPubSubChunkedExample {
          * Step 3:
          * Wait 10 seconds (to ensure data propagated to mirror nodes).
          */
-        System.out.println("Wait 10 seconds (to ensure data propagated to mirror nodes) ...");
-        Thread.sleep(10_000);
+        System.out.println("Wait 5 seconds (to ensure data propagated to mirror nodes) ...");
+        Thread.sleep(5_000);
 
         /*
          * Step 4:
