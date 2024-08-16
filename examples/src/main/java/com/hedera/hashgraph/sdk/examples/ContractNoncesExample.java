@@ -38,9 +38,6 @@ import java.util.Objects;
  */
 class ContractNoncesExample {
 
-    // TODO: find this contract (.sol and .json) and add to the resources folder, then fetch it from there (.json)
-    private static final String SMART_CONTRACT_BYTECODE = "6080604052348015600f57600080fd5b50604051601a90603b565b604051809103906000f0801580156035573d6000803e3d6000fd5b50506047565b605c8061009483390190565b603f806100556000396000f3fe6080604052600080fdfea2646970667358221220a20122cbad3457fedcc0600363d6e895f17048f5caa4afdab9e655123737567d64736f6c634300081200336080604052348015600f57600080fd5b50603f80601d6000396000f3fe6080604052600080fdfea264697066735822122053dfd8835e3dc6fedfb8b4806460b9b7163f8a7248bac510c6d6808d9da9d6d364736f6c63430008120033";
-
     /*
      * See .env.sample in the examples folder root for how to specify values below
      * or set environment variables with the same names.
@@ -93,9 +90,10 @@ class ContractNoncesExample {
          * Step 1:
          * Create a file with smart contract bytecode.
          */
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/parent_deploys_child/parent_deploys_child.json");
         TransactionResponse bytecodeFileCreateTxResponse = new FileCreateTransaction()
             .setKeys(operatorPublicKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
+            .setContents(contractBytecodeHex)
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
