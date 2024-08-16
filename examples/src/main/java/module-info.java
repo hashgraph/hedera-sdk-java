@@ -25,6 +25,5 @@ module com.hedera.hashgraph.examples {
     requires com.google.gson;
     requires java.dotenv;
 
-    requires static com.google.errorprone.annotations;
     requires static java.annotation;
 }

@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -95,14 +94,14 @@ class TransferTokensExample {
          */
         System.out.println("Creating accounts...");
         Hbar initialBalance = Hbar.from(1);
-        @Var TransactionResponse response = new AccountCreateTransaction()
+        TransactionResponse response = new AccountCreateTransaction()
             // The only required property here is key.
             .setKey(publicKey1)
             .setInitialBalance(initialBalance)
             .execute(client);
 
         // This will wait for the receipt to become available.
-        @Var TransactionReceipt receipt = response.getReceipt(client);
+        TransactionReceipt receipt = response.getReceipt(client);
         AccountId accountId1 = Objects.requireNonNull(receipt.accountId);
         System.out.println("Created new account with ID: " + accountId1);
 

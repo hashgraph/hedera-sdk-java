@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -117,7 +116,7 @@ class ScheduleMultiSigTransactionExample {
             .execute(client);
 
         // This will wait for the receipt to become available.
-        @Var TransactionReceipt receipt = response.getReceipt(client);
+        TransactionReceipt receipt = response.getReceipt(client);
         AccountId accountId = Objects.requireNonNull(receipt.accountId);
         System.out.println("Created new account with ID: " + accountId);
 
@@ -133,7 +132,7 @@ class ScheduleMultiSigTransactionExample {
 
         // Create a transfer transaction with 2/3 signatures.
         System.out.println("Creating a token transfer transaction...");
-        @Var TransferTransaction transfer = new TransferTransaction()
+        TransferTransaction transfer = new TransferTransaction()
             .addHbarTransfer(accountId, Hbar.from(1).negated())
             .addHbarTransfer(OPERATOR_ID, Hbar.from(1));
 

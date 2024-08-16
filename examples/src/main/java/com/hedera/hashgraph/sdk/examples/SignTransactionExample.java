@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -107,7 +106,6 @@ class SignTransactionExample {
             .setKey(keylist)
             .execute(client);
 
-        @Var
         TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
         var accountId = receipt.accountId;
         System.out.println("Created new account with ID: " + accountId);

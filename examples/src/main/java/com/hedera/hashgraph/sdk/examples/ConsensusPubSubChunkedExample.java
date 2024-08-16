@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -146,7 +145,7 @@ class ConsensusPubSubChunkedExample {
         String bigContents = readResources("util/large_message.txt");
 
         // Prepare a message send transaction that requires a submit key from "somewhere else".
-        @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
+        Transaction<?> transaction = new TopicMessageSubmitTransaction()
             // This is value 10 by default,
             // increasing so large message will "fit".
             .setMaxChunks(15)
@@ -201,7 +200,7 @@ class ConsensusPubSubChunkedExample {
         InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
-            @Var String line;
+            String line;
             while ((line = reader.readLine()) != null) {
                 bigContents.append(line).append("\n");
             }

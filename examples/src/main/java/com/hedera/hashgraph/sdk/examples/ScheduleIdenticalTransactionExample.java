@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -86,7 +85,6 @@ class ScheduleIdenticalTransactionExample {
         Client[] clients = new Client[3];
         AccountId[] accounts = new AccountId[3];
 
-        @Var
         ScheduleId scheduleID = null;
 
         for (int i = 0; i < 3 ; i++) {
