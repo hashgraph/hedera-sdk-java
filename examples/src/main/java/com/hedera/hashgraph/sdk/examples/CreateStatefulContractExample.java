@@ -85,7 +85,7 @@ class CreateStatefulContractExample {
          * Create a file with smart contract bytecode.
          */
         System.out.println("Creating new bytecode file...");
-        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/stateful/stateful.json");
 
         TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.

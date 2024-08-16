@@ -83,7 +83,7 @@ class CreateSimpleContractExample {
          * Create a file with smart contract bytecode.
          */
         System.out.println("Creating new bytecode file...");
-        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/hello_world/hello_world.json");
 
         TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
