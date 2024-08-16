@@ -142,8 +142,8 @@ class AccountAliasExample {
          */
         System.out.println("Transferring Hbar to the new account...");
         new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, new Hbar(1).negated())
-            .addHbarTransfer(aliasAccountId, new Hbar(1))
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+            .addHbarTransfer(aliasAccountId, Hbar.from(1))
             .execute(client)
             .getReceipt(client);
 

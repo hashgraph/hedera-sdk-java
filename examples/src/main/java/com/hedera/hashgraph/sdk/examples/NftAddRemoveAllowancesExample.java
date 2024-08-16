@@ -140,7 +140,7 @@ class NftAddRemoveAllowancesExample {
         PublicKey spenderPublicKey = spenderPrivateKey.getPublicKey();
         AccountId spenderAccountId = new AccountCreateTransaction()
             .setKey(spenderPublicKey)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -150,7 +150,7 @@ class NftAddRemoveAllowancesExample {
         PublicKey receiverPublicKey = receiverPrivateKey.getPublicKey();
         AccountId receiverAccountId = new AccountCreateTransaction()
             .setKey(receiverPublicKey)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -305,7 +305,7 @@ class NftAddRemoveAllowancesExample {
         PublicKey delegatingSpenderPublicKey2 = delegatingSpenderPrivateKey.getPublicKey();
         AccountId delegatingSpenderAccountId = new AccountCreateTransaction()
             .setKey(delegatingSpenderPublicKey2)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -315,7 +315,7 @@ class NftAddRemoveAllowancesExample {
         PublicKey receiverPublicKey2 = receiverPrivateKey2.getPublicKey();
         AccountId receiverAccountId2 = new AccountCreateTransaction()
             .setKey(receiverPublicKey2)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -368,7 +368,7 @@ class NftAddRemoveAllowancesExample {
         PublicKey spenderPublicKey2 = spenderPrivateKey2.getPublicKey();
         AccountId spenderAccountId2 = new AccountCreateTransaction()
             .setKey(spenderPublicKey2)
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .execute(client)
             .getReceipt(client)
             .accountId;

@@ -104,7 +104,7 @@ class ScheduleIdenticalTransactionExample {
             System.out.println("Creating new account...");
             TransactionResponse createResponse = new AccountCreateTransaction()
                 .setKey(newPublicKey)
-                .setInitialBalance(new Hbar(1))
+                .setInitialBalance(Hbar.from(1))
                 .execute(client);
 
             // Make sure the transaction succeeded.
@@ -141,7 +141,7 @@ class ScheduleIdenticalTransactionExample {
             // The key that must sign each transfer out of the account. If receiverSigRequired is true, then
             // it must also sign any transfer into the account.
             .setKey(keyList)
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(Hbar.from(10))
             .execute(client);
 
         // Make sure the transaction succeeded.
@@ -163,9 +163,9 @@ class ScheduleIdenticalTransactionExample {
             System.out.println("Creating transfer transaction...");
             TransferTransaction tx = new TransferTransaction();
             for (AccountId account : accounts) {
-                tx.addHbarTransfer(account, new Hbar(1));
+                tx.addHbarTransfer(account, Hbar.from(1));
             }
-            tx.addHbarTransfer(Objects.requireNonNull(thresholdAccount), new Hbar(3).negated());
+            tx.addHbarTransfer(Objects.requireNonNull(thresholdAccount), Hbar.from(3).negated());
 
             System.out.println("Scheduling created transfer transaction...");
             ScheduleCreateTransaction scheduledTx = new ScheduleCreateTransaction()

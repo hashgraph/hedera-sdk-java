@@ -98,7 +98,7 @@ class TransactionSerializationExample {
          * Create the transfer transaction with adding only Hbar transfer which credits the operator.
          */
         System.out.println("Creating the transfer transaction...");
-        Hbar transferAmount = Hbar.fromTinybars(10_000);
+        Hbar transferAmount = Hbar.from(1);
         var transferTransaction = new TransferTransaction()
             // addSender and addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent.

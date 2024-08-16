@@ -87,7 +87,7 @@ class CustomFeesExample {
          */
         System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
 
-        Hbar initialBalance = new Hbar(10);
+        Hbar initialBalance = Hbar.from(1);
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceId = new AccountCreateTransaction()
@@ -142,7 +142,7 @@ class CustomFeesExample {
          * setDenominatingTokenId(tokenForFee) and setAmount(tokenFeeAmount).
          */
         CustomFixedFee customHbarFee = new CustomFixedFee()
-            .setHbarAmount(new Hbar(1))
+            .setHbarAmount(Hbar.from(1))
             .setFeeCollectorAccountId(aliceId);
         List<CustomFee> hbarFeeList = Collections.singletonList(customHbarFee);
 
@@ -254,7 +254,7 @@ class CustomFeesExample {
             .execute(client)
             .hbars;
 
-        if (aliceHbar2.equals(new Hbar(11))) {
+        if (aliceHbar2.equals(Hbar.from(2))) {
             System.out.println("Alice's Hbar balance after Bob transferred 20 tokens to Charlie: " + aliceHbar2);
         } else {
             throw new Exception("Custom fee was not set correctly! (Fail)");

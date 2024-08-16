@@ -96,7 +96,7 @@ class ContractNoncesExample {
         TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             .setKeys(operatorPublicKey)
             .setContents(SMART_CONTRACT_BYTECODE)
-            .setMaxTransactionFee(new Hbar(2))
+            .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
@@ -137,7 +137,7 @@ class ContractNoncesExample {
         new ContractDeleteTransaction()
             .setContractId(contractId)
             .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)
-            .setMaxTransactionFee(new Hbar(1))
+            .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);
 

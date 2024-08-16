@@ -75,8 +75,8 @@ class CreateStatefulContractExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
         // Default max fee for all transactions executed by this client.
-        client.setDefaultMaxTransactionFee(new Hbar(100));
-        client.setDefaultMaxQueryPayment(new Hbar(10));
+        client.setDefaultMaxTransactionFee(Hbar.from(100));
+        client.setDefaultMaxQueryPayment(Hbar.from(10));
 
         var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
@@ -103,8 +103,8 @@ class CreateStatefulContractExample {
          * Create a smart contract.
          */
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
-            // Set an admin key, so we can delete the contract later.
-            .setGas(500_000)
+            // Set an Admin Key, so we can delete the contract later.
+            .setGas(150_000)
             .setBytecodeFileId(newFileId)
             .setAdminKey(operatorPublicKey)
             .setConstructorParameters(
@@ -123,9 +123,9 @@ class CreateStatefulContractExample {
         System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractCallResult = new ContractCallQuery()
             .setContractId(newContractId)
-            .setGas(500_000)
+            .setGas(100_000)
             .setFunction("get_message")
-            .setQueryPayment(new Hbar(1))
+            .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
@@ -138,7 +138,7 @@ class CreateStatefulContractExample {
         System.out.println("Calling contract function \"set_message\"...");
         TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
-            .setGas(500_000)
+            .setGas(100_000)
             .setFunction("set_message", new ContractFunctionParameters()
                 .addString("hello from hedera again!"))
             .execute(client);
@@ -152,10 +152,10 @@ class CreateStatefulContractExample {
          */
         System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractUpdateResult = new ContractCallQuery()
-            .setGas(500_000)
+            .setGas(100_000)
             .setContractId(newContractId)
             .setFunction("get_message")
-            .setQueryPayment(new Hbar(1))
+            .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
         if (contractUpdateResult.errorMessage != null) {
@@ -172,7 +172,7 @@ class CreateStatefulContractExample {
         new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
-            .setMaxTransactionFee(new Hbar(1))
+            .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);
 

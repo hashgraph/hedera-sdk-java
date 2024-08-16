@@ -97,7 +97,7 @@ class StakingExample {
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
             .setKey(alicePublicKey)
-            .setInitialBalance(Hbar.from(10))
+            .setInitialBalance(Hbar.from(1))
             .setStakedAccountId(stakedAccountId)
             .execute(client)
             .getReceipt(client)

@@ -82,7 +82,7 @@ class AccountCreateWithHtsExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
         // Set the maximum fee to be paid for transactions executed by this client.
-        client.setDefaultMaxTransactionFee(new Hbar(10));
+        client.setDefaultMaxTransactionFee(Hbar.from(10));
 
         /*
          * Step 1:

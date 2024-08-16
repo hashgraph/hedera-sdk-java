@@ -102,8 +102,8 @@ class TransferUsingEvmAddressExample {
          */
         System.out.println("Transferring Hbar to the the new account...");
         TransferTransaction transferTx = new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())
-            .addHbarTransfer(evmAddress, Hbar.from(10))
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+            .addHbarTransfer(evmAddress, Hbar.from(1))
             .freezeWith(client);
 
         TransferTransaction transferTxSign = transferTx.sign(OPERATOR_KEY);

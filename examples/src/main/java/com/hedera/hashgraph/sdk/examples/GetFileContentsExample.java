@@ -95,7 +95,7 @@ class GetFileContentsExample {
             .setKeys(operatorPublicKey)
             // Contents of the file.
             .setContents(fileContents)
-            .setMaxTransactionFee(new Hbar(2))
+            .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
         FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);

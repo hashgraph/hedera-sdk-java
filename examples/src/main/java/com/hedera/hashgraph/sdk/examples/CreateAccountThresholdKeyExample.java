@@ -113,7 +113,7 @@ class CreateAccountThresholdKeyExample {
         System.out.println("Creating new account...");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             .setKey(transactionKey)
-            .setInitialBalance(new Hbar(1))
+            .setInitialBalance(Hbar.from(1))
             .execute(client);
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);
@@ -126,8 +126,8 @@ class CreateAccountThresholdKeyExample {
          */
         System.out.println("Transferring 1 Hbar from a newly created account...");
         TransactionResponse transferTransactionResponse = new TransferTransaction()
-            .addHbarTransfer(newAccountId, new Hbar(1).negated())
-            .addHbarTransfer(new AccountId(3), new Hbar(1))
+            .addHbarTransfer(newAccountId, Hbar.from(1).negated())
+            .addHbarTransfer(new AccountId(3), Hbar.from(1))
             // To manually sign, you must explicitly build the Transaction.
             .freezeWith(client)
             // We sign with 2 of the 3 keys.

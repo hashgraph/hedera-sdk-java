@@ -118,7 +118,7 @@ class ScheduledTransferExample {
         AccountId bobsId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setKey(bobsPublicKey)
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(Hbar.from(1))
             .freezeWith(client)
             .sign(bobsPrivateKey)
             .execute(client)
@@ -141,8 +141,8 @@ class ScheduledTransferExample {
          * Create a transfer transaction which we will schedule.
          */
         TransferTransaction transferToSchedule = new TransferTransaction()
-            .addHbarTransfer(client.getOperatorAccountId(), new Hbar(-1))
-            .addHbarTransfer(bobsId, new Hbar(1));
+            .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1).negated())
+            .addHbarTransfer(bobsId, Hbar.from(1));
         System.out.println("Scheduling token transfer: " + transferToSchedule);
 
         /*

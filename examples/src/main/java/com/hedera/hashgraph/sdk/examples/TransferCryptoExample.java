@@ -99,7 +99,7 @@ class TransferCryptoExample {
          * Execute the transfer transaction to send Hbars from operator to the recipient.
          */
         System.out.println("Executing the transfer transaction...");
-        Hbar transferAmount = Hbar.fromTinybars(10_000);
+        Hbar transferAmount = Hbar.from(1);
         TransactionResponse transactionResponse = new TransferTransaction()
             // addSender and addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent.

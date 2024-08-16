@@ -109,7 +109,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         System.out.println("Creating new account...(with the above Key List as an account key).");
         TransactionResponse transactionResponse = new AccountCreateTransaction()
             .setKey(transactionKey)
-            .setInitialBalance(Hbar.fromTinybars(1))
+            .setInitialBalance(Hbar.from(1))
             .setAccountMemo("3-of-4 multi-sig account")
             .execute(client);
 
@@ -134,8 +134,8 @@ class ScheduledTransactionMultiSigThresholdExample {
          */
         System.out.println("Scheduling crypto transfer from multi-sig account to operator account...");
         TransactionResponse transferToSchedule = new TransferTransaction()
-            .addHbarTransfer(multiSigAccountId, Hbar.fromTinybars(-1))
-            .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.fromTinybars(1))
+            .addHbarTransfer(multiSigAccountId, Hbar.from(1).negated())
+            .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.from(1))
             .schedule()
             .freezeWith(client)
             // Add first signature.

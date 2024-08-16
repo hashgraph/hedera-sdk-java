@@ -101,7 +101,7 @@ class SolidityPrecompileExample {
         System.out.println("Creating Alice account...");
         AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
             .setKey(alicePublicKey)
-            .setInitialBalance(Hbar.fromTinybars(1000))
+            .setInitialBalance(Hbar.from(1))
             .execute(client)
             .getReceipt(client)
             .accountId
@@ -130,7 +130,7 @@ class SolidityPrecompileExample {
             .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
-            }).setPayableAmountForStep(1, Hbar.from(20))
+            }).setPayableAmountForStep(1, Hbar.from(20)) // TODO: double check when example is fixed
             // Step 3 associates Alice with the token, which requires Alice's signature.
             .addSignerForStep(3, alicePrivateKey)
             .addSignerForStep(5, alicePrivateKey)

@@ -105,7 +105,7 @@ class CreateAccountWithAliasExample {
          * Set the EVM address field to the Ethereum public address.
          */
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(1))
+            .setInitialBalance(Hbar.from(1))
             .setKey(operatorPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);

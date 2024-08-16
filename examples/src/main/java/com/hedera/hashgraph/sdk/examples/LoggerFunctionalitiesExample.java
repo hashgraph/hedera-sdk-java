@@ -100,8 +100,8 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Transferring Hbar to the the new account...");
         new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, Hbar.fromTinybars(-10))
-            .addHbarTransfer(aliasAccountId, Hbar.fromTinybars(10))
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+            .addHbarTransfer(aliasAccountId, Hbar.from(1))
             .setTransactionMemo("")
             .execute(client);
 

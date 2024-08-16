@@ -75,7 +75,7 @@ class UpdateAccountPublicKeyExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        client.setDefaultMaxTransactionFee(new Hbar(10));
+        client.setDefaultMaxTransactionFee(Hbar.from(10));
 
         /*
          * Step 1:
@@ -94,7 +94,7 @@ class UpdateAccountPublicKeyExample {
         System.out.println("Creating new account...");
         TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
             .setKey(publicKey1)
-            .setInitialBalance(new Hbar(1))
+            .setInitialBalance(Hbar.from(1))
             .execute(client);
 
         AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);

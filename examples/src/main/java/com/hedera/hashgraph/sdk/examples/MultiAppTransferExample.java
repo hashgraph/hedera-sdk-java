@@ -109,20 +109,22 @@ class MultiAppTransferExample {
         // For the purpose of this example we create an account for the user with a balance of 5 Hbar.
         AccountId userAccountId = Objects.requireNonNull(
             new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(5))
+            .setInitialBalance(Hbar.from(2))
             .setKey(userPublicKey)
             .execute(client)
             .getReceipt(client)
             .accountId
         );
 
+        // TODO: display balances before transfer
+
         /*
          * Step 3:
          * Make a transfer from the user account to the exchange account, this requires signing by both parties.
          */
         TransferTransaction transferTxn = new TransferTransaction()
-            .addHbarTransfer(userAccountId, new Hbar(2).negated())
-            .addHbarTransfer(exchangeAccountId, new Hbar(2))
+            .addHbarTransfer(userAccountId, Hbar.from(1).negated())
+            .addHbarTransfer(exchangeAccountId, Hbar.from(1))
             // The exchange-provided memo required to validate the transaction.
             .setTransactionMemo("https://some-exchange.com/user1/account1")
             // NOTE: to manually sign, you must freeze the Transaction first

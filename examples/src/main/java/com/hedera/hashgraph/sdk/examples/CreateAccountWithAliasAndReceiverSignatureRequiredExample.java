@@ -106,7 +106,7 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
         System.out.println("Creating new account...(with alias and receiver signature required).");
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
-            .setInitialBalance(new Hbar(1))
+            .setInitialBalance(Hbar.from(1))
             .setKey(adminPublicKey)
             .setAlias(evmAddress)
             .freezeWith(client);

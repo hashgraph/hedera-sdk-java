@@ -113,7 +113,7 @@ class ScheduleMultiSigTransactionExample {
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
             // The only required property here is `key`.
             .setKey(keyList)
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(Hbar.from(2))
             .execute(client);
 
         // This will wait for the receipt to become available.
@@ -134,8 +134,8 @@ class ScheduleMultiSigTransactionExample {
         // Create a transfer transaction with 2/3 signatures.
         System.out.println("Creating a token transfer transaction...");
         @Var TransferTransaction transfer = new TransferTransaction()
-            .addHbarTransfer(accountId, new Hbar(1).negated())
-            .addHbarTransfer(OPERATOR_ID, new Hbar(1));
+            .addHbarTransfer(accountId, Hbar.from(1).negated())
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1));
 
         // Schedule the transaction.
         System.out.println("Scheduling the token transfer transaction...");
@@ -170,11 +170,11 @@ class ScheduleMultiSigTransactionExample {
             throw new Exception("More transfers than expected! (Fail)");
         }
 
-        if (!transfers.get(accountId).equals(new Hbar(1).negated())) {
+        if (!transfers.get(accountId).equals(Hbar.from(1).negated())) {
             throw new Exception("Transfer for " + accountId + " is not what is expected " + transfers.get(accountId));
         }
 
-        if (!transfers.get(OPERATOR_ID).equals(new Hbar(1))) {
+        if (!transfers.get(OPERATOR_ID).equals(Hbar.from(1))) {
             throw new Exception("Transfer for " + OPERATOR_ID + " is not what is expected " + transfers.get(OPERATOR_ID));
         }
 

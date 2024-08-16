@@ -74,7 +74,7 @@ class ZeroTokenOperationsExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        client.setDefaultMaxTransactionFee(new Hbar(10));
+        client.setDefaultMaxTransactionFee(Hbar.from(10));
 
         /*
          * Step 1:
@@ -91,7 +91,7 @@ class ZeroTokenOperationsExample {
         System.out.println("Creating Alice account...");
         AccountCreateTransaction transaction = new AccountCreateTransaction()
             .setKey(alicePublicKey)
-            .setInitialBalance(Hbar.from(10))
+            .setInitialBalance(Hbar.from(1))
             .freezeWith(client);
 
         transaction = transaction.signWithOperator(client);
@@ -119,7 +119,7 @@ class ZeroTokenOperationsExample {
          */
         System.out.println("Configuring steps in `ContractHelper`...");
         contractHelper
-            .setPayableAmountForStep(0, Hbar.from(20))
+            .setPayableAmountForStep(0, Hbar.from(20)) // TODO: double check when example is fixed
             .addSignerForStep(1, alicePrivateKey);
 
          /*

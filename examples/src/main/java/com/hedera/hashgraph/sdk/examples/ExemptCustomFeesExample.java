@@ -84,10 +84,11 @@ class ExemptCustomFeesExample {
          * Create accounts A, B, and C.
          */
         System.out.println("Creating new accounts...");
+        Hbar initialBalance = Hbar.from(1);
         PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
         AccountId firstAccountId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(firstAccountPublicKey)
             .freezeWith(client)
             .sign(firstAccountPrivateKey)
@@ -98,7 +99,7 @@ class ExemptCustomFeesExample {
         PrivateKey secondAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey secondAccountPublicKey = secondAccountPrivateKey.getPublicKey();
         AccountId secondAccountId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(secondAccountPublicKey)
             .freezeWith(client)
             .sign(secondAccountPrivateKey)
@@ -109,7 +110,7 @@ class ExemptCustomFeesExample {
         PrivateKey thirdAccountPrivateKey = PrivateKey.generateED25519();
         PublicKey thirdAccountPublicKey = thirdAccountPrivateKey.getPublicKey();
         AccountId thirdAccountId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
+            .setInitialBalance(initialBalance)
             .setKey(thirdAccountPublicKey)
             .freezeWith(client)
             .sign(thirdAccountPrivateKey)

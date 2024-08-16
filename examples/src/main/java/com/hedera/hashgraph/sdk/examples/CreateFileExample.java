@@ -91,7 +91,7 @@ class CreateFileExample {
             .setKeys(operatorPublicKey)
             .setContents(fileContents)
             // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
-            .setMaxTransactionFee(new Hbar(2))
+            .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
         TransactionReceipt receipt = transactionResponse.getReceipt(client);

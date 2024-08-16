@@ -89,7 +89,7 @@ class CreateSimpleContractExample {
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
-            .setMaxTransactionFee(new Hbar(2))
+            .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
         TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
@@ -103,11 +103,11 @@ class CreateSimpleContractExample {
          */
         System.out.println("Creating new contract...");
         TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
-            .setGas(500_000)
+            .setGas(100_000)
             .setBytecodeFileId(newFileId)
             // Set an admin key, so we can delete the contract later.
             .setAdminKey(operatorPublicKey)
-            .setMaxTransactionFee(new Hbar(16))
+            .setMaxTransactionFee(Hbar.from(16))
             .execute(client);
 
         TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
@@ -120,10 +120,10 @@ class CreateSimpleContractExample {
          */
         System.out.println("Calling contract function \"greet\"...");
         ContractFunctionResult contractCallResult = new ContractCallQuery()
-            .setGas(500_000)
+            .setGas(100_000)
             .setContractId(newContractId)
             .setFunction("greet")
-            .setQueryPayment(new Hbar(1))
+            .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
@@ -140,7 +140,7 @@ class CreateSimpleContractExample {
         new ContractDeleteTransaction()
             .setContractId(newContractId)
             .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
-            .setMaxTransactionFee(new Hbar(1))
+            .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);
 

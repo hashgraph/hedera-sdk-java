@@ -94,10 +94,11 @@ class TransferTokensExample {
          * Create two new accounts.
          */
         System.out.println("Creating accounts...");
+        Hbar initialBalance = Hbar.from(1);
         @Var TransactionResponse response = new AccountCreateTransaction()
-            // The only _required_ property here is `key`.
+            // The only required property here is key.
             .setKey(publicKey1)
-            .setInitialBalance(Hbar.fromTinybars(1_000))
+            .setInitialBalance(initialBalance)
             .execute(client);
 
         // This will wait for the receipt to become available.
@@ -106,9 +107,9 @@ class TransferTokensExample {
         System.out.println("Created new account with ID: " + accountId1);
 
         response = new AccountCreateTransaction()
-            // The only _required_ property here is `key`.
+            // The only required property here is key.
             .setKey(publicKey2)
-            .setInitialBalance(Hbar.fromTinybars(1_000))
+            .setInitialBalance(initialBalance)
             .execute(client);
 
         // This will wait for the receipt to become available.

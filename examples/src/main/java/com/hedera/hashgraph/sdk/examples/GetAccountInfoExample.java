@@ -81,7 +81,7 @@ class GetAccountInfoExample {
          */
         AccountInfo info = new AccountInfoQuery()
             .setAccountId(OPERATOR_ID)
-            .setMaxQueryPayment(new Hbar(1))
+            .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
         System.out.println("Operator's account public key: " + info.key);

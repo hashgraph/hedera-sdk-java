@@ -19,7 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -41,11 +44,6 @@ class GetAccountBalanceExample {
      * Used to sign and pay for operations on Hedera.
      */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-
-    /**
-     * Operator's private key.
-     */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.

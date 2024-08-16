@@ -108,7 +108,7 @@ class MultiSigOfflineExample {
 
         System.out.println("Creating a new account...");
         TransactionResponse createAccountTransaction = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(2))
+            .setInitialBalance(Hbar.from(2))
             .setKey(keylist)
             .execute(client);
 
@@ -125,8 +125,8 @@ class MultiSigOfflineExample {
         System.out.println("Transferring 1 Hbar from new account to the account with ID `0.0.3`...");
         TransferTransaction transferTransaction = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(-1))
-            .addHbarTransfer(new AccountId(3), new Hbar(1))
+            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(1).negated())
+            .addHbarTransfer(new AccountId(3), Hbar.from(1))
             .freezeWith(client);
 
         /*
