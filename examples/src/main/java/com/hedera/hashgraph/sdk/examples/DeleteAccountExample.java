@@ -81,25 +81,25 @@ class DeleteAccountExample {
          * Step 1:
          * Generate ED25519 key pair.
          */
-        PrivateKey newPrivateKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newPrivateKey.getPublicKey();
-        System.out.println("Future account private key: " + newPrivateKey);
-        System.out.println("Future account public key: " + newPublicKey);
+        PrivateKey privateKey = PrivateKey.generateED25519();
+        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("Future account private key: " + privateKey);
+        System.out.println("Future account public key: " + publicKey);
 
         /*
          * Step 2:
          * Create new account.
          */
         System.out.println("Creating new account...");
-        TransactionResponse transactionResponse = new AccountCreateTransaction()
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
             // The only required property here is `key`.
-            .setKey(newPublicKey)
+            .setKey(publicKey)
             .setInitialBalance(Hbar.from(1))
             .execute(client);
 
         // This will wait for the receipt to become available.
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId newAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
         System.out.println("Created new account with ID: " + newAccountId);
 
         /*
@@ -112,7 +112,7 @@ class DeleteAccountExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(newPrivateKey)
+            .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 

@@ -89,15 +89,15 @@ class CreateAccountExample {
          * Create a new account.
          */
         System.out.println("Creating new account...");
-        TransactionResponse transactionResponse = new AccountCreateTransaction()
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
             // The only required property here is `key`.
             .setKey(publicKey)
             .setInitialBalance(Hbar.from(1))
             .execute(client);
 
         // This will wait for the receipt to become available.
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        AccountId newAccountId = receipt.accountId;
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId newAccountId = accountCreateTxReceipt.accountId;
         System.out.println("Created account with ID: " + newAccountId);
 
         /*

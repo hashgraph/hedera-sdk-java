@@ -105,7 +105,7 @@ class ChangeRemoveTokenKeys {
          * Create NFT and check its keys.
          */
         System.out.println("Creating NFT using the Hedera Token Service...");
-        var tokenId = Objects.requireNonNull(
+        var nftTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("Example NFT")
                 .setTokenSymbol("ENFT")
@@ -121,16 +121,16 @@ class ChangeRemoveTokenKeys {
                 .tokenId
         );
 
-        var tokenInfoBefore = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        var nftInfoBefore = new TokenInfoQuery()
+            .setTokenId(nftTokenId)
             .execute(client);
 
-        if (tokenInfoBefore.adminKey != null &&
-            tokenInfoBefore.supplyKey != null &&
-            tokenInfoBefore.wipeKey != null) {
-            System.out.println("Admin public key in the newly created token: " + tokenInfoBefore.adminKey);
-            System.out.println("Supply public key in the newly created token: " + tokenInfoBefore.supplyKey);
-            System.out.println("Wipe public key in the newly created token: " + tokenInfoBefore.wipeKey);
+        if (nftInfoBefore.adminKey != null &&
+            nftInfoBefore.supplyKey != null &&
+            nftInfoBefore.wipeKey != null) {
+            System.out.println("Admin public key in the newly created token: " + nftInfoBefore.adminKey);
+            System.out.println("Supply public key in the newly created token: " + nftInfoBefore.supplyKey);
+            System.out.println("Wipe public key in the newly created token: " + nftInfoBefore.wipeKey);
         } else {
             throw new Exception("The required keys are not set correctly! (Fail)");
         }
@@ -147,7 +147,7 @@ class ChangeRemoveTokenKeys {
         var emptyKeyList = new KeyList();
 
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(nftTokenId)
             .setWipeKey(emptyKeyList)
             // It is set by default, but we set it here explicitly for illustration.
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
@@ -156,12 +156,12 @@ class ChangeRemoveTokenKeys {
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterWipeKeyRemoval = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        var nftInfoAfterWipeKeyRemoval = new TokenInfoQuery()
+            .setTokenId(nftTokenId)
             .execute(client);
 
-        if (tokenInfoAfterWipeKeyRemoval.wipeKey == null) {
-            System.out.println("Token Wipe Public Key (after removal): " + tokenInfoAfterWipeKeyRemoval.wipeKey);
+        if (nftInfoAfterWipeKeyRemoval.wipeKey == null) {
+            System.out.println("Token Wipe Public Key (after removal): " + nftInfoAfterWipeKeyRemoval.wipeKey);
         } else {
             throw new Exception("Token Wipe Key was not removed after removal operation! (Fail)");
         }
@@ -173,7 +173,7 @@ class ChangeRemoveTokenKeys {
         System.out.println("Removing the Admin Key...(updating to an empty Key List).");
 
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(nftTokenId)
             .setAdminKey(emptyKeyList)
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
@@ -181,12 +181,12 @@ class ChangeRemoveTokenKeys {
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterAdminKeyRemoval = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        var nftInfoAfterAdminKeyRemoval = new TokenInfoQuery()
+            .setTokenId(nftTokenId)
             .execute(client);
 
-        if (tokenInfoAfterAdminKeyRemoval.adminKey == null) {
-            System.out.println("Token Admin Public Key (after removal): " + tokenInfoAfterAdminKeyRemoval.adminKey);
+        if (nftInfoAfterAdminKeyRemoval.adminKey == null) {
+            System.out.println("Token Admin Public Key (after removal): " + nftInfoAfterAdminKeyRemoval.adminKey);
         } else {
             throw new Exception("Token Admin Key was not removed after removal operation! (Fail)");
         }
@@ -198,7 +198,7 @@ class ChangeRemoveTokenKeys {
         System.out.println("Updating the Supply Key...(to the new key).");
 
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(nftTokenId)
             .setSupplyKey(newSupplyPublicKey)
             .setKeyVerificationMode(TokenKeyValidation.FULL_VALIDATION)
             .freezeWith(client)
@@ -207,12 +207,12 @@ class ChangeRemoveTokenKeys {
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterSupplyKeyUpdate = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        var nftInfoAfterSupplyKeyUpdate = new TokenInfoQuery()
+            .setTokenId(nftTokenId)
             .execute(client);
 
-        if (tokenInfoAfterSupplyKeyUpdate.supplyKey.equals(newSupplyPublicKey)) {
-            System.out.println("Token Supply Public Key (after update): " + tokenInfoAfterSupplyKeyUpdate.supplyKey);
+        if (nftInfoAfterSupplyKeyUpdate.supplyKey.equals(newSupplyPublicKey)) {
+            System.out.println("Token Supply Public Key (after update): " + nftInfoAfterSupplyKeyUpdate.supplyKey);
         } else {
             throw new Exception("Token Supply Key was not updated correctly! (Fail)");
         }
@@ -224,7 +224,7 @@ class ChangeRemoveTokenKeys {
         System.out.println("Removing the Supply Key...(updating to the unusable key).");
 
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(nftTokenId)
             .setSupplyKey(PublicKey.unusableKey())
             .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
             .freezeWith(client)
@@ -232,11 +232,11 @@ class ChangeRemoveTokenKeys {
             .execute(client)
             .getReceipt(client);
 
-        var tokenInfoAfterSupplyKeyRemoval = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        var nftInfoAfterSupplyKeyRemoval = new TokenInfoQuery()
+            .setTokenId(nftTokenId)
             .execute(client);
 
-        var supplyKeyAfterRemoval = (PublicKey) tokenInfoAfterSupplyKeyRemoval.supplyKey;
+        var supplyKeyAfterRemoval = (PublicKey) nftInfoAfterSupplyKeyRemoval.supplyKey;
 
         if (supplyKeyAfterRemoval.equals(PublicKey.unusableKey())) {
             System.out.println("Token Supply Public Key (after removal): " + supplyKeyAfterRemoval.toStringRaw());

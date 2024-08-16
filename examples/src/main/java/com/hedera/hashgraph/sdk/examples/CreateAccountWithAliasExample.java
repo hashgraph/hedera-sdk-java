@@ -104,7 +104,7 @@ class CreateAccountWithAliasExample {
          *
          * Set the EVM address field to the Ethereum public address.
          */
-        AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
+        AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
             .setInitialBalance(Hbar.from(1))
             .setKey(operatorPublicKey)
             .setAlias(evmAddress)
@@ -114,11 +114,11 @@ class CreateAccountWithAliasExample {
          * Step 5:
          * Sign the AccountCreateTransaction transaction using an existing Hedera account and key paying for the transaction fee.
          */
-        accountCreateTransaction.sign(privateKey);
-        TransactionResponse response = accountCreateTransaction.execute(client);
+        accountCreateTx.sign(privateKey);
+        TransactionResponse accountCreateTxResponse = accountCreateTx.execute(client);
 
         AccountId newAccountId = new TransactionReceiptQuery()
-            .setTransactionId(response.transactionId)
+            .setTransactionId(accountCreateTxResponse.transactionId)
             .execute(client)
             .accountId;
 
@@ -128,12 +128,12 @@ class CreateAccountWithAliasExample {
          * Step 6:
          * Get the AccountInfo and show that the account has contractAccountId.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
+        AccountInfo newAccountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
-        if (accountInfo.contractAccountId != null) {
-            System.out.println("The newly account has alias: " + accountInfo.contractAccountId);
+        if (newAccountInfo.contractAccountId != null) {
+            System.out.println("The newly account has alias: " + newAccountInfo.contractAccountId);
         } else {
             throw new Exception("The newly account doesn't have alias! (Fail)");
         }

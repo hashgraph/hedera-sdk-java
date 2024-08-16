@@ -107,7 +107,7 @@ class TopicWithAdminKeyExample {
          * Create the topic create transaction with Threshold Key.
          */
         System.out.println("Creating topic create transaction...");
-        Transaction<?> topicCreateTransaction = new TopicCreateTransaction()
+        Transaction<?> topicCreateTx = new TopicCreateTransaction()
             .setTopicMemo("demo topic")
             .setAdminKey(thresholdKey)
             .freezeWith(client);
@@ -118,16 +118,16 @@ class TopicWithAdminKeyExample {
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing topic create transaction with key " + k);
-            topicCreateTransaction.sign(k);
+            topicCreateTx.sign(k);
         });
 
         /*
          * Step 5:
          * Execute the topic create transaction.
          */
-        TransactionResponse transactionResponse = topicCreateTransaction.execute(client);
-        TopicId topicId = transactionResponse.getReceipt(client).topicId;
-        System.out.println("Created new topic (" + topicId + ") with 2-of-3 threshold key as admin key.");
+        TransactionResponse topicCreateTxResponse = topicCreateTx.execute(client);
+        TopicId hederaTopicId = topicCreateTxResponse.getReceipt(client).topicId;
+        System.out.println("Created new topic (" + hederaTopicId + ") with 2-of-3 threshold key as admin key.");
 
         /*
          * Step 6:
@@ -155,8 +155,8 @@ class TopicWithAdminKeyExample {
          * Create the topic update transaction with the new threshold key.
          */
         System.out.println("Creating topic update transaction...");
-        Transaction<?> topicUpdatetransaction = new TopicUpdateTransaction()
-            .setTopicId(topicId)
+        Transaction<?> topicUpdateTx = new TopicUpdateTransaction()
+            .setTopicId(hederaTopicId)
             .setTopicMemo("updated demo topic")
             .setAdminKey(newThresholdKey)
             .freezeWith(client);
@@ -169,7 +169,7 @@ class TopicWithAdminKeyExample {
          */
         Arrays.stream(initialAdminPrivateKeys, 0, 2).forEach(k -> {
             System.out.println("Signing topic update transaction with initial admin key " + k);
-            topicUpdatetransaction.sign(k);
+            topicUpdateTx.sign(k);
         });
 
         /*
@@ -179,34 +179,34 @@ class TopicWithAdminKeyExample {
          */
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {
             System.out.println("Signing topic update transaction with new admin key " + k);
-            topicUpdatetransaction.sign(k);
+            topicUpdateTx.sign(k);
         });
 
         /*
          * Step 10:
          * Execute the topic update transaction.
          */
-        TransactionResponse transactionResponse2 = topicUpdatetransaction.execute(client);
+        TransactionResponse topicUpdateTxResponse = topicUpdateTx.execute(client);
 
         // Retrieve results post-consensus.
-        transactionResponse2.getReceipt(client);
-        System.out.println("Updated topic (" + topicId + ") with 3-of-4 threshold key as admin key.");
+        topicUpdateTxResponse.getReceipt(client);
+        System.out.println("Updated topic (" + hederaTopicId + ") with 3-of-4 threshold key as admin key.");
 
         /*
          * Step 11:
          * Query the topic info and output it.
          */
-        TopicInfo topicInfo = new TopicInfoQuery()
-            .setTopicId(topicId)
+        TopicInfo hederaTopicInfo = new TopicInfoQuery()
+            .setTopicId(hederaTopicId)
             .execute(client);
-        System.out.println("Topic info: " + topicInfo);
+        System.out.println("Topic info: " + hederaTopicInfo);
 
         /*
          * Clean up:
          * Delete created topic.
          */
         var topicDeleteTransaction = new TopicDeleteTransaction()
-            .setTopicId(topicId)
+            .setTopicId(hederaTopicId)
             .freezeWith(client);
 
         Arrays.stream(newAdminKeys, 0, 3).forEach(k -> {

@@ -85,24 +85,23 @@ class CreateStatefulContractExample {
          * Create a file with smart contract bytecode.
          */
         System.out.println("Creating new bytecode file...");
-        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/stateful.json");
 
-        TransactionResponse fileTransactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
-            .setContents(byteCodeHex)
+            .setContents(contractBytecodeHex)
             .execute(client);
 
-        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
-
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
         System.out.println("Created new bytecode file with ID: " + newFileId);
 
         /*
          * Step 2:
          * Create a smart contract.
          */
-        TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
+        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
             // Set an Admin Key, so we can delete the contract later.
             .setGas(150_000)
             .setBytecodeFileId(newFileId)
@@ -112,8 +111,8 @@ class CreateStatefulContractExample {
                     .addString("Hello from Hedera!"))
             .execute(client);
 
-        TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
-        ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
+        TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
+        ContractId newContractId = Objects.requireNonNull(contractCreateTxReceipt.contractId);
         System.out.println("Created new contract with ID: " + newContractId);
 
         /*
@@ -121,22 +120,22 @@ class CreateStatefulContractExample {
          * Call smart contract function.
          */
         System.out.println("Calling contract function \"get_message\"...");
-        ContractFunctionResult contractCallResult = new ContractCallQuery()
+        ContractFunctionResult contractCallResult_BeforeSetMessage = new ContractCallQuery()
             .setContractId(newContractId)
             .setGas(100_000)
             .setFunction("get_message")
             .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
-        if (contractCallResult.errorMessage != null) {
-            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult.errorMessage);
+        if (contractCallResult_BeforeSetMessage.errorMessage != null) {
+            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult_BeforeSetMessage.errorMessage);
         }
 
-        String message = contractCallResult.getString(0);
-        System.out.println("Contract call result (\"get_message\" function returned): " + message);
+        String contractCallResult_BeforeSetMessage_String = contractCallResult_BeforeSetMessage.getString(0);
+        System.out.println("Contract call result (\"get_message\" function returned): " + contractCallResult_BeforeSetMessage_String);
 
         System.out.println("Calling contract function \"set_message\"...");
-        TransactionResponse contractExecTransactionResponse = new ContractExecuteTransaction()
+        TransactionResponse contractExecuteTxResponse = new ContractExecuteTransaction()
             .setContractId(newContractId)
             .setGas(100_000)
             .setFunction("set_message", new ContractFunctionParameters()
@@ -144,26 +143,26 @@ class CreateStatefulContractExample {
             .execute(client);
 
         // If this doesn't throw then we know the contract executed successfully.
-        contractExecTransactionResponse.getReceipt(client);
+        contractExecuteTxResponse.getReceipt(client);
 
         /*
          * Step 3:
          * Call smart contract function.
          */
         System.out.println("Calling contract function \"get_message\"...");
-        ContractFunctionResult contractUpdateResult = new ContractCallQuery()
+        ContractFunctionResult contractCallResult_AfterSetMessage = new ContractCallQuery()
             .setGas(100_000)
             .setContractId(newContractId)
             .setFunction("get_message")
             .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
-        if (contractUpdateResult.errorMessage != null) {
-            throw new Exception("Error calling contract function \"get_message\": " + contractUpdateResult.errorMessage);
+        if (contractCallResult_AfterSetMessage.errorMessage != null) {
+            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult_AfterSetMessage.errorMessage);
         }
 
-        String message2 = contractUpdateResult.getString(0);
-        System.out.println("Contract call result (\"get_message\" function returned): " + message2);
+        String contractCallResult_AfterSetMessage_String = contractCallResult_AfterSetMessage.getString(0);
+        System.out.println("Contract call result (\"get_message\" function returned): " + contractCallResult_AfterSetMessage_String);
 
         /*
          * Clean up:
@@ -171,7 +170,7 @@ class CreateStatefulContractExample {
          */
         new ContractDeleteTransaction()
             .setContractId(newContractId)
-            .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
+            .setTransferAccountId(contractCreateTxResponse.transactionId.accountId)
             .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);

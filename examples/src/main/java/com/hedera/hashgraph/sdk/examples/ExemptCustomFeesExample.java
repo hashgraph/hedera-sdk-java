@@ -81,39 +81,39 @@ class ExemptCustomFeesExample {
 
         /*
          * Step 1:
-         * Create accounts A, B, and C.
+         * Create three accounts: Alice, Bob, and Charlie.
          */
         System.out.println("Creating new accounts...");
         Hbar initialBalance = Hbar.from(1);
-        PrivateKey firstAccountPrivateKey = PrivateKey.generateED25519();
-        PublicKey firstAccountPublicKey = firstAccountPrivateKey.getPublicKey();
-        AccountId firstAccountId = new AccountCreateTransaction()
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        AccountId aliceAccountId = new AccountCreateTransaction()
             .setInitialBalance(initialBalance)
-            .setKey(firstAccountPublicKey)
+            .setKey(alicePublicKey)
             .freezeWith(client)
-            .sign(firstAccountPrivateKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
 
-        PrivateKey secondAccountPrivateKey = PrivateKey.generateED25519();
-        PublicKey secondAccountPublicKey = secondAccountPrivateKey.getPublicKey();
-        AccountId secondAccountId = new AccountCreateTransaction()
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
+        AccountId bobAccountId = new AccountCreateTransaction()
             .setInitialBalance(initialBalance)
-            .setKey(secondAccountPublicKey)
+            .setKey(bobPublicKey)
             .freezeWith(client)
-            .sign(secondAccountPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
 
-        PrivateKey thirdAccountPrivateKey = PrivateKey.generateED25519();
-        PublicKey thirdAccountPublicKey = thirdAccountPrivateKey.getPublicKey();
-        AccountId thirdAccountId = new AccountCreateTransaction()
+        PrivateKey charilePrivateKey = PrivateKey.generateED25519();
+        PublicKey charilePublicKey = charilePrivateKey.getPublicKey();
+        AccountId charlieAccountId = new AccountCreateTransaction()
             .setInitialBalance(initialBalance)
-            .setKey(thirdAccountPublicKey)
+            .setKey(charilePublicKey)
             .freezeWith(client)
-            .sign(thirdAccountPrivateKey)
+            .sign(charilePrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -121,30 +121,30 @@ class ExemptCustomFeesExample {
         /*
          * Step 2:
          * Create a fungible token that has three fractional fees:
-         * - fee #1 sends 1/100 of the transferred value to collector 0.0.A.;
-         * - fee #2 sends 2/100 of the transferred value to collector 0.0.B.;
-         * - fee #3 sends 3/100 of the transferred value to collector 0.0.C.
+         * - aliceFee sends 1/100 of the transferred value to Alice's account;
+         * - bobFee sends 2/100 of the transferred value to Bob's account;
+         * - charlieFee sends 3/100 of the transferred value to Charlie's account.
          */
-        CustomFractionalFee fee1 = new CustomFractionalFee()
-            .setFeeCollectorAccountId(firstAccountId)
+        CustomFractionalFee aliceFee = new CustomFractionalFee()
+            .setFeeCollectorAccountId(aliceAccountId)
             .setNumerator(1)
             .setDenominator(100)
             .setAllCollectorsAreExempt(true);
 
-        CustomFractionalFee fee2 = new CustomFractionalFee()
-            .setFeeCollectorAccountId(secondAccountId)
+        CustomFractionalFee bobFee = new CustomFractionalFee()
+            .setFeeCollectorAccountId(bobAccountId)
             .setNumerator(2)
             .setDenominator(100)
             .setAllCollectorsAreExempt(true);
 
-        CustomFractionalFee fee3 = new CustomFractionalFee()
-            .setFeeCollectorAccountId(thirdAccountId)
+        CustomFractionalFee charlieFee = new CustomFractionalFee()
+            .setFeeCollectorAccountId(charlieAccountId)
             .setNumerator(3)
             .setDenominator(100)
             .setAllCollectorsAreExempt(true);
 
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
-        TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
+        TokenId fungibleTokenId = new TokenCreateTransaction()
             .setTokenName("HIP-573 Token")
             .setTokenSymbol("H573")
             .setTokenType(TokenType.FUNGIBLE_COMMON)
@@ -155,47 +155,47 @@ class ExemptCustomFeesExample {
             .setWipeKey(operatorPublicKey)
             .setInitialSupply(100_000_000)
             .setDecimals(2)
-            .setCustomFees(List.of(fee1, fee2, fee3))
+            .setCustomFees(List.of(aliceFee, bobFee, charlieFee))
             .freezeWith(client)
-            .sign(firstAccountPrivateKey)
-            .sign(secondAccountPrivateKey)
-            .sign(thirdAccountPrivateKey);
-
-        TokenId tokenId = tokenCreateTransaction
+            .sign(alicePrivateKey)
+            .sign(bobPrivateKey)
+            .sign(charilePrivateKey)
             .execute(client)
             .getReceipt(client)
             .tokenId;
-        System.out.println("Created new fungible token with ID: " + tokenId);
+
+        System.out.println("Created new fungible token with ID: " + fungibleTokenId);
 
         /*
          * Step 3:
          * Transfer tokens:
-         * - 10_000 units of the fungible token from the operator to the second account;
-         * - 10_000 units of the fungible token from the second to the first account.
+         * - 10_000 units of the Fungible Token from the operator's to Bob's account;
+         * - 10_000 units of the Fungible Token from Bob's to Alice's account.
          */
-        System.out.println("Transferring 10_000 units of the fungible token from the operator to the second account...");
+        System.out.println("Transferring 10_000 units of the Fungible Token from the operator's to Bob's account...");
         new TransferTransaction()
-            .addTokenTransfer(tokenId, OPERATOR_ID, -10_000)
-            .addTokenTransfer(tokenId, secondAccountId, 10_000)
+            .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10_000)
+            .addTokenTransfer(fungibleTokenId, bobAccountId, 10_000)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client);
 
-        System.out.println("Transferring 10_000 units of the fungible token from the second to the first account...");
-        TransactionResponse tokenTransferResponse = new TransferTransaction()
-            .addTokenTransfer(tokenId, secondAccountId, -10_000)
-            .addTokenTransfer(tokenId, firstAccountId, 10_000)
+        System.out.println("Transferring 10_000 units of the Fungible Token from Bob's to Alice's account...");
+        TransactionResponse transferTxResponse = new TransferTransaction()
+            .addTokenTransfer(fungibleTokenId, bobAccountId, -10_000)
+            .addTokenTransfer(fungibleTokenId, aliceAccountId, 10_000)
             .freezeWith(client)
-            .sign(secondAccountPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client);
 
         /*
          * Step 4:
          * Get the transaction fee for that transfer transaction.
          */
-        Hbar transactionFee = tokenTransferResponse
+        Hbar transactionFee = transferTxResponse
             .getRecord(client)
             .transactionFee;
+
         System.out.println("Transaction fee for the transfer above: " + transactionFee);
 
         /*
@@ -203,69 +203,69 @@ class ExemptCustomFeesExample {
          * Show that the fee collector accounts in the custom fee list
          * of the token that was created was not charged a custom fee in the transfer.
          */
-        Long firstAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(firstAccountId)
+        Long aliceAccountBalanceAfter = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
-            .tokens.get(tokenId);
+            .tokens.get(fungibleTokenId);
 
-        Long secondAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(secondAccountId)
+        Long bobAccountBalanceAfter = new AccountBalanceQuery()
+            .setAccountId(bobAccountId)
             .execute(client)
-            .tokens.get(tokenId);
+            .tokens.get(fungibleTokenId);
 
-        Long thirdAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(thirdAccountId)
+        Long charlieAccountBalanceAfter = new AccountBalanceQuery()
+            .setAccountId(charlieAccountId)
             .execute(client)
-            .tokens.get(tokenId);
+            .tokens.get(fungibleTokenId);
 
-        System.out.println("First account balance after transferring the fungible token: " + firstAccountBalanceAfter);
-        System.out.println("Second account balance after transferring the fungible token: " + secondAccountBalanceAfter);
-        System.out.println("Third account balance after transferring the fungible token: " + thirdAccountBalanceAfter);
+        System.out.println("Alice's balance after transferring the fungible token: " + aliceAccountBalanceAfter);
+        System.out.println("Bob's account balance after transferring the fungible token: " + bobAccountBalanceAfter);
+        System.out.println("Charlie's account balance after transferring the fungible token: " + charlieAccountBalanceAfter);
 
         /*
          * Clean up:
          * Delete created accounts and token.
          */
-        Map<TokenId, Long> firstAccountTokensBeforeWipe = new AccountBalanceQuery()
-            .setAccountId(firstAccountId)
+        Map<TokenId, Long> alicesTokens = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
             .tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(tokenId)
-            .setAmount(firstAccountTokensBeforeWipe.get(tokenId))
-            .setAccountId(firstAccountId)
+            .setTokenId(fungibleTokenId)
+            .setAmount(alicesTokens.get(fungibleTokenId))
+            .setAccountId(aliceAccountId)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(firstAccountId)
+            .setAccountId(aliceAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(firstAccountPrivateKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(secondAccountId)
+            .setAccountId(bobAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(secondAccountPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(thirdAccountId)
+            .setAccountId(charlieAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(thirdAccountPrivateKey)
+            .sign(charilePrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new TokenDeleteTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(fungibleTokenId)
             .execute(client)
             .getReceipt(client);
 

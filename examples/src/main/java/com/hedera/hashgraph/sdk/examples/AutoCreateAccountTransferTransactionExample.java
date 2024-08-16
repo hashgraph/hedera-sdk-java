@@ -109,7 +109,7 @@ public class AutoCreateAccountTransferTransactionExample {
          * Transfers from hollow accounts will not work because the hollow account does not have a public key
          * assigned to authorize transfers out of the account.
          */
-        TransferTransaction transferTransaction = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
             .addHbarTransfer(AccountId.fromEvmAddress(evmAddress), Hbar.from(1))
             .freezeWith(client);
@@ -120,20 +120,20 @@ public class AutoCreateAccountTransferTransactionExample {
          * and key paying for the transaction fee.
          */
         System.out.println("Transferring Hbar to the the new account...");
-        TransactionResponse response = transferTransaction.execute(client);
+        TransactionResponse transferTxResponse = transferTx.execute(client);
 
         /*
          * Step 6:
          * Get the new account ID ask for the child receipts or child records for the parent transaction ID of the TransferTransaction
          * (the AccountCreateTransaction is executed as a child transaction triggered by the TransferTransaction).
          */
-        TransactionReceipt receipt = new TransactionReceiptQuery()
-            .setTransactionId(response.transactionId)
+        TransactionReceipt transferTxReceipt = new TransactionReceiptQuery()
+            .setTransactionId(transferTxResponse.transactionId)
             .setIncludeChildren(true)
             .execute(client);
 
-        AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println("The \"normal\" account ID of the given alias: " + newAccountId);
+        AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*
          * Step 7:
@@ -145,11 +145,11 @@ public class AutoCreateAccountTransferTransactionExample {
          *  - the alias property of the account does not have the public address;
          *  - referred to as a hollow account.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_BeforeEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        if (((KeyList) accountInfo.key).isEmpty()) {
+        if (((KeyList) aliceAccountInfo_BeforeEnhancing.key).isEmpty()) {
             System.out.println("The newly created account is a hollow account! (Success)");
         } else {
             throw new Exception("The newly created account is not a hollow account! (Fail)");
@@ -163,25 +163,26 @@ public class AutoCreateAccountTransferTransactionExample {
          * (to enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction).
          */
         System.out.println("Creating new topic...");
-        TransactionReceipt receipt2 = new TopicCreateTransaction()
+        TransactionReceipt topicCreateTxReceipt = new TopicCreateTransaction()
             .setAdminKey(publicKey)
-            .setTransactionId(TransactionId.generate(newAccountId))
+            .setTransactionId(TransactionId.generate(aliceAccountId))
             .setTopicMemo("Memo")
             .freezeWith(client)
             .sign(privateKey)
             .execute(client)
             .getReceipt(client);
-        System.out.println("Created new topic with ID: " + receipt2.topicId);
+
+        System.out.println("Created new topic with ID: " + topicCreateTxReceipt.topicId);
 
         /*
          * Step 9:
          * Get the account info and return public key to show its complete account.
          */
-        AccountInfo accountInfo2 = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_AfterEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+        System.out.println("The public key of the newly created and now complete account: " + aliceAccountInfo_AfterEnhancing.key);
 
         /*
          * Clean up:
@@ -189,14 +190,14 @@ public class AutoCreateAccountTransferTransactionExample {
          */
         new AccountDeleteTransaction()
             .setTransferAccountId(OPERATOR_ID)
-            .setAccountId(newAccountId)
+            .setAccountId(aliceAccountId)
             .freezeWith(client)
             .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(receipt2.topicId)
+            .setTopicId(topicCreateTxReceipt.topicId)
             .freezeWith(client)
             .sign(privateKey)
             .execute(client)

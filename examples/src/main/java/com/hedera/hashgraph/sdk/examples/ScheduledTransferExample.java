@@ -107,32 +107,32 @@ class ScheduledTransferExample {
          * Generate ED25519 key pair.
          */
         System.out.println("Generating ED25519 key pair for Bob's account...");
-        PrivateKey bobsPrivateKey = PrivateKey.generateED25519();
-        PublicKey bobsPublicKey = bobsPrivateKey.getPublicKey();
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
 
         /*
          * Step 2:
          * Create Bob's account with receiver signature property enabled.
          */
         System.out.println("Create Bob's account...(with receiver signature property enabled).");
-        AccountId bobsId = new AccountCreateTransaction()
+        AccountId bobAccountId = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
-            .setKey(bobsPublicKey)
+            .setKey(bobPublicKey)
             .setInitialBalance(Hbar.from(1))
             .freezeWith(client)
-            .sign(bobsPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client)
             .accountId;
-        Objects.requireNonNull(bobsId);
-        System.out.println("Created Bob's account with ID: " + bobsId);
+        Objects.requireNonNull(bobAccountId);
+        System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*
          * Step 3:
          * Check Bob's initial balance.
          */
         AccountBalance bobsInitialBalance = new AccountBalanceQuery()
-            .setAccountId(bobsId)
+            .setAccountId(bobAccountId)
             .execute(client);
         System.out.println("Bob's initial account balance: " + bobsInitialBalance);
 
@@ -140,10 +140,10 @@ class ScheduledTransferExample {
          * Step 4:
          * Create a transfer transaction which we will schedule.
          */
-        TransferTransaction transferToSchedule = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1).negated())
-            .addHbarTransfer(bobsId, Hbar.from(1));
-        System.out.println("Scheduling token transfer: " + transferToSchedule);
+            .addHbarTransfer(bobAccountId, Hbar.from(1));
+        System.out.println("Scheduling token transfer: " + transferTx);
 
         /*
          * Step 5:
@@ -163,8 +163,8 @@ class ScheduledTransferExample {
          * will be charged for executing the scheduled transaction.
          */
         ScheduleId scheduleId = new ScheduleCreateTransaction()
-            .setScheduledTransaction(transferToSchedule)
-            .setPayerAccountId(bobsId)
+            .setScheduledTransaction(transferTx)
+            .setPayerAccountId(bobAccountId)
             .execute(client)
             .getReceipt(client)
             .scheduleId;
@@ -177,7 +177,7 @@ class ScheduledTransferExample {
          * but it hasn't been executed yet as it requires Bob's signature.
          */
         AccountBalance bobsBalanceAfterSchedule = new AccountBalanceQuery()
-            .setAccountId(bobsId)
+            .setAccountId(bobAccountId)
             .execute(client);
         System.out.println("Bob's balance after scheduling the transfer (should be unchanged): " + bobsBalanceAfterSchedule);
 
@@ -210,21 +210,21 @@ class ScheduledTransferExample {
          * Appends Bob's signature to a schedule transaction, i.e. Bob signs the scheduled transaction.
          */
         System.out.println("Appending Bob's signature to a schedule transaction...");
-        var scheduleSignTransactionReceipt = new ScheduleSignTransaction()
+        var scheduleSignTxReceipt = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(bobsPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
         System.out.println("A transaction that appends Bob's signature to a schedule transfer transaction " +
-            "was complete with status: " + scheduleSignTransactionReceipt.status);
+            "was complete with status: " + scheduleSignTxReceipt.status);
 
         /*
          * Step 9:
          * Check Bob's account balance after signing the scheduled transaction.
          */
         AccountBalance balanceAfterSigning = new AccountBalanceQuery()
-            .setAccountId(bobsId)
+            .setAccountId(bobAccountId)
             .execute(client);
         System.out.println("Bob's balance after signing the scheduled transaction: " + balanceAfterSigning);
 
@@ -243,9 +243,9 @@ class ScheduledTransferExample {
          */
         new AccountDeleteTransaction()
             .setTransferAccountId(client.getOperatorAccountId())
-            .setAccountId(bobsId)
+            .setAccountId(bobAccountId)
             .freezeWith(client)
-            .sign(bobsPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 

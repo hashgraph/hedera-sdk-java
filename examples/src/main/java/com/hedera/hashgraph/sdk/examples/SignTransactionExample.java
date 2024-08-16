@@ -81,10 +81,10 @@ class SignTransactionExample {
          * Generate ED25519 key pairs.
          */
         System.out.println("Generating ED25519 key pairs...");
-        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
-        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
-        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
-        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
 
         /*
          * Step 2:
@@ -92,8 +92,8 @@ class SignTransactionExample {
          */
         System.out.println("Creating a Key List...");
         KeyList keylist = new KeyList();
-        keylist.add(user1PublicKey);
-        keylist.add(user2PublicKey);
+        keylist.add(publicKey1);
+        keylist.add(publicKey2);
         System.out.println("Created a Key List: " + keylist);
 
         /*
@@ -101,13 +101,13 @@ class SignTransactionExample {
          * Create a new account with a Key List created in a previous step.
          */
         System.out.println("Creating new account...");
-        TransactionResponse createAccountTransaction = new AccountCreateTransaction()
+        TransactionResponse createAccountTxResponse = new AccountCreateTransaction()
             .setInitialBalance(Hbar.from(2))
             .setKey(keylist)
             .execute(client);
 
-        TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
-        var accountId = receipt.accountId;
+        TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);
+        var accountId = createAccountTxReceipt.accountId;
         System.out.println("Created new account with ID: " + accountId);
 
         /*
@@ -115,9 +115,9 @@ class SignTransactionExample {
          * Create a transfer transaction and freeze it with a client.
          */
         System.out.println("Creating a transfer transaction...");
-        TransferTransaction transferTransaction = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(1).negated())
+            .addHbarTransfer(Objects.requireNonNull(createAccountTxReceipt.accountId), Hbar.from(1).negated())
             .addHbarTransfer(new AccountId(3), Hbar.from(1))
             .freezeWith(client);
 
@@ -126,19 +126,18 @@ class SignTransactionExample {
          * Sign the transfer transaction with all respective keys (from a Key List).
          */
         System.out.println("Signing the transfer transaction...");
-        transferTransaction.signWithOperator(client);
-        user1PrivateKey.signTransaction(transferTransaction);
-        user2PrivateKey.signTransaction(transferTransaction);
+        transferTx.signWithOperator(client);
+        privateKey1.signTransaction(transferTx);
+        privateKey2.signTransaction(transferTx);
 
         /*
          * Step 6:
          * Execute the transfer transaction and output its status.
          */
         System.out.println("Executing the transfer transaction...");
-        TransactionResponse result = transferTransaction.execute(client);
-        receipt = result.getReceipt(client);
-
-        System.out.println("The transfer transaction was complete with status: " + receipt.status);
+        TransactionResponse transferTxResponse = transferTx.execute(client);
+        TransactionReceipt transferTxReceipt = transferTxResponse.getReceipt(client);
+        System.out.println("The transfer transaction was complete with status: " + transferTxReceipt.status);
 
         /*
          * Clean up:
@@ -148,8 +147,8 @@ class SignTransactionExample {
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(user1PrivateKey)
-            .sign(user2PrivateKey)
+            .sign(privateKey1)
+            .sign(privateKey2)
             .execute(client)
             .getReceipt(client);
 

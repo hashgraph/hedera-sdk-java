@@ -87,7 +87,7 @@ class FileAppendChunkedExample {
         String fileContents = "Hedera hashgraph is great!";
 
         System.out.println("Creating new file...");
-        TransactionResponse transactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(fileContents)
@@ -95,9 +95,8 @@ class FileAppendChunkedExample {
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(receipt.fileId);
-
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*
@@ -107,6 +106,7 @@ class FileAppendChunkedExample {
         FileInfo fileInfoAfterCreate = new FileInfoQuery()
             .setFileId(newFileId)
             .execute(client);
+
         System.out.println("Created file size after create (according to `FileInfoQuery`): " + fileInfoAfterCreate.size + " bytes.");
 
         /*
@@ -124,7 +124,7 @@ class FileAppendChunkedExample {
          */
         System.out.println("Appending new contents to the created file...");
         new FileAppendTransaction()
-            .setNodeAccountIds(Collections.singletonList(transactionResponse.nodeId))
+            .setNodeAccountIds(Collections.singletonList(fileCreateTxResponse.nodeId))
             .setFileId(newFileId)
             .setContents(contents.toString())
             .setMaxChunks(40)

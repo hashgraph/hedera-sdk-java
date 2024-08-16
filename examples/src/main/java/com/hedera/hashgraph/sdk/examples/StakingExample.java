@@ -82,8 +82,8 @@ class StakingExample {
          * Generate ED25519 key pair.
          */
         System.out.println("Generating ED25519 key pair...");
-        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
-        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        PrivateKey privateKey = PrivateKey.generateED25519();
+        PublicKey publicKey = privateKey.getPublicKey();
 
         /*
          * Step 2:
@@ -96,7 +96,7 @@ class StakingExample {
         System.out.println("Creating new account with staked account ID...");
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(alicePublicKey)
+            .setKey(publicKey)
             .setInitialBalance(Hbar.from(1))
             .setStakedAccountId(stakedAccountId)
             .execute(client)
@@ -109,7 +109,7 @@ class StakingExample {
         // Show the required key used to sign the account update transaction to
         // stake the accounts Hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different.
-        System.out.println("Key required to update staking information: " + alicePublicKey);
+        System.out.println("Key required to update staking information: " + publicKey);
         System.out.println("Fee payer / operator key: " + client.getOperatorPublicKey());
 
         /*
@@ -134,7 +134,7 @@ class StakingExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(alicePrivateKey)
+            .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 

@@ -104,7 +104,7 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * and the setReceiverSignatureRequired to true.
          */
         System.out.println("Creating new account...(with alias and receiver signature required).");
-        AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction()
+        AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
             .setReceiverSignatureRequired(true)
             .setInitialBalance(Hbar.from(1))
             .setKey(adminPublicKey)
@@ -115,8 +115,8 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Step 5:
          * Sign the AccountCreateTransaction transaction with both the new private key and the admin key.
          */
-        accountCreateTransaction.sign(adminPrivateKey).sign(privateKey);
-        AccountId newAccountId = accountCreateTransaction.execute(client).getReceipt(client).accountId;
+        accountCreateTx.sign(adminPrivateKey).sign(privateKey);
+        AccountId newAccountId = accountCreateTx.execute(client).getReceipt(client).accountId;
 
         System.out.println("Created account with ID: " + newAccountId);
 
@@ -124,12 +124,12 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          * Step 6:
          * Get the AccountInfo and show that the account has contractAccountId.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
+        AccountInfo newAccountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
-        if (accountInfo.contractAccountId != null) {
-            System.out.println("The newly account has alias: " + accountInfo.contractAccountId);
+        if (newAccountInfo.contractAccountId != null) {
+            System.out.println("The newly account has alias: " + newAccountInfo.contractAccountId);
         } else {
             throw new Exception("The newly account doesn't have alias! (Fail)");
         }

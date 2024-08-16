@@ -99,7 +99,7 @@ class TransactionSerializationExample {
          */
         System.out.println("Creating the transfer transaction...");
         Hbar transferAmount = Hbar.from(1);
-        var transferTransaction = new TransferTransaction()
+        var transferTx = new TransferTransaction()
             // addSender and addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent.
             .addHbarTransfer(OPERATOR_ID, transferAmount.negated());
@@ -109,14 +109,14 @@ class TransactionSerializationExample {
          * Serialize the transfer transaction.
          */
         System.out.println("Serializing the transfer transaction...");
-        var transactionBytes = transferTransaction.toBytes();
+        var transactionBytes = transferTx.toBytes();
 
         /*
          * Step 4:
          * Deserialize the transfer transaction.
          */
         System.out.println("Deserializing the transfer transaction...");
-        TransferTransaction transferTransactionDeserialized = (TransferTransaction) Transaction.fromBytes(transactionBytes);
+        TransferTransaction transferTxDeserialized = (TransferTransaction) Transaction.fromBytes(transactionBytes);
 
         /*
          * Step 5:
@@ -124,15 +124,15 @@ class TransactionSerializationExample {
          * And execute the transfer transaction.
          */
         System.out.println("Completing and executing the transfer transaction...");
-        var transactionResponse = transferTransactionDeserialized
+        var transferTxResponse = transferTxDeserialized
             .addHbarTransfer(recipientId, transferAmount)
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        System.out.println("Transaction info: " + transactionResponse);
-        TransactionRecord record = transactionResponse.getRecord(client);
+        System.out.println("Transaction info: " + transferTxResponse);
+        TransactionRecord transferTxRecord = transferTxResponse.getRecord(client);
         System.out.println("Transferred " + transferAmount);
-        System.out.println("Transfer memo: " + record.transactionMemo);
+        System.out.println("Transfer memo: " + transferTxRecord.transactionMemo);
 
         /*
          * Step 6:

@@ -88,7 +88,7 @@ public final class DeleteFileExample {
         String fileContents = "Hedera hashgraph is great!";
 
         System.out.println("Creating new file...");
-        TransactionResponse transactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(fileContents)
@@ -96,8 +96,8 @@ public final class DeleteFileExample {
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        FileId newFileId = receipt.fileId;
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = fileCreateTxReceipt.fileId;
 
         System.out.println("Created new file with ID: " + newFileId);
 
@@ -105,12 +105,12 @@ public final class DeleteFileExample {
          * Clean up:
          * Delete created file.
          */
-        TransactionResponse fileDeleteTransactionResponse = new FileDeleteTransaction()
+        TransactionResponse fileDeleteTxResponse = new FileDeleteTransaction()
             .setFileId(newFileId)
             .execute(client);
 
         // If this doesn't throw then the transaction was a success.
-        fileDeleteTransactionResponse.getReceipt(client);
+        fileDeleteTxResponse.getReceipt(client);
 
         System.out.println("File deleted successfully.");
 

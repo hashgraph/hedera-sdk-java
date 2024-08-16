@@ -93,15 +93,13 @@ class ConsensusPubSubExample {
          */
         System.out.println("Creating new topic...");
 
-        TransactionResponse transactionResponse = new TopicCreateTransaction()
+        TransactionResponse topicCreateTxResponse = new TopicCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .execute(client);
 
-        TransactionReceipt transactionReceipt = transactionResponse.getReceipt(client);
-
-        TopicId topicId = Objects.requireNonNull(transactionReceipt.topicId);
-
-        System.out.println("Created new topic with ID: " + topicId);
+        TransactionReceipt transactionReceipt = topicCreateTxResponse.getReceipt(client);
+        TopicId hederaTopicId = Objects.requireNonNull(transactionReceipt.topicId);
+        System.out.println("Created new topic with ID: " + hederaTopicId);
 
         /*
          * Step 2:
@@ -117,7 +115,7 @@ class ConsensusPubSubExample {
          */
         System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
-            .setTopicId(topicId)
+            .setTopicId(hederaTopicId)
             .subscribe(client, resp -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
                 System.out.println("Topic message received!" +
@@ -136,7 +134,7 @@ class ConsensusPubSubExample {
             System.out.println("Publishing message to the topic: " + message);
 
             new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
+                .setTopicId(hederaTopicId)
                 .setMessage(message)
                 .execute(client)
                 .getReceipt(client);
@@ -152,7 +150,7 @@ class ConsensusPubSubExample {
          * Delete created topic.
          */
         new TopicDeleteTransaction()
-            .setTopicId(topicId)
+            .setTopicId(hederaTopicId)
             .execute(client)
             .getReceipt(client);
 

@@ -110,7 +110,7 @@ public class LoggerFunctionalitiesExample {
          * Create a topic with attached info logger.
          */
         System.out.println("Creating new topic...(with attached info logger).");
-        var topicId1 = new TopicCreateTransaction()
+        TopicId hederaTopicId = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
             .setAdminKey(operatorPublicKey)
@@ -131,7 +131,7 @@ public class LoggerFunctionalitiesExample {
          * This should not display any logs because currently there are no warn logs predefined in the SDK.
          */
         System.out.println("Creating new topic...(with attached info logger).");
-        var topicId2 = new TopicCreateTransaction()
+        var logisticsTopicId = new TopicCreateTransaction()
             .setLogger(infoLogger)
             .setTopicMemo("topic memo")
             .setAdminKey(operatorPublicKey)
@@ -153,7 +153,7 @@ public class LoggerFunctionalitiesExample {
          * This should not display any logs because logger was silenced.
          */
         System.out.println("Creating new topic...(with attached debug logger).");
-        var topicId3 = new TopicCreateTransaction()
+        var supplyChainTopicId = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topic memo")
             .setAdminKey(operatorPublicKey)
@@ -174,7 +174,7 @@ public class LoggerFunctionalitiesExample {
          * Should produce logs.
          */
         System.out.println("Creating new topic...(with attached debug logger).");
-        var topicId4 = new TopicCreateTransaction()
+        var chatTopicId = new TopicCreateTransaction()
             .setLogger(debugLogger)
             .setTopicMemo("topicMemo")
             .setAdminKey(operatorPublicKey)
@@ -187,22 +187,22 @@ public class LoggerFunctionalitiesExample {
          * Delete created topics.
          */
         new TopicDeleteTransaction()
-            .setTopicId(topicId1)
+            .setTopicId(hederaTopicId)
             .execute(client)
             .getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(topicId2)
+            .setTopicId(logisticsTopicId)
             .execute(client)
             .getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(topicId3)
+            .setTopicId(supplyChainTopicId)
             .execute(client)
             .getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(topicId4)
+            .setTopicId(chatTopicId)
             .execute(client)
             .getReceipt(client);
 

@@ -95,7 +95,7 @@ class NftAddRemoveAllowancesExample {
         };
 
         System.out.println("Creating NFT using the Hedera Token Service...");
-        TransactionReceipt nftCreateReceipt = new TokenCreateTransaction()
+        TransactionReceipt nftCreateTxReceipt = new TokenCreateTransaction()
             .setTokenName("NFT Token")
             .setTokenSymbol("NFTT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
@@ -111,7 +111,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client);
 
-        TokenId nftTokenId = nftCreateReceipt.tokenId;
+        TokenId nftTokenId = nftCreateTxReceipt.tokenId;
         System.out.println("Created NFT with token ID: " + nftTokenId);
 
         /*
@@ -119,16 +119,16 @@ class NftAddRemoveAllowancesExample {
          * Mint NFTs.
          */
         System.out.println("Minting NFTs...");
-        List<TransactionReceipt> nftCollection = new ArrayList<>();
+        List<TransactionReceipt> nftMintTxReceipts = new ArrayList<>();
         for (int i = 0; i < CIDs.length; i++) {
-            nftCollection.add(new TokenMintTransaction()
+            nftMintTxReceipts.add(new TokenMintTransaction()
                 .setTokenId(nftTokenId)
                 .setMetadata(List.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
                 .freezeWith(client)
                 .execute(client)
                 .getReceipt(client));
 
-            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftCollection.get(i).serials.get(0));
+            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftMintTxReceipts.get(i).serials.get(0));
         }
 
         /*

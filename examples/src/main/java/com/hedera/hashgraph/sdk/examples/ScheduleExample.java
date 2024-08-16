@@ -91,22 +91,22 @@ class ScheduleExample {
          * Create new account.
          */
         System.out.println("Creating new account...");
-        AccountId newAccountId = new AccountCreateTransaction()
+        AccountId accountId = new AccountCreateTransaction()
             .setKey(KeyList.of(publicKey1, publicKey2))
             .setInitialBalance(Hbar.from(1))
             .execute(client)
             .getReceipt(client)
             .accountId;
-        Objects.requireNonNull(newAccountId);
-        System.out.println("Created new account with ID: " + newAccountId);
+        Objects.requireNonNull(accountId);
+        System.out.println("Created new account with ID: " + accountId);
 
         /*
          * Step 2:
          * Schedule a transfer transaction.
          */
         System.out.println("Scheduling token transfer...");
-        TransactionResponse response = new TransferTransaction()
-            .addHbarTransfer(newAccountId, Hbar.from(1).negated())
+        TransactionResponse transferTxResponse = new TransferTransaction()
+            .addHbarTransfer(accountId, Hbar.from(1).negated())
             .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1))
             .schedule()
             // Set expiration time to be now + 24 hours
@@ -115,12 +115,12 @@ class ScheduleExample {
             .setWaitForExpiry(true)
             .execute(client);
 
-        System.out.println("Scheduled transaction ID: " + response.transactionId);
+        System.out.println("Scheduled transaction ID: " + transferTxResponse.transactionId);
 
-        ScheduleId scheduleId = Objects.requireNonNull(response.getReceipt(client).scheduleId);
+        ScheduleId scheduleId = Objects.requireNonNull(transferTxResponse.getReceipt(client).scheduleId);
         System.out.println("Schedule ID for the transaction above: " + scheduleId);
 
-        TransactionRecord record = response.getRecord(client);
+        TransactionRecord record = transferTxResponse.getRecord(client);
         System.out.println("Scheduled transaction record: " + record);
 
         /*
@@ -128,7 +128,7 @@ class ScheduleExample {
          * Sign the schedule transaction with the first key.
          */
         System.out.println("Appending private key #1 signature to a schedule transaction...");
-        var txScheduleSign1Receipt = new ScheduleSignTransaction()
+        var scheduleSignTxReceiptFirstSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKey1)
@@ -136,24 +136,24 @@ class ScheduleExample {
             .getReceipt(client);
 
         System.out.println("A transaction that appends signature to a schedule transaction (private key #1) " +
-            "was complete with status: " + txScheduleSign1Receipt.status);
+            "was complete with status: " + scheduleSignTxReceiptFirstSignature.status);
 
         /*
          * Step 4:
          * Query the state of a schedule transaction.
          */
-        ScheduleInfo info = new ScheduleInfoQuery()
+        ScheduleInfo scheduleInfo = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(client);
 
-        System.out.println("Schedule info: " + info);
+        System.out.println("Schedule info: " + scheduleInfo);
 
         /*
          * Step 5:
          * Sign the schedule transaction with the second key.
          */
         System.out.println("Appending private key #2 signature to a schedule transaction...");
-        var txScheduleSign2Receipt = new ScheduleSignTransaction()
+        var scheduleSignTxReceiptSecondSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKey2)
@@ -161,9 +161,9 @@ class ScheduleExample {
             .getReceipt(client);
 
         System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
-            "was complete with status: " + txScheduleSign2Receipt.status);
+            "was complete with status: " + scheduleSignTxReceiptSecondSignature.status);
 
-        TransactionId transactionId = response.transactionId;
+        TransactionId transactionId = transferTxResponse.transactionId;
         String validMirrorTransactionId = transactionId.accountId.toString() + "-" + transactionId.validStart.getEpochSecond() + "-" + transactionId.validStart.getNano();
         // TODO: double check this
         String mirrorNodeUrl = "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId;
@@ -174,7 +174,7 @@ class ScheduleExample {
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setAccountId(newAccountId)
+            .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(privateKey1)

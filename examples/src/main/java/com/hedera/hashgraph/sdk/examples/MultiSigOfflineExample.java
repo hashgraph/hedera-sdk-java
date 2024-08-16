@@ -83,17 +83,17 @@ class MultiSigOfflineExample {
          */
         System.out.println("Generating ED25519 private and public keys for accounts...");
 
-        PrivateKey user1PrivateKey = PrivateKey.generateED25519();
-        System.out.println("ED25519 private key for user 1: " + user1PrivateKey);
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        System.out.println("Alice's ED25519 Private Key: " + alicePrivateKey);
 
-        PublicKey user1PublicKey = user1PrivateKey.getPublicKey();
-        System.out.println("ED25519 public key for user 1: " + user1PublicKey);
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        System.out.println("Alice's ED25519 Public Key: " + alicePublicKey);
 
-        PrivateKey user2PrivateKey = PrivateKey.generateED25519();
-        System.out.println("ED25519 private key for user 2: " + user2PrivateKey);
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        System.out.println("Bob's ED25519 Private Key: " + bobPrivateKey);
 
-        PublicKey user2PublicKey = user2PrivateKey.getPublicKey();
-        System.out.println("ED25519 public key for user 2: " + user2PublicKey);
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
+        System.out.println("Bob's ED25519 Public Key: " + bobPublicKey);
 
         /*
          * Step 2:
@@ -101,19 +101,18 @@ class MultiSigOfflineExample {
          */
         System.out.println("Creating new Key List..");
         KeyList keylist = new KeyList();
-        keylist.add(user1PublicKey);
-        keylist.add(user2PublicKey);
+        keylist.add(alicePublicKey);
+        keylist.add(bobPublicKey);
         System.out.println("Created Key List: " + keylist);
 
         System.out.println("Creating a new account...");
-        TransactionResponse createAccountTransaction = new AccountCreateTransaction()
+        TransactionResponse createAccountTxResponse = new AccountCreateTransaction()
             .setInitialBalance(Hbar.from(2))
             .setKey(keylist)
             .execute(client);
 
-        TransactionReceipt receipt = createAccountTransaction.getReceipt(client);
-        var newAccountId = receipt.accountId;
-
+        TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);
+        var newAccountId = createAccountTxReceipt.accountId;
         System.out.println("Created new account with ID: " + newAccountId);
 
         /*
@@ -121,9 +120,9 @@ class MultiSigOfflineExample {
          * Create a transfer from new account to the account with ID '0.0.3'.
          */
         System.out.println("Transferring 1 Hbar from new account to the account with ID `0.0.3`...");
-        TransferTransaction transferTransaction = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(Objects.requireNonNull(receipt.accountId), Hbar.from(1).negated())
+            .addHbarTransfer(Objects.requireNonNull(createAccountTxReceipt.accountId), Hbar.from(1).negated())
             .addHbarTransfer(new AccountId(3), Hbar.from(1))
             .freezeWith(client);
 
@@ -132,35 +131,35 @@ class MultiSigOfflineExample {
          * Convert transaction to bytes to send to signatories.
          */
         System.out.println("Converting transaction to bytes to send to signatories...");
-        byte[] transactionBytes = transferTransaction.toBytes();
+        byte[] transactionBytes = transferTx.toBytes();
         Transaction<?> transactionToExecute = Transaction.fromBytes(transactionBytes);
 
         /*
          * Step 4:
          * Ask users to sign and return signature.
          */
-        byte[] user1Signature = user1PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
-        System.out.println("User 1 signed transaction. Signature: " + Arrays.toString(user1Signature));
-        byte[] user2Signature = user2PrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
-        System.out.println("User 2 signed transaction. Signature: " + Arrays.toString(user2Signature));
+        byte[] alicesSignature = alicePrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
+        System.out.println("Alice signed the transaction. Signature: " + Arrays.toString(alicesSignature));
+        byte[] bobsSignature = bobPrivateKey.signTransaction(Transaction.fromBytes(transactionBytes));
+        System.out.println("Bob signed the transaction. Signature: " + Arrays.toString(bobsSignature));
 
         /*
          * Step 5:
          * Recreate the transaction from bytes.
          */
-        System.out.println("Adding user's signatures to the transaction...");
+        System.out.println("Adding users' signatures to the transaction...");
         transactionToExecute.signWithOperator(client);
-        transactionToExecute.addSignature(user1PrivateKey.getPublicKey(), user1Signature);
-        transactionToExecute.addSignature(user2PrivateKey.getPublicKey(), user2Signature);
+        transactionToExecute.addSignature(alicePrivateKey.getPublicKey(), alicesSignature);
+        transactionToExecute.addSignature(bobPrivateKey.getPublicKey(), bobsSignature);
 
         /*
          * Step 6:
          * Execute recreated transaction.
          */
         System.out.println("Executing transfer transaction...");
-        TransactionResponse result = transactionToExecute.execute(client);
-        receipt = result.getReceipt(client);
-        System.out.println("Transfer transaction was complete with status: " + receipt.status);
+        TransactionResponse transferTxResponse = transactionToExecute.execute(client);
+        createAccountTxReceipt = transferTxResponse.getReceipt(client);
+        System.out.println("Transfer transaction was complete with status: " + createAccountTxReceipt.status);
 
         /*
          * Clean up:
@@ -170,8 +169,8 @@ class MultiSigOfflineExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(user1PrivateKey)
-            .sign(user2PrivateKey)
+            .sign(alicePrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 

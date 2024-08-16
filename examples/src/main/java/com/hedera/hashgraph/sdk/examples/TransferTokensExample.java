@@ -83,10 +83,10 @@ class TransferTokensExample {
          * Generate ED25519 key pairs.
          */
         System.out.println("Generating ED25519 key pairs for accounts...");
-        PrivateKey privateKey1 = PrivateKey.generateED25519();
-        PublicKey publicKey1 = privateKey1.getPublicKey();
-        PrivateKey privateKey2 = PrivateKey.generateED25519();
-        PublicKey publicKey2 = privateKey2.getPublicKey();
+        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
 
         /*
          * Step 2:
@@ -94,35 +94,35 @@ class TransferTokensExample {
          */
         System.out.println("Creating accounts...");
         Hbar initialBalance = Hbar.from(1);
-        TransactionResponse response = new AccountCreateTransaction()
+        TransactionResponse aliceAccountCreateTxResponse = new AccountCreateTransaction()
             // The only required property here is key.
-            .setKey(publicKey1)
+            .setKey(alicePublicKey)
             .setInitialBalance(initialBalance)
             .execute(client);
 
         // This will wait for the receipt to become available.
-        TransactionReceipt receipt = response.getReceipt(client);
-        AccountId accountId1 = Objects.requireNonNull(receipt.accountId);
-        System.out.println("Created new account with ID: " + accountId1);
+        TransactionReceipt aliceAccountCreateTxReceipt = aliceAccountCreateTxResponse.getReceipt(client);
+        AccountId aliceAccountId = Objects.requireNonNull(aliceAccountCreateTxReceipt.accountId);
+        System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
-        response = new AccountCreateTransaction()
+        TransactionResponse bobAccountCreateTxResponse = new AccountCreateTransaction()
             // The only required property here is key.
-            .setKey(publicKey2)
+            .setKey(bobPublicKey)
             .setInitialBalance(initialBalance)
             .execute(client);
 
         // This will wait for the receipt to become available.
-        receipt = response.getReceipt(client);
-        AccountId accountId2 = Objects.requireNonNull(receipt.accountId);
-        System.out.println("Created new account with ID: " + accountId2);
+        TransactionReceipt bobAccountCreateTxReceipt = bobAccountCreateTxResponse.getReceipt(client);
+        AccountId bobAccountId = Objects.requireNonNull(bobAccountCreateTxReceipt.accountId);
+        System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*
          * Step 3:
          * Create a Fungible Token.
          */
         System.out.println("Creating Fungible Token...");
-        response = new TokenCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+        TransactionResponse tokenCreateTxResponse = new TokenCreateTransaction()
+            .setNodeAccountIds(Collections.singletonList(bobAccountCreateTxResponse.nodeId))
             .setTokenName("ffff")
             .setTokenSymbol("F")
             .setDecimals(3)
@@ -136,7 +136,7 @@ class TransferTokensExample {
             .setFreezeDefault(false)
             .execute(client);
 
-        TokenId tokenId = Objects.requireNonNull(response.getReceipt(client).tokenId);
+        TokenId tokenId = Objects.requireNonNull(tokenCreateTxResponse.getReceipt(client).tokenId);
         System.out.println("Created Fungible Token with ID: " + tokenId);
 
         /*
@@ -145,28 +145,28 @@ class TransferTokensExample {
          */
         System.out.println("Associating the token with created accounts...");
         new TokenAssociateTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setAccountId(accountId1)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .setAccountId(aliceAccountId)
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(privateKey1)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Associated account " + accountId1 + " with token " + tokenId);
+        System.out.println("Associated account " + aliceAccountId + " with token " + tokenId);
 
         new TokenAssociateTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setAccountId(accountId2)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .setAccountId(bobAccountId)
             .setTokenIds(Collections.singletonList(tokenId))
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(privateKey2)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Associated account " + accountId2 + " with token " + tokenId);
+        System.out.println("Associated account " + bobAccountId + " with token " + tokenId);
 
         /*
          * Step 5:
@@ -174,102 +174,102 @@ class TransferTokensExample {
          */
         System.out.println("Granting token KYC for created accounts...");
         new TokenGrantKycTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setAccountId(accountId1)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .setAccountId(aliceAccountId)
             .setTokenId(tokenId)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Granted KYC for account " + accountId1 + " on token " + tokenId);
+        System.out.println("Granted KYC for account " + aliceAccountId + " on token " + tokenId);
 
         new TokenGrantKycTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setAccountId(accountId2)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .setAccountId(bobAccountId)
             .setTokenId(tokenId)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Granted KYC for account " + accountId2 + " on token " + tokenId);
+        System.out.println("Granted KYC for account " + bobAccountId + " on token " + tokenId);
 
         /*
          * Step 6:
-         * Transfer tokens from operator's (treasury) account to the accountId1.
+         * Transfer tokens from the operator (treasury) to Alice's account.
          */
         System.out.println("Transferring tokens from operator's (treasury) account to the `accountId1`...");
         new TransferTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
             .addTokenTransfer(tokenId, OPERATOR_ID, -10)
-            .addTokenTransfer(tokenId, accountId1, 10)
+            .addTokenTransfer(tokenId, aliceAccountId, 10)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Sent 10 tokens from account " + OPERATOR_ID + " to account " + accountId1 + " on token " + tokenId);
+        System.out.println("Sent 10 tokens from account " + OPERATOR_ID + " to account " + aliceAccountId + " on token " + tokenId);
 
         /*
          * Step 6:
-         * Transfer tokens from the accountId1 to the accountId2.
+         * Transfer 10 tokens from the Alice to Bob.
          */
         System.out.println("Transferring tokens from the `accountId1` to the `accountId2`...");
         new TransferTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .addTokenTransfer(tokenId, accountId1, -10)
-            .addTokenTransfer(tokenId, accountId2, 10)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .addTokenTransfer(tokenId, aliceAccountId, -10)
+            .addTokenTransfer(tokenId, bobAccountId, 10)
             .freezeWith(client)
-            .sign(privateKey1)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Sent 10 tokens from account " + accountId1 + " to account " + accountId2 + " on token " + tokenId);
+        System.out.println("Sent 10 tokens from account " + aliceAccountId + " to account " + bobAccountId + " on token " + tokenId);
 
         /*
          * Step 6:
-         * Transfer tokens from the accountId2 to the accountId1.
+         * Transfer 10 tokens from Bob to Alice.
          */
         System.out.println("Transferring tokens from the `accountId2` to the `accountId1`...");
         new TransferTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .addTokenTransfer(tokenId, accountId2, -10)
-            .addTokenTransfer(tokenId, accountId1, 10)
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
+            .addTokenTransfer(tokenId, bobAccountId, -10)
+            .addTokenTransfer(tokenId, aliceAccountId, 10)
             .freezeWith(client)
-            .sign(privateKey2)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
-        System.out.println("Sent 10 tokens from account " + accountId2 + " to account " + accountId1 + " on token " + tokenId);
+        System.out.println("Sent 10 tokens from account " + bobAccountId + " to account " + aliceAccountId + " on token " + tokenId);
 
         /*
          * Clean up:
          * Delete created accounts and tokens.
          */
         new TokenWipeTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
             .setTokenId(tokenId)
-            .setAccountId(accountId1)
+            .setAccountId(aliceAccountId)
             .setAmount(10)
             .execute(client)
             .getReceipt(client);
 
         new TokenDeleteTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+            .setNodeAccountIds(Collections.singletonList(tokenCreateTxResponse.nodeId))
             .setTokenId(tokenId)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(accountId1)
+            .setAccountId(aliceAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(privateKey1)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(accountId2)
+            .setAccountId(bobAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
-            .sign(privateKey2)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 

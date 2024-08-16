@@ -83,32 +83,32 @@ class CreateTopicExample {
          */
         System.out.println("Creating new topic...");
 
-        TransactionResponse createResponse = new TopicCreateTransaction()
+        TransactionResponse topicCreateTxResponse = new TopicCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .execute(client);
 
-        TransactionReceipt createReceipt = createResponse.getReceipt(client);
-        System.out.println("Created new topic with ID: " + createReceipt.topicId);
+        TransactionReceipt topicCreateTxReceipt = topicCreateTxResponse.getReceipt(client);
+        System.out.println("Created new topic with ID: " + topicCreateTxReceipt.topicId);
 
         /*
          * Step 2:
          * Submit message to the topic created in previous step.
          */
         System.out.println("Publishing message to the topic...");
-        TransactionResponse sendResponse = new TopicMessageSubmitTransaction()
-            .setTopicId(createReceipt.topicId)
+        TransactionResponse topicMessageSubmitTxResponse = new TopicMessageSubmitTransaction()
+            .setTopicId(topicCreateTxReceipt.topicId)
             .setMessage("Hello World")
             .execute(client);
 
-        TransactionReceipt sendReceipt = sendResponse.getReceipt(client);
-        System.out.println("Topic sequence number: " + sendReceipt.topicSequenceNumber);
+        TransactionReceipt topicMessageSubmitTxReceipt = topicMessageSubmitTxResponse.getReceipt(client);
+        System.out.println("Topic sequence number: " + topicMessageSubmitTxReceipt.topicSequenceNumber);
 
         /*
          * Clean up:
          * Delete created topic.
          */
         new TopicDeleteTransaction()
-            .setTopicId(createReceipt.topicId)
+            .setTopicId(topicCreateTxReceipt.topicId)
             .execute(client)
             .getReceipt(client);
 

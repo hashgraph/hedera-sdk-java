@@ -89,15 +89,14 @@ class ZeroTokenOperationsExample {
          * Create a new account for the contract to interact with in some of its steps.
          */
         System.out.println("Creating Alice account...");
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
+        AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
             .setKey(alicePublicKey)
             .setInitialBalance(Hbar.from(1))
             .freezeWith(client);
 
-        transaction = transaction.signWithOperator(client);
-
-        TransactionResponse response = transaction.execute(client);
-        AccountId aliceAccountId = response.getReceipt(client).accountId;
+        accountCreateTx = accountCreateTx.signWithOperator(client);
+        TransactionResponse accountCreateTxResponse = accountCreateTx.execute(client);
+        AccountId aliceAccountId = accountCreateTxResponse.getReceipt(client).accountId;
         System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*
@@ -140,7 +139,7 @@ class ZeroTokenOperationsExample {
          * Create and execute a transfer transaction with a zero value.
          */
         System.out.println("Creating a Fungible Token...");
-        TokenCreateTransaction tokenCreateTransaction = new TokenCreateTransaction()
+        TokenCreateTransaction tokenCreateTx = new TokenCreateTransaction()
             .setTokenName("Black Sea LimeChain Token")
             .setTokenSymbol("BSL")
             .setTreasuryAccountId(OPERATOR_ID)
@@ -150,42 +149,42 @@ class ZeroTokenOperationsExample {
             .setAutoRenewAccountId(OPERATOR_ID)
             .freezeWith(client);
 
-        tokenCreateTransaction = tokenCreateTransaction.signWithOperator(client);
-        TransactionResponse responseTokenCreate = tokenCreateTransaction.execute(client);
+        tokenCreateTx = tokenCreateTx.signWithOperator(client);
+        TransactionResponse tokenCreateTxResponse = tokenCreateTx.execute(client);
 
-        TokenId tokenId = responseTokenCreate.getReceipt(client).tokenId;
-        System.out.println("Created token with ID: " + tokenId);
+        TokenId fungibleTokenId = tokenCreateTxResponse.getReceipt(client).tokenId;
+        System.out.println("Created Fungible Token with ID: " + fungibleTokenId);
 
         // Associate Token with Account.
         // Accounts on hedera have to opt in to receive any types of token that aren't Hbar.
         System.out.println("Associate Token with Alice's account...");
-        TokenAssociateTransaction tokenAssociateTransaction = new TokenAssociateTransaction()
+        TokenAssociateTransaction tokenAssociateTx = new TokenAssociateTransaction()
             .setAccountId(aliceAccountId)
-            .setTokenIds(Collections.singletonList(tokenId))
+            .setTokenIds(Collections.singletonList(fungibleTokenId))
             .freezeWith(client);
 
-        TokenAssociateTransaction signedTxForAssociateToken = tokenAssociateTransaction.sign(alicePrivateKey);
-        TransactionResponse txResponseAssociatedToken = signedTxForAssociateToken.execute(client);
-        var txReceipt = txResponseAssociatedToken.getReceipt(client);
-        System.out.println("Alice association transaction was complete with status: " + txReceipt.status);
+        TokenAssociateTransaction tokenAssociateTxSigned = tokenAssociateTx.sign(alicePrivateKey);
+        TransactionResponse tokenAssociateTxResponse = tokenAssociateTxSigned.execute(client);
+        TransactionReceipt tokenAssociateTxReceipt = tokenAssociateTxResponse.getReceipt(client);
+        System.out.println("Alice association transaction was complete with status: " + tokenAssociateTxReceipt.status);
 
         // Transfer token.
         System.out.println("Transferring zero tokens from operator's account to Alice's account...");
-        TransferTransaction transferToken = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             // Deduct 0 tokens.
-            .addTokenTransfer(tokenId, OPERATOR_ID, 0)
+            .addTokenTransfer(fungibleTokenId, OPERATOR_ID, 0)
             // Increase balance by 0.
-            .addTokenTransfer(tokenId, aliceAccountId, 0)
+            .addTokenTransfer(fungibleTokenId, aliceAccountId, 0)
             .freezeWith(client);
 
-        TransferTransaction signedTransferTokenTX = transferToken.signWithOperator(client);
-        TransactionResponse txResponseTransferToken = signedTransferTokenTX.execute(client);
+        TransferTransaction transferTxSigned = transferTx.signWithOperator(client);
+        TransactionResponse transferTxResponse = transferTxSigned.execute(client);
 
         // Verify the transaction reached consensus.
-        TransactionRecord transferReceiptRecord = txResponseTransferToken.getRecord(client);
+        TransactionRecord transferTxRecord = transferTxResponse.getRecord(client);
 
         System.out.println(
-            "step 6 completed, and returned valid result. TransactionId: " + transferReceiptRecord.transactionId);
+            "step 6 completed, and returned valid result. TransactionId: " + transferTxRecord.transactionId);
 
         System.out.println("All steps completed with valid results.");
 

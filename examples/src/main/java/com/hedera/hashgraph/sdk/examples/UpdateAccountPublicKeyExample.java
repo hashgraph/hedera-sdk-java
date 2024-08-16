@@ -92,12 +92,12 @@ class UpdateAccountPublicKeyExample {
          * Create a new account.
          */
         System.out.println("Creating new account...");
-        TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
             .setKey(publicKey1)
             .setInitialBalance(Hbar.from(1))
             .execute(client);
 
-        AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
+        AccountId accountId = Objects.requireNonNull(accountCreateTxResponse.getReceipt(client).accountId);
         System.out.println("Created new account with ID: " + accountId + " and public key: " + publicKey1);
 
         /*
@@ -105,7 +105,7 @@ class UpdateAccountPublicKeyExample {
          * Update account's key.
          */
         System.out.println("Updating public key of new account...(Setting key: " + publicKey2 + ").");
-        TransactionResponse accountUpdateTransactionResponse = new AccountUpdateTransaction()
+        TransactionResponse accountUpdateTxResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
             .setKey(publicKey2)
             .freezeWith(client)
@@ -116,17 +116,17 @@ class UpdateAccountPublicKeyExample {
             .execute(client);
 
         // (Important!) Wait for the transaction to complete by querying the receipt.
-        accountUpdateTransactionResponse.getReceipt(client);
+        accountUpdateTxResponse.getReceipt(client);
 
         /*
          * Step 3:
          * Get account info to confirm the key was changed.
          */
-        AccountInfo info = new AccountInfoQuery()
+        AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(client);
 
-        System.out.println("New account public key: " + info.key);
+        System.out.println("New account public key: " + accountInfo.key);
 
         /*
          * Clean up:

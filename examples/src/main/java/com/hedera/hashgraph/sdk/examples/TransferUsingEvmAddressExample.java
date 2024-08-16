@@ -79,20 +79,20 @@ class TransferUsingEvmAddressExample {
          * Step 1:
          * Create an ECSDA private key.
          */
-        PrivateKey privateKey = PrivateKey.generateECDSA();
+        PrivateKey alicePrivateKey = PrivateKey.generateECDSA();
 
         /*
          * Step 2:
          * Extract the ECDSA public key.
          */
-        PublicKey publicKey = privateKey.getPublicKey();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
         /*
          * Step 3:
          * Extract the Ethereum public address.
          */
-        EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println("EVM address of the new account: " + evmAddress);
+        EvmAddress aliceEvmAddress = alicePublicKey.toEvmAddress();
+        System.out.println("EVM address of Alice's account: " + aliceEvmAddress);
 
         /*
          * Step 4:
@@ -100,71 +100,71 @@ class TransferUsingEvmAddressExample {
          * - the from field should be a complete account that has a public address;
          * - the to field should be to a public address (to create a new account).
          */
-        System.out.println("Transferring Hbar to the the new account...");
+        System.out.println("Transferring Hbar to Alice's account...");
         TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
-            .addHbarTransfer(evmAddress, Hbar.from(1))
+            .addHbarTransfer(aliceEvmAddress, Hbar.from(1))
             .freezeWith(client);
 
-        TransferTransaction transferTxSign = transferTx.sign(OPERATOR_KEY);
-        TransactionResponse transferTxSubmit = transferTxSign.execute(client);
+        TransferTransaction transferTxSigned = transferTx.sign(OPERATOR_KEY);
+        TransactionResponse transferTxResponse = transferTxSigned.execute(client);
 
         /*
          * Step 5:
          * Get the child receipt or child record to return the Hedera Account ID for the new account that was created.
          */
-        TransactionReceipt receipt = new TransactionReceiptQuery()
-            .setTransactionId(transferTxSubmit.transactionId)
+        TransactionReceipt transferTxReceipt = new TransactionReceiptQuery()
+            .setTransactionId(transferTxResponse.transactionId)
             .setIncludeChildren(true)
             .execute(client);
 
-        AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println("The \"normal\" account ID of the given alias: " + newAccountId);
+        AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*
          * Step 6:
          * Get the AccountInfo on the new account and show it is a hollow account by not having a public key.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_BeforeEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("New account info: " + accountInfo);
+        System.out.println("Alice's account info: " + aliceAccountInfo_BeforeEnhancing);
 
         /*
          * Step 7:
          * Use the hollow account as a transaction fee payer in a HAPI transaction.
          */
         System.out.println("Setting new account as client's operator...");
-        client.setOperator(newAccountId, privateKey);
-        PrivateKey newPrivateKey = PrivateKey.generateED25519();
-        PublicKey newPublicKey = newPrivateKey.getPublicKey();
+        client.setOperator(aliceAccountId, alicePrivateKey);
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
 
-        System.out.println("Creating new account...");
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKey(newPublicKey)
+        System.out.println("Creating Bob's account...");
+        AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
+            .setKey(bobPublicKey)
             .freezeWith(client);
 
         /*
          * Step 8:
          * Sign the transaction with ECDSA private key.
          */
-        AccountCreateTransaction transactionSign = transaction.sign(privateKey);
-        TransactionResponse transactionSubmit = transactionSign.execute(client);
-        TransactionReceipt status = transactionSubmit.getReceipt(client);
-        var accountId = status.accountId;
-        System.out.println("Created new account with ID: " + accountId);
+        AccountCreateTransaction accountCreateTxSigned = accountCreateTx.sign(alicePrivateKey);
+        TransactionResponse accountCreateTxResponse = accountCreateTxSigned.execute(client);
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        var bobAccountId = accountCreateTxReceipt.accountId;
+        System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*
          * Step 9:
          * Get the AccountInfo of the account and show the account is now a complete account
          * by returning the public key on the account.
          */
-        AccountInfo accountInfo2 = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_AfterEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("The public key of the newly created (and now complete) account: " + accountInfo2.key);
+        System.out.println("The public key of the newly created (and now complete) account: " + aliceAccountInfo_AfterEnhancing.key);
 
         /*
          * Clean up:
@@ -173,18 +173,18 @@ class TransferUsingEvmAddressExample {
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
         new AccountDeleteTransaction()
-            .setAccountId(newAccountId)
+            .setAccountId(aliceAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(privateKey)
+            .sign(alicePrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(accountId)
+            .setAccountId(bobAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(newPrivateKey)
+            .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 

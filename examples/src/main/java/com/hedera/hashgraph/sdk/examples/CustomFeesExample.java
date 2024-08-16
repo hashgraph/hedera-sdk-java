@@ -87,11 +87,11 @@ class CustomFeesExample {
          */
         System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
 
-        Hbar initialBalance = Hbar.from(1);
+        Hbar initialAccountBalance = Hbar.from(1);
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
-        AccountId aliceId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
+        AccountId aliceAccountId = new AccountCreateTransaction()
+            .setInitialBalance(initialAccountBalance)
             .setKey(alicePublicKey)
             .freezeWith(client)
             .sign(alicePrivateKey)
@@ -101,8 +101,8 @@ class CustomFeesExample {
 
         PrivateKey bobPrivateKey = PrivateKey.generateED25519();
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
-        AccountId bobId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
+        AccountId bobAccountId = new AccountCreateTransaction()
+            .setInitialBalance(initialAccountBalance)
             .setKey(bobPublicKey)
             .freezeWith(client)
             .sign(bobPrivateKey)
@@ -112,8 +112,8 @@ class CustomFeesExample {
 
         PrivateKey charliePrivateKey = PrivateKey.generateED25519();
         PublicKey charliePublicKey = charliePrivateKey.getPublicKey();
-        AccountId charlieId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
+        AccountId charlieAccountId = new AccountCreateTransaction()
+            .setInitialBalance(initialAccountBalance)
             .setKey(charliePublicKey)
             .freezeWith(client)
             .sign(charliePrivateKey)
@@ -121,9 +121,9 @@ class CustomFeesExample {
             .getReceipt(client)
             .accountId;
 
-        System.out.println("Alice's account ID: " + aliceId);
-        System.out.println("Bob's account ID: " + bobId);
-        System.out.println("Charlie's account ID: " + charlieId);
+        System.out.println("Alice's account ID: " + aliceAccountId);
+        System.out.println("Bob's account ID: " + bobAccountId);
+        System.out.println("Charlie's account ID: " + charlieAccountId);
 
         /*
          * Step 2:
@@ -143,7 +143,7 @@ class CustomFeesExample {
          */
         CustomFixedFee customHbarFee = new CustomFixedFee()
             .setHbarAmount(Hbar.from(1))
-            .setFeeCollectorAccountId(aliceId);
+            .setFeeCollectorAccountId(aliceAccountId);
         List<CustomFee> hbarFeeList = Collections.singletonList(customHbarFee);
 
         /*
@@ -156,14 +156,14 @@ class CustomFeesExample {
          */
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
 
-        TokenId tokenId = new TokenCreateTransaction()
+        TokenId fungibleTokenId = new TokenCreateTransaction()
             .setTokenName("Example Fungible Token")
             .setTokenSymbol("EFT")
             .setAdminKey(alicePublicKey)
             .setSupplyKey(alicePublicKey)
             .setFeeScheduleKey(alicePublicKey)
             .setWipeKey(alicePublicKey)
-            .setTreasuryAccountId(aliceId)
+            .setTreasuryAccountId(aliceAccountId)
             .setCustomFees(hbarFeeList)
             .setInitialSupply(100)
             .freezeWith(client)
@@ -172,11 +172,12 @@ class CustomFeesExample {
             .getReceipt(client)
             .tokenId;
 
-        TokenInfo tokenInfo1 = new TokenInfoQuery()
-            .setTokenId(tokenId)
+        TokenInfo fungibleTokenInfo = new TokenInfoQuery()
+            .setTokenId(fungibleTokenId)
             .execute(client);
 
-        System.out.println("Created new fungible token with ID: " + tokenId + " and custom fees: " + tokenInfo1.customFees);
+        System.out.println("Created new fungible token with ID: " + fungibleTokenId + " and custom fees: "
+            + fungibleTokenInfo.customFees);
 
         /*
          * Step 4:
@@ -185,16 +186,16 @@ class CustomFeesExample {
         System.out.println("Associate created fungible token with Bob's and Charlie's accounts...");
 
         new TokenAssociateTransaction()
-            .setAccountId(bobId)
-            .setTokenIds(Collections.singletonList(tokenId))
+            .setAccountId(bobAccountId)
+            .setTokenIds(Collections.singletonList(fungibleTokenId))
             .freezeWith(client)
             .sign(bobPrivateKey)
             .execute(client)
             .getReceipt(client);
 
         new TokenAssociateTransaction()
-            .setAccountId(charlieId)
-            .setTokenIds(Collections.singletonList(tokenId))
+            .setAccountId(charlieAccountId)
+            .setTokenIds(Collections.singletonList(fungibleTokenId))
             .freezeWith(client)
             .sign(charliePrivateKey)
             .execute(client)
@@ -207,8 +208,8 @@ class CustomFeesExample {
         System.out.println("Transferring all 100 tokens from Alice to Bob...");
 
         new TransferTransaction()
-            .addTokenTransfer(tokenId, bobId, 100)
-            .addTokenTransfer(tokenId, aliceId, -100)
+            .addTokenTransfer(fungibleTokenId, bobAccountId, 100)
+            .addTokenTransfer(fungibleTokenId, aliceAccountId, -100)
             .freezeWith(client)
             .sign(alicePrivateKey)
             .execute(client)
@@ -218,13 +219,13 @@ class CustomFeesExample {
          * Step 6:
          * Check Alice's Hbar balance.
          */
-        Hbar aliceHbar1 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+        Hbar aliceAccountBalanceHbars_BeforeCollectingFees = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
             .hbars;
 
-        if (aliceHbar1.equals(initialBalance)) {
-            System.out.println("Alice's Hbar balance before: " + aliceHbar1);
+        if (aliceAccountBalanceHbars_BeforeCollectingFees.equals(initialAccountBalance)) {
+            System.out.println("Alice's Hbar balance before: " + aliceAccountBalanceHbars_BeforeCollectingFees);
         } else {
             throw new Exception("Alice's account initial balance was not set correctly! (Fail)");
         }
@@ -235,9 +236,9 @@ class CustomFeesExample {
          */
         System.out.println("Transferring 20 tokens from Bob to Charlie...");
 
-        TransactionRecord record1 = new TransferTransaction()
-            .addTokenTransfer(tokenId, bobId, -20)
-            .addTokenTransfer(tokenId, charlieId, 20)
+        TransactionRecord transferTxRecord = new TransferTransaction()
+            .addTokenTransfer(fungibleTokenId, bobAccountId, -20)
+            .addTokenTransfer(fungibleTokenId, charlieAccountId, 20)
             .freezeWith(client)
             .sign(bobPrivateKey)
             .execute(client)
@@ -249,18 +250,19 @@ class CustomFeesExample {
          *
          * It should increase, because of the fee taken from the transfer in the previous step.
          */
-        Hbar aliceHbar2 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+        Hbar aliceAccountBalanceHbars_AfterCollectingFees = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
             .hbars;
 
-        if (aliceHbar2.equals(Hbar.from(2))) {
-            System.out.println("Alice's Hbar balance after Bob transferred 20 tokens to Charlie: " + aliceHbar2);
+        if (aliceAccountBalanceHbars_AfterCollectingFees.equals(Hbar.from(2))) {
+            System.out.println("Alice's Hbar balance after Bob transferred 20 tokens to Charlie: "
+                + aliceAccountBalanceHbars_AfterCollectingFees);
         } else {
             throw new Exception("Custom fee was not set correctly! (Fail)");
         }
 
-        System.out.println("Assessed fees: " + record1.assessedCustomFees);
+        System.out.println("Assessed fees: " + transferTxRecord.assessedCustomFees);
 
         /*
          * Step 9:
@@ -282,13 +284,13 @@ class CustomFeesExample {
             .setMin(1)
             .setMax(10)
             // .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
-            .setFeeCollectorAccountId(aliceId);
+            .setFeeCollectorAccountId(aliceAccountId);
         List<CustomFee> fractionalFeeList = Collections.singletonList(customFractionalFee);
 
         System.out.println("Updating the custom fees for a fungible token...");
 
         new TokenFeeScheduleUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(fungibleTokenId)
             .setCustomFees(fractionalFeeList)
             .freezeWith(client)
             .sign(alicePrivateKey)
@@ -296,7 +298,7 @@ class CustomFeesExample {
             .getReceipt(client);
 
         TokenInfo tokenInfo2 = new TokenInfoQuery()
-            .setTokenId(tokenId)
+            .setTokenId(fungibleTokenId)
             .execute(client);
 
         System.out.println("Updated custom fees: " + tokenInfo2.customFees);
@@ -305,12 +307,13 @@ class CustomFeesExample {
          * Step 10:
          * Check Alice's token balance.
          */
-        Map<TokenId, Long> aliceTokens3 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+        Map<TokenId, Long> aliceAccountBalanceTokens_BeforeCollectingFees = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
             .tokens;
-        if (aliceTokens3.get(tokenId) == 0) {
-            System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: " + aliceTokens3.get(tokenId));
+        if (aliceAccountBalanceTokens_BeforeCollectingFees.get(fungibleTokenId) == 0) {
+            System.out.println("Alice's token balance before Bob transfers 20 tokens to Charlie: "
+                + aliceAccountBalanceTokens_BeforeCollectingFees.get(fungibleTokenId));
         } else {
             throw new Exception("Alice's account initial token balance is not zero! (Fail)");
         }
@@ -321,9 +324,9 @@ class CustomFeesExample {
          */
         System.out.println("Transferring 20 tokens from Bob to Charlie...");
 
-        TransactionRecord record2 = new TransferTransaction()
-            .addTokenTransfer(tokenId, bobId, -20)
-            .addTokenTransfer(tokenId, charlieId, 20)
+        TransactionRecord transferTxRecord_2 = new TransferTransaction()
+            .addTokenTransfer(fungibleTokenId, bobAccountId, -20)
+            .addTokenTransfer(fungibleTokenId, charlieAccountId, 20)
             .freezeWith(client)
             .sign(bobPrivateKey)
             .execute(client)
@@ -334,19 +337,20 @@ class CustomFeesExample {
          * Check Alice's token balance. It should increase, because of the fee taken from the
          * transfer in the previous step.
          */
-        Map<TokenId, Long> aliceTokens4 = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+        Map<TokenId, Long> aliceAccountBalanceTokens_AfterCollectingFees = new AccountBalanceQuery()
+            .setAccountId(aliceAccountId)
             .execute(client)
             .tokens;
 
-        if (aliceTokens4.get(tokenId) == 2) {
-            System.out.println("Alice's token balance after Bob transfers 20 tokens to Charlie: " + aliceTokens4.get(tokenId));
+        if (aliceAccountBalanceTokens_AfterCollectingFees.get(fungibleTokenId) == 2) {
+            System.out.println("Alice's token balance after Bob transfers 20 tokens to Charlie: "
+                + aliceAccountBalanceTokens_AfterCollectingFees.get(fungibleTokenId));
         } else {
             throw new Exception("Custom fractional fee was not set correctly! (Fail)");
         }
 
-        System.out.println("Token transfers: " + record2.tokenTransfers);
-        System.out.println("Assessed fees: " + record2.assessedCustomFees);
+        System.out.println("Token transfers: " + transferTxRecord_2.tokenTransfers);
+        System.out.println("Assessed fees: " + transferTxRecord_2.assessedCustomFees);
 
         /*
          * Clean up:
@@ -356,14 +360,14 @@ class CustomFeesExample {
         // Move token to operator account.
         new TokenAssociateTransaction()
             .setAccountId(client.getOperatorAccountId())
-            .setTokenIds(Collections.singletonList(tokenId))
+            .setTokenIds(Collections.singletonList(fungibleTokenId))
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)
             .getReceipt(client);
 
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(fungibleTokenId)
             .setAdminKey(OPERATOR_KEY)
             .setSupplyKey(OPERATOR_KEY)
             .setFeeScheduleKey(OPERATOR_KEY)
@@ -376,42 +380,42 @@ class CustomFeesExample {
 
         // Wipe token on created accounts.
         Map<TokenId, Long> charlieTokensBeforeWipe = new AccountBalanceQuery()
-            .setAccountId(charlieId)
+            .setAccountId(charlieAccountId)
             .execute(client)
             .tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(tokenId)
-            .setAmount(charlieTokensBeforeWipe.get(tokenId))
-            .setAccountId(charlieId)
+            .setTokenId(fungibleTokenId)
+            .setAmount(charlieTokensBeforeWipe.get(fungibleTokenId))
+            .setAccountId(charlieAccountId)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)
             .getReceipt(client);
 
-        Map<TokenId, Long> bobTokensBeforeWipe = new AccountBalanceQuery()
-            .setAccountId(bobId)
+        Map<TokenId, Long> bobsTokens = new AccountBalanceQuery()
+            .setAccountId(bobAccountId)
             .execute(client)
             .tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(tokenId)
-            .setAmount(bobTokensBeforeWipe.get(tokenId))
-            .setAccountId(bobId)
+            .setTokenId(fungibleTokenId)
+            .setAmount(bobsTokens.get(fungibleTokenId))
+            .setAccountId(bobAccountId)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)
             .getReceipt(client);
 
         Map<TokenId, Long> aliceTokensBeforeWipe = new AccountBalanceQuery()
-            .setAccountId(aliceId)
+            .setAccountId(aliceAccountId)
             .execute(client)
             .tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(tokenId)
-            .setAmount(aliceTokensBeforeWipe.get(tokenId))
-            .setAccountId(aliceId)
+            .setTokenId(fungibleTokenId)
+            .setAmount(aliceTokensBeforeWipe.get(fungibleTokenId))
+            .setAccountId(aliceAccountId)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)
@@ -419,7 +423,7 @@ class CustomFeesExample {
 
         // Delete created accounts.
         new AccountDeleteTransaction()
-            .setAccountId(charlieId)
+            .setAccountId(charlieAccountId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
             .sign(charliePrivateKey)
@@ -427,7 +431,7 @@ class CustomFeesExample {
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(bobId)
+            .setAccountId(bobAccountId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
             .sign(bobPrivateKey)
@@ -435,7 +439,7 @@ class CustomFeesExample {
             .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(aliceId)
+            .setAccountId(aliceAccountId)
             .setTransferAccountId(client.getOperatorAccountId())
             .freezeWith(client)
             .sign(alicePrivateKey)
@@ -444,7 +448,7 @@ class CustomFeesExample {
 
         // Delete created token.
         new TokenDeleteTransaction()
-            .setTokenId(tokenId)
+            .setTokenId(fungibleTokenId)
             .freezeWith(client)
             .sign(OPERATOR_KEY)
             .execute(client)

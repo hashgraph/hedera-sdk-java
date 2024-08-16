@@ -80,8 +80,8 @@ class StakingWithUpdateExample {
          * Generate an ED25519 key pair.
          */
         System.out.println("Generating ED25519 key pair...");
-        PrivateKey alicePrivateKey = PrivateKey.generateED25519();
-        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
+        PrivateKey privateKey = PrivateKey.generateED25519();
+        PublicKey publicKey = privateKey.getPublicKey();
 
         /*
          * Step 2:
@@ -94,7 +94,7 @@ class StakingWithUpdateExample {
         System.out.println("Creating new account with staked account ID...");
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(alicePublicKey)
+            .setKey(publicKey)
             .setInitialBalance(Hbar.from(1))
             .setStakedAccountId(stakedAccountId)
             .execute(client)
@@ -107,19 +107,19 @@ class StakingWithUpdateExample {
         // Show the required key used to sign the account update transaction to
         // stake the accounts Hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different.
-        System.out.println("Key required to update staking information: " + alicePublicKey);
+        System.out.println("Key required to update staking information: " + publicKey);
         System.out.println("Fee payer / operator key: " + client.getOperatorPublicKey());
 
         /*
          * Step 3:
          * Query the account info, it should show the staked account ID to be 0.0.3.
          */
-        AccountInfo info = new AccountInfoQuery()
+        AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
-        if (info.stakingInfo.stakedAccountId.equals(stakedAccountId)) {
-            System.out.println("New account staking info: " + info.stakingInfo);
+        if (accountInfo.stakingInfo.stakedAccountId.equals(stakedAccountId)) {
+            System.out.println("New account staking info: " + accountInfo.stakingInfo);
         } else {
             throw new Exception("Staked account ID was not set correctly! (Fail)");
         }
@@ -135,7 +135,7 @@ class StakingWithUpdateExample {
             .setAccountId(newAccountId)
             .clearStakedAccountId()
             .freezeWith(client)
-            .sign(alicePrivateKey)
+            .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 
@@ -143,12 +143,12 @@ class StakingWithUpdateExample {
          * Step 5:
          * Query the account info, it should show the staked account ID to be null.
          */
-        info = new AccountInfoQuery()
+        accountInfo = new AccountInfoQuery()
             .setAccountId(newAccountId)
             .execute(client);
 
-        if (info.stakingInfo.stakedAccountId == null) {
-            System.out.println("New account staking info: " + info.stakingInfo);
+        if (accountInfo.stakingInfo.stakedAccountId == null) {
+            System.out.println("New account staking info: " + accountInfo.stakingInfo);
         } else {
             throw new Exception("Staked account ID was not set correctly! (Fail)");
         }
@@ -161,7 +161,7 @@ class StakingWithUpdateExample {
             .setAccountId(newAccountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(alicePrivateKey)
+            .sign(privateKey)
             .execute(client)
             .getReceipt(client);
 

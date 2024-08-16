@@ -98,42 +98,42 @@ class ScheduledTransactionMultiSigThresholdExample {
          */
         System.out.println("Creating a Key List..." +
             "(with threshold, it will require 3 of 4 keys we generated to sign on anything modifying this account).");
-        KeyList transactionKey = KeyList.withThreshold(3);
-        Collections.addAll(transactionKey, publicKeys);
-        System.out.println("Created a Key List: " + transactionKey);
+        KeyList thresholdKey = KeyList.withThreshold(3);
+        Collections.addAll(thresholdKey, publicKeys);
+        System.out.println("Created a Key List: " + thresholdKey);
 
         /*
          * Step 3:
          * Create a new account with a Key List from previous step.
          */
         System.out.println("Creating new account...(with the above Key List as an account key).");
-        TransactionResponse transactionResponse = new AccountCreateTransaction()
-            .setKey(transactionKey)
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
+            .setKey(thresholdKey)
             .setInitialBalance(Hbar.from(1))
             .setAccountMemo("3-of-4 multi-sig account")
             .execute(client);
 
         // This will wait for the receipt to become available.
-        TransactionReceipt txAccountCreateReceipt = transactionResponse.getReceipt(client);
-        AccountId multiSigAccountId = Objects.requireNonNull(txAccountCreateReceipt.accountId);
-
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId multiSigAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
         System.out.println("Created new account with ID: " + multiSigAccountId);
 
         /*
          * Step 4:
          * Check the balance of the newly created account.
          */
-        AccountBalance balance = new AccountBalanceQuery()
+        AccountBalance accountBalance = new AccountBalanceQuery()
             .setAccountId(multiSigAccountId)
             .execute(client);
-        System.out.println("Balance of a newly created account with ID " + multiSigAccountId + ": " + balance.hbars.toTinybars() + " tinybar.");
+
+        System.out.println("Balance of a newly created account with ID " + multiSigAccountId + ": " + accountBalance.hbars.toTinybars() + " tinybar.");
 
         /*
          * Step 5:
          * Schedule crypto transfer from multi-sig account to operator account.
          */
         System.out.println("Scheduling crypto transfer from multi-sig account to operator account...");
-        TransactionResponse transferToSchedule = new TransferTransaction()
+        TransactionResponse transferTxScheduled = new TransferTransaction()
             .addHbarTransfer(multiSigAccountId, Hbar.from(1).negated())
             .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.from(1))
             .schedule()
@@ -142,34 +142,34 @@ class ScheduledTransactionMultiSigThresholdExample {
             .sign(privateKeys[0])
             .execute(client);
 
-        TransactionReceipt txScheduleReceipt = transferToSchedule.getReceipt(client);
-        System.out.println("Schedule status: " + txScheduleReceipt.status);
-        ScheduleId scheduleId = Objects.requireNonNull(txScheduleReceipt.scheduleId);
+        TransactionReceipt transferTxScheduledReceipt = transferTxScheduled.getReceipt(client);
+        System.out.println("Schedule status: " + transferTxScheduledReceipt.status);
+        ScheduleId scheduleId = Objects.requireNonNull(transferTxScheduledReceipt.scheduleId);
         System.out.println("Schedule ID: " + scheduleId);
-        TransactionId scheduledTxId = Objects.requireNonNull(txScheduleReceipt.scheduledTransactionId);
+        TransactionId scheduledTxId = Objects.requireNonNull(transferTxScheduledReceipt.scheduledTransactionId);
         System.out.println("Scheduled transaction ID: " + scheduledTxId);
 
         // Add second signature.
-        TransactionResponse txScheduleSign1 = new ScheduleSignTransaction()
+        TransactionResponse scheduleSignTxResponseSecondSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKeys[1])
             .execute(client);
 
-        TransactionReceipt txScheduleSign1Receipt = txScheduleSign1.getReceipt(client);
+        TransactionReceipt scheduleSignTxReceiptSecondSignature = scheduleSignTxResponseSecondSignature.getReceipt(client);
         System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
-            "was complete with status: " + txScheduleSign1Receipt.status);
+            "was complete with status: " + scheduleSignTxReceiptSecondSignature.status);
 
         // Add third signature.
-        TransactionResponse txScheduleSign2 = new ScheduleSignTransaction()
+        TransactionResponse scheduleSignTxResponseThirdSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKeys[2])
             .execute(client);
 
-        TransactionReceipt txScheduleSign2Receipt = txScheduleSign2.getReceipt(client);
+        TransactionReceipt scheduleSignTxReceiptThirdSignature = scheduleSignTxResponseThirdSignature.getReceipt(client);
         System.out.println("A transaction that appends signature to a schedule transaction (private key #3) " +
-            "was complete with status: " + txScheduleSign2Receipt.status);
+            "was complete with status: " + scheduleSignTxReceiptThirdSignature.status);
 
         /*
          * Step 6:

@@ -86,7 +86,7 @@ class CreateFileExample {
         String fileContents = "Hedera hashgraph is great!";
 
         System.out.println("Creating new file...");
-        TransactionResponse transactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
             .setContents(fileContents)
@@ -94,9 +94,8 @@ class CreateFileExample {
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        FileId newFileId = receipt.fileId;
-
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = fileCreateTxReceipt.fileId;
         System.out.println("Created new file with ID: " + newFileId);
 
         /*

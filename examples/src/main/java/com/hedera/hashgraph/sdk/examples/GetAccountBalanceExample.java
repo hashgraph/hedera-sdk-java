@@ -77,12 +77,12 @@ class GetAccountBalanceExample {
          * Step 1:
          * Execute AccountBalanceQuery and output operator's account balance.
          */
-        Hbar balance = new AccountBalanceQuery()
+        Hbar operatorsBalance = new AccountBalanceQuery()
             .setAccountId(OPERATOR_ID)
             .execute(client)
             .hbars;
 
-        System.out.println("Operator's Hbar account balance: " + balance);
+        System.out.println("Operator's Hbar account balance: " + operatorsBalance);
 
         /*
          * Clean up:

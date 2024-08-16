@@ -102,7 +102,7 @@ class ConsensusPubSubChunkedExample {
          */
         System.out.println("Creating new topic...");
 
-        TopicId newTopicId = Objects.requireNonNull(
+        TopicId hederaTopicID = Objects.requireNonNull(
             new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setAdminKey(operatorPublicKey)
@@ -112,7 +112,7 @@ class ConsensusPubSubChunkedExample {
             .topicId
         );
 
-        System.out.println("Created new topic with ID: " + newTopicId);
+        System.out.println("Created new topic with ID: " + hederaTopicID);
 
         /*
          * Step 3:
@@ -128,7 +128,7 @@ class ConsensusPubSubChunkedExample {
          */
         System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
-            .setTopicId(newTopicId)
+            .setTopicId(hederaTopicID)
             .subscribe(client, topicMessage -> {
                 System.out.println("Topic message received!" +
                     " | Time: " + topicMessage.consensusTimestamp +
@@ -142,36 +142,36 @@ class ConsensusPubSubChunkedExample {
          * Send large message to the topic created previously.
          */
         // Get a large file to send.
-        String bigContents = readResources("util/large_message.txt");
+        String largeMessage = readResources("util/large_message.txt");
 
         // Prepare a message send transaction that requires a submit key from "somewhere else".
-        Transaction<?> transaction = new TopicMessageSubmitTransaction()
+        Transaction<?> topicMessageSubmitTx = new TopicMessageSubmitTransaction()
             // This is value 10 by default,
             // increasing so large message will "fit".
             .setMaxChunks(15)
-            .setTopicId(newTopicId)
-            .setMessage(bigContents)
+            .setTopicId(hederaTopicID)
+            .setMessage(largeMessage)
             // Sign with the operator or "sender" of the message,
             // this is the party who will be charged the transaction fee.
             .signWithOperator(client);
 
         // Serialize to bytes, so we can be signed "somewhere else" by the submit key.
-        byte[] transactionBytes = transaction.toBytes();
+        byte[] transactionBytes = topicMessageSubmitTx.toBytes();
 
         // Now pretend we sent those bytes across the network.
         // Parse them into a transaction, so we can sign as the submit key.
-        transaction = Transaction.fromBytes(transactionBytes);
+        topicMessageSubmitTx = Transaction.fromBytes(transactionBytes);
 
         // View out the message size from the parsed transaction.
         // This can be useful to display what we are about to sign.
-        long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
+        long transactionMessageSize = ((TopicMessageSubmitTransaction) topicMessageSubmitTx).getMessage().size();
         System.out.println("Preparing to submit a message to the created topic (size of the message: " + transactionMessageSize + " bytes)...");
 
         // Sign with that Submit Key.
-        transaction.sign(submitPrivateKey);
+        topicMessageSubmitTx.sign(submitPrivateKey);
 
         // Now actually submit the transaction and get the receipt to ensure there were no errors.
-        transaction.execute(client).getReceipt(client);
+        topicMessageSubmitTx.execute(client).getReceipt(client);
 
         // Wait 60 seconds to receive the message. Fail if not received.
         boolean largeMessageReceived = LARGE_MESSAGE_LATCH.await(60, TimeUnit.SECONDS);
@@ -181,7 +181,7 @@ class ConsensusPubSubChunkedExample {
          * Delete created topic.
          */
         new TopicDeleteTransaction()
-            .setTopicId(newTopicId)
+            .setTopicId(hederaTopicID)
             .execute(client)
             .getReceipt(client);
 

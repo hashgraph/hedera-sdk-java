@@ -104,7 +104,7 @@ public class TokenMetadataExample {
         byte[] initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
 
         System.out.println("Creating mutable Fungible Token using the Hedera Token Service...");
-        var tokenIdMutable = Objects.requireNonNull(
+        var mutableFungibleTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -122,19 +122,20 @@ public class TokenMetadataExample {
                 .tokenId
         );
 
-        System.out.println("Created mutable Fungible Token with ID: " + tokenIdMutable);
+        System.out.println("Created mutable Fungible Token with ID: " + mutableFungibleTokenId);
 
         /*
          * Step 3:
          * Query and output mutable Fungible Token info after its creation.
          */
-        var mutableTokenInfoAfterCreation = new TokenInfoQuery()
-            .setTokenId(tokenIdMutable)
+        var mutableFungibleTokenInfo_AfterCreation = new TokenInfoQuery()
+            .setTokenId(mutableFungibleTokenId)
             .execute(client);
 
         // Check that metadata was set correctly.
-        if (Arrays.equals(mutableTokenInfoAfterCreation.metadata, initialTokenMetadata)) {
-            System.out.println("Mutable Fungible Token metadata after creation: " + Arrays.toString(mutableTokenInfoAfterCreation.metadata));
+        if (Arrays.equals(mutableFungibleTokenInfo_AfterCreation.metadata, initialTokenMetadata)) {
+            System.out.println("Mutable Fungible Token metadata after creation: "
+                + Arrays.toString(mutableFungibleTokenInfo_AfterCreation.metadata));
         } else {
             throw new Exception("Mutable Fungible Token metadata was not set correctly! (Fail)");
         }
@@ -146,7 +147,7 @@ public class TokenMetadataExample {
         byte[] updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
         System.out.println("Updating mutable Fungible Token metadata...");
         new TokenUpdateTransaction()
-            .setTokenId(tokenIdMutable)
+            .setTokenId(mutableFungibleTokenId)
             .setTokenMetadata(updatedTokenMetadata)
             .freezeWith(client)
             .sign(adminPrivateKey)
@@ -157,13 +158,14 @@ public class TokenMetadataExample {
          * Step 5:
          * Query and output mutable Fungible Token info after its metadata was updated.
          */
-        var mutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
-            .setTokenId(tokenIdMutable)
+        var mutableFungibleTokenInfo_AfterMetadataUpdate = new TokenInfoQuery()
+            .setTokenId(mutableFungibleTokenId)
             .execute(client);
 
         // Check that metadata was updated correctly.
-        if (Arrays.equals(mutableTokenInfoAfterMetadataUpdate.metadata, updatedTokenMetadata)) {
-            System.out.println("Mutable Fungible Token metadata after update: " + Arrays.toString(mutableTokenInfoAfterMetadataUpdate.metadata));
+        if (Arrays.equals(mutableFungibleTokenInfo_AfterMetadataUpdate.metadata, updatedTokenMetadata)) {
+            System.out.println("Mutable Fungible Token metadata after update: "
+                + Arrays.toString(mutableFungibleTokenInfo_AfterMetadataUpdate.metadata));
         } else {
             throw new Exception("Mutable Fungible Token metadata was not updated correctly! (Fail)");
         }
@@ -177,7 +179,7 @@ public class TokenMetadataExample {
         System.out.println("The beginning of the second example (immutable token's metadata).");
 
         System.out.println("Creating immutable Fungible Token using the Hedera Token Service...");
-        var tokenIdImmutable = Objects.requireNonNull(
+        var immutableFungibleTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
@@ -193,19 +195,20 @@ public class TokenMetadataExample {
                 .tokenId
         );
 
-        System.out.println("Created an immutable Fungible Token with ID: " + tokenIdImmutable);
+        System.out.println("Created an immutable Fungible Token with ID: " + immutableFungibleTokenId);
 
         /*
          * Step 7:
          * Query and output immutable Fungible Token info after its creation.
          */
-        var immutableTokenInfoAfterCreation = new TokenInfoQuery()
-            .setTokenId(tokenIdImmutable)
+        var immutableFungibleTokenTokenInfo_AfterCreation = new TokenInfoQuery()
+            .setTokenId(immutableFungibleTokenId)
             .execute(client);
 
         // Check that metadata was set correctly.
-        if (Arrays.equals(immutableTokenInfoAfterCreation.metadata, initialTokenMetadata)) {
-            System.out.println("Immutable Fungible Token metadata after creation: " + Arrays.toString(immutableTokenInfoAfterCreation.metadata));
+        if (Arrays.equals(immutableFungibleTokenTokenInfo_AfterCreation.metadata, initialTokenMetadata)) {
+            System.out.println("Immutable Fungible Token metadata after creation: "
+                + Arrays.toString(immutableFungibleTokenTokenInfo_AfterCreation.metadata));
         } else {
             throw new Exception("Immutable Fungible Token metadata was not set correctly! (Fail)");
         }
@@ -216,7 +219,7 @@ public class TokenMetadataExample {
          */
         System.out.println("Updating immutable Fungible Token metadata...");
         new TokenUpdateTransaction()
-            .setTokenId(tokenIdImmutable)
+            .setTokenId(immutableFungibleTokenId)
             .setTokenMetadata(updatedTokenMetadata)
             .freezeWith(client)
             .sign(metadataPrivateKey)
@@ -227,13 +230,14 @@ public class TokenMetadataExample {
          * Step 5:
          * Query and output immutable Fungible Token info after its metadata was updated.
          */
-        var immutableTokenInfoAfterMetadataUpdate = new TokenInfoQuery()
-            .setTokenId(tokenIdImmutable)
+        var immutableFungibleTokenInfo_AfterMetadataUpdate = new TokenInfoQuery()
+            .setTokenId(immutableFungibleTokenId)
             .execute(client);
 
         // Check that metadata was updated correctly.
-        if (Arrays.equals(immutableTokenInfoAfterMetadataUpdate.metadata, updatedTokenMetadata)) {
-            System.out.println("Immutable Fungible Token metadata after update: " + Arrays.toString(immutableTokenInfoAfterMetadataUpdate.metadata));
+        if (Arrays.equals(immutableFungibleTokenInfo_AfterMetadataUpdate.metadata, updatedTokenMetadata)) {
+            System.out.println("Immutable Fungible Token metadata after update: "
+                + Arrays.toString(immutableFungibleTokenInfo_AfterMetadataUpdate.metadata));
         } else {
             throw new Exception("Immutable Fungible Token metadata was not updated correctly! (Fail)");
         }
@@ -243,7 +247,7 @@ public class TokenMetadataExample {
          * Delete created mutable token.
          */
         new TokenDeleteTransaction()
-            .setTokenId(tokenIdMutable)
+            .setTokenId(mutableFungibleTokenId)
             .freezeWith(client)
             .sign(adminPrivateKey)
             .execute(client)

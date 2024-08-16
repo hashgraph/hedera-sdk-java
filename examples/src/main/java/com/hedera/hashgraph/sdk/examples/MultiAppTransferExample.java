@@ -122,7 +122,7 @@ class MultiAppTransferExample {
          * Step 3:
          * Make a transfer from the user account to the exchange account, this requires signing by both parties.
          */
-        TransferTransaction transferTxn = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(userAccountId, Hbar.from(1).negated())
             .addHbarTransfer(exchangeAccountId, Hbar.from(1))
             // The exchange-provided memo required to validate the transaction.
@@ -133,21 +133,21 @@ class MultiAppTransferExample {
 
         // The exchange must sign the transaction in order for it to be accepted by the network
         // (assume this is some REST call to the exchange API server).
-        byte[] signedTxnBytes = Transaction.fromBytes(transferTxn.toBytes()).sign(exchangePrivateKey).toBytes();
+        byte[] signedTransferTxBytes = Transaction.fromBytes(transferTx.toBytes()).sign(exchangePrivateKey).toBytes();
 
         // Parse the transaction bytes returned from the exchange.
-        Transaction<?> signedTransferTxn = Transaction.fromBytes(signedTxnBytes);
+        Transaction<?> signedTransferTx = Transaction.fromBytes(signedTransferTxBytes);
 
         // Get the amount we are about to transfer (we built this with +2, -2).
-        Hbar transferAmount = ((TransferTransaction) signedTransferTxn).getHbarTransfers().values().toArray(new Hbar[0])[0];
+        Hbar transferAmount = ((TransferTransaction) signedTransferTx).getHbarTransfers().values().toArray(new Hbar[0])[0];
 
         System.out.println("Transferring " + transferAmount + " from the user account to the exchange account...");
 
         // We now execute the signed transaction and wait for it to be accepted.
-        TransactionResponse transactionResponse = signedTransferTxn.execute(client);
+        TransactionResponse transactionTxResponse = signedTransferTx.execute(client);
 
         // (Important!) Wait for consensus by querying for the receipt.
-        transactionResponse.getReceipt(client);
+        transactionTxResponse.getReceipt(client);
 
         /*
          * Step 4:
@@ -158,13 +158,13 @@ class MultiAppTransferExample {
             .execute(client)
             .hbars;
 
-        Hbar receiptBalanceAfter = new AccountBalanceQuery()
+        Hbar exchangeBalanceAfter = new AccountBalanceQuery()
             .setAccountId(exchangeAccountId)
             .execute(client)
             .hbars;
 
         System.out.println("User account (" + userAccountId + ") balance: " + senderBalanceAfter);
-        System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + receiptBalanceAfter);
+        System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + exchangeBalanceAfter);
 
         /*
          * Clean up:

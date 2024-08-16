@@ -100,7 +100,7 @@ class TransferCryptoExample {
          */
         System.out.println("Executing the transfer transaction...");
         Hbar transferAmount = Hbar.from(1);
-        TransactionResponse transactionResponse = new TransferTransaction()
+        TransactionResponse transferTxResponse = new TransferTransaction()
             // addSender and addRecipient can be called as many times as you want as long as the total sum from
             // both sides is equivalent.
             .addHbarTransfer(OPERATOR_ID, transferAmount.negated())
@@ -108,8 +108,8 @@ class TransferCryptoExample {
             .setTransactionMemo("transfer test")
             .execute(client);
 
-        System.out.println("Transaction info: " + transactionResponse);
-        TransactionRecord record = transactionResponse.getRecord(client);
+        System.out.println("Transaction info: " + transferTxResponse);
+        TransactionRecord record = transferTxResponse.getRecord(client);
         System.out.println("Transferred " + transferAmount);
         System.out.println("Transfer memo: " + record.transactionMemo);
 

@@ -103,21 +103,21 @@ class CreateAccountThresholdKeyExample {
          *
          * Require 2 of the 3 keys we generated to sign on anything modifying this account.
          */
-        KeyList transactionKey = KeyList.withThreshold(2);
-        Collections.addAll(transactionKey, publicKeys);
+        KeyList thresholdKey = KeyList.withThreshold(2);
+        Collections.addAll(thresholdKey, publicKeys);
 
         /*
          * Step 2:
          * Create a new account setting a Key List from a previous step as an account's key.
          */
         System.out.println("Creating new account...");
-        TransactionResponse transactionResponse = new AccountCreateTransaction()
-            .setKey(transactionKey)
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
+            .setKey(thresholdKey)
             .setInitialBalance(Hbar.from(1))
             .execute(client);
 
-        TransactionReceipt receipt = transactionResponse.getReceipt(client);
-        AccountId newAccountId = Objects.requireNonNull(receipt.accountId);
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId newAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
         System.out.println("Created account with ID: " + newAccountId);
 
         /*
@@ -125,7 +125,7 @@ class CreateAccountThresholdKeyExample {
          * Create a transfer transaction from a newly created account to demonstrate the signing process (threshold).
          */
         System.out.println("Transferring 1 Hbar from a newly created account...");
-        TransactionResponse transferTransactionResponse = new TransferTransaction()
+        TransactionResponse transferTxResponse = new TransferTransaction()
             .addHbarTransfer(newAccountId, Hbar.from(1).negated())
             .addHbarTransfer(new AccountId(3), Hbar.from(1))
             // To manually sign, you must explicitly build the Transaction.
@@ -136,7 +136,7 @@ class CreateAccountThresholdKeyExample {
             .execute(client);
 
         // (Important!) Wait for the transfer to reach the consensus.
-        transferTransactionResponse.getReceipt(client);
+        transferTxResponse.getReceipt(client);
 
         Hbar accountBalanceAfterTransfer = new AccountBalanceQuery()
             .setAccountId(newAccountId)

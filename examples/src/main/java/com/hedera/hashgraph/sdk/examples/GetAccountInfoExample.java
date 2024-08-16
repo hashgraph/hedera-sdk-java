@@ -79,14 +79,14 @@ class GetAccountInfoExample {
          * Step 1:
          * Execute AccountBalanceQuery and output operator's account info.
          */
-        AccountInfo info = new AccountInfoQuery()
+        AccountInfo operatorsAccountInfo = new AccountInfoQuery()
             .setAccountId(OPERATOR_ID)
             .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
-        System.out.println("Operator's account public key: " + info.key);
-        System.out.println("Operator's account require receiver signature: " + info.isReceiverSignatureRequired);
-        System.out.println("Operator's account expiration time: " + info.expirationTime);
+        System.out.println("Operator's account public key: " + operatorsAccountInfo.key);
+        System.out.println("Operator's account require receiver signature: " + operatorsAccountInfo.isReceiverSignatureRequired);
+        System.out.println("Operator's account expiration time: " + operatorsAccountInfo.expirationTime);
 
         /*
          * Clean up:

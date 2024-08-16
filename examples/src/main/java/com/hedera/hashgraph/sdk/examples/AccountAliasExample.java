@@ -157,26 +157,26 @@ class AccountAliasExample {
          * Users may continue to refer to the account by its aliasKey AccountId, but they may also
          * now refer to it by its normal AccountId
          */
-        AccountBalance balance = new AccountBalanceQuery()
+        AccountBalance newAccountBalance = new AccountBalanceQuery()
             .setAccountId(aliasAccountId)
             .execute(client);
 
-        System.out.println("Balances of the new account: " + balance);
+        System.out.println("Balances of the new account: " + newAccountBalance);
 
-        AccountInfo info = new AccountInfoQuery()
+        AccountInfo newAccountInfo = new AccountInfoQuery()
             .setAccountId(aliasAccountId)
             .execute(client);
 
-        System.out.println("Info about the new account: " + info);
-        System.out.println("The normal account ID: " + info.accountId);
-        System.out.println("The alias key: " + info.aliasKey);
+        System.out.println("Info about the new account: " + newAccountInfo);
+        System.out.println("The normal account ID: " + newAccountInfo.accountId);
+        System.out.println("The alias key: " + newAccountInfo.aliasKey);
 
         /*
          * Clean up:
          * Delete created account and close the client.
          */
         new AccountDeleteTransaction()
-            .setAccountId(info.accountId)
+            .setAccountId(newAccountInfo.accountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
             .sign(privateKey)

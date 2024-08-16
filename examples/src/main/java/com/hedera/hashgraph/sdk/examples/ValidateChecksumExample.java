@@ -139,27 +139,28 @@ class ValidateChecksumExample {
         while (true) {
             try {
                 System.out.print("Enter an account ID with checksum: ");
-                String inString = inputScanner.nextLine();
+                String inputString = inputScanner.nextLine();
 
                 // Throws IllegalArgumentException if incorrectly formatted.
-                AccountId id = AccountId.fromString(inString);
+                AccountId accountId = AccountId.fromString(inputString);
 
-                System.out.println("The ID with no checksum is: " + id.toString());
-                System.out.println("The ID with the correct checksum is: " + id.toStringWithChecksum(client));
+                System.out.println("The account ID with no checksum is: " + accountId.toString());
+                System.out.println("The account ID with the correct checksum is: " + accountId.toStringWithChecksum(client));
 
-                if (id.getChecksum() == null) {
+                if (accountId.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
                     continue;
                 }
-                System.out.println("The checksum entered was: " + id.getChecksum());
+                System.out.println("The checksum entered was: " + accountId.getChecksum());
 
                 // Throws BadEntityIdException if checksum is incorrect.
-                id.validateChecksum(client);
+                accountId.validateChecksum(client);
 
-                AccountBalance balance = new AccountBalanceQuery()
-                    .setAccountId(id)
+                AccountBalance accountBalance = new AccountBalanceQuery()
+                    .setAccountId(accountId)
                     .execute(client);
-                System.out.println(balance);
+
+                System.out.println("Account Balance: " + accountBalance);
 
                 // Exit the loop.
                 break;
@@ -197,18 +198,18 @@ class ValidateChecksumExample {
             try {
                 System.out.print("Enter an account ID with checksum: ");
 
-                AccountId id = AccountId.fromString(inputScanner.nextLine());
+                AccountId accountId = AccountId.fromString(inputScanner.nextLine());
 
-                if (id.getChecksum() == null) {
+                if (accountId.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
                     continue;
                 }
 
-                AccountBalance balance = new AccountBalanceQuery()
-                    .setAccountId(id)
+                AccountBalance accountBalance = new AccountBalanceQuery()
+                    .setAccountId(accountId)
                     .execute(client);
 
-                System.out.println(balance);
+                System.out.println("Account Balance: " + accountBalance);
 
                 // Exit the loop.
                 break;

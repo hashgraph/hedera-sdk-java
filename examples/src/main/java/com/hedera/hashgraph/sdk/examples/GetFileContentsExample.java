@@ -90,7 +90,7 @@ class GetFileContentsExample {
 
         // Create the new file and set its properties.
         System.out.println("Creating new file...");
-        TransactionResponse newFileTransactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // The public key of the owner of the file.
             .setKeys(operatorPublicKey)
             // Contents of the file.
@@ -98,7 +98,7 @@ class GetFileContentsExample {
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        FileId newFileId = Objects.requireNonNull(newFileTransactionResponse.getReceipt(client).fileId);
+        FileId newFileId = Objects.requireNonNull(fileCreateTxResponse.getReceipt(client).fileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*

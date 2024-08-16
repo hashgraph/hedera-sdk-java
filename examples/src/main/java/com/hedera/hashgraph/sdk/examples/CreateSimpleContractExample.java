@@ -83,18 +83,17 @@ class CreateSimpleContractExample {
          * Create a file with smart contract bytecode.
          */
         System.out.println("Creating new bytecode file...");
-        String byteCodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/hello_world.json");
 
-        TransactionResponse fileTransactionResponse = new FileCreateTransaction()
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
             // Use the same key as the operator to "own" this file.
             .setKeys(operatorPublicKey)
-            .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
+            .setContents(contractBytecodeHex.getBytes(StandardCharsets.UTF_8))
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
-
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
         System.out.println("Created new bytecode file with ID: " + newFileId);
 
         /*
@@ -102,7 +101,7 @@ class CreateSimpleContractExample {
          * Create a smart contract.
          */
         System.out.println("Creating new contract...");
-        TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
+        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
             .setGas(100_000)
             .setBytecodeFileId(newFileId)
             // Set an admin key, so we can delete the contract later.
@@ -110,8 +109,8 @@ class CreateSimpleContractExample {
             .setMaxTransactionFee(Hbar.from(16))
             .execute(client);
 
-        TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
-        ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
+        TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
+        ContractId newContractId = Objects.requireNonNull(contractCreateTxReceipt.contractId);
         System.out.println("Created new contract with ID: " + newContractId);
 
         /*
@@ -130,8 +129,8 @@ class CreateSimpleContractExample {
             throw new Exception("Error calling contract function \"greet\": " + contractCallResult.errorMessage);
         }
 
-        String message = contractCallResult.getString(0);
-        System.out.println("Contract call result (\"greet\" function returned): " + message);
+        String contractCallResultString = contractCallResult.getString(0);
+        System.out.println("Contract call result (\"greet\" function returned): " + contractCallResultString);
 
         /*
          * Clean up:
@@ -139,7 +138,7 @@ class CreateSimpleContractExample {
          */
         new ContractDeleteTransaction()
             .setContractId(newContractId)
-            .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
+            .setTransferAccountId(contractCreateTxResponse.transactionId.accountId)
             .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);

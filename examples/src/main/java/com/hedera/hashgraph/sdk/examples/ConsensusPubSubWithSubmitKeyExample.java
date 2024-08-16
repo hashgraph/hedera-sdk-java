@@ -105,14 +105,14 @@ class ConsensusPubSubWithSubmitKeyExample {
          * ConsensusMessageSubmitTransactions for that topic.
          */
         System.out.println("Creating new HCS topic...");
-        TransactionResponse transactionResponse = new TopicCreateTransaction()
+        TransactionResponse topicCreateTxResponse = new TopicCreateTransaction()
             .setTopicMemo("HCS topic with submit key")
             .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client);
 
-        TopicId topicId = Objects.requireNonNull(transactionResponse.getReceipt(client).topicId);
-        System.out.println("Created topic with ID: " + topicId + " and public ED25519 submit key: " + submitPrivateKey);
+        TopicId hederaTopicId = Objects.requireNonNull(topicCreateTxResponse.getReceipt(client).topicId);
+        System.out.println("Created topic with ID: " + hederaTopicId + " and public ED25519 submit key: " + submitPrivateKey);
 
         /*
          * Step 3:
@@ -128,7 +128,7 @@ class ConsensusPubSubWithSubmitKeyExample {
          */
         System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
-            .setTopicId(topicId)
+            .setTopicId(hederaTopicId)
             .setStartTime(Instant.ofEpochSecond(0))
             .subscribe(client, (resp) -> {
                 String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
@@ -142,14 +142,14 @@ class ConsensusPubSubWithSubmitKeyExample {
          * Step 5:
          * Publish a list of messages to a topic, signing each transaction with the topic's Submit Key.
          */
-        Random r = new Random();
+        Random randomGenerator = new Random();
         for (int i = 0; i <= TOTAL_MESSAGES; i++) {
-            String message = "random message " + r.nextLong();
+            String message = "random message " + randomGenerator.nextLong();
 
             System.out.println("Publishing message to the topic: " + message);
 
             new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
+                .setTopicId(hederaTopicId)
                 .setMessage(message)
                 .freezeWith(client)
 
@@ -172,7 +172,7 @@ class ConsensusPubSubWithSubmitKeyExample {
          * Delete created topic.
          */
         new TopicDeleteTransaction()
-            .setTopicId(topicId)
+            .setTopicId(hederaTopicId)
             .execute(client)
             .getReceipt(client);
 

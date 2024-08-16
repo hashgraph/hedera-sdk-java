@@ -93,14 +93,14 @@ class ContractNoncesExample {
          * Step 1:
          * Create a file with smart contract bytecode.
          */
-        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
+        TransactionResponse bytecodeFileCreateTxResponse = new FileCreateTransaction()
             .setKeys(operatorPublicKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
-        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
-        FileId newFileId = fileCreateTxReceipt.fileId;
+        TransactionReceipt bytecodeFileCreateTxReceipt = bytecodeFileCreateTxResponse.getReceipt(client);
+        FileId bytecodeFileId = bytecodeFileCreateTxReceipt.fileId;
 
         /*
          * Step 2:
@@ -109,7 +109,7 @@ class ContractNoncesExample {
         TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
             .setAdminKey(operatorPublicKey)
             .setGas(100_000)
-            .setBytecodeFileId(newFileId)
+            .setBytecodeFileId(bytecodeFileId)
             .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
             .execute(client);
 

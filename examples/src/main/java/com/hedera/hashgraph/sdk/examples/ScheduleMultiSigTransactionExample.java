@@ -84,9 +84,12 @@ class ScheduleMultiSigTransactionExample {
          * Generate three ED25519 private keys.
          */
         System.out.println("Generating ED25519 private keys...");
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
-        PrivateKey key3 = PrivateKey.generateED25519();
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
+        PrivateKey privateKey3 = PrivateKey.generateED25519();
+        PublicKey publicKey3 = privateKey3.getPublicKey();
 
         /*
          * Step 2:
@@ -98,9 +101,9 @@ class ScheduleMultiSigTransactionExample {
          */
         System.out.println("Creating a Key List...");
         KeyList keyList = new KeyList();
-        keyList.add(key1.getPublicKey());
-        keyList.add(key2.getPublicKey());
-        keyList.add(key3.getPublicKey());
+        keyList.add(publicKey1);
+        keyList.add(publicKey2);
+        keyList.add(publicKey3);
         System.out.println("Created a Key List: " + keyList);
 
         /*
@@ -108,16 +111,16 @@ class ScheduleMultiSigTransactionExample {
          * Create a new account with a Key List created in a previous step.
          */
         System.out.println("Creating new account...");
-        TransactionResponse response = new AccountCreateTransaction()
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            // The only required property here is `key`.
+            // The only required property here is key.
             .setKey(keyList)
             .setInitialBalance(Hbar.from(2))
             .execute(client);
 
         // This will wait for the receipt to become available.
-        TransactionReceipt receipt = response.getReceipt(client);
-        AccountId accountId = Objects.requireNonNull(receipt.accountId);
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId accountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
         System.out.println("Created new account with ID: " + accountId);
 
         /*
@@ -132,37 +135,36 @@ class ScheduleMultiSigTransactionExample {
 
         // Create a transfer transaction with 2/3 signatures.
         System.out.println("Creating a token transfer transaction...");
-        TransferTransaction transfer = new TransferTransaction()
+        TransferTransaction transferTx = new TransferTransaction()
             .addHbarTransfer(accountId, Hbar.from(1).negated())
             .addHbarTransfer(OPERATOR_ID, Hbar.from(1));
 
         // Schedule the transaction.
         System.out.println("Scheduling the token transfer transaction...");
-        ScheduleCreateTransaction scheduled = transfer.schedule()
+        ScheduleCreateTransaction scheduled = transferTx.schedule()
             .setPayerAccountId(OPERATOR_ID)
             .setAdminKey(operatorPublicKey)
             .freezeWith(client)
-            .sign(key2);
+            .sign(privateKey2);
 
-        receipt = scheduled.execute(client).getReceipt(client);
+        accountCreateTxReceipt = scheduled.execute(client).getReceipt(client);
         // Get the schedule ID from the receipt.
-        ScheduleId scheduleId = Objects.requireNonNull(receipt.scheduleId);
-
+        ScheduleId scheduleId = Objects.requireNonNull(accountCreateTxReceipt.scheduleId);
         System.out.println("Schedule ID: " + scheduleId);
 
         /*
          * Step 5:
          * Get the schedule info to see if signatories is populated with 2/3 signatures.
          */
-        ScheduleInfo info = new ScheduleInfoQuery()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+        ScheduleInfo scheduleInfo_BeforeLastSignature = new ScheduleInfoQuery()
+            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
             .setScheduleId(scheduleId)
             .execute(client);
 
-        System.out.println("Schedule info: " + info);
+        System.out.println("Schedule info: " + scheduleInfo_BeforeLastSignature);
 
-        transfer = (TransferTransaction) info.getScheduledTransaction();
-        Map<AccountId, Hbar> transfers = transfer.getHbarTransfers();
+        transferTx = (TransferTransaction) scheduleInfo_BeforeLastSignature.getScheduledTransaction();
+        Map<AccountId, Hbar> transfers = transferTx.getHbarTransfers();
 
         // Make sure the transfer transaction is what we expect.
         if (transfers.size() != 2) {
@@ -187,27 +189,27 @@ class ScheduleMultiSigTransactionExample {
          */
         System.out.println("Appending private key #3 signature to a schedule transaction..." +
             "(This last signature should mean the transaction executes since all 3 signatures have been provided)");
-        var txScheduleSign1Receipt = new ScheduleSignTransaction()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+        TransactionReceipt scheduleSignTxReceipt = new ScheduleSignTransaction()
+            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
             .setScheduleId(scheduleId)
             .freezeWith(client)
-            .sign(key3)
+            .sign(privateKey3)
             .execute(client)
             .getReceipt(client);
 
         System.out.println("A transaction that appends signature to a schedule transaction (private key #3) " +
-            "was complete with status: " + txScheduleSign1Receipt.status);
+            "was complete with status: " + scheduleSignTxReceipt.status);
 
         /*
          * Step 7:
          * Query the schedule info again.
          */
-        ScheduleInfo scheduleInfo = new ScheduleInfoQuery()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
+        ScheduleInfo scheduleInfo_AfterAllSigned = new ScheduleInfoQuery()
+            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
             .setScheduleId(scheduleId)
             .execute(client);
 
-        System.out.println("Schedule info: " + scheduleInfo);
+        System.out.println("Schedule info: " + scheduleInfo_AfterAllSigned);
 
         /*
          * Clean up:
@@ -217,9 +219,9 @@ class ScheduleMultiSigTransactionExample {
             .setAccountId(accountId)
             .setTransferAccountId(OPERATOR_ID)
             .freezeWith(client)
-            .sign(key1)
-            .sign(key2)
-            .sign(key3)
+            .sign(privateKey1)
+            .sign(privateKey2)
+            .sign(privateKey3)
             .execute(client);
 
         client.close();
