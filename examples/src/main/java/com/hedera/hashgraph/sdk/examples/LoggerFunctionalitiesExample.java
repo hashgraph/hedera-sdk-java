@@ -112,7 +112,7 @@ public class LoggerFunctionalitiesExample {
         System.out.println("Creating new topic...(with attached info logger).");
         TopicId hederaTopicId = new TopicCreateTransaction()
             .setLogger(infoLogger)
-            .setTopicMemo("topic memo")
+            .setTopicMemo("Hedera topic")
             .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
@@ -133,7 +133,7 @@ public class LoggerFunctionalitiesExample {
         System.out.println("Creating new topic...(with attached info logger).");
         var logisticsTopicId = new TopicCreateTransaction()
             .setLogger(infoLogger)
-            .setTopicMemo("topic memo")
+            .setTopicMemo("Logistics topic")
             .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
@@ -155,7 +155,7 @@ public class LoggerFunctionalitiesExample {
         System.out.println("Creating new topic...(with attached debug logger).");
         var supplyChainTopicId = new TopicCreateTransaction()
             .setLogger(debugLogger)
-            .setTopicMemo("topic memo")
+            .setTopicMemo("Supply chain topic")
             .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)
@@ -176,7 +176,7 @@ public class LoggerFunctionalitiesExample {
         System.out.println("Creating new topic...(with attached debug logger).");
         var chatTopicId = new TopicCreateTransaction()
             .setLogger(debugLogger)
-            .setTopicMemo("topicMemo")
+            .setTopicMemo("Chat topic")
             .setAdminKey(operatorPublicKey)
             .execute(client)
             .getReceipt(client)

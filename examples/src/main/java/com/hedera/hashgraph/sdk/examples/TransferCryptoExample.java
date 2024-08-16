@@ -105,7 +105,7 @@ class TransferCryptoExample {
             // both sides is equivalent.
             .addHbarTransfer(OPERATOR_ID, transferAmount.negated())
             .addHbarTransfer(recipientId, transferAmount)
-            .setTransactionMemo("transfer test")
+            .setTransactionMemo("Transfer example")
             .execute(client);
 
         System.out.println("Transaction info: " + transferTxResponse);

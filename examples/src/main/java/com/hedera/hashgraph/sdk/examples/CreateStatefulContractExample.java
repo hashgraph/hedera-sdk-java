@@ -139,7 +139,7 @@ class CreateStatefulContractExample {
             .setContractId(newContractId)
             .setGas(100_000)
             .setFunction("set_message", new ContractFunctionParameters()
-                .addString("hello from hedera again!"))
+                .addString("Hello from hedera again!"))
             .execute(client);
 
         // If this doesn't throw then we know the contract executed successfully.

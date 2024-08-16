@@ -126,7 +126,7 @@ class TransactionSerializationExample {
         System.out.println("Completing and executing the transfer transaction...");
         var transferTxResponse = transferTxDeserialized
             .addHbarTransfer(recipientId, transferAmount)
-            .setTransactionMemo("transfer test")
+            .setTransactionMemo("HIP-745 example")
             .execute(client);
 
         System.out.println("Transaction info: " + transferTxResponse);

@@ -140,8 +140,8 @@ class ZeroTokenOperationsExample {
          */
         System.out.println("Creating a Fungible Token...");
         TokenCreateTransaction tokenCreateTx = new TokenCreateTransaction()
-            .setTokenName("Black Sea LimeChain Token")
-            .setTokenSymbol("BSL")
+            .setTokenName("Zero Token Ops Fungible Token")
+            .setTokenSymbol("ZTOFT")
             .setTreasuryAccountId(OPERATOR_ID)
             // Total supply = 10000 / 10 ^ 2.
             .setInitialSupply(10_000)

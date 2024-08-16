@@ -157,7 +157,7 @@ class TopicWithAdminKeyExample {
         System.out.println("Creating topic update transaction...");
         Transaction<?> topicUpdateTx = new TopicUpdateTransaction()
             .setTopicId(hederaTopicId)
-            .setTopicMemo("updated demo topic")
+            .setTopicMemo("This topic will be updated")
             .setAdminKey(newThresholdKey)
             .freezeWith(client);
 

@@ -110,7 +110,7 @@ class ContractNoncesExample {
             .setAdminKey(operatorPublicKey)
             .setGas(100_000)
             .setBytecodeFileId(bytecodeFileId)
-            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
+            .setContractMemo("HIP-729 Contract")
             .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);

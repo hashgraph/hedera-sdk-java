@@ -97,8 +97,8 @@ class UpdateNftsMetadataExample {
         byte[] initialMetadata = new byte[]{1};
         System.out.println("Creating mutable NFT with the metadata key field set...");
         var mutableNftCreateTx = new TokenCreateTransaction()
-            .setTokenName("Mutable")
-            .setTokenSymbol("MUT")
+            .setTokenName("HIP-657 Mutable NFT")
+            .setTokenSymbol("HIP657MNFT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAdminKey(operatorKeyPublic)
@@ -205,8 +205,8 @@ class UpdateNftsMetadataExample {
         System.out.println("The beginning of the second example (immutable token's metadata).");
         System.out.println("Creating immutable NFT with the metadata key field set...");
         var immutableNftCreateTx = new TokenCreateTransaction()
-            .setTokenName("Immutable")
-            .setTokenSymbol("IMUT")
+            .setTokenName("HIP-657 Immutable NFT")
+            .setTokenSymbol("HIP657IMMNFT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyKey(operatorKeyPublic)

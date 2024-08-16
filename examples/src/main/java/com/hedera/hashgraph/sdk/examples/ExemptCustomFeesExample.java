@@ -145,8 +145,8 @@ class ExemptCustomFeesExample {
 
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
         TokenId fungibleTokenId = new TokenCreateTransaction()
-            .setTokenName("HIP-573 Token")
-            .setTokenSymbol("H573")
+            .setTokenName("HIP-573 Fungible Token")
+            .setTokenSymbol("HIP573FT")
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
             .setAutoRenewAccountId(OPERATOR_ID)

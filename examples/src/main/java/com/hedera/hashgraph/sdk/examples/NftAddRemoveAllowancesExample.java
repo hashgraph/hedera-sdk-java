@@ -96,8 +96,8 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Creating NFT using the Hedera Token Service...");
         TransactionReceipt nftCreateTxReceipt = new TokenCreateTransaction()
-            .setTokenName("NFT Token")
-            .setTokenSymbol("NFTT")
+            .setTokenName("HIP-336 NFT1")
+            .setTokenSymbol("HIP336NFT1")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
@@ -261,8 +261,8 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Creating NFT using the Hedera Token Service...");
         TransactionReceipt nftCreateReceipt2 = new TokenCreateTransaction()
-            .setTokenName("NFT Token")
-            .setTokenSymbol("NFTT")
+            .setTokenName("HIP336NFT2")
+            .setTokenSymbol("HIP336NFT2")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)

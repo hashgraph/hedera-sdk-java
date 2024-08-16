@@ -123,8 +123,8 @@ class TransferTokensExample {
         System.out.println("Creating Fungible Token...");
         TransactionResponse tokenCreateTxResponse = new TokenCreateTransaction()
             .setNodeAccountIds(Collections.singletonList(bobAccountCreateTxResponse.nodeId))
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
+            .setTokenName("Example Fungible Token for Transfer demo")
+            .setTokenSymbol("EFT")
             .setDecimals(3)
             .setInitialSupply(1_000_000)
             .setTreasuryAccountId(OPERATOR_ID)

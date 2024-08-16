@@ -106,7 +106,7 @@ class ConsensusPubSubWithSubmitKeyExample {
          */
         System.out.println("Creating new HCS topic...");
         TransactionResponse topicCreateTxResponse = new TopicCreateTransaction()
-            .setTopicMemo("HCS topic with submit key")
+            .setTopicMemo("HCS topic with Submit Key")
             .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client);

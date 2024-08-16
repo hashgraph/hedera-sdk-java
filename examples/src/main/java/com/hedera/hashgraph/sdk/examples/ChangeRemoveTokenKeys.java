@@ -107,8 +107,8 @@ class ChangeRemoveTokenKeys {
         System.out.println("Creating NFT using the Hedera Token Service...");
         var nftTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-                .setTokenName("Example NFT")
-                .setTokenSymbol("ENFT")
+                .setTokenName("HIP-540 NFT")
+                .setTokenSymbol("HIP540NFT")
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(OPERATOR_ID)
                 .setAdminKey(adminPublicKey)

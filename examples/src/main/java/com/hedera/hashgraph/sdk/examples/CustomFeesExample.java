@@ -157,8 +157,8 @@ class CustomFeesExample {
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
 
         TokenId fungibleTokenId = new TokenCreateTransaction()
-            .setTokenName("Example Fungible Token")
-            .setTokenSymbol("EFT")
+            .setTokenName("Custom Fees Example Fungible Token")
+            .setTokenSymbol("CFEFT")
             .setAdminKey(alicePublicKey)
             .setSupplyKey(alicePublicKey)
             .setFeeScheduleKey(alicePublicKey)

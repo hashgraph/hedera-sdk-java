@@ -106,8 +106,8 @@ public class TokenMetadataExample {
         System.out.println("Creating mutable Fungible Token using the Hedera Token Service...");
         var mutableFungibleTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
+                .setTokenName("HIP-646 Mutable FT")
+                .setTokenSymbol("HIP646MFT")
                 .setTokenMetadata(initialTokenMetadata)
                 // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
                 .setTokenType(TokenType.FUNGIBLE_COMMON)
@@ -181,8 +181,8 @@ public class TokenMetadataExample {
         System.out.println("Creating immutable Fungible Token using the Hedera Token Service...");
         var immutableFungibleTokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
+                .setTokenName("HIP-646 Immutable FT")
+                .setTokenSymbol("HIP646IMMFT")
                 .setTokenMetadata(initialTokenMetadata)
                 // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
                 .setTokenType(TokenType.FUNGIBLE_COMMON)

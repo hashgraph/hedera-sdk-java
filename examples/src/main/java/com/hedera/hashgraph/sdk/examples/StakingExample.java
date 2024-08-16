@@ -110,7 +110,7 @@ class StakingExample {
         // stake the accounts Hbar i.e. the fee payer key and key to authorize
         // changes to the account should be different.
         System.out.println("Key required to update staking information: " + publicKey);
-        System.out.println("Fee payer / operator key: " + client.getOperatorPublicKey());
+        System.out.println("Fee payer or operator key: " + client.getOperatorPublicKey());
 
         /*
          * Step 3:

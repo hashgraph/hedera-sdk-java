@@ -123,6 +123,8 @@ class AccountCreateWithHtsExample {
         TokenCreateTransaction nftCreateTx = new TokenCreateTransaction()
             .setTokenName("HIP-542 Example Collection")
             .setTokenSymbol("HIP-542")
+            .setTokenName("HIP-542 NFT")
+            .setTokenSymbol("HIP542NFT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
@@ -247,8 +249,8 @@ class AccountCreateWithHtsExample {
         System.out.println("Creating Fungible Token using the Hedera Token Service...");
 
         TokenCreateTransaction ftCreateTx = new TokenCreateTransaction()
-            .setTokenName("HIP-542 Token")
-            .setTokenSymbol("H542")
+            .setTokenName("HIP-542 Fungible Token")
+            .setTokenSymbol("HIP542FT")
             .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
             .setDecimals(2)
             .setTokenType(TokenType.FUNGIBLE_COMMON)

@@ -120,9 +120,8 @@ class TokenRejectExample {
         // Create a Fungible Token.
         final int FUNGIBLE_TOKEN_SUPPLY = 1_000_000;
         TokenId fungibleTokenId = new TokenCreateTransaction()
-            .setTokenName("Example Fungible Token")
-            .setTokenSymbol("EFT")
-            .setTokenMemo("I was created for demo")
+            .setTokenName("HIP-904 FT")
+            .setTokenSymbol("HIP904FT")
             .setDecimals(0)
             .setInitialSupply(FUNGIBLE_TOKEN_SUPPLY)
             .setMaxSupply(FUNGIBLE_TOKEN_SUPPLY)
@@ -137,8 +136,8 @@ class TokenRejectExample {
 
         // Create NFT.
         TokenId nftId = new TokenCreateTransaction()
-            .setTokenName("Example NFT")
-            .setTokenSymbol("ENFT")
+            .setTokenName("HIP-904 NFT")
+            .setTokenSymbol("HIP904NFT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setTreasuryAccountId(treasuryAccountId)
             .setSupplyType(TokenSupplyType.FINITE)
