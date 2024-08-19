@@ -32,7 +32,7 @@ dependencies.constraints {
     api("com.google.errorprone:error_prone_annotations:2.21.1") {
         because("com.google.errorprone.annotations")
     }
-    api("com.google.code.gson:gson:2.10.1") {
+    api("com.google.code.gson:gson:2.11.0") {
         because("com.google.gson")
     }
     api("com.google.protobuf:protobuf-java:3.25.3") {
