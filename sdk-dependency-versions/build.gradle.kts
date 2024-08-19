@@ -52,7 +52,7 @@ dependencies.constraints {
     api("io.grpc:grpc-protobuf:1.64.0") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-protobuf-lite:1.64.0") {
+    api("io.grpc:grpc-protobuf-lite:1.66.0") {
         because("io.grpc.protobuf")
     }
     api("io.grpc:grpc-stub:1.64.0") {
