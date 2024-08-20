@@ -67,7 +67,7 @@ dependencies.constraints {
     api("org.bouncycastle:bcprov-jdk18on:1.78.1") {
         because("org.bouncycastle.provider")
     }
-    api("org.slf4j:slf4j-api:2.0.9") {
+    api("org.slf4j:slf4j-api:2.0.16") {
         because("org.slf4j")
     }
     api("org.slf4j:slf4j-simple:2.0.16") {
