@@ -93,8 +93,7 @@ class MultiAppTransferExample {
          */
         System.out.println("Creating exchange and receiver accounts...");
         // The exchange creates an account for the user to transfer funds to.
-        AccountId exchangeAccountId = Objects.requireNonNull(
-            new AccountCreateTransaction()
+        AccountId exchangeAccountId = new AccountCreateTransaction()
             // The exchange only accepts transfers that it validates through a side channel (e.g. REST API).
             .setReceiverSignatureRequired(true)
             .setKey(exchangePublicKey)
@@ -103,18 +102,17 @@ class MultiAppTransferExample {
             .sign(exchangePrivateKey)
             .execute(client)
             .getReceipt(client)
-            .accountId
-        );
+            .accountId;
+        Objects.requireNonNull(exchangeAccountId);
 
         // For the purpose of this example we create an account for the user with a balance of 5 Hbar.
-        AccountId userAccountId = Objects.requireNonNull(
-            new AccountCreateTransaction()
+        AccountId userAccountId = new AccountCreateTransaction()
             .setInitialBalance(Hbar.from(2))
             .setKey(userPublicKey)
             .execute(client)
             .getReceipt(client)
-            .accountId
-        );
+            .accountId;
+        Objects.requireNonNull(userAccountId);
 
         // TODO: display balances before transfer
 

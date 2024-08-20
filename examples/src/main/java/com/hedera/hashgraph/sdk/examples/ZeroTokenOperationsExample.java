@@ -97,6 +97,7 @@ class ZeroTokenOperationsExample {
         accountCreateTx = accountCreateTx.signWithOperator(client);
         TransactionResponse accountCreateTxResponse = accountCreateTx.execute(client);
         AccountId aliceAccountId = accountCreateTxResponse.getReceipt(client).accountId;
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*
@@ -153,6 +154,7 @@ class ZeroTokenOperationsExample {
         TransactionResponse tokenCreateTxResponse = tokenCreateTx.execute(client);
 
         TokenId fungibleTokenId = tokenCreateTxResponse.getReceipt(client).tokenId;
+        Objects.requireNonNull(fungibleTokenId);
         System.out.println("Created Fungible Token with ID: " + fungibleTokenId);
 
         // Associate Token with Account.

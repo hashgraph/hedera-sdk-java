@@ -106,6 +106,7 @@ class SolidityPrecompileExample {
             .getReceipt(client)
             .accountId
         );
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*

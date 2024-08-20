@@ -94,6 +94,7 @@ class CreateSimpleContractExample {
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
+        Objects.requireNonNull(newFileId);
         System.out.println("Created new bytecode file with ID: " + newFileId);
 
         /*
@@ -111,6 +112,7 @@ class CreateSimpleContractExample {
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractCreateTxReceipt.contractId);
+        Objects.requireNonNull(newContractId);
         System.out.println("Created new contract with ID: " + newContractId);
 
         /*

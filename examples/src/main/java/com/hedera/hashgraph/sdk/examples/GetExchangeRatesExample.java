@@ -84,6 +84,7 @@ class GetExchangeRatesExample {
         ByteString fileContentsByteString = new FileContentsQuery()
             .setFileId(FileId.fromString("0.0.112"))
             .execute(client);
+        Objects.requireNonNull(fileContentsByteString);
 
         /*
          * Step 2:

@@ -110,6 +110,7 @@ class UpdateNftsMetadataExample {
         var mutableNftCreateTxReceipt = mutableNftCreateTxResponse.getReceipt(client);
         // Get the token ID of the token that was created.
         var mutableNftId = mutableNftCreateTxReceipt.tokenId;
+        Objects.requireNonNull(mutableNftId);
         System.out.println("Created mutable NFT with token ID: " + mutableNftId);
 
         /*
@@ -161,6 +162,7 @@ class UpdateNftsMetadataExample {
             .execute(client);
 
         var aliceAccountId = aliceAccountCreateTx.getReceipt(client).accountId;
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         /*
@@ -217,6 +219,7 @@ class UpdateNftsMetadataExample {
         var immutableNftCreateTxReceipt = immutableNftCreateTxResponse.getReceipt(client);
         // Get the token ID of the token that was created.
         var immutableNftId = immutableNftCreateTxReceipt.tokenId;
+        Objects.requireNonNull(immutableNftId);
         System.out.println("Created immutable NFT with token ID: " + immutableNftId);
 
         /*
@@ -267,6 +270,7 @@ class UpdateNftsMetadataExample {
             .execute(client);
 
         var bobAccountId = bobAccountCreateTx.getReceipt(client).accountId;
+        Objects.requireNonNull(bobAccountId);
         System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*

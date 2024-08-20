@@ -116,6 +116,7 @@ class ScheduledTransactionMultiSigThresholdExample {
         // This will wait for the receipt to become available.
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
         AccountId multiSigAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
+        Objects.requireNonNull(multiSigAccountId);
         System.out.println("Created new account with ID: " + multiSigAccountId);
 
         /*

@@ -101,7 +101,6 @@ class StakingWithUpdateExample {
             .getReceipt(client)
             .accountId;
         Objects.requireNonNull(newAccountId);
-
         System.out.println("Created new account with ID: " + newAccountId);
 
         // Show the required key used to sign the account update transaction to

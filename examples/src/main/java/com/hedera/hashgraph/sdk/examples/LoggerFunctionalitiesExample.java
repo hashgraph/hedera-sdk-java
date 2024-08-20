@@ -117,6 +117,7 @@ public class LoggerFunctionalitiesExample {
             .execute(client)
             .getReceipt(client)
             .topicId;
+        Objects.requireNonNull(hederaTopicId);
 
         /*
          * Step 6:
@@ -138,6 +139,7 @@ public class LoggerFunctionalitiesExample {
             .execute(client)
             .getReceipt(client)
             .topicId;
+        Objects.requireNonNull(logisticsTopicId);
 
         /*
          * Step 8:
@@ -160,6 +162,7 @@ public class LoggerFunctionalitiesExample {
             .execute(client)
             .getReceipt(client)
             .topicId;
+        Objects.requireNonNull(supplyChainTopicId);
 
         /*
          * Step 10:
@@ -181,6 +184,7 @@ public class LoggerFunctionalitiesExample {
             .execute(client)
             .getReceipt(client)
             .topicId;
+        Objects.requireNonNull(chatTopicId);
 
         /*
          * Clean up:

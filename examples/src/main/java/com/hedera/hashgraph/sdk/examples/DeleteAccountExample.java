@@ -100,6 +100,7 @@ class DeleteAccountExample {
         // This will wait for the receipt to become available.
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
         AccountId newAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created new account with ID: " + newAccountId);
 
         /*

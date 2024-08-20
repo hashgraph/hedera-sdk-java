@@ -113,6 +113,7 @@ class MultiSigOfflineExample {
 
         TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);
         var newAccountId = createAccountTxReceipt.accountId;
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created new account with ID: " + newAccountId);
 
         /*

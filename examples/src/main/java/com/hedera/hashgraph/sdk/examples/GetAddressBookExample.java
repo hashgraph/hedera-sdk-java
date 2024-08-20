@@ -29,6 +29,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.util.Objects;
 
 /**
  * How to get the network address book and then inspect node public keys, etc.
@@ -77,6 +78,7 @@ class GetAddressBookExample {
             .setFileId(FileId.ADDRESS_BOOK)
             .execute(client);
 
+        Objects.requireNonNull(addressBook);
         System.out.println("Address book for " + HEDERA_NETWORK + ": " + addressBook);
 
         /*

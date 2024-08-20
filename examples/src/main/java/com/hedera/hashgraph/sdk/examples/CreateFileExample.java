@@ -93,9 +93,10 @@ class CreateFileExample {
             // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
-
+        
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
+        Objects.requireNonNull(newFileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*

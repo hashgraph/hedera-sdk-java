@@ -104,24 +104,22 @@ public class TokenMetadataExample {
         byte[] initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
 
         System.out.println("Creating mutable Fungible Token using the Hedera Token Service...");
-        var mutableFungibleTokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("HIP-646 Mutable FT")
-                .setTokenSymbol("HIP646MFT")
-                .setTokenMetadata(initialTokenMetadata)
-                // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
-                .setTokenType(TokenType.FUNGIBLE_COMMON)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setDecimals(3)
-                .setInitialSupply(1_000_000)
-                .setAdminKey(adminPublicKey)
-                .freezeWith(client)
-                .sign(adminPrivateKey)
-                .execute(client)
-                .getReceipt(client)
-                .tokenId
-        );
-
+        var mutableFungibleTokenId = new TokenCreateTransaction()
+            .setTokenName("HIP-646 Mutable FT")
+            .setTokenSymbol("HIP646MFT")
+            .setTokenMetadata(initialTokenMetadata)
+            // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
+            .setTokenType(TokenType.FUNGIBLE_COMMON)
+            .setTreasuryAccountId(OPERATOR_ID)
+            .setDecimals(3)
+            .setInitialSupply(1_000_000)
+            .setAdminKey(adminPublicKey)
+            .freezeWith(client)
+            .sign(adminPrivateKey)
+            .execute(client)
+            .getReceipt(client)
+            .tokenId;
+        Objects.requireNonNull(mutableFungibleTokenId);
         System.out.println("Created mutable Fungible Token with ID: " + mutableFungibleTokenId);
 
         /*
@@ -179,22 +177,20 @@ public class TokenMetadataExample {
         System.out.println("The beginning of the second example (immutable token's metadata).");
 
         System.out.println("Creating immutable Fungible Token using the Hedera Token Service...");
-        var immutableFungibleTokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("HIP-646 Immutable FT")
-                .setTokenSymbol("HIP646IMMFT")
-                .setTokenMetadata(initialTokenMetadata)
-                // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
-                .setTokenType(TokenType.FUNGIBLE_COMMON)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setMetadataKey(metadataPublicKey)
-                .setDecimals(3)
-                .setInitialSupply(1_000_000)
-                .execute(client)
-                .getReceipt(client)
-                .tokenId
-        );
-
+        var immutableFungibleTokenId = new TokenCreateTransaction()
+            .setTokenName("HIP-646 Immutable FT")
+            .setTokenSymbol("HIP646IMMFT")
+            .setTokenMetadata(initialTokenMetadata)
+            // The same flow can be executed with a TokenType.NON_FUNGIBLE_UNIQUE (i.e. HIP-765).
+            .setTokenType(TokenType.FUNGIBLE_COMMON)
+            .setTreasuryAccountId(OPERATOR_ID)
+            .setMetadataKey(metadataPublicKey)
+            .setDecimals(3)
+            .setInitialSupply(1_000_000)
+            .execute(client)
+            .getReceipt(client)
+            .tokenId;
+        Objects.requireNonNull(immutableFungibleTokenId);
         System.out.println("Created an immutable Fungible Token with ID: " + immutableFungibleTokenId);
 
         /*

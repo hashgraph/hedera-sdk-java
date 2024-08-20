@@ -88,7 +88,9 @@ class CreateTopicExample {
             .execute(client);
 
         TransactionReceipt topicCreateTxReceipt = topicCreateTxResponse.getReceipt(client);
-        System.out.println("Created new topic with ID: " + topicCreateTxReceipt.topicId);
+        TopicId topicId = topicCreateTxReceipt.topicId;
+        Objects.requireNonNull(topicId);
+        System.out.println("Created new topic with ID: " + topicId);
 
         /*
          * Step 2:

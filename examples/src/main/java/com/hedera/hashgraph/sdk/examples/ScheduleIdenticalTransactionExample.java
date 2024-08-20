@@ -146,6 +146,7 @@ class ScheduleIdenticalTransactionExample {
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
 
         AccountId thresholdAccount = accountCreateTxReceipt.accountId;
+        Objects.requireNonNull(thresholdAccount);
         System.out.println("Created new account with ID: " + thresholdAccount);
 
         System.out.println("\n---\n");

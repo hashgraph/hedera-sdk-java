@@ -99,6 +99,7 @@ class GetFileContentsExample {
             .execute(client);
 
         FileId newFileId = Objects.requireNonNull(fileCreateTxResponse.getReceipt(client).fileId);
+        Objects.requireNonNull(newFileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*
@@ -109,6 +110,7 @@ class GetFileContentsExample {
             .setFileId(newFileId)
             .execute(client);
 
+        Objects.requireNonNull(contents);
         // Prints query results to console.
         System.out.println("File contents: " + contents.toStringUtf8());
 

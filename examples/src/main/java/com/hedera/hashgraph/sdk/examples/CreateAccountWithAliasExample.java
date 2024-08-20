@@ -121,7 +121,7 @@ class CreateAccountWithAliasExample {
             .setTransactionId(accountCreateTxResponse.transactionId)
             .execute(client)
             .accountId;
-
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created account with ID: " + newAccountId);
 
          /*

@@ -108,6 +108,7 @@ class SignTransactionExample {
 
         TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);
         var accountId = createAccountTxReceipt.accountId;
+        Objects.requireNonNull(accountId);
         System.out.println("Created new account with ID: " + accountId);
 
         /*

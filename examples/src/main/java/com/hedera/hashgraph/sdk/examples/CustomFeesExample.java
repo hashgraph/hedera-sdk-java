@@ -98,6 +98,7 @@ class CustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(aliceAccountId);
 
         PrivateKey bobPrivateKey = PrivateKey.generateED25519();
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
@@ -109,6 +110,7 @@ class CustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(bobAccountId);
 
         PrivateKey charliePrivateKey = PrivateKey.generateED25519();
         PublicKey charliePublicKey = charliePrivateKey.getPublicKey();
@@ -120,6 +122,7 @@ class CustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(charlieAccountId);
 
         System.out.println("Alice's account ID: " + aliceAccountId);
         System.out.println("Bob's account ID: " + bobAccountId);
@@ -171,6 +174,8 @@ class CustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .tokenId;
+
+        Objects.requireNonNull(fungibleTokenId);
 
         TokenInfo fungibleTokenInfo = new TokenInfoQuery()
             .setTokenId(fungibleTokenId)

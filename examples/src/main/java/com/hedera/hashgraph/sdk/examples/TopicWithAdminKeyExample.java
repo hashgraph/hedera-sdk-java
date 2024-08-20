@@ -127,6 +127,7 @@ class TopicWithAdminKeyExample {
          */
         TransactionResponse topicCreateTxResponse = topicCreateTx.execute(client);
         TopicId hederaTopicId = topicCreateTxResponse.getReceipt(client).topicId;
+        Objects.requireNonNull(hederaTopicId);
         System.out.println("Created new topic (" + hederaTopicId + ") with 2-of-3 threshold key as admin key.");
 
         /*

@@ -98,6 +98,7 @@ class UpdateAccountPublicKeyExample {
             .execute(client);
 
         AccountId accountId = Objects.requireNonNull(accountCreateTxResponse.getReceipt(client).accountId);
+        Objects.requireNonNull(accountId);
         System.out.println("Created new account with ID: " + accountId + " and public key: " + publicKey1);
 
         /*

@@ -117,7 +117,7 @@ class CreateAccountWithAliasAndReceiverSignatureRequiredExample {
          */
         accountCreateTx.sign(adminPrivateKey).sign(privateKey);
         AccountId newAccountId = accountCreateTx.execute(client).getReceipt(client).accountId;
-
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created account with ID: " + newAccountId);
 
          /*

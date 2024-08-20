@@ -167,6 +167,8 @@ class AccountAliasExample {
             .setAccountId(aliasAccountId)
             .execute(client);
 
+        Objects.requireNonNull(newAccountInfo.accountId);
+
         System.out.println("Info about the new account: " + newAccountInfo);
         System.out.println("The normal account ID: " + newAccountInfo.accountId);
         System.out.println("The alias key: " + newAccountInfo.aliasKey);

@@ -98,6 +98,7 @@ class CreateAccountExample {
         // This will wait for the receipt to become available.
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
         AccountId newAccountId = accountCreateTxReceipt.accountId;
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created account with ID: " + newAccountId);
 
         /*

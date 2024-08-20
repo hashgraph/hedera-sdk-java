@@ -102,15 +102,14 @@ class ConsensusPubSubChunkedExample {
          */
         System.out.println("Creating new topic...");
 
-        TopicId hederaTopicID = Objects.requireNonNull(
-            new TopicCreateTransaction()
+        TopicId hederaTopicID = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
             .setAdminKey(operatorPublicKey)
             .setSubmitKey(submitPublicKey)
             .execute(client)
             .getReceipt(client)
-            .topicId
-        );
+            .topicId;
+        Objects.requireNonNull(hederaTopicID);
 
         System.out.println("Created new topic with ID: " + hederaTopicID);
 

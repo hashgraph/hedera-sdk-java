@@ -101,6 +101,7 @@ class TokenRejectExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(treasuryAccountId);
 
         // Create a receiver account with unlimited max auto associations (-1).
         var receiverAccountId = new AccountCreateTransaction()
@@ -111,6 +112,7 @@ class TokenRejectExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(receiverAccountId);
 
         /*
          * Step 3:
@@ -133,6 +135,7 @@ class TokenRejectExample {
             .execute(client)
             .getReceipt(client)
             .tokenId;
+        Objects.requireNonNull(fungibleTokenId);
 
         // Create NFT.
         TokenId nftId = new TokenCreateTransaction()
@@ -149,6 +152,7 @@ class TokenRejectExample {
             .execute(client)
             .getReceipt(client)
             .tokenId;
+        Objects.requireNonNull(nftId);
 
         /*
          * Step 4:
@@ -162,7 +166,6 @@ class TokenRejectExample {
             .sign(treasuryAccountPrivateKey)
             .execute(client)
             .getReceipt(client);
-
         var nftSerials = tokenMintTxReceipt.serials;
 
         /*

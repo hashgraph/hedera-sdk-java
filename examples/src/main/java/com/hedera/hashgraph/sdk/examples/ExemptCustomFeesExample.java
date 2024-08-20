@@ -95,6 +95,7 @@ class ExemptCustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(aliceAccountId);
 
         PrivateKey bobPrivateKey = PrivateKey.generateED25519();
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
@@ -106,6 +107,7 @@ class ExemptCustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(bobAccountId);
 
         PrivateKey charilePrivateKey = PrivateKey.generateED25519();
         PublicKey charilePublicKey = charilePrivateKey.getPublicKey();
@@ -117,6 +119,7 @@ class ExemptCustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(charlieAccountId);
 
         /*
          * Step 2:
@@ -163,7 +166,7 @@ class ExemptCustomFeesExample {
             .execute(client)
             .getReceipt(client)
             .tokenId;
-
+        Objects.requireNonNull(fungibleTokenId);
         System.out.println("Created new fungible token with ID: " + fungibleTokenId);
 
         /*

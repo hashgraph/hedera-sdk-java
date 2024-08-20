@@ -146,6 +146,7 @@ class AccountCreateWithHtsExample {
         // Get transaction receipt information.
         TransactionReceipt nftCreateTxReceipt = nftCreateTxResponse.getReceipt(client);
         TokenId nftTokenId = nftCreateTxReceipt.tokenId;
+        Objects.requireNonNull(nftTokenId);
 
         System.out.println("Created NFT with token ID: " + nftTokenId);
 
@@ -269,6 +270,7 @@ class AccountCreateWithHtsExample {
         // Get transaction receipt information.
         TransactionReceipt ftCreateReceipt = ftCreateResponse.getReceipt(client);
         TokenId fungibleTokenId = ftCreateReceipt.tokenId;
+        Objects.requireNonNull(fungibleTokenId);
 
         System.out.println("Created fungible token with ID: " + fungibleTokenId);
 

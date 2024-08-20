@@ -119,6 +119,7 @@ class TransferUsingEvmAddressExample {
             .execute(client);
 
         AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*
@@ -153,6 +154,7 @@ class TransferUsingEvmAddressExample {
         TransactionResponse accountCreateTxResponse = accountCreateTxSigned.execute(client);
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
         var bobAccountId = accountCreateTxReceipt.accountId;
+        Objects.requireNonNull(bobAccountId);
         System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*

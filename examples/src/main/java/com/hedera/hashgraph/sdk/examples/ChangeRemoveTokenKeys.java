@@ -105,21 +105,20 @@ class ChangeRemoveTokenKeys {
          * Create NFT and check its keys.
          */
         System.out.println("Creating NFT using the Hedera Token Service...");
-        var nftTokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-                .setTokenName("HIP-540 NFT")
-                .setTokenSymbol("HIP540NFT")
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(OPERATOR_ID)
-                .setAdminKey(adminPublicKey)
-                .setWipeKey(wipePublicKey)
-                .setSupplyKey(supplyPublicKey)
-                .freezeWith(client)
-                .sign(adminPrivateKey)
-                .execute(client)
-                .getReceipt(client)
-                .tokenId
-        );
+        var nftTokenId = new TokenCreateTransaction()
+            .setTokenName("HIP-540 NFT")
+            .setTokenSymbol("HIP540NFT")
+            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+            .setTreasuryAccountId(OPERATOR_ID)
+            .setAdminKey(adminPublicKey)
+            .setWipeKey(wipePublicKey)
+            .setSupplyKey(supplyPublicKey)
+            .freezeWith(client)
+            .sign(adminPrivateKey)
+            .execute(client)
+            .getReceipt(client)
+            .tokenId;
+        Objects.requireNonNull(nftTokenId);
 
         var nftInfoBefore = new TokenInfoQuery()
             .setTokenId(nftTokenId)

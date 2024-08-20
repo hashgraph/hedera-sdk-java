@@ -133,6 +133,7 @@ public class AutoCreateAccountTransferTransactionExample {
             .execute(client);
 
         AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*

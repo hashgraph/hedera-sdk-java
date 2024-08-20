@@ -98,7 +98,7 @@ public final class DeleteFileExample {
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
-
+        Objects.requireNonNull(newFileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*

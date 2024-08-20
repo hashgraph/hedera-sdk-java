@@ -96,7 +96,8 @@ class FileAppendChunkedExample {
             .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
+        FileId newFileId = fileCreateTxReceipt.fileId;
+        Objects.requireNonNull(newFileId);
         System.out.println("Created new file with ID: " + newFileId);
 
         /*

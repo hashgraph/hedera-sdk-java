@@ -112,6 +112,7 @@ class NftAddRemoveAllowancesExample {
             .getReceipt(client);
 
         TokenId nftTokenId = nftCreateTxReceipt.tokenId;
+        Objects.requireNonNull(nftTokenId);
         System.out.println("Created NFT with token ID: " + nftTokenId);
 
         /*
@@ -144,6 +145,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(spenderAccountId);
         System.out.println("Created spender account with ID: " + spenderAccountId);
 
         PrivateKey receiverPrivateKey = PrivateKey.generateECDSA();
@@ -154,6 +156,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(receiverAccountId);
         System.out.println("Created receiver account with ID: " + receiverAccountId);
 
         /*
@@ -277,6 +280,7 @@ class NftAddRemoveAllowancesExample {
             .getReceipt(client);
 
         TokenId nftTokenId2 = nftCreateReceipt2.tokenId;
+        Objects.requireNonNull(nftCreateReceipt2);
         System.out.println("Created NFT with token ID: " + nftTokenId2);
 
         /*
@@ -309,6 +313,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(delegatingSpenderAccountId);
         System.out.println("Created spender account with ID: " + delegatingSpenderAccountId);
 
         PrivateKey receiverPrivateKey2 = PrivateKey.generateECDSA();
@@ -319,6 +324,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(receiverAccountId2);
         System.out.println("Created receiver account with ID: " + receiverAccountId2);
 
         /*
@@ -372,6 +378,7 @@ class NftAddRemoveAllowancesExample {
             .execute(client)
             .getReceipt(client)
             .accountId;
+        Objects.requireNonNull(spenderAccountId2);
         System.out.println("Created delegate spender account with ID: : " + spenderAccountId2);
 
         /*

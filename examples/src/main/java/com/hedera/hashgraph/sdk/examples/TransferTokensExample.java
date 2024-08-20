@@ -103,6 +103,7 @@ class TransferTokensExample {
         // This will wait for the receipt to become available.
         TransactionReceipt aliceAccountCreateTxReceipt = aliceAccountCreateTxResponse.getReceipt(client);
         AccountId aliceAccountId = Objects.requireNonNull(aliceAccountCreateTxReceipt.accountId);
+        Objects.requireNonNull(aliceAccountId);
         System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
         TransactionResponse bobAccountCreateTxResponse = new AccountCreateTransaction()
@@ -114,6 +115,7 @@ class TransferTokensExample {
         // This will wait for the receipt to become available.
         TransactionReceipt bobAccountCreateTxReceipt = bobAccountCreateTxResponse.getReceipt(client);
         AccountId bobAccountId = Objects.requireNonNull(bobAccountCreateTxReceipt.accountId);
+        Objects.requireNonNull(bobAccountId);
         System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*
@@ -137,6 +139,7 @@ class TransferTokensExample {
             .execute(client);
 
         TokenId tokenId = Objects.requireNonNull(tokenCreateTxResponse.getReceipt(client).tokenId);
+        Objects.requireNonNull(tokenId);
         System.out.println("Created Fungible Token with ID: " + tokenId);
 
         /*

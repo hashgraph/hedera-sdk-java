@@ -118,6 +118,7 @@ class CreateAccountThresholdKeyExample {
 
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
         AccountId newAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
+        Objects.requireNonNull(newAccountId);
         System.out.println("Created account with ID: " + newAccountId);
 
         /*

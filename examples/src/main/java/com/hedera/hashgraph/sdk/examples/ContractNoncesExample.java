@@ -99,6 +99,7 @@ class ContractNoncesExample {
 
         TransactionReceipt bytecodeFileCreateTxReceipt = bytecodeFileCreateTxResponse.getReceipt(client);
         FileId bytecodeFileId = bytecodeFileCreateTxReceipt.fileId;
+        Objects.requireNonNull(bytecodeFileId);
 
         /*
          * Step 2:
@@ -112,8 +113,9 @@ class ContractNoncesExample {
             .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
-
         ContractId contractId = contractCreateTxReceipt.contractId;
+        Objects.requireNonNull(contractId);
+
         System.out.println("Created new contract with ID: " + contractId);
 
         /*
