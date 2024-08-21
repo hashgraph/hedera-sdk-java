@@ -81,7 +81,7 @@ dependencies.constraints {
     api("io.github.json-snapshot:json-snapshot:1.0.17") {
         because("json.snapshot")
     }
-    api("org.apache.commons:commons-lang3:3.14.0") {
+    api("org.apache.commons:commons-lang3:3.16.0") {
         because("org.apache.commons.lang3")
     }
     api("org.assertj:assertj-core:3.26.3") {
