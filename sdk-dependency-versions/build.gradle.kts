@@ -84,7 +84,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.14.0") {
         because("org.apache.commons.lang3")
     }
-    api("org.assertj:assertj-core:3.24.2") {
+    api("org.assertj:assertj-core:3.26.3") {
         because("org.assertj.core")
     }
 
