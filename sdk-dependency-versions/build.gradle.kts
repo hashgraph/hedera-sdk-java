@@ -70,7 +70,7 @@ dependencies.constraints {
     api("org.slf4j:slf4j-api:2.0.9") {
         because("org.slf4j")
     }
-    api("org.slf4j:slf4j-simple:2.0.9") {
+    api("org.slf4j:slf4j-simple:2.0.16") {
         because("org.slf4j.simple")
     }
 
@@ -89,7 +89,7 @@ dependencies.constraints {
     }
 
     // Examples
-    api("org.jetbrains.kotlin:kotlin-stdlib:1.9.22") {
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.10") {
         because("kotlin.stdlib")
     }
 }
