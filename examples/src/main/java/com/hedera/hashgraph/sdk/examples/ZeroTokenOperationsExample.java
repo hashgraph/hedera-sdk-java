@@ -66,9 +66,25 @@ public final class ZeroTokenOperationsExample {
             client
         );
 
+        // Update the signer to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(OPERATOR_ID)
+            .setKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+            .execute(client)
+            .getReceipt(client);
+
+        // Update the Alice account to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(aliceAccountId)
+            .setKey(KeyList.of(alicePublicKey, contractHelper.contractId).setThreshold(1))
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
         // Configure steps in ContractHelper
         contractHelper
-            .setPayableAmountForStep(0, Hbar.from(20))
+            .setPayableAmountForStep(0, Hbar.from(40))
             .addSignerForStep(1, alicePrivateKey);
 
         // step 0 creates a fungible token
@@ -77,7 +93,6 @@ public final class ZeroTokenOperationsExample {
         // step 3 mint the token by passing a zero value
         // step 4 burn the token by passing a zero value
         // step 5 wipe the token by passing a zero value
-
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 5, client);
 
         // step 6 use SDK and transfer passing a zero value
