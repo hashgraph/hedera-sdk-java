@@ -35,7 +35,7 @@ public class IPv4AddressPart implements Cloneable {
     /**
      * Constructor.
      */
-    IPv4AddressPart() {
+    public IPv4AddressPart() {
     }
 
     /**

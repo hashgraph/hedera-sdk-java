@@ -40,7 +40,7 @@ public class Endpoint implements Cloneable {
     /**
      * Constructor.
      */
-    Endpoint() {
+    public Endpoint() {
     }
 
     /**
@@ -140,12 +140,13 @@ public class Endpoint implements Cloneable {
         return builder.setPort(port).build();
     }
 
-    // TODO: revisit there is `domainName` added
     @Override
     public String toString() {
-        return Objects.requireNonNull(address) +
-            ":" +
-            port;
+        if (this.domainName != null && !this.domainName.isEmpty()) {
+            return domainName + ":" + port;
+        } else {
+            return Objects.requireNonNull(address) + ":" + port;
+        }
     }
 
     @Override
