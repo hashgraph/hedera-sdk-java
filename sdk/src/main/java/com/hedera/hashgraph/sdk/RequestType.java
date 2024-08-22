@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -417,7 +417,22 @@ public enum RequestType {
     /**
      * Transfer one or more token balances held by the requesting account to the treasury for each token type.
      */
-    TOKEN_REJECT(HederaFunctionality.TokenReject);
+    TOKEN_REJECT(HederaFunctionality.TokenReject),
+
+    /**
+     * Airdrop one or more tokens to one or more accounts.
+     */
+    TOKEN_AIRDROP(HederaFunctionality.TokenAirdrop),
+
+    /**
+     * Remove one or more pending airdrops from state on behalf of the sender(s) for each airdrop.
+     */
+    TOKEN_CANCEL_AIRDROP(HederaFunctionality.TokenCancelAirdrop),
+
+    /**
+     * Claim one or more pending airdrops
+     */
+    TOKEN_CLAIM_AIRDROP(HederaFunctionality.TokenClaimAirdrop);
 
     final HederaFunctionality code;
 
@@ -506,6 +521,9 @@ public enum RequestType {
             case NodeUpdate -> NODE_UPDATE;
             case NodeDelete -> NODE_DELETE;
             case TokenReject -> TOKEN_REJECT;
+            case TokenAirdrop -> TOKEN_AIRDROP;
+            case TokenCancelAirdrop -> TOKEN_CANCEL_AIRDROP;
+            case TokenClaimAirdrop -> TOKEN_CLAIM_AIRDROP;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -592,6 +610,9 @@ public enum RequestType {
             case NODE_UPDATE -> "NODE_UPDATE";
             case NODE_DELETE -> "NODE_DELETE";
             case TOKEN_REJECT -> "TOKEN_REJECT";
+            case TOKEN_AIRDROP -> "TOKEN_AIRDROP";
+            case TOKEN_CANCEL_AIRDROP -> "TOKEN_CANCEL_AIRDROP";
+            case TOKEN_CLAIM_AIRDROP -> "TOKEN_CLAIM_AIRDROP";
         };
     }
 }

@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -357,6 +357,7 @@ public abstract class Transaction<T extends Transaction<T>>
             case SCHEDULESIGN -> new ScheduleSignTransaction(txs);
             case TOKEN_PAUSE -> new TokenPauseTransaction(txs);
             case TOKEN_UNPAUSE -> new TokenUnpauseTransaction(txs);
+            case TOKENREJECT -> new TokenRejectTransaction(txs);
             case CRYPTOAPPROVEALLOWANCE -> new AccountAllowanceApproveTransaction(txs);
             case CRYPTODELETEALLOWANCE -> new AccountAllowanceDeleteTransaction(txs);
             default -> throw new IllegalArgumentException("parsed transaction body has no data");
@@ -440,6 +441,8 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKEN_PAUSE -> new TokenPauseTransaction(body.setTokenPause(scheduled.getTokenPause()).build());
             case TOKEN_UNPAUSE ->
                 new TokenUnpauseTransaction(body.setTokenUnpause(scheduled.getTokenUnpause()).build());
+            case TOKENREJECT ->
+                new TokenRejectTransaction(body.setTokenReject(scheduled.getTokenReject()).build());
             case SCHEDULEDELETE ->
                 new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
             default -> throw new IllegalStateException("schedulable transaction did not have a transaction set");

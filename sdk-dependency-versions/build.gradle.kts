@@ -1,5 +1,8 @@
-/*
- * Copyright (C) 2023 Hedera Hashgraph, LLC
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,6 +15,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
 plugins {
@@ -19,7 +23,7 @@ plugins {
 }
 
 dependencies.constraints {
-    api("com.esaulpaugh:headlong:10.0.0") {
+    api("com.esaulpaugh:headlong:12.1.0") {
         because("headlong")
     }
     api("com.github.spotbugs:spotbugs-annotations:4.7.3") {
@@ -31,10 +35,12 @@ dependencies.constraints {
     api("com.google.code.gson:gson:2.10.1") {
         because("com.google.gson")
     }
-    api("com.google.protobuf:protobuf-java:3.21.9") {
+    api("com.google.protobuf:protobuf-java:3.25.3") {
+        // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("com.google.protobuf:protobuf-javalite:3.21.9") {
+    api("com.google.protobuf:protobuf-javalite:3.25.3") {
+        // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
     api("io.grpc:grpc-api:1.64.0") {
@@ -55,16 +61,16 @@ dependencies.constraints {
     api("javax.annotation:javax.annotation-api:1.3.2") {
         because("java.annotation")
     }
-    api("org.bouncycastle:bcpkix-jdk18on:1.76") {
+    api("org.bouncycastle:bcpkix-jdk18on:1.78.1") {
         because("org.bouncycastle.pkix")
     }
-    api("org.bouncycastle:bcprov-jdk18on:1.76") {
+    api("org.bouncycastle:bcprov-jdk18on:1.78.1") {
         because("org.bouncycastle.provider")
     }
     api("org.slf4j:slf4j-api:2.0.9") {
         because("org.slf4j")
     }
-    api("org.slf4j:slf4j-simple:2.0.9") {
+    api("org.slf4j:slf4j-simple:2.0.16") {
         because("org.slf4j.simple")
     }
 
@@ -75,15 +81,15 @@ dependencies.constraints {
     api("io.github.json-snapshot:json-snapshot:1.0.17") {
         because("json.snapshot")
     }
-    api("org.apache.commons:commons-lang3:3.14.0") {
+    api("org.apache.commons:commons-lang3:3.16.0") {
         because("org.apache.commons.lang3")
     }
-    api("org.assertj:assertj-core:3.24.2") {
+    api("org.assertj:assertj-core:3.26.3") {
         because("org.assertj.core")
     }
 
     // Examples
-    api("org.jetbrains.kotlin:kotlin-stdlib:1.9.22") {
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.10") {
         because("kotlin.stdlib")
     }
 }

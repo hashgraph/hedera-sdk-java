@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2023 Hedera Hashgraph, LLC
+ * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -489,7 +489,7 @@ public final class ContractFunctionResult {
     }
 
     public Tuple getResult(String types) {
-        TupleType tupleType = TupleType.parse(types);
+        TupleType<Tuple> tupleType = TupleType.parse(types);
         return tupleType.decode(rawResult.toByteArray());
     }
 }

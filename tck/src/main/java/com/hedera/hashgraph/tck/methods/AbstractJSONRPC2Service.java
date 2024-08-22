@@ -1,9 +1,31 @@
+/*-
+ *
+ * Hedera Java SDK
+ *
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 package com.hedera.hashgraph.tck.methods;
 
 import static com.hedera.hashgraph.tck.methods.JSONRPC2Error.HEDERA_ERROR;
 
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2ParamsException;
+import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2RequestException;
 import com.hedera.hashgraph.tck.methods.JSONRPC2Error.ErrorData;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
@@ -15,6 +37,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import net.minidev.json.JSONObject;
 
 /**
  * Implements RequestHandler and overrides some of the Dispatcher logic,
@@ -74,10 +97,28 @@ public abstract class AbstractJSONRPC2Service implements RequestHandler {
         } catch (InvalidJSONRPC2ParamsException e) {
             return new JSONRPC2Response(JSONRPC2Error.INVALID_PARAMS, req.getID());
         } catch (InvocationTargetException e) {
-            // the target is HederaException
-            var hederaException = e.getTargetException();
-            var errorData = new ErrorData(hederaException.getMessage(), "");
-            var hederaError = HEDERA_ERROR.setData(errorData);
+            // target exception can be anything
+            // if its precheck, receipt - we handle it by setting error object
+            // and returning custom HEDERA_STATUS_CODE -32001
+            // if not - return server error or invalid request error codes
+            var targetException = e.getTargetException();
+
+            ErrorData errorData;
+
+            if (targetException instanceof PrecheckStatusException precheckStatusException) {
+                errorData = new ErrorData(precheckStatusException.status, precheckStatusException.getMessage());
+            } else if (targetException instanceof ReceiptStatusException receiptStatusException) {
+                errorData = new ErrorData(receiptStatusException.receipt.status, receiptStatusException.getMessage());
+            } else if (targetException instanceof InvalidJSONRPC2RequestException) {
+                return new JSONRPC2Response(JSONRPC2Error.INVALID_REQUEST, req.getID());
+            } else {
+                return new JSONRPC2Response(JSONRPC2Error.INTERNAL_ERROR, req.getID());
+            }
+            JSONObject errorJsonObject = new JSONObject();
+            errorJsonObject.put("status", errorData.status().toString());
+            errorJsonObject.put("message", errorData.message());
+
+            var hederaError = HEDERA_ERROR.setData(errorJsonObject);
             return new JSONRPC2Response(hederaError, req.getID());
         } catch (Exception e) {
             // other exceptions
