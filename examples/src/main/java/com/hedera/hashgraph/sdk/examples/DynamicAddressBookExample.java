@@ -16,7 +16,10 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 
-public class DabExample {
+/**
+ * hip-869
+ */
+public class DynamicAddressBookExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(
@@ -34,7 +37,6 @@ public class DabExample {
         // by this account and be signed by this key
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
 
-        // Replace with your Hedera account ID
         AccountId accountId = AccountId.fromString("0.0.1999");
         String description = "Hedera™ cryptocurrency";
         String newDescription = "Hedera™ cryptocurrency - updated";
