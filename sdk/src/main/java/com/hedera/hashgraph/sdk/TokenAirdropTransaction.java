@@ -1,38 +1,12 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
 package com.hedera.hashgraph.sdk;
 
-import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.UInt32Value;
-import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.NftTransfer;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenAirdropTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,52 +14,15 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A transaction that transfers hbars and tokens between Hedera accounts.
- * You can enter multiple transfers in a single transaction. The net value
- * of hbars between the sending accounts and receiving accounts must equal
- * zero.
- *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/cryptocurrency/transfer-cryptocurrency">Hedera Documentation</a>
- */
-public class TransferTransaction extends Transaction<TransferTransaction> {
+public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransaction> {
+
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
     private final ArrayList<TokenNftTransfer> nftTransfers = new ArrayList<>();
-    private final ArrayList<HbarTransfer> hbarTransfers = new ArrayList<>();
-
-    private static class HbarTransfer {
-        final AccountId accountId;
-        Hbar amount;
-        boolean isApproved;
-
-        HbarTransfer(AccountId accountId, Hbar amount, boolean isApproved) {
-            this.accountId = accountId;
-            this.amount = amount;
-            this.isApproved = isApproved;
-        }
-
-        AccountAmount toProtobuf() {
-            return AccountAmount.newBuilder()
-                .setAccountID(accountId.toProtobuf())
-                .setAmount(amount.toTinybars())
-                .setIsApproval(isApproved)
-                .build();
-        }
-
-        @Override
-        public String toString() {
-            return MoreObjects.toStringHelper(this)
-                .add("accountId", accountId)
-                .add("amount", amount)
-                .add("isApproved", isApproved)
-                .toString();
-        }
-    }
 
     /**
      * Constructor.
      */
-    public TransferTransaction() {
+    public TokenAirdropTransaction() {
         defaultMaxTransactionFee = new Hbar(1);
     }
 
@@ -96,7 +33,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    TokenAirdropTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -106,7 +43,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      *
      * @param txBody protobuf TransactionBody
      */
-    TransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
+    TokenAirdropTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
         initFromTransactionBody();
     }
@@ -144,16 +81,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    /**
-     * Add a token transfer to the transaction.
-     *
-     * @param tokenId                   the token id
-     * @param accountId                 the account id
-     * @param value                     the value
-     * @param isApproved                is it approved
-     * @return {@code this}
-     */
-    private TransferTransaction doAddTokenTransfer(TokenId tokenId, AccountId accountId, long value, boolean isApproved) {
+    private TokenAirdropTransaction doAddTokenTransfer(TokenId tokenId, AccountId accountId, long value, boolean isApproved) {
         requireNotFrozen();
 
         for (var transfer : tokenTransfers) {
@@ -175,7 +103,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param value                     the value
      * @return                          the updated transaction
      */
-    public TransferTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
+    public TokenAirdropTransaction addTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         return doAddTokenTransfer(tokenId, accountId, value, false);
     }
 
@@ -187,11 +115,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param value                     the value
      * @return                          the updated transaction
      */
-    public TransferTransaction addApprovedTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
+    public TokenAirdropTransaction addApprovedTokenTransfer(TokenId tokenId, AccountId accountId, long value) {
         return doAddTokenTransfer(tokenId, accountId, value, true);
     }
 
-    private TransferTransaction doAddTokenTransferWithDecimals(
+    private TokenAirdropTransaction doAddTokenTransferWithDecimals(
         TokenId tokenId,
         AccountId accountId,
         long value,
@@ -236,7 +164,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param decimals                  the deco
      * @return                          the updated transaction
      */
-    public TransferTransaction addTokenTransferWithDecimals(
+    public TokenAirdropTransaction addTokenTransferWithDecimals(
         TokenId tokenId,
         AccountId accountId,
         long value,
@@ -254,34 +182,13 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param decimals                  the deco
      * @return                          the updated transaction
      */
-    public TransferTransaction addApprovedTokenTransferWithDecimals(
+    public TokenAirdropTransaction addApprovedTokenTransferWithDecimals(
         TokenId tokenId,
         AccountId accountId,
         long value,
         int decimals
     ) {
         return doAddTokenTransferWithDecimals(tokenId, accountId, value, decimals, true);
-    }
-
-    /**
-     * @deprecated - Use {@link #addApprovedTokenTransfer(TokenId, AccountId, long)} instead
-     * @param tokenId       the token id
-     * @param accountId     the account id
-     * @param isApproved    whether the transfer is approved
-     * @return {@code this}
-     */
-    @Deprecated
-    public TransferTransaction setTokenTransferApproval(TokenId tokenId, AccountId accountId, boolean isApproved) {
-        requireNotFrozen();
-
-        for (var transfer : tokenTransfers) {
-            if (transfer.tokenId.equals(tokenId) && transfer.accountId.equals(accountId)) {
-                transfer.isApproved = isApproved;
-                return this;
-            }
-        }
-
-        return this;
     }
 
     /**
@@ -302,7 +209,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
         return transfers;
     }
 
-    private TransferTransaction doAddNftTransfer(NftId nftId, AccountId sender, AccountId receiver, boolean isApproved) {
+    private TokenAirdropTransaction doAddNftTransfer(NftId nftId, AccountId sender, AccountId receiver, boolean isApproved) {
         requireNotFrozen();
         nftTransfers.add(new TokenNftTransfer(nftId.tokenId, sender, receiver, nftId.serial, isApproved));
         return this;
@@ -316,7 +223,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param receiver                  the receiver account id
      * @return                          the updated transaction
      */
-    public TransferTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+    public TokenAirdropTransaction addNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         return doAddNftTransfer(nftId, sender, receiver, false);
     }
 
@@ -328,123 +235,19 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
      * @param receiver                  the receiver account id
      * @return                          the updated transaction
      */
-    public TransferTransaction addApprovedNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
+    public TokenAirdropTransaction addApprovedNftTransfer(NftId nftId, AccountId sender, AccountId receiver) {
         return doAddNftTransfer(nftId, sender, receiver, true);
-    }
-
-    /**
-     * @deprecated - Use {@link #addApprovedNftTransfer(NftId, AccountId, AccountId)} instead
-     * @param nftId         the NFT id
-     * @param isApproved    whether the transfer is approved
-     * @return {@code this}
-     */
-    @Deprecated
-    public TransferTransaction setNftTransferApproval(NftId nftId, boolean isApproved) {
-        requireNotFrozen();
-
-        for (var transfer : nftTransfers) {
-            if (transfer.tokenId.equals(nftId.tokenId) && transfer.serial == nftId.serial) {
-                transfer.isApproved = isApproved;
-                return this;
-            }
-        }
-
-        return this;
-    }
-
-    /**
-     * Extract the of hbar transfers.
-     *
-     * @return                          list of hbar transfers
-     */
-    public Map<AccountId, Hbar> getHbarTransfers() {
-        Map<AccountId, Hbar> transfers = new HashMap<>();
-
-        for (var transfer : hbarTransfers) {
-            transfers.put(transfer.accountId, transfer.amount);
-        }
-
-        return transfers;
-    }
-
-    private TransferTransaction doAddHbarTransfer(AccountId accountId, Hbar value, boolean isApproved) {
-        requireNotFrozen();
-
-        for (var transfer : hbarTransfers) {
-            if (transfer.accountId.equals(accountId) && transfer.isApproved == isApproved) {
-                transfer.amount = Hbar.fromTinybars(transfer.amount.toTinybars() + value.toTinybars());
-                return this;
-            }
-        }
-
-        hbarTransfers.add(new HbarTransfer(accountId, value, isApproved));
-        return this;
-    }
-
-    /**
-     * Add a non approved hbar transfer to an EVM address.
-     *
-     * @param evmAddress                the EVM address
-     * @param value                     the value
-     * @return                          the updated transaction
-     */
-    public TransferTransaction addHbarTransfer(EvmAddress evmAddress, Hbar value) {
-        AccountId accountId = AccountId.fromEvmAddress(evmAddress);
-        return doAddHbarTransfer(accountId, value, false);
-    }
-
-    /**
-     * Add a non approved hbar transfer.
-     *
-     * @param accountId                 the account id
-     * @param value                     the value
-     * @return                          the updated transaction
-     */
-    public TransferTransaction addHbarTransfer(AccountId accountId, Hbar value) {
-        return doAddHbarTransfer(accountId, value, false);
-    }
-
-    /**
-     * Add an approved hbar transfer.
-     *
-     * @param accountId                 the account id
-     * @param value                     the value
-     * @return                          the updated transaction
-     */
-    public TransferTransaction addApprovedHbarTransfer(AccountId accountId, Hbar value) {
-        return doAddHbarTransfer(accountId, value, true);
-    }
-
-    /**
-     * @deprecated - Use {@link #addApprovedHbarTransfer(AccountId, Hbar)} instead
-     * @param accountId     the account id
-     * @param isApproved    whether the transfer is approved
-     * @return {@code this}
-     */
-    @Deprecated
-    public TransferTransaction setHbarTransferApproval(AccountId accountId, boolean isApproved) {
-        requireNotFrozen();
-
-        for (var transfer : hbarTransfers) {
-            if (transfer.accountId.equals(accountId)) {
-                transfer.isApproved = isApproved;
-                return this;
-            }
-        }
-
-        return this;
     }
 
     /**
      * Build the transaction body.
      *
      * @return {@link
-     *         com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody}
+     *         com.hedera.hashgraph.sdk.proto.TokenAirdropTransactionBody}
      */
-    CryptoTransferTransactionBody.Builder build() {
-        var tokenTransfers = new ArrayList<TokenTransferList>();
+    TokenAirdropTransactionBody.Builder build() {
+        var tokenTransfers = new ArrayList<com.hedera.hashgraph.sdk.TokenTransferList>();
 
-        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
         this.tokenTransfers.sort(Comparator.comparing((TokenTransfer a) -> a.tokenId).thenComparing(a -> a.accountId).thenComparing(a -> a.isApproved));
         this.nftTransfers.sort(Comparator.comparing((TokenNftTransfer a) -> a.tokenId).thenComparing(a -> a.sender).thenComparing(a -> a.receiver).thenComparing(a -> a.serial));
 
@@ -472,11 +275,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                 var result = iTokenId.compareTo(jTokenId);
 
                 if (result == 0) {
-                    tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), this.nftTransfers.get(j++)));
+                    tokenTransfers.add(new com.hedera.hashgraph.sdk.TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), this.nftTransfers.get(j++)));
                 } else if (result < 0) {
-                    tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
+                    tokenTransfers.add(new com.hedera.hashgraph.sdk.TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
                 } else {
-                    tokenTransfers.add(new TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
+                    tokenTransfers.add(new com.hedera.hashgraph.sdk.TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
                 }
             } else if (i < this.tokenTransfers.size()) {
                 var iTokenId = this.tokenTransfers.get(i).tokenId;
@@ -488,7 +291,7 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                     continue;
                 }
 
-                tokenTransfers.add(new TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
+                tokenTransfers.add(new com.hedera.hashgraph.sdk.TokenTransferList(iTokenId, this.tokenTransfers.get(i).expectedDecimals, this.tokenTransfers.get(i++), null));
             } else {
                 var jTokenId = this.nftTransfers.get(j).tokenId;
                 var last = !tokenTransfers.isEmpty() ? tokenTransfers.get(tokenTransfers.size() - 1) : null;
@@ -499,17 +302,11 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
                     continue;
                 }
 
-                tokenTransfers.add(new TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
+                tokenTransfers.add(new com.hedera.hashgraph.sdk.TokenTransferList(jTokenId, null, null, this.nftTransfers.get(j++)));
             }
         }
 
-        var builder = CryptoTransferTransactionBody.newBuilder();
-
-        var transfers = TransferList.newBuilder();
-        for (var transfer : hbarTransfers) {
-            transfers.addAccountAmounts(transfer.toProtobuf());
-        }
-        builder.setTransfers(transfers);
+        var builder = TokenAirdropTransactionBody.newBuilder();
 
         for (var transfer : tokenTransfers) {
             builder.addTokenTransfers(transfer.toProtobuf());
@@ -520,10 +317,6 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     @Override
     void validateChecksums(Client client) throws BadEntityIdException {
-        for (var transfer : hbarTransfers) {
-            transfer.accountId.validateChecksum(client);
-        }
-
         for (var transfer : nftTransfers) {
             transfer.tokenId.validateChecksum(client);
             transfer.sender.validateChecksum(client);
@@ -543,27 +336,19 @@ public class TransferTransaction extends Transaction<TransferTransaction> {
 
     @Override
     void onFreeze(TransactionBody.Builder bodyBuilder) {
-        bodyBuilder.setCryptoTransfer(build());
+        bodyBuilder.setTokenAirdrop(build());
     }
 
     @Override
     void onScheduled(SchedulableTransactionBody.Builder scheduled) {
-        scheduled.setCryptoTransfer(build());
+        scheduled.setTokenAirdrop(build());
     }
 
     /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
-        var body = sourceTransactionBody.getCryptoTransfer();
-
-        for (var transfer : body.getTransfers().getAccountAmountsList()) {
-            hbarTransfers.add(new HbarTransfer(
-                AccountId.fromProtobuf(transfer.getAccountID()),
-                Hbar.fromTinybars(transfer.getAmount()),
-                transfer.getIsApproval()
-            ));
-        }
+        var body = sourceTransactionBody.getTokenAirdrop();
 
         for (var tokenTransferList : body.getTokenTransfersList()) {
             var token = TokenId.fromProtobuf(tokenTransferList.getToken());
