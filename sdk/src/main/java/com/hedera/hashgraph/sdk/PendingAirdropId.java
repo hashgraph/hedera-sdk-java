@@ -1,48 +1,40 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
+import javax.annotation.Nullable;
 
 public class PendingAirdropId {
-    private AccountId sender;
-    private AccountId receiver;
-    private TokenId tokenId;
-    private NftId nftId;
+    private final AccountId sender;
+    private final AccountId receiver;
+    @Nullable
+    private final TokenId tokenId;
+    @Nullable
+    private final NftId nftId;
 
-    public PendingAirdropId(AccountId sender, AccountId receiver, TokenId tokenId, NftId nftId) {
+    public PendingAirdropId(AccountId sender, AccountId receiver, TokenId tokenId) {
         this.sender = sender;
         this.receiver = receiver;
         this.tokenId = tokenId;
-        this.nftId = nftId;
+        this.nftId = null;
     }
-
-    public PendingAirdropId() {
-    }
-
-    public void setSender(final AccountId sender) {
+    public PendingAirdropId(AccountId sender, AccountId receiver, NftId nftId) {
         this.sender = sender;
+        this.receiver = receiver;
+        this.nftId = nftId;
+        this.tokenId = null;
     }
+
     public AccountId getSender() {
         return sender;
     }
 
-    public void setReceiver(AccountId receiver) {
-        this.receiver = receiver;
-    }
 
     public AccountId getReceiver() {
         return receiver;
     }
 
-    public void setTokenId(TokenId tokenId) {
-        this.tokenId = tokenId;
-    }
-
     public TokenId getTokenId() {
         return tokenId;
-    }
-
-    public void setNftId(NftId nftId) {
-        this.nftId = nftId;
     }
 
     public NftId getNftId() {
@@ -50,19 +42,28 @@ public class PendingAirdropId {
     }
 
     static PendingAirdropId fromProtobuf(com.hedera.hashgraph.sdk.proto.PendingAirdropId pendingAirdropId) {
-        return new PendingAirdropId(AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
-            AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
-            TokenId.fromProtobuf(pendingAirdropId.getFungibleTokenType()),
-            NftId.fromProtobuf(pendingAirdropId.getNonFungibleToken()));
+        if (pendingAirdropId.hasFungibleTokenType()) {
+            return new PendingAirdropId(AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
+                AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
+                TokenId.fromProtobuf(pendingAirdropId.getFungibleTokenType()));
+        } else {
+            return new PendingAirdropId(AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
+                AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
+                NftId.fromProtobuf(pendingAirdropId.getNonFungibleToken()));
+        }
     }
 
     com.hedera.hashgraph.sdk.proto.PendingAirdropId toProtobuf() {
-        return com.hedera.hashgraph.sdk.proto.PendingAirdropId.newBuilder()
-            .setFungibleTokenType(tokenId.toProtobuf())
-            .setNonFungibleToken(nftId.toProtobuf())
+        var builder = com.hedera.hashgraph.sdk.proto.PendingAirdropId.newBuilder()
             .setSenderId(sender.toProtobuf())
-            .setReceiverId(receiver.toProtobuf())
-            .build();
+            .setReceiverId(receiver.toProtobuf());
+
+        if (tokenId != null) {
+            builder.setFungibleTokenType(tokenId.toProtobuf());
+        } else if (nftId != null) {
+            builder.setNonFungibleToken(nftId.toProtobuf());
+        }
+        return builder.build();
      }
 
     @Override

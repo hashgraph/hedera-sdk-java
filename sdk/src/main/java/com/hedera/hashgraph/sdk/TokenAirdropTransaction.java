@@ -4,6 +4,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenAirdropTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
@@ -96,7 +97,7 @@ public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransactio
     }
 
     /**
-     * Add a non approved token transfer to the transaction.
+     * Add a non-approved token transfer to the transaction.
      *
      * @param tokenId                   the token id
      * @param accountId                 the account id
@@ -149,19 +150,18 @@ public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransactio
         if (found) {
             return this;
         }
-
         tokenTransfers.add(new TokenTransfer(tokenId, accountId, value, decimals, isApproved));
 
         return this;
     }
 
     /**
-     * Add a non approved token transfer with decimals.
+     * Add a non-approved token transfer with decimals.
      *
      * @param tokenId                   the token id
      * @param accountId                 the account id
      * @param value                     the value
-     * @param decimals                  the deco
+     * @param decimals                  the decimals
      * @return                          the updated transaction
      */
     public TokenAirdropTransaction addTokenTransferWithDecimals(
@@ -179,7 +179,7 @@ public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransactio
      * @param tokenId                   the token id
      * @param accountId                 the account id
      * @param value                     the value
-     * @param decimals                  the deco
+     * @param decimals                  the decimals
      * @return                          the updated transaction
      */
     public TokenAirdropTransaction addApprovedTokenTransferWithDecimals(
@@ -216,7 +216,7 @@ public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransactio
     }
 
     /**
-     * Add a non approved nft transfer.
+     * Add a non-approved nft transfer.
      *
      * @param nftId                     the nft's id
      * @param sender                    the sender account id
@@ -331,7 +331,7 @@ public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransactio
 
     @Override
     MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {
-        return CryptoServiceGrpc.getCryptoTransferMethod();
+        return TokenServiceGrpc.getAirdropTokensMethod();
     }
 
     @Override

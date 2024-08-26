@@ -469,9 +469,9 @@ public final class TransactionRecord {
             transactionRecord.setPrngNumber(prngNumber);
         }
 
-        if(pendingAirdropRecords != null) {
+        if (pendingAirdropRecords != null) {
             for (PendingAirdropRecord pendingAirdropRecord : pendingAirdropRecords) {
-                transactionRecord.setNewPendingAirdrops(pendingAirdropRecords.indexOf(pendingAirdropRecord), pendingAirdropRecord.toProtobuf());
+                transactionRecord.addNewPendingAirdrops(pendingAirdropRecords.indexOf(pendingAirdropRecord), pendingAirdropRecord.toProtobuf());
             }
         }
 

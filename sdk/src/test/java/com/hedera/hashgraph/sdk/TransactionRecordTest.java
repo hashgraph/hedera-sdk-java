@@ -83,7 +83,10 @@ public class TransactionRecordTest {
             prngBytes,
             prngNumber,
             ByteString.copyFrom("0x00", StandardCharsets.UTF_8),
-            List.of(new PendingAirdropRecord(new PendingAirdropId(AccountId.fromString("0.0.123"), AccountId.fromString("0.0.124"), TokenId.fromString("0.0.12345"), NftId.fromString("0.0.321")), 123))
+            List.of(
+                new PendingAirdropRecord(new PendingAirdropId(AccountId.fromString("0.0.123"), AccountId.fromString("0.0.124"), NftId.fromString("0.0.5005/1234")), 123),
+                new PendingAirdropRecord(new PendingAirdropId(AccountId.fromString("0.0.123"), AccountId.fromString("0.0.124"), TokenId.fromString("0.0.12345")), 123)
+                )
         );
     }
 
