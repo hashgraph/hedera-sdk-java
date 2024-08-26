@@ -22,6 +22,7 @@ package com.hedera.hashgraph.sdk.test.integration;
 import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.KeyList;
@@ -130,4 +131,21 @@ public class FileUpdateIntegrationTest {
 
         testEnv.close();
     }
+
+    @Test
+    @DisplayName("Can update fee schedule file")
+    void canUpdateFeeScheduleFile() throws Exception {
+        var testEnv = new IntegrationTestEnv(1);
+
+        var fileId = new FileId(0, 0, 111);
+        var receipt = new FileUpdateTransaction()
+            .setFileId(fileId)
+            .setContents("[e2e::FileUpdateTransaction]")
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
+        assertThat(receipt.status).isEqualTo(Status.FEE_SCHEDULE_FILE_PART_UPLOADED);
+        testEnv.close();
+    }
+
 }
