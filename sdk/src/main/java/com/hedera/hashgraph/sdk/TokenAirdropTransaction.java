@@ -1,7 +1,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenAirdropTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
@@ -15,7 +14,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TokenAirdropTransaction  extends Transaction<TokenAirdropTransaction> {
+/**
+ * Token Airdrop
+ * An "airdrop" is a distribution of tokens from a funding account
+ * to one or more recipient accounts, ideally with no action required
+ * by the recipient account(s).
+ */
+public class TokenAirdropTransaction extends Transaction<TokenAirdropTransaction> {
+    // TODO extract common logic between transfer transaction
 
     private final ArrayList<TokenTransfer> tokenTransfers = new ArrayList<>();
     private final ArrayList<TokenNftTransfer> nftTransfers = new ArrayList<>();

@@ -3,6 +3,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import javax.annotation.Nullable;
 
+/**
+ * PendingAirdropId can contain only one of tokenId or nftId
+ */
 public class PendingAirdropId {
     private final AccountId sender;
     private final AccountId receiver;
@@ -17,6 +20,7 @@ public class PendingAirdropId {
         this.tokenId = tokenId;
         this.nftId = null;
     }
+
     public PendingAirdropId(AccountId sender, AccountId receiver, NftId nftId) {
         this.sender = sender;
         this.receiver = receiver;
@@ -27,7 +31,6 @@ public class PendingAirdropId {
     public AccountId getSender() {
         return sender;
     }
-
 
     public AccountId getReceiver() {
         return receiver;
