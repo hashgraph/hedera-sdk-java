@@ -20,8 +20,10 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
+import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
 
+import java.util.Arrays;
 import javax.annotation.Nullable;
 import java.util.Objects;
 
@@ -31,7 +33,7 @@ import java.util.Objects;
 public class Endpoint implements Cloneable {
 
     @Nullable
-    IPv4Address address = null;
+    byte[] address = null;
 
     int port;
 
@@ -57,7 +59,7 @@ public class Endpoint implements Cloneable {
         }
 
         return new Endpoint()
-            .setAddress(IPv4Address.fromProtobuf(serviceEndpoint.getIpAddressV4()))
+            .setAddress(serviceEndpoint.getIpAddressV4().toByteArray())
             .setPort(port)
             .setDomainName(serviceEndpoint.getDomainName());
     }
@@ -68,7 +70,7 @@ public class Endpoint implements Cloneable {
      * @return                          the ipv4 address
      */
     @Nullable
-    public IPv4Address getAddress() {
+    public byte[] getAddress() {
         return address;
     }
 
@@ -78,7 +80,7 @@ public class Endpoint implements Cloneable {
      * @param address                   the desired ipv4 address
      * @return {@code this}
      */
-    public Endpoint setAddress(IPv4Address address) {
+    public Endpoint setAddress(byte[] address) {
         this.address = address;
         return this;
     }
@@ -132,7 +134,7 @@ public class Endpoint implements Cloneable {
         var builder = ServiceEndpoint.newBuilder();
 
         if (address != null) {
-            builder.setIpAddressV4(address.toProtobuf());
+            builder.setIpAddressV4(ByteString.copyFrom(address));
         }
 
         builder.setDomainName(domainName);
@@ -145,7 +147,9 @@ public class Endpoint implements Cloneable {
         if (this.domainName != null && !this.domainName.isEmpty()) {
             return domainName + ":" + port;
         } else {
-            return Objects.requireNonNull(address) + ":" + port;
+            return ((int) address[0] & 0x000000FF) + "." + ((int) address[1] & 0x000000FF) +
+                ((int) address[2] & 0x000000FF) + "." + ((int) address[3] & 0x000000FF) +
+                ":" + port;
         }
     }
 
