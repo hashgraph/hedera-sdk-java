@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk.test.integration;
 
 import com.google.errorprone.annotations.Var;
+import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileId;
@@ -27,6 +28,7 @@ import com.hedera.hashgraph.sdk.FileInfoQuery;
 import com.hedera.hashgraph.sdk.FileUpdateTransaction;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
@@ -136,6 +138,8 @@ public class FileUpdateIntegrationTest {
     @DisplayName("Can update fee schedule file")
     void canUpdateFeeScheduleFile() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
+        testEnv.client.setOperator(new AccountId(0, 0, 2), PrivateKey.fromString(
+            "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"));
 
         var fileId = new FileId(0, 0, 111);
         var receipt = new FileUpdateTransaction()
@@ -147,5 +151,4 @@ public class FileUpdateIntegrationTest {
         assertThat(receipt.status).isEqualTo(Status.FEE_SCHEDULE_FILE_PART_UPLOADED);
         testEnv.close();
     }
-
 }
