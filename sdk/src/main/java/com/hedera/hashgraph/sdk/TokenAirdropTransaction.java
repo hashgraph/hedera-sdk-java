@@ -26,12 +26,7 @@ import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Token Airdrop

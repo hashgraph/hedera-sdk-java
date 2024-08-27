@@ -25,7 +25,6 @@ abstract class AbstractTokenTransferTransaction<T extends AbstractTokenTransferT
         LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
         throws InvalidProtocolBufferException {
         super(txs);
-        initFromTransactionBody();
     }
 
     /**
@@ -35,7 +34,6 @@ abstract class AbstractTokenTransferTransaction<T extends AbstractTokenTransferT
      */
     AbstractTokenTransferTransaction(com.hedera.hashgraph.sdk.proto.TransactionBody txBody) {
         super(txBody);
-        initFromTransactionBody();
     }
 
 
@@ -366,6 +364,4 @@ abstract class AbstractTokenTransferTransaction<T extends AbstractTokenTransferT
             transfer.accountId.validateChecksum(client);
         }
     }
-
-    abstract void initFromTransactionBody();
 }

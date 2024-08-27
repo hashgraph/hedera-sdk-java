@@ -30,6 +30,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import com.hedera.hashgraph.sdk.proto.TransferList;
 import io.grpc.MethodDescriptor;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -196,6 +197,7 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
 
         var builder = CryptoTransferTransactionBody.newBuilder();
 
+        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
         var hbarTransfersList = TransferList.newBuilder();
         for (var transfer : hbarTransfers) {
             hbarTransfersList.addAccountAmounts(transfer.toProtobuf());
