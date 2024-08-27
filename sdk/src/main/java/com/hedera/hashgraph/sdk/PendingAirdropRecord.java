@@ -31,7 +31,15 @@ public class PendingAirdropRecord {
         this.pendingAirdropAmount = pendingAirdropAmount;
     }
 
-    public com.hedera.hashgraph.sdk.proto.PendingAirdropRecord toProtobuf() {
+    public PendingAirdropId getPendingAirdropId() {
+        return pendingAirdropId;
+    }
+
+    public long getPendingAirdropAmount() {
+        return pendingAirdropAmount;
+    }
+
+    com.hedera.hashgraph.sdk.proto.PendingAirdropRecord toProtobuf() {
         return com.hedera.hashgraph.sdk.proto.PendingAirdropRecord.newBuilder()
             .setPendingAirdropId(this.pendingAirdropId.toProtobuf())
             .setPendingAirdropValue(PendingAirdropValue.newBuilder().setAmount(pendingAirdropAmount))
