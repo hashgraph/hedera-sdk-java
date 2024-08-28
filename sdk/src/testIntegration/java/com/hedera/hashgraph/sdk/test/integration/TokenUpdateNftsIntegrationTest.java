@@ -280,6 +280,7 @@ public class TokenUpdateNftsIntegrationTest {
     void cannotUpdateNFTMetadataWhenTransactionIsNotSignedWithMetadataKey() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
+        var supplyKey = PrivateKey.generateED25519();
         var metadataKey = PrivateKey.generateED25519();
         var nftCount = 4;
         var initialMetadataList = NftMetadataGenerator.generate(new byte[]{4, 2, 0}, nftCount);
@@ -293,7 +294,7 @@ public class TokenUpdateNftsIntegrationTest {
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
+                .setSupplyKey(supplyKey)
                 .setMetadataKey(metadataKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
@@ -310,6 +311,8 @@ public class TokenUpdateNftsIntegrationTest {
         var tokenMintTransactionReceipt = new TokenMintTransaction()
             .setMetadata(initialMetadataList)
             .setTokenId(tokenId)
+            .freezeWith(testEnv.client)
+            .sign(supplyKey)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -333,6 +336,7 @@ public class TokenUpdateNftsIntegrationTest {
     void cannotUpdateNFTMetadataWhenMetadataKeyNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
+        var supplyKey = PrivateKey.generateED25519();
         var metadataKey = PrivateKey.generateED25519();
         var nftCount = 4;
         var initialMetadataList = NftMetadataGenerator.generate(new byte[]{4, 2, 0}, nftCount);
@@ -346,7 +350,7 @@ public class TokenUpdateNftsIntegrationTest {
                 .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
                 .setTreasuryAccountId(testEnv.operatorId)
                 .setAdminKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
+                .setSupplyKey(supplyKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId
@@ -362,6 +366,8 @@ public class TokenUpdateNftsIntegrationTest {
         var tokenMintTransactionReceipt = new TokenMintTransaction()
             .setMetadata(initialMetadataList)
             .setTokenId(tokenId)
+            .freezeWith(testEnv.client)
+            .sign(supplyKey)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
 
@@ -377,7 +383,7 @@ public class TokenUpdateNftsIntegrationTest {
                 .sign(metadataKey)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.TOKEN_HAS_NO_METADATA_KEY.toString());
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
         testEnv.close(tokenId);
     }
