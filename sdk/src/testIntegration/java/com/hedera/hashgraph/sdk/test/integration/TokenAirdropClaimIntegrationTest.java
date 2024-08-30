@@ -33,12 +33,14 @@ import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenClaimAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenPauseTransaction;
 import java.util.ArrayList;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -117,6 +119,7 @@ class TokenAirdropClaimIntegrationTest {
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
 
+        testEnv.close();
     }
 
     @Test
@@ -192,6 +195,8 @@ class TokenAirdropClaimIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount * 2, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 4, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
 
@@ -262,6 +267,8 @@ class TokenAirdropClaimIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -291,6 +298,8 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -331,6 +340,7 @@ class TokenAirdropClaimIntegrationTest {
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.INVALID_PENDING_AIRDROP_ID.toString());
 
+        testEnv.close();
     }
 
     @Test
@@ -345,6 +355,8 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.EMPTY_PENDING_AIRDROP_ID_LIST.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -375,6 +387,8 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.PENDING_AIRDROP_ID_REPEATED.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -401,7 +415,7 @@ class TokenAirdropClaimIntegrationTest {
 
         // claim the tokens with receiver
         // fails with TOKEN_IS_PAUSED
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenClaimAirdropTransaction()
                 .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
                 .freezeWith(testEnv.client)
@@ -409,6 +423,8 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.TOKEN_IS_PAUSED.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -435,7 +451,7 @@ class TokenAirdropClaimIntegrationTest {
 
         // claim the tokens with receiver
         // fails with TOKEN_IS_DELETED
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenClaimAirdropTransaction()
                 .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
                 .freezeWith(testEnv.client)
@@ -443,6 +459,8 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.TOKEN_WAS_DELETED.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -464,6 +482,15 @@ class TokenAirdropClaimIntegrationTest {
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
+        // associate
+        new TokenAssociateTransaction()
+            .setAccountId(receiverAccountId)
+            .setTokenIds(Collections.singletonList(tokenID))
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+
         // freeze the token
         new TokenFreezeTransaction()
             .setAccountId(receiverAccountId)
@@ -473,7 +500,7 @@ class TokenAirdropClaimIntegrationTest {
 
         // claim the tokens with receiver
         // fails with ACCOUNT_FROZEN_FOR_TOKEN
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenClaimAirdropTransaction()
                 .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
                 .freezeWith(testEnv.client)
@@ -481,5 +508,7 @@ class TokenAirdropClaimIntegrationTest {
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.ACCOUNT_FROZEN_FOR_TOKEN.toString());
+
+        testEnv.close();
     }
 }

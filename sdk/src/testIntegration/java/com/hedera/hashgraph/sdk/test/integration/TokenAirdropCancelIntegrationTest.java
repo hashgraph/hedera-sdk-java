@@ -19,176 +19,474 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
+import static com.hedera.hashgraph.sdk.test.integration.EntityHelper.fungibleInitialBalance;
+import static com.hedera.hashgraph.sdk.test.integration.EntityHelper.mitedNfts;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.PendingAirdropId;
+import com.hedera.hashgraph.sdk.PendingAirdropRecord;
+import com.hedera.hashgraph.sdk.PrecheckStatusException;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hedera.hashgraph.sdk.Status;
+import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenCancelAirdropTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenPauseTransaction;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 class TokenAirdropCancelIntegrationTest {
 
+    private final int amount = 100;
+
     @Test
     @DisplayName("Cancels the tokens when they are in pending state")
-    void canCancelTokens() {
+    void canCancelTokens() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible and nf token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
+        var nftID = EntityHelper.createNft(testEnv);
         // mint some NFTs
+        var mintReceipt = new TokenMintTransaction()
+            .setTokenId(nftID)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+        var nftSerials = mintReceipt.serials;
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
+            .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
         // cancel the tokens with the receiver
+        record = new TokenCancelAirdropTransaction()
+            .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+            .addPendingAirdrop(record.pendingAirdropRecords.get(1).getPendingAirdropId())
+            .addPendingAirdrop(record.pendingAirdropRecords.get(2).getPendingAirdropId())
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
+        assertEquals(0, record.pendingAirdropRecords.size());
+
         // verify the receiver does not hold the tokens via query
-        // verify the operator holds the tokens
+        var receiverAccountBalance = new AccountBalanceQuery()
+            .setAccountId(receiverAccountId)
+            .execute(testEnv.client);
+        assertNull(receiverAccountBalance.tokens.get(tokenID));
+        assertNull(receiverAccountBalance.tokens.get(nftID));
+
+        // verify the operator does hold the tokens
+        var operatorBalance = new AccountBalanceQuery()
+            .setAccountId(testEnv.operatorId)
+            .execute(testEnv.client);
+        assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
+        assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cancels the tokens when token is frozen")
-    void canCancelTokensWhenTokenIsFrozen() {
+    void canCancelTokensWhenTokenIsFrozen() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
+        // associate
+        new TokenAssociateTransaction()
+            .setAccountId(receiverAccountId)
+            .setTokenIds(Collections.singletonList(tokenID))
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
         // freeze the token
+        new TokenFreezeTransaction()
+            .setAccountId(receiverAccountId)
+            .setTokenId(tokenID)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
 
-        // cancel the tokens with the receiver
+        // cancel
+        new TokenCancelAirdropTransaction()
+            .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cancels the tokens when token is paused")
-    void canCancelTokensWhenTokenIsPaused() {
+    void canCancelTokensWhenTokenIsPaused() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // pause the token
+        new TokenPauseTransaction().setTokenId(tokenID).execute(testEnv.client).getReceipt(testEnv.client);
 
-        // cancel the tokens with the receiver
+        // cancel
+        new TokenCancelAirdropTransaction()
+            .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cancels the tokens when token is deleted")
-    void canCancelTokensWhenTokenIsDeleted() {
+    void canCancelTokensWhenTokenIsDeleted() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // delete the token
+        new TokenDeleteTransaction().setTokenId(tokenID).execute(testEnv.client).getReceipt(testEnv.client);
 
-        // cancel the tokens with the receiver
+        // cancel
+        new TokenCancelAirdropTransaction()
+            .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cancels the tokens when they are in pending state to multiple receivers")
-    void canCancelTokensToMultipleReceivers() {
+    void canCancelTokensToMultipleReceivers() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible and nf token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
+        var nftID = EntityHelper.createNft(testEnv);
         // mint some NFTs
+        var mintReceipt = new TokenMintTransaction()
+            .setTokenId(nftID)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+        var nftSerials = mintReceipt.serials;
 
         // create receiver1 with 0 auto associations
+        var receiver1AccountKey = PrivateKey.generateED25519();
+        var receiver1AccountId = EntityHelper.createAccount(testEnv, receiver1AccountKey, 0);
+
         // create receiver2 with 0 auto associations
+        var receiver2AccountKey = PrivateKey.generateED25519();
+        var receiver2AccountId = EntityHelper.createAccount(testEnv, receiver2AccountKey, 0);
 
         // airdrop the tokens to both
+        var record = new TokenAirdropTransaction()
+            .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiver1AccountId)
+            .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiver1AccountId)
+            .addTokenTransfer(tokenID, receiver1AccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .addNftTransfer(nftID.nft(nftSerials.get(2)), testEnv.operatorId, receiver2AccountId)
+            .addNftTransfer(nftID.nft(nftSerials.get(3)), testEnv.operatorId, receiver2AccountId)
+            .addTokenTransfer(tokenID, receiver2AccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
+
+        // verify the txn record
+        assertEquals(6, record.pendingAirdropRecords.size());
 
         // cancel the tokens signing with receiver1 and receiver2
+        var pendingAirdropIDs = record.pendingAirdropRecords.stream().map(PendingAirdropRecord::getPendingAirdropId)
+            .toList();
+        record = new TokenCancelAirdropTransaction()
+            .setPendingAirdropIds(pendingAirdropIDs)
+            .freezeWith(testEnv.client)
+            .sign(receiver1AccountKey)
+            .sign(receiver2AccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
-        // verify receiver1 holds the tokens via query
-        // verify receiver2 holds the tokens via query
-        // verify the operator does not hold the tokens
+        assertEquals(0, record.pendingAirdropRecords.size());
+
+        // verify receiver1 does not hold the tokens via query
+        var receiverAccountBalance = new AccountBalanceQuery()
+            .setAccountId(receiver1AccountId)
+            .execute(testEnv.client);
+        assertEquals(0, receiverAccountBalance.tokens.get(tokenID));
+        assertEquals(0, receiverAccountBalance.tokens.get(nftID));
+
+        // verify receiver2 does not hold the tokens via query
+        var receiver2AccountBalance = new AccountBalanceQuery()
+            .setAccountId(receiver1AccountId)
+            .execute(testEnv.client);
+        assertEquals(0, receiver2AccountBalance.tokens.get(tokenID));
+        assertEquals(0, receiver2AccountBalance.tokens.get(nftID));
+
+        // verify the operator does hold the tokens
+        var operatorBalance = new AccountBalanceQuery()
+            .setAccountId(testEnv.operatorId)
+            .execute(testEnv.client);
+        assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
+        assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
 
     @Test
     @DisplayName("Cancels the tokens when they are in pending state from multiple airdrop transactions")
-    void canCancelTokensFromMultipleAirdropTxns() {
+    void canCancelTokensFromMultipleAirdropTxns() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible and nf token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
+        var nftID = EntityHelper.createNft(testEnv);
         // mint some NFTs
+        var mintReceipt = new TokenMintTransaction()
+            .setTokenId(nftID)
+            .setMetadata(NftMetadataGenerator.generate((byte) 10))
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
+        var nftSerials = mintReceipt.serials;
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop some of the tokens to the receiver
+        var record1 = new TokenAirdropTransaction()
+            .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
         // airdrop some of the tokens to the receiver
+        var record2 = new TokenAirdropTransaction()
+            .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
         // airdrop some of the tokens to the receiver
+        var record3 = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // get the PendingIds from the records
+        var pendingAirdropIDs = new ArrayList<PendingAirdropId>();
+        pendingAirdropIDs.add(record1.pendingAirdropRecords.get(0).getPendingAirdropId());
+        pendingAirdropIDs.add(record2.pendingAirdropRecords.get(0).getPendingAirdropId());
+        pendingAirdropIDs.add(record3.pendingAirdropRecords.get(0).getPendingAirdropId());
 
         // cancel the all the tokens with the receiver
+        var record = new TokenCancelAirdropTransaction()
+            .setPendingAirdropIds(pendingAirdropIDs)
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
-        // verify receiver holds the tokens via query
-        // verify the operator does not hold the tokens
-    }
+        assertEquals(0, record.pendingAirdropRecords.size());
 
-    @Test
-    @DisplayName("Cancels the tokens when they are in pending state from multiple airdrop transactions")
-    void canCancelTokensFromHollowAccount() {
-        // create fungible and nf token
-        // mint some NFTs
+        // verify the receiver does not hold the tokens via query
+        var receiverAccountBalance = new AccountBalanceQuery()
+            .setAccountId(receiverAccountId)
+            .execute(testEnv.client);
+        assertEquals(amount, receiverAccountBalance.tokens.get(tokenID));
+        assertEquals(2, receiverAccountBalance.tokens.get(nftID));
 
-        // airdrop the tokens to an alias
-        // should lazy-create and transfer the tokens
+        // verify the operator does hold the tokens
+        var operatorBalance = new AccountBalanceQuery()
+            .setAccountId(testEnv.operatorId)
+            .execute(testEnv.client);
+        assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
+        assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
 
-        // cancel the tokens signing with the key of the hollow account
-
-        // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
-        // verify receiver holds the tokens via query
-        // verify the operator does not hold the tokens
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot cancel the tokens when they are not airdropped")
-    void cannotCancelTokensForNonExistingAirdrop() {
+    void cannotCancelTokensForNonExistingAirdrop() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // cancel the tokens with the operator which does not have pending airdrops
-        // fails
+        // fails with INVALID_SIGNATURE
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenCancelAirdropTransaction()
+                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .execute(testEnv.client)
+                .getRecord(testEnv.client);
+        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot cancel the tokens when they are already canceled")
-    void canonCancelTokensForAlreadyCanceledAirdrop() {
+    void canonCancelTokensForAlreadyCanceledAirdrop() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // cancel the tokens with the receiver
+        new TokenCancelAirdropTransaction()
+            .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+            .freezeWith(testEnv.client)
+            .sign(receiverAccountKey)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // cancel the tokens with the receiver again
-        // fails
+        // fails with INVALID_PENDING_AIRDROP_ID
+        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+            new TokenCancelAirdropTransaction()
+                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .freezeWith(testEnv.client)
+                .sign(receiverAccountKey)
+                .execute(testEnv.client)
+                .getRecord(testEnv.client);
+        }).withMessageContaining(Status.INVALID_PENDING_AIRDROP_ID.toString());
+
+        testEnv.close();
     }
 
 
     @Test
     @DisplayName("Cannot cancel the tokens with empty list")
-    void canonCancelWithEmptyPendingAirdropsList() {
-        // create fungible token
-
-        // create receiver with 0 auto associations
+    void canonCancelWithEmptyPendingAirdropsList() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // cancel the tokens with the receiver without setting pendingAirdropIds
-        // fails
+        // fails with EMPTY_PENDING_AIRDROP_ID_LIST
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenCancelAirdropTransaction()
+                .execute(testEnv.client)
+                .getRecord(testEnv.client);
+        }).withMessageContaining(Status.EMPTY_PENDING_AIRDROP_ID_LIST.toString());
+
+        testEnv.close();
     }
 
     @Test
     @DisplayName("Cannot cancel the tokens with duplicate entries")
-    void cannotCancelTokensWithDuplicateEntries() {
+    void cannotCancelTokensWithDuplicateEntries() throws Exception {
+        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+
         // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
 
         // create receiver with 0 auto associations
+        var receiverAccountKey = PrivateKey.generateED25519();
+        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, 0);
 
         // airdrop the tokens
+        var record = new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getRecord(testEnv.client);
 
         // cancel the tokens with duplicate pending airdrop token ids
-        // fails
+        // fails with PENDING_AIRDROP_ID_REPEATED
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenCancelAirdropTransaction()
+                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .execute(testEnv.client)
+                .getRecord(testEnv.client);
+        }).withMessageContaining(Status.PENDING_AIRDROP_ID_REPEATED.toString());
+
+        testEnv.close();
     }
 }
