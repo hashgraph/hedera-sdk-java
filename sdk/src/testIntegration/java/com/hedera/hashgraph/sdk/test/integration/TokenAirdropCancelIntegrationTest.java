@@ -39,6 +39,7 @@ import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
 import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenPauseTransaction;
+import com.hedera.hashgraph.sdk.TransactionId;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
@@ -77,13 +78,11 @@ class TokenAirdropCancelIntegrationTest {
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
-        // cancel the tokens with the receiver
+        // sender cancels the tokens
         record = new TokenCancelAirdropTransaction()
             .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
             .addPendingAirdrop(record.pendingAirdropRecords.get(1).getPendingAirdropId())
             .addPendingAirdrop(record.pendingAirdropRecords.get(2).getPendingAirdropId())
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -145,8 +144,6 @@ class TokenAirdropCancelIntegrationTest {
         // cancel
         new TokenCancelAirdropTransaction()
             .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -178,8 +175,6 @@ class TokenAirdropCancelIntegrationTest {
         // cancel
         new TokenCancelAirdropTransaction()
             .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -211,8 +206,6 @@ class TokenAirdropCancelIntegrationTest {
         // cancel
         new TokenCancelAirdropTransaction()
             .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -264,9 +257,6 @@ class TokenAirdropCancelIntegrationTest {
             .toList();
         record = new TokenCancelAirdropTransaction()
             .setPendingAirdropIds(pendingAirdropIDs)
-            .freezeWith(testEnv.client)
-            .sign(receiver1AccountKey)
-            .sign(receiver2AccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -277,15 +267,15 @@ class TokenAirdropCancelIntegrationTest {
         var receiverAccountBalance = new AccountBalanceQuery()
             .setAccountId(receiver1AccountId)
             .execute(testEnv.client);
-        assertEquals(0, receiverAccountBalance.tokens.get(tokenID));
-        assertEquals(0, receiverAccountBalance.tokens.get(nftID));
+        assertNull(receiverAccountBalance.tokens.get(tokenID));
+        assertNull(receiverAccountBalance.tokens.get(nftID));
 
         // verify receiver2 does not hold the tokens via query
         var receiver2AccountBalance = new AccountBalanceQuery()
             .setAccountId(receiver1AccountId)
             .execute(testEnv.client);
-        assertEquals(0, receiver2AccountBalance.tokens.get(tokenID));
-        assertEquals(0, receiver2AccountBalance.tokens.get(nftID));
+        assertNull(receiver2AccountBalance.tokens.get(tokenID));
+        assertNull(receiver2AccountBalance.tokens.get(nftID));
 
         // verify the operator does hold the tokens
         var operatorBalance = new AccountBalanceQuery()
@@ -344,8 +334,6 @@ class TokenAirdropCancelIntegrationTest {
         // cancel the all the tokens with the receiver
         var record = new TokenCancelAirdropTransaction()
             .setPendingAirdropIds(pendingAirdropIDs)
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -356,8 +344,8 @@ class TokenAirdropCancelIntegrationTest {
         var receiverAccountBalance = new AccountBalanceQuery()
             .setAccountId(receiverAccountId)
             .execute(testEnv.client);
-        assertEquals(amount, receiverAccountBalance.tokens.get(tokenID));
-        assertEquals(2, receiverAccountBalance.tokens.get(nftID));
+        assertNull(receiverAccountBalance.tokens.get(tokenID));
+        assertNull(receiverAccountBalance.tokens.get(nftID));
 
         // verify the operator does hold the tokens
         var operatorBalance = new AccountBalanceQuery()
@@ -388,10 +376,16 @@ class TokenAirdropCancelIntegrationTest {
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
-        // cancel the tokens with the operator which does not have pending airdrops
+        // create receiver with 0 auto associations
+        var randomAccountKey = PrivateKey.generateED25519();
+        var randomAccount = EntityHelper.createAccount(testEnv, randomAccountKey, 0);
+
+
+        // cancel the tokens with the random account which has not created pending airdrops
         // fails with INVALID_SIGNATURE
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenCancelAirdropTransaction()
+                .setTransactionId(TransactionId.generate(randomAccount))
                 .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
@@ -422,8 +416,6 @@ class TokenAirdropCancelIntegrationTest {
         // cancel the tokens with the receiver
         new TokenCancelAirdropTransaction()
             .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(testEnv.client)
-            .sign(receiverAccountKey)
             .execute(testEnv.client)
             .getRecord(testEnv.client);
 
@@ -432,8 +424,6 @@ class TokenAirdropCancelIntegrationTest {
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenCancelAirdropTransaction()
                 .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .freezeWith(testEnv.client)
-                .sign(receiverAccountKey)
                 .execute(testEnv.client)
                 .getRecord(testEnv.client);
         }).withMessageContaining(Status.INVALID_PENDING_AIRDROP_ID.toString());

@@ -26,7 +26,6 @@ import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenCancelAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenClaimAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
@@ -34,6 +33,7 @@ import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenRejectTransaction;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -41,7 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class TokenAridropExample {
+public class TokenAirdropExample {
 
     /*
      * See .env.sample in the examples folder root for how to specify values below
@@ -120,6 +120,7 @@ public class TokenAridropExample {
         var privateKey4 = PrivateKey.generateECDSA();
         var treasuryAccount = new AccountCreateTransaction()
             .setKey(privateKey4)
+            .setInitialBalance(new Hbar(10))
             .execute(client)
             .getReceipt(client)
             .accountId;
@@ -167,27 +168,15 @@ public class TokenAridropExample {
             .getReceipt(client)
             .tokenId;
 
-        var mintReceipt = new TokenMintTransaction()
+        new TokenMintTransaction()
             .setTokenId(nftID)
             .setMetadata(generateNftMetadata((byte) 3))
             .execute(client)
             .getReceipt(client);
-        var nftSerials = mintReceipt.serials;
+
 
         /*
          * Step 3:
-         * Associate Account 2
-         */
-        new TokenAssociateTransaction()
-            .setTokenIds(List.of(tokenID))
-            .setAccountId(account2)
-            .freezeWith(client)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
-
-        /*
-         * Step 4:
          * Airdrop fungible tokens to all 3 accounts
          */
         System.out.println("Airdropping fts");
@@ -204,14 +193,14 @@ public class TokenAridropExample {
             .getRecord(client);
 
         /*
-         * Step 5:
+         * Step 4:
          * Get the transaction record and see one pending airdrop (for Account 3)
          */
         System.out.println("Pending airdrops length: " + txnRecord.pendingAirdropRecords.size());
         System.out.println("Pending airdrops: " + txnRecord.pendingAirdropRecords.get(0));
 
         /*
-         * Step 6:
+         * Step 5:
          * Query to verify Account 1 and Account 2 received the airdrops and Account 3 did not
          */
         var account1Balance = new AccountBalanceQuery()
@@ -306,11 +295,12 @@ public class TokenAridropExample {
          * Step 11:
          * Cancel the airdrop for Account 3
          */
-        System.out.println("Canceling nft with account2");
+        System.out.println("Canceling nft for account3");
         new TokenCancelAirdropTransaction()
+            .setTransactionId(TransactionId.generate(treasuryAccount))
             .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(1).getPendingAirdropId())
             .freezeWith(client)
-            .sign(privateKey3)
+            .sign(privateKey4)
             .execute(client);
 
         account3Balance = new AccountBalanceQuery()
@@ -322,8 +312,10 @@ public class TokenAridropExample {
          * Step 12:
          * Reject the NFT for Account 2
          */
+        System.out.println("Rejecting nft with account2");
         new TokenRejectTransaction()
-            .addNftId(nftID.nft(1))
+            .setOwnerId(account2)
+            .addNftId(nftID.nft(2))
             .freezeWith(client)
             .sign(privateKey2)
             .execute(client)
@@ -351,7 +343,9 @@ public class TokenAridropExample {
          * Step 14:
          * Reject the fungible tokens for Account 3
          */
+        System.out.println("Rejecting ft with account3");
         new TokenRejectTransaction()
+            .setOwnerId(account3)
             .addTokenId(tokenID)
             .freezeWith(client)
             .sign(privateKey3)

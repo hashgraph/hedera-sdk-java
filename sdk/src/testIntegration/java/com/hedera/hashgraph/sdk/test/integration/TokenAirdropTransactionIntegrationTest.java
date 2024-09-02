@@ -285,8 +285,8 @@ class TokenAirdropTransactionIntegrationTest {
     }
 
     @Test
-    @DisplayName("Cannot airdrop ft with receiverSig=true")
-    void cannotAirdropTokensWithReceiverSigRequiredFungible() throws Exception {
+    @DisplayName("Can airdrop ft with receiverSig=true")
+    void canAirdropTokensWithReceiverSigRequiredFungible() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // create fungible token
@@ -306,19 +306,16 @@ class TokenAirdropTransactionIntegrationTest {
             .accountId;
 
         // airdrop the tokens
-        // fails with INVALID_SIGNATURE
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+        new TokenAirdropTransaction()
+            .addTokenTransfer(tokenID, receiverAccountId, amount)
+            .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
     }
 
     @Test
-    @DisplayName("Cannot airdrop nft with receiverSig=true")
-    void cannotAirdropTokensWithReceiverSigRequiredNFT() throws Exception {
+    @DisplayName("Can airdrop nft with receiverSig=true")
+    void canAirdropTokensWithReceiverSigRequiredNFT() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // create nft
@@ -345,14 +342,11 @@ class TokenAirdropTransactionIntegrationTest {
             .accountId;
 
         // airdrop the tokens
-        // fails with INVALID_SIGNATURE
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenAirdropTransaction()
-                .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+        new TokenAirdropTransaction()
+            .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
+            .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
+            .execute(testEnv.client)
+            .getReceipt(testEnv.client);
     }
 
     @Test
@@ -481,44 +475,11 @@ class TokenAirdropTransactionIntegrationTest {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
 
         // airdrop with no tokenID or NftID
-        // fails with INVALID_TRANSACTION_BODY
+        // fails with EMPTY_TOKEN_TRANSFER_BODY
         assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
             new TokenAirdropTransaction()
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TRANSACTION_BODY.toString());
-
-        var ftTokenId = EntityHelper.createFungibleToken(testEnv, 18);
-        var receiverAccountKey = PrivateKey.generateED25519();
-        var receiverAccountId = EntityHelper.createAccount(testEnv, receiverAccountKey, -1);
-        var nftTokenId = EntityHelper.createNft(testEnv);
-
-        var mintReceipt = new TokenMintTransaction()
-            .setTokenId(nftTokenId)
-            .setMetadata(NftMetadataGenerator.generate((byte) 10))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        var nftSerials = mintReceipt.serials;
-
-        // airdrop with more than 10 tokenIDs/nftIDs
-        // fails with INVALID_TRANSACTION_BODY
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenAirdropTransaction()
-                .addTokenTransfer(ftTokenId, testEnv.operatorId, -10)
-                .addTokenTransfer(ftTokenId, receiverAccountId, 10)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(2)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(3)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(4)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(5)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(6)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(7)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(8)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftTokenId.nft(nftSerials.get(9)), testEnv.operatorId, receiverAccountId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TRANSACTION_BODY.toString());
+        }).withMessageContaining(Status.EMPTY_TOKEN_TRANSFER_BODY.toString());
     }
 }
