@@ -95,6 +95,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -144,6 +146,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -190,6 +194,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -282,6 +288,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount + 1, operatorBalance.tokens.get(customFeeTokenID));
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
+
+        testEnv.close();
     }
 
     @Test
@@ -314,6 +322,8 @@ class TokenAirdropTransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -353,6 +363,8 @@ class TokenAirdropTransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        testEnv.close();
     }
 
     @Test
@@ -409,6 +421,8 @@ class TokenAirdropTransactionIntegrationTest {
 //            .sign(spenderKey)
 //            .execute(testEnv.client)
 //            .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -473,6 +487,8 @@ class TokenAirdropTransactionIntegrationTest {
 //            .sign(spenderKey)
 //            .execute(testEnv.client)
 //            .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -520,5 +536,7 @@ class TokenAirdropTransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.INVALID_TRANSACTION_BODY.toString());
+
+        testEnv.close();
     }
 }
