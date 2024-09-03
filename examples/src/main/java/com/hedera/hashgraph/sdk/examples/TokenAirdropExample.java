@@ -33,7 +33,6 @@ import com.hedera.hashgraph.sdk.TokenMintTransaction;
 import com.hedera.hashgraph.sdk.TokenRejectTransaction;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -297,11 +296,11 @@ public class TokenAirdropExample {
          */
         System.out.println("Canceling nft for account3");
         new TokenCancelAirdropTransaction()
-            .setTransactionId(TransactionId.generate(treasuryAccount))
             .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(1).getPendingAirdropId())
             .freezeWith(client)
             .sign(privateKey4)
-            .execute(client);
+            .execute(client)
+            .getReceipt(client);
 
         account3Balance = new AccountBalanceQuery()
             .setAccountId(account3)
