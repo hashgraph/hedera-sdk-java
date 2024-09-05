@@ -156,6 +156,26 @@ public final class Client implements AutoCloseable {
      * @param networkMap the map of node IDs to node addresses that make up the network.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
+    public static Client forNetworkWithExecutor(Map<String, AccountId> networkMap, ExecutorService executor) {
+        var network = Network.forNetwork(executor, networkMap);
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
+
+        return new Client(executor, network, mirrorNetwork, null, null);
+    }
+
+
+    /**
+     * Construct a client given a set of nodes.
+     *
+     * <p>It is the responsibility of the caller to ensure that all nodes in the map are part of the
+     * same Hedera network. Failure to do so will result in undefined behavior.
+     *
+     * <p>The client will load balance all requests to Hedera using a simple round-robin scheme to
+     * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be tried.
+     *
+     * @param networkMap the map of node IDs to node addresses that make up the network.
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
     public static Client forNetwork(Map<String, AccountId> networkMap) {
         var executor = createExecutor();
         var network = Network.forNetwork(executor, networkMap);
@@ -178,6 +198,50 @@ public final class Client implements AutoCloseable {
             default -> throw new IllegalArgumentException("Name must be one-of `mainnet`, `testnet`, or `previewnet`");
         };
     }
+
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forMainnetWithExecutor(ExecutorService executor) {
+        var network = Network.forMainnet(executor);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
+    }
+
+    /**
+     * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
+     * access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forTestnetWithExecutor(ExecutorService executor) {
+        var network = Network.forTestnet(executor);
+        var mirrorNetwork = MirrorNetwork.forTestnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
+    }
+
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
+     * nodes</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forPreviewnetWithExecutor(ExecutorService executor) {
+        var network = Network.forPreviewnet(executor);
+        var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            DEFAULT_NETWORK_UPDATE_PERIOD);
+    }
+
 
     /**
      * Construct a Hedera client pre-configured for <a
