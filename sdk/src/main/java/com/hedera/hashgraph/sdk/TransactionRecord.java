@@ -197,6 +197,17 @@ public final class TransactionRecord {
      */
     public final ByteString evmAddress;
 
+    /**
+     * A list of pending token airdrops.
+     * Each pending airdrop represents a single requested transfer from a
+     * sending account to a recipient account. These pending transfers are
+     * issued unilaterally by the sending account, and MUST be claimed by the
+     * recipient account before the transfer MAY complete.
+     * A sender MAY cancel a pending airdrop before it is claimed.
+     * An airdrop transaction SHALL emit a pending airdrop when the recipient has no
+     * available automatic association slots available or when the recipient
+     * has set `receiver_sig_required`.
+     */
     public final List<PendingAirdropRecord> pendingAirdropRecords;
 
     TransactionRecord(

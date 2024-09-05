@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
-public class TokenTransferList {
+class TokenTransferList {
     final TokenId tokenId;
     @Nullable
     final Integer expectDecimals;

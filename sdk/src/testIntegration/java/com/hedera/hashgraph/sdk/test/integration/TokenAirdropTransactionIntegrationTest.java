@@ -404,17 +404,6 @@ class TokenAirdropTransactionIntegrationTest {
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        // verify transferFrom would work
-        // TODO
-//        new TransferTransaction()
-//            .addApprovedTokenTransfer(tokenID, senderAccountID, -amount)
-//            .addTokenTransfer(tokenID, spenderAccountID, amount)
-//            .setTransactionId(TransactionId.generate(spenderAccountID))
-//            .freezeWith(testEnv.client)
-//            .sign(spenderKey)
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-
         testEnv.close();
     }
 
@@ -470,17 +459,6 @@ class TokenAirdropTransactionIntegrationTest {
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        // verify transferFrom would work
-        // TODO
-//        new TransferTransaction()
-//            .addApprovedNftTransfer(nftID.nft(nftSerials.get(0)), senderAccountID, spenderAccountID)
-//            .addApprovedNftTransfer(nftID.nft(nftSerials.get(1)), senderAccountID, spenderAccountID)
-//            .setTransactionId(TransactionId.generate(spenderAccountID))
-//            .freezeWith(testEnv.client)
-//            .sign(spenderKey)
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
-
         testEnv.close();
     }
 
@@ -496,6 +474,19 @@ class TokenAirdropTransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.EMPTY_TOKEN_TRANSFER_BODY.toString());
+
+        // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
+
+        // airdrop with invalid transfers
+        // fails with INVALID_TRANSACTION_BODY
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenAirdropTransaction()
+                .addTokenTransfer(tokenID, testEnv.operatorId, 100)
+                .addTokenTransfer(tokenID, testEnv.operatorId, 100)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_TRANSACTION_BODY.toString());
 
         testEnv.close();
     }
