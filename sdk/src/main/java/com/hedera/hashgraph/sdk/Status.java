@@ -1705,7 +1705,7 @@ public enum Status {
     /**
      * The transaction attempted to use more than the allowed number of `PendingAirdropId`.
      */
-    MAX_PENDING_AIRDROP_ID_EXCEEDED(ResponseCodeEnum.MAX_PENDING_AIRDROP_ID_EXCEEDED),
+    PENDING_AIRDROP_ID_LIST_TOO_LONG(ResponseCodeEnum.PENDING_AIRDROP_ID_LIST_TOO_LONG),
 
     /**
      * A pending airdrop already exists for the specified NFT.
@@ -1718,7 +1718,38 @@ public enum Status {
      * Requester should cancel all pending airdrops before resending
      * this transaction.
      */
-    ACCOUNT_HAS_PENDING_AIRDROPS(ResponseCodeEnum.ACCOUNT_HAS_PENDING_AIRDROPS);
+    ACCOUNT_HAS_PENDING_AIRDROPS(ResponseCodeEnum.ACCOUNT_HAS_PENDING_AIRDROPS),
+
+    /**
+     * Consensus throttle did not allow execution of this transaction.<br/>
+     * The transaction should be retried after a modest delay.
+     */
+    THROTTLED_AT_CONSENSUS(ResponseCodeEnum.THROTTLED_AT_CONSENSUS),
+
+    /**
+     * The provided pending airdrop id is invalid.<br/>
+     * This pending airdrop MAY already be claimed or cancelled.
+     * <p>
+     * The client SHOULD query a mirror node to determine the current status of
+     * the pending airdrop.
+     */
+    INVALID_PENDING_AIRDROP_ID(ResponseCodeEnum.INVALID_PENDING_AIRDROP_ID),
+
+    /**
+     * The token to be airdropped has a fallback royalty fee and cannot be
+     * sent or claimed via an airdrop transaction.
+     */
+    TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY(ResponseCodeEnum.TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY),
+
+    /**
+     * This airdrop claim is for a pending airdrop with an invalid token.<br/>
+     * The token might be deleted, or the sender may not have enough tokens
+     * to fulfill the offer.
+     * <p>
+     * The client SHOULD query mirror node to determine the status of the pending
+     * airdrop and whether the sender can fulfill the offer.
+     */
+    INVALID_TOKEN_IN_PENDING_AIRDROP(ResponseCodeEnum.INVALID_TOKEN_IN_PENDING_AIRDROP);
 
     final ResponseCodeEnum code;
 
@@ -2049,9 +2080,13 @@ public enum Status {
             case TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY -> TOKEN_HAS_NO_METADATA_OR_SUPPLY_KEY;
             case EMPTY_PENDING_AIRDROP_ID_LIST -> EMPTY_PENDING_AIRDROP_ID_LIST;
             case PENDING_AIRDROP_ID_REPEATED -> PENDING_AIRDROP_ID_REPEATED;
-            case MAX_PENDING_AIRDROP_ID_EXCEEDED -> MAX_PENDING_AIRDROP_ID_EXCEEDED;
+            case PENDING_AIRDROP_ID_LIST_TOO_LONG -> PENDING_AIRDROP_ID_LIST_TOO_LONG;
             case PENDING_NFT_AIRDROP_ALREADY_EXISTS -> PENDING_NFT_AIRDROP_ALREADY_EXISTS;
             case ACCOUNT_HAS_PENDING_AIRDROPS -> ACCOUNT_HAS_PENDING_AIRDROPS;
+            case THROTTLED_AT_CONSENSUS -> THROTTLED_AT_CONSENSUS;
+            case INVALID_PENDING_AIRDROP_ID -> INVALID_PENDING_AIRDROP_ID;
+            case TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY -> TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY;
+            case INVALID_TOKEN_IN_PENDING_AIRDROP -> INVALID_TOKEN_IN_PENDING_AIRDROP;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(

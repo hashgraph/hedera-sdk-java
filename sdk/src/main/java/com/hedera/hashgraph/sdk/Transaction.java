@@ -359,6 +359,8 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKEN_UNPAUSE -> new TokenUnpauseTransaction(txs);
             case TOKENREJECT -> new TokenRejectTransaction(txs);
             case TOKENAIRDROP -> new TokenAirdropTransaction(txs);
+            case TOKENCANCELAIRDROP -> new TokenCancelAirdropTransaction(txs);
+            case TOKENCLAIMAIRDROP -> new TokenClaimAirdropTransaction(txs);
             case CRYPTOAPPROVEALLOWANCE -> new AccountAllowanceApproveTransaction(txs);
             case CRYPTODELETEALLOWANCE -> new AccountAllowanceDeleteTransaction(txs);
             default -> throw new IllegalArgumentException("parsed transaction body has no data");
@@ -445,6 +447,8 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKENREJECT ->
                 new TokenRejectTransaction(body.setTokenReject(scheduled.getTokenReject()).build());
             case TOKENAIRDROP -> new TokenAirdropTransaction(body.setTokenAirdrop(scheduled.getTokenAirdrop()).build());
+            case TOKENCANCELAIRDROP -> new TokenCancelAirdropTransaction(body.setTokenCancelAirdrop(scheduled.getTokenCancelAirdrop()).build());
+            case TOKENCLAIMAIRDROP -> new TokenClaimAirdropTransaction(body.setTokenCancelAirdrop(scheduled.getTokenCancelAirdrop()).build());
             case SCHEDULEDELETE ->
                 new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
             default -> throw new IllegalStateException("schedulable transaction did not have a transaction set");
