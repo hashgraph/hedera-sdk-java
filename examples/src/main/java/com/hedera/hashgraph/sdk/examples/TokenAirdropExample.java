@@ -92,7 +92,7 @@ public class TokenAirdropExample {
          * Create 4 accounts
          */
         var privateKey1 = PrivateKey.generateECDSA();
-        var account1 = new AccountCreateTransaction()
+        var alice = new AccountCreateTransaction()
             .setKey(privateKey1)
             .setInitialBalance(new Hbar(10))
             .setMaxAutomaticTokenAssociations(-1)
@@ -101,7 +101,7 @@ public class TokenAirdropExample {
             .accountId;
 
         var privateKey2 = PrivateKey.generateECDSA();
-        var account2 = new AccountCreateTransaction()
+        var bob = new AccountCreateTransaction()
             .setKey(privateKey2)
             .setMaxAutomaticTokenAssociations(1)
             .execute(client)
@@ -109,16 +109,16 @@ public class TokenAirdropExample {
             .accountId;
 
         var privateKey3 = PrivateKey.generateECDSA();
-        var account3 = new AccountCreateTransaction()
+        var carol = new AccountCreateTransaction()
             .setKey(privateKey3)
             .setMaxAutomaticTokenAssociations(0)
             .execute(client)
             .getReceipt(client)
             .accountId;
 
-        var privateKey4 = PrivateKey.generateECDSA();
+        var treasuryKey = PrivateKey.generateECDSA();
         var treasuryAccount = new AccountCreateTransaction()
-            .setKey(privateKey4)
+            .setKey(treasuryKey)
             .setInitialBalance(new Hbar(10))
             .execute(client)
             .getReceipt(client)
@@ -143,7 +143,7 @@ public class TokenAirdropExample {
             .setMetadataKey(client.getOperatorPublicKey())
             .setPauseKey(client.getOperatorPublicKey())
             .freezeWith(client)
-            .sign(privateKey4)
+            .sign(treasuryKey)
             .execute(client)
             .getReceipt(client)
             .tokenId;
@@ -162,7 +162,7 @@ public class TokenAirdropExample {
             .setMetadataKey(client.getOperatorPublicKey())
             .setPauseKey(client.getOperatorPublicKey())
             .freezeWith(client)
-            .sign(privateKey4)
+            .sign(treasuryKey)
             .execute(client)
             .getReceipt(client)
             .tokenId;
@@ -180,47 +180,47 @@ public class TokenAirdropExample {
          */
         System.out.println("Airdropping fts");
         var txnRecord = new TokenAirdropTransaction()
-            .addTokenTransfer(tokenID, account1, 10)
+            .addTokenTransfer(tokenID, alice, 10)
             .addTokenTransfer(tokenID, treasuryAccount, -10)
-            .addTokenTransfer(tokenID, account2, 10)
+            .addTokenTransfer(tokenID, bob, 10)
             .addTokenTransfer(tokenID, treasuryAccount, -10)
-            .addTokenTransfer(tokenID, account3, 10)
+            .addTokenTransfer(tokenID, carol, 10)
             .addTokenTransfer(tokenID, treasuryAccount, -10)
             .freezeWith(client)
-            .sign(privateKey4)
+            .sign(treasuryKey)
             .execute(client)
             .getRecord(client);
 
         /*
          * Step 4:
-         * Get the transaction record and see one pending airdrop (for Account 3)
+         * Get the transaction record and see one pending airdrop (for carol)
          */
         System.out.println("Pending airdrops length: " + txnRecord.pendingAirdropRecords.size());
         System.out.println("Pending airdrops: " + txnRecord.pendingAirdropRecords.get(0));
 
         /*
          * Step 5:
-         * Query to verify Account 1 and Account 2 received the airdrops and Account 3 did not
+         * Query to verify alice and bob received the airdrops and carol did not
          */
-        var account1Balance = new AccountBalanceQuery()
-            .setAccountId(account1)
+        var aliceBalance = new AccountBalanceQuery()
+            .setAccountId(alice)
             .execute(client);
-        var account2Balance = new AccountBalanceQuery()
-            .setAccountId(account2)
+        var bobBalance = new AccountBalanceQuery()
+            .setAccountId(bob)
             .execute(client);
-        var account3Balance = new AccountBalanceQuery()
-            .setAccountId(account3)
+        var carolBalance = new AccountBalanceQuery()
+            .setAccountId(carol)
             .execute(client);
 
-        System.out.println("Account1 ft balance after airdrop: " + account1Balance.tokens.get(tokenID));
-        System.out.println("Account2 ft balance after airdrop: " + account2Balance.tokens.get(tokenID));
-        System.out.println("Account3 ft balance after airdrop: " + account3Balance.tokens.get(tokenID));
+        System.out.println("Alice ft balance after airdrop: " + aliceBalance.tokens.get(tokenID));
+        System.out.println("Bob ft balance after airdrop: " + bobBalance.tokens.get(tokenID));
+        System.out.println("Carol ft balance after airdrop: " + carolBalance.tokens.get(tokenID));
 
         /*
          * Step 6:
-         * Claim the airdrop for Account 3
+         * Claim the airdrop for carol
          */
-        System.out.println("Claiming ft with account3");
+        System.out.println("Claiming ft with carol");
         new TokenClaimAirdropTransaction()
             .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
             .freezeWith(client)
@@ -228,10 +228,10 @@ public class TokenAirdropExample {
             .execute(client)
             .getReceipt(client);
 
-        account3Balance = new AccountBalanceQuery()
-            .setAccountId(account3)
+        carolBalance = new AccountBalanceQuery()
+            .setAccountId(carol)
             .execute(client);
-        System.out.println("Account3 ft balance after claim: " + account3Balance.tokens.get(tokenID));
+        System.out.println("Carol ft balance after claim: " + carolBalance.tokens.get(tokenID));
 
         /*
          * Step 7:
@@ -239,45 +239,45 @@ public class TokenAirdropExample {
          */
         System.out.println("Airdropping nfts");
         txnRecord = new TokenAirdropTransaction()
-            .addNftTransfer(nftID.nft(1), treasuryAccount, account1)
-            .addNftTransfer(nftID.nft(2), treasuryAccount, account2)
-            .addNftTransfer(nftID.nft(3), treasuryAccount, account3)
+            .addNftTransfer(nftID.nft(1), treasuryAccount, alice)
+            .addNftTransfer(nftID.nft(2), treasuryAccount, bob)
+            .addNftTransfer(nftID.nft(3), treasuryAccount, carol)
             .freezeWith(client)
-            .sign(privateKey4)
+            .sign(treasuryKey)
             .execute(client)
             .getRecord(client);
 
         /*
          * Step 8:
-         * Get the transaction record and verify two pending airdrops (for Account 2 & 3)
+         * Get the transaction record and verify two pending airdrops (for bob & 3)
          */
         System.out.println("Pending airdrops length: " + txnRecord.pendingAirdropRecords.size());
-        System.out.println("Pending airdrops for account 2: " + txnRecord.pendingAirdropRecords.get(0));
-        System.out.println("Pending airdrops for account 3: " + txnRecord.pendingAirdropRecords.get(1));
+        System.out.println("Pending airdrops for Bob: " + txnRecord.pendingAirdropRecords.get(0));
+        System.out.println("Pending airdrops for Carol: " + txnRecord.pendingAirdropRecords.get(1));
 
         /*
          * Step 9:
-         * Query to verify Account 1 received the airdrop and Account 2 and Account 3 did not
+         * Query to verify alice received the airdrop and bob and carol did not
          */
-        account1Balance = new AccountBalanceQuery()
-            .setAccountId(account1)
+        aliceBalance = new AccountBalanceQuery()
+            .setAccountId(alice)
             .execute(client);
-        account2Balance = new AccountBalanceQuery()
-            .setAccountId(account2)
+        bobBalance = new AccountBalanceQuery()
+            .setAccountId(bob)
             .execute(client);
-        account3Balance = new AccountBalanceQuery()
-            .setAccountId(account3)
+        carolBalance = new AccountBalanceQuery()
+            .setAccountId(carol)
             .execute(client);
 
-        System.out.println("Account1 nft balance after airdrop: " + account1Balance.tokens.get(nftID));
-        System.out.println("Account2 nft balance after airdrop: " + account2Balance.tokens.get(nftID));
-        System.out.println("Account3 nft balance after airdrop: " + account3Balance.tokens.get(nftID));
+        System.out.println("Alice nft balance after airdrop: " + aliceBalance.tokens.get(nftID));
+        System.out.println("Bob nft balance after airdrop: " + bobBalance.tokens.get(nftID));
+        System.out.println("Carol nft balance after airdrop: " + carolBalance.tokens.get(nftID));
 
         /*
          * Step 10:
-         * Claim the airdrop for Account 2
+         * Claim the airdrop for bob
          */
-        System.out.println("Claiming nft with account2");
+        System.out.println("Claiming nft with Bob");
         new TokenClaimAirdropTransaction()
             .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
             .freezeWith(client)
@@ -285,35 +285,35 @@ public class TokenAirdropExample {
             .execute(client)
             .getReceipt(client);
 
-        account2Balance = new AccountBalanceQuery()
-            .setAccountId(account2)
+        bobBalance = new AccountBalanceQuery()
+            .setAccountId(bob)
             .execute(client);
-        System.out.println("Account2 nft balance after claim: " + account2Balance.tokens.get(nftID));
+        System.out.println("Bob nft balance after claim: " + bobBalance.tokens.get(nftID));
 
         /*
          * Step 11:
-         * Cancel the airdrop for Account 3
+         * Cancel the airdrop for carol
          */
-        System.out.println("Canceling nft for account3");
+        System.out.println("Canceling nft for Carol");
         new TokenCancelAirdropTransaction()
             .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(1).getPendingAirdropId())
             .freezeWith(client)
-            .sign(privateKey4)
+            .sign(treasuryKey)
             .execute(client)
             .getReceipt(client);
 
-        account3Balance = new AccountBalanceQuery()
-            .setAccountId(account3)
+        carolBalance = new AccountBalanceQuery()
+            .setAccountId(carol)
             .execute(client);
-        System.out.println("Account3 nft balance after cancel: " + account3Balance.tokens.get(nftID));
+        System.out.println("Carol nft balance after cancel: " + carolBalance.tokens.get(nftID));
 
         /*
          * Step 12:
-         * Reject the NFT for Account 2
+         * Reject the NFT for bob
          */
-        System.out.println("Rejecting nft with account2");
+        System.out.println("Rejecting nft with Bob");
         new TokenRejectTransaction()
-            .setOwnerId(account2)
+            .setOwnerId(bob)
             .addNftId(nftID.nft(2))
             .freezeWith(client)
             .sign(privateKey2)
@@ -322,12 +322,12 @@ public class TokenAirdropExample {
 
         /*
          * Step 13:
-         * Query to verify Account 2 no longer has the NFT
+         * Query to verify bob no longer has the NFT
          */
-        account2Balance = new AccountBalanceQuery()
-            .setAccountId(account2)
+        bobBalance = new AccountBalanceQuery()
+            .setAccountId(bob)
             .execute(client);
-        System.out.println("Account2 nft balance after reject: " + account2Balance.tokens.get(nftID));
+        System.out.println("Bob nft balance after reject: " + bobBalance.tokens.get(nftID));
 
         /*
          * Step 13:
@@ -340,11 +340,11 @@ public class TokenAirdropExample {
 
         /*
          * Step 14:
-         * Reject the fungible tokens for Account 3
+         * Reject the fungible tokens for Carol
          */
-        System.out.println("Rejecting ft with account3");
+        System.out.println("Rejecting ft with Carol");
         new TokenRejectTransaction()
-            .setOwnerId(account3)
+            .setOwnerId(carol)
             .addTokenId(tokenID)
             .freezeWith(client)
             .sign(privateKey3)
@@ -353,12 +353,12 @@ public class TokenAirdropExample {
 
         /*
          * Step 14:
-         * Query to verify Account 3 no longer has the fungible tokens
+         * Query to verify carol no longer has the fungible tokens
          */
-        account3Balance = new AccountBalanceQuery()
-            .setAccountId(account3)
+        carolBalance = new AccountBalanceQuery()
+            .setAccountId(carol)
             .execute(client);
-        System.out.println("Account3 ft balance after reject: " + account3Balance.tokens.get(tokenID));
+        System.out.println("Carol ft balance after reject: " + carolBalance.tokens.get(tokenID));
 
         /*
          * Step 15:
@@ -387,5 +387,4 @@ public class TokenAirdropExample {
 
         return metadatas;
     }
-
 }
