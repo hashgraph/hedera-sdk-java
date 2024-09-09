@@ -42,7 +42,7 @@ public class IPv4Address implements Cloneable {
     /**
      * Constructor.
      */
-    IPv4Address() {
+    public IPv4Address() {
     }
 
     /**

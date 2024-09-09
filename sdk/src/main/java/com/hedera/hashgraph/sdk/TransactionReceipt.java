@@ -123,6 +123,16 @@ public final class TransactionReceipt {
     public final List<Long> serials;
 
     /**
+     * In the receipt of a NodeCreate, NodeUpdate, NodeDelete, the id of the newly created node.
+     * An affected node identifier.<br/>
+     * This value SHALL be set following a `createNode` transaction.<br/>
+     * This value SHALL be set following a `updateNode` transaction.<br/>
+     * This value SHALL be set following a `deleteNode` transaction.<br/>
+     * This value SHALL NOT be set following any other transaction.
+     */
+    public final long nodeId;
+
+    /**
      * The receipts of processing all transactions with the given id, in consensus time order.
      */
     public final List<TransactionReceipt> duplicates;
@@ -148,6 +158,7 @@ public final class TransactionReceipt {
         @Nullable ScheduleId scheduleId,
         @Nullable TransactionId scheduledTransactionId,
         List<Long> serials,
+        long nodeId,
         List<TransactionReceipt> duplicates,
         List<TransactionReceipt> children
     ) {
@@ -165,6 +176,7 @@ public final class TransactionReceipt {
         this.scheduleId = scheduleId;
         this.scheduledTransactionId = scheduledTransactionId;
         this.serials = serials;
+        this.nodeId = nodeId;
         this.duplicates = duplicates;
         this.children = children;
     }
@@ -237,6 +249,8 @@ public final class TransactionReceipt {
 
         var serials = transactionReceipt.getSerialNumbersList();
 
+        var nodeId = transactionReceipt.getNodeId();
+
         return new TransactionReceipt(
             transactionId,
             status,
@@ -252,6 +266,7 @@ public final class TransactionReceipt {
             scheduleId,
             scheduledTransactionId,
             serials,
+            nodeId,
             duplicates,
             children
         );
@@ -293,7 +308,7 @@ public final class TransactionReceipt {
      * @throws ReceiptStatusException when shouldValidate is true and the transaction status is not SUCCESS
      */
     public TransactionReceipt validateStatus(boolean shouldValidate) throws ReceiptStatusException {
-        if (shouldValidate && status != Status.SUCCESS) {
+        if (shouldValidate && status != Status.SUCCESS && status != Status.FEE_SCHEDULE_FILE_PART_UPLOADED) {
             throw new ReceiptStatusException(transactionId, this);
         }
         return this;
@@ -358,6 +373,8 @@ public final class TransactionReceipt {
             transactionReceiptBuilder.addSerialNumbers(serial);
         }
 
+        transactionReceiptBuilder.setNodeId(nodeId);
+
         return transactionReceiptBuilder.build();
     }
 
@@ -378,6 +395,7 @@ public final class TransactionReceipt {
             .add("scheduleId", scheduleId)
             .add("scheduledTransactionId", scheduledTransactionId)
             .add("serials", serials)
+            .add("nodeId", nodeId)
             .add("duplicates", duplicates)
             .add("children", children)
             .toString();

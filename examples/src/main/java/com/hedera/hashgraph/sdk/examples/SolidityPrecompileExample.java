@@ -26,6 +26,8 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 /**
  * This example just instantiates the solidity contract
@@ -39,7 +41,6 @@ import java.util.Objects;
  * When this example spits out a raw response code,
  * you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
-// TODO: update description
 class SolidityPrecompileExample {
 
     /*
@@ -127,6 +128,40 @@ class SolidityPrecompileExample {
          * Configure steps in ContractHelper.
          */
         System.out.println("Configuring steps in `ContractHelper`...");
+        // Update the signer to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(OPERATOR_ID)
+            .setKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+            .execute(client)
+            .getReceipt(client);
+
+        // Update the Alice account to have contractId KeyList (this is by security requirement)
+        new AccountUpdateTransaction()
+            .setAccountId(aliceAccountId)
+            .setKey(KeyList.of(alicePublicKey, contractHelper.contractId).setThreshold(1))
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        Consumer<String> additionalLogic = tokenAddress -> {
+            try {
+                var tokenUpdateTransactionReceipt = new TokenUpdateTransaction()
+                    .setTokenId(TokenId.fromSolidityAddress(tokenAddress))
+                    .setAdminKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+                    .setSupplyKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId).setThreshold(1))
+                    .freezeWith(client)
+                    .sign(alicePrivateKey)
+                    .execute(client)
+                    .getReceipt(client);
+
+                System.out.println("Status of Token Update Transaction: " + tokenUpdateTransactionReceipt.status);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        // Configure steps in ContractHelper
         contractHelper
             .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));

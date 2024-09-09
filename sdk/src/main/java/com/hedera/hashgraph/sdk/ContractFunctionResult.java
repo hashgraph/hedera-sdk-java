@@ -489,7 +489,7 @@ public final class ContractFunctionResult {
     }
 
     public Tuple getResult(String types) {
-        TupleType tupleType = TupleType.parse(types);
+        TupleType<Tuple> tupleType = TupleType.parse(types);
         return tupleType.decode(rawResult.toByteArray());
     }
 }

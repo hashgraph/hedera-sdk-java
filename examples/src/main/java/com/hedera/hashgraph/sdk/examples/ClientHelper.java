@@ -21,6 +21,8 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.Hbar;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -35,11 +37,14 @@ public class ClientHelper {
     private static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
 
     public static Client forName(String network) throws InterruptedException {
+        Client client;
+
         if (network.equals(LOCAL_NETWORK_NAME)) {
-            return forLocalNetwork();
+            client = forLocalNetwork();
         } else {
-            return Client.forName(network);
+            client = Client.forName(network);
         }
+        return client.setDefaultMaxTransactionFee(new Hbar(50));
     }
 
     public static Client forLocalNetwork() throws InterruptedException {

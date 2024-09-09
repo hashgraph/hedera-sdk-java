@@ -194,7 +194,6 @@ class ConsensusPubSubChunkedExample {
         System.out.println("Consensus Service Submit Large Message And Subscribe Example Complete!");
     }
 
-    // TODO: check if it will possible to optimize it
     private static String readResources(String filename) {
         InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();

@@ -68,9 +68,7 @@ abstract class RunAllExample : DefaultTask() {
             .asSequence()
             .map { it.name.replace(".java", "") }
             .filter { it != "ValidateChecksumExample" } // disabled this example, because it needs user input (but it WORKS)
-            .filter { it != "ZeroTokenOperationsExample" } // doesn't work
-            .filter { it != "SolidityPrecompileExample" } // doesn't work with hedera-local-node
-            .filter { it != "ConsensusPubSubChunkedExample" } // doesn't work on CI
+            .filter { it != "ConsensusPubSubChunkedExample" } // is flaky on local-node env, will be investigated
             .toList()
 
         exampleClasses.forEach { className ->
