@@ -27,7 +27,10 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Collections;
 import java.util.Objects;
 
-// TODO: description
+/**
+ * Steps 1-5 are executed through ContractHelper and calling HIP564Example Contract.
+ * Step 6 is executed through the SDK
+ */
 class ZeroTokenOperationsExample {
 
     /*
@@ -119,7 +122,7 @@ class ZeroTokenOperationsExample {
          */
         System.out.println("Configuring steps in `ContractHelper`...");
         contractHelper
-            .setPayableAmountForStep(0, Hbar.from(20)) // TODO: double check when example is fixed
+            .setPayableAmountForStep(0, Hbar.from(20))
             .addSignerForStep(1, alicePrivateKey);
 
          /*

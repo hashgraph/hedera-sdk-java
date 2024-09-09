@@ -26,4 +26,5 @@ module com.hedera.hashgraph.examples {
     requires java.dotenv;
 
     requires static java.annotation;
+    requires com.google.protobuf;
 }

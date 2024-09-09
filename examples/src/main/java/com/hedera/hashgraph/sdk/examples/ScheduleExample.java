@@ -165,7 +165,6 @@ class ScheduleExample {
 
         TransactionId transactionId = transferTxResponse.transactionId;
         String validMirrorTransactionId = transactionId.accountId.toString() + "-" + transactionId.validStart.getEpochSecond() + "-" + transactionId.validStart.getNano();
-        // TODO: double check this
         String mirrorNodeUrl = "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId;
         System.out.println("The following link should query the mirror node for the scheduled transaction: " + mirrorNodeUrl);
 

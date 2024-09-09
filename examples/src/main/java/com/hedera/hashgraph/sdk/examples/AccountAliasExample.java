@@ -48,7 +48,6 @@ import java.util.Objects;
  * until an amount of Hbar is transferred to the account. The moment that Hbar is transferred to that aliasKey
  * AccountId is the moment that that account actually begins to exist in the Hedera ledger.
  */
-// TODO: rename this examples, as it is about HIP-32?
 class AccountAliasExample {
 
     /*

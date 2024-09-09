@@ -29,7 +29,6 @@ import java.util.Objects;
 /**
  * How to stake to some account.
  *
- * TODO: possible duplicate of `StakingWithUpdateExample`?
  */
 class StakingExample {
 

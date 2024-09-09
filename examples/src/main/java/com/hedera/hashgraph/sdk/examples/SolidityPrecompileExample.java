@@ -166,44 +166,44 @@ class SolidityPrecompileExample {
             .setResultValidatorForStep(0, contractFunctionResult -> {
                 System.out.println("getPseudoRandomSeed() returned " + Arrays.toString(contractFunctionResult.getBytes32(0)));
                 return true;
-            }).setPayableAmountForStep(1, Hbar.from(20)) // TODO: double check when example is fixed
-            // Step 3 associates Alice with the token, which requires Alice's signature.
+            }).setPayableAmountForStep(1, Hbar.from(20))
+            // step 3 associates Alice with the token, which requires Alice's signature
             .addSignerForStep(3, alicePrivateKey)
             .addSignerForStep(5, alicePrivateKey)
-            .setParameterSupplierForStep(11, () -> new ContractFunctionParameters()
-                // When contracts work with a public key, they handle the raw bytes of the public key.
-                .addBytes(alicePublicKey.toBytesRaw())).setPayableAmountForStep(11, Hbar.from(40))
+            .setParameterSupplierForStep(11, () -> {
+                return new ContractFunctionParameters()
+                    // when contracts work with a public key, they handle the raw bytes of the public key
+                    .addBytes(alicePublicKey.toBytesRaw());
+            }).setPayableAmountForStep(11, Hbar.from(40))
             // Because we're setting the adminKey for the created NFT token to Alice's key,
             // Alice must sign the ContractExecuteTransaction.
             .addSignerForStep(11, alicePrivateKey)
-            // And Alice must sign for minting because her key is the supply key.
+            .setStepLogic(11, additionalLogic)
+            // and Alice must sign for minting because her key is the supply key.
             .addSignerForStep(12, alicePrivateKey)
-            .setParameterSupplierForStep(12, () -> new ContractFunctionParameters()
-                // Add three metadatas. Alice must sign to become associated with the token.
-                .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}}))
+            .setParameterSupplierForStep(12, () -> {
+                return new ContractFunctionParameters()
+                    // add three metadatas
+                    .addBytesArray(new byte[][]{new byte[]{0x01b}, new byte[]{0x02b}, new byte[]{0x03b}});
+            }) // and alice must sign to become associated with the token.
             .addSignerForStep(13, alicePrivateKey)
-            // Alice must sign to burn the token because her key is the supply key.
+            // Alice must sign to burn the token because her key is the supply key
             .addSignerForStep(16, alicePrivateKey);
 
+        // step 0 tests pseudo random number generator (PRNG)
+        // step 1 creates a fungible token
+        // step 2 mints it
+        // step 3 associates Alice with it
+        // step 4 transfers it to Alice.
+        // step 5 approves an allowance of the fungible token with operator as the owner and Alice as the spender [NOT WORKING]
+        // steps 6 - 10 test misc functions on the fungible token (see PrecompileExample.sol for details).
+        // step 11 creates an NFT token with a custom fee, and with the admin and supply set to Alice's key
+        // step 12 mints some NFTs
+        // step 13 associates Alice with the NFT token
+        // step 14 transfers some NFTs to Alice
+        // step 15 approves an NFT allowance with operator as the owner and Alice as the spender [NOT WORKING]
+        // step 16 burn some NFTs
 
-        /*
-         * Step 5:
-         * Execute steps in `ContractHelper`.
-         * - step 0 tests pseudo random number generator (PRNG);
-         * - step 1 creates a fungible token;
-         * - step 2 mints it;
-         * - step 3 associates Alice with it;
-         * - step 4 transfers it to Alice;
-         * - step 5 approves an allowance of the fungible token with operator as the owner and Alice as the spender;
-         * - steps 6 - 10 test misc functions on the fungible token (see PrecompileExample.sol for details);
-         * - step 11 creates an NFT token with a custom fee, and with the admin and supply set to Alice's key;
-         * - step 12 mints some NFTs;
-         * - step 13 associates Alice with the NFT token;
-         * - step 14 transfers some NFTs to Alice;
-         * - step 15 approves an NFT allowance with operator as the owner and Alice as the spender;
-         * - step 16 burn some NFTs.
-         */
-        System.out.println("Executing steps in `ContractHelper`.");
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 16, client);
 
         System.out.println("All steps completed with valid results.");

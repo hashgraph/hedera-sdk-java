@@ -31,7 +31,6 @@ import java.util.Objects;
 /**
  * How to get file contents.
  *
- * TODO: possible duplicate of `CreateFileExample` and `DeleteFileExample`.
  */
 class GetFileContentsExample {
 

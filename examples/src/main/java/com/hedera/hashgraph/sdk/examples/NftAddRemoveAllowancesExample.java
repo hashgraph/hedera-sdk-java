@@ -32,7 +32,6 @@ import java.util.Objects;
 /**
  * How to grant another account the right to transfer hbar, fungible and non-fungible tokens from your account (HIP-336).
  */
-// TODO: double check this example (case with delegating spender): rewrite code, logs and docs
 class NftAddRemoveAllowancesExample {
 
     /*

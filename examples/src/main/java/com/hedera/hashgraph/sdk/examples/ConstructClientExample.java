@@ -58,9 +58,8 @@ class ConstructClientExample {
      */
 
     /**
-     * Path to .json config file.
+     * Path to .json config file. See resources/client-config.json
      */
-    // TODO: its not defined in anyway in .env.sample or in docs -- need to define or write an additional doc here
     @Nullable
     private static final String CONFIG_FILE = Dotenv.load().get("CONFIG_FILE");
 

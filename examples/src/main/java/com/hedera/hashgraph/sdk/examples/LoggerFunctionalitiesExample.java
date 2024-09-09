@@ -29,7 +29,6 @@ import java.util.Objects;
 /**
  * How SDK Logger works.
  *
- * TODO: this example should be revisited/updated, as there is almost no logging with showcased logging levels.
  */
 public class LoggerFunctionalitiesExample {
 

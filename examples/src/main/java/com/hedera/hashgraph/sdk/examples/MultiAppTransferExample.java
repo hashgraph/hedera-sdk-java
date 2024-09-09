@@ -114,7 +114,18 @@ class MultiAppTransferExample {
             .accountId;
         Objects.requireNonNull(userAccountId);
 
-        // TODO: display balances before transfer
+        Hbar senderBalanceBefore = new AccountBalanceQuery()
+            .setAccountId(userAccountId)
+            .execute(client)
+            .hbars;
+
+        Hbar exchangeBalanceBefore = new AccountBalanceQuery()
+            .setAccountId(exchangeAccountId)
+            .execute(client)
+            .hbars;
+
+        System.out.println("User account (" + userAccountId + ") balance: " + senderBalanceBefore);
+        System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + exchangeBalanceBefore);
 
         /*
          * Step 3:

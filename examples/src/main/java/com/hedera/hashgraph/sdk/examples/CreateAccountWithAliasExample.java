@@ -29,7 +29,6 @@ import java.util.Objects;
 /**
  * How to create a Hedera account with alias.
  *
- * TODO: possible duplicate of `CreateAccountWithAliasAndReceiverSignatureRequiredExample`?
  */
 class CreateAccountWithAliasExample {
 
