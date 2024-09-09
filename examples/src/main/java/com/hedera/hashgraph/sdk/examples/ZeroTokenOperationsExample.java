@@ -232,12 +232,6 @@ class ZeroTokenOperationsExample {
             .execute(client)
             .getReceipt(client);
 
-        new ContractDeleteTransaction()
-            .setContractId(contractHelper.contractId)
-            .setTransferAccountId(OPERATOR_ID)
-            .execute(client)
-            .getReceipt(client);
-
         client.close();
 
         System.out.println("Zero Token Operations Example Complete!");

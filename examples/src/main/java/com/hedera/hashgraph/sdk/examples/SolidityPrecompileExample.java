@@ -20,101 +20,56 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
-import com.hedera.hashgraph.sdk.logger.LogLevel;
-import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-/**
- * This example just instantiates the solidity contract
- * defined in `resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.sol`, which has been
- * compiled into `resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.json`.
- * <p>
- * You should go look at that `PrecompileExample.sol` file, because that's where the meat of this example is.
- * <p>
- * This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
- * <p>
- * When this example spits out a raw response code,
- * you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
+/*
+This example just instantiates the solidity contract
+defined in examples/src/main/resources/precompile-example/PrecompileExample.sol, which has been
+compiled into examples/src/main/resources/precompile-example/PrecompileExample.json.
+
+You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
+
+This example uses the ContractHelper class (defined in ./ContractHelper.java) to declutter things.
+
+When this example spits out a raw response code,
+you can look it up here: https://github.com/hashgraph/hedera-protobufs/blob/main/services/response_code.proto
  */
-class SolidityPrecompileExample {
 
-    /*
-     * See .env.sample in the examples folder root for how to specify values below
-     * or set environment variables with the same names.
-     */
+public class SolidityPrecompileExample {
 
-    /**
-     * Operator's account ID.
-     * Used to sign and pay for operations on Hedera.
-     */
+    // see `.env.sample` in the repository root for how to specify these values
+    // or set environment variables with the same names
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-
-    /**
-     * Operator's private key.
-     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-
-    /**
-     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
-     * Network can be: localhost, testnet, previewnet or mainnet.
-     */
+    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    /**
-     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
-     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
-     * <p>
-     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
-     */
-    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
+    private SolidityPrecompileExample() {
+    }
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Solidity Precompile Example Start!");
-
-        /*
-         * Step 0:
-         * Create and configure the SDK Client.
-         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-        // All generated transactions will be paid by this account and signed by this key.
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
-        // Attach logger to the SDK Client.
-        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        /*
-         * Step 1:
-         * Generate ED25519 key pair.
-         */
-        System.out.println("Generating ED25519 key pair...");
+        // Defaults the operator account ID and key such that all generated transactions will be paid for
+        // by this account and be signed by this key
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        // We need a new account for the contract to interact with in some of its steps
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
-
-        /*
-         * Step 2:
-         * Create a new account for the contract to interact with in some of its steps.
-         */
-        System.out.println("Creating Alice account...");
         AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
             .setKey(alicePublicKey)
-            .setInitialBalance(Hbar.from(1))
+            .setInitialBalance(Hbar.fromTinybars(1000))
             .execute(client)
             .getReceipt(client)
             .accountId
         );
-        Objects.requireNonNull(aliceAccountId);
-        System.out.println("Created Alice's account with ID: " + aliceAccountId);
 
-        /*
-         * Step 3:
-         * Instantiate ContractHelper.
-         */
-        System.out.println("Instantiating `ContractHelper`...");
+        // Instantiate ContractHelper
         ContractHelper contractHelper = new ContractHelper(
             "contracts/precompile/PrecompileExample.json",
             new ContractFunctionParameters()
@@ -123,11 +78,6 @@ class SolidityPrecompileExample {
             client
         );
 
-        /*
-         * Step 4:
-         * Configure steps in ContractHelper.
-         */
-        System.out.println("Configuring steps in `ContractHelper`...");
         // Update the signer to have contractId KeyList (this is by security requirement)
         new AccountUpdateTransaction()
             .setAccountId(OPERATOR_ID)
@@ -207,27 +157,5 @@ class SolidityPrecompileExample {
         contractHelper.executeSteps(/* from step */ 0, /* to step */ 16, client);
 
         System.out.println("All steps completed with valid results.");
-
-        /*
-         * Clean up:
-         * Delete created account and contract.
-         */
-        new AccountDeleteTransaction()
-            .setAccountId(aliceAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
-
-        new ContractDeleteTransaction()
-            .setContractId(contractHelper.contractId)
-            .setTransferAccountId(OPERATOR_ID)
-            .execute(client)
-            .getReceipt(client);
-
-        client.close();
-
-        System.out.println("Solidity Precompile Example Complete!");
     }
 }
