@@ -145,15 +145,16 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     *
      * Construct a client given a set of nodes.
-     *
-     * <p>It is the responsibility of the caller to ensure that all nodes in the map are part of the
+     * It is the responsibility of the caller to ensure that all nodes in the map are part of the
      * same Hedera network. Failure to do so will result in undefined behavior.
-     *
-     * <p>The client will load balance all requests to Hedera using a simple round-robin scheme to
+     * The client will load balance all requests to Hedera using a simple round-robin scheme to
      * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be tried.
      *
      * @param networkMap the map of node IDs to node addresses that make up the network.
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forNetworkWithExecutor(Map<String, AccountId> networkMap, ExecutorService executor) {
@@ -203,6 +204,8 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnetWithExecutor(ExecutorService executor) {
@@ -217,6 +220,8 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
      * access</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnetWithExecutor(ExecutorService executor) {
@@ -232,6 +237,8 @@ public final class Client implements AutoCloseable {
      * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
      * nodes</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forPreviewnetWithExecutor(ExecutorService executor) {
@@ -1410,6 +1417,34 @@ public final class Client implements AutoCloseable {
     @Override
     public synchronized void close() throws TimeoutException {
         close(closeTimeout);
+    }
+
+    /**
+     * Initiates an orderly shutdown of all channels (to the Hedera network),
+     * without closing the ExecutorService {@link #executor}
+     *
+     * @throws TimeoutException if the network doesn't close in time
+     */
+    public synchronized void closeChannels() throws TimeoutException {
+        var closeDeadline = Instant.now().plus(closeTimeout);
+
+        networkUpdatePeriod = null;
+        cancelScheduledNetworkUpdate();
+        cancelAllSubscriptions();
+
+        network.beginClose();
+        mirrorNetwork.beginClose();
+
+        var networkError = network.awaitClose(closeDeadline, null);
+        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+
+        if (mirrorNetworkError != null) {
+            if (mirrorNetworkError instanceof TimeoutException ex) {
+                throw ex;
+            } else {
+                throw new RuntimeException(mirrorNetworkError);
+            }
+        }
     }
 
     /**
