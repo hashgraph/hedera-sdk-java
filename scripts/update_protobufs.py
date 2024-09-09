@@ -135,6 +135,7 @@ def ensure_protobufs():
         print(">>> No protobufs detected")
         run_command("git", "clone", PROTO_GIT_REMOTE, PROTO_GIT_PATH)
     os.chdir(PROTO_GIT_PATH)
+    run_command("git", "fetch")
     checkout_ref = PROTO_GIT_REF if PROTO_GIT_REF else get_latest_tag()
     print(f">>> Checking out {checkout_ref}")
     run_command("git", "checkout", checkout_ref)
