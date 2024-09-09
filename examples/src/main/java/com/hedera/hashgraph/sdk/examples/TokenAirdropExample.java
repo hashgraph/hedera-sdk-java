@@ -249,7 +249,7 @@ public class TokenAirdropExample {
 
         /*
          * Step 8:
-         * Get the transaction record and verify two pending airdrops (for bob & 3)
+         * Get the transaction record and verify two pending airdrops (for bob & carol)
          */
         System.out.println("Pending airdrops length: " + txnRecord.pendingAirdropRecords.size());
         System.out.println("Pending airdrops for Bob: " + txnRecord.pendingAirdropRecords.get(0));
