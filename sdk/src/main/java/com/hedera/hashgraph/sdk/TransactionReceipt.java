@@ -308,7 +308,7 @@ public final class TransactionReceipt {
      * @throws ReceiptStatusException when shouldValidate is true and the transaction status is not SUCCESS
      */
     public TransactionReceipt validateStatus(boolean shouldValidate) throws ReceiptStatusException {
-        if (shouldValidate && status != Status.SUCCESS) {
+        if (shouldValidate && status != Status.SUCCESS && status != Status.FEE_SCHEDULE_FILE_PART_UPLOADED) {
             throw new ReceiptStatusException(transactionId, this);
         }
         return this;

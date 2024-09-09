@@ -26,7 +26,7 @@ dependencies.constraints {
     api("com.esaulpaugh:headlong:12.1.0") {
         because("headlong")
     }
-    api("com.github.spotbugs:spotbugs-annotations:4.7.3") {
+    api("com.github.spotbugs:spotbugs-annotations:4.8.6") {
         because("com.github.spotbugs.annotations")
     }
     api("com.google.errorprone:error_prone_annotations:2.21.1") {
@@ -81,7 +81,7 @@ dependencies.constraints {
     api("io.github.json-snapshot:json-snapshot:1.0.17") {
         because("json.snapshot")
     }
-    api("org.apache.commons:commons-lang3:3.16.0") {
+    api("org.apache.commons:commons-lang3:3.17.0") {
         because("org.apache.commons.lang3")
     }
     api("org.assertj:assertj-core:3.26.3") {
@@ -89,7 +89,7 @@ dependencies.constraints {
     }
 
     // Examples
-    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.10") {
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.20") {
         because("kotlin.stdlib")
     }
 }

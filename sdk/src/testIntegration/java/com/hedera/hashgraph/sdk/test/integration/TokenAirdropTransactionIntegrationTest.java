@@ -36,7 +36,6 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
@@ -95,6 +94,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -144,6 +145,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -190,6 +193,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
         assertEquals(mitedNfts - 2, operatorBalance.tokens.get(nftID));
+
+        testEnv.close();
     }
 
     @Test
@@ -282,6 +287,8 @@ class TokenAirdropTransactionIntegrationTest {
             .execute(testEnv.client);
         assertEquals(fungibleInitialBalance - amount + 1, operatorBalance.tokens.get(customFeeTokenID));
         assertEquals(fungibleInitialBalance - amount, operatorBalance.tokens.get(tokenID));
+
+        testEnv.close();
     }
 
     @Test
@@ -311,6 +318,8 @@ class TokenAirdropTransactionIntegrationTest {
             .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -347,6 +356,8 @@ class TokenAirdropTransactionIntegrationTest {
             .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
             .execute(testEnv.client)
             .getReceipt(testEnv.client);
+
+        testEnv.close();
     }
 
     @Test
@@ -393,16 +404,7 @@ class TokenAirdropTransactionIntegrationTest {
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        // verify transferFrom would work
-        // TODO
-//        new TransferTransaction()
-//            .addApprovedTokenTransfer(tokenID, senderAccountID, -amount)
-//            .addTokenTransfer(tokenID, spenderAccountID, amount)
-//            .setTransactionId(TransactionId.generate(spenderAccountID))
-//            .freezeWith(testEnv.client)
-//            .sign(spenderKey)
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
+        testEnv.close();
     }
 
     @Test
@@ -457,16 +459,7 @@ class TokenAirdropTransactionIntegrationTest {
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        // verify transferFrom would work
-        // TODO
-//        new TransferTransaction()
-//            .addApprovedNftTransfer(nftID.nft(nftSerials.get(0)), senderAccountID, spenderAccountID)
-//            .addApprovedNftTransfer(nftID.nft(nftSerials.get(1)), senderAccountID, spenderAccountID)
-//            .setTransactionId(TransactionId.generate(spenderAccountID))
-//            .freezeWith(testEnv.client)
-//            .sign(spenderKey)
-//            .execute(testEnv.client)
-//            .getReceipt(testEnv.client);
+        testEnv.close();
     }
 
     @Test
@@ -481,5 +474,20 @@ class TokenAirdropTransactionIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.EMPTY_TOKEN_TRANSFER_BODY.toString());
+
+        // create fungible token
+        var tokenID = EntityHelper.createFungibleToken(testEnv, 3);
+
+        // airdrop with invalid transfers
+        // fails with INVALID_TRANSACTION_BODY
+        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+            new TokenAirdropTransaction()
+                .addTokenTransfer(tokenID, testEnv.operatorId, 100)
+                .addTokenTransfer(tokenID, testEnv.operatorId, 100)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }).withMessageContaining(Status.INVALID_TRANSACTION_BODY.toString());
+
+        testEnv.close();
     }
 }

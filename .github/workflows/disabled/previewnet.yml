@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: client-sdk-linux-medium
 
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +28,7 @@ jobs:
         run: ./gradlew build
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: client-sdk-linux-medium
 
     steps:
       - uses: actions/checkout@v2
