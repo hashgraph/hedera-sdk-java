@@ -18,6 +18,8 @@
  *
  */
 
+import net.ltgt.gradle.errorprone.errorprone
+
 plugins {
     id("application")
     id("com.hedera.gradle.java-base")
@@ -26,6 +28,13 @@ plugins {
 javaModuleDependencies {
     moduleNameToGA.put("com.hedera.hashgraph.sdk", "com.hedera.hashgraph:sdk")
     moduleNameToGA.put("com.hedera.hashgraph.sdk.full", "com.hedera.hashgraph:sdk-full")
+}
+
+tasks.withType<JavaCompile>().configureEach {
+    options.errorprone {
+        disable("DefaultPackage")
+        disable("SystemOut")
+    }
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
@@ -85,7 +94,7 @@ abstract class RunAllExample : DefaultTask() {
                 mainClass = "com.hedera.hashgraph.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
-                // jvmArgs("-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace")
+                // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
             }
         }
     }
