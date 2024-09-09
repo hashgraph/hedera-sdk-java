@@ -2,7 +2,7 @@
  *
  * Hedera Java SDK
  *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,10 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.Client;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.PublicKey;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -27,9 +30,19 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.util.Objects;
 
 /**
- * How to create a file.
+ * This is a template for examples.
+ * <p>
+ * Simple title, like "How to do X".
+ * <p>
+ * General description of the example should be here (class-level comment).
  */
-class CreateFileExample {
+// Class access modifier should be default (simplicity and accessibility).
+class ExampleTemplate {
+
+    // UTIL VARIABLES BELOW
+    private static final int TOTAL_MESSAGES = 5; // Example.
+
+    // CONFIG VARIABLES BELOW
 
     /*
      * See .env.sample in the examples folder root for how to specify values below
@@ -62,12 +75,16 @@ class CreateFileExample {
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
+    // No constructor (for simplicity)
+
+    // There should be only main method for simplicity
+    // throws only Exception for simplicity
     public static void main(String[] args) throws Exception {
-        System.out.println("Create File Example Start!");
+        System.out.println("Example Start!");
 
         /*
          * Step 0:
-         * Create and configure the SDK Client.
+         * Create and configure SDK Client.
          */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
         // All generated transactions will be paid by this account and signed by this key.
@@ -75,41 +92,25 @@ class CreateFileExample {
         // Attach logger to the SDK Client.
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+        // Steps with comments, for example:
 
         /*
          * Step 1:
-         * Submit the file create transaction.
+         * Create an ECSDA private key.
          */
-        // The file is required to be a byte array,
-        // you can easily use the bytes of a file instead.
-        String fileContents = "Hedera hashgraph is great!";
+        PrivateKey privateKey = PrivateKey.generateECDSA();
 
-        System.out.println("Creating new file...");
-        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file.
-            .setKeys(operatorPublicKey)
-            .setContents(fileContents)
-            // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
-            .setMaxTransactionFee(Hbar.from(2))
-            .execute(client);
-        
-        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
-        FileId newFileId = fileCreateTxReceipt.fileId;
-        Objects.requireNonNull(newFileId);
-        System.out.println("Created new file with ID: " + newFileId);
+        /*
+         * Step 2:
+         * Extract the ECDSA public key.
+         */
+        PublicKey publicKey = privateKey.getPublicKey();
 
         /*
          * Clean up:
-         * Delete created file.
          */
-        new FileDeleteTransaction()
-            .setFileId(newFileId)
-            .execute(client)
-            .getReceipt(client);
-
         client.close();
 
-        System.out.println("Create File Example Complete!");
+        System.out.println("Example Complete!");
     }
 }

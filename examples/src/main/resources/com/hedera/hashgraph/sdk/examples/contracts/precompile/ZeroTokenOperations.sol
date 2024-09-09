@@ -13,11 +13,11 @@ import "./FeeHelper.sol";
 // and copy the outputted json file to ./PrecompileExample.json
 
 contract ZeroTokenOperations is
-    PrngSystemContract,
-    HederaTokenService,
-    ExpiryHelper,
-    KeyHelper,
-    FeeHelper
+PrngSystemContract,
+HederaTokenService,
+ExpiryHelper,
+KeyHelper,
+FeeHelper
 {
     address payable owner;
     address payable aliceAccount;
@@ -36,7 +36,7 @@ contract ZeroTokenOperations is
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[]
-            memory keys = new IHederaTokenService.TokenKey[](4);
+        memory keys = new IHederaTokenService.TokenKey[](4);
         keys[0] = getSingleKey(
             KeyType.ADMIN,
             KeyType.PAUSE,

@@ -2,12 +2,11 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 27 2023
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
 import "./HederaTokenService.sol";
 
 abstract contract ExpiryHelper {
-
     function createAutoRenewExpiry(
         address autoRenewAccount,
         int64 autoRenewPeriod
@@ -16,7 +15,9 @@ abstract contract ExpiryHelper {
         expiry.autoRenewPeriod = autoRenewPeriod;
     }
 
-    function createSecondExpiry(int64 second) internal pure returns (IHederaTokenService.Expiry memory expiry) {
+    function createSecondExpiry(
+        int64 second
+    ) internal pure returns (IHederaTokenService.Expiry memory expiry) {
         expiry.second = second;
     }
 }

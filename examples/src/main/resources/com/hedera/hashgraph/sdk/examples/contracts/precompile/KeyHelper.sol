@@ -2,7 +2,7 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 27 2023
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
 import "./HederaTokenService.sol";
 
@@ -49,9 +49,9 @@ abstract contract KeyHelper {
     }
 
     function getAllTypeKeys(KeyValueType keyValueType, bytes memory key)
-        internal
-        view
-        returns (IHederaTokenService.TokenKey[] memory keys)
+    internal
+    view
+    returns (IHederaTokenService.TokenKey[] memory keys)
     {
         keys = new IHederaTokenService.TokenKey[](1);
         keys[0] = IHederaTokenService.TokenKey(getAllKeyTypes(), getKeyValueType(keyValueType, key));
@@ -127,9 +127,9 @@ abstract contract KeyHelper {
     }
 
     function getKeyValueType(KeyValueType keyValueType, bytes memory key)
-        internal
-        view
-        returns (IHederaTokenService.KeyValue memory keyValue)
+    internal
+    view
+    returns (IHederaTokenService.KeyValue memory keyValue)
     {
         if (keyValueType == KeyValueType.INHERIT_ACCOUNT_KEY) {
             keyValue.inheritAccountKey = true;
@@ -145,9 +145,9 @@ abstract contract KeyHelper {
     }
 
     function getKeyValueType(KeyValueType keyValueType, address keyAddress)
-        internal
-        pure
-        returns (IHederaTokenService.KeyValue memory keyValue)
+    internal
+    pure
+    returns (IHederaTokenService.KeyValue memory keyValue)
     {
         if (keyValueType == KeyValueType.CONTRACT_ID) {
             keyValue.contractId = keyAddress;
