@@ -41,6 +41,8 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransferTransaction;
 import java.util.Collections;
 import java.util.List;
+
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -579,6 +581,7 @@ public class TokenRejectIntegrationTest {
     }
 
     @Test
+    @Disabled // temp disabled till issue re nfts will be resolved on services side
     @DisplayName("Can remove allowance when executing TokenReject transaction for FT and NFT")
     void canRemoveAllowanceWhenExecutingTokenRejectForFtAndNft() throws Exception {
         var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();

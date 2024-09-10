@@ -57,6 +57,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    packaging {
+        resources.excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
+    }
 }
 
 dependencies {
@@ -64,7 +68,7 @@ dependencies {
     implementation(platform("com.hedera.hashgraph:sdk-dependency-versions"))
     // ---------------------------------------------
 
-    implementation("com.hedera.hashgraph:sdk:2.36.0")
+    implementation("com.hedera.hashgraph:sdk:2.39.0")
 
     implementation("com.google.android.material:material:1.11.0")
 

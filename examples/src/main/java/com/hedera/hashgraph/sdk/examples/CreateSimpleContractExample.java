@@ -19,104 +19,134 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionResult;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-public final class CreateSimpleContractExample {
+/**
+ * How to create a simple stateless smart contract and call its function.
+ */
+class CreateSimpleContractExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private CreateSimpleContractExample() {
-    }
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
-    public static void main(String[] args)
-        throws Exception {
-        String byteCodeHex = ContractHelper.getBytecodeHex("hello_world.json");
+    public static void main(String[] args) throws Exception {
+        System.out.println("Create Simple Contract Example Start!");
 
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        // create the contract's bytecode file
-        TransactionResponse fileTransactionResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file
-            .setKeys(OPERATOR_KEY)
-            .setContents(byteCodeHex.getBytes(StandardCharsets.UTF_8))
-            .setMaxTransactionFee(new Hbar(2))
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
+
+        /*
+         * Step 1:
+         * Create a file with smart contract bytecode.
+         */
+        System.out.println("Creating new bytecode file...");
+        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/hello_world/hello_world.json");
+
+        TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
+            // Use the same key as the operator to "own" this file.
+            .setKeys(operatorPublicKey)
+            .setContents(contractBytecodeHex.getBytes(StandardCharsets.UTF_8))
+            .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
 
+        TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
+        FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
+        Objects.requireNonNull(newFileId);
+        System.out.println("Created new bytecode file with ID: " + newFileId);
 
-        TransactionReceipt fileReceipt = fileTransactionResponse.getReceipt(client);
-        FileId newFileId = Objects.requireNonNull(fileReceipt.fileId);
-
-        System.out.println("contract bytecode file: " + newFileId);
-
-        // create the contract itself
-        TransactionResponse contractTransactionResponse = new ContractCreateTransaction()
-            .setGas(500000)
+        /*
+         * Step 2:
+         * Create a smart contract.
+         */
+        System.out.println("Creating new contract...");
+        TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
+            .setGas(100_000)
             .setBytecodeFileId(newFileId)
-            // set an admin key so we can delete the contract later
-            .setAdminKey(OPERATOR_KEY)
-            .setMaxTransactionFee(new Hbar(16))
+            // Set an admin key, so we can delete the contract later.
+            .setAdminKey(operatorPublicKey)
+            .setMaxTransactionFee(Hbar.from(16))
             .execute(client);
 
+        TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
+        ContractId newContractId = Objects.requireNonNull(contractCreateTxReceipt.contractId);
+        Objects.requireNonNull(newContractId);
+        System.out.println("Created new contract with ID: " + newContractId);
 
-        TransactionReceipt contractReceipt = contractTransactionResponse.getReceipt(client);
-
-        System.out.println(contractReceipt);
-
-        ContractId newContractId = Objects.requireNonNull(contractReceipt.contractId);
-
-        System.out.println("new contract ID: " + newContractId);
-
+        /*
+         * Step 3:
+         * Call smart contract function.
+         */
+        System.out.println("Calling contract function \"greet\"...");
         ContractFunctionResult contractCallResult = new ContractCallQuery()
-            .setGas(500000)
+            .setGas(100_000)
             .setContractId(newContractId)
             .setFunction("greet")
-            .setQueryPayment(new Hbar(1))
+            .setMaxQueryPayment(Hbar.from(1))
             .execute(client);
 
         if (contractCallResult.errorMessage != null) {
-            throw new Exception("error calling contract: " + contractCallResult.errorMessage);
+            throw new Exception("Error calling contract function \"greet\": " + contractCallResult.errorMessage);
         }
 
-        String message = contractCallResult.getString(0);
-        System.out.println("contract message: " + message);
+        String contractCallResultString = contractCallResult.getString(0);
+        System.out.println("Contract call result (\"greet\" function returned): " + contractCallResultString);
 
-        // now delete the contract
-        TransactionReceipt contractDeleteResult = new ContractDeleteTransaction()
+        /*
+         * Clean up:
+         * Delete created contract.
+         */
+        new ContractDeleteTransaction()
             .setContractId(newContractId)
-            .setTransferAccountId(contractTransactionResponse.transactionId.accountId)
-            .setMaxTransactionFee(new Hbar(1))
+            .setTransferAccountId(contractCreateTxResponse.transactionId.accountId)
+            .setMaxTransactionFee(Hbar.from(1))
             .execute(client)
             .getReceipt(client);
 
-        if (contractDeleteResult.status != Status.SUCCESS) {
-            throw new Exception("error deleting contract: " + contractDeleteResult.status);
-        }
-        System.out.println("Contract successfully deleted");
+        client.close();
+
+        System.out.println("Create Simple Contract Example Complete!");
     }
 }
