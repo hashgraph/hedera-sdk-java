@@ -390,7 +390,7 @@ class ClientTest {
             client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "10001", new byte[] {1, 0, 1}, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "10002", new byte[] {1, 0, 2}, new byte[] {10, 0, 0, 2}))
-                .build().toByteString()));
+                .build().toByteString()), true);
 
             // verify security parameters in client
             assertThat(nodeAddress.apply(10001).certHash).isEqualTo(ByteString.copyFrom(new byte[]{1, 0, 1}));
@@ -402,7 +402,7 @@ class ClientTest {
             client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "10001", null, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "10002", null, new byte[] {10, 0, 0, 2}))
-                .build().toByteString()));
+                .build().toByteString()), true);
 
             // verify security parameters in client (unchanged)
             assertThat(nodeAddress.apply(10001).certHash).isEqualTo(ByteString.copyFrom(new byte[]{1, 0, 1}));
@@ -414,7 +414,7 @@ class ClientTest {
             client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "810001", new byte[] {8, 1, 0, 1}, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "810002", new byte[] {8, 1, 0, 2}, new byte[] {10, 0, 0, 2}))
-                .build().toByteString()));
+                .build().toByteString()), true);
 
             // verify security parameters in client
             assertThat(nodeAddress.apply(10001).certHash).isEqualTo(ByteString.copyFrom(new byte[]{8, 1, 0, 1}));
