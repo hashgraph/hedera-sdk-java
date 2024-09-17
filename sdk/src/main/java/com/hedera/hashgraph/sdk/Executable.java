@@ -345,7 +345,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
         try {
             if (delay > 0) {
-                logger.debug("Sleeping for: " + delay + " | Thread name: " + Thread.currentThread().getName());
+                if (logger.isEnabledForLevel(LogLevel.DEBUG)) {
+                    logger.debug("Sleeping for: " + delay + " | Thread name: " + Thread.currentThread().getName());
+                }
                 Thread.sleep(delay);
             }
         } catch (InterruptedException e) {

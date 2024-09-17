@@ -53,7 +53,7 @@ class LoadIntegrationTest {
         for (int i = 0; i < nThreads; i++) {
             int finalI = i;
             threadPoolExecutor.submit(() -> {
-                var client = Client.forNetworkWithExecutor(testEnv.client.getNetwork(), clientExecutor);
+                var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
                 client.setOperator(operatorId, operatorPrivateKey);
                 client.setMaxAttempts(10);
                 try {

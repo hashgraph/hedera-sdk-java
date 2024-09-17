@@ -61,7 +61,7 @@ class ClientTest {
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
-        Client.forMainnetWithExecutor(executor).close();
+        Client.forMainnet(executor).close();
     }
 
     @Test
@@ -71,7 +71,7 @@ class ClientTest {
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
-        Client.forTestnetWithExecutor(executor).close();
+        Client.forTestnet(executor).close();
     }
 
     @Test
@@ -81,7 +81,7 @@ class ClientTest {
             0L, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
 
-        Client.forPreviewnetWithExecutor(executor).close();
+        Client.forPreviewnet(executor).close();
     }
 
     @Test

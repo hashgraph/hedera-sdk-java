@@ -157,7 +157,7 @@ public final class Client implements AutoCloseable {
      *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forNetworkWithExecutor(Map<String, AccountId> networkMap, ExecutorService executor) {
+    public static Client forNetwork(Map<String, AccountId> networkMap, ExecutorService executor) {
         var network = Network.forNetwork(executor, networkMap);
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
 
@@ -179,10 +179,7 @@ public final class Client implements AutoCloseable {
      */
     public static Client forNetwork(Map<String, AccountId> networkMap) {
         var executor = createExecutor();
-        var network = Network.forNetwork(executor, networkMap);
-        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
-
-        return new Client(executor, network, mirrorNetwork, null, null);
+        return forNetwork(networkMap, executor);
     }
 
     /**
@@ -208,7 +205,7 @@ public final class Client implements AutoCloseable {
      *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forMainnetWithExecutor(ExecutorService executor) {
+    public static Client forMainnet(ExecutorService executor) {
         var network = Network.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
@@ -224,7 +221,7 @@ public final class Client implements AutoCloseable {
      *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forTestnetWithExecutor(ExecutorService executor) {
+    public static Client forTestnet(ExecutorService executor) {
         var network = Network.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
@@ -241,7 +238,7 @@ public final class Client implements AutoCloseable {
      *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forPreviewnetWithExecutor(ExecutorService executor) {
+    public static Client forPreviewnet(ExecutorService executor) {
         var network = Network.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
@@ -258,11 +255,7 @@ public final class Client implements AutoCloseable {
      */
     public static Client forMainnet() {
         var executor = createExecutor();
-        var network = Network.forMainnet(executor);
-        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
-
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return forMainnet(executor);
     }
 
     /**
@@ -273,11 +266,7 @@ public final class Client implements AutoCloseable {
      */
     public static Client forTestnet() {
         var executor = createExecutor();
-        var network = Network.forTestnet(executor);
-        var mirrorNetwork = MirrorNetwork.forTestnet(executor);
-
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return forTestnet(executor);
     }
 
     /**
@@ -289,11 +278,7 @@ public final class Client implements AutoCloseable {
      */
     public static Client forPreviewnet() {
         var executor = createExecutor();
-        var network = Network.forPreviewnet(executor);
-        var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
-
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return forPreviewnet(executor);
     }
 
     /**
