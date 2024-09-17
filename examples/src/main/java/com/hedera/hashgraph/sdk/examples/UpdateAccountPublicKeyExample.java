@@ -19,85 +19,130 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfo;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TransactionResponse;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-public final class UpdateAccountPublicKeyExample {
+/**
+ * How to update account's key.
+ */
+class UpdateAccountPublicKeyExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private UpdateAccountPublicKeyExample() {
-    }
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
-    public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        System.out.println("Update Account Public Key Example Start!");
+
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        client.setDefaultMaxTransactionFee(new Hbar(10));
+        client.setDefaultMaxTransactionFee(Hbar.from(10));
 
-        // First, we create a new account so we don't affect our account
+        /*
+         * Step 1:
+         * Generate ED25519 key pairs.
+         */
+        System.out.println("Generating ED25519 key pairs...");
+        PrivateKey privateKey1 = PrivateKey.generateED25519();
+        PublicKey publicKey1 = privateKey1.getPublicKey();
+        PrivateKey privateKey2 = PrivateKey.generateED25519();
+        PublicKey publicKey2 = privateKey2.getPublicKey();
 
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
-
-        TransactionResponse acctTransactionResponse = new AccountCreateTransaction()
-            .setKey(key1.getPublicKey())
-            .setInitialBalance(new Hbar(1))
+        /*
+         * Step 2:
+         * Create a new account.
+         */
+        System.out.println("Creating new account...");
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
+            .setKey(publicKey1)
+            .setInitialBalance(Hbar.from(1))
             .execute(client);
 
-        System.out.println("transaction ID: " + acctTransactionResponse);
-        AccountId accountId = Objects.requireNonNull(acctTransactionResponse.getReceipt(client).accountId);
-        System.out.println("account = " + accountId);
-        System.out.println("key = " + key1.getPublicKey());
-        // Next, we update the key
+        AccountId accountId = Objects.requireNonNull(accountCreateTxResponse.getReceipt(client).accountId);
+        Objects.requireNonNull(accountId);
+        System.out.println("Created new account with ID: " + accountId + " and public key: " + publicKey1);
 
-        System.out.println(" :: update public key of account " + accountId);
-        System.out.println("set key = " + key2.getPublicKey());
-
-        TransactionResponse accountUpdateTransactionResponse = new AccountUpdateTransaction()
+        /*
+         * Step 2:
+         * Update account's key.
+         */
+        System.out.println("Updating public key of new account...(Setting key: " + publicKey2 + ").");
+        TransactionResponse accountUpdateTxResponse = new AccountUpdateTransaction()
             .setAccountId(accountId)
-            .setKey(key2.getPublicKey())
+            .setKey(publicKey2)
             .freezeWith(client)
-            // sign with the previous key and the new key
-            .sign(key1)
-            .sign(key2)
-            // execute will implicitly sign with the operator
+            // Sign with the previous key and the new key.
+            .sign(privateKey1)
+            .sign(privateKey2)
+            // Execute will implicitly sign with the operator.
             .execute(client);
 
-        System.out.println("transaction ID: " + accountUpdateTransactionResponse);
+        // (Important!) Wait for the transaction to complete by querying the receipt.
+        accountUpdateTxResponse.getReceipt(client);
 
-        // (important!) wait for the transaction to complete by querying the receipt
-        accountUpdateTransactionResponse.getReceipt(client);
-
-        // Now we fetch the account information to check if the key was changed
-        System.out.println(" :: getAccount and check our current key");
-
-        AccountInfo info = new AccountInfoQuery()
+        /*
+         * Step 3:
+         * Get account info to confirm the key was changed.
+         */
+        AccountInfo accountInfo = new AccountInfoQuery()
             .setAccountId(accountId)
             .execute(client);
 
-        System.out.println("key = " + info.key);
+        System.out.println("New account public key: " + accountInfo.key);
+
+        /*
+         * Clean up:
+         * Delete created account.
+         */
+        new AccountDeleteTransaction()
+            .setAccountId(accountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKey2)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        System.out.println("Update Account Public Key Example Complete!");
     }
 }

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity >=0.4.9 <0.9.0;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 27 2023
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
 library HederaResponseCodes {
 

@@ -20,131 +20,178 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-public class TransferUsingEvmAddressExample {
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
-
-    private TransferUsingEvmAddressExample() {
-    }
+/**
+ * How to transfer Hbar or tokens to a Hedera account using their public-address (HIP-583).
+ */
+class TransferUsingEvmAddressExample {
 
     /*
-    Transfer HBAR or tokens to a Hedera account using their public-address.
-    Reference: [HIP-583 Expand alias support in CryptoCreate & CryptoTransfer Transactions](https://hips.hedera.com/hip/hip-583)
-    ## Example 1
-        - Create an ECSDA private key
-        - Extract the ECDSA public key
-        - Extract the Ethereum public address
-          - Add function to calculate the Ethereum Address to example in SDK
-          - Ethereum account address / public-address - This is the rightmost 20 bytes of the 32 byte Keccak-256 hash of the ECDSA public key of the account. This calculation is in the manner described by the Ethereum Yellow Paper.
-        - Transfer tokens using the `TransferTransaction` to the Etherum Account Address
-        - The From field should be a complete account that has a public address
-        - The To field should be to a public address (to create a new account)
-        - Get the child receipt or child record to return the Hedera Account ID for the new account that was created
-        - Get the `AccountInfo` on the new account and show it is a hollow account by not having a public key
-        - This is a hollow account in this state
-        - Use the hollow account as a transaction fee payer in a HAPI transaction
-        - Sign the transaction with ECDSA private key
-        - Get the `AccountInfo` of the account and show the account is now a complete account by returning the public key on the account
-    */
-    public static void main(String[] args) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException, IOException {
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
+    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("Transfer Using Evm Address Example Start!");
+
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         /*
-         * Step 1
-         * Create an ECSDA private key
+         * Step 1:
+         * Create an ECSDA private key.
          */
-        PrivateKey privateKey = PrivateKey.generateECDSA();
+        PrivateKey alicePrivateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 2
-         * Extract the ECDSA public key
+         * Step 2:
+         * Extract the ECDSA public key.
          */
-        PublicKey publicKey = privateKey.getPublicKey();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
         /*
-         * Step 3
-         * Extract the Ethereum public address
+         * Step 3:
+         * Extract the Ethereum public address.
          */
-        EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println("Corresponding evm address: " + evmAddress);
+        EvmAddress aliceEvmAddress = alicePublicKey.toEvmAddress();
+        System.out.println("EVM address of Alice's account: " + aliceEvmAddress);
 
         /*
-         * Step 4
-         * Transfer tokens using the `TransferTransaction` to the Etherum Account Address
-         *    - The From field should be a complete account that has a public address
-         *    - The To field should be to a public address (to create a new account)
+         * Step 4:
+         * Transfer tokens using the TransferTransaction to the Ethereum Account Address.
+         * - the from field should be a complete account that has a public address;
+         * - the to field should be to a public address (to create a new account).
          */
+        System.out.println("Transferring Hbar to Alice's account...");
         TransferTransaction transferTx = new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())
-            .addHbarTransfer(evmAddress, Hbar.from(10))
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+            .addHbarTransfer(aliceEvmAddress, Hbar.from(1))
             .freezeWith(client);
 
-        TransferTransaction transferTxSign = transferTx.sign(OPERATOR_KEY);
-        TransactionResponse transferTxSubmit = transferTxSign.execute(client);
+        TransferTransaction transferTxSigned = transferTx.sign(OPERATOR_KEY);
+        TransactionResponse transferTxResponse = transferTxSigned.execute(client);
 
         /*
-         * Step 5
-         * Get the child receipt or child record to return the Hedera Account ID for the new account that was created
+         * Step 5:
+         * Get the child receipt or child record to return the Hedera Account ID for the new account that was created.
          */
-        TransactionReceipt receipt = new TransactionReceiptQuery()
-            .setTransactionId(transferTxSubmit.transactionId)
+        TransactionReceipt transferTxReceipt = new TransactionReceiptQuery()
+            .setTransactionId(transferTxResponse.transactionId)
             .setIncludeChildren(true)
             .execute(client);
 
-        AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println(newAccountId);
+        AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        Objects.requireNonNull(aliceAccountId);
+        System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*
-         * Step 6
-         * Get the `AccountInfo` on the new account and show it is a hollow account by not having a public key
+         * Step 6:
+         * Get the AccountInfo on the new account and show it is a hollow account by not having a public key.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_BeforeEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("accountInfo: " + accountInfo);
+        System.out.println("Alice's account info: " + aliceAccountInfo_BeforeEnhancing);
 
         /*
-         * Step 7
-         * Use the hollow account as a transaction fee payer in a HAPI transaction
+         * Step 7:
+         * Use the hollow account as a transaction fee payer in a HAPI transaction.
          */
-        client.setOperator(newAccountId, privateKey);
-        PublicKey newPublicKey = PrivateKey.generateED25519().getPublicKey();
+        System.out.println("Setting new account as client's operator...");
+        client.setOperator(aliceAccountId, alicePrivateKey);
+        PrivateKey bobPrivateKey = PrivateKey.generateED25519();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKey(newPublicKey)
+        System.out.println("Creating Bob's account...");
+        AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
+            .setKey(bobPublicKey)
             .freezeWith(client);
 
         /*
-         * Step 8
-         * Sign the transaction with ECDSA private key
+         * Step 8:
+         * Sign the transaction with ECDSA private key.
          */
-        AccountCreateTransaction transactionSign = transaction.sign(privateKey);
-        TransactionResponse transactionSubmit = transactionSign.execute(client);
-        TransactionReceipt status = transactionSubmit.getReceipt(client);
-        System.out.println(status);
+        AccountCreateTransaction accountCreateTxSigned = accountCreateTx.sign(alicePrivateKey);
+        TransactionResponse accountCreateTxResponse = accountCreateTxSigned.execute(client);
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        var bobAccountId = accountCreateTxReceipt.accountId;
+        Objects.requireNonNull(bobAccountId);
+        System.out.println("Created Bob's account with ID: " + bobAccountId);
 
         /*
-         * Step 9
-         * Get the `AccountInfo` of the account and show the account is now a complete account by returning the public key on the account
+         * Step 9:
+         * Get the AccountInfo of the account and show the account is now a complete account
+         * by returning the public key on the account.
          */
-        AccountInfo accountInfo2 = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_AfterEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+        System.out.println("The public key of the newly created (and now complete) account: " + aliceAccountInfo_AfterEnhancing.key);
+
+        /*
+         * Clean up:
+         * Delete created accounts.
+         */
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        new AccountDeleteTransaction()
+            .setAccountId(aliceAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(bobAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(bobPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        System.out.println("Transfer Using Evm Address Example Complete!");
     }
 }

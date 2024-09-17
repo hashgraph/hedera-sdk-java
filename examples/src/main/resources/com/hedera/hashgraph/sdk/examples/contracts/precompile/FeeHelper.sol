@@ -2,16 +2,15 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Sep 27 2023
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
 import "./IHederaTokenService.sol";
 
 abstract contract FeeHelper {
-    function createFixedHbarFee(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee memory fixedFee)
-    {
+    function createFixedHbarFee(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee memory fixedFee) {
         fixedFee.amount = amount;
         fixedFee.useHbarsForPayment = true;
         fixedFee.feeCollector = feeCollector;
@@ -27,11 +26,10 @@ abstract contract FeeHelper {
         fixedFee.feeCollector = feeCollector;
     }
 
-    function createFixedSelfDenominatedFee(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee memory fixedFee)
-    {
+    function createFixedSelfDenominatedFee(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee memory fixedFee) {
         fixedFee.amount = amount;
         fixedFee.useCurrentTokenForPayment = true;
         fixedFee.feeCollector = feeCollector;
@@ -179,11 +177,10 @@ abstract contract FeeHelper {
         fixedFees[0] = fixedFee2;
     }
 
-    function createSingleFixedFeeForHbars(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee[] memory fixedFees)
-    {
+    function createSingleFixedFeeForHbars(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee[] memory fixedFees) {
         fixedFees = new IHederaTokenService.FixedFee[](1);
         IHederaTokenService.FixedFee memory fixedFee = createFixedFeeForHbars(
             amount,
@@ -270,32 +267,29 @@ abstract contract FeeHelper {
         fixedFee.feeCollector = feeCollector;
     }
 
-    function createFixedFeeForHbars(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee memory fixedFee)
-    {
+    function createFixedFeeForHbars(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee memory fixedFee) {
         fixedFee.amount = amount;
         fixedFee.useHbarsForPayment = true;
         fixedFee.feeCollector = feeCollector;
     }
 
-    function createFixedFeeForCurrentToken(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee memory fixedFee)
-    {
+    function createFixedFeeForCurrentToken(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee memory fixedFee) {
         fixedFee.amount = amount;
         fixedFee.useCurrentTokenForPayment = true;
         fixedFee.feeCollector = feeCollector;
     }
 
     //Used for negative scenarios
-    function createFixedFeeWithInvalidFlags(int64 amount, address feeCollector)
-        internal
-        pure
-        returns (IHederaTokenService.FixedFee memory fixedFee)
-    {
+    function createFixedFeeWithInvalidFlags(
+        int64 amount,
+        address feeCollector
+    ) internal pure returns (IHederaTokenService.FixedFee memory fixedFee) {
         fixedFee.amount = amount;
         fixedFee.useHbarsForPayment = true;
         fixedFee.useCurrentTokenForPayment = true;

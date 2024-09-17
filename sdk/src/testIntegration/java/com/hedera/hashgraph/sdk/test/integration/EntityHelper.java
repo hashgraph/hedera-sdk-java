@@ -41,6 +41,9 @@ public final class EntityHelper {
 
     private EntityHelper() {}
 
+    public static int fungibleInitialBalance = 1_000_000;
+    public static int mitedNfts = 10;
+
     /**
      * Create a non-fungible unique token.
      *
@@ -87,8 +90,8 @@ public final class EntityHelper {
             .setTokenSymbol("TFT")
             .setTokenMemo("I was created for integration tests")
             .setDecimals(decimals)
-            .setInitialSupply(1_000_000)
-            .setMaxSupply(1_000_000)
+            .setInitialSupply(fungibleInitialBalance)
+            .setMaxSupply(fungibleInitialBalance)
             .setTreasuryAccountId(testEnv.operatorId)
             .setSupplyType(TokenSupplyType.FINITE)
             .setAdminKey(testEnv.operatorKey)
@@ -116,7 +119,7 @@ public final class EntityHelper {
         throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         return new AccountCreateTransaction()
             .setKey(accountKey)
-            .setInitialBalance(new Hbar(1))
+            .setInitialBalance(new Hbar(10))
             .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
             .execute(testEnv.client)
             .getReceipt(testEnv.client)

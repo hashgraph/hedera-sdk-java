@@ -419,17 +419,18 @@ public final class Client implements AutoCloseable {
         networkUpdateFuture.thenRun(() -> {
             // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
             requireNetworkUpdatePeriodNotNull(() -> {
-                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
-                    try {
-                        this.setNetworkFromAddressBook(addressBook);
-                    } catch (Throwable error) {
-                        return CompletableFuture.failedFuture(error);
-                    }
-                    return CompletableFuture.completedFuture(null);
-                })).exceptionally(error -> {
-                    logger.warn("Failed to update address book via mirror node query ", error);
-                    return null;
-                });
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this)
+                    .thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
+                        try {
+                            this.setNetworkFromAddressBook(addressBook);
+                        } catch (Throwable error) {
+                            return CompletableFuture.failedFuture(error);
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    })).exceptionally(error -> {
+                        logger.warn("Failed to update address book via mirror node query ", error);
+                        return null;
+                    });
                 scheduleNetworkUpdate(networkUpdatePeriod);
                 return null;
             });
@@ -460,6 +461,26 @@ public final class Client implements AutoCloseable {
 
     /**
      * Replace all nodes in this Client with the nodes in the Address Book
+     * and update the address book if necessary.
+     *
+     * @param addressBook A list of nodes and their metadata
+     * @param updateAddressBook whether to update the address book of the network
+     * @return {@code this}
+     */
+    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook, boolean updateAddressBook)
+        throws InterruptedException, TimeoutException {
+        network.setNetwork(Network.addressBookToNetwork(
+            addressBook.nodeAddresses,
+            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
+        ));
+        if (updateAddressBook) {
+            network.setAddressBook(addressBook);
+        }
+        return this;
+    }
+
+    /**
+     * Replace all nodes in this Client with the nodes in the Address Book
      *
      * @param addressBook A list of nodes and their metadata
      * @return {@code this}
@@ -468,11 +489,7 @@ public final class Client implements AutoCloseable {
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook)
         throws InterruptedException, TimeoutException {
-        network.setNetwork(Network.addressBookToNetwork(
-            addressBook.nodeAddresses,
-            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
-        ));
-        return this;
+        return setNetworkFromAddressBook(addressBook, false);
     }
 
     /**
@@ -670,7 +687,7 @@ public final class Client implements AutoCloseable {
      * @param onFailure     a Consumer which consumes the error on failure.
      */
     public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess,
-                          Consumer<Throwable> onFailure) {
+        Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
     }
 
@@ -803,7 +820,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
-                                               UnaryOperator<byte[]> transactionSigner) {
+        UnaryOperator<byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
