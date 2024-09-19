@@ -19,6 +19,9 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -47,12 +50,42 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ClientTest {
+
     @Test
     @DisplayName("Can construct mainnet client")
     void forMainnet() throws TimeoutException {
         Client.forMainnet().close();
     }
 
+    @Test
+    @DisplayName("Can construct mainnet client with executor")
+    void forMainnetWithExecutor() throws TimeoutException {
+        var executor = new ThreadPoolExecutor(2, 2,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+
+        Client.forMainnet(executor).close();
+    }
+
+    @Test
+    @DisplayName("Can construct testnet client with executor")
+    void forTestnetWithExecutor() throws TimeoutException {
+        var executor = new ThreadPoolExecutor(2, 2,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+
+        Client.forTestnet(executor).close();
+    }
+
+    @Test
+    @DisplayName("Can construct previewnet client with executor")
+    void forPreviewnetWithWithExecutor() throws TimeoutException {
+        var executor = new ThreadPoolExecutor(2, 2,
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>(), new ThreadPoolExecutor.CallerRunsPolicy());
+
+        Client.forPreviewnet(executor).close();
+    }
 
     @Test
     @DisplayName("Client.setMaxQueryPayment() negative")
