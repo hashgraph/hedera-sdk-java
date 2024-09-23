@@ -43,7 +43,7 @@ dependencies.constraints {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("io.grpc:grpc-api:1.64.0") {
+    api("io.grpc:grpc-api:1.68.0") {
         because("io.grpc")
     }
     api("io.grpc:grpc-inprocess:1.64.0") {
