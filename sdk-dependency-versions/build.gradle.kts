@@ -35,11 +35,11 @@ dependencies.constraints {
     api("com.google.code.gson:gson:2.10.1") {
         because("com.google.gson")
     }
-    api("com.google.protobuf:protobuf-java:3.25.3") {
+    api("com.google.protobuf:protobuf-java:4.28.2") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("com.google.protobuf:protobuf-javalite:3.25.3") {
+    api("com.google.protobuf:protobuf-javalite:4.28.2") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
