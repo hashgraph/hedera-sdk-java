@@ -328,6 +328,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case FILECREATE -> new FileCreateTransaction(txs);
             case FILEDELETE -> new FileDeleteTransaction(txs);
             case FILEUPDATE -> new FileUpdateTransaction(txs);
+            case NODECREATE -> new NodeCreateTransaction(txs);
+            case NODEUPDATE -> new NodeUpdateTransaction(txs);
+            case NODEDELETE -> new NodeDeleteTransaction(txs);
             case SYSTEMDELETE -> new SystemDeleteTransaction(txs);
             case SYSTEMUNDELETE -> new SystemUndeleteTransaction(txs);
             case FREEZE -> new FreezeTransaction(txs);
@@ -355,6 +358,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case TOKEN_PAUSE -> new TokenPauseTransaction(txs);
             case TOKEN_UNPAUSE -> new TokenUnpauseTransaction(txs);
             case TOKENREJECT -> new TokenRejectTransaction(txs);
+            case TOKENAIRDROP -> new TokenAirdropTransaction(txs);
+            case TOKENCANCELAIRDROP -> new TokenCancelAirdropTransaction(txs);
+            case TOKENCLAIMAIRDROP -> new TokenClaimAirdropTransaction(txs);
             case CRYPTOAPPROVEALLOWANCE -> new AccountAllowanceApproveTransaction(txs);
             case CRYPTODELETEALLOWANCE -> new AccountAllowanceDeleteTransaction(txs);
             default -> throw new IllegalArgumentException("parsed transaction body has no data");
@@ -398,6 +404,9 @@ public abstract class Transaction<T extends Transaction<T>>
             case FILECREATE -> new FileCreateTransaction(body.setFileCreate(scheduled.getFileCreate()).build());
             case FILEDELETE -> new FileDeleteTransaction(body.setFileDelete(scheduled.getFileDelete()).build());
             case FILEUPDATE -> new FileUpdateTransaction(body.setFileUpdate(scheduled.getFileUpdate()).build());
+            case NODECREATE -> new NodeCreateTransaction(body.setNodeCreate(scheduled.getNodeCreate()).build());
+            case NODEUPDATE -> new NodeUpdateTransaction(body.setNodeUpdate(scheduled.getNodeUpdate()).build());
+            case NODEDELETE -> new NodeDeleteTransaction(body.setNodeDelete(scheduled.getNodeDelete()).build());
             case SYSTEMDELETE -> new SystemDeleteTransaction(body.setSystemDelete(scheduled.getSystemDelete()).build());
             case SYSTEMUNDELETE ->
                 new SystemUndeleteTransaction(body.setSystemUndelete(scheduled.getSystemUndelete()).build());
@@ -437,6 +446,9 @@ public abstract class Transaction<T extends Transaction<T>>
                 new TokenUnpauseTransaction(body.setTokenUnpause(scheduled.getTokenUnpause()).build());
             case TOKENREJECT ->
                 new TokenRejectTransaction(body.setTokenReject(scheduled.getTokenReject()).build());
+            case TOKENAIRDROP -> new TokenAirdropTransaction(body.setTokenAirdrop(scheduled.getTokenAirdrop()).build());
+            case TOKENCANCELAIRDROP -> new TokenCancelAirdropTransaction(body.setTokenCancelAirdrop(scheduled.getTokenCancelAirdrop()).build());
+            case TOKENCLAIMAIRDROP -> new TokenClaimAirdropTransaction(body.setTokenCancelAirdrop(scheduled.getTokenCancelAirdrop()).build());
             case SCHEDULEDELETE ->
                 new ScheduleDeleteTransaction(body.setScheduleDelete(scheduled.getScheduleDelete()).build());
             default -> throw new IllegalStateException("schedulable transaction did not have a transaction set");

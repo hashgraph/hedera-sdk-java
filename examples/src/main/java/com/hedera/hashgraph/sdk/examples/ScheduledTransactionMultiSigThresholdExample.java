@@ -19,133 +19,193 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hedera.hashgraph.sdk.AccountBalance;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.ScheduleId;
-import com.hedera.hashgraph.sdk.ScheduleInfo;
-import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
-import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionRecord;
-import com.hedera.hashgraph.sdk.TransactionRecordQuery;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Collections;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
-public class ScheduledTransactionMultiSigThresholdExample {
+/**
+ * How to schedule a transaction with a multi-sig account with a threshold.
+ */
+class ScheduledTransactionMultiSigThresholdExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private ScheduledTransactionMultiSigThresholdExample() {
-    }
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
-    public static void main(String[] args)
-        throws PrecheckStatusException, TimeoutException, ReceiptStatusException, InterruptedException {
+    public static void main(String[] args) throws Exception {
+        System.out.println("Scheduled Transaction Multi-Sig With Threshold Example Start!");
+
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        // Generate four new Ed25519 private, public key pairs.
+        /*
+         * Step 1:
+         * Generate four ED25519 key pairs.
+         */
+        System.out.println("Generating ED25519 key pairs...");
         PrivateKey[] privateKeys = new PrivateKey[4];
         PublicKey[] publicKeys = new PublicKey[4];
         for (int i = 0; i < 4; i++) {
             PrivateKey key = PrivateKey.generateED25519();
             privateKeys[i] = key;
             publicKeys[i] = key.getPublicKey();
-            System.out.println("public key " + (i + 1) + ": " + publicKeys[i]);
-            System.out.println("private key " + (i + 1) + ": " + privateKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Private key: " + privateKeys[i]);
+            System.out.println("Key pair #" + (i + 1) +" | Public key: " + publicKeys[i]);
         }
 
-        // require 3 of the 4 keys we generated to sign on anything modifying this account
-        KeyList transactionKey = KeyList.withThreshold(3);
-        Collections.addAll(transactionKey, publicKeys);
+        /*
+         * Step 2:
+         * Create a Key List with threshold
+         * (require 3 of 4 keys we generated to sign on anything modifying this account).
+         */
+        System.out.println("Creating a Key List..." +
+            "(with threshold, it will require 3 of 4 keys we generated to sign on anything modifying this account).");
+        KeyList thresholdKey = KeyList.withThreshold(3);
+        Collections.addAll(thresholdKey, publicKeys);
+        System.out.println("Created a Key List: " + thresholdKey);
 
-        TransactionResponse transactionResponse = new AccountCreateTransaction()
-            .setKey(transactionKey)
-            .setInitialBalance(Hbar.fromTinybars(1))
+        /*
+         * Step 3:
+         * Create a new account with a Key List from previous step.
+         */
+        System.out.println("Creating new account...(with the above Key List as an account key).");
+        TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
+            .setKey(thresholdKey)
+            .setInitialBalance(Hbar.from(1))
             .setAccountMemo("3-of-4 multi-sig account")
             .execute(client);
 
-        // This will wait for the receipt to become available
-        TransactionReceipt txAccountCreateReceipt = transactionResponse.getReceipt(client);
-        AccountId multiSigAccountId = Objects.requireNonNull(txAccountCreateReceipt.accountId);
+        // This will wait for the receipt to become available.
+        TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
+        AccountId multiSigAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
+        Objects.requireNonNull(multiSigAccountId);
+        System.out.println("Created new account with ID: " + multiSigAccountId);
 
-        System.out.println("3-of-4 multi-sig account ID: " + multiSigAccountId);
-
-        AccountBalance balance = new AccountBalanceQuery()
+        /*
+         * Step 4:
+         * Check the balance of the newly created account.
+         */
+        AccountBalance accountBalance = new AccountBalanceQuery()
             .setAccountId(multiSigAccountId)
             .execute(client);
-        System.out.println("Balance of account " + multiSigAccountId + ": " + balance.hbars.toTinybars() + " tinybar.");
 
-        // schedule crypto transfer from multi-sig account to operator account
-        TransactionResponse transferToSchedule = new TransferTransaction()
-            .addHbarTransfer(multiSigAccountId, Hbar.fromTinybars(-1))
-            .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.fromTinybars(1))
+        System.out.println("Balance of a newly created account with ID " + multiSigAccountId + ": " + accountBalance.hbars.toTinybars() + " tinybar.");
+
+        /*
+         * Step 5:
+         * Schedule crypto transfer from multi-sig account to operator account.
+         */
+        System.out.println("Scheduling crypto transfer from multi-sig account to operator account...");
+        TransactionResponse transferTxScheduled = new TransferTransaction()
+            .addHbarTransfer(multiSigAccountId, Hbar.from(1).negated())
+            .addHbarTransfer(Objects.requireNonNull(client.getOperatorAccountId()), Hbar.from(1))
             .schedule()
             .freezeWith(client)
-            .sign(privateKeys[0])   // add 1 signature`
+            // Add first signature.
+            .sign(privateKeys[0])
             .execute(client);
 
-        TransactionReceipt txScheduleReceipt = transferToSchedule.getReceipt(client);
-        System.out.println("Schedule status: " + txScheduleReceipt.status);
-        ScheduleId scheduleId = Objects.requireNonNull(txScheduleReceipt.scheduleId);
+        TransactionReceipt transferTxScheduledReceipt = transferTxScheduled.getReceipt(client);
+        System.out.println("Schedule status: " + transferTxScheduledReceipt.status);
+        ScheduleId scheduleId = Objects.requireNonNull(transferTxScheduledReceipt.scheduleId);
         System.out.println("Schedule ID: " + scheduleId);
-        TransactionId scheduledTxId = Objects.requireNonNull(txScheduleReceipt.scheduledTransactionId);
-        System.out.println("Scheduled tx ID: " + scheduledTxId);
+        TransactionId scheduledTxId = Objects.requireNonNull(transferTxScheduledReceipt.scheduledTransactionId);
+        System.out.println("Scheduled transaction ID: " + scheduledTxId);
 
-        // add 2 signature
-        TransactionResponse txScheduleSign1 = new ScheduleSignTransaction()
+        // Add second signature.
+        TransactionResponse scheduleSignTxResponseSecondSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKeys[1])
             .execute(client);
 
-        TransactionReceipt txScheduleSign1Receipt = txScheduleSign1.getReceipt(client);
-        System.out.println("1. ScheduleSignTransaction status: " + txScheduleSign1Receipt.status);
+        TransactionReceipt scheduleSignTxReceiptSecondSignature = scheduleSignTxResponseSecondSignature.getReceipt(client);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
+            "was complete with status: " + scheduleSignTxReceiptSecondSignature.status);
 
-        // add 3 signature
-        TransactionResponse txScheduleSign2 = new ScheduleSignTransaction()
+        // Add third signature.
+        TransactionResponse scheduleSignTxResponseThirdSignature = new ScheduleSignTransaction()
             .setScheduleId(scheduleId)
             .freezeWith(client)
             .sign(privateKeys[2])
             .execute(client);
 
-        TransactionReceipt txScheduleSign2Receipt = txScheduleSign2.getReceipt(client);
-        System.out.println("2. ScheduleSignTransaction status: " + txScheduleSign2Receipt.status);
+        TransactionReceipt scheduleSignTxReceiptThirdSignature = scheduleSignTxResponseThirdSignature.getReceipt(client);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #3) " +
+            "was complete with status: " + scheduleSignTxReceiptThirdSignature.status);
 
-        // query schedule
+        /*
+         * Step 6:
+         * Query schedule.
+         */
         ScheduleInfo scheduleInfo = new ScheduleInfoQuery()
             .setScheduleId(scheduleId)
             .execute(client);
-        System.out.println(scheduleInfo);
+        System.out.println("Schedule info: " + scheduleInfo);
 
-        // query triggered scheduled tx
+        /*
+         * Step 7:
+         * Query triggered scheduled transaction.
+         */
         TransactionRecord recordScheduledTx = new TransactionRecordQuery()
             .setTransactionId(scheduledTxId)
             .execute(client);
-        System.out.println(recordScheduledTx);
+        System.out.println("Triggered scheduled transaction info: " + recordScheduledTx);
 
+        /*
+         * Clean up:
+         * Delete created account.
+         */
+        new AccountDeleteTransaction()
+            .setAccountId(multiSigAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(privateKeys[0])
+            .sign(privateKeys[1])
+            .sign(privateKeys[2])
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        System.out.println("Scheduled Transaction Multi-Sig With Threshold Example Complete!");
     }
-
 }

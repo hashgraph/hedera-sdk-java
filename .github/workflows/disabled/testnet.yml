@@ -6,7 +6,7 @@ on:
 
 jobs:
   compile:
-    runs-on: ubuntu-latest
+    runs-on: client-sdk-linux-medium
 
     steps:
       - uses: actions/checkout@v2
@@ -36,7 +36,7 @@ jobs:
         run: ./gradlew :examples:compileJava
 
   build:
-    runs-on: ubuntu-latest
+    runs-on: client-sdk-linux-medium
 
     steps:
       - uses: actions/checkout@v2
@@ -69,7 +69,7 @@ jobs:
         run: ./gradlew build sonarqube --info
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: client-sdk-linux-medium
 
     steps:
       - uses: actions/checkout@v2

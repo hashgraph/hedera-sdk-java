@@ -28,10 +28,10 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
         with:
           egress-policy: audit
 
@@ -39,13 +39,13 @@ jobs:
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Setup Java
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
         with:
           distribution: temurin
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3.5.0
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
         with:
           cache-read-only: false
 
@@ -54,12 +54,12 @@ jobs:
 
   test:
     name: Unit and Integration Tests
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     needs:
       - build
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
         with:
           egress-policy: audit
 
@@ -74,13 +74,13 @@ jobs:
           node-version: 18
 
       - name: Setup Java
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
         with:
           distribution: temurin
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3.5.0
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -118,12 +118,12 @@ jobs:
 
   run-examples:
     name: Run Examples
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     needs:
       - build
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@17d0e2bd7d51742c71671bd19fa12bdc9d40a3d6 # v2.8.1
+        uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
         with:
           egress-policy: audit
 
@@ -136,7 +136,7 @@ jobs:
           node-version: 18
 
       - name: Setup Java
-        uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+        uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
         with:
           distribution: temurin
           java-version: 17
@@ -145,7 +145,7 @@ jobs:
         uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3.5.0
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -173,7 +173,7 @@ jobs:
 
   test-tck:
       name: TCK Tests
-      runs-on: [ self-hosted, Linux, medium, ephemeral ]
+      runs-on: client-sdk-linux-medium
       needs:
           - build
       steps:
@@ -188,13 +188,13 @@ jobs:
                 node-version: 18
 
           - name: Setup Java
-            uses: actions/setup-java@99b8673ff64fbf99d8d325f52d9a5bdedb8483e9 # v4.2.1
+            uses: actions/setup-java@6a0805fcefea3d4657a47ac4c165951e33482018 # v4.2.2
             with:
                 distribution: temurin
                 java-version: 17
 
           - name: Setup Gradle
-            uses: gradle/actions/setup-gradle@d9c87d481d55275bb5441eef3fe0e46805f9ef70 # v3.5.0
+            uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
           - name: Install Local Node
             run: npm install @hashgraph/hedera-local

@@ -41,9 +41,9 @@ import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv {
-    private static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
-    private static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
-    private static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
+    static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
+    static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
+    static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
     private final Client originalClient;
     public Client client;
     public PublicKey operatorKey;

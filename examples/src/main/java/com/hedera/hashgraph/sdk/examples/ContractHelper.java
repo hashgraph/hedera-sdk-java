@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
@@ -39,14 +40,11 @@ import com.hedera.hashgraph.sdk.TransactionRecord;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -59,7 +57,7 @@ which is assumed to have functions named "step0()" through "stepN()".
 
 Each of these step functions is assumed to take no function parameters, and to return a Hedera ResponseCode
 which ought to be SUCCESS -- in other words, an int32 with value 22.
-See examples/src/main/resources/precompile-example/HederaResponseCodes.sol
+See resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/HederaResponseCodes.sol
 
 If a step takes function parameters, or if its ContractFunctionResult should be validated with a different method,
 the user can specify a supplier for a particular step with setParameterSupplier(stepIndex, parametersSupplier),
@@ -76,21 +74,22 @@ public class ContractHelper {
     final Map<Integer, Hbar> stepPayableAmounts = new HashMap<>();
     final Map<Integer, List<PrivateKey>> stepSigners = new HashMap<>();
     final Map<Integer, AccountId> stepFeePayers = new HashMap<>();
+    final Map<Integer, Consumer<String>> stepLogic = new HashMap<>();
 
     public static String getBytecodeHex(String filename) throws IOException {
-        try (InputStream jsonStream = ContractHelper.class.getResourceAsStream(filename)) {
-            if (jsonStream == null) {
-                throw new RuntimeException("failed to get " + filename);
+        try (Reader reader = new InputStreamReader(
+            Optional.ofNullable(ContractHelper.class.getResourceAsStream(filename))
+                .orElseThrow(() -> new RuntimeException("Failed to find: " + filename)),
+            StandardCharsets.UTF_8)) {
+
+            JsonObject json = new Gson().fromJson(reader, JsonObject.class);
+            JsonElement bytecodeElement = Optional.ofNullable(json.has("object") ? json.get("object") : json.get("bytecode"))
+                .orElseThrow(() -> new RuntimeException("No bytecode or object found in json."));
+
+            if (bytecodeElement.isJsonObject()) {
+                bytecodeElement = bytecodeElement.getAsJsonObject().get("object");
             }
-
-            JsonObject json = new Gson()
-                .fromJson(new InputStreamReader(jsonStream, StandardCharsets.UTF_8), JsonObject.class);
-
-            if (json.has("object")) {
-                return json.getAsJsonPrimitive("object").getAsString();
-            }
-
-            return json.getAsJsonPrimitive("bytecode").getAsString();
+            return bytecodeElement.getAsString();
         }
     }
 
@@ -138,6 +137,11 @@ public class ContractHelper {
     public ContractHelper setFeePayerForStep(int stepIndex, AccountId feePayerAccount, PrivateKey feePayerKey) {
         stepFeePayers.put(stepIndex, feePayerAccount);
         return addSignerForStep(stepIndex, feePayerKey);
+    }
+
+    public ContractHelper setStepLogic(int stepIndex, Consumer<String> stepLogic) {
+        this.stepLogic.put(stepIndex, stepLogic);
+        return this;
     }
 
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
@@ -206,18 +210,30 @@ public class ContractHelper {
                 .setValidateStatus(false)
                 .getRecord(client);
 
-            if (record.receipt.status != Status.SUCCESS) {
-                throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
-            }
-            ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
-            System.out.println("gas used: " + functionResult.gasUsed);
-            if (getResultValidator(stepIndex).apply(functionResult)) {
-                System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
-            } else {
-                throw new Exception("returned invalid result");
+            try {
+                if (record.receipt.status != Status.SUCCESS) {
+                    throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
+                }
+
+                ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
+                System.out.println("gas used: " + functionResult.gasUsed);
+
+                var currentStepLogic = stepLogic.get(stepIndex);
+                if (currentStepLogic != null) {
+                    currentStepLogic.accept(functionResult.getAddress(1));
+                }
+
+                if (getResultValidator(stepIndex).apply(functionResult)) {
+                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
+                } else {
+                    throw new Exception("returned invalid result");
+                }
+            } catch (Throwable error) {
+                throw new Exception("Error occurred in step " + stepIndex + ": " + error.getMessage() + "\n" + "Transaction record: " + record);
             }
 
-            break;
+            // otherwise will meet local-node throttle
+            Thread.sleep(500L);
         }
         return this;
     }

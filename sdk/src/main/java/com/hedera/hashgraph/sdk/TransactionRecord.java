@@ -197,6 +197,19 @@ public final class TransactionRecord {
      */
     public final ByteString evmAddress;
 
+    /**
+     * A list of pending token airdrops.
+     * Each pending airdrop represents a single requested transfer from a
+     * sending account to a recipient account. These pending transfers are
+     * issued unilaterally by the sending account, and MUST be claimed by the
+     * recipient account before the transfer MAY complete.
+     * A sender MAY cancel a pending airdrop before it is claimed.
+     * An airdrop transaction SHALL emit a pending airdrop when the recipient has no
+     * available automatic association slots available or when the recipient
+     * has set `receiver_sig_required`.
+     */
+    public final List<PendingAirdropRecord> pendingAirdropRecords;
+
     TransactionRecord(
         TransactionReceipt transactionReceipt,
         ByteString transactionHash,
@@ -220,7 +233,8 @@ public final class TransactionRecord {
         List<Transfer> paidStakingRewards,
         @Nullable ByteString prngBytes,
         @Nullable Integer prngNumber,
-        ByteString evmAddress
+        ByteString evmAddress,
+        List<PendingAirdropRecord> pendingAirdropRecords
     ) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
@@ -241,6 +255,7 @@ public final class TransactionRecord {
         this.duplicates = duplicates;
         this.parentConsensusTimestamp = parentConsensusTimestamp;
         this.ethereumHash = ethereumHash;
+        this.pendingAirdropRecords = pendingAirdropRecords;
         this.hbarAllowanceAdjustments = Collections.emptyList();
         this.tokenAllowanceAdjustments = Collections.emptyList();
         this.tokenNftAllowanceAdjustments = Collections.emptyList();
@@ -311,6 +326,10 @@ public final class TransactionRecord {
             paidStakingRewards.add(Transfer.fromProtobuf(reward));
         }
 
+        List<PendingAirdropRecord> pendingAirdropRecords = transactionRecord.getNewPendingAirdropsList()
+            .stream().map(PendingAirdropRecord::fromProtobuf)
+            .toList();
+
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt(), transactionId),
             transactionRecord.getTransactionHash(),
@@ -335,7 +354,8 @@ public final class TransactionRecord {
             paidStakingRewards,
             transactionRecord.hasPrngBytes() ? transactionRecord.getPrngBytes() : null,
             transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null,
-            transactionRecord.getEvmAddress()
+            transactionRecord.getEvmAddress(),
+            pendingAirdropRecords
         );
     }
 
@@ -460,6 +480,12 @@ public final class TransactionRecord {
             transactionRecord.setPrngNumber(prngNumber);
         }
 
+        if (pendingAirdropRecords != null) {
+            for (PendingAirdropRecord pendingAirdropRecord : pendingAirdropRecords) {
+                transactionRecord.addNewPendingAirdrops(pendingAirdropRecords.indexOf(pendingAirdropRecord), pendingAirdropRecord.toProtobuf());
+            }
+        }
+
         return transactionRecord.build();
     }
 
@@ -488,6 +514,7 @@ public final class TransactionRecord {
             .add("prngBytes", prngBytes != null ? Hex.toHexString(prngBytes.toByteArray()) : null)
             .add("prngNumber", prngNumber)
             .add("evmAddress", Hex.toHexString(evmAddress.toByteArray()))
+            .add("pendingAirdropRecords", pendingAirdropRecords.toString())
             .toString();
     }
 

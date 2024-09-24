@@ -345,6 +345,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
         try {
             if (delay > 0) {
+                if (logger.isEnabledForLevel(LogLevel.DEBUG)) {
+                    logger.debug("Sleeping for: " + delay + " | Thread name: " + Thread.currentThread().getName());
+                }
                 Thread.sleep(delay);
             }
         } catch (InterruptedException e) {
@@ -829,8 +832,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         switch (status) {
             case PLATFORM_TRANSACTION_NOT_CREATED:
             case PLATFORM_NOT_ACTIVE:
-            case BUSY:
                 return ExecutionState.SERVER_ERROR;
+            case BUSY:
+                return ExecutionState.RETRY;
             case OK:
                 return ExecutionState.SUCCESS;
             default:

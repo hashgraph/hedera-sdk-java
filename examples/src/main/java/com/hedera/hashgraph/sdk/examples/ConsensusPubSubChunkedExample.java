@@ -19,18 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.google.errorprone.annotations.Var;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicId;
-import com.hedera.hashgraph.sdk.TopicMessageQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.BufferedReader;
@@ -44,95 +35,170 @@ import java.util.concurrent.TimeoutException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public final class ConsensusPubSubChunkedExample {
+/**
+ * How to send large message to the private HCS topic and how to subscribe to the topic to receive it.
+ */
+class ConsensusPubSubChunkedExample {
+
+    private static final CountDownLatch LARGE_MESSAGE_LATCH = new CountDownLatch(1);
+
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private static final CountDownLatch largeMessageLatch = new CountDownLatch(1);
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
-    private ConsensusPubSubChunkedExample() {
-    }
+    public static void main(String[] args) throws Exception {
+        System.out.println("Consensus Service Submit Large Message And Subscribe Example Start!");
 
-    public static void main(String[] args) throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException, InvalidProtocolBufferException {
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
-        // generate a submit key to use with the topic
-        PrivateKey submitKey = PrivateKey.generateED25519();
+        var operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        // make a new topic ID to use
-        TopicId newTopicId = new TopicCreateTransaction()
+        /*
+         * Step 1:
+         * Generate ED25519 key pair (Submit Key to use with the topic).
+         */
+        System.out.println("Generating ED25519 key pair...");
+        PrivateKey submitPrivateKey = PrivateKey.generateED25519();
+        PublicKey submitPublicKey = submitPrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * Create new HCS topic.
+         */
+        System.out.println("Creating new topic...");
+
+        TopicId hederaTopicID = new TopicCreateTransaction()
             .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
-            .setSubmitKey(submitKey)
+            .setAdminKey(operatorPublicKey)
+            .setSubmitKey(submitPublicKey)
             .execute(client)
             .getReceipt(client)
             .topicId;
+        Objects.requireNonNull(hederaTopicID);
 
-        assert newTopicId != null;
+        System.out.println("Created new topic with ID: " + hederaTopicID);
 
-        System.out.println("for topic " + newTopicId);
+        /*
+         * Step 3:
+         * Wait 10 seconds (to ensure data propagated to mirror nodes).
+         */
+        System.out.println("Wait 5 seconds (to ensure data propagated to mirror nodes) ...");
+        Thread.sleep(5_000);
 
-        // Let's wait a bit
-        System.out.println("wait 10s to propagate to the mirror ...");
-        Thread.sleep(10000);
-
-        // setup a mirror client to print out messages as we receive them
+        /*
+         * Step 4:
+         * Subscribe to messages on the topic, printing out the received message and metadata as it is published by the
+         * Hedera mirror node.
+         */
+        System.out.println("Setting up a mirror client...");
         new TopicMessageQuery()
-            .setTopicId(newTopicId)
+            .setTopicId(hederaTopicID)
             .subscribe(client, topicMessage -> {
-                System.out.println("at " + topicMessage.consensusTimestamp + " ( seq = " + topicMessage.sequenceNumber + " ) received topic message of " + topicMessage.contents.length + " bytes");
-                largeMessageLatch.countDown();
+                System.out.println("Topic message received!" +
+                    " | Time: " + topicMessage.consensusTimestamp +
+                    " | Sequence No.: " + topicMessage.sequenceNumber +
+                    " | Size: " + topicMessage.contents.length + " bytes.");
+                LARGE_MESSAGE_LATCH.countDown();
             });
 
-        // get a large file to send
-        String bigContents = readResources("large_message.txt");
+        /*
+         * Step 5:
+         * Send large message to the topic created previously.
+         */
+        // Get a large file to send.
+        String largeMessage = readResources("util/large_message.txt");
 
-        System.out.println("about to prepare a transaction to send a message of " + bigContents.length() + " bytes");
-
-        // prepare a message send transaction that requires a submit key from "somewhere else"
-        @Var Transaction<?> transaction = new TopicMessageSubmitTransaction()
-            .setMaxChunks(15) // this is 10 by default
-            .setTopicId(newTopicId)
-            .setMessage(bigContents)
-            // sign with the operator or "sender" of the message
-            // this is the party who will be charged the transaction fee
+        // Prepare a message send transaction that requires a submit key from "somewhere else".
+        Transaction<?> topicMessageSubmitTx = new TopicMessageSubmitTransaction()
+            // This is value 10 by default,
+            // increasing so large message will "fit".
+            .setMaxChunks(15)
+            .setTopicId(hederaTopicID)
+            .setMessage(largeMessage)
+            // Sign with the operator or "sender" of the message,
+            // this is the party who will be charged the transaction fee.
             .signWithOperator(client);
 
-        // serialize to bytes so we can be signed "somewhere else" by the submit key
-        byte[] transactionBytes = transaction.toBytes();
+        // Serialize to bytes, so we can be signed "somewhere else" by the submit key.
+        byte[] transactionBytes = topicMessageSubmitTx.toBytes();
 
-        // now pretend we sent those bytes across the network
-        // parse them into a transaction so we can sign as the submit key
-        transaction = Transaction.fromBytes(transactionBytes);
+        // Now pretend we sent those bytes across the network.
+        // Parse them into a transaction, so we can sign as the submit key.
+        topicMessageSubmitTx = Transaction.fromBytes(transactionBytes);
 
-        // view out the message size from the parsed transaction
-        // this can be useful to display what we are about to sign
-        long transactionMessageSize = ((TopicMessageSubmitTransaction) transaction).getMessage().size();
-        System.out.println("about to send a transaction with a message of " + transactionMessageSize + " bytes");
+        // View out the message size from the parsed transaction.
+        // This can be useful to display what we are about to sign.
+        long transactionMessageSize = ((TopicMessageSubmitTransaction) topicMessageSubmitTx).getMessage().size();
+        System.out.println("Preparing to submit a message to the created topic (size of the message: " + transactionMessageSize + " bytes)...");
 
-        // sign with that submit key
-        transaction.sign(submitKey);
+        // Sign with that Submit Key.
+        topicMessageSubmitTx.sign(submitPrivateKey);
 
-        // now actually submit the transaction
-        // get the receipt to ensure there were no errors
-        transaction.execute(client).getReceipt(client);
+        // Now actually submit the transaction and get the receipt to ensure there were no errors.
+        topicMessageSubmitTx.execute(client).getReceipt(client);
 
-        boolean largeMessageReceived = largeMessageLatch.await(60, TimeUnit.SECONDS);
+        // Wait 60 seconds to receive the message. Fail if not received.
+        boolean largeMessageReceived = LARGE_MESSAGE_LATCH.await(60, TimeUnit.SECONDS);
+
+        /*
+         * Clean up:
+         * Delete created topic.
+         */
+        new TopicDeleteTransaction()
+            .setTopicId(hederaTopicID)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        // Fail if message wasn't received.
         if (!largeMessageReceived) {
-            throw new TimeoutException("Large topic message was not received!");
+            throw new TimeoutException("Large topic message was not received! (Fail)");
         }
+
+        System.out.println("Consensus Service Submit Large Message And Subscribe Example Complete!");
     }
 
     private static String readResources(String filename) {
         InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
-            @Var String line;
+            String line;
             while ((line = reader.readLine()) != null) {
                 bigContents.append(line).append("\n");
             }
