@@ -147,8 +147,8 @@ public class Endpoint implements Cloneable {
         if (this.domainName != null && !this.domainName.isEmpty()) {
             return domainName + ":" + port;
         } else {
-            return ((int) address[0] & 0x000000FF) + "." + ((int) address[1] & 0x000000FF) +
-                ((int) address[2] & 0x000000FF) + "." + ((int) address[3] & 0x000000FF) +
+            return ((int) address[0] & 0x000000FF) + "." + ((int) address[1] & 0x000000FF) + "." +
+            ((int) address[2] & 0x000000FF) + "." + ((int) address[3] & 0x000000FF) +
                 ":" + port;
         }
     }
