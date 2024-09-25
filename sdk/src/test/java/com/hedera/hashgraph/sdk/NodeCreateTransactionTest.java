@@ -83,18 +83,7 @@ public class NodeCreateTransactionTest {
 
     private static Endpoint spawnTestEndpoint(byte offset) {
         return new Endpoint()
-            .setAddress(
-                new IPv4Address()
-                    .setNetwork(
-                        new IPv4AddressPart()
-                            .setLeft((byte) (0x00 + offset))
-                            .setRight((byte) (0x01 + offset))
-                    ).setHost(
-                        new IPv4AddressPart()
-                            .setLeft((byte) (0x02 + offset))
-                            .setRight((byte) (0x03 + offset))
-                    )
-            )
+            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
             .setDomainName(offset + "unit.test.com")
             .setPort(42 + offset);
     }

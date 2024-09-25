@@ -3,8 +3,6 @@ package com.hedera.hashgraph.sdk.examples;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.Endpoint;
-import com.hedera.hashgraph.sdk.IPv4Address;
-import com.hedera.hashgraph.sdk.IPv4AddressPart;
 import com.hedera.hashgraph.sdk.NodeCreateTransaction;
 import com.hedera.hashgraph.sdk.NodeDeleteTransaction;
 import com.hedera.hashgraph.sdk.NodeUpdateTransaction;
@@ -42,15 +40,14 @@ public class DynamicAddressBookExample {
         String newDescription = "Hedera™ cryptocurrency - updated";
 
         // Set up IPv4 address
-        IPv4Address ipv4Address = new IPv4Address();
-        ipv4Address.setHost(new IPv4AddressPart());
-        ipv4Address.setNetwork(new IPv4AddressPart());
         Endpoint gossipEndpoint = new Endpoint();
-        gossipEndpoint.setAddress(ipv4Address);
+        gossipEndpoint
+            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
 
         // Set up service endpoint
         Endpoint serviceEndpoint = new Endpoint();
-        serviceEndpoint.setAddress(ipv4Address);
+        serviceEndpoint
+            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
 
         // Generate admin key
         PrivateKey adminKey = PrivateKey.generateED25519();

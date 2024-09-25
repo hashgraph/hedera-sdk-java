@@ -566,7 +566,7 @@ class ExecutableTest {
         assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(
             ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.SERVER_ERROR);
-        assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.SERVER_ERROR);
+        assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.RETRY);
         assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.SUCCESS);
         assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.REQUEST_ERROR);
     }

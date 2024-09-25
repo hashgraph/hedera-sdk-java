@@ -145,6 +145,27 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     *
+     * Construct a client given a set of nodes.
+     * It is the responsibility of the caller to ensure that all nodes in the map are part of the
+     * same Hedera network. Failure to do so will result in undefined behavior.
+     * The client will load balance all requests to Hedera using a simple round-robin scheme to
+     * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be tried.
+     *
+     * @param networkMap the map of node IDs to node addresses that make up the network.
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forNetwork(Map<String, AccountId> networkMap, ExecutorService executor) {
+        var network = Network.forNetwork(executor, networkMap);
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
+
+        return new Client(executor, network, mirrorNetwork, null, null);
+    }
+
+
+    /**
      * Construct a client given a set of nodes.
      *
      * <p>It is the responsibility of the caller to ensure that all nodes in the map are part of the
@@ -158,10 +179,7 @@ public final class Client implements AutoCloseable {
      */
     public static Client forNetwork(Map<String, AccountId> networkMap) {
         var executor = createExecutor();
-        var network = Network.forNetwork(executor, networkMap);
-        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
-
-        return new Client(executor, network, mirrorNetwork, null, null);
+        return forNetwork(networkMap, executor);
     }
 
     /**
@@ -183,10 +201,11 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forMainnet() {
-        var executor = createExecutor();
+    public static Client forMainnet(ExecutorService executor) {
         var network = Network.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
@@ -198,10 +217,11 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
      * access</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forTestnet() {
-        var executor = createExecutor();
+    public static Client forTestnet(ExecutorService executor) {
         var network = Network.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
@@ -214,15 +234,51 @@ public final class Client implements AutoCloseable {
      * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
      * nodes</a>.
      *
+     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
+     *                 clients will close the executor for all the other clients sharing this executor
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
-    public static Client forPreviewnet() {
-        var executor = createExecutor();
+    public static Client forPreviewnet(ExecutorService executor) {
         var network = Network.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
         return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
             DEFAULT_NETWORK_UPDATE_PERIOD);
+    }
+
+
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forMainnet() {
+        var executor = createExecutor();
+        return forMainnet(executor);
+    }
+
+    /**
+     * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
+     * access</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forTestnet() {
+        var executor = createExecutor();
+        return forTestnet(executor);
+    }
+
+    /**
+     * Construct a Hedera client pre-configured for <a
+     * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
+     * nodes</a>.
+     *
+     * @return {@link com.hedera.hashgraph.sdk.Client}
+     */
+    public static Client forPreviewnet() {
+        var executor = createExecutor();
+        return forPreviewnet(executor);
     }
 
     /**
@@ -363,17 +419,18 @@ public final class Client implements AutoCloseable {
         networkUpdateFuture.thenRun(() -> {
             // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
             requireNetworkUpdatePeriodNotNull(() -> {
-                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this).thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
-                    try {
-                        this.setNetworkFromAddressBook(addressBook);
-                    } catch (Throwable error) {
-                        return CompletableFuture.failedFuture(error);
-                    }
-                    return CompletableFuture.completedFuture(null);
-                })).exceptionally(error -> {
-                    logger.warn("Failed to update address book via mirror node query ", error);
-                    return null;
-                });
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this)
+                    .thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
+                        try {
+                            this.setNetworkFromAddressBook(addressBook);
+                        } catch (Throwable error) {
+                            return CompletableFuture.failedFuture(error);
+                        }
+                        return CompletableFuture.completedFuture(null);
+                    })).exceptionally(error -> {
+                        logger.warn("Failed to update address book via mirror node query ", error);
+                        return null;
+                    });
                 scheduleNetworkUpdate(networkUpdatePeriod);
                 return null;
             });
@@ -404,6 +461,26 @@ public final class Client implements AutoCloseable {
 
     /**
      * Replace all nodes in this Client with the nodes in the Address Book
+     * and update the address book if necessary.
+     *
+     * @param addressBook A list of nodes and their metadata
+     * @param updateAddressBook whether to update the address book of the network
+     * @return {@code this}
+     */
+    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook, boolean updateAddressBook)
+        throws InterruptedException, TimeoutException {
+        network.setNetwork(Network.addressBookToNetwork(
+            addressBook.nodeAddresses,
+            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
+        ));
+        if (updateAddressBook) {
+            network.setAddressBook(addressBook);
+        }
+        return this;
+    }
+
+    /**
+     * Replace all nodes in this Client with the nodes in the Address Book
      *
      * @param addressBook A list of nodes and their metadata
      * @return {@code this}
@@ -412,11 +489,7 @@ public final class Client implements AutoCloseable {
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook)
         throws InterruptedException, TimeoutException {
-        network.setNetwork(Network.addressBookToNetwork(
-            addressBook.nodeAddresses,
-            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
-        ));
-        return this;
+        return setNetworkFromAddressBook(addressBook, false);
     }
 
     /**
@@ -614,7 +687,7 @@ public final class Client implements AutoCloseable {
      * @param onFailure     a Consumer which consumes the error on failure.
      */
     public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess,
-                          Consumer<Throwable> onFailure) {
+        Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
     }
 
@@ -747,7 +820,7 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
-                                               UnaryOperator<byte[]> transactionSigner) {
+        UnaryOperator<byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
@@ -1311,6 +1384,9 @@ public final class Client implements AutoCloseable {
     /**
      * Set the period for updating the Address Book
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
+     *
      * @param networkUpdatePeriod the period for updating the Address Book
      * @return {@code this}
      */
@@ -1346,6 +1422,34 @@ public final class Client implements AutoCloseable {
     @Override
     public synchronized void close() throws TimeoutException {
         close(closeTimeout);
+    }
+
+    /**
+     * Initiates an orderly shutdown of all channels (to the Hedera network),
+     * without closing the ExecutorService {@link #executor}
+     *
+     * @throws TimeoutException if the network doesn't close in time
+     */
+    public synchronized void closeChannels() throws TimeoutException {
+        var closeDeadline = Instant.now().plus(closeTimeout);
+
+        networkUpdatePeriod = null;
+        cancelScheduledNetworkUpdate();
+        cancelAllSubscriptions();
+
+        network.beginClose();
+        mirrorNetwork.beginClose();
+
+        var networkError = network.awaitClose(closeDeadline, null);
+        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
+
+        if (mirrorNetworkError != null) {
+            if (mirrorNetworkError instanceof TimeoutException ex) {
+                throw ex;
+            } else {
+                throw new RuntimeException(mirrorNetworkError);
+            }
+        }
     }
 
     /**

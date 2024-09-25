@@ -345,6 +345,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         }
         try {
             if (delay > 0) {
+                if (logger.isEnabledForLevel(LogLevel.DEBUG)) {
+                    logger.debug("Sleeping for: " + delay + " | Thread name: " + Thread.currentThread().getName());
+                }
                 Thread.sleep(delay);
             }
         } catch (InterruptedException e) {
@@ -468,6 +471,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
     /**
      * Execute this transaction or query asynchronously.
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
+     *
      * @param client The client with which this will be executed.
      * @return Future result of execution
      */
@@ -477,6 +483,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
 
     /**
      * Execute this transaction or query asynchronously.
+     *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
      *
      * @param client  The client with which this will be executed.
      * @param timeout The timeout after which the execution attempt will be cancelled.
@@ -829,8 +838,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         switch (status) {
             case PLATFORM_TRANSACTION_NOT_CREATED:
             case PLATFORM_NOT_ACTIVE:
-            case BUSY:
                 return ExecutionState.SERVER_ERROR;
+            case BUSY:
+                return ExecutionState.RETRY;
             case OK:
                 return ExecutionState.SUCCESS;
             default:
