@@ -31,6 +31,8 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -156,10 +158,9 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).toList();
+        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
 
-        createdContractIds = inner.getCreatedContractIDsList().stream().map(ContractId::fromProtobuf)
-            .toList();
+        createdContractIds = inner.getCreatedContractIDsList().stream().map(ContractId::fromProtobuf).collect(Collectors.toList());
 
         stateChanges = new ArrayList<ContractStateChange>();
         // for (var stateChangeProto : inner.getStateChangesList()) {
@@ -174,7 +175,7 @@ public final class ContractFunctionResult {
 
         senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
 
-        contractNonces = inner.getContractNoncesList().stream().map(ContractNonceInfo::fromProtobuf).toList();
+        contractNonces = inner.getContractNoncesList().stream().map(ContractNonceInfo::fromProtobuf).collect(Collectors.toList());
 
         signerNonce = inner.getSignerNonce().getValue();
     }

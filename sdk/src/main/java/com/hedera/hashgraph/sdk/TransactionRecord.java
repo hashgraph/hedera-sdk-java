@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * The complete record for a transaction on Hedera that has reached consensus.
@@ -328,7 +329,7 @@ public final class TransactionRecord {
 
         List<PendingAirdropRecord> pendingAirdropRecords = transactionRecord.getNewPendingAirdropsList()
             .stream().map(PendingAirdropRecord::fromProtobuf)
-            .toList();
+            .collect(Collectors.toList());
 
         return new TransactionRecord(
             TransactionReceipt.fromProtobuf(transactionRecord.getReceipt(), transactionId),

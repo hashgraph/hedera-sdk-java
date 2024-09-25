@@ -316,6 +316,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         grpcCostQuery.finish();
     }
 
+    /**
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
+     */
     @Override
     CompletableFuture<Void> onExecuteAsync(Client client) {
         var grpcCostQuery = new GrpcCostQuery(client);

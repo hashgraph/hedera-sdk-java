@@ -192,6 +192,9 @@ public class EthereumFlow {
     /**
      * Execute the transactions in the flow with the passed in client asynchronously.
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
+     *
      * @param client the client with the transaction to execute
      * @return the response
      */
@@ -201,6 +204,9 @@ public class EthereumFlow {
 
     /**
      * Execute the transactions in the flow with the passed in client asynchronously.
+     *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
      *
      * @param client                the client with the transaction to execute
      * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.

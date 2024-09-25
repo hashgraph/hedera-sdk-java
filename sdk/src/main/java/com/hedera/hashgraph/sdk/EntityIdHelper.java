@@ -285,6 +285,9 @@ class EntityIdHelper {
     /**
      * Get AccountId num from mirror node using evm address.
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 33
+     * because it uses features introduced in API level 33 (Android 13).</p>*
+     *
      * @param client
      * @param evmAddress
      * @return
@@ -301,6 +304,9 @@ class EntityIdHelper {
     /**
      * Get EvmAddress from mirror node using account num.
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 33
+     * because it uses features introduced in API level 33 (Android 13).</p>*
+     *
      * @param client
      * @param num
      * @return
@@ -316,6 +322,9 @@ class EntityIdHelper {
 
     /**
      * Get ContractId num from mirror node using evm address.
+     *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 33
+     * because it uses features introduced in API level 33 (Android 13).</p>*
      *
      * @param client
      * @param evmAddress
