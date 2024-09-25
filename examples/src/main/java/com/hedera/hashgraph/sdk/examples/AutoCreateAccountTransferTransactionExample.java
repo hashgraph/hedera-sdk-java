@@ -20,144 +20,192 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 
+/**
+ * How to use auto account creation (HIP-583).
+ * <p>
+ * This HIP allows any new account on Hedera to have an ECDSA derived alias, compatible with Ethereum addresses,
+ * and permits the use of this alias for all operations supported by alias today.
+ * This HIP expands support in the auto-create flow for ECDSA derived addresses to be used as the alias.
+ * It also adds support to CryptoCreate transactions for creation with an ECDSA derived alias.
+ */
 public class AutoCreateAccountTransferTransactionExample {
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
-    // HEDERA_NETWORK defaults to testnet if not specified in dotenv
-    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
-
-    private AutoCreateAccountTransferTransactionExample() {
-    }
 
     /*
-    Auto-create a new account using a public-address via a `TransferTransaction`.
-    Reference: [HIP-583 Expand alias support in CryptoCreate & CryptoTransfer Transactions](https://hips.hedera.com/hip/hip-583)
-    ## Example 2
-    - Create an ECSDA private key
-    - Extract the ECDSA public key
-    - Extract the Ethereum public address
-    - Use the `TransferTransaction`
-       - Populate the `FromAddress` with the sender Hedera AccountID
-       - Populate the `ToAddress` with Ethereum public address
-       - Note: Can transfer from public address to public address in the `TransferTransaction` for complete accounts. Transfers from hollow accounts will not work because the hollow account does not have a public key assigned to authorize transfers out of the account
-    - Sign the `TransferTransaction` transaction using an existing Hedera account and key paying for the transaction fee
-    - The `AccountCreateTransaction` is executed as a child transaction triggered by the `TransferTransaction`
-    - The Hedera Account that was created has a public address the user specified in the TransferTransaction ToAddress
-           - Will not have a public key at this stage
-           - Cannot do anything besides receive tokens or hbars
-           - The alias property of the account does not have the public address
-           - Referred to as a hollow account
-    - To get the new account ID ask for the child receipts or child records for the parent transaction ID of the `TransferTransaction`
-    - Get the `AccountInfo` and verify the account is a hollow account with the supplied public address (may need to verify with mirror node API)
-    - To enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction
-    - Create a HAPI transaction and assign the new hollow account as the transaction fee payer
-    - Sign with the private key that corresponds to the public key on the hollow account
-    - Get the `AccountInfo` for the account and return the public key on the account to show it is a complete account
-    */
-    public static void main(String[] args) throws Exception {
-        Client client = ClientHelper.forName(HEDERA_NETWORK);
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
 
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
-        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
+    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
+    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
+
+    public static void main(String[] args) throws Exception {
+        System.out.println("Auto Create Account Via Transfer Transaction (HIP-583) Example Start!");
 
         /*
-         * Step 1
-         * Create an ECSDA private key
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+        // All generated transactions will be paid by this account and signed by this key.
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
+
+        /*
+         * Step 1:
+         * Generate ECSDA private key.
          */
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 2
-         * Extract the ECDSA public key
+         * Step 2:
+         * Extract ECDSA public key.
          */
         PublicKey publicKey = privateKey.getPublicKey();
 
         /*
-         * Step 3
-         * Extract the Ethereum public address
+         * Step 3:
+         * Extract Ethereum public address.
          */
         EvmAddress evmAddress = publicKey.toEvmAddress();
-        System.out.println(evmAddress);
+        System.out.println("EVM address of the new account: " + evmAddress);
 
         /*
-         * Step 4
-         * Use the `TransferTransaction` and set the EVM address field to the Ethereum public address
+         * Step 4:
+         * Use the TransferTransaction.
+         * - populate the FromAddress with the sender Hedera account ID;
+         * - populate the ToAddress with Ethereum public address.
+         *
+         * Note: Can transfer from public address to public address in the TransferTransaction for complete accounts.
+         * Transfers from hollow accounts will not work because the hollow account does not have a public key
+         * assigned to authorize transfers out of the account.
          */
-        TransferTransaction transferTransaction = new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, Hbar.from(10).negated())
-            .addHbarTransfer(AccountId.fromEvmAddress(evmAddress), Hbar.from(10))
+        TransferTransaction transferTx = new TransferTransaction()
+            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+            .addHbarTransfer(AccountId.fromEvmAddress(evmAddress), Hbar.from(1))
             .freezeWith(client);
 
         /*
-         * Step 5
-         * Sign the `TransferTransaction` transaction using an existing Hedera account and key paying for the transaction fee
+         * Step 5:
+         * Sign and execute the TransferTransaction transaction using existing Hedera account
+         * and key paying for the transaction fee.
          */
-        TransactionResponse response = transferTransaction.execute(client);
+        System.out.println("Transferring Hbar to the the new account...");
+        TransactionResponse transferTxResponse = transferTx.execute(client);
 
         /*
-         * Step 6
-         * To get the new account ID ask for the child receipts or child records for the parent transaction ID of the `TransferTransaction`
-         *     - The `AccountCreateTransaction` is executed as a child transaction triggered by the `TransferTransaction`
+         * Step 6:
+         * Get the new account ID ask for the child receipts or child records for the parent transaction ID of the TransferTransaction
+         * (the AccountCreateTransaction is executed as a child transaction triggered by the TransferTransaction).
          */
-        TransactionReceipt receipt = new TransactionReceiptQuery()
-            .setTransactionId(response.transactionId)
+        TransactionReceipt transferTxReceipt = new TransactionReceiptQuery()
+            .setTransactionId(transferTxResponse.transactionId)
             .setIncludeChildren(true)
             .execute(client);
 
-        AccountId newAccountId = receipt.children.get(0).accountId;
-        System.out.println(newAccountId);
+        AccountId aliceAccountId = transferTxReceipt.children.get(0).accountId;
+        Objects.requireNonNull(aliceAccountId);
+        System.out.println("The \"normal\" account ID of the given alias: " + aliceAccountId);
 
         /*
-         * Step 7
-         * Get the `AccountInfo` and verify the account is a hollow account with the supplied public address (may need to verify with mirror node API)
-         * The Hedera Account that was created has a public address the user specified in the TransferTransaction ToAddress
-             - Will not have a public key at this stage
-             - Cannot do anything besides receive tokens or hbars
-             - The alias property of the account does not have the public address
-             - Referred to as a hollow account
+         * Step 7:
+         * Get the AccountInfo and verify the account is a hollow account with the supplied public address (may need to verify with mirror node API).
+         *
+         * The Hedera Account that was created has a public address the user specified in the TransferTransaction ToAddress:
+         *  - will not have a public key at this stage;
+         *  - cannot do anything besides receive Hbar or tokens;
+         *  - the alias property of the account does not have the public address;
+         *  - referred to as a hollow account.
          */
-        AccountInfo accountInfo = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_BeforeEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        if (((KeyList) accountInfo.key).isEmpty()) {
-            System.out.println("The newly created account is a hollow account");
+        if (((KeyList) aliceAccountInfo_BeforeEnhancing.key).isEmpty()) {
+            System.out.println("The newly created account is a hollow account! (Success)");
         } else {
-            throw new Exception("Not a hollow account");
+            throw new Exception("The newly created account is not a hollow account! (Fail)");
         }
 
         /*
-         * Step 8
-         * Create a HAPI transaction and assign the new hollow account as the transaction fee payer
-         *     - To enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction
+         * Step 8:
+         * Create a HAPI transaction and assign the new hollow account as the transaction fee payer.
+         *
+         * Sign with the private key that corresponds to the public key on the hollow account
+         * (to enhance the hollow account to have a public key the hollow account needs to be specified as a transaction fee payer in a HAPI transaction).
          */
-        TransactionReceipt receipt2 = new TopicCreateTransaction()
-            .setTransactionId(TransactionId.generate(newAccountId))
+        System.out.println("Creating new topic...");
+        TransactionReceipt topicCreateTxReceipt = new TopicCreateTransaction()
+            .setAdminKey(publicKey)
+            .setTransactionId(TransactionId.generate(aliceAccountId))
             .setTopicMemo("Memo")
             .freezeWith(client)
             .sign(privateKey)
             .execute(client)
             .getReceipt(client);
-        System.out.println("Topic id = " + receipt2.topicId);
+
+        System.out.println("Created new topic with ID: " + topicCreateTxReceipt.topicId);
 
         /*
-         *
-         * Step 9
-         * Get the `AccountInfo` for the account and return the public key on the account to show it is a complete account
+         * Step 9:
+         * Get the account info and return public key to show its complete account.
          */
-        AccountInfo accountInfo2 = new AccountInfoQuery()
-            .setAccountId(newAccountId)
+        AccountInfo aliceAccountInfo_AfterEnhancing = new AccountInfoQuery()
+            .setAccountId(aliceAccountId)
             .execute(client);
 
-        System.out.println("The public key of the newly created and now complete account: " + accountInfo2.key);
+        System.out.println("The public key of the newly created and now complete account: " + aliceAccountInfo_AfterEnhancing.key);
+
+        /*
+         * Clean up:
+         * Delete created account and topic.
+         */
+        new AccountDeleteTransaction()
+            .setTransferAccountId(OPERATOR_ID)
+            .setAccountId(aliceAccountId)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new TopicDeleteTransaction()
+            .setTopicId(topicCreateTxReceipt.topicId)
+            .freezeWith(client)
+            .sign(privateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        client.close();
+
+        System.out.println("Auto Create Account Via Transfer Transaction (HIP-583) Example Complete!");
     }
 }

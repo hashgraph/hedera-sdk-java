@@ -28,7 +28,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@5c7944e73c4c2a096b17a9cb74d65b6c2bbafbde # v2.9.1
@@ -45,7 +45,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
         with:
           cache-read-only: false
 
@@ -54,7 +54,7 @@ jobs:
 
   test:
     name: Unit and Integration Tests
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     needs:
       - build
     steps:
@@ -80,7 +80,7 @@ jobs:
           java-version: 17
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -118,7 +118,7 @@ jobs:
 
   run-examples:
     name: Run Examples
-    runs-on: [ self-hosted, Linux, medium, ephemeral ]
+    runs-on: client-sdk-linux-medium
     needs:
       - build
     steps:
@@ -145,7 +145,7 @@ jobs:
         uses: android-actions/setup-android@00854ea68c109d98c75d956347303bf7c45b0277 # v3.2.1
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4
+        uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
       - name: Install Local Node
         run: npm install @hashgraph/hedera-local
@@ -173,7 +173,7 @@ jobs:
 
   test-tck:
       name: TCK Tests
-      runs-on: [ self-hosted, Linux, medium, ephemeral ]
+      runs-on: client-sdk-linux-medium
       needs:
           - build
       steps:
@@ -194,7 +194,7 @@ jobs:
                 java-version: 17
 
           - name: Setup Gradle
-            uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4
+            uses: gradle/actions/setup-gradle@16bf8bc8fe830fa669c3c9f914d3eb147c629707 # v4
 
           - name: Install Local Node
             run: npm install @hashgraph/hedera-local

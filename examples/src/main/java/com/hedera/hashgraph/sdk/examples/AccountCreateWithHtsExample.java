@@ -20,39 +20,96 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-public final class AccountCreateWithHtsExample {
+/**
+ * How to use auto account creation via HTS assets (HIP-542).
+ * <p>
+ * This means a new alias may be given anywhere in the transaction--
+ * both in the Hbar transfer list, or in an HTS token transfer list. In the latter case,
+ * the assessed creation fee will include at least one auto-association slot,
+ * since the new account must be associated to its originating HTS assets.
+ */
+class AccountCreateWithHtsExample {
 
-    // see `.env.sample` in the repository root for how to specify these values
-    // or set environment variables with the same names
+    /*
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
+     */
+
+    /**
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
+     */
     private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+
+    /**
+     * Operator's private key.
+     */
     private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+
+    /**
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
+     */
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
-    private AccountCreateWithHtsExample() {
-    }
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
     public static void main(String[] args) throws Exception {
+        System.out.println("Account Auto-Creation Via HTS Assets (HIP-542) Example Start!");
+
+        /*
+         * Step 0:
+         * Create and configure the SDK Client.
+         */
         Client client = ClientHelper.forName(HEDERA_NETWORK);
-
-        // Defaults the operator account ID and key such that all generated transactions will be paid for
-        // by this account and be signed by this key
+        // All generated transactions will be paid by this account and signed by this key.
         client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+        // Attach logger to the SDK Client.
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
+        // Set the maximum fee to be paid for transactions executed by this client.
+        client.setDefaultMaxTransactionFee(Hbar.from(10));
 
-        client.setDefaultMaxTransactionFee(new Hbar(10));
+        /*
+         * Step 1:
+         * Generate ECDSA keys pairs.
+         */
+        PublicKey operatorPublicKey = OPERATOR_KEY.getPublicKey();
 
-        PrivateKey supplyKey = PrivateKey.generateECDSA();
-        PrivateKey freezeKey = PrivateKey.generateECDSA();
-        PrivateKey wipeKey = PrivateKey.generateECDSA();
+        System.out.println("Generating ECDSA key pairs...");
 
-        System.out.println("Example 1");
+        PrivateKey supplyPrivateKey = PrivateKey.generateECDSA();
+        PublicKey supplyPublicKey = supplyPrivateKey.getPublicKey();
 
-        // Step 1 - Create an NFT using the Hedera Token Service
+        PrivateKey freezePrivateKey = PrivateKey.generateECDSA();
+        PublicKey freezePublicKey = freezePrivateKey.getPublicKey();
 
-        // IPFS content identifiers for the NFT metadata
+        PrivateKey wipePrivateKey = PrivateKey.generateECDSA();
+        PublicKey wipePublicKey = wipePrivateKey.getPublicKey();
+
+        /*
+         * Step 2:
+         * The beginning of the first example (with NFT).
+         *
+         * Create NFT using the Hedera Token Service.
+         */
+        System.out.println("The beginning of the first example (with NFT)...");
+
+        // IPFS content identifiers for the NFT metadata.
         String[] CIDs = new String[] {
             "QmNPCiNA3Dsu3K5FxDPMG5Q3fZRwVTg14EXA92uqEeSRXn",
             "QmZ4dgAgt8owvnULxnKxNe8YqpavtVCXmc1Lt2XajFpJs9",
@@ -61,171 +118,290 @@ public final class AccountCreateWithHtsExample {
             "QmWgkKz3ozgqtnvbCLeh7EaR1H8u5Sshx3ZJzxkcrT3jbw",
         };
 
+        System.out.println("Creating NFT using the Hedera Token Service...");
+
         TokenCreateTransaction nftCreateTx = new TokenCreateTransaction()
             .setTokenName("HIP-542 Example Collection")
             .setTokenSymbol("HIP-542")
+            .setTokenName("HIP-542 NFT")
+            .setTokenSymbol("HIP542NFT")
             .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
             .setDecimals(0)
             .setInitialSupply(0)
             .setMaxSupply(CIDs.length)
             .setTreasuryAccountId(OPERATOR_ID)
             .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(OPERATOR_KEY)
-            .setFreezeKey(freezeKey)
-            .setWipeKey(wipeKey)
-            .setSupplyKey(supplyKey)
+            .setAdminKey(operatorPublicKey)
+            .setFreezeKey(freezePublicKey)
+            .setWipeKey(wipePublicKey)
+            .setSupplyKey(supplyPublicKey)
             .freezeWith(client);
 
-        // Sign the transaction with the operator key
-        TokenCreateTransaction nftCreateTxSign = nftCreateTx.sign(OPERATOR_KEY);
+        // Sign the transaction with the operator key.
+        TokenCreateTransaction nftCreateTxSigned = nftCreateTx.sign(OPERATOR_KEY);
 
-        // Submit the transaction to the Hedera network
-        TransactionResponse nftCreateSubmit = nftCreateTxSign.execute(client);
+        // Submit the transaction to the Hedera network.
+        TransactionResponse nftCreateTxResponse = nftCreateTxSigned.execute(client);
 
-        // Get transaction receipt information
-        TransactionReceipt nftCreateRx = nftCreateSubmit.getReceipt(client);
-        TokenId nftTokenId = nftCreateRx.tokenId;
-        System.out.println("Created NFT with token id: " + nftTokenId);
+        // Get transaction receipt information.
+        TransactionReceipt nftCreateTxReceipt = nftCreateTxResponse.getReceipt(client);
+        TokenId nftTokenId = nftCreateTxReceipt.tokenId;
+        Objects.requireNonNull(nftTokenId);
 
-        // Step 2 -  Mint the NFT
-        TransactionReceipt[] nftCollection = new TransactionReceipt[CIDs.length];
+        System.out.println("Created NFT with token ID: " + nftTokenId);
+
+        /*
+         * Step 3:
+         * Mint NFTs.
+         */
+        System.out.println("Minting NFTs...");
+        TransactionReceipt[] nftMintTxReceipts = new TransactionReceipt[CIDs.length];
         for (int i = 0; i < CIDs.length; i++) {
             byte[] nftMetadata = CIDs[i].getBytes();
-            TokenMintTransaction mintTx = new TokenMintTransaction()
+
+            TokenMintTransaction nftMintTx = new TokenMintTransaction()
                 .setTokenId(nftTokenId)
                 .setMetadata(List.of(nftMetadata))
                 .freezeWith(client);
 
-            TokenMintTransaction mintTxSign = mintTx.sign(supplyKey);
-            TransactionResponse mintTxSubmit = mintTxSign.execute(client);
+            TokenMintTransaction nftMintTxSigned = nftMintTx.sign(supplyPrivateKey);
+            TransactionResponse nftMintTxResponse = nftMintTxSigned.execute(client);
 
-            nftCollection[i] = mintTxSubmit.getReceipt(client);
+            nftMintTxReceipts[i] = nftMintTxResponse.getReceipt(client);
 
-            System.out.println("Created NFT " + nftTokenId + " with serial: " + nftCollection[i].serials.get(0));
+            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftMintTxReceipts[i].serials.get(0));
         }
 
-        long exampleNftId = nftCollection[0].serials.get(0);
+        long exampleNftId = nftMintTxReceipts[0].serials.get(0);
 
-        // Step 3 - Create an ECDSA public key alias
-        System.out.println("Creating a new account...");
+        /*
+         * Step 4:
+         * Create an ECDSA public key alias.
+         */
+        PrivateKey alicePrivateKey = PrivateKey.generateECDSA();
+        PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
 
-        PrivateKey privateKey = PrivateKey.generateECDSA();
-        PublicKey publicKey = privateKey.getPublicKey();
+        System.out.println("\"Creating\" Alice's account...");
 
         // Assuming that the target shard and realm are known.
         // For now they are virtually always 0 and 0.
-        AccountId aliasAccountId = publicKey.toAccountId(0, 0);
+        AccountId aliceAliasAccountId = alicePublicKey.toAccountId(0, 0);
 
-        System.out.println("New account ID: " + aliasAccountId);
-        System.out.println("Just the aliasKey: " + aliasAccountId.aliasKey);
+        System.out.println("Alice's account ID: " + aliceAliasAccountId);
+        System.out.println("Alice's alias key: " + aliceAliasAccountId.aliasKey);
 
-        // Step 4 -  Tranfer the NFT to the public key alias using the transfer transaction
+        /*
+         * Step 5:
+         * Transfer the NFT to Alice's public key alias using the transfer transaction.
+         */
+        System.out.println("Transferring NFT to Alice's account...");
+
         TransferTransaction nftTransferTx = new TransferTransaction()
-            .addNftTransfer(nftTokenId.nft(exampleNftId), OPERATOR_ID, aliasAccountId)
+            .addNftTransfer(nftTokenId.nft(exampleNftId), OPERATOR_ID, aliceAliasAccountId)
             .freezeWith(client);
 
-        // Sign the transaction with the operator key
-        TransferTransaction nftTransferTxSign = nftTransferTx.sign(OPERATOR_KEY);
+        // Sign the transaction with the operator key.
+        TransferTransaction nftTransferTxSigned = nftTransferTx.sign(OPERATOR_KEY);
 
-        // Submit the transaction to the Hedera network
-        TransactionResponse nftTransferSubmit = nftTransferTxSign.execute(client);
+        // Submit the transaction to the Hedera network.
+        TransactionResponse nftTransferTxResponse = nftTransferTxSigned.execute(client);
 
-        // Get transaction receipt information here
-        nftTransferSubmit.getReceipt(client);
+        // Get transaction receipt information here.
+        nftTransferTxResponse.getReceipt(client);
 
-        // Step 5 - Return the new account ID in the child record
-        List<TokenNftInfo> nftInfo = new TokenNftInfoQuery()
+        /*
+         * Step 6:
+         * Get the new account ID from the child record.
+         */
+        List<TokenNftInfo> nftsInfo = new TokenNftInfoQuery()
             .setNftId(nftTokenId.nft(exampleNftId))
             .execute(client);
 
-        String nftOwnerAccountId = nftInfo.get(0).accountId.toString();
-        System.out.println("Current owner account id: " + nftOwnerAccountId);
+        String nftOwnerAccountId_FromChildRecord = nftsInfo.get(0).accountId.toString();
+        System.out.println("Current owner account ID: " + nftOwnerAccountId_FromChildRecord);
 
-        // Step 6 - Show the new account ID owns the NFT
-        String accountId = new AccountInfoQuery()
-            .setAccountId(aliasAccountId)
+        /*
+         * Step 7:
+         * Show the normal account ID of account which owns the NFT.
+         */
+        String nftOwnerAccountId_FromQuery = new AccountInfoQuery()
+            .setAccountId(aliceAliasAccountId)
             .execute(client)
             .accountId.toString();
 
-        System.out.println("The normal account ID of the given alias: " + accountId);
+        System.out.println("The \"normal\" account ID of the given alias: " + nftOwnerAccountId_FromQuery);
 
-        if (nftOwnerAccountId.equals(accountId)) {
-            System.out.println("The NFT owner accountId matches the accountId created with the HTS");
+        /*
+         * Step 8:
+         * Validate that account ID value from the child record is equal to normal account ID value from the query.
+         */
+        if (nftOwnerAccountId_FromChildRecord.equals(nftOwnerAccountId_FromQuery)) {
+            System.out.println("The NFT owner account ID matches the account ID created with the HTS! (Success)");
         } else {
-            throw new Exception("The two account IDs does not match");
+            throw new Exception("The two account IDs does not match! (Error)");
         }
 
-        System.out.println("Example 2");
+        /*
+         * Step 9:
+         * The beginning of the second example (with Fungible Token).
+         * Create a fungible HTS token using the Hedera Token Service.
+         */
+        System.out.println("The beginning of the second example (with Fungible Token).");
+        System.out.println("Creating Fungible Token using the Hedera Token Service...");
 
-        // Step 1 - Create a fungible HTS token using the Hedera Token Service
-        TokenCreateTransaction tokenCreateTx = new TokenCreateTransaction()
-            .setTokenName("HIP-542 Token")
-            .setTokenSymbol("H542")
+        TokenCreateTransaction ftCreateTx = new TokenCreateTransaction()
+            .setTokenName("HIP-542 Fungible Token")
+            .setTokenSymbol("HIP542FT")
+            .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
+            .setDecimals(2)
             .setTokenType(TokenType.FUNGIBLE_COMMON)
             .setTreasuryAccountId(OPERATOR_ID)
-            .setInitialSupply(10000) // Total supply = 10000 / 10 ^ 2
-            .setDecimals(2)
             .setAutoRenewAccountId(OPERATOR_ID)
+            .setAdminKey(operatorPublicKey)
+            .setWipeKey(wipePrivateKey)
             .freezeWith(client);
 
-        // Sign the transaction with the operator key
-        TokenCreateTransaction tokenCreateTxSign = tokenCreateTx.sign(OPERATOR_KEY);
+        // Sign the transaction with the operator key.
+        TokenCreateTransaction ftCreateTxSigned = ftCreateTx.sign(OPERATOR_KEY);
 
-        // Submit the transaction to the Hedera network
-        TransactionResponse tokenCreateSubmit = tokenCreateTxSign.execute(client);
+        // Submit the transaction to the Hedera network.
+        TransactionResponse ftCreateResponse = ftCreateTxSigned.execute(client);
 
-        // Get transaction receipt information
-        TransactionReceipt tokenCreateRx = tokenCreateSubmit.getReceipt(client);
-        TokenId tokenId = tokenCreateRx.tokenId;
-        System.out.println("Created token with token id: " + tokenId);
+        // Get transaction receipt information.
+        TransactionReceipt ftCreateReceipt = ftCreateResponse.getReceipt(client);
+        TokenId fungibleTokenId = ftCreateReceipt.tokenId;
+        Objects.requireNonNull(fungibleTokenId);
 
-        // Step 2 -  Create an ECDSA public key alias
-        System.out.println("Creating a new account...");
+        System.out.println("Created fungible token with ID: " + fungibleTokenId);
 
-        PrivateKey privateKey2 = PrivateKey.generateECDSA();
-        PublicKey publicKey2 = privateKey2.getPublicKey();
+        /*
+         * Step 10:
+         * Create an ECDSA public key alias.
+         */
+        PrivateKey bobPrivateKey = PrivateKey.generateECDSA();
+        PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
 
+        System.out.println("\"Creating\" Bob's account...");
         // Assuming that the target shard and realm are known.
-        // For now they are virtually always 0 and 0.
-        AccountId aliasAccountId2 = publicKey2.toAccountId(0, 0);
+        // For now, they are virtually always 0 and 0.
+        AccountId bobAliasAccountId = bobPublicKey.toAccountId(0, 0);
 
-        System.out.println("New account ID: " + aliasAccountId2);
-        System.out.println("Just the aliasKey: " + aliasAccountId2.aliasKey);
+        System.out.println("Bob's account ID: " + bobAliasAccountId);
+        System.out.println("Bob's alias key: " + bobAliasAccountId.aliasKey);
 
-        // Step 3 -  Transfer the fungible token to the public key alias
+        /*
+         * Step 11:
+         * Transfer the Fungible Token to the Bob's public key alias using the transfer transaction.
+         */
+        System.out.println("Transferring Fungible Token the Bob's account...");
         TransferTransaction tokenTransferTx = new TransferTransaction()
-            .addTokenTransfer(tokenId, OPERATOR_ID, -10)
-            .addTokenTransfer(tokenId, aliasAccountId2, 10)
+            .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10)
+            .addTokenTransfer(fungibleTokenId, bobAliasAccountId, 10)
             .freezeWith(client);
 
-        // Sign the transaction with the operator key
+        // Sign the transaction with the operator key.
         TransferTransaction tokenTransferTxSign = tokenTransferTx.sign(OPERATOR_KEY);
 
-        // Submit the transaction to the Hedera network
+        // Submit the transaction to the Hedera network.
         TransactionResponse tokenTransferSubmit = tokenTransferTxSign.execute(client);
 
-        // Get transaction receipt information
+        // Get transaction receipt information.
         tokenTransferSubmit.getReceipt(client);
 
-        // Step 4 -  Return the new account ID in the child record
-        String accountId2 = new AccountInfoQuery()
-            .setAccountId(aliasAccountId2)
+        /*
+         * Step 12:
+         * Get the new account ID from the child record.
+         */
+        String bobAccountInfo = new AccountInfoQuery()
+            .setAccountId(bobAliasAccountId)
             .execute(client)
-            .accountId.toString();
+            .accountId
+            .toString();
 
-        System.out.println("The normal account ID of the given alias: " + accountId2);
+        System.out.println("The \"normal\" account ID of the given alias: " + bobAccountInfo);
 
-        // Step 5 -  Show the new account ID owns the fungible token
-        AccountBalance accountBalances = new AccountBalanceQuery()
-            .setAccountId(aliasAccountId2)
+        /*
+         * Step 13:
+         * Show the normal account ID of account which owns the NFT.
+         */
+        AccountBalance bobAccountBalances = new AccountBalanceQuery()
+            .setAccountId(bobAliasAccountId)
             .execute(client);
 
-        int tokenBalanceAccountId2 = accountBalances.tokens.get(tokenId).intValue();
-        if (tokenBalanceAccountId2 == 10)
-            System.out.println("Account is created successfully using HTS 'TransferTransaction'");
-        else
-            throw new Exception("Creating account with HTS using public key alias failed");
+        /*
+         * Step 14:
+         * Validate token balance of newly created account.
+         */
+        int bobFtBalance = bobAccountBalances.tokens.get(fungibleTokenId).intValue();
+        if (bobFtBalance == 10) {
+            System.out.println("New account was created using HTS TransferTransaction! (Success)");
+        } else {
+            throw new Exception("Creating account with HTS using public key alias failed! (Error)");
+        }
+
+        /*
+         * Clean up:
+         * Delete created accounts and tokens.
+         */
+        AccountId nftOwnerAccountId = AccountId.fromString(nftOwnerAccountId_FromQuery);
+
+        new TokenWipeTransaction()
+            .setTokenId(nftTokenId)
+            .addSerial(exampleNftId)
+            .setAccountId(nftOwnerAccountId)
+            .freezeWith(client)
+            .sign(wipePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        AccountId bobAccountId = AccountId.fromString(bobAccountInfo);
+
+        Map<TokenId, Long> bobsTokens = new AccountBalanceQuery()
+            .setAccountId(bobAccountId)
+            .execute(client)
+            .tokens;
+
+        new TokenWipeTransaction()
+            .setTokenId(fungibleTokenId)
+            .setAmount(bobsTokens.get(fungibleTokenId))
+            .setAccountId(bobAccountId)
+            .freezeWith(client)
+            .sign(wipePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(nftOwnerAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(alicePrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new AccountDeleteTransaction()
+            .setAccountId(bobAccountId)
+            .setTransferAccountId(OPERATOR_ID)
+            .freezeWith(client)
+            .sign(bobPrivateKey)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(nftTokenId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
+
+        new TokenDeleteTransaction()
+            .setTokenId(fungibleTokenId)
+            .freezeWith(client)
+            .sign(OPERATOR_KEY)
+            .execute(client)
+            .getReceipt(client);
 
         client.close();
+
+        System.out.println("Account Auto-Creation Via HTS Assets (HIP-542) Example Complete!");
     }
 }

@@ -13,11 +13,11 @@ import "./FeeHelper.sol";
 // and copy the outputted json file to ./PrecompileExample.json
 
 contract PrecompileExample is
-    PrngSystemContract,
-    HederaTokenService,
-    ExpiryHelper,
-    KeyHelper,
-    FeeHelper
+PrngSystemContract,
+HederaTokenService,
+ExpiryHelper,
+KeyHelper,
+FeeHelper
 {
     address payable owner;
     address payable aliceAccount;
@@ -43,7 +43,7 @@ contract PrecompileExample is
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[]
-            memory keys = new IHederaTokenService.TokenKey[](4);
+        memory keys = new IHederaTokenService.TokenKey[](4);
         keys[0] = getSingleKey(
             KeyType.ADMIN,
             KeyType.PAUSE,
@@ -175,7 +175,7 @@ contract PrecompileExample is
         require(msg.sender == owner);
 
         IHederaTokenService.TokenKey[]
-            memory keys = new IHederaTokenService.TokenKey[](1);
+        memory keys = new IHederaTokenService.TokenKey[](1);
         // Set the admin key and the supply key to given ED25519 public key bytes.
         // These must be the key's raw bytes acquired via key.toBytesRaw()
 
@@ -187,7 +187,7 @@ contract PrecompileExample is
         );
 
         IHederaTokenService.FixedFee[]
-            memory fixedFees = new IHederaTokenService.FixedFee[](1);
+        memory fixedFees = new IHederaTokenService.FixedFee[](1);
         // Create a fixed fee of 1 Hbar (100,000,000 tinybar) that is collected by owner
         fixedFees[0] = createFixedFeeForHbars(100000000, owner);
 

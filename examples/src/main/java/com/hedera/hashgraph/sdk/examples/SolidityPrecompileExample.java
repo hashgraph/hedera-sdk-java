@@ -24,13 +24,12 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
 /*
 This example just instantiates the solidity contract
-defined in examples/src/main/resources/precompile-example/PrecompileExample.sol, which has been
-compiled into examples/src/main/resources/precompile-example/PrecompileExample.json.
+defined in resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.sol, which has been
+compiled into resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.json.
 
 You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
 
@@ -72,7 +71,7 @@ public class SolidityPrecompileExample {
 
         // Instantiate ContractHelper
         ContractHelper contractHelper = new ContractHelper(
-            "precompile-example/PrecompileExample.json",
+            "contracts/precompile/PrecompileExample.json",
             new ContractFunctionParameters()
                 .addAddress(OPERATOR_ID.toSolidityAddress())
                 .addAddress(aliceAccountId.toSolidityAddress()),

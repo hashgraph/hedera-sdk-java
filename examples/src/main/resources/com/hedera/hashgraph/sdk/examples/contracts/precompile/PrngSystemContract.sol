@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
+pragma solidity >=0.5.0 <0.9.0;
 
-// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 31 2022
+// This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
 import "./IPrngSystemContract.sol";
 
 contract PrngSystemContract {
+    event PseudoRandomSeed(bytes32 seedBytes);
+
     // Prng system contract address with ContractID 0.0.361
     address constant PRECOMPILE_ADDRESS = address(0x169);
 
@@ -13,5 +16,6 @@ contract PrngSystemContract {
             abi.encodeWithSelector(IPrngSystemContract.getPseudorandomSeed.selector));
         require(success, "PRNG system call failed");
         seedBytes = abi.decode(result, (bytes32));
+        emit PseudoRandomSeed(seedBytes);
     }
 }

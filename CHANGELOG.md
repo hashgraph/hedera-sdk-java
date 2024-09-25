@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.40.0
+
+### Added
+- The ability to create multiple Clients using shared `ExecutorService`
+- `closeChannels` method to `Client` to close the channels without closing the executor
+- New method to update security parameters when updating the addressbook
+
+### Fixed
+- handling of `BUSY` status code
+
+## 2.39.0
+
+### Added
+- `TokenAirdropTransaction`,`TokenClaimAirdropTransaction`,`TokenCancelAirdropTransaction` (HIP-904)
+
+### Fixed
+- handling of `FEE_SCHEDULE_FILE_PART_UPLOADED` status code
+
 ## 2.38.0
 
 ### Added
@@ -12,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - updated examples
-
 
 ## 2.37.0
 
