@@ -79,18 +79,7 @@ class AddressBookQueryMockTest {
 
     Endpoint spawnEndpoint() {
         return new Endpoint()
-            .setAddress(
-                new IPv4Address()
-                    .setNetwork(
-                        new IPv4AddressPart()
-                            .setLeft((byte) 0x00)
-                            .setRight((byte) 0x01)
-                    ).setHost(
-                        new IPv4AddressPart()
-                            .setLeft((byte) 0x02)
-                            .setRight((byte) 0x03)
-                    )
-            )
+            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
             .setDomainName("unit.test.com")
             .setPort(PORT_NODE_PLAIN);
     }
