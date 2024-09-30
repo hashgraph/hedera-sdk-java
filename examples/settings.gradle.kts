@@ -19,11 +19,14 @@
  */
 
 pluginManagement {
-    includeBuild("../gradle/plugins")
-    repositories {
-        gradlePluginPortal()
-    }
+    repositories.gradlePluginPortal()
+    repositories.maven("https://repo.onepiece.software/snapshots")
 }
+
+plugins { id("com.hedera.gradle.build") version "0.1.20" apply false }
+
+@Suppress("UnstableApiUsage")
+dependencyResolutionManagement { repositories.mavenCentral() }
 
 // --- Remove to use a published SDK version ---
 includeBuild("..")

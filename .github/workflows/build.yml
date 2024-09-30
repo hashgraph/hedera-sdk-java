@@ -88,8 +88,8 @@ jobs:
       - name: Build SDK
         run: ./gradlew assemble --scan
 
-      - name: Gradle Dependency Scopes Check
-        run: ./gradlew checkAllModuleInfo --continue --scan
+      - name: Code Quality Checks
+        run: ./gradlew qualityCheck --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local
