@@ -19,8 +19,11 @@
  */
 
 plugins {
-    id("com.hedera.gradle.versions")
+    id("com.hedera.gradle.base.lifecycle")
+    id("com.hedera.gradle.base.jpms-modules")
 }
+
+group = "com.hedera.hashgraph"
 
 dependencies.constraints {
     api("com.esaulpaugh:headlong:12.1.0") {
@@ -41,13 +44,13 @@ dependencies.constraints {
         because("io.grpc")
     }
     api("io.grpc:grpc-inprocess:1.64.0") {
-        because("io.grpc.protobuf")
+        because("io.grpc.inprocess")
     }
     api("io.grpc:grpc-protobuf:1.64.0") {
         because("io.grpc.protobuf")
     }
     api("io.grpc:grpc-protobuf-lite:1.64.0") {
-        because("io.grpc.protobuf")
+        because("io.grpc.protobuf.lite")
     }
     api("io.grpc:grpc-stub:1.64.0") {
         because("io.grpc.stub")
@@ -67,6 +70,9 @@ dependencies.constraints {
     api("org.slf4j:slf4j-simple:2.0.16") {
         because("org.slf4j.simple")
     }
+    api("com.google.code.findbugs:jsr305:3.0.2") {
+        because("javax.annotation")
+    }
 
     // Testing
     api("com.fasterxml.jackson.core:jackson-core:2.18.0") {
@@ -84,6 +90,21 @@ dependencies.constraints {
     api("org.assertj:assertj-core:3.26.3") {
         because("org.assertj.core")
     }
+    api("org.junit.jupiter:junit-jupiter-api:5.10.2") {
+        because("org.junit.jupiter.api")
+    }
+    api("org.mockito:mockito-core:5.8.0") {
+        because("org.mockito")
+    }
+    api("com.google.guava:guava:33.3.1-android") {
+        because("com.google.common")
+    }
+    api("com.fasterxml.jackson.core:jackson-core:2.18.0") {
+        because("com.fasterxml.jackson.core")
+    }
+
+    api("com.google.protobuf:protoc:3.25.4")
+    api("io.grpc:protoc-gen-grpc-java:1.66.0")
 
     // Examples
     api("org.jetbrains.kotlin:kotlin-stdlib:2.0.21") {
