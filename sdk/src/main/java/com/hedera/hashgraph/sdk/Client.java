@@ -29,7 +29,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -913,10 +912,6 @@ public final class Client implements AutoCloseable {
      *
      * @return maxBackoff
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getMaxBackoff() {
         return maxBackoff;
     }
@@ -928,10 +923,6 @@ public final class Client implements AutoCloseable {
      * @param maxBackoff The maximum amount of time to wait between retries
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("maxBackoff must be a positive duration");
@@ -947,10 +938,6 @@ public final class Client implements AutoCloseable {
      *
      * @return minBackoff
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getMinBackoff() {
         return minBackoff;
     }
@@ -962,10 +949,6 @@ public final class Client implements AutoCloseable {
      * @param minBackoff The minimum amount of time to wait between retries
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setMinBackoff(Duration minBackoff) {
         if (minBackoff == null || minBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("minBackoff must be a positive duration");
@@ -1276,10 +1259,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the timeout value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Duration getRequestTimeout() {
         return requestTimeout;
     }
@@ -1290,10 +1269,6 @@ public final class Client implements AutoCloseable {
      * @param requestTimeout the timeout value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = Objects.requireNonNull(requestTimeout);
         return this;
@@ -1304,10 +1279,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the timeout value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getCloseTimeout() {
         return closeTimeout;
     }
@@ -1318,10 +1289,6 @@ public final class Client implements AutoCloseable {
      * @param closeTimeout the timeout value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
@@ -1334,10 +1301,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the gRPC deadline value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getGrpcDeadline() {
         return grpcDeadline.get();
     }
@@ -1348,10 +1311,6 @@ public final class Client implements AutoCloseable {
      * @param grpcDeadline the gRPC deadline value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setGrpcDeadline(Duration grpcDeadline) {
         this.grpcDeadline.set(Objects.requireNonNull(grpcDeadline));
         return this;
@@ -1372,10 +1331,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the networkUpdatePeriod
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     @Nullable
     public synchronized Duration getNetworkUpdatePeriod() {
         return this.networkUpdatePeriod;
@@ -1390,10 +1345,6 @@ public final class Client implements AutoCloseable {
      * @param networkUpdatePeriod the period for updating the Address Book
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Client setNetworkUpdatePeriod(Duration networkUpdatePeriod) {
         cancelScheduledNetworkUpdate();
         this.networkUpdatePeriod = networkUpdatePeriod;

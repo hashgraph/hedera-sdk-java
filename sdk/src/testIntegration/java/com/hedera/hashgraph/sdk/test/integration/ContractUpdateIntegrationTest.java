@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
@@ -46,7 +45,7 @@ class ContractUpdateIntegrationTest {
     void canUpdateContract() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        @Var var response = new FileCreateTransaction()
+        var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
@@ -63,7 +62,7 @@ class ContractUpdateIntegrationTest {
 
         var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        @Var var info = new ContractInfoQuery()
+        var info = new ContractInfoQuery()
             .setContractId(contractId)
             .execute(testEnv.client);
 

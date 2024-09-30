@@ -19,9 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -49,7 +47,7 @@ class TokenTransferIntegrationTest {
 
         var key = PrivateKey.generateED25519();
 
-        @Var TransactionResponse response = new AccountCreateTransaction()
+        TransactionResponse response = new AccountCreateTransaction()
             .setKey(key)
             .setInitialBalance(new Hbar(1))
             .execute(testEnv.client);

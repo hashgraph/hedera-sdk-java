@@ -33,9 +33,7 @@ module com.hedera.hashgraph.sdk.full {
     requires org.bouncycastle.provider;
     requires org.slf4j;
 
-    requires static com.github.spotbugs.annotations;
-    requires static com.google.errorprone.annotations;
-    requires static java.annotation;
+    requires static transitive java.annotation;
 
     exports com.hedera.hashgraph.sdk;
     exports com.hedera.hashgraph.sdk.logger;

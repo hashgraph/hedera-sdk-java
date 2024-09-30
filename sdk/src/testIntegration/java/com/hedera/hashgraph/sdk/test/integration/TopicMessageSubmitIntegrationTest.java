@@ -19,9 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
@@ -52,7 +50,7 @@ public class TopicMessageSubmitIntegrationTest {
 
         var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-        @Var var info = new TopicInfoQuery()
+        var info = new TopicInfoQuery()
             .setTopicId(topicId)
             .execute(testEnv.client);
 
@@ -102,7 +100,7 @@ public class TopicMessageSubmitIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var var info = new TopicInfoQuery()
+            var info = new TopicInfoQuery()
                 .setTopicId(topicId)
                 .execute(testEnv.client);
 

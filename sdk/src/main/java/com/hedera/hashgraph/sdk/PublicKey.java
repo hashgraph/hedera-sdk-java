@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
@@ -197,7 +196,7 @@ public abstract class PublicKey extends Key {
         }
 
         for (var signedTransaction : transaction.innerSignedTransactions) {
-            @Var var found = false;
+            var found = false;
 
             for (var sigPair : signedTransaction.getSigMap().getSigPairList()) {
                 if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytesRaw()))) {

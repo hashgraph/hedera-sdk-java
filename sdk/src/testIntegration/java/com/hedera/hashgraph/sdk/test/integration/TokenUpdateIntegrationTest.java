@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -63,7 +62,7 @@ class TokenUpdateIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        @Var var info = new TokenInfoQuery()
+        var info = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(testEnv.client);
 

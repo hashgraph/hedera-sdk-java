@@ -26,7 +26,6 @@ import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
@@ -244,10 +243,6 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return                          the auto renew period
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -258,10 +253,6 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public TopicUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
@@ -320,10 +311,6 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return Expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An Instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -336,10 +323,6 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @param expirationTime the new expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public TopicUpdateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
         this.expirationTime = Objects.requireNonNull(expirationTime);

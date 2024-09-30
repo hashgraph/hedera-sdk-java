@@ -24,8 +24,6 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 plugins {
     id("java-library")
     id("com.google.protobuf")
-    id("com.github.spotbugs")
-    id("org.sonarqube")
     id("com.hedera.gradle.java-base")
     id("com.hedera.gradle.publish")
 }
@@ -105,16 +103,16 @@ tasks.jacocoTestReport {
 protobuf {
     protoc {
         // shouldn't be updated for now (breaking changes after 4.x.x)
-        artifact = "com.google.protobuf:protoc:3.25.3"
+        artifact = "com.google.protobuf:protoc:3.25.4"
     }
     plugins {
         id("grpc") {
-            artifact = "io.grpc:protoc-gen-grpc-java:1.50.2"
+            artifact = "io.grpc:protoc-gen-grpc-java:1.66.0"
         }
     }
 }
 tasks.generateProto {
-    plugins { plugins.register("grpc") }
+    plugins { plugins.register("grpc") { option("@generated=omit") } }
 }
 
 tasks.compileJava {
@@ -131,45 +129,4 @@ tasks.jar {
 
 sourceSets.all {
     configurations[getTaskName("", "compileProtoPath")].extendsFrom(configurations["internal"])
-}
-
-spotbugs {
-    //ignoreFailures = false
-    //showStackTraces = true
-    //showProgress = false
-    //reportLevel = 'default'
-    //effort = 'default'
-    //visitors = [ 'FindSqlInjection', 'SwitchFallthrough' ]
-    //omitVisitors = [ 'FindNonShortCircuit' ]
-    reportsDir = layout.buildDirectory.dir("reports/spotbugs")
-    //includeFilter = file('spotbugs-include.xml')
-    //excludeFilter = file('spotbugs-exclude.xml')
-    onlyAnalyze = listOf("com.hedera.hashgraph.sdk.*")
-    //projectName = name
-    //release = version
-    //extraArgs = [ '-nested:false' ]
-    //jvmArgs = [ '-Duser.language=ja' ]
-    //maxHeapSize = '512m'
-}
-
-tasks.spotbugsMain {
-    reports.register("html") {
-        required = true
-        outputLocation = layout.buildDirectory.file("reports/spotbugs/main/spotbugs.html")
-        setStylesheet("fancy-hist.xsl")
-    }
-}
-
-dependencies {
-    spotbugs("com.github.spotbugs:spotbugs:4.8.4")
-    spotbugs("com.google.code.findbugs:jsr305:3.0.2")
-}
-
-sonarqube {
-    properties {
-        property("sonar.projectKey", "hashgraph_hedera-sdk-java")
-        property("sonar.organization", "hashgraph")
-        property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.exclusions", "examples/**")
-    }
 }

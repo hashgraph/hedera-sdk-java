@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
@@ -52,7 +51,7 @@ public class FileUpdateIntegrationTest {
 
         var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        @Var var info = new FileInfoQuery()
+        var info = new FileInfoQuery()
             .setFileId(fileId)
             .execute(testEnv.client);
 

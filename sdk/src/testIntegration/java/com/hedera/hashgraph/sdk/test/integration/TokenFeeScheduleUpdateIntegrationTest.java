@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
 import com.hedera.hashgraph.sdk.CustomFractionalFee;
@@ -62,7 +61,7 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
         var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        @Var var info = new TokenInfoQuery()
+        var info = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
@@ -134,8 +133,8 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
         var fees = info.customFees;
         assertThat(fees.size()).isEqualTo(2);
-        @Var int fixedCount = 0;
-        @Var int fractionalCount = 0;
+        int fixedCount = 0;
+        int fractionalCount = 0;
         for (var fee : fees) {
             if (fee instanceof CustomFixedFee) {
                 fixedCount++;

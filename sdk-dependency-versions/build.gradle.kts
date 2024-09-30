@@ -26,12 +26,6 @@ dependencies.constraints {
     api("com.esaulpaugh:headlong:12.1.0") {
         because("headlong")
     }
-    api("com.github.spotbugs:spotbugs-annotations:4.8.6") {
-        because("com.github.spotbugs.annotations")
-    }
-    api("com.google.errorprone:error_prone_annotations:2.21.1") {
-        because("com.google.errorprone.annotations")
-    }
     api("com.google.code.gson:gson:2.10.1") {
         because("com.google.gson")
     }
@@ -58,7 +52,7 @@ dependencies.constraints {
     api("io.grpc:grpc-stub:1.64.0") {
         because("io.grpc.stub")
     }
-    api("javax.annotation:javax.annotation-api:1.3.2") {
+    api("com.google.code.findbugs:jsr305:3.0.2") {
         because("java.annotation")
     }
     api("org.bouncycastle:bcpkix-jdk18on:1.78.1") {

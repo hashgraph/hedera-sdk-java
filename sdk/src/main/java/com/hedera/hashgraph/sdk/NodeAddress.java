@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
@@ -180,10 +179,6 @@ public class NodeAddress implements Cloneable {
      * @return                          the certificate hash
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A ByteString can't actually be mutated"
-    )
     public ByteString getCertHash() {
         return certHash;
     }
@@ -195,10 +190,6 @@ public class NodeAddress implements Cloneable {
      * @return {@code this}
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A ByteString can't actually be mutated"
-    )
     public NodeAddress setCertHash(ByteString certHash) {
         this.certHash = certHash;
         return this;

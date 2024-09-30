@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -88,7 +87,7 @@ public class IntegrationTestEnv {
         var network = new HashMap<String, AccountId>();
 
         var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
-        for (@Var int i = 0; i < nodeCount; i++) {
+        for (int i = 0; i < nodeCount; i++) {
             nodeGetter.nextNode(network);
         }
         client.setNetwork(network);
@@ -204,7 +203,6 @@ public class IntegrationTestEnv {
     private static class TestEnvNodeGetter {
         private final Client client;
         private final List<Map.Entry<String, AccountId>> nodes;
-        @Var
         private int index = 0;
 
         public TestEnvNodeGetter(Client client) {

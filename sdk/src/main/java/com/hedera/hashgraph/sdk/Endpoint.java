@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
 
@@ -52,7 +51,7 @@ public class Endpoint implements Cloneable {
      * @return                          the endpoint object
      */
     static Endpoint fromProtobuf(ServiceEndpoint serviceEndpoint) {
-        @Var var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
+        var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
 
         if (port == 0 || port == 50111) {
             port = 50211;

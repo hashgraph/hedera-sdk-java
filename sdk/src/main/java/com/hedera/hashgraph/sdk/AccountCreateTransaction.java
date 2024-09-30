@@ -26,7 +26,6 @@ import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 
@@ -194,10 +193,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @return                          the duration for auto-renew
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -214,10 +209,6 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param autoRenewPeriod the auto renew period for this account.
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public AccountCreateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         requireNotFrozen();
         Objects.requireNonNull(autoRenewPeriod);
