@@ -23,7 +23,7 @@ plugins {
 }
 
 dependencies.constraints {
-    api("com.esaulpaugh:headlong:12.1.0") {
+    api("com.esaulpaugh:headlong:12.3.0") {
         because("headlong")
     }
     api("com.github.spotbugs:spotbugs-annotations:4.8.6") {
