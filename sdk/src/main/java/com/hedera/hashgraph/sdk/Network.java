@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.io.ByteStreams;
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -316,7 +315,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
             network.clear();
 
             for (int i = 0; i < nodes.size(); i++) {
-                @Var var node = nodes.get(i);
+                var node = nodes.get(i);
                 node.close(closeTimeout);
 
                 node = transportSecurity ? node.toSecure() : node.toInsecure();

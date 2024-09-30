@@ -563,9 +563,9 @@ public class ContractFunctionParametersTest {
                 if (bitWidth == 8) {
                     return (byte) (1 << (bitWidth - 1));
                 } else if (bitWidth <= 32) {
-                    return (int) (1 << (bitWidth - 1));
+                    return (1 << (bitWidth - 1));
                 } else if (bitWidth <= 64) {
-                    return (long) (1L << (bitWidth - 1));
+                    return (1L << (bitWidth - 1));
                 } else {
                     return BigInteger.ONE.shiftLeft(bitWidth - 1);
                 }
