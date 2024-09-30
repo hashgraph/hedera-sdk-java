@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 name: PR Checks
 
 on:
@@ -88,8 +89,8 @@ jobs:
       - name: Build SDK
         run: ./gradlew assemble --scan
 
-      - name: Gradle Dependency Scopes Check
-        run: ./gradlew checkAllModuleInfo --continue --scan
+      - name: Code Quality Checks
+        run: ./gradlew qualityCheck :examples:qualityCheck --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.57.0
@@ -204,7 +205,7 @@ jobs:
             run: npx @hashgraph/hedera-local start -d --network local
 
           - name: Run TCK Unit Tests
-            run: ./gradlew :tck:test
+            run: ./gradlew :tck:test --scan
 
           - name: Stop the local node
             run: npx @hashgraph/hedera-local stop

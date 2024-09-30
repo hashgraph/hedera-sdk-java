@@ -65,7 +65,7 @@ android {
 
 dependencies {
     // --- Remove to use a published SDK version ---
-    implementation(platform("com.hedera.hashgraph:sdk-dependency-versions"))
+    implementation(platform("com.hedera.hashgraph:hiero-dependency-versions"))
     // ---------------------------------------------
 
     implementation("com.hedera.hashgraph:sdk:2.46.0")
