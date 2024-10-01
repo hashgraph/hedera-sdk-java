@@ -28,6 +28,6 @@ mainModuleInfo {
 }
 
 dependencies.constraints {
-    implementation("com.hedera.hashgraph:sdk:2.40.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.40.0")
+    implementation("com.hedera.hashgraph:sdk:2.41.0")
+    implementation("com.hedera.hashgraph:sdk-full:2.41.0")
 }
