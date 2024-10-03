@@ -40,7 +40,7 @@ import java.time.Duration;
 import java.time.Instant;
 
 /**
- * AccountCreateService for account related methods
+ * AccountService for account related methods
  */
 @JSONRPC2Service
 public class AccountService extends AbstractJSONRPC2Service {
