@@ -149,84 +149,84 @@ class AccountBalanceIntegrationTest {
     @Test
     @DisplayName("Can fetch balance for client operator")
     void canFetchBalanceForClientOperator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (IntegrationTestEnv testEnv = new IntegrationTestEnv(1)) {
 
-        var balance = new AccountBalanceQuery()
+            var balance = new AccountBalanceQuery()
             .setAccountId(testEnv.operatorId)
             .execute(testEnv.client);
 
-        assertThat(balance.hbars.toTinybars() > 0).isTrue();
+            assertThat(balance.hbars.toTinybars() > 0).isTrue();
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Can fetch cost for the query")
     void getCostBalanceForClientOperator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (IntegrationTestEnv testEnv = new IntegrationTestEnv(1)) {
 
-        var balance = new AccountBalanceQuery()
-            .setAccountId(testEnv.operatorId)
-            .setMaxQueryPayment(new Hbar(1));
+            var balance = new AccountBalanceQuery()
+                .setAccountId(testEnv.operatorId)
+                .setMaxQueryPayment(new Hbar(1));
 
-        var cost = balance.getCost(testEnv.client);
+            var cost = balance.getCost(testEnv.client);
 
-        var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
-        assertThat(cost.toTinybars()).isEqualTo(0);
+            assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
+            assertThat(cost.toTinybars()).isEqualTo(0);
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Can fetch cost for the query, big max set")
     void getCostBigMaxBalanceForClientOperator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (IntegrationTestEnv testEnv = new IntegrationTestEnv(1)) {
 
-        var balance = new AccountBalanceQuery()
-            .setAccountId(testEnv.operatorId)
-            .setMaxQueryPayment(new Hbar(1000000));
+            var balance = new AccountBalanceQuery()
+                .setAccountId(testEnv.operatorId)
+                .setMaxQueryPayment(new Hbar(1000000));
 
-        var cost = balance.getCost(testEnv.client);
+            var cost = balance.getCost(testEnv.client);
 
-        var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
+            assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Can fetch cost for the query, very small max set")
     void getCostSmallMaxBalanceForClientOperator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (IntegrationTestEnv testEnv = new IntegrationTestEnv(1)) {
 
-        var balance = new AccountBalanceQuery()
-            .setAccountId(testEnv.operatorId)
-            .setMaxQueryPayment(Hbar.fromTinybars(1));
+            var balance = new AccountBalanceQuery()
+                .setAccountId(testEnv.operatorId)
+                .setMaxQueryPayment(Hbar.fromTinybars(1));
 
-        var cost = balance.getCost(testEnv.client);
+            var cost = balance.getCost(testEnv.client);
 
-        var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
+            var accBalance = balance.setQueryPayment(cost).execute(testEnv.client);
 
-        assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
+            assertThat(accBalance.hbars.toTinybars() > 0).isTrue();
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot fetch balance for invalid account ID")
     void canNotFetchBalanceForInvalidAccountId() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (IntegrationTestEnv testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new AccountBalanceQuery()
-                .setAccountId(AccountId.fromString("1.0.3"))
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new AccountBalanceQuery()
+                    .setAccountId(AccountId.fromString("1.0.3"))
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.INVALID_ACCOUNT_ID.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test

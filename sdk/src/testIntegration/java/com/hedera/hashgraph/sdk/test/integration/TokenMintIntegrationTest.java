@@ -59,7 +59,7 @@ class TokenMintIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId
-        );
+            );
 
         var receipt = new TokenMintTransaction()
             .setAmount(10)
@@ -72,7 +72,6 @@ class TokenMintIntegrationTest {
         testEnv.close(tokenId);
     }
 
-
     @Test
     @DisplayName("Cannot mint more tokens than max supply")
     void cannotMintMoreThanMaxSupply() throws Exception {
@@ -80,18 +79,17 @@ class TokenMintIntegrationTest {
 
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setSupplyType(TokenSupplyType.FINITE)
-                .setMaxSupply(5)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .tokenId
-        );
-
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setSupplyType(TokenSupplyType.FINITE)
+                    .setMaxSupply(5)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+                );
 
         assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
             new TokenMintTransaction()
@@ -107,16 +105,16 @@ class TokenMintIntegrationTest {
     @Test
     @DisplayName("Cannot mint tokens when token ID is not set")
     void cannotMintTokensWhenTokenIDIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenMintTransaction()
-                .setAmount(10)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new TokenMintTransaction()
+                    .setAmount(10)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
@@ -140,7 +138,7 @@ class TokenMintIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId
-        );
+            );
 
         var receipt = new TokenMintTransaction()
             .setTokenId(tokenId)
@@ -195,7 +193,6 @@ class TokenMintIntegrationTest {
         testEnv.close(tokenId, accountId, key);
     }
 
-
     @Test
     @DisplayName("Can mint NFTs")
     void canMintNfts() throws Exception {
@@ -228,7 +225,6 @@ class TokenMintIntegrationTest {
 
         testEnv.close(tokenId);
     }
-
 
     @Test
     @DisplayName("Cannot mint NFTs if metadata too big")

@@ -126,27 +126,27 @@ class TokenUpdateIntegrationTest {
     @Test
     @DisplayName("Cannot update immutable token")
     void cannotUpdateImmutableToken() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenUpdateTransaction()
-                .setTokenId(tokenId)
-                .setTokenName("aaaa")
-                .setTokenSymbol("A")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenUpdateTransaction()
+                    .setTokenId(tokenId)
+                    .setTokenName("aaaa")
+                    .setTokenSymbol("A")
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
 
-        testEnv.close();
+        }
     }
 
     /**
@@ -163,18 +163,18 @@ class TokenUpdateIntegrationTest {
         // create a fungible token with metadata
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTokenMetadata(initialTokenMetadata)
-            .setTokenType(TokenType.FUNGIBLE_COMMON)
-            .setDecimals(3)
-            .setInitialSupply(1000000)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
         );
 
         var tokenInfoAfterCreation = new TokenInfoQuery()
@@ -213,18 +213,18 @@ class TokenUpdateIntegrationTest {
         // create a non fungible token with metadata
         var tokenId = Objects.requireNonNull(
             new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTokenMetadata(initialTokenMetadata)
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId
-        );
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenMetadata(initialTokenMetadata)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId
+            );
 
         var tokenInfoAfterCreation = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -275,7 +275,7 @@ class TokenUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId
-        );
+            );
 
         var tokenInfoAfterCreation = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -328,7 +328,7 @@ class TokenUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .tokenId
-        );
+            );
 
         var tokenInfoAfterCreation = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -416,7 +416,7 @@ class TokenUpdateIntegrationTest {
 
         // create a non fungible token with metadata
         var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
+        new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenMetadata(initialTokenMetadata)
@@ -488,10 +488,10 @@ class TokenUpdateIntegrationTest {
 
         // erase token metadata (update token with empty metadata)
         new TokenUpdateTransaction()
-            .setTokenId(tokenId)
-            .setTokenMetadata(emptyTokenMetadata)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+                .setTokenId(tokenId)
+                .setTokenMetadata(emptyTokenMetadata)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
         var tokenInfoAfterSettingEmptyMetadata = new TokenInfoQuery()
             .setTokenId(tokenId)
@@ -515,7 +515,7 @@ class TokenUpdateIntegrationTest {
 
         // create a non fungible token with metadata
         var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
+        new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTokenMetadata(initialTokenMetadata)
@@ -558,40 +558,41 @@ class TokenUpdateIntegrationTest {
     @Test
     @DisplayName("Cannot update a fungible token with metadata when transaction is not signed with an admin or a metadata key")
     void cannotUpdateFungibleTokenMetadataWhenTransactionIsNotSignedWithMetadataKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
-        var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
-        var adminKey = PrivateKey.generateED25519();
-        var metadataKey = PrivateKey.generateED25519();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        // create a fungible token with metadata and metadata key
-        var tokenId = Objects.requireNonNull(
-            new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTokenMetadata(initialTokenMetadata)
-            .setTokenType(TokenType.FUNGIBLE_COMMON)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setDecimals(3)
-            .setInitialSupply(1000000)
-            .setAdminKey(adminKey)
-            .setMetadataKey(metadataKey)
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId
-        );
+            var initialTokenMetadata = new byte[]{1, 1, 1, 1, 1};
+            var updatedTokenMetadata = new byte[]{2, 2, 2, 2, 2};
+            var adminKey = PrivateKey.generateED25519();
+            var metadataKey = PrivateKey.generateED25519();
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-          new TokenUpdateTransaction()
-                .setTokenId(tokenId)
-                .setTokenMetadata(updatedTokenMetadata)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+            // create a fungible token with metadata and metadata key
+            var tokenId = Objects.requireNonNull(
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenMetadata(initialTokenMetadata)
+                    .setTokenType(TokenType.FUNGIBLE_COMMON)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setAdminKey(adminKey)
+                    .setMetadataKey(metadataKey)
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .tokenId
+            );
 
-        testEnv.close();
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenUpdateTransaction()
+                    .setTokenId(tokenId)
+                    .setTokenMetadata(updatedTokenMetadata)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+
+        }
     }
 
     /**
@@ -705,7 +706,6 @@ class TokenUpdateIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
         }).withMessageContaining(Status.TOKEN_IS_IMMUTABLE.toString());
-
 
         testEnv.close(tokenId);
     }

@@ -76,16 +76,16 @@ class TokenBurnIntegrationTest {
     @Test
     @DisplayName("Cannot burn tokens when token ID is not set")
     void cannotBurnTokensWhenTokenIDIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenBurnTransaction()
-                .setAmount(10)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new TokenBurnTransaction()
+                    .setAmount(10)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_TOKEN_ID.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
@@ -151,7 +151,6 @@ class TokenBurnIntegrationTest {
         testEnv.close(tokenId);
     }
 
-
     @Test
     @DisplayName("Can burn NFTs")
     void canBurnNfts() throws Exception {
@@ -187,7 +186,6 @@ class TokenBurnIntegrationTest {
 
         testEnv.close(tokenId);
     }
-
 
     @Test
     @DisplayName("Cannot burn NFTs when NFT is not owned by treasury")
@@ -244,7 +242,7 @@ class TokenBurnIntegrationTest {
                 .setSerials(serials)
                 .setTokenId(tokenId)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .getReceipt(testEnv.client);
         }).withMessageContaining(Status.TREASURY_MUST_OWN_BURNED_NFT.toString());
 
         testEnv.close(tokenId, accountId, key);

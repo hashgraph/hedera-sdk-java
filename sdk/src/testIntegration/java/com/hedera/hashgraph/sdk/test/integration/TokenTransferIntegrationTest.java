@@ -101,78 +101,78 @@ class TokenTransferIntegrationTest {
     @Test
     @DisplayName("Cannot transfer tokens if balance is insufficient to pay fee")
     void insufficientBalanceForFee() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        PrivateKey key1 = PrivateKey.generateED25519();
-        PrivateKey key2 = PrivateKey.generateED25519();
-        var accountId1 = new AccountCreateTransaction()
-            .setKey(key1)
-            .setInitialBalance(new Hbar(2))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
-        var accountId2 = new AccountCreateTransaction()
-            .setKey(key2)
-            .setInitialBalance(new Hbar(2))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
+            PrivateKey key1 = PrivateKey.generateED25519();
+            PrivateKey key2 = PrivateKey.generateED25519();
+            var accountId1 = new AccountCreateTransaction()
+                .setKey(key1)
+                .setInitialBalance(new Hbar(2))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+            var accountId2 = new AccountCreateTransaction()
+                .setKey(key2)
+                .setInitialBalance(new Hbar(2))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setInitialSupply(1)
-            .setCustomFees(Collections.singletonList(new CustomFixedFee()
-                .setAmount(5000_000_000L)
-                .setFeeCollectorAccountId(testEnv.operatorId)))
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFeeScheduleKey(testEnv.operatorKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            var tokenId = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(1)
+                .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                    .setAmount(5000_000_000L)
+                    .setFeeCollectorAccountId(testEnv.operatorId)))
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-        new TokenAssociateTransaction()
-            .setAccountId(accountId1)
-            .setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client)
-            .sign(key1)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        new TokenAssociateTransaction()
-            .setAccountId(accountId2)
-            .setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client)
-            .sign(key2)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        new TransferTransaction()
-            .addTokenTransfer(tokenId, testEnv.operatorId, -1)
-            .addTokenTransfer(tokenId, accountId1, 1)
-            .freezeWith(testEnv.client)
-            .sign(key1)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TransferTransaction()
-                .addTokenTransfer(tokenId, accountId1, -1)
-                .addTokenTransfer(tokenId, accountId2, 1)
+            new TokenAssociateTransaction()
+                .setAccountId(accountId1)
+                .setTokenIds(Collections.singletonList(tokenId))
                 .freezeWith(testEnv.client)
                 .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new TokenAssociateTransaction()
+                .setAccountId(accountId2)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
                 .sign(key2)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).satisfies(error -> assertThat(error.getMessage()).containsAnyOf(
-            Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString(),
-            Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()
-        ));
 
-        testEnv.wipeAccountHbars(accountId1, key1);
-        testEnv.wipeAccountHbars(accountId2, key2);
+            new TransferTransaction()
+                .addTokenTransfer(tokenId, testEnv.operatorId, -1)
+                .addTokenTransfer(tokenId, accountId1, 1)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TransferTransaction()
+                    .addTokenTransfer(tokenId, accountId1, -1)
+                    .addTokenTransfer(tokenId, accountId2, 1)
+                    .freezeWith(testEnv.client)
+                    .sign(key1)
+                    .sign(key2)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).satisfies(error -> assertThat(error.getMessage()).containsAnyOf(
+                    Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString(),
+                    Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()
+                ));
+
+            testEnv.wipeAccountHbars(accountId1, key1);
+            testEnv.wipeAccountHbars(accountId2, key2);
+
+        }
     }
 }

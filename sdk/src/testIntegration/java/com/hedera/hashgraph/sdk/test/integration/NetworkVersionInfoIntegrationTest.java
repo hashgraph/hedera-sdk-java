@@ -27,11 +27,11 @@ public class NetworkVersionInfoIntegrationTest {
     @Test
     @DisplayName("Cannot query network version info")
     void cannotQueryNetworkVersionInfo() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        new NetworkVersionInfoQuery()
-            .execute(testEnv.client);
+            new NetworkVersionInfoQuery()
+                .execute(testEnv.client);
 
-        testEnv.close();
+        }
     }
 }

@@ -90,14 +90,14 @@ class AccountUpdateIntegrationTest {
     @Test
     @DisplayName("Cannot update account when account ID is not set")
     void cannotUpdateAccountWhenAccountIdIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new AccountUpdateTransaction()
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new AccountUpdateTransaction()
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
 
-        testEnv.close();
+        }
     }
 }

@@ -95,106 +95,106 @@ class TokenCreateIntegrationTest {
     @DisplayName("Can create token with minimal properties set")
     @SuppressWarnings("UnusedVariable")
     void canCreateTokenWithMinimalPropertiesSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            var tokenId = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create token when token name is not set")
     void cannotCreateTokenWhenTokenNameIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        }).withMessageContaining(Status.MISSING_TOKEN_NAME.toString());
+            }).withMessageContaining(Status.MISSING_TOKEN_NAME.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create token when token symbol is not set")
     void cannotCreateTokenWhenTokenSymbolIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        }).withMessageContaining(Status.MISSING_TOKEN_SYMBOL.toString());
+            }).withMessageContaining(Status.MISSING_TOKEN_SYMBOL.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create token when token treasury account ID is not set")
     void cannotCreateTokenWhenTokenTreasuryAccountIDIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        }).withMessageContaining(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString());
+            }).withMessageContaining(Status.INVALID_TREASURY_ACCOUNT_FOR_TOKEN.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create token when token treasury account ID does not sign transaction")
     void cannotCreateTokenWhenTokenTreasuryAccountIDDoesNotSignTransaction() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(AccountId.fromString("0.0.3"))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(AccountId.fromString("0.0.3"))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create token when admin key does not sign transaction")
     void cannotCreateTokenWhenAdminKeyDoesNotSignTransaction() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
@@ -222,30 +222,28 @@ class TokenCreateIntegrationTest {
             .setAdminKey(testEnv.operatorKey)
             .setCustomFees(customFees)
             .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            .getReceipt(testEnv.client).tokenId;
         testEnv.close(tokenId);
     }
 
     @Test
     @DisplayName("Cannot create custom fee list with > 10 entries")
     void cannotCreateMoreThanTenCustomFees() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setAdminKey(testEnv.operatorKey)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.CUSTOM_FEES_LIST_TOO_LONG.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(createFixedFeeList(11, testEnv.operatorId))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.CUSTOM_FEES_LIST_TOO_LONG.toString());
 
-        testEnv.close();
+        }
     }
-
 
     @Test
     @DisplayName("Can create custom fee list with 10 fixed fees")
@@ -264,7 +262,6 @@ class TokenCreateIntegrationTest {
 
         testEnv.close(tokenId);
     }
-
 
     @Test
     @DisplayName("Can create custom fee list with 10 fractional fees")
@@ -287,93 +284,91 @@ class TokenCreateIntegrationTest {
     @Test
     @DisplayName("Cannot create a token with a custom fee where min > max")
     void cannotCreateMinGreaterThanMax() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setCustomFees(Collections.singletonList(new CustomFractionalFee()
-                    .setNumerator(1)
-                    .setDenominator(3)
-                    .setMin(3)
-                    .setMax(2)
-                    .setFeeCollectorAccountId(testEnv.operatorId)))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setCustomFees(Collections.singletonList(new CustomFractionalFee()
+                        .setNumerator(1)
+                        .setDenominator(3)
+                        .setMin(3)
+                        .setMax(2)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.FRACTIONAL_FEE_MAX_AMOUNT_LESS_THAN_MIN_AMOUNT.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create a token with invalid fee collector account ID")
     void cannotCreateInvalidFeeCollector() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setAdminKey(testEnv.operatorKey)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setCustomFees(Collections.singletonList(new CustomFixedFee()
-                    .setAmount(1)))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                        .setAmount(1)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_CUSTOM_FEE_COLLECTOR.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot create a token with a negative custom fee")
     void cannotCreateNegativeFee() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setAdminKey(testEnv.operatorKey)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setCustomFees(Collections.singletonList(new CustomFixedFee()
-                    .setAmount(-1)
-                    .setFeeCollectorAccountId(testEnv.operatorId)))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setCustomFees(Collections.singletonList(new CustomFixedFee()
+                        .setAmount(-1)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.CUSTOM_FEE_MUST_BE_POSITIVE.toString());
 
-        testEnv.close();
+        }
     }
-
 
     @Test
     @DisplayName("Cannot create custom fee with 0 denominator")
     void cannotCreateZeroDenominator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setCustomFees(Collections.singletonList(new CustomFractionalFee()
-                    .setNumerator(1)
-                    .setDenominator(0)
-                    .setMin(1)
-                    .setMax(10)
-                    .setFeeCollectorAccountId(testEnv.operatorId)))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.FRACTION_DIVIDES_BY_ZERO.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenCreateTransaction()
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setCustomFees(Collections.singletonList(new CustomFractionalFee()
+                        .setNumerator(1)
+                        .setDenominator(0)
+                        .setMin(1)
+                        .setMax(10)
+                        .setFeeCollectorAccountId(testEnv.operatorId)))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.FRACTION_DIVIDES_BY_ZERO.toString());
 
-        testEnv.close();
+        }
     }
-
 
     @Test
     @DisplayName("Can create NFT")
@@ -397,7 +392,6 @@ class TokenCreateIntegrationTest {
 
         testEnv.close(tokenId);
     }
-
 
     @Test
     @DisplayName("Can create NFT with royalty fee")

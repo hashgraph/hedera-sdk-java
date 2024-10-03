@@ -69,16 +69,16 @@ class AccountDeleteIntegrationTest {
     @Test
     @DisplayName("Cannot delete invalid account ID")
     void cannotCreateAccountWithNoKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new AccountDeleteTransaction()
-                .setTransferAccountId(testEnv.operatorId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new AccountDeleteTransaction()
+                    .setTransferAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
