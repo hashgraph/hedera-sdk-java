@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
+
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+
 import org.bouncycastle.util.encoders.DecoderException;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -85,6 +87,14 @@ public final class ContractFunctionParameters {
         return int256(bytes.length, 32)
             .concat(rightPad32(ByteString.copyFrom(bytes)));
     }
+
+    private static ByteString encodeBytes4(byte[] bytes) {
+        if (bytes.length > 4) {
+            throw new IllegalArgumentException("bytes4 encoding forbids byte array length greater than 4");
+        }
+        return rightPad32(ByteString.copyFrom(bytes));
+    }
+
 
     private static ByteString encodeBytes32(byte[] bytes) {
         if (bytes.length > 32) {
@@ -187,7 +197,7 @@ public final class ContractFunctionParameters {
         return rem == 32
             ? input
             : (negative ? negativePadding : padding).substring(0, rem)
-                .concat(input);
+            .concat(input);
     }
 
     static ByteString leftPad32(byte[] input, boolean negative) {
@@ -271,6 +281,35 @@ public final class ContractFunctionParameters {
             .collect(Collectors.toList());
 
         args.add(new Argument("bytes[]", encodeDynArr(byteArrays), true));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes4}, a 4-byte fixed-length byte-string.
+     *
+     * @param param The 4-byte array to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if the length of the byte array is not 4.
+     */
+    public ContractFunctionParameters addBytes4(byte[] param) {
+        args.add(new Argument("bytes4", encodeBytes4(param), false));
+
+        return this;
+    }
+
+    /**
+     * Add a parameter of type {@code bytes4[]}, an array of 4-byte fixed-length byte-strings.
+     *
+     * @param param The array of 4-byte arrays to be added
+     * @return {@code this}
+     * @throws IllegalArgumentException if the length of any byte array is not 4.
+     */
+    public ContractFunctionParameters addBytes4Array(byte[][] param) {
+        Stream<ByteString> byteArrays = Arrays.stream(param)
+            .map(ContractFunctionParameters::encodeBytes4);
+
+        args.add(new Argument("bytes4[]", encodeArray(byteArrays), true));
 
         return this;
     }

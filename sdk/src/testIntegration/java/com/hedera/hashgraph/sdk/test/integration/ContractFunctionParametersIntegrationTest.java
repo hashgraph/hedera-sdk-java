@@ -2788,6 +2788,39 @@ public class ContractFunctionParametersIntegrationTest {
         assertThat(responseResult).isEqualTo(testBytes);
     }
 
+
+    @Test
+    @DisplayName("Can receive bytes4 value from contract call")
+    void canCallContractFunctionBytes4Type() throws Exception {
+        byte[] testBytes = "Test".getBytes();
+        byte[] testBytesLen4 = new byte[4];
+        System.arraycopy(testBytes, 0, testBytesLen4, 0, testBytes.length);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+            .setFunction("returnBytes4", new ContractFunctionParameters().addBytes4(testBytesLen4))
+            .setQueryPayment(new Hbar(10)).execute(testEnv.client);
+
+        assertThat(response.getBytes(0)).isEqualTo(testBytesLen4);
+    }
+
+    @Test
+    @DisplayName("Can receive bytes4 array value from contract call")
+    void canCallContractFunctionBytes4ArrayType() throws Exception {
+        byte[] testBytes = "Test".getBytes();
+        byte[] testBytes2 = "Test2".getBytes();
+        byte[][] testBytesLen4 = new byte[2][4];
+        System.arraycopy(testBytes, 0, testBytesLen4[0], 0, testBytes.length);
+        System.arraycopy(testBytes2, 0, testBytesLen4[1], 0, testBytes2.length);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+            .setFunction("returnBytes4Arr", new ContractFunctionParameters().addBytes4Array(testBytesLen4))
+            .setQueryPayment(new Hbar(10)).execute(testEnv.client);
+
+        var responseResult = (byte[][]) response.getResult("(bytes4[])").get(0);
+
+        assertThat(responseResult).isEqualTo(testBytesLen4);
+    }
+
     @Test
     @DisplayName("Can receive bytes32 value from contract call")
     void canCallContractFunctionBytes32Type() throws Exception {
