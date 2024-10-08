@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 class DelegateContractIdTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
