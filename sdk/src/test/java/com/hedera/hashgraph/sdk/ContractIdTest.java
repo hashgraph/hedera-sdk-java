@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ContractIdTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
