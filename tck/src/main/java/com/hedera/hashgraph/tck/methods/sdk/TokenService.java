@@ -117,7 +117,7 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getName().ifPresent(tokenCreateTransaction::setTokenName);
         params.getSymbol().ifPresent(tokenCreateTransaction::setTokenSymbol);
         params.getDecimals().ifPresent(decimals -> tokenCreateTransaction.setDecimals(decimals.intValue()));
-        params.getInitialSupply().ifPresent(supply -> tokenCreateTransaction.setInitialSupply(supply.intValue()));
+        params.getInitialSupply().ifPresent(supply -> tokenCreateTransaction.setInitialSupply(supply.longValue()));
 
         params.getTreasuryAccountId()
                 .ifPresent(treasuryAccountId ->
@@ -165,7 +165,10 @@ public class TokenService extends AbstractJSONRPC2Service {
             for (var customFee : customFees) {
                 // set fixed fees
                 customFee.getFixedFee().ifPresent(fixedFee -> {
-                    var sdkFixedFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
+                    var sdkFixedFee = new CustomFixedFee()
+                            .setAmount(fixedFee.getAmount())
+                            .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                            .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
                     fixedFee.getDenominatingTokenId()
                             .ifPresent(tokenID -> sdkFixedFee.setDenominatingTokenId(TokenId.fromString(tokenID)));
                     customFeeList.add(sdkFixedFee);
@@ -176,8 +179,11 @@ public class TokenService extends AbstractJSONRPC2Service {
                     var sdkFractionalFee = new CustomFractionalFee()
                             .setNumerator(fractionalFee.getNumerator())
                             .setDenominator(fractionalFee.getDenominator())
-                            .setMin(fractionalFee.getMaximumAmount())
-                            .setMax(fractionalFee.getMaximumAmount());
+                            .setMin(fractionalFee.getMinimumAmount())
+                            .setMax(fractionalFee.getMaximumAmount())
+                            .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                            .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
+
                     customFeeList.add(sdkFractionalFee);
                 });
 
@@ -185,7 +191,10 @@ public class TokenService extends AbstractJSONRPC2Service {
                 customFee.getRoyaltyFee().ifPresent(royaltyFee -> {
                     var sdkRoyaltyFee = new CustomRoyaltyFee()
                             .setDenominator(royaltyFee.getDenominator())
-                            .setNumerator(royaltyFee.getNumerator());
+                            .setNumerator(royaltyFee.getNumerator())
+                            .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                            .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
+
                     royaltyFee.getFallbackFee().ifPresent(fallbackFee -> {
                         var fixedFallback = new CustomFixedFee().setAmount(fallbackFee.getAmount());
                         fallbackFee
@@ -201,6 +210,10 @@ public class TokenService extends AbstractJSONRPC2Service {
         });
 
         params.getMetadata().ifPresent(metadata -> tokenCreateTransaction.setTokenMetadata(metadata.getBytes()));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonTransactionParams ->
+                        commonTransactionParams.fillOutTransaction(tokenCreateTransaction, sdkService.getClient()));
 
         TransactionReceipt transactionReceipt =
                 tokenCreateTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());

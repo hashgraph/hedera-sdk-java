@@ -21,6 +21,7 @@
 package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -78,7 +79,12 @@ public class CustomFee extends JSONRPC2Param {
         private Optional<String> denominatingTokenId;
 
         public static FixedFee parse(Map<String, Object> jrpcParams) throws Exception {
-            var amountParsed = (Long) jrpcParams.get("amount");
+            Long amountParsed;
+            try {
+                amountParsed = (Long) jrpcParams.get("amount");
+            } catch (Exception e) {
+                amountParsed = ((BigInteger) jrpcParams.get("amount")).longValue();
+            }
             var denominatingTokenIdParsed = Optional.ofNullable((String) jrpcParams.get("denominatingTokenId"));
             return new FixedFee(amountParsed, denominatingTokenIdParsed);
         }
@@ -94,10 +100,30 @@ public class CustomFee extends JSONRPC2Param {
         private Long maximumAmount;
 
         public static FractionalFee parse(Map<String, Object> jrpcParams) throws Exception {
-            var numeratorParsed = (Long) jrpcParams.get("numerator");
-            var denominatorParsed = (Long) jrpcParams.get("denominator");
-            var minimumAmountParsed = (Long) jrpcParams.get("minimumAmount");
-            var maximumAmountParsed = (Long) jrpcParams.get("maximumAmount");
+            Long numeratorParsed;
+            try {
+                numeratorParsed = (Long) jrpcParams.get("numerator");
+            } catch (Exception e) {
+                numeratorParsed = ((BigInteger) jrpcParams.get("numerator")).longValue();
+            }
+            Long denominatorParsed;
+            try {
+                denominatorParsed = (Long) jrpcParams.get("denominator");
+            } catch (Exception e) {
+                denominatorParsed = ((BigInteger) jrpcParams.get("denominator")).longValue();
+            }
+            Long minimumAmountParsed;
+            try {
+                minimumAmountParsed = (Long) jrpcParams.get("minimumAmount");
+            } catch (Exception e) {
+                minimumAmountParsed = ((BigInteger) jrpcParams.get("minimumAmount")).longValue();
+            }
+            Long maximumAmountParsed;
+            try {
+                maximumAmountParsed = (Long) jrpcParams.get("maximumAmount");
+            } catch (Exception e) {
+                maximumAmountParsed = ((BigInteger) jrpcParams.get("maximumAmount")).longValue();
+            }
             return new FractionalFee(numeratorParsed, denominatorParsed, minimumAmountParsed, maximumAmountParsed);
         }
     }
@@ -111,8 +137,18 @@ public class CustomFee extends JSONRPC2Param {
         private Optional<FixedFee> fallbackFee;
 
         public static RoyaltyFee parse(Map<String, Object> jrpcParams) throws Exception {
-            var numeratorParsed = (Long) jrpcParams.get("numerator");
-            var denominatorParsed = (Long) jrpcParams.get("denominator");
+            Long numeratorParsed;
+            try {
+                numeratorParsed = (Long) jrpcParams.get("numerator");
+            } catch (Exception e) {
+                numeratorParsed = ((BigInteger) jrpcParams.get("numerator")).longValue();
+            }
+            Long denominatorParsed;
+            try {
+                denominatorParsed = (Long) jrpcParams.get("denominator");
+            } catch (Exception e) {
+                denominatorParsed = ((BigInteger) jrpcParams.get("denominator")).longValue();
+            }
 
             Optional<FixedFee> fallbackFeeParsed = Optional.empty();
             if (jrpcParams.containsKey("fallbackFee")) {

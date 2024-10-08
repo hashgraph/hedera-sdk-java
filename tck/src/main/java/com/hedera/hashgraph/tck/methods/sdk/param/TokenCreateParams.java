@@ -21,6 +21,7 @@
 package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,7 +69,12 @@ public class TokenCreateParams extends JSONRPC2Param {
         var parsedName = Optional.ofNullable((String) jrpcParams.get("name"));
         var parsedSymbol = Optional.ofNullable((String) jrpcParams.get("symbol"));
         var parsedDecimals = Optional.ofNullable((Long) jrpcParams.get("decimals"));
-        var parsedInitialSupply = Optional.ofNullable((Long) jrpcParams.get("initialSupply"));
+        Optional<Long> parsedInitialSupply;
+        try {
+            parsedInitialSupply = Optional.ofNullable((Long) jrpcParams.get("initialSupply"));
+        } catch (Exception e) {
+            parsedInitialSupply = Optional.of(((BigInteger) jrpcParams.get("initialSupply")).longValue());
+        }
         var parsedTreasuryAccountId = Optional.ofNullable((String) jrpcParams.get("treasuryAccountId"));
         var parsedAdminKey = Optional.ofNullable((String) jrpcParams.get("adminKey"));
         var parsedKycKey = Optional.ofNullable((String) jrpcParams.get("kycKey"));
@@ -81,11 +87,21 @@ public class TokenCreateParams extends JSONRPC2Param {
         var parsedFreezeDefault = Optional.ofNullable((Boolean) jrpcParams.get("freezeDefault"));
         var parsedExpirationTime = Optional.ofNullable((Long) jrpcParams.get("expirationTime"));
         var parsedAutoRenewAccountId = Optional.ofNullable((String) jrpcParams.get("autoRenewAccountId"));
-        var parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
+        Optional<Long> parsedAutoRenewPeriod;
+        try {
+            parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
+        } catch (Exception e) {
+            parsedAutoRenewPeriod = Optional.of(((BigInteger) jrpcParams.get("autoRenewPeriod")).longValue());
+        }
         var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
         var parsedTokenType = Optional.ofNullable((String) jrpcParams.get("tokenType"));
         var parsedSupplyType = Optional.ofNullable((String) jrpcParams.get("supplyType"));
-        var parsedMaxSupply = Optional.ofNullable((Long) jrpcParams.get("maxSupply"));
+        Optional<Long> parsedMaxSupply;
+        try {
+            parsedMaxSupply = Optional.ofNullable((Long) jrpcParams.get("maxSupply"));
+        } catch (Exception e) {
+            parsedMaxSupply = Optional.of(((BigInteger) jrpcParams.get("maxSupply")).longValue());
+        }
         var parsedMetadata = Optional.ofNullable((String) jrpcParams.get("metadata"));
 
         Optional<List<CustomFee>> parsedCustomFees = Optional.empty();
