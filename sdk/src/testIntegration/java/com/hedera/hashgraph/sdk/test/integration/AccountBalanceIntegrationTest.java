@@ -114,6 +114,7 @@ class AccountBalanceIntegrationTest {
                 succeededAtLeastOnce = true;
             } catch (Throwable error) {
                 System.out.println("failed for " + entry);
+                System.out.println(error);
             }
         }
 

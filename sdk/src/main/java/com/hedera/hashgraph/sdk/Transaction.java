@@ -856,6 +856,7 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public final T setTransactionId(TransactionId transactionId) {
         requireNotFrozen();
+
         transactionIds.setList(Collections.singletonList(transactionId)).setLocked(true);
 
         // noinspection unchecked

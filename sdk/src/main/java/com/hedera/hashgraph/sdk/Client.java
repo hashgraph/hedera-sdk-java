@@ -1378,6 +1378,9 @@ public final class Client implements AutoCloseable {
     /**
      * Set the period for updating the Address Book
      *
+     * <p>Note: This method requires API level 33 or higher. It will not work on devices running API versions below 31
+     * because it uses features introduced in API level 31 (Android 12).</p>*
+     *
      * @param networkUpdatePeriod the period for updating the Address Book
      * @return {@code this}
      */

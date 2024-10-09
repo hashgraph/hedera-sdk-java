@@ -29,6 +29,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
 
@@ -243,7 +244,7 @@ public class TokenRejectFlow {
     private TokenDissociateTransaction createTokenDissociateTransaction() {
         List<TokenId> tokenIdsToReject = Stream.concat(tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
             .distinct()
-            .toList();
+            .collect(Collectors.toList());
 
         var tokenDissociateTransaction = new TokenDissociateTransaction()
             .setAccountId(ownerId)
