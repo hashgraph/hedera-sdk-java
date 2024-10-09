@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.QueryHeader;
@@ -28,7 +25,7 @@ import org.junit.jupiter.api.Test;
 public class AccountBalanceQueryTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -40,17 +37,19 @@ public class AccountBalanceQueryTest {
     void shouldSerializeWithAccountId() {
         var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         new AccountBalanceQuery()
-            .setAccountId(AccountId.fromString("0.0.5005"))
-            .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .setAccountId(AccountId.fromString("0.0.5005"))
+                .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 
     @Test
     void shouldSerializeWithContractId() {
         var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
         new AccountBalanceQuery()
-            .setContractId(ContractId.fromString("0.0.5005"))
-            .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .setContractId(ContractId.fromString("0.0.5005"))
+                .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

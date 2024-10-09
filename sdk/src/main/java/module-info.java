@@ -20,7 +20,6 @@
 
 module com.hedera.hashgraph.sdk {
     requires transitive com.google.protobuf;
-
     requires com.google.common;
     requires com.google.gson;
     requires headlong;
@@ -32,10 +31,7 @@ module com.hedera.hashgraph.sdk {
     requires org.bouncycastle.pkix;
     requires org.bouncycastle.provider;
     requires org.slf4j;
-
-    requires static com.github.spotbugs.annotations;
-    requires static com.google.errorprone.annotations;
-    requires static java.annotation;
+    requires static transitive java.annotation;
 
     exports com.hedera.hashgraph.sdk;
     exports com.hedera.hashgraph.sdk.logger;

@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +12,29 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenFeeScheduleUpdateTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TokenFeeScheduleUpdateTransactionTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -49,25 +45,23 @@ public class TokenFeeScheduleUpdateTransactionTest {
     private TokenFeeScheduleUpdateTransaction spawnTestTransaction() {
         var customFees = new ArrayList<CustomFee>();
         customFees.add(new CustomFixedFee()
-            .setFeeCollectorAccountId(new AccountId(4322))
-            .setDenominatingTokenId(new TokenId(483902))
-            .setAmount(10)
-        );
+                .setFeeCollectorAccountId(new AccountId(4322))
+                .setDenominatingTokenId(new TokenId(483902))
+                .setAmount(10));
         customFees.add(new CustomFractionalFee()
-            .setFeeCollectorAccountId(new AccountId(389042))
-            .setNumerator(3)
-            .setDenominator(7)
-            .setMin(3)
-            .setMax(100)
-            .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
-        );
+                .setFeeCollectorAccountId(new AccountId(389042))
+                .setNumerator(3)
+                .setDenominator(7)
+                .setMin(3)
+                .setMax(100)
+                .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE));
 
         return new TokenFeeScheduleUpdateTransaction()
-            .setTokenId(new TokenId(8798))
-            .setCustomFees(customFees)
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .freeze();
+                .setTokenId(new TokenId(8798))
+                .setCustomFees(customFees)
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .freeze();
     }
 
     @Test
@@ -82,8 +76,9 @@ public class TokenFeeScheduleUpdateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenFeeScheduleUpdate(TokenFeeScheduleUpdateTransactionBody.newBuilder().build())
-            .build();
+                .setTokenFeeScheduleUpdate(
+                        TokenFeeScheduleUpdateTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 

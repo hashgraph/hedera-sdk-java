@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -27,16 +24,14 @@ import com.hedera.hashgraph.sdk.proto.LiveHash;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
-
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,
@@ -45,17 +40,19 @@ import java.util.Objects;
 public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransaction> {
     @Nullable
     private AccountId accountId = null;
+
     private byte[] hash = {};
+
     @Nullable
     private KeyList keys = null;
+
     @Nullable
     private Duration duration = null;
 
     /**
      * Constructor.
      */
-    public LiveHashAddTransaction() {
-    }
+    public LiveHashAddTransaction() {}
 
     /**
      * Constructor.
@@ -64,7 +61,9 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    LiveHashAddTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    LiveHashAddTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -156,10 +155,6 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @return                          the duration
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getDuration() {
         return duration;
     }
@@ -170,10 +165,6 @@ public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransac
      * @param duration The Duration to be set
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public LiveHashAddTransaction setDuration(Duration duration) {
         requireNotFrozen();
         Objects.requireNonNull(duration);

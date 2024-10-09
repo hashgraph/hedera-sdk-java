@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -25,13 +22,11 @@ import com.hedera.hashgraph.sdk.proto.ScheduleCreateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.ScheduleServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Create a scheduled transaction.
@@ -41,10 +36,13 @@ import java.util.Objects;
 public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateTransaction> {
     @Nullable
     private AccountId payerAccountId = null;
+
     @Nullable
     private SchedulableTransactionBody transactionToSchedule = null;
+
     @Nullable
     private Key adminKey = null;
+
     private String scheduleMemo = "";
 
     @Nullable
@@ -66,7 +64,9 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ScheduleCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ScheduleCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -77,10 +77,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
      * @return The expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An Instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -95,10 +91,6 @@ public final class ScheduleCreateTransaction extends Transaction<ScheduleCreateT
      * @param expirationTime The expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public ScheduleCreateTransaction setExpirationTime(Instant expirationTime) {
         this.expirationTime = expirationTime;
         return this;

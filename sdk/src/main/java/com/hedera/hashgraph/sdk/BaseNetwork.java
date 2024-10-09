@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.annotation.Nullable;
 
 /**
  * Abstracts away most of the similar functionality between {@link Network} and {@link MirrorNetwork}
@@ -39,9 +34,9 @@ import java.util.concurrent.TimeoutException;
  * @param <BaseNodeT> - The specific node type for this network.
  */
 abstract class BaseNetwork<
-    BaseNetworkT extends BaseNetwork<BaseNetworkT, KeyT, BaseNodeT>,
-    KeyT,
-    BaseNodeT extends BaseNode<BaseNodeT, KeyT>> {
+        BaseNetworkT extends BaseNetwork<BaseNetworkT, KeyT, BaseNodeT>,
+        KeyT,
+        BaseNodeT extends BaseNode<BaseNodeT, KeyT>> {
     protected static final Integer DEFAULT_MAX_NODE_ATTEMPTS = -1;
     protected static final Random random = new Random();
 
@@ -111,10 +106,6 @@ abstract class BaseNetwork<
     private LedgerId ledgerId;
 
     @VisibleForTesting
-    @SuppressFBWarnings(
-        value = "URF_UNREAD_FIELD",
-        justification = "this field is used for testing"
-    )
     boolean hasShutDownNow = false;
 
     protected BaseNetwork(ExecutorService executor) {
@@ -225,7 +216,7 @@ abstract class BaseNetwork<
      *
      * @return                          the minimum node readmit time
      */
-    synchronized public Duration getMinNodeReadmitTime() {
+    public synchronized Duration getMinNodeReadmitTime() {
         return minNodeReadmitTime;
     }
 
@@ -234,7 +225,7 @@ abstract class BaseNetwork<
      *
      * @param minNodeReadmitTime        the minimum node readmit time
      */
-    synchronized public void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
+    public synchronized void setMinNodeReadmitTime(Duration minNodeReadmitTime) {
         this.minNodeReadmitTime = minNodeReadmitTime;
 
         for (var node : nodes) {
@@ -315,12 +306,10 @@ abstract class BaseNetwork<
         return nodes;
     }
 
-    private boolean nodeIsInGivenNetwork(BaseNodeT node, Map<String,KeyT> network) {
+    private boolean nodeIsInGivenNetwork(BaseNodeT node, Map<String, KeyT> network) {
         for (var entry : network.entrySet()) {
-            if (
-                node.getKey().equals(entry.getValue()) &&
-                node.address.equals(BaseNodeAddress.fromString(entry.getKey()))
-            ) {
+            if (node.getKey().equals(entry.getValue())
+                    && node.address.equals(BaseNodeAddress.fromString(entry.getKey()))) {
                 return true;
             }
         }
@@ -372,7 +361,8 @@ abstract class BaseNetwork<
         for (var entry : network.entrySet()) {
             var node = createNodeFromNetworkEntry(entry);
 
-            if (newNodeKeys.contains(node.getKey()) && newNodeAddresses.contains(node.getAddress().toString())) {
+            if (newNodeKeys.contains(node.getKey())
+                    && newNodeAddresses.contains(node.getAddress().toString())) {
                 continue;
             }
 
@@ -464,13 +454,13 @@ abstract class BaseNetwork<
                 }
             }
 
-
             this.earliestReadmitTime = nextEarliestReadmitTime;
             if (this.earliestReadmitTime.isBefore(now.plus(minNodeReadmitTime))) {
                 this.earliestReadmitTime = now.plus(minNodeReadmitTime);
             }
 
-            outer: for (var i = 0; i < this.nodes.size(); i++) {
+            outer:
+            for (var i = 0; i < this.nodes.size(); i++) {
                 // Check if `healthyNodes` already contains this node
                 for (var j = 0; j < this.healthyNodes.size(); j++) {
                     if (this.nodes.get(i) == this.healthyNodes.get(j)) {
@@ -483,7 +473,6 @@ abstract class BaseNetwork<
                     this.healthyNodes.add(this.nodes.get(i));
                 }
             }
-
         }
     }
 
@@ -536,7 +525,7 @@ abstract class BaseNetwork<
 
         var returnNodes = new HashMap<KeyT, BaseNodeT>(count);
 
-        for (var i = 0; i < count; i++ ) {
+        for (var i = 0; i < count; i++) {
             var node = getRandomNode();
 
             if (!returnNodes.containsKey(node.getKey())) {
@@ -548,7 +537,6 @@ abstract class BaseNetwork<
         returnList.addAll(returnNodes.values());
         return returnList;
     }
-
 
     synchronized void beginClose() {
         for (var node : nodes) {
@@ -568,7 +556,8 @@ abstract class BaseNetwork<
 
             for (var node : nodes) {
                 if (node.channel != null) {
-                    var timeoutMillis = Duration.between(Instant.now(), deadline).toMillis();
+                    var timeoutMillis =
+                            Duration.between(Instant.now(), deadline).toMillis();
                     if (timeoutMillis <= 0 || !node.channel.awaitTermination(timeoutMillis, TimeUnit.MILLISECONDS)) {
                         throw new TimeoutException("Failed to properly shutdown all channels");
                     } else {

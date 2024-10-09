@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
@@ -28,14 +25,12 @@ import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -63,18 +58,25 @@ import java.util.Objects;
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
     @Nullable
     private ContractId contractId = null;
+
     @Nullable
     private AccountId proxyAccountId = null;
+
     @Nullable
     private FileId bytecodeFileId = null;
+
     @Nullable
     private Instant expirationTime = null;
+
     @Nullable
     private Key adminKey = null;
+
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     @Nullable
     private String contractMemo = null;
 
@@ -93,8 +95,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     /**
      * Contract.
      */
-    public ContractUpdateTransaction() {
-    }
+    public ContractUpdateTransaction() {}
 
     /**
      * Contract.
@@ -102,7 +103,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) record
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ContractUpdateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -145,10 +148,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return                          the contract expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -160,10 +159,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param expirationTime The Instant to be set for expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
@@ -241,7 +236,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param maxAutomaticTokenAssociations The maximum automatic token associations
      * @return  {@code this}
      */
-
     public ContractUpdateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
         requireNotFrozen();
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
@@ -254,10 +248,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return                          the duration for auto-renew
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -268,10 +258,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
@@ -498,7 +484,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
         if (body.hasMaxAutomaticTokenAssociations()) {
-            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+            maxAutomaticTokenAssociations =
+                    body.getMaxAutomaticTokenAssociations().getValue();
         }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
@@ -562,7 +549,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
 
         if (declineStakingReward != null) {
-            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+            builder.setDeclineReward(
+                    BoolValue.newBuilder().setValue(declineStakingReward).build());
         }
 
         if (autoRenewAccountId != null) {

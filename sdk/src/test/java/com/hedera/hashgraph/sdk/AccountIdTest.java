@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.util.concurrent.TimeoutException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.TimeoutException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountIdTest {
 
@@ -39,7 +35,7 @@ class AccountIdTest {
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
         mainnetClient = Client.forMainnet();
         testnetClient = Client.forTestnet();
         previewnetClient = Client.forPreviewnet();
@@ -60,17 +56,20 @@ class AccountIdTest {
 
     @Test
     void fromStringWithChecksumOnMainnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-vfmkw").toStringWithChecksum(mainnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-vfmkw").toStringWithChecksum(mainnetClient))
+                .toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnTestnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-esxsf").toStringWithChecksum(testnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-esxsf").toStringWithChecksum(testnetClient))
+                .toMatchSnapshot();
     }
 
     @Test
     void fromStringWithChecksumOnPreviewnet() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ogizo").toStringWithChecksum(previewnetClient)).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.123-ogizo").toStringWithChecksum(previewnetClient))
+                .toMatchSnapshot();
     }
 
     @Test
@@ -119,62 +118,82 @@ class AccountIdTest {
     @Test
     void malformedAliasKey() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
-            AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777");
+            AccountId.fromString(
+                    "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777");
         });
     }
 
     @Test
     void malformedAliasKey2() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
-            AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777g");
+            AccountId.fromString(
+                    "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf777g");
         });
     }
 
     @Test
     void malformedAliasKey3() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
-            AccountId.fromString("0.0.303a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
+            AccountId.fromString(
+                    "0.0.303a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
         });
     }
 
     @Test
     void fromStringWithAliasKey() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString(
+                                "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void fromStringWithEvmAddress() {
-        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddress() {
-        SnapshotMatcher.expect(AccountId.fromSolidityAddress("000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromSolidityAddress("000000000000000000000000000000000000138D")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddressWith0x() {
-        SnapshotMatcher.expect(AccountId.fromSolidityAddress("0x000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromSolidityAddress("0x000000000000000000000000000000000000138D")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void toBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(Hex.toHexString(new AccountId(5005).toProtobuf().toByteArray())).toMatchSnapshot();
+        SnapshotMatcher.expect(Hex.toHexString(new AccountId(5005).toProtobuf().toByteArray()))
+                .toMatchSnapshot();
     }
 
     @Test
     void toBytesAlias() {
-        SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toBytes())).toMatchSnapshot();
+        SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString(
+                                "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777")
+                        .toBytes()))
+                .toMatchSnapshot();
     }
 
     @Test
     void toBytesEvmAddress() {
-        SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes())).toMatchSnapshot();
+        SnapshotMatcher.expect(Hex.toHexString(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da")
+                        .toBytes()))
+                .toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(AccountId.fromBytes(new AccountId(5005).toBytes()).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(
+                        AccountId.fromBytes(new AccountId(5005).toBytes()).toString())
+                .toMatchSnapshot();
     }
 
     @Test
@@ -186,26 +205,35 @@ class AccountIdTest {
 
     @Test
     void fromBytesAlias() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777").toBytes()).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString(
+                                        "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777")
+                                .toBytes())
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void toFromProtobufAliasKey() {
-        var id1 = AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
+        var id1 = AccountId.fromString(
+                "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777");
         var id2 = AccountId.fromProtobuf(id1.toProtobuf());
         assertThat(id2).isEqualTo(id1);
     }
 
     @Test
     void toFromProtobufEcdsaAliasKey() {
-        var id1 = AccountId.fromString("0.0.302d300706052b8104000a032200035d348292bbb8b511fdbe24e3217ec099944b4728999d337f9a025f4193324525");
+        var id1 = AccountId.fromString(
+                "0.0.302d300706052b8104000a032200035d348292bbb8b511fdbe24e3217ec099944b4728999d337f9a025f4193324525");
         var id2 = AccountId.fromProtobuf(id1.toProtobuf());
         assertThat(id2).isEqualTo(id1);
     }
 
     @Test
     void fromBytesEvmAddress() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da").toBytes()).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(AccountId.fromBytes(AccountId.fromString("0.0.302a300506032b6570032100114e6abc371b82da")
+                                .toBytes())
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test

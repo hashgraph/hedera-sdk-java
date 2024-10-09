@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.Arrays;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.Arrays;
 
 /**
  * A private key on the Hedera™ network.
@@ -112,13 +106,13 @@ public abstract class PrivateKey extends Key {
     @Deprecated
     public static PrivateKey fromMnemonic(Mnemonic mnemonic, String passphrase) {
         var seed = mnemonic.toSeed(passphrase);
-        @Var PrivateKey derivedKey = fromSeedED25519(seed);
+        PrivateKey derivedKey = fromSeedED25519(seed);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index
         // https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
         // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-        for (int index : new int[]{44, 3030, 0, 0}) {
+        for (int index : new int[] {44, 3030, 0, 0}) {
             derivedKey = derivedKey.derive(index);
         }
 
@@ -189,7 +183,7 @@ public abstract class PrivateKey extends Key {
      */
     public static PrivateKey fromBytes(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
-            || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
+                || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
             return new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
         }
@@ -393,7 +387,7 @@ public abstract class PrivateKey extends Key {
             transaction.freeze();
         }
 
-        var builder = (SignedTransaction.Builder) transaction.innerSignedTransactions.get(0);
+        var builder = transaction.innerSignedTransactions.get(0);
         var signature = sign(builder.getBodyBytes().toByteArray());
 
         transaction.addSignature(getPublicKey(), signature);

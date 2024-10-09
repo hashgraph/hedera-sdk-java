@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -26,17 +23,15 @@ import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
-import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Creates a file with the content by submitting the transaction.
@@ -47,8 +42,10 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
 
     @Nullable
     private Instant expirationTime = null;
+
     @Nullable
     private KeyList keys = null;
+
     private byte[] contents = {};
     private String fileMemo = "";
 
@@ -67,7 +64,9 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    FileCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -88,10 +87,6 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * @return                          expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An Instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -108,10 +103,6 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      * @param expirationTime the {@link Instant} at which this file should expire.
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public FileCreateTransaction setExpirationTime(Instant expirationTime) {
         requireNotFrozen();
         Objects.requireNonNull(expirationTime);

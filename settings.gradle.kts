@@ -19,16 +19,19 @@
  */
 
 pluginManagement {
-    includeBuild("gradle/plugins")
+    repositories.gradlePluginPortal()
+    repositories.maven("https://repo.onepiece.software/snapshots")
 }
-plugins {
-    id("com.hedera.gradle.settings")
+
+plugins { id("com.hedera.gradle.build") version "0.1.20" }
+
+rootProject.name = "hedera-sdk-java"
+
+javaModules {
+    module("sdk") { group = "com.hedera.hashgraph" }
+    module("sdk-full") { group = "com.hedera.hashgraph" }
+    module("tck") { group = "com.hedera.hashgraph.sdk.tck" }
 }
 
 includeBuild("examples")
 includeBuild("example-android")
-
-include("sdk")
-include("sdk-full")
-include("sdk-dependency-versions")
-include("tck")

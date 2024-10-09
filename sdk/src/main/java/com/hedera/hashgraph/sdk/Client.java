@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
@@ -29,7 +26,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
@@ -83,13 +79,17 @@ public final class Client implements AutoCloseable {
     final ExecutorService executor;
     private final AtomicReference<Duration> grpcDeadline = new AtomicReference(DEFAULT_GRPC_DEADLINE);
     private final Set<SubscriptionHandle> subscriptions = ConcurrentHashMap.newKeySet();
+
     @Nullable
     Hbar defaultMaxTransactionFee = null;
+
     Hbar defaultMaxQueryPayment = DEFAULT_MAX_QUERY_PAYMENT;
     Network network;
     MirrorNetwork mirrorNetwork;
+
     @Nullable
     private Operator operator;
+
     private Duration requestTimeout = DEFAULT_REQUEST_TIMEOUT;
     private Duration closeTimeout = DEFAULT_CLOSE_TIMEOUT;
     private int maxAttempts = DEFAULT_MAX_ATTEMPTS;
@@ -100,8 +100,10 @@ public final class Client implements AutoCloseable {
     // If networkUpdatePeriod is null, any network updates in progress will not complete
     @Nullable
     private Duration networkUpdatePeriod;
+
     @Nullable
     private CompletableFuture<Void> networkUpdateFuture;
+
     private Logger logger = new Logger(LogLevel.SILENT);
 
     /**
@@ -113,12 +115,11 @@ public final class Client implements AutoCloseable {
      */
     @VisibleForTesting
     Client(
-        ExecutorService executor,
-        Network network,
-        MirrorNetwork mirrorNetwork,
-        @Nullable Duration networkUpdateInitialDelay,
-        @Nullable Duration networkUpdatePeriod
-    ) {
+            ExecutorService executor,
+            Network network,
+            MirrorNetwork mirrorNetwork,
+            @Nullable Duration networkUpdateInitialDelay,
+            @Nullable Duration networkUpdatePeriod) {
         this.executor = executor;
         this.network = network;
         this.mirrorNetwork = mirrorNetwork;
@@ -133,15 +134,19 @@ public final class Client implements AutoCloseable {
      */
     static ExecutorService createExecutor() {
         var threadFactory = new ThreadFactoryBuilder()
-            .setNameFormat("hedera-sdk-%d")
-            .setDaemon(true)
-            .build();
+                .setNameFormat("hedera-sdk-%d")
+                .setDaemon(true)
+                .build();
 
         int nThreads = Runtime.getRuntime().availableProcessors();
-        return new ThreadPoolExecutor(nThreads, nThreads,
-            0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(),
-            threadFactory, new ThreadPoolExecutor.CallerRunsPolicy());
+        return new ThreadPoolExecutor(
+                nThreads,
+                nThreads,
+                0L,
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(),
+                threadFactory,
+                new ThreadPoolExecutor.CallerRunsPolicy());
     }
 
     /**
@@ -163,7 +168,6 @@ public final class Client implements AutoCloseable {
 
         return new Client(executor, network, mirrorNetwork, null, null);
     }
-
 
     /**
      * Construct a client given a set of nodes.
@@ -209,8 +213,8 @@ public final class Client implements AutoCloseable {
         var network = Network.forMainnet(executor);
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(
+                executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -225,8 +229,8 @@ public final class Client implements AutoCloseable {
         var network = Network.forTestnet(executor);
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(
+                executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -242,10 +246,9 @@ public final class Client implements AutoCloseable {
         var network = Network.forPreviewnet(executor);
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
-        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+        return new Client(
+                executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
-
 
     /**
      * Construct a Hedera client pre-configured for <a
@@ -309,8 +312,9 @@ public final class Client implements AutoCloseable {
             var networks = config.network.getAsJsonObject();
             Map<String, AccountId> nodes = new HashMap<>(networks.size());
             for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
-                nodes.put(entry.getValue().toString().replace("\"", ""),
-                    AccountId.fromString(entry.getKey().replace("\"", "")));
+                nodes.put(
+                        entry.getValue().toString().replace("\"", ""),
+                        AccountId.fromString(entry.getKey().replace("\"", "")));
             }
             client = Client.forNetwork(nodes);
             if (config.networkName != null) {
@@ -319,7 +323,7 @@ public final class Client implements AutoCloseable {
                     client.setNetworkName(NetworkName.fromString(networkNameString));
                 } catch (Exception ignored) {
                     throw new IllegalArgumentException("networkName in config was \"" + networkNameString
-                        + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
+                            + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
                 }
             }
         } else {
@@ -328,8 +332,7 @@ public final class Client implements AutoCloseable {
                 case MAINNET -> Client.forMainnet();
                 case TESTNET -> Client.forTestnet();
                 case PREVIEWNET -> Client.forPreviewnet();
-                default -> throw new JsonParseException("Illegal argument for network.");
-            };
+                default -> throw new JsonParseException("Illegal argument for network.");};
         }
 
         if (config.operator != null) {
@@ -339,7 +342,7 @@ public final class Client implements AutoCloseable {
             client.setOperator(operatorAccount, privateKey);
         }
 
-        //already set in previous set network if?
+        // already set in previous set network if?
         if (config.mirrorNetwork != null) {
             if (config.mirrorNetwork.isJsonArray()) {
                 var mirrors = config.mirrorNetwork.getAsJsonArray();
@@ -389,7 +392,7 @@ public final class Client implements AutoCloseable {
      *
      * @return the list of mirror nodes
      */
-    synchronized public List<String> getMirrorNetwork() {
+    public synchronized List<String> getMirrorNetwork() {
         return mirrorNetwork.getNetwork();
     }
 
@@ -419,18 +422,21 @@ public final class Client implements AutoCloseable {
         networkUpdateFuture.thenRun(() -> {
             // Checking networkUpdatePeriod != null must be synchronized, so I've put it in a synchronized method.
             requireNetworkUpdatePeriodNotNull(() -> {
-                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).executeAsync(this)
-                    .thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
-                        try {
-                            this.setNetworkFromAddressBook(addressBook);
-                        } catch (Throwable error) {
-                            return CompletableFuture.failedFuture(error);
-                        }
-                        return CompletableFuture.completedFuture(null);
-                    })).exceptionally(error -> {
-                        logger.warn("Failed to update address book via mirror node query ", error);
-                        return null;
-                    });
+                new AddressBookQuery()
+                        .setFileId(FileId.ADDRESS_BOOK)
+                        .executeAsync(this)
+                        .thenCompose(addressBook -> requireNetworkUpdatePeriodNotNull(() -> {
+                            try {
+                                this.setNetworkFromAddressBook(addressBook);
+                            } catch (Throwable error) {
+                                return CompletableFuture.failedFuture(error);
+                            }
+                            return CompletableFuture.completedFuture(null);
+                        }))
+                        .exceptionally(error -> {
+                            logger.warn("Failed to update address book via mirror node query ", error);
+                            return null;
+                        });
                 scheduleNetworkUpdate(networkUpdatePeriod);
                 return null;
             });
@@ -468,11 +474,9 @@ public final class Client implements AutoCloseable {
      * @return {@code this}
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook, boolean updateAddressBook)
-        throws InterruptedException, TimeoutException {
+            throws InterruptedException, TimeoutException {
         network.setNetwork(Network.addressBookToNetwork(
-            addressBook.nodeAddresses,
-            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
-        ));
+                addressBook.nodeAddresses, isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN));
         if (updateAddressBook) {
             network.setAddressBook(addressBook);
         }
@@ -488,7 +492,7 @@ public final class Client implements AutoCloseable {
      * @throws TimeoutException     when shutting down nodes
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook)
-        throws InterruptedException, TimeoutException {
+            throws InterruptedException, TimeoutException {
         return setNetworkFromAddressBook(addressBook, false);
     }
 
@@ -497,7 +501,7 @@ public final class Client implements AutoCloseable {
      *
      * @return the client's network
      */
-    synchronized public Map<String, AccountId> getNetwork() {
+    public synchronized Map<String, AccountId> getNetwork() {
         return network.getNetwork();
     }
 
@@ -510,7 +514,7 @@ public final class Client implements AutoCloseable {
      * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
      */
     public synchronized Client setNetwork(Map<String, AccountId> network)
-        throws InterruptedException, TimeoutException {
+            throws InterruptedException, TimeoutException {
         this.network.setNetwork(network);
         return this;
     }
@@ -606,9 +610,9 @@ public final class Client implements AutoCloseable {
      */
     public Void ping(AccountId nodeAccountId, Duration timeout) throws PrecheckStatusException, TimeoutException {
         new AccountBalanceQuery()
-            .setAccountId(nodeAccountId)
-            .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-            .execute(this, timeout);
+                .setAccountId(nodeAccountId)
+                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+                .execute(this, timeout);
 
         return null;
     }
@@ -633,16 +637,16 @@ public final class Client implements AutoCloseable {
     public CompletableFuture<Void> pingAsync(AccountId nodeAccountId, Duration timeout) {
         var result = new CompletableFuture<Void>();
         new AccountBalanceQuery()
-            .setAccountId(nodeAccountId)
-            .setNodeAccountIds(Collections.singletonList(nodeAccountId))
-            .executeAsync(this, timeout)
-            .whenComplete((balance, error) -> {
-                if (error == null) {
-                    result.complete(null);
-                } else {
-                    result.completeExceptionally(error);
-                }
-            });
+                .setAccountId(nodeAccountId)
+                .setNodeAccountIds(Collections.singletonList(nodeAccountId))
+                .executeAsync(this, timeout)
+                .whenComplete((balance, error) -> {
+                    if (error == null) {
+                        result.complete(null);
+                    } else {
+                        result.completeExceptionally(error);
+                    }
+                });
         return result;
     }
 
@@ -686,8 +690,8 @@ public final class Client implements AutoCloseable {
      * @param onSuccess     a Consumer which consumes the result on success.
      * @param onFailure     a Consumer which consumes the error on failure.
      */
-    public void pingAsync(AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess,
-        Consumer<Throwable> onFailure) {
+    public void pingAsync(
+            AccountId nodeAccountId, Duration timeout, Consumer<Void> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(pingAsync(nodeAccountId, timeout), onSuccess, onFailure);
     }
 
@@ -743,7 +747,8 @@ public final class Client implements AutoCloseable {
             list.add(pingAsync(nodeAccountId, timeoutPerPing));
         }
 
-        return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0])).thenApply((v) -> null);
+        return CompletableFuture.allOf(list.toArray(new CompletableFuture<?>[0]))
+                .thenApply((v) -> null);
     }
 
     /**
@@ -819,16 +824,15 @@ public final class Client implements AutoCloseable {
      * @param transactionSigner The signer for the operator
      * @return {@code this}
      */
-    public synchronized Client setOperatorWith(AccountId accountId, PublicKey publicKey,
-        UnaryOperator<byte[]> transactionSigner) {
+    public synchronized Client setOperatorWith(
+            AccountId accountId, PublicKey publicKey, UnaryOperator<byte[]> transactionSigner) {
         if (getNetworkName() != null) {
             try {
                 accountId.validateChecksum(this);
             } catch (BadEntityIdException exc) {
                 throw new IllegalArgumentException(
-                    "Tried to set the client operator account ID to an account ID with an invalid checksum: "
-                        + exc.getMessage()
-                );
+                        "Tried to set the client operator account ID to an account ID with an invalid checksum: "
+                                + exc.getMessage());
             }
         }
 
@@ -913,10 +917,6 @@ public final class Client implements AutoCloseable {
      *
      * @return maxBackoff
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getMaxBackoff() {
         return maxBackoff;
     }
@@ -928,10 +928,6 @@ public final class Client implements AutoCloseable {
      * @param maxBackoff The maximum amount of time to wait between retries
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setMaxBackoff(Duration maxBackoff) {
         if (maxBackoff == null || maxBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("maxBackoff must be a positive duration");
@@ -947,10 +943,6 @@ public final class Client implements AutoCloseable {
      *
      * @return minBackoff
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getMinBackoff() {
         return minBackoff;
     }
@@ -962,10 +954,6 @@ public final class Client implements AutoCloseable {
      * @param minBackoff The minimum amount of time to wait between retries
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setMinBackoff(Duration minBackoff) {
         if (minBackoff == null || minBackoff.toNanos() < 0) {
             throw new IllegalArgumentException("minBackoff must be a positive duration");
@@ -1276,10 +1264,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the timeout value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Duration getRequestTimeout() {
         return requestTimeout;
     }
@@ -1290,10 +1274,6 @@ public final class Client implements AutoCloseable {
      * @param requestTimeout the timeout value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Client setRequestTimeout(Duration requestTimeout) {
         this.requestTimeout = Objects.requireNonNull(requestTimeout);
         return this;
@@ -1304,10 +1284,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the timeout value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getCloseTimeout() {
         return closeTimeout;
     }
@@ -1318,10 +1294,6 @@ public final class Client implements AutoCloseable {
      * @param closeTimeout the timeout value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setCloseTimeout(Duration closeTimeout) {
         this.closeTimeout = Objects.requireNonNull(closeTimeout);
         network.setCloseTimeout(closeTimeout);
@@ -1334,10 +1306,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the gRPC deadline value
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getGrpcDeadline() {
         return grpcDeadline.get();
     }
@@ -1348,10 +1316,6 @@ public final class Client implements AutoCloseable {
      * @param grpcDeadline the gRPC deadline value
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public Client setGrpcDeadline(Duration grpcDeadline) {
         this.grpcDeadline.set(Objects.requireNonNull(grpcDeadline));
         return this;
@@ -1372,10 +1336,6 @@ public final class Client implements AutoCloseable {
      *
      * @return the networkUpdatePeriod
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     @Nullable
     public synchronized Duration getNetworkUpdatePeriod() {
         return this.networkUpdatePeriod;
@@ -1390,10 +1350,6 @@ public final class Client implements AutoCloseable {
      * @param networkUpdatePeriod the period for updating the Address Book
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public synchronized Client setNetworkUpdatePeriod(Duration networkUpdatePeriod) {
         cancelScheduledNetworkUpdate();
         this.networkUpdatePeriod = networkUpdatePeriod;

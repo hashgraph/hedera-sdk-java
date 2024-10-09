@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
@@ -28,14 +25,12 @@ import com.hedera.hashgraph.sdk.proto.CryptoUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Change properties for the given account.
@@ -56,20 +51,28 @@ import java.util.Objects;
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     @Nullable
     private AccountId accountId = null;
+
     @Nullable
     private AccountId proxyAccountId = null;
+
     @Nullable
     private Key key = null;
+
     @Nullable
     private Instant expirationTime = null;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     @Nullable
     private Boolean receiverSigRequired = null;
+
     @Nullable
     private String accountMemo = null;
+
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
+
     @Nullable
     private Key aliasKey;
 
@@ -85,8 +88,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     /**
      * Constructor.
      */
-    public AccountUpdateTransaction() {
-    }
+    public AccountUpdateTransaction() {}
 
     /**
      * Constructor.
@@ -94,7 +96,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    AccountUpdateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -218,10 +222,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return                          the expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -233,10 +233,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param expirationTime The Instant to be set as the expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public AccountUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
@@ -250,10 +246,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @return                          the auto renew period
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -267,10 +259,6 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public AccountUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();
@@ -502,7 +490,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
             accountMemo = body.getMemo().getValue();
         }
         if (body.hasMaxAutomaticTokenAssociations()) {
-            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+            maxAutomaticTokenAssociations =
+                    body.getMaxAutomaticTokenAssociations().getValue();
         }
 
         if (body.hasDeclineReward()) {
@@ -562,7 +551,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
 
         if (declineStakingReward != null) {
-            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+            builder.setDeclineReward(
+                    BoolValue.newBuilder().setValue(declineStakingReward).build());
         }
 
         return builder;

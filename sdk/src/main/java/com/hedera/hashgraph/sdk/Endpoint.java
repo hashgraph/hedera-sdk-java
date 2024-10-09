@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +12,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
-
-import java.util.Arrays;
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * Utility class used internally by the sdk.
@@ -42,8 +35,7 @@ public class Endpoint implements Cloneable {
     /**
      * Constructor.
      */
-    public Endpoint() {
-    }
+    public Endpoint() {}
 
     /**
      * Create an endpoint object from a service endpoint protobuf.
@@ -52,16 +44,16 @@ public class Endpoint implements Cloneable {
      * @return                          the endpoint object
      */
     static Endpoint fromProtobuf(ServiceEndpoint serviceEndpoint) {
-        @Var var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
+        var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
 
         if (port == 0 || port == 50111) {
             port = 50211;
         }
 
         return new Endpoint()
-            .setAddress(serviceEndpoint.getIpAddressV4().toByteArray())
-            .setPort(port)
-            .setDomainName(serviceEndpoint.getDomainName());
+                .setAddress(serviceEndpoint.getIpAddressV4().toByteArray())
+                .setPort(port)
+                .setDomainName(serviceEndpoint.getDomainName());
     }
 
     /**
@@ -147,9 +139,10 @@ public class Endpoint implements Cloneable {
         if (this.domainName != null && !this.domainName.isEmpty()) {
             return domainName + ":" + port;
         } else {
-            return ((int) address[0] & 0x000000FF) + "." + ((int) address[1] & 0x000000FF) + "." +
-            ((int) address[2] & 0x000000FF) + "." + ((int) address[3] & 0x000000FF) +
-                ":" + port;
+            return ((int) address[0] & 0x000000FF) + "." + ((int) address[1] & 0x000000FF) + "."
+                    + ((int) address[2] & 0x000000FF)
+                    + "." + ((int) address[3] & 0x000000FF) + ":"
+                    + port;
         }
     }
 

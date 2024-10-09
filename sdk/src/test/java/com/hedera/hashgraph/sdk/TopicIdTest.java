@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -29,7 +26,7 @@ import org.junit.jupiter.api.Test;
 class TopicIdTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -49,12 +46,15 @@ class TopicIdTest {
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(TopicId.fromBytes(new TopicId(5005).toBytes()).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TopicId.fromBytes(new TopicId(5005).toBytes()).toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddress() {
-        SnapshotMatcher.expect(TokenId.fromSolidityAddress("000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TokenId.fromSolidityAddress("000000000000000000000000000000000000138D")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test

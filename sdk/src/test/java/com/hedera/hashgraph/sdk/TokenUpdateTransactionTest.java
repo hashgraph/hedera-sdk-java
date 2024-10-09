@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,34 +34,33 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-
 public class TokenUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final PublicKey testAdminKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
+            .getPublicKey();
     private static final PublicKey testKycKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
+            .getPublicKey();
     private static final PublicKey testFreezeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
+            .getPublicKey();
     private static final PublicKey testWipeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
+            .getPublicKey();
     private static final PublicKey testSupplyKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
+            .getPublicKey();
     private static final PublicKey testFeeScheduleKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
+            .getPublicKey();
     private static final PublicKey testPauseKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
+            .getPublicKey();
     private static final PublicKey testMetadataKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
+            .getPublicKey();
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.8.8");
     private static final String testTokenName = "test name";
@@ -73,12 +69,12 @@ public class TokenUpdateTransactionTest {
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.now();
-    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
+    private static final byte[] testMetadata = new byte[] {1, 2, 3, 4, 5};
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -92,16 +88,30 @@ public class TokenUpdateTransactionTest {
     }
 
     private TokenUpdateTransaction spawnTestTransaction() {
-        return new TokenUpdateTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId).setFeeScheduleKey(testFeeScheduleKey).setSupplyKey(testSupplyKey)
-            .setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
-            .setAutoRenewPeriod(testAutoRenewPeriod).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
-            .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
-            .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
-            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1))
-            .setTokenMetadata(testMetadata).setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION).freeze().sign(unusedPrivateKey);
+        return new TokenUpdateTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(testTokenId)
+                .setFeeScheduleKey(testFeeScheduleKey)
+                .setSupplyKey(testSupplyKey)
+                .setAdminKey(testAdminKey)
+                .setAutoRenewAccountId(testAutoRenewAccountId)
+                .setAutoRenewPeriod(testAutoRenewPeriod)
+                .setFreezeKey(testFreezeKey)
+                .setWipeKey(testWipeKey)
+                .setTokenSymbol(testTokenSymbol)
+                .setKycKey(testKycKey)
+                .setPauseKey(testPauseKey)
+                .setMetadataKey(testMetadataKey)
+                .setExpirationTime(validStart)
+                .setTreasuryAccountId(testTreasuryAccountId)
+                .setTokenName(testTokenName)
+                .setTokenMemo(testTokenMemo)
+                .setMaxTransactionFee(new Hbar(1))
+                .setTokenMetadata(testMetadata)
+                .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -114,7 +124,8 @@ public class TokenUpdateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenUpdate(TokenUpdateTransactionBody.newBuilder().build()).build();
+                .setTokenUpdate(TokenUpdateTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -123,19 +134,30 @@ public class TokenUpdateTransactionTest {
 
     @Test
     void constructTokenUpdateTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = TokenUpdateTransactionBody.newBuilder().setToken(testTokenId.toProtobuf())
-            .setName(testTokenName).setSymbol(testTokenSymbol).setTreasury(testTreasuryAccountId.toProtobuf())
-            .setAdminKey(testAdminKey.toProtobufKey()).setKycKey(testKycKey.toProtobufKey())
-            .setFreezeKey(testFreezeKey.toProtobufKey()).setWipeKey(testWipeKey.toProtobufKey())
-            .setSupplyKey(testSupplyKey.toProtobufKey()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
-            .setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
-                    .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
-            .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
-            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
-            .setMetadataKey(testMetadataKey.toProtobufKey())
-            .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata)))
-            .setKeyVerificationMode(com.hedera.hashgraph.sdk.proto.TokenKeyValidation.NO_VALIDATION).build();
+        var transactionBody = TokenUpdateTransactionBody.newBuilder()
+                .setToken(testTokenId.toProtobuf())
+                .setName(testTokenName)
+                .setSymbol(testTokenSymbol)
+                .setTreasury(testTreasuryAccountId.toProtobuf())
+                .setAdminKey(testAdminKey.toProtobufKey())
+                .setKycKey(testKycKey.toProtobufKey())
+                .setFreezeKey(testFreezeKey.toProtobufKey())
+                .setWipeKey(testWipeKey.toProtobufKey())
+                .setSupplyKey(testSupplyKey.toProtobufKey())
+                .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
+                .setAutoRenewPeriod(com.hedera.hashgraph.sdk.proto.Duration.newBuilder()
+                        .setSeconds(testAutoRenewPeriod.toSeconds())
+                        .build())
+                .setExpiry(Timestamp.newBuilder()
+                        .setSeconds(testExpirationTime.getEpochSecond())
+                        .build())
+                .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
+                .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey())
+                .setPauseKey(testPauseKey.toProtobufKey())
+                .setMetadataKey(testMetadataKey.toProtobufKey())
+                .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata)))
+                .setKeyVerificationMode(com.hedera.hashgraph.sdk.proto.TokenKeyValidation.NO_VALIDATION)
+                .build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);
@@ -151,8 +173,8 @@ public class TokenUpdateTransactionTest {
         assertThat(tokenUpdateTransaction.getSupplyKey()).isEqualTo(testSupplyKey);
         assertThat(tokenUpdateTransaction.getAutoRenewAccountId()).isEqualTo(testAutoRenewAccountId);
         assertThat(tokenUpdateTransaction.getAutoRenewPeriod().toSeconds()).isEqualTo(testAutoRenewPeriod.toSeconds());
-        assertThat(tokenUpdateTransaction.getExpirationTime().getEpochSecond()).isEqualTo(
-            testExpirationTime.getEpochSecond());
+        assertThat(tokenUpdateTransaction.getExpirationTime().getEpochSecond())
+                .isEqualTo(testExpirationTime.getEpochSecond());
         assertThat(tokenUpdateTransaction.getTokenMemo()).isEqualTo(testTokenMemo);
         assertThat(tokenUpdateTransaction.getFeeScheduleKey()).isEqualTo(testFeeScheduleKey);
         assertThat(tokenUpdateTransaction.getPauseKey()).isEqualTo(testPauseKey);

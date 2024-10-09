@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.io.ByteStreams;
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +27,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
  * Internal utility class.
@@ -82,10 +77,8 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
      */
     static Network forMainnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.MAINNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+        HashMap<String, AccountId> network =
+                addressBookToNetwork(Objects.requireNonNull(addressBook).values(), BaseNodeAddress.PORT_NODE_PLAIN);
         return new Network(executor, network).setLedgerIdInternal(LedgerId.MAINNET, addressBook);
     }
 
@@ -97,10 +90,8 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
      */
     static Network forTestnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.TESTNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+        HashMap<String, AccountId> network =
+                addressBookToNetwork(Objects.requireNonNull(addressBook).values(), BaseNodeAddress.PORT_NODE_PLAIN);
         return new Network(executor, network).setLedgerIdInternal(LedgerId.TESTNET, addressBook);
     }
 
@@ -112,10 +103,8 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
      */
     static Network forPreviewnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.PREVIEWNET);
-        HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+        HashMap<String, AccountId> network =
+                addressBookToNetwork(Objects.requireNonNull(addressBook).values(), BaseNodeAddress.PORT_NODE_PLAIN);
         return new Network(executor, network).setLedgerIdInternal(LedgerId.PREVIEWNET, addressBook);
     }
 
@@ -149,7 +138,8 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
         return setLedgerIdInternal(ledgerId, getAddressBookForLedger(ledgerId));
     }
 
-    private Network setLedgerIdInternal(@Nullable LedgerId ledgerId, @Nullable Map<AccountId, NodeAddress> addressBook) {
+    private Network setLedgerIdInternal(
+            @Nullable LedgerId ledgerId, @Nullable Map<AccountId, NodeAddress> addressBook) {
         super.setLedgerId(ledgerId);
 
         this.addressBook = addressBook;
@@ -162,25 +152,27 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
 
     void setAddressBook(NodeAddressBook addressBook) {
         Map<AccountId, NodeAddress> newAddressBook = addressBook.getNodeAddresses().stream()
-            .filter(nodeAddress -> Objects.nonNull(nodeAddress.getAccountId()))
-            .collect(Collectors.toMap(NodeAddress::getAccountId, Function.identity(),
-                /*
-                * Here we index by AccountId ignoring any subsequent entries with the same AccountId.
-                *
-                * Currently, this seems to be needed when reloading predefined address book for testnet which contains
-                * multiple entries with the same AccountId.
-                *
-                * If it becomes necessary to better handle such cases, either the one-to-one mapping from AccountId to
-                * single NodeAddress should be abandoned or NodeAddresses with the same AccountId may need to be merged.
-                * */
-                (a, b) -> a));
+                .filter(nodeAddress -> Objects.nonNull(nodeAddress.getAccountId()))
+                .collect(Collectors.toMap(
+                        NodeAddress::getAccountId,
+                        Function.identity(),
+                        /*
+                         * Here we index by AccountId ignoring any subsequent entries with the same AccountId.
+                         *
+                         * Currently, this seems to be needed when reloading predefined address book for testnet which contains
+                         * multiple entries with the same AccountId.
+                         *
+                         * If it becomes necessary to better handle such cases, either the one-to-one mapping from AccountId to
+                         * single NodeAddress should be abandoned or NodeAddresses with the same AccountId may need to be merged.
+                         * */
+                        (a, b) -> a));
         /*
-        * Here we preserve the certificate hash in the case where one is previously defined and no new one is provided.
-        *
-        * Currently, this seems to be needed since the downloaded address book lacks the certificate hash. However,
-        * it is expected the certificate hash will be provided in the future in which case this workaround will no
-        * longer be necessary.
-        * */
+         * Here we preserve the certificate hash in the case where one is previously defined and no new one is provided.
+         *
+         * Currently, this seems to be needed since the downloaded address book lacks the certificate hash. However,
+         * it is expected the certificate hash will be provided in the future in which case this workaround will no
+         * longer be necessary.
+         * */
         if (null != this.addressBook) {
             for (Map.Entry<AccountId, NodeAddress> entry : newAddressBook.entrySet()) {
                 NodeAddress previous = this.addressBook.get(entry.getKey());
@@ -200,9 +192,9 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
 
     @Nullable
     private static Map<AccountId, NodeAddress> getAddressBookForLedger(@Nullable LedgerId ledgerId) {
-        return (ledgerId == null || !ledgerId.isKnownNetwork()) ?
-            null :
-            readAddressBookResource("addressbook/" + ledgerId + ".pb");
+        return (ledgerId == null || !ledgerId.isKnownNetwork())
+                ? null
+                : readAddressBookResource("addressbook/" + ledgerId + ".pb");
     }
 
     static HashMap<String, AccountId> addressBookToNetwork(Collection<NodeAddress> addressBook, int desiredPort) {
@@ -224,7 +216,8 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
      * @return                          the list of address book records
      */
     static Map<AccountId, NodeAddress> readAddressBookResource(String fileName) {
-        try (var inputStream = Objects.requireNonNull(Network.class.getResource("/" + fileName)).openStream()) {
+        try (var inputStream = Objects.requireNonNull(Network.class.getResource("/" + fileName))
+                .openStream()) {
             var contents = ByteStreams.toByteArray(inputStream);
             var nodeAddressBook = NodeAddressBook.fromBytes(ByteString.copyFrom(contents));
             var map = new HashMap<AccountId, NodeAddress>();
@@ -258,8 +251,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
 
     @Override
     protected Node createNodeFromNetworkEntry(Map.Entry<String, AccountId> entry) {
-        return new Node(entry.getValue(), entry.getKey(), executor)
-            .setVerifyCertificates(verifyCertificates);
+        return new Node(entry.getValue(), entry.getKey(), executor).setVerifyCertificates(verifyCertificates);
     }
 
     /**
@@ -325,7 +317,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
             network.clear();
 
             for (int i = 0; i < nodes.size(); i++) {
-                @Var var node = nodes.get(i);
+                var node = nodes.get(i);
                 node.close(closeTimeout);
 
                 node = transportSecurity ? node.toSecure() : node.toInsecure();

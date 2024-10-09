@@ -1,7 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
+/*
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,24 +34,21 @@ import org.junit.jupiter.api.Test;
 public class TokenRejectTransactionTest {
 
     private static final PrivateKey TEST_PRIVATE_KEY = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
     private static final AccountId TEST_OWNER_ID = AccountId.fromString("0.6.9");
 
-    private static final List<TokenId> TEST_TOKEN_IDS = List.of(
-        TokenId.fromString("1.2.3"),
-        TokenId.fromString("4.5.6"),
-        TokenId.fromString("7.8.9"));
+    private static final List<TokenId> TEST_TOKEN_IDS =
+            List.of(TokenId.fromString("1.2.3"), TokenId.fromString("4.5.6"), TokenId.fromString("7.8.9"));
 
-    private static final List<NftId> TEST_NFT_IDS = List.of(
-        new NftId(TokenId.fromString("4.5.6"), 2),
-        new NftId(TokenId.fromString("7.8.9"), 3));
+    private static final List<NftId> TEST_NFT_IDS =
+            List.of(new NftId(TokenId.fromString("4.5.6"), 2), new NftId(TokenId.fromString("7.8.9"), 3));
 
     final Instant TEST_VALID_START = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -68,11 +62,15 @@ public class TokenRejectTransactionTest {
     }
 
     private TokenRejectTransaction spawnTestTransaction() {
-        return new TokenRejectTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
-            .setOwnerId(TEST_OWNER_ID).setTokenIds(TEST_TOKEN_IDS).setNftIds(TEST_NFT_IDS)
-            .setMaxTransactionFee(new Hbar(1)).freeze().sign(TEST_PRIVATE_KEY);
+        return new TokenRejectTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
+                .setOwnerId(TEST_OWNER_ID)
+                .setTokenIds(TEST_TOKEN_IDS)
+                .setNftIds(TEST_NFT_IDS)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(TEST_PRIVATE_KEY);
     }
 
     @Test
@@ -85,7 +83,8 @@ public class TokenRejectTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenReject(TokenRejectTransactionBody.newBuilder().build()).build();
+                .setTokenReject(TokenRejectTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -99,21 +98,25 @@ public class TokenRejectTransactionTest {
         transactionBodyBuilder.setOwner(TEST_OWNER_ID.toProtobuf());
 
         for (TokenId tokenId : TEST_TOKEN_IDS) {
-            transactionBodyBuilder.addRejections(TokenReference.newBuilder().setFungibleToken(tokenId.toProtobuf()).build());
+            transactionBodyBuilder.addRejections(TokenReference.newBuilder()
+                    .setFungibleToken(tokenId.toProtobuf())
+                    .build());
         }
 
         for (NftId nftId : TEST_NFT_IDS) {
-            transactionBodyBuilder.addRejections(TokenReference.newBuilder().setNft(nftId.toProtobuf()).build());
+            transactionBodyBuilder.addRejections(
+                    TokenReference.newBuilder().setNft(nftId.toProtobuf()).build());
         }
 
-        var tx = TransactionBody.newBuilder().setTokenReject(transactionBodyBuilder.build()).build();
+        var tx = TransactionBody.newBuilder()
+                .setTokenReject(transactionBodyBuilder.build())
+                .build();
         var tokenRejectTransaction = new TokenRejectTransaction(tx);
 
         assertThat(tokenRejectTransaction.getOwnerId()).isEqualTo(TEST_OWNER_ID);
         assertThat(tokenRejectTransaction.getTokenIds()).hasSize(TEST_TOKEN_IDS.size());
         assertThat(tokenRejectTransaction.getNftIds()).hasSize(TEST_NFT_IDS.size());
     }
-
 
     @Test
     void getSetOwnerId() {
