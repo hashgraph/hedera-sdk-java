@@ -40,6 +40,7 @@ class BaseNodeAddress {
     @Nullable
     private final String address;
     private final int port;
+    private final boolean secure;
 
     /**
      * Constructor.
@@ -49,9 +50,22 @@ class BaseNodeAddress {
      * @param port                      the port part
      */
     public BaseNodeAddress(@Nullable String name, @Nullable String address, int port) {
+        this(name, address, port, false);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param name                      the name part
+     * @param address                   the address part
+     * @param port                      the port part
+     * @param secure                    secure transport
+     */
+    public BaseNodeAddress(@Nullable String name, @Nullable String address, int port, boolean secure) {
         this.name = name;
         this.address = address;
         this.port = port;
+        this.secure = secure;
     }
 
     /**
@@ -118,7 +132,7 @@ class BaseNodeAddress {
      * @return                          are we secure
      */
     public boolean isTransportSecurity() {
-        return port == PORT_NODE_TLS || port == PORT_MIRROR_TLS;
+        return port == PORT_NODE_TLS || port == PORT_MIRROR_TLS || secure;
     }
 
     /**
@@ -128,7 +142,7 @@ class BaseNodeAddress {
      */
     public BaseNodeAddress toInsecure() {
         var newPort = (this.port == PORT_NODE_TLS) ? PORT_NODE_PLAIN : this.port;
-        return new BaseNodeAddress(name, address, newPort);
+        return new BaseNodeAddress(name, address, newPort, false);
     }
 
     /**
@@ -138,7 +152,7 @@ class BaseNodeAddress {
      */
     public BaseNodeAddress toSecure() {
         var newPort = (this.port == PORT_NODE_PLAIN) ? PORT_NODE_TLS : this.port;
-        return new BaseNodeAddress(name, address, newPort);
+        return new BaseNodeAddress(name, address, newPort, true);
     }
 
     @Override

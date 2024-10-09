@@ -22,10 +22,6 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.io.ByteStreams;
 import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
-
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +31,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 
 /**
  * Internal utility class.
@@ -83,9 +82,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
     static Network forMainnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.MAINNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+            Objects.requireNonNull(addressBook).values());
         return new Network(executor, network).setLedgerIdInternal(LedgerId.MAINNET, addressBook);
     }
 
@@ -98,9 +95,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
     static Network forTestnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.TESTNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+            Objects.requireNonNull(addressBook).values());
         return new Network(executor, network).setLedgerIdInternal(LedgerId.TESTNET, addressBook);
     }
 
@@ -113,9 +108,7 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
     static Network forPreviewnet(ExecutorService executor) {
         var addressBook = getAddressBookForLedger(LedgerId.PREVIEWNET);
         HashMap<String, AccountId> network = addressBookToNetwork(
-            Objects.requireNonNull(addressBook).values(),
-            BaseNodeAddress.PORT_NODE_PLAIN
-        );
+            Objects.requireNonNull(addressBook).values());
         return new Network(executor, network).setLedgerIdInternal(LedgerId.PREVIEWNET, addressBook);
     }
 
@@ -205,13 +198,11 @@ class Network extends BaseNetwork<Network, AccountId, Node> {
             readAddressBookResource("addressbook/" + ledgerId + ".pb");
     }
 
-    static HashMap<String, AccountId> addressBookToNetwork(Collection<NodeAddress> addressBook, int desiredPort) {
+    static HashMap<String, AccountId> addressBookToNetwork(Collection<NodeAddress> addressBook) {
         var network = new HashMap<String, AccountId>();
         for (var nodeAddress : addressBook) {
             for (var endpoint : nodeAddress.addresses) {
-                if (endpoint.port == desiredPort) {
                     network.put(endpoint.toString(), nodeAddress.accountId);
-                }
             }
         }
         return network;
