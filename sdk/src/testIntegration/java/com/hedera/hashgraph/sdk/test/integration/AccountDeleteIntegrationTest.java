@@ -40,30 +40,30 @@ class AccountDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete account")
     void canDeleteAccount() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(info.accountId).isEqualTo(accountId);
-        assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
-        assertThat(info.balance).isEqualTo(new Hbar(1));
-        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
-        assertThat(info.proxyAccountId).isNull();
-        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
+            assertThat(info.accountId).isEqualTo(accountId);
+            assertThat(info.isDeleted).isFalse();
+            assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+            assertThat(info.balance).isEqualTo(new Hbar(1));
+            assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+            assertThat(info.proxyAccountId).isNull();
+            assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
-        testEnv.close(accountId, key);
+        }
     }
 
     @Test
@@ -84,25 +84,25 @@ class AccountDeleteIntegrationTest {
     @Test
     @DisplayName("Cannot delete account that has not signed transaction")
     void cannotDeleteAccountThatHasNotSignedTransaction() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.operatorId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new AccountDeleteTransaction()
+                    .setAccountId(accountId)
+                    .setTransferAccountId(testEnv.operatorId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
-        testEnv.close(accountId, key);
+        }
     }
 }

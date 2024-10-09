@@ -232,31 +232,31 @@ class AccountBalanceIntegrationTest {
     @Test
     @DisplayName("Can fetch token balances for client operator")
     void canFetchTokenBalancesForClientOperator() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setInitialSupply(10000)
-            .setDecimals(50)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(10000)
+                .setDecimals(50)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var query = new AccountBalanceQuery();
-        var balance = query
-            .setAccountId(testEnv.operatorId)
-            .execute(testEnv.client);
+            var query = new AccountBalanceQuery();
+            var balance = query
+                .setAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
-        assertThat(balance.tokens.get(tokenId)).isEqualTo(10000);
-        assertThat(balance.tokenDecimals.get(tokenId)).isEqualTo(50);
-        assertThat(query.toString()).isNotEmpty();
-        assertThat(query.getPaymentTransactionId()).isNull();
+            assertThat(balance.tokens.get(tokenId)).isEqualTo(10000);
+            assertThat(balance.tokenDecimals.get(tokenId)).isEqualTo(50);
+            assertThat(query.toString()).isNotEmpty();
+            assertThat(query.getPaymentTransactionId()).isNull();
 
-        testEnv.close(tokenId);
+        }
     }
 }

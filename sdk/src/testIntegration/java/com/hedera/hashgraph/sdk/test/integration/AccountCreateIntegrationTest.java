@@ -34,58 +34,58 @@ class AccountCreateIntegrationTest {
     @Test
     @DisplayName("Can create account with only initial balance and key")
     void canCreateAccountWithOnlyInitialBalanceAndKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(info.accountId).isEqualTo(accountId);
-        assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
-        assertThat(info.balance).isEqualTo(new Hbar(1));
-        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
-        assertThat(info.proxyAccountId).isNull();
-        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
+            assertThat(info.accountId).isEqualTo(accountId);
+            assertThat(info.isDeleted).isFalse();
+            assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+            assertThat(info.balance).isEqualTo(new Hbar(1));
+            assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+            assertThat(info.proxyAccountId).isNull();
+            assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
-        testEnv.close(accountId, key);
+        }
     }
 
     @Test
     @DisplayName("Can create account with no initial balance")
     void canCreateAccountWithNoInitialBalance() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(info.accountId).isEqualTo(accountId);
-        assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
-        assertThat(info.balance).isEqualTo(new Hbar(0));
-        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
-        assertThat(info.proxyAccountId).isNull();
-        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
+            assertThat(info.accountId).isEqualTo(accountId);
+            assertThat(info.isDeleted).isFalse();
+            assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+            assertThat(info.balance).isEqualTo(new Hbar(0));
+            assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+            assertThat(info.proxyAccountId).isNull();
+            assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
-        testEnv.close(accountId, key);
+        }
     }
 
     @Test
@@ -104,56 +104,56 @@ class AccountCreateIntegrationTest {
     @Test
     @DisplayName("Can create account using aliasKey")
     void canCreateWithAliasKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var aliasId = key.toAccountId(0, 0);
+            var aliasId = key.toAccountId(0, 0);
 
-        new TransferTransaction()
-            .addHbarTransfer(testEnv.operatorId, new Hbar(10).negated())
-            .addHbarTransfer(aliasId, new Hbar(10))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TransferTransaction()
+                .addHbarTransfer(testEnv.operatorId, new Hbar(10).negated())
+                .addHbarTransfer(aliasId, new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(aliasId)
-            .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+                .setAccountId(aliasId)
+                .execute(testEnv.client);
 
-        assertThat(key.getPublicKey()).isEqualTo(info.aliasKey);
+            assertThat(key.getPublicKey()).isEqualTo(info.aliasKey);
 
-        testEnv.close(info.accountId, key);
+        }  
     }
 
     @Test
     @DisplayName("Regenerates TransactionIds in response to expiration")
     void managesExpiration() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .setTransactionId(new TransactionId(testEnv.operatorId, Instant.now().minusSeconds(40)))
-            .setTransactionValidDuration(Duration.ofSeconds(30))
-            .freezeWith(testEnv.client)
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setTransactionId(new TransactionId(testEnv.operatorId, Instant.now().minusSeconds(40)))
+                .setTransactionValidDuration(Duration.ofSeconds(30))
+                .freezeWith(testEnv.client)
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(info.accountId).isEqualTo(accountId);
-        assertThat(info.isDeleted).isFalse();
-        assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
-        assertThat(info.balance).isEqualTo(new Hbar(0));
-        assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
-        assertThat(info.proxyAccountId).isNull();
-        assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
+            assertThat(info.accountId).isEqualTo(accountId);
+            assertThat(info.isDeleted).isFalse();
+            assertThat(info.key.toString()).isEqualTo(key.getPublicKey().toString());
+            assertThat(info.balance).isEqualTo(new Hbar(0));
+            assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
+            assertThat(info.proxyAccountId).isNull();
+            assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
-        testEnv.close(accountId, key);
+        }
     }
 
     @Test

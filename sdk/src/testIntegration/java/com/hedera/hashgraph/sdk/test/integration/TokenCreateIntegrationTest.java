@@ -67,28 +67,28 @@ class TokenCreateIntegrationTest {
     @Test
     @DisplayName("Can create token with operator as all keys")
     void canCreateTokenWithOperatorAsAllKeys() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setDecimals(3)
-            .setInitialSupply(1000000)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFreezeKey(testEnv.operatorKey)
-            .setWipeKey(testEnv.operatorKey)
-            .setKycKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFeeScheduleKey(testEnv.operatorKey)
-            .setPauseKey(testEnv.operatorKey)
-            .setMetadataKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
+                .setPauseKey(testEnv.operatorKey)
+                .setMetadataKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            Objects.requireNonNull(response.getReceipt(testEnv.client));
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test
@@ -97,13 +97,12 @@ class TokenCreateIntegrationTest {
     void canCreateTokenWithMinimalPropertiesSet() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-            var tokenId = new TokenCreateTransaction()
+            new TokenCreateTransaction()
                 .setTokenName("ffff")
                 .setTokenSymbol("F")
                 .setTreasuryAccountId(testEnv.operatorId)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .tokenId;
+                .getReceipt(testEnv.client);
 
         }
     }
@@ -200,30 +199,30 @@ class TokenCreateIntegrationTest {
     @Test
     @DisplayName("Can create token with custom fees")
     void canCreateTokenWithCustomFees() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var customFees = new ArrayList<CustomFee>();
-        customFees.add(new CustomFixedFee()
-            .setAmount(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
-        customFees.add(new CustomFractionalFee()
-            .setNumerator(1)
-            .setDenominator(20)
-            .setMin(1)
-            .setMax(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setCustomFees(customFees)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client).tokenId;
-        testEnv.close(tokenId);
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setCustomFees(customFees)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+        }
     }
 
     @Test
@@ -248,37 +247,35 @@ class TokenCreateIntegrationTest {
     @Test
     @DisplayName("Can create custom fee list with 10 fixed fees")
     void canCreateTenFixedFees() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setCustomFees(createFixedFeeList(10, testEnv.operatorId))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setCustomFees(createFixedFeeList(10, testEnv.operatorId))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test
     @DisplayName("Can create custom fee list with 10 fractional fees")
     void canCreateTenFractionalFees() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var tokenId = new TokenCreateTransaction()
+        new TokenCreateTransaction()
             .setTokenName("ffff")
             .setTokenSymbol("F")
             .setAdminKey(testEnv.operatorKey)
             .setTreasuryAccountId(testEnv.operatorId)
             .setCustomFees(createFractionalFeeList(10, testEnv.operatorId))
             .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            .getReceipt(testEnv.client);
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test
@@ -373,47 +370,46 @@ class TokenCreateIntegrationTest {
     @Test
     @DisplayName("Can create NFT")
     void canCreateNfts() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFreezeKey(testEnv.operatorKey)
-            .setWipeKey(testEnv.operatorKey)
-            .setKycKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test
     @DisplayName("Can create NFT with royalty fee")
     void canCreateRoyaltyFee() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setSupplyKey(testEnv.operatorKey)
-            .setAdminKey(testEnv.operatorKey)
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setCustomFees(Collections.singletonList(new CustomRoyaltyFee()
-                .setNumerator(1)
-                .setDenominator(10)
-                .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
-                .setFeeCollectorAccountId(testEnv.operatorId)))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setSupplyKey(testEnv.operatorKey)
+                .setAdminKey(testEnv.operatorKey)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setCustomFees(Collections.singletonList(new CustomRoyaltyFee()
+                    .setNumerator(1)
+                    .setDenominator(10)
+                    .setFallbackFee(new CustomFixedFee().setHbarAmount(new Hbar(1)))
+                    .setFeeCollectorAccountId(testEnv.operatorId)))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close(tokenId);
+        }
     }
 }

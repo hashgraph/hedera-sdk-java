@@ -227,116 +227,116 @@ public class ScheduleCreateIntegrationTest {
     @Test
     @DisplayName("Can schedule token transfer")
     void canScheduleTokenTransfer() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        PrivateKey key = PrivateKey.generateED25519();
+            PrivateKey key = PrivateKey.generateED25519();
 
-        var accountId = new AccountCreateTransaction()
-            .setReceiverSignatureRequired(true)
-            .setKey(key)
-            .setInitialBalance(new Hbar(10))
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
+            var accountId = new AccountCreateTransaction()
+                .setReceiverSignatureRequired(true)
+                .setKey(key)
+                .setInitialBalance(new Hbar(10))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
 
-        Objects.requireNonNull(accountId);
+            Objects.requireNonNull(accountId);
 
-        var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setInitialSupply(100)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+            var tokenId = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(100)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
 
-        Objects.requireNonNull(tokenId);
+            Objects.requireNonNull(tokenId);
 
-        new TokenAssociateTransaction()
-            .setAccountId(accountId)
-            .setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TokenAssociateTransaction()
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        var scheduleId = new TransferTransaction()
-            .addTokenTransfer(tokenId, testEnv.operatorId, -10)
-            .addTokenTransfer(tokenId, accountId, 10)
-            .schedule()
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .scheduleId;
+            var scheduleId = new TransferTransaction()
+                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .schedule()
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
 
-        Objects.requireNonNull(scheduleId);
+            Objects.requireNonNull(scheduleId);
 
-        var balanceQuery1 = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var balanceQuery1 = new AccountBalanceQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(balanceQuery1.tokens.get(tokenId)).isEqualTo(0);
+            assertThat(balanceQuery1.tokens.get(tokenId)).isEqualTo(0);
 
-        new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        var balanceQuery2 = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+            var balanceQuery2 = new AccountBalanceQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
 
-        assertThat(balanceQuery2.tokens.get(tokenId)).isEqualTo(10);
+            assertThat(balanceQuery2.tokens.get(tokenId)).isEqualTo(10);
 
-        testEnv.close(tokenId, accountId, key);
+        }
     }
 
     @Test
     @DisplayName("Cannot schedule two identical transactions")
     void cannotScheduleTwoTransactions() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
-        var accountId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
-            .setKey(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
-
-        var transferTx = new TransferTransaction()
-            .addHbarTransfer(testEnv.operatorId, new Hbar(-10))
-            .addHbarTransfer(accountId, new Hbar(10));
-
-        var scheduleId1 = transferTx.schedule()
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .scheduleId;
-
-        var info1 = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId1)
-            .execute(testEnv.client);
-
-        assertThat(info1.executedAt).isNotNull();
-
-        var transferTxFromInfo = info1.getScheduledTransaction();
-
-        var scheduleCreateTx1 = transferTx.schedule();
-        var scheduleCreateTx2 = transferTxFromInfo.schedule();
-
-        assertThat(scheduleCreateTx2.toString()).isEqualTo(scheduleCreateTx1.toString());
-
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            transferTxFromInfo.schedule()
+            var key = PrivateKey.generateED25519();
+            var accountId = new AccountCreateTransaction()
+                .setInitialBalance(new Hbar(10))
+                .setKey(key)
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining("IDENTICAL_SCHEDULE_ALREADY_CREATED");
+                .getReceipt(testEnv.client)
+                .accountId;
 
-        testEnv.close(accountId, key);
+            var transferTx = new TransferTransaction()
+                .addHbarTransfer(testEnv.operatorId, new Hbar(-10))
+                .addHbarTransfer(accountId, new Hbar(10));
+
+            var scheduleId1 = transferTx.schedule()
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            var info1 = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId1)
+                .execute(testEnv.client);
+
+            assertThat(info1.executedAt).isNotNull();
+
+            var transferTxFromInfo = info1.getScheduledTransaction();
+
+            var scheduleCreateTx1 = transferTx.schedule();
+            var scheduleCreateTx2 = transferTxFromInfo.schedule();
+
+            assertThat(scheduleCreateTx2.toString()).isEqualTo(scheduleCreateTx1.toString());
+
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                transferTxFromInfo.schedule()
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining("IDENTICAL_SCHEDULE_ALREADY_CREATED");
+
+        }
     }
 
     @Test

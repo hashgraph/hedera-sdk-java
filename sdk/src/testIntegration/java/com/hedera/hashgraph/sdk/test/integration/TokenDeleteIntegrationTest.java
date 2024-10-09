@@ -65,18 +65,18 @@ class TokenDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete token with only admin key set")
     void canDeleteTokenWithOnlyAdminKeySet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test

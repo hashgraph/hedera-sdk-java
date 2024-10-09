@@ -45,57 +45,57 @@ class TokenTransferIntegrationTest {
     @Test
     @DisplayName("Can transfer tokens")
     void tokenTransferTest() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        @Var TransactionResponse response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+            @Var TransactionResponse response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
 
-        var accountId = response.getReceipt(testEnv.client).accountId;
-        assertThat(accountId).isNotNull();
+            var accountId = response.getReceipt(testEnv.client).accountId;
+            assertThat(accountId).isNotNull();
 
-        response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setDecimals(3)
-            .setInitialSupply(1000000)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFreezeKey(testEnv.operatorKey)
-            .setWipeKey(testEnv.operatorKey)
-            .setKycKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = response.getReceipt(testEnv.client).tokenId;
-        assertThat(tokenId).isNotNull();
+            var tokenId = response.getReceipt(testEnv.client).tokenId;
+            assertThat(tokenId).isNotNull();
 
-        new TokenAssociateTransaction()
-            .setAccountId(accountId)
-            .setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client)
-            .signWithOperator(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TokenAssociateTransaction()
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .signWithOperator(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new TokenGrantKycTransaction()
-            .setAccountId(accountId)
-            .setTokenId(tokenId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TokenGrantKycTransaction()
+                .setAccountId(accountId)
+                .setTokenId(tokenId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new TransferTransaction()
-            .addTokenTransfer(tokenId, testEnv.operatorId, -10)
-            .addTokenTransfer(tokenId, accountId, 10)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TransferTransaction()
+                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close(tokenId, accountId, key);
+        }
     }
 
     @Test
@@ -169,10 +169,6 @@ class TokenTransferIntegrationTest {
                     Status.INSUFFICIENT_SENDER_ACCOUNT_BALANCE_FOR_CUSTOM_FEE.toString(),
                     Status.INSUFFICIENT_PAYER_BALANCE_FOR_CUSTOM_FEE.toString()
                 ));
-
-            testEnv.wipeAccountHbars(accountId1, key1);
-            testEnv.wipeAccountHbars(accountId2, key2);
-
         }
     }
 }

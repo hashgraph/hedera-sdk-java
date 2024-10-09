@@ -150,15 +150,8 @@ public class IntegrationTestEnv implements AutoCloseable {
         Assumptions.assumeFalse(isLocalNode);
     }
 
-    public void close(
-        @Nullable TokenId newTokenId,
-        @Nullable AccountId newAccountId,
-        @Nullable PrivateKey newAccountKey
-    ) throws Exception {
-        if (newAccountId != null) {
-            wipeAccountHbars(newAccountId, newAccountKey);
-        }
-
+    @Override
+    public void close() throws Exception {
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
             var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
@@ -174,32 +167,6 @@ public class IntegrationTestEnv implements AutoCloseable {
         }
 
         originalClient.close();
-    }
-
-    public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        var hbarsBalance = new AccountBalanceQuery()
-            .setAccountId(newAccountId)
-            .execute(originalClient)
-            .hbars;
-        new TransferTransaction()
-            .addHbarTransfer(newAccountId, hbarsBalance.negated())
-            .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
-            .freezeWith(originalClient)
-            .sign(Objects.requireNonNull(newAccountKey))
-            .execute(originalClient);
-    }
-
-    @Override
-    public void close() throws Exception {
-        close(null, null, null);
-    }
-
-    public void close(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        close(null, newAccountId, newAccountKey);
-    }
-
-    public void close(TokenId newTokenId) throws Exception {
-        close(newTokenId, null, null);
     }
 
     private static class TestEnvNodeGetter {

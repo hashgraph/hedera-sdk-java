@@ -67,33 +67,33 @@ public class TransactionIntegrationTest {
     @Test
     @DisplayName("transaction hash in transaction record is equal to the derived transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheDerivedTransactionHash() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
 
-        var key = PrivateKey.generateED25519();
+        try (var testEnv = new IntegrationTestEnv(1)) {
+            var key = PrivateKey.generateED25519();
 
-        var transaction = new AccountCreateTransaction()
-            .setKey(key)
-            .freezeWith(testEnv.client)
-            .signWithOperator(testEnv.client);
+            var transaction = new AccountCreateTransaction()
+                .setKey(key)
+                .freezeWith(testEnv.client)
+                .signWithOperator(testEnv.client);
 
-        var expectedHash = transaction.getTransactionHashPerNode();
+            var expectedHash = transaction.getTransactionHashPerNode();
 
-        var response = transaction.execute(testEnv.client);
+            var response = transaction.execute(testEnv.client);
 
-        var record = response.getRecord(testEnv.client);
+            var record = response.getRecord(testEnv.client);
 
-        assertThat(expectedHash.get(response.nodeId)).containsExactly(record.transactionHash.toByteArray());
+            assertThat(expectedHash.get(response.nodeId)).containsExactly(record.transactionHash.toByteArray());
 
-        var accountId = record.receipt.accountId;
-        assertThat(accountId).isNotNull();
+            var accountId = record.receipt.accountId;
+            assertThat(accountId).isNotNull();
 
-        var transactionId = transaction.getTransactionId();
-        assertThat(transactionId.getReceipt(testEnv.client)).isNotNull();
-        assertThat(transactionId.getReceiptAsync(testEnv.client).get()).isNotNull();
-        assertThat(transactionId.getRecord(testEnv.client)).isNotNull();
-        assertThat(transactionId.getRecordAsync(testEnv.client).get()).isNotNull();
+            var transactionId = transaction.getTransactionId();
+            assertThat(transactionId.getReceipt(testEnv.client)).isNotNull();
+            assertThat(transactionId.getReceiptAsync(testEnv.client).get()).isNotNull();
+            assertThat(transactionId.getRecord(testEnv.client)).isNotNull();
+            assertThat(transactionId.getRecordAsync(testEnv.client).get()).isNotNull();
+        }
 
-        testEnv.close(accountId, key);
     }
 
     /**
@@ -109,19 +109,20 @@ public class TransactionIntegrationTest {
             var publicKey = adminKey.getPublicKey();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setKey(publicKey)
-                .setInitialBalance(new Hbar(1L));
+                    .setKey(publicKey)
+                    .setInitialBalance(new Hbar(1L));
 
             var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             assertThat(expectedNodeAccountIds).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds());
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-                accountCreateTransactionDeserialized::getTransactionId);
+                    accountCreateTransactionDeserialized::getTransactionId);
 
         }
     }
@@ -141,20 +142,22 @@ public class TransactionIntegrationTest {
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setKey(publicKey)
-                .setInitialBalance(new Hbar(1L));
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setKey(publicKey)
+                    .setInitialBalance(new Hbar(1L));
 
             var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
-            assertThat(expectedNodeAccountIds.size()).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds().size());
+            assertThat(expectedNodeAccountIds.size())
+                    .isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds().size());
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
             assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-                accountCreateTransactionDeserialized::getTransactionId);
+                    accountCreateTransactionDeserialized::getTransactionId);
 
         }
     }
@@ -172,23 +175,24 @@ public class TransactionIntegrationTest {
             var publicKey = adminKey.getPublicKey();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setKey(publicKey)
-                .setInitialBalance(new Hbar(1L));
+                    .setKey(publicKey)
+                    .setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
-                transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(
+                            transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             new AccountDeleteTransaction()
-                .setAccountId(txReceipt.accountId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client);
+                    .setAccountId(txReceipt.accountId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client);
 
         }
     }
@@ -208,24 +212,25 @@ public class TransactionIntegrationTest {
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setKey(publicKey)
-                .setInitialBalance(new Hbar(1L));
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setKey(publicKey)
+                    .setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(
                             transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             new AccountDeleteTransaction()
-                .setAccountId(txReceipt.accountId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client);
+                    .setAccountId(txReceipt.accountId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client);
 
         }
     }
@@ -243,29 +248,30 @@ public class TransactionIntegrationTest {
             var publicKey = adminKey.getPublicKey();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setKey(publicKey);
+                    .setKey(publicKey);
 
             var expectedBalance = new Hbar(1L);
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
-                .setInitialBalance(new Hbar(1L))
-                .setNodeAccountIds(nodeAccountIds)
-                .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setInitialBalance(new Hbar(1L))
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
 
             new AccountDeleteTransaction()
-                .setAccountId(txReceipt.accountId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client);
+                    .setAccountId(txReceipt.accountId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client);
 
         }
     }
@@ -285,28 +291,29 @@ public class TransactionIntegrationTest {
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setKey(publicKey);
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setKey(publicKey);
 
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
-                .setInitialBalance(new Hbar(1L))
-                .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setInitialBalance(new Hbar(1L))
+                    .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
 
             new AccountDeleteTransaction()
-                .setAccountId(txReceipt.accountId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client);
+                    .setAccountId(txReceipt.accountId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client);
 
         }
     }
@@ -330,35 +337,37 @@ public class TransactionIntegrationTest {
             var maxAutomaticTokenAssociations = 4;
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                .setKey(publicKey)
-                .setInitialBalance(initialBalance)
-                .setReceiverSignatureRequired(true)
-                .setAutoRenewPeriod(autoRenewPeriod)
-                .setAccountMemo(memo)
-                .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-                .setDeclineStakingReward(true)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .sign(adminKey);
+                    .setKey(publicKey)
+                    .setInitialBalance(initialBalance)
+                    .setReceiverSignatureRequired(true)
+                    .setAutoRenewPeriod(autoRenewPeriod)
+                    .setAccountMemo(memo)
+                    .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+                    .setDeclineStakingReward(true)
+                    .setAlias(evmAddress)
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = accountCreateTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
 
-            AccountCreateTransaction accountCreateTransactionReserialized = (AccountCreateTransaction) Transaction.fromBytes(transactionBytesReserialized);
+            AccountCreateTransaction accountCreateTransactionReserialized = (AccountCreateTransaction) Transaction
+                    .fromBytes(transactionBytesReserialized);
 
             var txResponse = accountCreateTransactionReserialized.execute(testEnv.client);
 
             var accountId = txResponse.getReceipt(testEnv.client).accountId;
 
             new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client);
+                    .setAccountId(accountId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client);
 
         }
     }
@@ -371,13 +380,14 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var transaction = new AccountCreateTransaction()
-                .setKey(key)
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client);
+                    .setKey(key)
+                    .freezeWith(testEnv.client)
+                    .signWithOperator(testEnv.client);
 
             var expectedHash = transaction.getTransactionHashPerNode();
 
-            @Var var response = transaction.execute(testEnv.client);
+            @Var
+            var response = transaction.execute(testEnv.client);
 
             var record = response.getRecord(testEnv.client);
 
@@ -387,9 +397,9 @@ public class TransactionIntegrationTest {
             assertThat(accountId).isNotNull();
 
             var deleteTransaction = new AccountDeleteTransaction()
-                .setAccountId(accountId)
-                .setTransferAccountId(testEnv.operatorId)
-                .freezeWith(testEnv.client);
+                    .setAccountId(accountId)
+                    .setTransferAccountId(testEnv.operatorId)
+                    .freezeWith(testEnv.client);
 
             var updateBytes = deleteTransaction.toBytes();
 
@@ -398,8 +408,8 @@ public class TransactionIntegrationTest {
             var deleteTransaction2 = Transaction.fromBytes(updateBytes);
 
             deleteTransaction2
-                .addSignature(key.getPublicKey(), sig1)
-                .execute(testEnv.client);
+                    .addSignature(key.getPublicKey(), sig1)
+                    .execute(testEnv.client);
 
         }
     }
@@ -416,17 +426,18 @@ public class TransactionIntegrationTest {
             var privateKey = PrivateKey.generateED25519();
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             Thread.sleep(5000);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            @Var
+            var info = new FileInfoQuery()
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -436,13 +447,14 @@ public class TransactionIntegrationTest {
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
             var fileAppendTransaction = new FileAppendTransaction()
-                .setFileId(fileId)
-                .setContents(Contents.BIG_CONTENTS)
-                .freezeWith(testEnv.client)
-                .sign(privateKey);
+                    .setFileId(fileId)
+                    .setContents(Contents.BIG_CONTENTS)
+                    .freezeWith(testEnv.client)
+                    .sign(privateKey);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
@@ -460,17 +472,18 @@ public class TransactionIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             Thread.sleep(5000);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            @Var
+            var info = new FileInfoQuery()
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -480,25 +493,26 @@ public class TransactionIntegrationTest {
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
             var fileAppendTransaction = new FileAppendTransaction()
-                .setFileId(fileId)
-                .setContents(Contents.BIG_CONTENTS);
+                    .setFileId(fileId)
+                    .setContents(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             fileAppendTransactionDeserialized
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
             info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(13522);
@@ -508,9 +522,9 @@ public class TransactionIntegrationTest {
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
         }
     }
@@ -527,17 +541,18 @@ public class TransactionIntegrationTest {
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
             Thread.sleep(5000);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            @Var
+            var info = new FileInfoQuery()
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -547,27 +562,28 @@ public class TransactionIntegrationTest {
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
             var fileAppendTransaction = new FileAppendTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setFileId(fileId)
-                .setContents(Contents.BIG_CONTENTS);
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setFileId(fileId)
+                    .setContents(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             fileAppendTransactionDeserialized
-                .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
             info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(13522);
@@ -577,9 +593,9 @@ public class TransactionIntegrationTest {
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
         }
     }
@@ -596,17 +612,18 @@ public class TransactionIntegrationTest {
             var privateKey = PrivateKey.generateED25519();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             Thread.sleep(5000);
 
-            @Var var info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+            @Var
+            var info = new TopicInfoQuery()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -614,22 +631,23 @@ public class TransactionIntegrationTest {
             assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
-                .setMaxChunks(15)
-                .setMessage(Contents.BIG_CONTENTS)
-                .freezeWith(testEnv.client)
-                .sign(privateKey);
+                    .setTopicId(topicId)
+                    .setMaxChunks(15)
+                    .setMessage(Contents.BIG_CONTENTS)
+                    .freezeWith(testEnv.client)
+                    .sign(privateKey);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction fileAppendTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction fileAppendTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
         }
     }
@@ -644,17 +662,18 @@ public class TransactionIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             Thread.sleep(5000);
 
-            @Var var info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+            @Var
+            var info = new TopicInfoQuery()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -662,12 +681,13 @@ public class TransactionIntegrationTest {
             assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
-                .setMaxChunks(15)
-                .setMessage(Contents.BIG_CONTENTS);
+                    .setTopicId(topicId)
+                    .setMaxChunks(15)
+                    .setMessage(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
 
@@ -676,8 +696,8 @@ public class TransactionIntegrationTest {
             }
 
             info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -685,9 +705,9 @@ public class TransactionIntegrationTest {
             assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
         }
     }
@@ -705,17 +725,18 @@ public class TransactionIntegrationTest {
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
             Thread.sleep(5000);
 
-            @Var var info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+            @Var
+            var info = new TopicInfoQuery()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -723,13 +744,14 @@ public class TransactionIntegrationTest {
             assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
-                .setNodeAccountIds(nodeAccountIds)
-                .setTopicId(topicId)
-                .setMaxChunks(15)
-                .setMessage(Contents.BIG_CONTENTS);
+                    .setNodeAccountIds(nodeAccountIds)
+                    .setTopicId(topicId)
+                    .setMaxChunks(15)
+                    .setMessage(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
+                    .fromBytes(transactionBytesSerialized);
 
             var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
 
@@ -738,8 +760,8 @@ public class TransactionIntegrationTest {
             }
 
             info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -747,15 +769,16 @@ public class TransactionIntegrationTest {
             assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
         }
     }
 
-    // TODO: this test has a bunch of things hard-coded into it, which is kinda dumb, but it's a good idea for a test.
-    //       Any way to fix it and bring it back?
+    // TODO: this test has a bunch of things hard-coded into it, which is kinda
+    // dumb, but it's a good idea for a test.
+    // Any way to fix it and bring it back?
     @Disabled
     @Test
     @DisplayName("transaction can be serialized into bytes, deserialized, signature added and executed")
@@ -765,58 +788,62 @@ public class TransactionIntegrationTest {
 
             var transactionBodyBuilder = TransactionBody.newBuilder();
             transactionBodyBuilder
-                .setTransactionID(TransactionID.newBuilder()
-                    .setTransactionValidStart(Timestamp.newBuilder()
-                        .setNanos(id.validStart.getNano())
-                        .setSeconds(id.validStart.getEpochSecond())
-                        .build())
-                    .setAccountID(AccountID.newBuilder()
-                        .setAccountNum(542348)
-                        .setRealmNum(0)
-                        .setShardNum(0)
-                        .build())
-                    .build())
-                .setNodeAccountID(AccountID.newBuilder()
-                    .setAccountNum(3)
-                    .setRealmNum(0)
-                    .setShardNum(0)
-                    .build())
-                .setTransactionFee(200_000_000)
-                .setTransactionValidDuration(
-                    Duration.newBuilder()
-                        .setSeconds(120)
-                        .build()
-                )
-                .setGenerateRecord(false)
-                .setMemo("")
-                .setCryptoTransfer(
-                    CryptoTransferTransactionBody.newBuilder()
-                        .setTransfers(TransferList.newBuilder()
-                            .addAccountAmounts(AccountAmount.newBuilder()
-                                    .setAccountID(AccountID.newBuilder()
-                                        .setAccountNum(47439)
-                                        .setRealmNum(0)
-                                        .setShardNum(0)
-                                        .build())
-                                    .setAmount(10)
+                    .setTransactionID(TransactionID.newBuilder()
+                            .setTransactionValidStart(Timestamp.newBuilder()
+                                    .setNanos(id.validStart.getNano())
+                                    .setSeconds(id.validStart.getEpochSecond())
                                     .build())
-                                .addAccountAmounts(AccountAmount.newBuilder()
-                                    .setAccountID(AccountID.newBuilder()
-                                        .setAccountNum(542348)
-                                        .setRealmNum(0)
-                                        .setShardNum(0)
-                                        .build())
-                                    .setAmount(-10)
+                            .setAccountID(AccountID.newBuilder()
+                                    .setAccountNum(542348)
+                                    .setRealmNum(0)
+                                    .setShardNum(0)
                                     .build())
-                                .build())
-                        .build());
+                            .build())
+                    .setNodeAccountID(AccountID.newBuilder()
+                            .setAccountNum(3)
+                            .setRealmNum(0)
+                            .setShardNum(0)
+                            .build())
+                    .setTransactionFee(200_000_000)
+                    .setTransactionValidDuration(
+                            Duration.newBuilder()
+                                    .setSeconds(120)
+                                    .build())
+                    .setGenerateRecord(false)
+                    .setMemo("")
+                    .setCryptoTransfer(
+                            CryptoTransferTransactionBody.newBuilder()
+                                    .setTransfers(TransferList.newBuilder()
+                                            .addAccountAmounts(AccountAmount.newBuilder()
+                                                    .setAccountID(AccountID.newBuilder()
+                                                            .setAccountNum(47439)
+                                                            .setRealmNum(0)
+                                                            .setShardNum(0)
+                                                            .build())
+                                                    .setAmount(10)
+                                                    .build())
+                                            .addAccountAmounts(AccountAmount.newBuilder()
+                                                    .setAccountID(AccountID.newBuilder()
+                                                            .setAccountNum(542348)
+                                                            .setRealmNum(0)
+                                                            .setShardNum(0)
+                                                            .build())
+                                                    .setAmount(-10)
+                                                    .build())
+                                            .build())
+                                    .build());
             var bodyBytes = transactionBodyBuilder.build().toByteString();
 
-            var key1 = PrivateKey.fromString("302e020100300506032b6570042204203e7fda6dde63c3cdb3cb5ecf5264324c5faad7c9847b6db093c088838b35a110");
-            var key2 = PrivateKey.fromString("302e020100300506032b65700422042032d3d5a32e9d06776976b39c09a31fbda4a4a0208223da761c26a2ae560c1755");
-            var key3 = PrivateKey.fromString("302e020100300506032b657004220420195a919056d1d698f632c228dbf248bbbc3955adf8a80347032076832b8299f9");
-            var key4 = PrivateKey.fromString("302e020100300506032b657004220420b9962f17f94ffce73a23649718a11638cac4b47095a7a6520e88c7563865be62");
-            var key5 = PrivateKey.fromString("302e020100300506032b657004220420fef68591819080cd9d48b0cbaa10f65f919752abb50ffb3e7411ac66ab22692e");
+            var key1 = PrivateKey.fromString(
+                    "302e020100300506032b6570042204203e7fda6dde63c3cdb3cb5ecf5264324c5faad7c9847b6db093c088838b35a110");
+            var key2 = PrivateKey.fromString(
+                    "302e020100300506032b65700422042032d3d5a32e9d06776976b39c09a31fbda4a4a0208223da761c26a2ae560c1755");
+            var key3 = PrivateKey.fromString(
+                    "302e020100300506032b657004220420195a919056d1d698f632c228dbf248bbbc3955adf8a80347032076832b8299f9");
+            var key4 = PrivateKey.fromString(
+                    "302e020100300506032b657004220420b9962f17f94ffce73a23649718a11638cac4b47095a7a6520e88c7563865be62");
+            var key5 = PrivateKey.fromString(
+                    "302e020100300506032b657004220420fef68591819080cd9d48b0cbaa10f65f919752abb50ffb3e7411ac66ab22692e");
 
             var publicKey1 = key1.getPublicKey();
             var publicKey2 = key2.getPublicKey();
@@ -834,33 +861,34 @@ public class TransactionIntegrationTest {
             signedBuilder
                     .setBodyBytes(bodyBytes)
                     .setSigMap(SignatureMap.newBuilder()
-                        .addSigPair(SignaturePair.newBuilder()
-                            .setEd25519(ByteString.copyFrom(signature1))
-                            .setPubKeyPrefix(ByteString.copyFrom(publicKey1.toBytes()))
-                            .build())
-                        .addSigPair(SignaturePair.newBuilder()
-                            .setEd25519(ByteString.copyFrom(signature2))
-                            .setPubKeyPrefix(ByteString.copyFrom(publicKey2.toBytes()))
-                            .build())
-                        .addSigPair(SignaturePair.newBuilder()
-                            .setEd25519(ByteString.copyFrom(signature3))
-                            .setPubKeyPrefix(ByteString.copyFrom(publicKey3.toBytes()))
-                            .build())
-                        .addSigPair(SignaturePair.newBuilder()
-                            .setEd25519(ByteString.copyFrom(signature4))
-                            .setPubKeyPrefix(ByteString.copyFrom(publicKey4.toBytes()))
-                            .build())
-                        .addSigPair(SignaturePair.newBuilder()
-                            .setEd25519(ByteString.copyFrom(signature5))
-                            .setPubKeyPrefix(ByteString.copyFrom(publicKey5.toBytes()))
-                            .build()));
-            @Var var byts = signedBuilder.build().toByteString();
+                            .addSigPair(SignaturePair.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature1))
+                                    .setPubKeyPrefix(ByteString.copyFrom(publicKey1.toBytes()))
+                                    .build())
+                            .addSigPair(SignaturePair.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature2))
+                                    .setPubKeyPrefix(ByteString.copyFrom(publicKey2.toBytes()))
+                                    .build())
+                            .addSigPair(SignaturePair.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature3))
+                                    .setPubKeyPrefix(ByteString.copyFrom(publicKey3.toBytes()))
+                                    .build())
+                            .addSigPair(SignaturePair.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature4))
+                                    .setPubKeyPrefix(ByteString.copyFrom(publicKey4.toBytes()))
+                                    .build())
+                            .addSigPair(SignaturePair.newBuilder()
+                                    .setEd25519(ByteString.copyFrom(signature5))
+                                    .setPubKeyPrefix(ByteString.copyFrom(publicKey5.toBytes()))
+                                    .build()));
+            @Var
+            var byts = signedBuilder.build().toByteString();
 
             byts = TransactionList.newBuilder()
-                .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
-                    .setSignedTransactionBytes(byts)
-                    .build())
-                .build().toByteString();
+                    .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                            .setSignedTransactionBytes(byts)
+                            .build())
+                    .build().toByteString();
 
             var tx = (TransferTransaction) Transaction.fromBytes(byts.toByteArray());
 
@@ -874,11 +902,16 @@ public class TransactionIntegrationTest {
                 assertThat(tx.getNodeAccountIds().get(0)).isEqualTo(new AccountId(3));
 
                 var signatures = tx.getSignatures();
-                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey1))).isEqualTo(Arrays.toString(signature1));
-                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey2))).isEqualTo(Arrays.toString(signature2));
-                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey3))).isEqualTo(Arrays.toString(signature3));
-                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey4))).isEqualTo(Arrays.toString(signature4));
-                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey5))).isEqualTo(Arrays.toString(signature5));
+                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey1)))
+                        .isEqualTo(Arrays.toString(signature1));
+                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey2)))
+                        .isEqualTo(Arrays.toString(signature2));
+                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey3)))
+                        .isEqualTo(Arrays.toString(signature3));
+                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey4)))
+                        .isEqualTo(Arrays.toString(signature4));
+                assertThat(Arrays.toString(signatures.get(new AccountId(3)).get(publicKey5)))
+                        .isEqualTo(Arrays.toString(signature5));
 
                 var resp = tx.execute(testEnv.client);
 
