@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -27,12 +24,11 @@ import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-import org.bouncycastle.util.Arrays;
 import java.time.Duration;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.Arrays;
 
 /**
  * Start a new smart contract instance.
@@ -82,6 +78,7 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     private FileId bytecodeFileId = null;
+
     @Nullable
     private byte[] bytecode = null;
 
@@ -94,11 +91,14 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     @Nullable
     private Key adminKey = null;
+
     private long gas = 0;
     private Hbar initialBalance = new Hbar(0);
     private int maxAutomaticTokenAssociations = 0;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     private byte[] constructorParameters = {};
     private String contractMemo = "";
 
@@ -128,7 +128,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ContractCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ContractCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -191,7 +193,6 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
      * @param bytecode The bytecode
      * @return {@code this}
      */
-
     public ContractCreateTransaction setBytecode(byte[] bytecode) {
         Objects.requireNonNull(bytecode);
         requireNotFrozen();

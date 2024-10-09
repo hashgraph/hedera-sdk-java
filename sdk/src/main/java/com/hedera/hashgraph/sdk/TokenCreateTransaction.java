@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -29,13 +26,12 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 
 /**
  * Create a new fungible or non-fungible token (NFT) on the Hedera network.
@@ -209,7 +205,9 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    TokenCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    TokenCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -486,7 +484,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     /**
      * Assign the pause key.
      *
-      * @param key                      the pause key
+     * @param key                      the pause key
      * @return {@code this}
      */
     public TokenCreateTransaction setPauseKey(Key key) {
@@ -688,7 +686,7 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
     /**
      * Assign the supply type.
      *
-      * @param supplyType               the supply type
+     * @param supplyType               the supply type
      * @return {@code this}
      */
     public TokenCreateTransaction setSupplyType(TokenSupplyType supplyType) {
@@ -742,12 +740,10 @@ public class TokenCreateTransaction extends Transaction<TokenCreateTransaction> 
 
     @Override
     public TokenCreateTransaction freezeWith(@Nullable Client client) {
-        if (
-            autoRenewPeriod != null &&
-                autoRenewAccountId == null &&
-                client != null &&
-                client.getOperatorAccountId() != null
-        ) {
+        if (autoRenewPeriod != null
+                && autoRenewAccountId == null
+                && client != null
+                && client.getOperatorAccountId() != null) {
             autoRenewAccountId = client.getOperatorAccountId();
         }
 

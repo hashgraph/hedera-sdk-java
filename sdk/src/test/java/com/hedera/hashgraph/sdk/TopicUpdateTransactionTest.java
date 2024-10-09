@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.protobuf.StringValue;
 import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
@@ -26,26 +26,22 @@ import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class TopicUpdateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final PublicKey testAdminKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
+            .getPublicKey();
     private static final PublicKey testSubmitKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
+            .getPublicKey();
     private static final TopicId testTopicId = TopicId.fromString("0.0.5007");
     private static final String testTopicMemo = "test memo";
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
@@ -65,11 +61,19 @@ public class TopicUpdateTransactionTest {
 
     @Test
     void clearShouldSerialize() {
-        SnapshotMatcher.expect(new TopicUpdateTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(testTopicId).clearAdminKey().clearAutoRenewAccountId().clearSubmitKey().clearTopicMemo()
-            .freeze().sign(unusedPrivateKey).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(new TopicUpdateTransaction()
+                        .setNodeAccountIds(
+                                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                        .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                        .setTopicId(testTopicId)
+                        .clearAdminKey()
+                        .clearAutoRenewAccountId()
+                        .clearSubmitKey()
+                        .clearTopicMemo()
+                        .freeze()
+                        .sign(unusedPrivateKey)
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
@@ -78,12 +82,18 @@ public class TopicUpdateTransactionTest {
     }
 
     private TopicUpdateTransaction spawnTestTransaction() {
-        return new TopicUpdateTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(testTopicId).setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
-            .setAutoRenewPeriod(testAutoRenewPeriod).setSubmitKey(testSubmitKey).setTopicMemo(testTopicMemo)
-            .setExpirationTime(validStart).freeze().sign(unusedPrivateKey);
+        return new TopicUpdateTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTopicId(testTopicId)
+                .setAdminKey(testAdminKey)
+                .setAutoRenewAccountId(testAutoRenewAccountId)
+                .setAutoRenewPeriod(testAutoRenewPeriod)
+                .setSubmitKey(testSubmitKey)
+                .setTopicMemo(testTopicMemo)
+                .setExpirationTime(validStart)
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -96,7 +106,9 @@ public class TopicUpdateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setConsensusUpdateTopic(ConsensusUpdateTopicTransactionBody.newBuilder().build()).build();
+                .setConsensusUpdateTopic(
+                        ConsensusUpdateTopicTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -105,20 +117,29 @@ public class TopicUpdateTransactionTest {
 
     @Test
     void constructTopicUpdateTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = ConsensusUpdateTopicTransactionBody.newBuilder().setTopicID(testTopicId.toProtobuf())
-            .setMemo(StringValue.newBuilder().setValue(testTopicMemo).build())
-            .setExpirationTime(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
-            .setAdminKey(testAdminKey.toProtobufKey()).setSubmitKey(testSubmitKey.toProtobufKey()).setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
-                    .build()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf()).build();
+        var transactionBody = ConsensusUpdateTopicTransactionBody.newBuilder()
+                .setTopicID(testTopicId.toProtobuf())
+                .setMemo(StringValue.newBuilder().setValue(testTopicMemo).build())
+                .setExpirationTime(Timestamp.newBuilder()
+                        .setSeconds(testExpirationTime.getEpochSecond())
+                        .build())
+                .setAdminKey(testAdminKey.toProtobufKey())
+                .setSubmitKey(testSubmitKey.toProtobufKey())
+                .setAutoRenewPeriod(com.hedera.hashgraph.sdk.proto.Duration.newBuilder()
+                        .setSeconds(testAutoRenewPeriod.toSeconds())
+                        .build())
+                .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
+                .build();
 
-        var tx = TransactionBody.newBuilder().setConsensusUpdateTopic(transactionBody).build();
+        var tx = TransactionBody.newBuilder()
+                .setConsensusUpdateTopic(transactionBody)
+                .build();
         var topicUpdateTransaction = new TopicUpdateTransaction(tx);
 
         assertThat(topicUpdateTransaction.getTopicId()).isEqualTo(testTopicId);
         assertThat(topicUpdateTransaction.getTopicMemo()).isEqualTo(testTopicMemo);
-        assertThat(topicUpdateTransaction.getExpirationTime().getEpochSecond()).isEqualTo(
-            testExpirationTime.getEpochSecond());
+        assertThat(topicUpdateTransaction.getExpirationTime().getEpochSecond())
+                .isEqualTo(testExpirationTime.getEpochSecond());
         assertThat(topicUpdateTransaction.getAdminKey()).isEqualTo(testAdminKey);
         assertThat(topicUpdateTransaction.getSubmitKey()).isEqualTo(testSubmitKey);
         assertThat(topicUpdateTransaction.getAutoRenewPeriod().toSeconds()).isEqualTo(testAutoRenewPeriod.toSeconds());

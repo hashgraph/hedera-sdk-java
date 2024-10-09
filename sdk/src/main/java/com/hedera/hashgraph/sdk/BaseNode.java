@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import io.grpc.ChannelCredentials;
@@ -26,7 +23,6 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.TlsChannelCredentials;
 import io.grpc.inprocess.InProcessChannelBuilder;
-
 import java.lang.module.ModuleDescriptor;
 import java.time.Duration;
 import java.time.Instant;
@@ -281,12 +277,12 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         }
 
         channel = channelBuilder
-            .keepAliveTimeout(10, TimeUnit.SECONDS)
-            .keepAliveWithoutCalls(true)
-            .disableRetry()
-            .userAgent(getUserAgent())
-            .executor(executor)
-            .build();
+                .keepAliveTimeout(10, TimeUnit.SECONDS)
+                .keepAliveWithoutCalls(true)
+                .disableRetry()
+                .userAgent(getUserAgent())
+                .executor(executor)
+                .build();
 
         return channel;
     }
@@ -319,7 +315,6 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         }
         return !hasConnected;
     }
-
 
     private CompletableFuture<Boolean> channelFailedToConnectAsync(int i, ConnectivityState state) {
         hasConnected = (state == ConnectivityState.READY);
@@ -368,12 +363,14 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         String implementationVersion;
         if (theModule.getName() == null) {
             // running on classpath
-            implementationVersion =
-                thePackage != null ? thePackage.getImplementationVersion() : null;
+            implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
         } else {
             // running on module path
-            implementationVersion =
-                theModule.getDescriptor().version().map(ModuleDescriptor.Version::toString).orElse(null);
+            implementationVersion = theModule
+                    .getDescriptor()
+                    .version()
+                    .map(ModuleDescriptor.Version::toString)
+                    .orElse(null);
         }
         return "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
     }

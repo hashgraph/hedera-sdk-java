@@ -1,23 +1,38 @@
+/*
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
+import java.util.Arrays;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 public class TopicMessageSubmitTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final TopicId testTopicId = new TopicId(0, 6, 9);
     private static final byte[] testMessageBytes = {0x04, 0x05, 0x06};
     private static final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -33,36 +48,47 @@ public class TopicMessageSubmitTransactionTest {
     }
 
     private TopicMessageSubmitTransaction spawnTestTransactionString() {
-        return new TopicMessageSubmitTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(testTopicId).setMessage(new String(testMessageBytes)).freeze().sign(unusedPrivateKey);
+        return new TopicMessageSubmitTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTopicId(testTopicId)
+                .setMessage(new String(testMessageBytes))
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     private TopicMessageSubmitTransaction spawnTestTransactionBytes() {
-        return new TopicMessageSubmitTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTopicId(testTopicId).setMessage(testMessageBytes).freeze().sign(unusedPrivateKey);
+        return new TopicMessageSubmitTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTopicId(testTopicId)
+                .setMessage(testMessageBytes)
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setConsensusSubmitMessage(ConsensusSubmitMessageTransactionBody.newBuilder().build()).build();
+                .setConsensusSubmitMessage(
+                        ConsensusSubmitMessageTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(TopicMessageSubmitTransaction.class);
     }
 
-
     @Test
     void constructTopicMessageSubmitTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = ConsensusSubmitMessageTransactionBody.newBuilder().setTopicID(testTopicId.toProtobuf())
-            .setMessage(ByteString.copyFrom(testMessageBytes)).build();
+        var transactionBody = ConsensusSubmitMessageTransactionBody.newBuilder()
+                .setTopicID(testTopicId.toProtobuf())
+                .setMessage(ByteString.copyFrom(testMessageBytes))
+                .build();
 
-        var tx = TransactionBody.newBuilder().setConsensusSubmitMessage(transactionBody).build();
+        var tx = TransactionBody.newBuilder()
+                .setConsensusSubmitMessage(transactionBody)
+                .build();
 
         var topicSubmitMessageTransaction = new TopicMessageSubmitTransaction(tx);
         assertThat(topicSubmitMessageTransaction.getTopicId()).isEqualTo(testTopicId);
@@ -82,20 +108,22 @@ public class TopicMessageSubmitTransactionTest {
 
     @Test
     void getSetMessage() {
-        var topicSubmitMessageTransactionString = new TopicMessageSubmitTransaction().setMessage(
-            new String(testMessageBytes));
+        var topicSubmitMessageTransactionString =
+                new TopicMessageSubmitTransaction().setMessage(new String(testMessageBytes));
         var topicSubmitMessageTransactionBytes = new TopicMessageSubmitTransaction().setMessage(testMessageBytes);
-        assertThat(topicSubmitMessageTransactionString.getMessage().toByteArray()).isEqualTo(testMessageBytes);
-        assertThat(topicSubmitMessageTransactionBytes.getMessage().toByteArray()).isEqualTo(testMessageBytes);
+        assertThat(topicSubmitMessageTransactionString.getMessage().toByteArray())
+                .isEqualTo(testMessageBytes);
+        assertThat(topicSubmitMessageTransactionBytes.getMessage().toByteArray())
+                .isEqualTo(testMessageBytes);
     }
 
     @Test
     void getSetMessageFrozen() {
         var topicSubmitMessageTransactionString = spawnTestTransactionString();
         var topicSubmitMessageTransactionBytes = spawnTestTransactionBytes();
-        assertThrows(IllegalStateException.class,
-            () -> topicSubmitMessageTransactionString.setMessage(testMessageBytes));
-        assertThrows(IllegalStateException.class,
-            () -> topicSubmitMessageTransactionBytes.setMessage(testMessageBytes));
+        assertThrows(
+                IllegalStateException.class, () -> topicSubmitMessageTransactionString.setMessage(testMessageBytes));
+        assertThrows(
+                IllegalStateException.class, () -> topicSubmitMessageTransactionBytes.setMessage(testMessageBytes));
     }
 }

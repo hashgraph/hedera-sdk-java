@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
@@ -46,26 +43,28 @@ public class AddressBookQuery {
 
     @Nullable
     private FileId fileId = null;
+
     @Nullable
     private Integer limit = null;
+
     private int maxAttempts = 10;
     private Duration maxBackoff = Duration.ofSeconds(8L);
 
     /**
      * Constructor.
      */
-    public AddressBookQuery() {
-    }
+    public AddressBookQuery() {}
 
     private static boolean shouldRetry(Throwable throwable) {
         if (throwable instanceof StatusRuntimeException statusRuntimeException) {
             var code = statusRuntimeException.getStatus().getCode();
             var description = statusRuntimeException.getStatus().getDescription();
 
-            return (code == io.grpc.Status.Code.UNAVAILABLE) ||
-                (code == io.grpc.Status.Code.RESOURCE_EXHAUSTED) ||
-                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description)
-                    .matches());
+            return (code == io.grpc.Status.Code.UNAVAILABLE)
+                    || (code == io.grpc.Status.Code.RESOURCE_EXHAUSTED)
+                    || (code == Status.Code.INTERNAL
+                            && description != null
+                            && Executable.RST_STREAM.matcher(description).matches());
         }
 
         return false;
@@ -169,10 +168,8 @@ public class AddressBookQuery {
         var deadline = Deadline.after(timeout.toMillis(), TimeUnit.MILLISECONDS);
         for (int attempt = 1; true; attempt++) {
             try {
-                var addressProtoIter = ClientCalls.blockingServerStreamingCall(
-                    buildCall(client, deadline),
-                    buildQuery()
-                );
+                var addressProtoIter =
+                        ClientCalls.blockingServerStreamingCall(buildCall(client, deadline), buildQuery());
                 List<NodeAddress> addresses = new ArrayList<>();
                 while (addressProtoIter.hasNext()) {
                     addresses.add(NodeAddress.fromProtobuf(addressProtoIter.next()));
@@ -223,31 +220,31 @@ public class AddressBookQuery {
     void executeAsync(Client client, Deadline deadline, CompletableFuture<NodeAddressBook> returnFuture, int attempt) {
         List<NodeAddress> addresses = new ArrayList<>();
         ClientCalls.asyncServerStreamingCall(
-            buildCall(client, deadline),
-            buildQuery(),
-            new StreamObserver<com.hedera.hashgraph.sdk.proto.NodeAddress>() {
-                @Override
-                public void onNext(com.hedera.hashgraph.sdk.proto.NodeAddress addressProto) {
-                    addresses.add(NodeAddress.fromProtobuf(addressProto));
-                }
-
-                @Override
-                public void onError(Throwable error) {
-                    if (attempt >= maxAttempts || !shouldRetry(error)) {
-                        LOGGER.error("Error attempting to get address book at FileId {}", fileId, error);
-                        returnFuture.completeExceptionally(error);
-                        return;
+                buildCall(client, deadline),
+                buildQuery(),
+                new StreamObserver<com.hedera.hashgraph.sdk.proto.NodeAddress>() {
+                    @Override
+                    public void onNext(com.hedera.hashgraph.sdk.proto.NodeAddress addressProto) {
+                        addresses.add(NodeAddress.fromProtobuf(addressProto));
                     }
-                    warnAndDelay(attempt, error);
-                    addresses.clear();
-                    executeAsync(client, deadline, returnFuture, attempt + 1);
-                }
 
-                @Override
-                public void onCompleted() {
-                    returnFuture.complete(new NodeAddressBook().setNodeAddresses(addresses));
-                }
-            });
+                    @Override
+                    public void onError(Throwable error) {
+                        if (attempt >= maxAttempts || !shouldRetry(error)) {
+                            LOGGER.error("Error attempting to get address book at FileId {}", fileId, error);
+                            returnFuture.completeExceptionally(error);
+                            return;
+                        }
+                        warnAndDelay(attempt, error);
+                        addresses.clear();
+                        executeAsync(client, deadline, returnFuture, attempt + 1);
+                    }
+
+                    @Override
+                    public void onCompleted() {
+                        returnFuture.complete(new NodeAddressBook().setNodeAddresses(addresses));
+                    }
+                });
     }
 
     /**
@@ -266,13 +263,14 @@ public class AddressBookQuery {
         return builder.build();
     }
 
-    private ClientCall<com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery, com.hedera.hashgraph.sdk.proto.NodeAddress>
-    buildCall(Client client, Deadline deadline) {
+    private ClientCall<
+                    com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery, com.hedera.hashgraph.sdk.proto.NodeAddress>
+            buildCall(Client client, Deadline deadline) {
         try {
-            return client.mirrorNetwork.getNextMirrorNode().getChannel().newCall(
-                NetworkServiceGrpc.getGetNodesMethod(),
-                CallOptions.DEFAULT.withDeadline(deadline)
-            );
+            return client.mirrorNetwork
+                    .getNextMirrorNode()
+                    .getChannel()
+                    .newCall(NetworkServiceGrpc.getGetNodesMethod(), CallOptions.DEFAULT.withDeadline(deadline));
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -281,8 +279,11 @@ public class AddressBookQuery {
     private void warnAndDelay(int attempt, Throwable error) {
         var delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
         LOGGER.warn(
-            "Error fetching address book at FileId {} during attempt #{}. Waiting {} ms before next attempt: {}",
-            fileId, attempt, delay, error.getMessage());
+                "Error fetching address book at FileId {} during attempt #{}. Waiting {} ms before next attempt: {}",
+                fileId,
+                attempt,
+                delay,
+                error.getMessage());
 
         try {
             Thread.sleep(delay);

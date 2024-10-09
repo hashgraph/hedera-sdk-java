@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class AllowancesTest {
     @BeforeAll
@@ -44,11 +40,7 @@ public class AllowancesTest {
 
     TokenAllowance spawnTokenAllowance() {
         return new TokenAllowance(
-            TokenId.fromString("1.2.3"),
-            AccountId.fromString("4.5.6"),
-            AccountId.fromString("5.5.5"),
-            777
-        );
+                TokenId.fromString("1.2.3"), AccountId.fromString("4.5.6"), AccountId.fromString("5.5.5"), 777);
     }
 
     TokenNftAllowance spawnNftAllowance() {
@@ -56,24 +48,22 @@ public class AllowancesTest {
         serials.add(123L);
         serials.add(456L);
         return new TokenNftAllowance(
-            TokenId.fromString("1.1.1"),
-            AccountId.fromString("2.2.2"),
-            AccountId.fromString("3.3.3"),
-            null,
-            serials,
-            null
-        );
+                TokenId.fromString("1.1.1"),
+                AccountId.fromString("2.2.2"),
+                AccountId.fromString("3.3.3"),
+                null,
+                serials,
+                null);
     }
 
     TokenNftAllowance spawnAllNftAllowance() {
         return new TokenNftAllowance(
-            TokenId.fromString("1.1.1"),
-            AccountId.fromString("2.2.2"),
-            AccountId.fromString("3.3.3"),
-            null,
-            Collections.emptyList(),
-            true
-        );
+                TokenId.fromString("1.1.1"),
+                AccountId.fromString("2.2.2"),
+                AccountId.fromString("3.3.3"),
+                null,
+                Collections.emptyList(),
+                true);
     }
 
     HbarAllowance spawnHbarAllowance() {
@@ -83,11 +73,11 @@ public class AllowancesTest {
     @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(
-            spawnHbarAllowance().toString(),
-            spawnTokenAllowance().toString(),
-            spawnNftAllowance().toString(),
-            spawnAllNftAllowance().toString()
-        ).toMatchSnapshot();
+                        spawnHbarAllowance().toString(),
+                        spawnTokenAllowance().toString(),
+                        spawnNftAllowance().toString(),
+                        spawnAllNftAllowance().toString())
+                .toMatchSnapshot();
     }
 
     @Test

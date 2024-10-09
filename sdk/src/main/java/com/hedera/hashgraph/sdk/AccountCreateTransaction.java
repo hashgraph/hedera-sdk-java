@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -28,10 +25,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Create a new Hedera™ account.
@@ -39,8 +35,10 @@ import java.util.Objects;
 public final class AccountCreateTransaction extends Transaction<AccountCreateTransaction> {
     @Nullable
     private AccountId proxyAccountId = null;
+
     @Nullable
     private Key key = null;
+
     private String accountMemo = "";
     private Hbar initialBalance = new Hbar(0);
     private boolean receiverSigRequired = false;
@@ -71,7 +69,9 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param txs                                   Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    AccountCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    AccountCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -392,12 +392,12 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      */
     CryptoCreateTransactionBody.Builder build() {
         var builder = CryptoCreateTransactionBody.newBuilder()
-            .setInitialBalance(initialBalance.toTinybars())
-            .setReceiverSigRequired(receiverSigRequired)
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .setMemo(accountMemo)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setDeclineReward(declineStakingReward);
+                .setInitialBalance(initialBalance.toTinybars())
+                .setReceiverSigRequired(receiverSigRequired)
+                .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+                .setMemo(accountMemo)
+                .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+                .setDeclineReward(declineStakingReward);
 
         if (proxyAccountId != null) {
             builder.setProxyAccountID(proxyAccountId.toProtobuf());

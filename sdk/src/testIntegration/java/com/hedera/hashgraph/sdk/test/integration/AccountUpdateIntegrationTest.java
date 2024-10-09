@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
@@ -26,14 +26,10 @@ import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.Status;
+import java.time.Duration;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Duration;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class AccountUpdateIntegrationTest {
     @Test
@@ -44,15 +40,11 @@ class AccountUpdateIntegrationTest {
         var key1 = PrivateKey.generateED25519();
         var key2 = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key1)
-            .execute(testEnv.client);
+        var response = new AccountCreateTransaction().setKey(key1).execute(testEnv.client);
 
         var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        var info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+        var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
         assertThat(info.accountId).isEqualTo(accountId);
         assertThat(info.isDeleted).isFalse();
@@ -63,17 +55,15 @@ class AccountUpdateIntegrationTest {
         assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
 
         new AccountUpdateTransaction()
-            .setAccountId(accountId)
-            .setKey(key2.getPublicKey())
-            .freezeWith(testEnv.client)
-            .sign(key1)
-            .sign(key2)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+                .setAccountId(accountId)
+                .setKey(key2.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+        info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
         assertThat(info.accountId).isEqualTo(accountId);
         assertThat(info.isDeleted).isFalse();
@@ -91,11 +81,11 @@ class AccountUpdateIntegrationTest {
     void cannotUpdateAccountWhenAccountIdIsNotSet() throws Exception {
         var testEnv = new IntegrationTestEnv(1);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new AccountUpdateTransaction()
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
+        assertThatExceptionOfType(PrecheckStatusException.class)
+                .isThrownBy(() -> {
+                    new AccountUpdateTransaction().execute(testEnv.client).getReceipt(testEnv.client);
+                })
+                .withMessageContaining(Status.ACCOUNT_ID_DOES_NOT_EXIST.toString());
 
         testEnv.close();
     }

@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk.test.integration;
-
-import com.hedera.hashgraph.sdk.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import java.time.Duration;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.hedera.hashgraph.sdk.*;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class ClientIntegrationTest {
     @Test
@@ -42,20 +38,16 @@ public class ClientIntegrationTest {
         var testEnv = new IntegrationTestEnv(1);
 
         testEnv.client
-            .setMaxQueryPayment(new Hbar(2))
-            .setRequestTimeout(Duration.ofMinutes(2))
-            .setNetwork(network);
+                .setMaxQueryPayment(new Hbar(2))
+                .setRequestTimeout(Duration.ofMinutes(2))
+                .setNetwork(network);
 
         assertThat(testEnv.operatorId).isNotNull();
 
         // Execute two simple queries so we create a channel for each network node.
-        new AccountBalanceQuery()
-            .setAccountId(new AccountId(3))
-            .execute(testEnv.client);
+        new AccountBalanceQuery().setAccountId(new AccountId(3)).execute(testEnv.client);
 
-        new AccountBalanceQuery()
-            .setAccountId(new AccountId(3))
-            .execute(testEnv.client);
+        new AccountBalanceQuery().setAccountId(new AccountId(3)).execute(testEnv.client);
 
         network = new HashMap<>();
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
@@ -79,8 +71,8 @@ public class ClientIntegrationTest {
             client.setAutoValidateChecksums(true);
 
             new AccountCreateTransaction()
-                .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-esxsf")))
-                .execute(client);
+                    .setTransactionId(TransactionId.generate(AccountId.fromString("0.0.123-esxsf")))
+                    .execute(client);
             client.close();
         });
     }
@@ -92,9 +84,8 @@ public class ClientIntegrationTest {
 
         testEnv.client.setMaxNodesPerTransaction(1);
 
-        var transaction = new AccountDeleteTransaction()
-            .setAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client);
+        var transaction =
+                new AccountDeleteTransaction().setAccountId(testEnv.operatorId).freezeWith(testEnv.client);
 
         assertThat(transaction.getNodeAccountIds()).isNotNull();
         assertThat(transaction.getNodeAccountIds().size()).isEqualTo(1);
@@ -131,9 +122,7 @@ public class ClientIntegrationTest {
 
         var node = nodes.get(0);
 
-        new AccountBalanceQuery()
-            .setAccountId(node)
-            .execute(testEnv.client);
+        new AccountBalanceQuery().setAccountId(node).execute(testEnv.client);
 
         testEnv.close();
     }
@@ -161,19 +150,18 @@ public class ClientIntegrationTest {
 
         testEnv.client.setNetwork(network);
 
-
-        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> {
-            testEnv.client.pingAll();
-        }).withMessageContaining("exceeded maximum attempts");
+        assertThatExceptionOfType(MaxAttemptsExceededException.class)
+                .isThrownBy(() -> {
+                    testEnv.client.pingAll();
+                })
+                .withMessageContaining("exceeded maximum attempts");
 
         var nodes = new ArrayList<>(testEnv.client.getNetwork().values());
         assertThat(nodes.isEmpty()).isFalse();
 
         var node = nodes.get(0);
 
-        new AccountBalanceQuery()
-            .setAccountId(node)
-            .execute(testEnv.client);
+        new AccountBalanceQuery().setAccountId(node).execute(testEnv.client);
 
         assertThat(testEnv.client.getNetwork().values().size()).isEqualTo(1);
 
@@ -209,9 +197,7 @@ public class ClientIntegrationTest {
 
         var node = nodes.get(0);
 
-        new AccountBalanceQuery()
-            .setAccountId(node)
-            .execute(testEnv.client);
+        new AccountBalanceQuery().setAccountId(node).execute(testEnv.client);
 
         testEnv.close();
     }

@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Timestamp;
@@ -184,8 +181,8 @@ public final class TopicMessageQuery {
     private void onError(Throwable throwable, TopicMessage topicMessage) {
         var topicId = TopicId.fromProtobuf(builder.getTopicID());
 
-        if (throwable instanceof StatusRuntimeException sre && sre.getStatus().getCode()
-            .equals(Status.Code.CANCELLED)) {
+        if (throwable instanceof StatusRuntimeException sre
+                && sre.getStatus().getCode().equals(Status.Code.CANCELLED)) {
             LOGGER.warn("Call is cancelled for topic {}.", topicId);
         } else {
             LOGGER.error("Error attempting to subscribe to topic {}:", topicId, throwable);
@@ -215,11 +212,12 @@ public final class TopicMessageQuery {
             var code = statusRuntimeException.getStatus().getCode();
             var description = statusRuntimeException.getStatus().getDescription();
 
-            return (code == Status.Code.NOT_FOUND) ||
-                (code == Status.Code.UNAVAILABLE) ||
-                (code == Status.Code.RESOURCE_EXHAUSTED) ||
-                (code == Status.Code.INTERNAL && description != null && Executable.RST_STREAM.matcher(description)
-                    .matches());
+            return (code == Status.Code.NOT_FOUND)
+                    || (code == Status.Code.UNAVAILABLE)
+                    || (code == Status.Code.RESOURCE_EXHAUSTED)
+                    || (code == Status.Code.INTERNAL
+                            && description != null
+                            && Executable.RST_STREAM.matcher(description).matches());
         }
 
         return false;
@@ -238,8 +236,8 @@ public final class TopicMessageQuery {
         HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages = new HashMap<>();
 
         try {
-            makeStreamingCall(client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(),
-                pendingMessages);
+            makeStreamingCall(
+                    client, subscriptionHandle, onNext, 0, new AtomicLong(), new AtomicReference<>(), pendingMessages);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -248,17 +246,18 @@ public final class TopicMessageQuery {
     }
 
     private void makeStreamingCall(
-        Client client,
-        SubscriptionHandle subscriptionHandle,
-        Consumer<TopicMessage> onNext,
-        int attempt,
-        AtomicLong counter,
-        AtomicReference<ConsensusTopicResponse> lastMessage,
-        HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages
-    ) throws InterruptedException {
+            Client client,
+            SubscriptionHandle subscriptionHandle,
+            Consumer<TopicMessage> onNext,
+            int attempt,
+            AtomicLong counter,
+            AtomicReference<ConsensusTopicResponse> lastMessage,
+            HashMap<TransactionID, ArrayList<ConsensusTopicResponse>> pendingMessages)
+            throws InterruptedException {
         // TODO: check status of channel before using it?
-        ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call =
-            client.mirrorNetwork.getNextMirrorNode().getChannel()
+        ClientCall<ConsensusTopicQuery, ConsensusTopicResponse> call = client.mirrorNetwork
+                .getNextMirrorNode()
+                .getChannel()
                 .newCall(ConsensusServiceGrpc.getSubscribeTopicMethod(), CallOptions.DEFAULT);
 
         subscriptionHandle.setOnUnsubscribe(() -> {
@@ -291,7 +290,8 @@ public final class TopicMessageQuery {
                 lastMessage.set(consensusTopicResponse);
 
                 // Short circuit for no chunks or 1/1 chunks
-                if (!consensusTopicResponse.hasChunkInfo() || consensusTopicResponse.getChunkInfo().getTotal() == 1) {
+                if (!consensusTopicResponse.hasChunkInfo()
+                        || consensusTopicResponse.getChunkInfo().getTotal() == 1) {
                     var message = TopicMessage.ofSingle(consensusTopicResponse);
 
                     try {
@@ -338,8 +338,12 @@ public final class TopicMessageQuery {
 
                 var delay = Math.min(500 * (long) Math.pow(2, attempt), maxBackoff.toMillis());
                 var topicId = TopicId.fromProtobuf(builder.getTopicID());
-                LOGGER.warn("Error subscribing to topic {} during attempt #{}. Waiting {} ms before next attempt: {}",
-                    topicId, attempt, delay, t.getMessage());
+                LOGGER.warn(
+                        "Error subscribing to topic {} during attempt #{}. Waiting {} ms before next attempt: {}",
+                        topicId,
+                        attempt,
+                        delay,
+                        t.getMessage());
                 call.cancel("unsubscribed", null);
 
                 // Cannot use `CompletableFuture<U>` here since this future is never polled
@@ -350,8 +354,8 @@ public final class TopicMessageQuery {
                 }
 
                 try {
-                    makeStreamingCall(client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage,
-                        pendingMessages);
+                    makeStreamingCall(
+                            client, subscriptionHandle, onNext, attempt + 1, counter, lastMessage, pendingMessages);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }

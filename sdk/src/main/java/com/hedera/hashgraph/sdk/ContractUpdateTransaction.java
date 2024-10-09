@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.BoolValue;
@@ -31,10 +28,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Modify a smart contract instance to have the given parameter values.
@@ -62,18 +58,25 @@ import java.util.Objects;
 public final class ContractUpdateTransaction extends Transaction<ContractUpdateTransaction> {
     @Nullable
     private ContractId contractId = null;
+
     @Nullable
     private AccountId proxyAccountId = null;
+
     @Nullable
     private FileId bytecodeFileId = null;
+
     @Nullable
     private Instant expirationTime = null;
+
     @Nullable
     private Key adminKey = null;
+
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     @Nullable
     private String contractMemo = null;
 
@@ -92,8 +95,7 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
     /**
      * Contract.
      */
-    public ContractUpdateTransaction() {
-    }
+    public ContractUpdateTransaction() {}
 
     /**
      * Contract.
@@ -101,7 +103,9 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) record
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ContractUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ContractUpdateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -480,7 +484,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
             adminKey = Key.fromProtobufKey(body.getAdminKey());
         }
         if (body.hasMaxAutomaticTokenAssociations()) {
-            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+            maxAutomaticTokenAssociations =
+                    body.getMaxAutomaticTokenAssociations().getValue();
         }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
@@ -544,7 +549,8 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
         }
 
         if (declineStakingReward != null) {
-            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+            builder.setDeclineReward(
+                    BoolValue.newBuilder().setValue(declineStakingReward).build());
         }
 
         if (autoRenewAccountId != null) {

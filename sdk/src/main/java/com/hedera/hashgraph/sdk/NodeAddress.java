@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.ServiceEndpoint;
-
-import javax.annotation.Nullable;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * The metadata for a Node – including IP Address, and the crypto account associated with the Node.
@@ -71,8 +67,7 @@ public class NodeAddress implements Cloneable {
     /**
      * Constructor.
      */
-    NodeAddress() {
-    }
+    NodeAddress() {}
 
     /**
      * Create a node from a protobuf.
@@ -84,12 +79,10 @@ public class NodeAddress implements Cloneable {
         var address = new ArrayList<Endpoint>(nodeAddress.getServiceEndpointCount());
 
         if (!nodeAddress.getIpAddress().isEmpty()) {
-            address.add(
-                Endpoint.fromProtobuf(ServiceEndpoint.newBuilder()
+            address.add(Endpoint.fromProtobuf(ServiceEndpoint.newBuilder()
                     .setIpAddressV4(nodeAddress.getIpAddress())
                     .setPort(nodeAddress.getPortno())
-                    .build())
-            );
+                    .build()));
         }
 
         for (var endpoint : nodeAddress.getServiceEndpointList()) {
@@ -97,12 +90,12 @@ public class NodeAddress implements Cloneable {
         }
 
         var node = new NodeAddress()
-            .setPublicKey(nodeAddress.getRSAPubKey())
-            .setNodeId(nodeAddress.getNodeId())
-            .setCertHash(nodeAddress.getNodeCertHash())
-            .setAddresses(address)
-            .setDescription(nodeAddress.getDescription())
-            .setStake(nodeAddress.getStake());
+                .setPublicKey(nodeAddress.getRSAPubKey())
+                .setNodeId(nodeAddress.getNodeId())
+                .setCertHash(nodeAddress.getNodeCertHash())
+                .setAddresses(address)
+                .setDescription(nodeAddress.getDescription())
+                .setStake(nodeAddress.getStake());
 
         if (nodeAddress.hasNodeAccountId()) {
             node.setAccountId(AccountId.fromProtobuf(nodeAddress.getNodeAccountId()));
@@ -124,7 +117,7 @@ public class NodeAddress implements Cloneable {
     /**
      * Assign the public key.
      *
-      * @param publicKey                the public key
+     * @param publicKey                the public key
      * @return {@code this}
      */
     public NodeAddress setPublicKey(String publicKey) {
@@ -156,7 +149,7 @@ public class NodeAddress implements Cloneable {
     /**
      * Extract the node id.
      *
-      * @return                         the node id
+     * @return                         the node id
      */
     public long getNodeId() {
         return nodeId;
@@ -270,8 +263,7 @@ public class NodeAddress implements Cloneable {
      * @return                          the protobuf representation.
      */
     com.hedera.hashgraph.sdk.proto.NodeAddress toProtobuf() {
-        var builder = com.hedera.hashgraph.sdk.proto.NodeAddress.newBuilder()
-            .setNodeId(nodeId);
+        var builder = com.hedera.hashgraph.sdk.proto.NodeAddress.newBuilder().setNodeId(nodeId);
 
         if (certHash != null) {
             builder.setNodeCertHash(certHash);
@@ -299,14 +291,14 @@ public class NodeAddress implements Cloneable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("publicKey", publicKey)
-            .add("accountId", accountId)
-            .add("nodeId", nodeId)
-            .add("certHash", certHash != null ? new String(certHash.toByteArray(), StandardCharsets.UTF_8) : null)
-            .add("addresses", addresses)
-            .add("description", description)
-            .add("stake", stake)
-            .toString();
+                .add("publicKey", publicKey)
+                .add("accountId", accountId)
+                .add("nodeId", nodeId)
+                .add("certHash", certHash != null ? new String(certHash.toByteArray(), StandardCharsets.UTF_8) : null)
+                .add("addresses", addresses)
+                .add("description", description)
+                .add("stake", stake)
+                .toString();
     }
 
     @Override

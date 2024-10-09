@@ -1,20 +1,35 @@
+/*
+ * Copyright (C) 2024 Hedera Hashgraph, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.hedera.hashgraph.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ScheduleInfoTest {
     private static final PublicKey unusedPublicKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"
-    ).getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10")
+            .getPublicKey();
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
@@ -30,42 +45,46 @@ public class ScheduleInfoTest {
 
     ScheduleInfo spawnScheduleInfoExample() {
         return new ScheduleInfo(
-            ScheduleId.fromString("1.2.3"),
-            AccountId.fromString("4.5.6"),
-            AccountId.fromString("2.3.4"),
-            SchedulableTransactionBody.newBuilder()
-                .setCryptoDelete(CryptoDeleteTransactionBody.newBuilder()
-                    .setDeleteAccountID(AccountId.fromString("6.6.6").toProtobuf()).build()).build(),
-            KeyList.of(unusedPublicKey),
-            unusedPublicKey,
-            TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart),
-            "memo",
-            validStart,
-            validStart,
-            null,
-            LedgerId.TESTNET,
-            true
-        );
+                ScheduleId.fromString("1.2.3"),
+                AccountId.fromString("4.5.6"),
+                AccountId.fromString("2.3.4"),
+                SchedulableTransactionBody.newBuilder()
+                        .setCryptoDelete(CryptoDeleteTransactionBody.newBuilder()
+                                .setDeleteAccountID(
+                                        AccountId.fromString("6.6.6").toProtobuf())
+                                .build())
+                        .build(),
+                KeyList.of(unusedPublicKey),
+                unusedPublicKey,
+                TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart),
+                "memo",
+                validStart,
+                validStart,
+                null,
+                LedgerId.TESTNET,
+                true);
     }
 
     ScheduleInfo spawnScheduleInfoDeletedExample() {
         return new ScheduleInfo(
-            ScheduleId.fromString("1.2.3"),
-            AccountId.fromString("4.5.6"),
-            AccountId.fromString("2.3.4"),
-            SchedulableTransactionBody.newBuilder()
-                .setCryptoDelete(CryptoDeleteTransactionBody.newBuilder()
-                    .setDeleteAccountID(AccountId.fromString("6.6.6").toProtobuf()).build()).build(),
-            KeyList.of(unusedPublicKey),
-            unusedPublicKey,
-            TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart),
-            "memo",
-            validStart,
-            null,
-            validStart,
-            LedgerId.TESTNET,
-            true
-        );
+                ScheduleId.fromString("1.2.3"),
+                AccountId.fromString("4.5.6"),
+                AccountId.fromString("2.3.4"),
+                SchedulableTransactionBody.newBuilder()
+                        .setCryptoDelete(CryptoDeleteTransactionBody.newBuilder()
+                                .setDeleteAccountID(
+                                        AccountId.fromString("6.6.6").toProtobuf())
+                                .build())
+                        .build(),
+                KeyList.of(unusedPublicKey),
+                unusedPublicKey,
+                TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart),
+                "memo",
+                validStart,
+                null,
+                validStart,
+                LedgerId.TESTNET,
+                true);
     }
 
     @Test
@@ -74,8 +93,9 @@ public class ScheduleInfoTest {
         byte[] scheduleInfoBytes = originalScheduleInfo.toBytes();
         var copyScheduleInfo = ScheduleInfo.fromBytes(scheduleInfoBytes);
         assertThat(copyScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 
     @Test
@@ -84,7 +104,8 @@ public class ScheduleInfoTest {
         byte[] scheduleInfoBytes = originalScheduleInfo.toBytes();
         var copyScheduleInfo = ScheduleInfo.fromBytes(scheduleInfoBytes);
         assertThat(copyScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalScheduleInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

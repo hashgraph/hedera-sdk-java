@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -47,16 +44,17 @@ import javax.annotation.Nullable;
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
     @Nullable
     private FileId fileId = null;
+
     @Nullable
     private ContractId contractId = null;
+
     @Nullable
     private Instant expirationTime = null;
 
     /**
      * Constructor.
      */
-    public SystemDeleteTransaction() {
-    }
+    public SystemDeleteTransaction() {}
 
     /**
      * Constructor.
@@ -65,7 +63,9 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    SystemDeleteTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -207,7 +207,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
         if (modesEnabled != 1) {
-            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
+            throw new IllegalStateException(
+                    "SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
         }
         return super.onExecuteAsync(client);
     }

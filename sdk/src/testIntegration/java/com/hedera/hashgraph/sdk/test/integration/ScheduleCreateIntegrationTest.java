@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2021 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2021-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
@@ -40,17 +40,13 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Objects;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ScheduleCreateIntegrationTest {
     @Test
@@ -61,21 +57,17 @@ public class ScheduleCreateIntegrationTest {
 
         var key = PrivateKey.generateED25519();
 
-        var transaction = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(10));
+        var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
 
         var response = new ScheduleCreateTransaction()
-            .setScheduledTransaction(transaction)
-            .setAdminKey(testEnv.operatorKey)
-            .setPayerAccountId(testEnv.operatorId)
-            .execute(testEnv.client);
+                .setScheduledTransaction(transaction)
+                .setAdminKey(testEnv.operatorKey)
+                .setPayerAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
         var scheduleId = Objects.requireNonNull(response.getReceipt(testEnv.client).scheduleId);
 
-        var info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        var info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNotNull();
 
@@ -90,21 +82,17 @@ public class ScheduleCreateIntegrationTest {
 
         var key = PrivateKey.generateED25519();
 
-        var transaction = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(10));
+        var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
 
         var response = new ScheduleCreateTransaction()
-            .setScheduledTransaction(transaction)
-            .setAdminKey(testEnv.operatorKey)
-            .setPayerAccountId(testEnv.operatorId)
-            .execute(testEnv.client);
+                .setScheduledTransaction(transaction)
+                .setAdminKey(testEnv.operatorKey)
+                .setPayerAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
         var scheduleId = Objects.requireNonNull(response.getReceipt(testEnv.client).scheduleId);
 
-        var info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        var info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNotNull();
         assertThat(info.getScheduledTransaction()).isNotNull();
@@ -120,22 +108,17 @@ public class ScheduleCreateIntegrationTest {
 
         var key = PrivateKey.generateED25519();
 
-        var transaction = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(10));
+        var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
 
         var tx = transaction.schedule();
 
-        var response = tx
-            .setAdminKey(testEnv.operatorKey)
-            .setPayerAccountId(testEnv.operatorId)
-            .execute(testEnv.client);
+        var response = tx.setAdminKey(testEnv.operatorKey)
+                .setPayerAccountId(testEnv.operatorId)
+                .execute(testEnv.client);
 
         var scheduleId = Objects.requireNonNull(response.getReceipt(testEnv.client).scheduleId);
 
-        var info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        var info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNotNull();
         assertThat(info.getScheduledTransaction()).isNotNull();
@@ -160,9 +143,9 @@ public class ScheduleCreateIntegrationTest {
 
         // Creat the account with the `KeyList`
         TransactionResponse response = new AccountCreateTransaction()
-            .setKey(keyList)
-            .setInitialBalance(new Hbar(10))
-            .execute(testEnv.client);
+                .setKey(keyList)
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client);
 
         // This will wait for the receipt to become available
         TransactionReceipt receipt = response.getReceipt(testEnv.client);
@@ -175,9 +158,9 @@ public class ScheduleCreateIntegrationTest {
 
         // Create a transfer transaction with 2/3 signatures.
         TransferTransaction transfer = new TransferTransaction()
-            .setTransactionId(transactionId)
-            .addHbarTransfer(accountId, new Hbar(1).negated())
-            .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+                .setTransactionId(transactionId)
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
 
         // Schedule the transactoin
         ScheduleCreateTransaction scheduled = transfer.schedule();
@@ -188,37 +171,35 @@ public class ScheduleCreateIntegrationTest {
         ScheduleId scheduleId = Objects.requireNonNull(receipt.scheduleId);
 
         // Get the schedule info to see if `signatories` is populated with 2/3 signatures
-        ScheduleInfo info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        ScheduleInfo info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNull();
 
         // Finally send this last signature to Hedera. This last signature _should_ mean the transaction executes
         // since all 3 signatures have been provided.
-        ScheduleSignTransaction signTransaction = new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(testEnv.client);
+        ScheduleSignTransaction signTransaction =
+                new ScheduleSignTransaction().setScheduleId(scheduleId).freezeWith(testEnv.client);
 
         signTransaction.sign(key1).sign(key2).sign(key3).execute(testEnv.client).getReceipt(testEnv.client);
 
-        info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNotNull();
 
         assertThat(scheduleId.getChecksum()).isNull();
         assertThat(scheduleId.hashCode()).isNotZero();
-        assertThat(scheduleId.compareTo(ScheduleId.fromBytes(scheduleId.toBytes()))).isZero();
+        assertThat(scheduleId.compareTo(ScheduleId.fromBytes(scheduleId.toBytes())))
+                .isZero();
 
         new AccountDeleteTransaction()
-            .setAccountId(accountId)
-            .setTransferAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client)
-            .sign(key1).sign(key2).sign(key3)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+                .setAccountId(accountId)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .sign(key2)
+                .sign(key3)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
         testEnv.close();
     }
@@ -231,63 +212,59 @@ public class ScheduleCreateIntegrationTest {
         PrivateKey key = PrivateKey.generateED25519();
 
         var accountId = new AccountCreateTransaction()
-            .setReceiverSignatureRequired(true)
-            .setKey(key)
-            .setInitialBalance(new Hbar(10))
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
+                .setReceiverSignatureRequired(true)
+                .setKey(key)
+                .setInitialBalance(new Hbar(10))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
 
         Objects.requireNonNull(accountId);
 
         var tokenId = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setInitialSupply(100)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .tokenId;
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setInitialSupply(100)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .tokenId;
 
         Objects.requireNonNull(tokenId);
 
         new TokenAssociateTransaction()
-            .setAccountId(accountId)
-            .setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+                .setAccountId(accountId)
+                .setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
         var scheduleId = new TransferTransaction()
-            .addTokenTransfer(tokenId, testEnv.operatorId, -10)
-            .addTokenTransfer(tokenId, accountId, 10)
-            .schedule()
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .scheduleId;
+                .addTokenTransfer(tokenId, testEnv.operatorId, -10)
+                .addTokenTransfer(tokenId, accountId, 10)
+                .schedule()
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
 
         Objects.requireNonNull(scheduleId);
 
-        var balanceQuery1 = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+        var balanceQuery1 = new AccountBalanceQuery().setAccountId(accountId).execute(testEnv.client);
 
         assertThat(balanceQuery1.tokens.get(tokenId)).isEqualTo(0);
 
         new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(testEnv.client)
-            .sign(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        var balanceQuery2 = new AccountBalanceQuery()
-            .setAccountId(accountId)
-            .execute(testEnv.client);
+        var balanceQuery2 = new AccountBalanceQuery().setAccountId(accountId).execute(testEnv.client);
 
         assertThat(balanceQuery2.tokens.get(tokenId)).isEqualTo(10);
 
@@ -301,24 +278,19 @@ public class ScheduleCreateIntegrationTest {
 
         var key = PrivateKey.generateED25519();
         var accountId = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(10))
-            .setKey(key)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .accountId;
+                .setInitialBalance(new Hbar(10))
+                .setKey(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
 
         var transferTx = new TransferTransaction()
-            .addHbarTransfer(testEnv.operatorId, new Hbar(-10))
-            .addHbarTransfer(accountId, new Hbar(10));
+                .addHbarTransfer(testEnv.operatorId, new Hbar(-10))
+                .addHbarTransfer(accountId, new Hbar(10));
 
-        var scheduleId1 = transferTx.schedule()
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .scheduleId;
+        var scheduleId1 = transferTx.schedule().execute(testEnv.client).getReceipt(testEnv.client).scheduleId;
 
-        var info1 = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId1)
-            .execute(testEnv.client);
+        var info1 = new ScheduleInfoQuery().setScheduleId(scheduleId1).execute(testEnv.client);
 
         assertThat(info1.executedAt).isNotNull();
 
@@ -329,11 +301,11 @@ public class ScheduleCreateIntegrationTest {
 
         assertThat(scheduleCreateTx2.toString()).isEqualTo(scheduleCreateTx1.toString());
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            transferTxFromInfo.schedule()
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining("IDENTICAL_SCHEDULE_ALREADY_CREATED");
+        assertThatExceptionOfType(ReceiptStatusException.class)
+                .isThrownBy(() -> {
+                    transferTxFromInfo.schedule().execute(testEnv.client).getReceipt(testEnv.client);
+                })
+                .withMessageContaining("IDENTICAL_SCHEDULE_ALREADY_CREATED");
 
         testEnv.close(accountId, key);
     }
@@ -358,44 +330,39 @@ public class ScheduleCreateIntegrationTest {
         keyList.add(key3.getPublicKey());
 
         var response = new AccountCreateTransaction()
-            .setInitialBalance(new Hbar(100))
-            .setKey(keyList)
-            .execute(testEnv.client);
+                .setInitialBalance(new Hbar(100))
+                .setKey(keyList)
+                .execute(testEnv.client);
 
         assertThat(response.getReceipt(testEnv.client).accountId).isNotNull();
 
         var topicId = Objects.requireNonNull(new TopicCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setAutoRenewAccountId(testEnv.operatorId)
-            .setTopicMemo("HCS Topic_")
-            .setSubmitKey(key2.getPublicKey())
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .topicId
-        );
+                .setAdminKey(testEnv.operatorKey)
+                .setAutoRenewAccountId(testEnv.operatorId)
+                .setTopicMemo("HCS Topic_")
+                .setSubmitKey(key2.getPublicKey())
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .topicId);
 
         var transaction = new TopicMessageSubmitTransaction()
-            .setTopicId(topicId)
-            .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8));
+                .setTopicId(topicId)
+                .setMessage("scheduled hcs message".getBytes(StandardCharsets.UTF_8));
 
         // create schedule
-        var scheduledTx = transaction.schedule()
-            .setAdminKey(testEnv.operatorKey)
-            .setPayerAccountId(testEnv.operatorId)
-            .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now());
+        var scheduledTx = transaction
+                .schedule()
+                .setAdminKey(testEnv.operatorKey)
+                .setPayerAccountId(testEnv.operatorId)
+                .setScheduleMemo("mirror scheduled E2E signature on create and sign_" + Instant.now());
 
         var scheduled = scheduledTx.freezeWith(testEnv.client);
 
-        var scheduleId = Objects.requireNonNull(scheduled
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .scheduleId
-        );
+        var scheduleId =
+                Objects.requireNonNull(scheduled.execute(testEnv.client).getReceipt(testEnv.client).scheduleId);
 
         // verify schedule has been created and has 1 of 2 signatures
-        var info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        var info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info).isNotNull();
         assertThat(info.scheduleId).isEqualTo(scheduleId);
@@ -405,18 +372,12 @@ public class ScheduleCreateIntegrationTest {
         assertThat(transaction.getTopicId()).isEqualTo(infoTransaction.getTopicId());
         assertThat(transaction.getNodeAccountIds()).isEqualTo(infoTransaction.getNodeAccountIds());
 
-        var scheduleSign = new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(testEnv.client);
+        var scheduleSign =
+                new ScheduleSignTransaction().setScheduleId(scheduleId).freezeWith(testEnv.client);
 
-        scheduleSign
-            .sign(key2)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+        scheduleSign.sign(key2).execute(testEnv.client).getReceipt(testEnv.client);
 
-        info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+        info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(testEnv.client);
 
         assertThat(info.executedAt).isNotNull();
 

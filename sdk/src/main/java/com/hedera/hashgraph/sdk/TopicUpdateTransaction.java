@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -29,10 +26,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Update a topic.
@@ -87,8 +83,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     /**
      * Constructor.
      */
-    public TopicUpdateTransaction() {
-    }
+    public TopicUpdateTransaction() {}
 
     /**
      * Constructor.
@@ -97,7 +92,9 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    TopicUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    TopicUpdateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -395,9 +392,7 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
             topicId.validateChecksum(client);
         }
 
-        if ((autoRenewAccountId != null) &&
-            !autoRenewAccountId.equals(new AccountId(0))
-        ) {
+        if ((autoRenewAccountId != null) && !autoRenewAccountId.equals(new AccountId(0))) {
             autoRenewAccountId.validateChecksum(client);
         }
     }

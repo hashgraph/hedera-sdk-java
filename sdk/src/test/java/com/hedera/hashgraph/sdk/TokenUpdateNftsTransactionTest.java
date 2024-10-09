@@ -1,7 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
+/*
  * Copyright (C) 2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,10 +34,10 @@ import org.junit.jupiter.api.Test;
 
 public class TokenUpdateNftsTransactionTest {
     private static final PrivateKey testMetadataKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final List<Long> testSerialNumbers = Arrays.asList(8L, 9L, 10L);
-    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
+    private static final byte[] testMetadata = new byte[] {1, 2, 3, 4, 5};
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -59,11 +56,15 @@ public class TokenUpdateNftsTransactionTest {
     }
 
     private TokenUpdateNftsTransaction spawnTestTransaction() {
-        return new TokenUpdateNftsTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId).setMetadata(testMetadata).setSerials(testSerialNumbers)
-            .setMaxTransactionFee(new Hbar(1)).freeze().sign(testMetadataKey);
+        return new TokenUpdateNftsTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(testTokenId)
+                .setMetadata(testMetadata)
+                .setSerials(testSerialNumbers)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(testMetadataKey);
     }
 
     @Test
@@ -76,7 +77,8 @@ public class TokenUpdateNftsTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenUpdateNfts(TokenUpdateNftsTransactionBody.newBuilder().build()).build();
+                .setTokenUpdateNfts(TokenUpdateNftsTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -85,11 +87,14 @@ public class TokenUpdateNftsTransactionTest {
 
     @Test
     void constructTokenUpdateTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = TokenUpdateNftsTransactionBody.newBuilder().setToken(testTokenId.toProtobuf())
-            .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata))).addAllSerialNumbers(testSerialNumbers)
-            .build();
+        var transactionBody = TokenUpdateNftsTransactionBody.newBuilder()
+                .setToken(testTokenId.toProtobuf())
+                .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata)))
+                .addAllSerialNumbers(testSerialNumbers)
+                .build();
 
-        var tx = TransactionBody.newBuilder().setTokenUpdateNfts(transactionBody).build();
+        var tx =
+                TransactionBody.newBuilder().setTokenUpdateNfts(transactionBody).build();
         var tokenUpdateNftsTransaction = new TokenUpdateNftsTransaction(tx);
 
         assertThat(tokenUpdateNftsTransaction.getTokenId()).isEqualTo(testTokenId);

@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.gson.Gson;
@@ -25,10 +22,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonWriter;
-import java.util.Optional;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -37,6 +30,9 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.Objects;
+import java.util.Optional;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Internal utility class to serialize / deserialize between java object / json representation.
@@ -57,8 +53,9 @@ final class Keystore {
 
     public static Keystore fromStream(InputStream stream, String passphrase) throws IOException {
         try {
-            JsonObject jsonObject = jsonParser.parse(new InputStreamReader(stream, StandardCharsets.UTF_8))
-                .getAsJsonObject();
+            JsonObject jsonObject = jsonParser
+                    .parse(new InputStreamReader(stream, StandardCharsets.UTF_8))
+                    .getAsJsonObject();
             return fromJson(jsonObject, passphrase);
         } catch (IllegalStateException e) {
             throw new BadKeyException(Optional.ofNullable(e.getMessage()).orElse("failed to parse Keystore"));

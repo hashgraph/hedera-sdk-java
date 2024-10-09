@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,18 +12,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class FeeSchedulesTest {
     @BeforeAll
@@ -41,32 +37,22 @@ public class FeeSchedulesTest {
 
     FeeSchedules spawnFeeSchedulesExample() {
         return new FeeSchedules()
-            .setCurrent(new FeeSchedule()
-                .setExpirationTime(Instant.ofEpochSecond(1554158542))
-                .addTransactionFeeSchedule(new TransactionFeeSchedule()
-                    .addFee(new FeeData()
-                        .setNodeData(new FeeComponents())
-                        .setNetworkData(new FeeComponents()
-                            .setMin(2)
-                            .setMax(5)
-                        )
-                        .setServiceData(new FeeComponents())
-                    )
-                )
-            )
-            .setNext(new FeeSchedule()
-                .setExpirationTime(Instant.ofEpochSecond(1554158222))
-                .addTransactionFeeSchedule(new TransactionFeeSchedule()
-                    .addFee(new FeeData()
-                        .setNodeData(new FeeComponents()
-                            .setMin(1)
-                            .setMax(2)
-                        )
-                        .setNetworkData(new FeeComponents())
-                        .setServiceData(new FeeComponents())
-                    )
-                )
-            );
+                .setCurrent(new FeeSchedule()
+                        .setExpirationTime(Instant.ofEpochSecond(1554158542))
+                        .addTransactionFeeSchedule(new TransactionFeeSchedule()
+                                .addFee(new FeeData()
+                                        .setNodeData(new FeeComponents())
+                                        .setNetworkData(
+                                                new FeeComponents().setMin(2).setMax(5))
+                                        .setServiceData(new FeeComponents()))))
+                .setNext(new FeeSchedule()
+                        .setExpirationTime(Instant.ofEpochSecond(1554158222))
+                        .addTransactionFeeSchedule(new TransactionFeeSchedule()
+                                .addFee(new FeeData()
+                                        .setNodeData(
+                                                new FeeComponents().setMin(1).setMax(2))
+                                        .setNetworkData(new FeeComponents())
+                                        .setServiceData(new FeeComponents()))));
     }
 
     @Test
@@ -75,8 +61,9 @@ public class FeeSchedulesTest {
         byte[] feeSchedulesBytes = originalFeeSchedules.toBytes();
         var copyFeeSchedules = FeeSchedules.fromBytes(feeSchedulesBytes);
         assertThat(copyFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalFeeSchedules.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 
     @Test

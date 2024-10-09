@@ -1,8 +1,5 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
+/*
+ * Copyright (C) 2020-2024 Hedera Hashgraph, LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +12,22 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
  */
+
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.ContractGetInfoResponse;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Duration;
+import java.time.Instant;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
-import java.time.Instant;
-
-
 public class ContractInfoTest {
-    private final ContractGetInfoResponse.ContractInfo info =
-        ContractGetInfoResponse.ContractInfo.newBuilder()
+    private final ContractGetInfoResponse.ContractInfo info = ContractGetInfoResponse.ContractInfo.newBuilder()
             .setContractID(new ContractId(1).toProtobuf())
             .setAccountID(new AccountId(2).toProtobuf())
             .setContractAccountID("3")
@@ -57,25 +51,23 @@ public class ContractInfoTest {
 
     @Test
     void fromProtobuf() {
-        SnapshotMatcher.expect(ContractInfo.fromProtobuf(info).toString())
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(ContractInfo.fromProtobuf(info).toString()).toMatchSnapshot();
     }
 
     @Test
     void toProtobuf() {
-        SnapshotMatcher.expect(ContractInfo.fromProtobuf(info).toProtobuf())
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(ContractInfo.fromProtobuf(info).toProtobuf()).toMatchSnapshot();
     }
 
     @Test
     void toBytes() {
         SnapshotMatcher.expect(Hex.toHexString(ContractInfo.fromProtobuf(info).toBytes()))
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(ContractInfo.fromBytes(info.toByteArray()).toString())
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 }
