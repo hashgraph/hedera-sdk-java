@@ -53,70 +53,46 @@ public class EthereumTransactionIntegrationTest {
     @Test
     @DisplayName("Signer nonce changed on Ethereum transaction")
     void signerNonceChangedOnEthereumTransaction() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var privateKey = PrivateKey.generateECDSA();
-        var newAccountAliasId = privateKey.toAccountId(0, 0);
+            var privateKey = PrivateKey.generateECDSA();
+            var newAccountAliasId = privateKey.toAccountId(0, 0);
 
-        new TransferTransaction()
-            .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
-            .addHbarTransfer(newAccountAliasId, new Hbar(1))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TransferTransaction()
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1).negated())
+                .addHbarTransfer(newAccountAliasId, new Hbar(1))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        var fileCreateTransactionResponse = new FileCreateTransaction()
-            .setKeys(testEnv.operatorKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
-            .execute(testEnv.client);
+            var fileCreateTransactionResponse = new FileCreateTransaction()
+                .setKeys(testEnv.operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(fileCreateTransactionResponse.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(fileCreateTransactionResponse.getReceipt(testEnv.client).fileId);
 
-        var contractCreateTransactionResponse = new ContractCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setBytecodeFileId(fileId)
-            .setContractMemo("[e2e::ContractCreateTransaction]")
-            .execute(testEnv.client);
+            var contractCreateTransactionResponse = new ContractCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(
-            contractCreateTransactionResponse.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(
+                    contractCreateTransactionResponse.getReceipt(testEnv.client).contractId);
 
-        int nonce = 0;
-        byte[] chainId = Hex.decode("012a");
-        byte[] maxPriorityGas = Hex.decode("00");
-        byte[] maxGas = Hex.decode("d1385c7bf0");
-        byte[] to = Hex.decode(contractId.toSolidityAddress());
-        byte[] callData = new ContractExecuteTransaction()
-            .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-            .getFunctionParameters()
-            .toByteArray();
+            int nonce = 0;
+            byte[] chainId = Hex.decode("012a");
+            byte[] maxPriorityGas = Hex.decode("00");
+            byte[] maxGas = Hex.decode("d1385c7bf0");
+            byte[] to = Hex.decode(contractId.toSolidityAddress());
+            byte[] callData = new ContractExecuteTransaction()
+                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                .getFunctionParameters()
+                .toByteArray();
 
-        var sequence = RLPEncoder.sequence(Integers.toBytes(2), new Object[]{
-            chainId,
-            Integers.toBytes(nonce), // nonce
-            maxPriorityGas,
-            maxGas,
-            Integers.toBytes(150000), // gasLimit
-            to,
-            Integers.toBytesUnsigned(BigInteger.ZERO), // value
-            callData,
-            new Object[0]
-        });
-
-        byte[] signedBytes = privateKey.sign(sequence);
-
-        // wrap in signature object
-        final byte[] r = new byte[32];
-        System.arraycopy(signedBytes, 0, r, 0, 32);
-        final byte[] s = new byte[32];
-        System.arraycopy(signedBytes, 32, s, 0, 32);
-
-        final int recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r, s, sequence);
-
-        byte[] ethereumData = RLPEncoder.sequence(
-            Integers.toBytes(0x02),
-            List.of(
+            var sequence = RLPEncoder.sequence(Integers.toBytes(2), new Object[]{
                 chainId,
                 Integers.toBytes(nonce), // nonce
                 maxPriorityGas,
@@ -125,29 +101,53 @@ public class EthereumTransactionIntegrationTest {
                 to,
                 Integers.toBytesUnsigned(BigInteger.ZERO), // value
                 callData,
-                List.of(/*accessList*/),
-                Integers.toBytes(recId), // recId
-                r,
-                s));
+                new Object[0]
+            });
 
-        EthereumTransaction ethereumTransaction = new EthereumTransaction()
-            .setEthereumData(ethereumData);
-        var ethereumTransactionResponse = ethereumTransaction.execute(testEnv.client);
-        var ethereumTransactionRecord = ethereumTransactionResponse.getRecord(testEnv.client);
+            byte[] signedBytes = privateKey.sign(sequence);
 
-        assertThat(ethereumTransactionRecord.contractFunctionResult.signerNonce).isEqualTo(1);
+            // wrap in signature object
+            final byte[] r = new byte[32];
+            System.arraycopy(signedBytes, 0, r, 0, 32);
+            final byte[] s = new byte[32];
+            System.arraycopy(signedBytes, 32, s, 0, 32);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            final int recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r, s, sequence);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            byte[] ethereumData = RLPEncoder.sequence(
+                Integers.toBytes(0x02),
+                List.of(
+                    chainId,
+                    Integers.toBytes(nonce), // nonce
+                    maxPriorityGas,
+                    maxGas,
+                    Integers.toBytes(150000), // gasLimit
+                    to,
+                    Integers.toBytesUnsigned(BigInteger.ZERO), // value
+                    callData,
+                    List.of(/*accessList*/),
+                    Integers.toBytes(recId), // recId
+                    r,
+                    s));
 
-        testEnv.close();
+            EthereumTransaction ethereumTransaction = new EthereumTransaction()
+                    .setEthereumData(ethereumData);
+            var ethereumTransactionResponse = ethereumTransaction.execute(testEnv.client);
+            var ethereumTransactionRecord = ethereumTransactionResponse.getRecord(testEnv.client);
+
+            assertThat(ethereumTransactionRecord.contractFunctionResult.signerNonce).isEqualTo(1);
+
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+        }
     }
 }

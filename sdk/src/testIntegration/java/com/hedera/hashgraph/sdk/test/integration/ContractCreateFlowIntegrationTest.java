@@ -34,131 +34,131 @@ public class ContractCreateFlowIntegrationTest {
     @Test
     @DisplayName("Create contract with flow")
     void createContractWithFlow() throws Throwable {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var response = new ContractCreateFlow()
-            .setBytecode(SMART_CONTRACT_BYTECODE)
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setContractMemo("[e2e::ContractCreateFlow]")
-            .execute(testEnv.client);
+            var response = new ContractCreateFlow()
+                .setBytecode(SMART_CONTRACT_BYTECODE)
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setContractMemo("[e2e::ContractCreateFlow]")
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        var receipt = new ContractExecuteTransaction()
-            .setContractId(contractId)
-            .setGas(100000)
-            .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            var receipt = new ContractExecuteTransaction()
+                .setContractId(contractId)
+                .setGas(100000)
+                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
+            assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .setTransferAccountId(testEnv.operatorId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .setTransferAccountId(testEnv.operatorId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Create contract with flow without signing")
     void createContractWithFlowWithoutSigning() throws Throwable {
-        var testEnv = new IntegrationTestEnv(1);
-        var adminKey = PrivateKey.generateED25519();
+        try(var testEnv = new IntegrationTestEnv(1)){
+            var adminKey = PrivateKey.generateED25519();
 
-        assertThatThrownBy(() -> new ContractCreateFlow()
-            .setBytecode(SMART_CONTRACT_BYTECODE)
-            .setAdminKey(adminKey)
-            .setGas(100000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setContractMemo("[e2e::ContractCreateFlow]")
-            .execute(testEnv.client))
-            .isInstanceOf(RuntimeException.class)
-            .hasMessageEndingWith("raised status INVALID_SIGNATURE");
+            assertThatThrownBy(() -> new ContractCreateFlow()
+                .setBytecode(SMART_CONTRACT_BYTECODE)
+                .setAdminKey(adminKey)
+                .setGas(100000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setContractMemo("[e2e::ContractCreateFlow]")
+                .execute(testEnv.client))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageEndingWith("raised status INVALID_SIGNATURE");
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Create contract with flow and sign with private key")
     void createContractWithFlowPrivateKeySign() throws Throwable {
-        var testEnv = new IntegrationTestEnv(1);
-        var adminKey = PrivateKey.generateED25519();
+        try(var testEnv = new IntegrationTestEnv(1)){
+            var adminKey = PrivateKey.generateED25519();
 
-        var response = new ContractCreateFlow()
-            .setBytecode(SMART_CONTRACT_BYTECODE)
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setContractMemo("[e2e::ContractCreateFlow]")
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client);
+            var response = new ContractCreateFlow()
+                .setBytecode(SMART_CONTRACT_BYTECODE)
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setContractMemo("[e2e::ContractCreateFlow]")
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        var receipt = new ContractExecuteTransaction()
-            .setContractId(contractId)
-            .setGas(100000)
-            .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            var receipt = new ContractExecuteTransaction()
+                .setContractId(contractId)
+                .setGas(100000)
+                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
+            assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .setTransferAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Create contract with flow and sign with public key and transaction signer")
     void createContractWithFlowPublicKeySign() throws Throwable {
-        var testEnv = new IntegrationTestEnv(1);
-        var adminKey = PrivateKey.generateED25519();
+        try(var testEnv = new IntegrationTestEnv(1)){
+            var adminKey = PrivateKey.generateED25519();
 
-        var response = new ContractCreateFlow()
-            .setBytecode(SMART_CONTRACT_BYTECODE)
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setContractMemo("[e2e::ContractCreateFlow]")
-            .freezeWith(testEnv.client)
-            .signWith(adminKey.getPublicKey(), adminKey::sign)
-            .execute(testEnv.client);
+            var response = new ContractCreateFlow()
+                .setBytecode(SMART_CONTRACT_BYTECODE)
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setContractMemo("[e2e::ContractCreateFlow]")
+                .freezeWith(testEnv.client)
+                .signWith(adminKey.getPublicKey(), adminKey::sign)
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        var receipt = new ContractExecuteTransaction()
-            .setContractId(contractId)
-            .setGas(100000)
-            .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            var receipt = new ContractExecuteTransaction()
+                .setContractId(contractId)
+                .setGas(100000)
+                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
+            assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .setTransferAccountId(testEnv.operatorId)
-            .freezeWith(testEnv.client)
-            .sign(adminKey)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .setTransferAccountId(testEnv.operatorId)
+                .freezeWith(testEnv.client)
+                .sign(adminKey)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 }
