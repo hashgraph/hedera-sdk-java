@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public final class ContractFunctionParameters {
         head.add(uint256(elements.size(), 32));
 
         // points to start of dynamic segment, *not* including the length of the array
-        @Var long currOffset = offsetsLen * 32L;
+        long currOffset = offsetsLen * 32L;
 
         for (ByteString elem : elements) {
             head.add(uint256(currOffset, 64));
@@ -128,7 +127,7 @@ public final class ContractFunctionParameters {
         return int256(val, bitWidth, true);
     }
 
-    static ByteString int256(long val, @Var int bitWidth, boolean signed) {
+    static ByteString int256(long val, int bitWidth, boolean signed) {
         // don't try to get wider than a `long` as it should just be filled with padding
         bitWidth = Math.min(bitWidth, 64);
         ByteString.Output output = ByteString.newOutput(bitWidth / 8);
@@ -199,7 +198,7 @@ public final class ContractFunctionParameters {
         return rem == 32 ? input : input.concat(padding.substring(0, rem));
     }
 
-    private static byte[] decodeAddress(@Var String address) {
+    private static byte[] decodeAddress(String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != ADDRESS_LEN_HEX) {
@@ -738,7 +737,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addInt8Array(byte[] intArray) {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> int256(i, 8))
                 .collect(Collectors.toList()));
 
@@ -756,7 +755,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt16Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 16))
                 .collect(Collectors.toList()));
 
@@ -774,7 +773,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt24Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 24))
                 .collect(Collectors.toList()));
 
@@ -792,7 +791,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt32Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 32))
                 .collect(Collectors.toList()));
 
@@ -810,7 +809,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt40Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 40))
                 .collect(Collectors.toList()));
 
@@ -828,7 +827,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt48Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 48))
                 .collect(Collectors.toList()));
 
@@ -846,7 +845,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt56Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 56))
                 .collect(Collectors.toList()));
 
@@ -864,7 +863,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt64Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> int256(i, 64))
                 .collect(Collectors.toList()));
 
@@ -882,7 +881,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt72Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 72))
                 .collect(Collectors.toList()));
 
@@ -900,7 +899,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt80Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 80))
                 .collect(Collectors.toList()));
 
@@ -918,7 +917,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt88Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 88))
                 .collect(Collectors.toList()));
 
@@ -936,7 +935,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt96Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 96))
                 .collect(Collectors.toList()));
 
@@ -954,7 +953,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt104Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 104))
                 .collect(Collectors.toList()));
 
@@ -972,7 +971,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt112Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 112))
                 .collect(Collectors.toList()));
 
@@ -990,7 +989,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt120Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 120))
                 .collect(Collectors.toList()));
 
@@ -1008,7 +1007,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt128Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 128))
                 .collect(Collectors.toList()));
 
@@ -1026,7 +1025,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt136Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 136))
                 .collect(Collectors.toList()));
 
@@ -1044,7 +1043,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt144Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 144))
                 .collect(Collectors.toList()));
 
@@ -1062,7 +1061,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt152Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 152))
                 .collect(Collectors.toList()));
 
@@ -1080,7 +1079,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt160Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 160))
                 .collect(Collectors.toList()));
 
@@ -1098,7 +1097,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt168Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 168))
                 .collect(Collectors.toList()));
 
@@ -1116,7 +1115,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt176Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 176))
                 .collect(Collectors.toList()));
 
@@ -1134,7 +1133,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt184Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 184))
                 .collect(Collectors.toList()));
 
@@ -1152,7 +1151,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt192Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 192))
                 .collect(Collectors.toList()));
 
@@ -1170,7 +1169,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt200Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 200))
                 .collect(Collectors.toList()));
 
@@ -1188,7 +1187,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt208Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 208))
                 .collect(Collectors.toList()));
 
@@ -1206,7 +1205,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt216Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 216))
                 .collect(Collectors.toList()));
 
@@ -1224,7 +1223,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt224Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 224))
                 .collect(Collectors.toList()));
 
@@ -1242,7 +1241,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt232Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 232))
                 .collect(Collectors.toList()));
 
@@ -1260,7 +1259,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt240Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 240))
                 .collect(Collectors.toList()));
 
@@ -1278,7 +1277,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt248Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 248))
                 .collect(Collectors.toList()));
 
@@ -1296,7 +1295,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addInt256Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> int256(i, 256))
                 .collect(Collectors.toList()));
 
@@ -1821,7 +1820,7 @@ public final class ContractFunctionParameters {
     public ContractFunctionParameters addUint8Array(byte[] intArray) {
         IntStream intStream = IntStream.range(0, intArray.length).map(idx -> intArray[idx]);
 
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             intStream.mapToObj(i -> uint256(i, 8))
                 .collect(Collectors.toList()));
 
@@ -1842,7 +1841,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint16Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 16))
                 .collect(Collectors.toList()));
 
@@ -1863,7 +1862,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint24Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 24))
                 .collect(Collectors.toList()));
 
@@ -1884,7 +1883,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint32Array(int[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 32))
                 .collect(Collectors.toList()));
 
@@ -1905,7 +1904,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint40Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 40))
                 .collect(Collectors.toList()));
 
@@ -1926,7 +1925,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint48Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 48))
                 .collect(Collectors.toList()));
 
@@ -1947,7 +1946,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint56Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 56))
                 .collect(Collectors.toList()));
 
@@ -1968,7 +1967,7 @@ public final class ContractFunctionParameters {
      * @return {@code this}
      */
     public ContractFunctionParameters addUint64Array(long[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).mapToObj(i -> uint256(i, 64))
                 .collect(Collectors.toList()));
 
@@ -1990,7 +1989,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint72Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 72))
                 .collect(Collectors.toList()));
 
@@ -2012,7 +2011,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint80Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 80))
                 .collect(Collectors.toList()));
 
@@ -2034,7 +2033,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint88Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 88))
                 .collect(Collectors.toList()));
 
@@ -2056,7 +2055,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint96Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 96))
                 .collect(Collectors.toList()));
 
@@ -2078,7 +2077,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint104Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 104))
                 .collect(Collectors.toList()));
 
@@ -2100,7 +2099,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint112Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 112))
                 .collect(Collectors.toList()));
 
@@ -2122,7 +2121,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint120Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 120))
                 .collect(Collectors.toList()));
 
@@ -2144,7 +2143,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint128Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 128))
                 .collect(Collectors.toList()));
 
@@ -2166,7 +2165,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint136Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 136))
                 .collect(Collectors.toList()));
 
@@ -2188,7 +2187,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint144Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 144))
                 .collect(Collectors.toList()));
 
@@ -2210,7 +2209,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint152Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 152))
                 .collect(Collectors.toList()));
 
@@ -2232,7 +2231,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint160Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 160))
                 .collect(Collectors.toList()));
 
@@ -2254,7 +2253,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint168Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 168))
                 .collect(Collectors.toList()));
 
@@ -2276,7 +2275,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint176Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 176))
                 .collect(Collectors.toList()));
 
@@ -2298,7 +2297,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint184Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 184))
                 .collect(Collectors.toList()));
 
@@ -2320,7 +2319,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint192Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 192))
                 .collect(Collectors.toList()));
 
@@ -2342,7 +2341,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint200Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 200))
                 .collect(Collectors.toList()));
 
@@ -2364,7 +2363,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint208Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 208))
                 .collect(Collectors.toList()));
 
@@ -2386,7 +2385,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint216Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 216))
                 .collect(Collectors.toList()));
 
@@ -2408,7 +2407,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint224Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 224))
                 .collect(Collectors.toList()));
 
@@ -2430,7 +2429,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint232Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 232))
                 .collect(Collectors.toList()));
 
@@ -2452,7 +2451,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint240Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 240))
                 .collect(Collectors.toList()));
 
@@ -2474,7 +2473,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint248Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 248))
                 .collect(Collectors.toList()));
 
@@ -2496,7 +2495,7 @@ public final class ContractFunctionParameters {
      * @throws IllegalArgumentException if {@code bigInt.signum() < 0}.
      */
     public ContractFunctionParameters addUint256Array(BigInteger[] intArray) {
-        @Var ByteString arrayBytes = ByteString.copyFrom(
+        ByteString arrayBytes = ByteString.copyFrom(
             Arrays.stream(intArray).map(i -> uint256(i, 256))
                 .collect(Collectors.toList()));
 
@@ -2607,7 +2606,7 @@ public final class ContractFunctionParameters {
      */
     ByteString toBytes(@Nullable String funcName) {
         // offset for dynamic-length data, immediately after value arguments
-        @Var var dynamicOffset = args.size() * 32;
+        var dynamicOffset = args.size() * 32;
 
         var paramsBytes = new ArrayList<ByteString>(args.size() + 1);
 

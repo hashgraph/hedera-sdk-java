@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.Key;
@@ -249,7 +248,7 @@ class KeyTest {
         assertThat(keyList).contains(key2);
         assertThat(keyList).contains(key3);
 
-        @Var var arr = keyList.toArray();
+        var arr = keyList.toArray();
         assertThat(arr[0]).isEqualTo(key1);
         assertThat(arr[1]).isEqualTo(key2);
         assertThat(arr[2]).isEqualTo(key3);

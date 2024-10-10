@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,7 @@ public class ClientIntegrationTest {
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() throws Exception {
-        @Var Map<String, AccountId> network = new HashMap<>();
+        Map<String, AccountId> network = new HashMap<>();
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
 

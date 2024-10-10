@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,10 +35,10 @@ public class ContractInfoIntegrationTest {
     void canQueryContractInfo() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
@@ -87,10 +86,10 @@ public class ContractInfoIntegrationTest {
     void canQueryContractInfoWhenAdminKeyIsNull() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
@@ -138,10 +137,10 @@ public class ContractInfoIntegrationTest {
     void getCostBigMaxContractInfoFunction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
@@ -183,10 +182,10 @@ public class ContractInfoIntegrationTest {
     void getCostSmallMaxContractInfoFunction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
@@ -227,10 +226,10 @@ public class ContractInfoIntegrationTest {
     void getCostInsufficientTxFeeContractInfoFunction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            @Var var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+            .setKeys(testEnv.operatorKey)
+            .setContents(SMART_CONTRACT_BYTECODE)
+            .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 

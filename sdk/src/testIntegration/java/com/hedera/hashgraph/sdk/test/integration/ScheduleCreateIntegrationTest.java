@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
@@ -166,7 +165,7 @@ public class ScheduleCreateIntegrationTest {
                 .execute(testEnv.client);
 
             // This will wait for the receipt to become available
-            @Var TransactionReceipt receipt = response.getReceipt(testEnv.client);
+            TransactionReceipt receipt = response.getReceipt(testEnv.client);
 
             AccountId accountId = Objects.requireNonNull(receipt.accountId);
 
@@ -189,9 +188,9 @@ public class ScheduleCreateIntegrationTest {
             ScheduleId scheduleId = Objects.requireNonNull(receipt.scheduleId);
 
             // Get the schedule info to see if `signatories` is populated with 2/3 signatures
-            @Var ScheduleInfo info = new ScheduleInfoQuery()
-                .setScheduleId(scheduleId)
-                .execute(testEnv.client);
+            ScheduleInfo info = new ScheduleInfoQuery()
+            .setScheduleId(scheduleId)
+            .execute(testEnv.client);
 
             assertThat(info.executedAt).isNull();
 
@@ -392,9 +391,9 @@ public class ScheduleCreateIntegrationTest {
                 .getReceipt(testEnv.client).scheduleId);
 
             // verify schedule has been created and has 1 of 2 signatures
-            @Var var info = new ScheduleInfoQuery()
-                .setScheduleId(scheduleId)
-                .execute(testEnv.client);
+            var info = new ScheduleInfoQuery()
+            .setScheduleId(scheduleId)
+            .execute(testEnv.client);
 
             assertThat(info).isNotNull();
             assertThat(info.scheduleId).isEqualTo(scheduleId);

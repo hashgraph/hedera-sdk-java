@@ -28,7 +28,6 @@ import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
@@ -145,10 +144,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return                          the contract expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -160,10 +155,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param expirationTime The Instant to be set for expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public ContractUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();
@@ -241,7 +232,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param maxAutomaticTokenAssociations The maximum automatic token associations
      * @return  {@code this}
      */
-
     public ContractUpdateTransaction setMaxAutomaticTokenAssociations(int maxAutomaticTokenAssociations) {
         requireNotFrozen();
         this.maxAutomaticTokenAssociations = maxAutomaticTokenAssociations;
@@ -254,10 +244,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @return                          the duration for auto-renew
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public Duration getAutoRenewPeriod() {
         return autoRenewPeriod;
     }
@@ -268,10 +254,6 @@ public final class ContractUpdateTransaction extends Transaction<ContractUpdateT
      * @param autoRenewPeriod The Duration to be set for auto renewal
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public ContractUpdateTransaction setAutoRenewPeriod(Duration autoRenewPeriod) {
         Objects.requireNonNull(autoRenewPeriod);
         requireNotFrozen();

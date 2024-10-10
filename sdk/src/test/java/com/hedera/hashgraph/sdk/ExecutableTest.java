@@ -25,7 +25,6 @@ import com.hedera.hashgraph.sdk.proto.QueryHeader;
 import com.hedera.hashgraph.sdk.proto.Response;
 import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
 import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -556,10 +555,6 @@ class ExecutableTest {
     }
 
     @Test
-    @SuppressFBWarnings(
-        value = "NP_NONNULL_PARAM_VIOLATION",
-        justification = "Cannot make TransactionResponse constructor public"
-    )
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 

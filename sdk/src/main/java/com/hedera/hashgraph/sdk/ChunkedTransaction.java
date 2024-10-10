@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SignatureMap;
@@ -356,7 +355,6 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     public CompletableFuture<List<TransactionResponse>> executeAllAsync(Client client, Duration timeoutPerChunk) {
         freezeAndSign(client);
 
-        @Var
         CompletableFuture<List<com.hedera.hashgraph.sdk.TransactionResponse>> future =
             CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
 
@@ -464,7 +462,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
     @Override
     int getRequiredChunks() {
-        @Var var requiredChunks = (this.data.size() + (chunkSize - 1)) / chunkSize;
+        var requiredChunks = (this.data.size() + (chunkSize - 1)) / chunkSize;
 
         if (requiredChunks == 0) {
             requiredChunks = 1;
@@ -487,7 +485,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         for (int i = 0; i < requiredChunks; i++) {
             if (!transactionIds.isEmpty()) {
                 var startIndex = i * chunkSize;
-                @Var var endIndex = startIndex + chunkSize;
+                var endIndex = startIndex + chunkSize;
 
                 if (endIndex > this.data.size()) {
                     endIndex = this.data.size();

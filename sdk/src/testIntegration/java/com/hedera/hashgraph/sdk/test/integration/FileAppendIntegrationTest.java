@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.FileAppendTransaction;
 import com.hedera.hashgraph.sdk.FileContentsQuery;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
@@ -48,9 +47,9 @@ public class FileAppendIntegrationTest {
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -103,9 +102,9 @@ public class FileAppendIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -164,9 +163,9 @@ public class FileAppendIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var var info = new FileInfoQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            var info = new FileInfoQuery()
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);

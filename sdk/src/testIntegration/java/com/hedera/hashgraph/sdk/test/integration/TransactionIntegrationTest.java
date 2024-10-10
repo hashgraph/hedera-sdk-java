@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
@@ -386,7 +385,6 @@ public class TransactionIntegrationTest {
 
             var expectedHash = transaction.getTransactionHashPerNode();
 
-            @Var
             var response = transaction.execute(testEnv.client);
 
             var record = response.getRecord(testEnv.client);
@@ -434,10 +432,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new FileInfoQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -480,10 +477,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new FileInfoQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -549,10 +545,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new FileInfoQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            .setFileId(fileId)
+            .execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -620,10 +615,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new TopicInfoQuery()
-                    .setTopicId(topicId)
-                    .execute(testEnv.client);
+            .setTopicId(topicId)
+            .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -670,10 +664,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new TopicInfoQuery()
-                    .setTopicId(topicId)
-                    .execute(testEnv.client);
+            .setTopicId(topicId)
+            .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -733,10 +726,9 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            @Var
             var info = new TopicInfoQuery()
-                    .setTopicId(topicId)
-                    .execute(testEnv.client);
+            .setTopicId(topicId)
+            .execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -881,7 +873,6 @@ public class TransactionIntegrationTest {
                                     .setEd25519(ByteString.copyFrom(signature5))
                                     .setPubKeyPrefix(ByteString.copyFrom(publicKey5.toBytes()))
                                     .build()));
-            @Var
             var byts = signedBuilder.build().toByteString();
 
             byts = TransactionList.newBuilder()

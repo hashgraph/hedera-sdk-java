@@ -27,7 +27,6 @@ import com.hedera.hashgraph.sdk.proto.FileUpdateTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Instant;
 
@@ -137,10 +136,6 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * @return                          the expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An Instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -154,10 +149,6 @@ public final class FileUpdateTransaction extends Transaction<FileUpdateTransacti
      * @param expirationTime the new {@link Instant} at which the transaction will expire.
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public FileUpdateTransaction setExpirationTime(Instant expirationTime) {
         Objects.requireNonNull(expirationTime);
         requireNotFrozen();

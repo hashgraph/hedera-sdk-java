@@ -24,13 +24,6 @@ plugins {
     id("org.gradlex.jvm-dependency-conflict-resolution")
 }
 
-// Do annotation processing on the classpath, because 'Error Prone' has many non-module dependencies
-sourceSets.all {
-    configurations.getByName(annotationProcessorConfigurationName) {
-        attributes { attribute(Attribute.of("javaModule", Boolean::class.javaObjectType), false) }
-    }
-}
-
 // Fix or enhance the metadata of third-party Modules. This is about the metadata in the
 // repositories: '*.pom' and '*.module' files.
 jvmDependencyConflicts.patch {
@@ -41,7 +34,6 @@ jvmDependencyConflicts.patch {
             "com.google.android:annotations",
             "com.google.code.findbugs:annotations",
             "com.google.code.findbugs:jsr305",
-            "com.google.errorprone:error_prone_annotations",
             "com.google.guava:listenablefuture",
             "com.google.j2objc:j2objc-annotations",
             "org.checkerframework:checker-compat-qual",
@@ -76,21 +68,7 @@ extraJavaModuleInfo {
     module("com.google.guava:failureaccess", "com.google.common.util.concurrent.internal")
     module("com.google.guava:guava", "com.google.common") {
         exportAllPackages()
-        requires("com.google.common.util.concurrent.internal")
-        requires("java.logging")
-    }
-    module("guava-32.1.3-jre.jar", "com.google.common") {
-        /**
-         * Repetition of the rule above:
-         *
-         * There is an issue when the version is "android", but the selected Jar
-         * with classifier is "jre". If this causes a problem depends on the local
-         * Gradle dependency cache state (most likely).
-         * This is an issue that needs to be investigated and fixed in
-         * https://github.com/gradlex-org/extra-java-module-info
-         */
-        exportAllPackages()
-        requires("com.google.common.util.concurrent.internal")
+        requireAllDefinedDependencies()
         requires("java.logging")
     }
     module("com.google.protobuf:protobuf-java", "com.google.protobuf") {
@@ -128,10 +106,7 @@ extraJavaModuleInfo {
         requires("java.logging")
     }
     module("io.perfmark:perfmark-api", "io.perfmark")
-    module("javax.annotation:javax.annotation-api", "java.annotation") {
-        exportAllPackages()
-        mergeJar("com.google.code.findbugs:jsr305")
-    }
+    module("com.google.code.findbugs:jsr305", "java.annotation")
     module("org.jetbrains:annotations", "org.jetbrains.annotations")
 
     // Full protobuf only
@@ -159,8 +134,4 @@ extraJavaModuleInfo {
     module("org.mockito:mockito-core", "org.mockito")
     module("org.mockito:mockito-junit-jupiter", "org.mockito.junit.jupiter")
     module("org.objenesis:objenesis", "org.objenesis")
-}
-
-dependencies {
-    javaModulesMergeJars("com.google.code.findbugs:jsr305:3.0.2")
 }

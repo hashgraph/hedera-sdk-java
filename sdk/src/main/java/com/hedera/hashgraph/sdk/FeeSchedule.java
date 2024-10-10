@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 
 import javax.annotation.Nullable;
@@ -118,10 +117,6 @@ public class FeeSchedule implements Cloneable {
      * @return                          the expiration time
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "An Instant can't actually be mutated"
-    )
     public Instant getExpirationTime() {
         return expirationTime;
     }
@@ -132,10 +127,6 @@ public class FeeSchedule implements Cloneable {
      * @param expirationTime            the expiration time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public FeeSchedule setExpirationTime(@Nullable Instant expirationTime) {
         this.expirationTime = expirationTime;
         return this;
