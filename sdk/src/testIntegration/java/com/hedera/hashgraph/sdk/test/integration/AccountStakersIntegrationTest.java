@@ -32,15 +32,15 @@ class AccountStakersIntegrationTest {
     @Test
     @DisplayName("Cannot query account stakers since it is not supported")
     void cannotQueryAccountStakersSinceItIsNotSupported() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new AccountStakersQuery()
-                .setAccountId(testEnv.operatorId)
-                .setMaxQueryPayment(new Hbar(1))
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new AccountStakersQuery()
+                    .setAccountId(testEnv.operatorId)
+                    .setMaxQueryPayment(new Hbar(1))
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        testEnv.close();
+        }
     }
 }

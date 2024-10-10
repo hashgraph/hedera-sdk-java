@@ -38,60 +38,62 @@ class LoadIntegrationTest {
     @Test
     @DisplayName("Load test with multiple clients and single executor")
     void loadTest() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
-        var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
-        var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        int nThreads = 10;
-        var clientExecutor = Executors.newFixedThreadPool(16);
+            var operatorPrivateKey = PrivateKey.fromString(System.getProperty("OPERATOR_KEY"));
+            var operatorId = AccountId.fromString(System.getProperty("OPERATOR_ID"));
 
-        var threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads);
+            int nThreads = 10;
+            var clientExecutor = Executors.newFixedThreadPool(16);
 
-        long startTime = System.currentTimeMillis();
+            var threadPoolExecutor = (ThreadPoolExecutor) Executors.newFixedThreadPool(nThreads);
 
-        System.out.println("Finished executing tasks:");
-        for (int i = 0; i < nThreads; i++) {
-            int finalI = i;
-            threadPoolExecutor.submit(() -> {
-                var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
-                client.setOperator(operatorId, operatorPrivateKey);
-                client.setMaxAttempts(10);
-                try {
-                    new AccountCreateTransaction()
-                        .setKey(PrivateKey.generateED25519())
-                        .execute(client)
-                        .getReceipt(client);
-                    System.out.println(finalI);
-                } catch (Exception e) {
-                    fail("AccountCreateTransaction failed, " + e);
-                } finally {
+            long startTime = System.currentTimeMillis();
+
+            System.out.println("Finished executing tasks:");
+            for (int i = 0; i < nThreads; i++) {
+                int finalI = i;
+                threadPoolExecutor.submit(() -> {
+                    var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
+                    client.setOperator(operatorId, operatorPrivateKey);
+                    client.setMaxAttempts(10);
                     try {
-                        client.closeChannels();
-                    } catch (TimeoutException e) {
-                        throw new RuntimeException(e);
+                        new AccountCreateTransaction()
+                            .setKey(PrivateKey.generateED25519())
+                            .execute(client)
+                            .getReceipt(client);
+                        System.out.println(finalI);
+                    } catch (Exception e) {
+                        fail("AccountCreateTransaction failed, " + e);
+                    } finally {
+                        try {
+                            client.closeChannels();
+                        } catch (TimeoutException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+                });
+            }
+
+            threadPoolExecutor.shutdown();
+
+            // Wait for all tasks to finish
+            try {
+                if (!threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    System.out.println();
+                    System.out.println("Forcing shutdown");
+                    threadPoolExecutor.shutdownNow();
                 }
-            });
-        }
-
-        threadPoolExecutor.shutdown();
-
-        // Wait for all tasks to finish
-        try {
-            if (!threadPoolExecutor.awaitTermination(60, TimeUnit.SECONDS)) {
-                System.out.println();
-                System.out.println("Forcing shutdown");
+            } catch (InterruptedException e) {
                 threadPoolExecutor.shutdownNow();
             }
-        } catch (InterruptedException e) {
-            threadPoolExecutor.shutdownNow();
-        }
 
-        long endTime = System.currentTimeMillis();
-        long executionTime = endTime - startTime;
-        System.out.println();
-        System.out.println("All tasks have finished execution in " + executionTime + "ms");
-        clientExecutor.shutdownNow();
-        testEnv.close();
+            long endTime = System.currentTimeMillis();
+            long executionTime = endTime - startTime;
+            System.out.println();
+            System.out.println("All tasks have finished execution in " + executionTime + "ms");
+            clientExecutor.shutdownNow();
+
+        }
     }
 }
