@@ -39,25 +39,25 @@ class LiveHashDeleteIntegrationTest {
     @Test
     @DisplayName("Cannot delete live hash because it's not supported")
     void cannotDeleteLiveHashBecauseItsNotSupported() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try(var testEnv = new IntegrationTestEnv(1)){
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+            var response = new AccountCreateTransaction()
+                .setKey(key)
+                .setInitialBalance(new Hbar(1))
+                .execute(testEnv.client);
 
-        var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
+            var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new LiveHashDeleteTransaction()
-                .setAccountId(accountId)
-                .setHash(HASH)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new LiveHashDeleteTransaction()
+                    .setAccountId(accountId)
+                    .setHash(HASH)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        testEnv.close(accountId, key);
+        }
     }
 }

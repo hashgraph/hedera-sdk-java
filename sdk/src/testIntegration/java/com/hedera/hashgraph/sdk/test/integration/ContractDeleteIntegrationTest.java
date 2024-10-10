@@ -44,107 +44,109 @@ public class ContractDeleteIntegrationTest {
     @Test
     @DisplayName("Can delete contract with admin key")
     void canDeleteContractWithAdminKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        @Var var response = new FileCreateTransaction()
-            .setKeys(testEnv.operatorKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
-            .execute(testEnv.client);
+            @Var
+            var response = new FileCreateTransaction()
+                .setKeys(testEnv.operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        response = new ContractCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setBytecodeFileId(fileId)
-            .setContractMemo("[e2e::ContractCreateTransaction]")
-            .execute(testEnv.client);
+            response = new ContractCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        var info = new ContractInfoQuery()
-            .setContractId(contractId)
-            .execute(testEnv.client);
+            var info = new ContractInfoQuery()
+                .setContractId(contractId)
+                .execute(testEnv.client);
 
-        assertThat(info.contractId).isEqualTo(contractId);
-        assertThat(info.accountId).isNotNull();
-        assertThat(Objects.requireNonNull(info.accountId).toString()).isEqualTo(contractId.toString());
-        assertThat(info.adminKey).isNotNull();
-        assertThat(Objects.requireNonNull(info.adminKey).toString()).isEqualTo(Objects.requireNonNull(testEnv.operatorKey).toString());
-        assertThat(info.storage).isEqualTo(128);
-        assertThat(info.contractMemo).isEqualTo("[e2e::ContractCreateTransaction]");
+            assertThat(info.contractId).isEqualTo(contractId);
+            assertThat(info.accountId).isNotNull();
+            assertThat(Objects.requireNonNull(info.accountId).toString()).isEqualTo(contractId.toString());
+            assertThat(info.adminKey).isNotNull();
+            assertThat(Objects.requireNonNull(info.adminKey).toString())
+                    .isEqualTo(Objects.requireNonNull(testEnv.operatorKey).toString());
+            assertThat(info.storage).isEqualTo(128);
+            assertThat(info.contractMemo).isEqualTo("[e2e::ContractCreateTransaction]");
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot delete contract which has no admin key")
     void cannotDeleteContractWhichHasNoAdminKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var response = new FileCreateTransaction()
-            .setKeys(testEnv.operatorKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
-            .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+                .setKeys(testEnv.operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        var contractId = Objects.requireNonNull(new ContractCreateTransaction()
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setBytecodeFileId(fileId)
-            .setContractMemo("[e2e::ContractCreateTransaction]")
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client)
-            .contractId
-        );
-
-        var info = new ContractInfoQuery()
-            .setContractId(contractId)
-            .execute(testEnv.client);
-
-        assertThat(info.contractId).isEqualTo(contractId);
-        assertThat(info.accountId).isNotNull();
-        assertThat(Objects.requireNonNull(info.accountId).toString()).isEqualTo(contractId.toString());
-        assertThat(info.adminKey).isNotNull();
-        // assertEquals(info.adminKey, contractId);
-        assertThat(info.storage).isEqualTo(128);
-        assertThat(info.contractMemo).isEqualTo("[e2e::ContractCreateTransaction]");
-
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new ContractDeleteTransaction()
-                .setContractId(contractId)
-                .setTransferAccountId(testEnv.client.getOperatorAccountId())
+            var contractId = Objects.requireNonNull(new ContractCreateTransaction()
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
                 .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.MODIFYING_IMMUTABLE_CONTRACT.toString());
+                .getReceipt(testEnv.client)
+                .contractId
+            );
 
-        testEnv.close();
+            var info = new ContractInfoQuery()
+                .setContractId(contractId)
+                .execute(testEnv.client);
+
+            assertThat(info.contractId).isEqualTo(contractId);
+            assertThat(info.accountId).isNotNull();
+            assertThat(Objects.requireNonNull(info.accountId).toString()).isEqualTo(contractId.toString());
+            assertThat(info.adminKey).isNotNull();
+            // assertEquals(info.adminKey, contractId);
+            assertThat(info.storage).isEqualTo(128);
+            assertThat(info.contractMemo).isEqualTo("[e2e::ContractCreateTransaction]");
+
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new ContractDeleteTransaction()
+                    .setContractId(contractId)
+                    .setTransferAccountId(testEnv.client.getOperatorAccountId())
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.MODIFYING_IMMUTABLE_CONTRACT.toString());
+
+        }
     }
 
     @Test
     @DisplayName("Cannot delete contract when contract ID is not set")
     void cannotDeleteContractWhenContractIDIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new ContractDeleteTransaction()
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_CONTRACT_ID.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new ContractDeleteTransaction()
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_CONTRACT_ID.toString());
 
-        testEnv.close();
+        }
     }
 }

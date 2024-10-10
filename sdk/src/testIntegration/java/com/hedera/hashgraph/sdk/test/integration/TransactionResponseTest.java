@@ -30,22 +30,22 @@ public class TransactionResponseTest {
     @Test
     @DisplayName("transaction hash in transaction record is equal to the transaction response transaction hash")
     void transactionHashInTransactionRecordIsEqualToTheTransactionResponseTransactionHash() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateED25519();
 
-        var transaction = new AccountCreateTransaction()
-            .setKey(key)
-            .execute(testEnv.client);
+            var transaction = new AccountCreateTransaction()
+                .setKey(key)
+                .execute(testEnv.client);
 
-        var record = transaction.getRecord(testEnv.client);
+            var record = transaction.getRecord(testEnv.client);
 
-        assertThat(record.transactionHash.toByteArray()).containsExactly(transaction.transactionHash);
+            assertThat(record.transactionHash.toByteArray()).containsExactly(transaction.transactionHash);
 
-        var accountId = record.receipt.accountId;
-        assertThat(accountId).isNotNull();
+            var accountId = record.receipt.accountId;
+            assertThat(accountId).isNotNull();
 
-        testEnv.close(accountId, key);
+        }
     }
 }
 

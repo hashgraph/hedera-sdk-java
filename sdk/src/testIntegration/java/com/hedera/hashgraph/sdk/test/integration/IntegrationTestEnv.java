@@ -40,7 +40,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
-public class IntegrationTestEnv {
+public class IntegrationTestEnv implements AutoCloseable {
     static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
     static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
     static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
@@ -150,15 +150,8 @@ public class IntegrationTestEnv {
         Assumptions.assumeFalse(isLocalNode);
     }
 
-    public void close(
-        @Nullable TokenId newTokenId,
-        @Nullable AccountId newAccountId,
-        @Nullable PrivateKey newAccountKey
-    ) throws Exception {
-        if (newAccountId != null) {
-            wipeAccountHbars(newAccountId, newAccountKey);
-        }
-
+    @Override
+    public void close() throws Exception {
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
             var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
@@ -174,31 +167,6 @@ public class IntegrationTestEnv {
         }
 
         originalClient.close();
-    }
-
-    public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        var hbarsBalance = new AccountBalanceQuery()
-            .setAccountId(newAccountId)
-            .execute(originalClient)
-            .hbars;
-        new TransferTransaction()
-            .addHbarTransfer(newAccountId, hbarsBalance.negated())
-            .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
-            .freezeWith(originalClient)
-            .sign(Objects.requireNonNull(newAccountKey))
-            .execute(originalClient);
-    }
-
-    public void close() throws Exception {
-        close(null, null, null);
-    }
-
-    public void close(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        close(null, newAccountId, newAccountKey);
-    }
-
-    public void close(TokenId newTokenId) throws Exception {
-        close(newTokenId, null, null);
     }
 
     private static class TestEnvNodeGetter {
