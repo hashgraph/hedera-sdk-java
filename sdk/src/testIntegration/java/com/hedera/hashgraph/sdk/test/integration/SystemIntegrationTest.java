@@ -41,54 +41,53 @@ public class SystemIntegrationTest {
     @Test
     @DisplayName("All system transactions are not supported")
     void allSystemTransactionsAreNotSupported() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var fileId = Objects.requireNonNull(
-            new FileCreateTransaction()
-                .setContents(SMART_CONTRACT_BYTECODE)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .fileId
-        );
+            var fileId = Objects.requireNonNull(
+                new FileCreateTransaction()
+                    .setContents(SMART_CONTRACT_BYTECODE)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .fileId);
 
-        var contractId = Objects.requireNonNull(
-            new ContractCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setGas(200000)
-                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                .setBytecodeFileId(fileId)
-                .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .contractId
-        );
+            var contractId = Objects.requireNonNull(
+                new ContractCreateTransaction()
+                    .setAdminKey(testEnv.operatorKey)
+                    .setGas(200000)
+                    .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                    .setBytecodeFileId(fileId)
+                    .setContractMemo("[e2e::ContractCreateTransaction]")
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .contractId
+            );
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new SystemDeleteTransaction()
-                .setContractId(contractId)
-                .setExpirationTime(Instant.now())
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new SystemDeleteTransaction()
+                    .setContractId(contractId)
+                    .setExpirationTime(Instant.now())
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new SystemDeleteTransaction()
-                .setFileId(fileId)
-                .setExpirationTime(Instant.now())
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new SystemDeleteTransaction()
+                    .setFileId(fileId)
+                    .setExpirationTime(Instant.now())
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new SystemUndeleteTransaction()
-                .setContractId(contractId)
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new SystemUndeleteTransaction()
+                    .setContractId(contractId)
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new SystemUndeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client);
-        }).withMessageContaining(Status.NOT_SUPPORTED.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new SystemUndeleteTransaction()
+                    .setFileId(fileId)
+                    .execute(testEnv.client);
+            }).withMessageContaining(Status.NOT_SUPPORTED.toString());
 
-        testEnv.close();
+        }
     }
 }
