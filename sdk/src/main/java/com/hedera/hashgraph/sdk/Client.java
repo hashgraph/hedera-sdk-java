@@ -19,9 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
@@ -469,10 +466,7 @@ public final class Client implements AutoCloseable {
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook, boolean updateAddressBook)
         throws InterruptedException, TimeoutException {
-        network.setNetwork(Network.addressBookToNetwork(
-            addressBook.nodeAddresses,
-            isTransportSecurity() ? PORT_NODE_TLS : PORT_NODE_PLAIN
-        ));
+        network.setNetwork(Network.addressBookToNetwork(addressBook.nodeAddresses));
         if (updateAddressBook) {
             network.setAddressBook(addressBook);
         }

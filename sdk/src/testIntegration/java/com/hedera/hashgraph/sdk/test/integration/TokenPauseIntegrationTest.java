@@ -39,45 +39,47 @@ public class TokenPauseIntegrationTest {
     @Test
     @DisplayName("Can execute token pause transaction")
     void canExecuteTokenPauseTransaction() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
-        var accountKey = PrivateKey.generateED25519();
-        var testTokenAmount = 10;
-        var accountId = new AccountCreateTransaction().setKey(accountKey).setInitialBalance(new Hbar(2))
-            .execute(testEnv.client).getReceipt(testEnv.client).accountId;
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        var tokenId = new TokenCreateTransaction().setTokenName("ffff").setTokenSymbol("F").setInitialSupply(1000000)
-            .setDecimals(3).setTreasuryAccountId(testEnv.operatorId).setAdminKey(testEnv.operatorKey)
-            .setPauseKey(testEnv.operatorKey).setFreezeDefault(false).execute(testEnv.client)
-            .getReceipt(testEnv.client).tokenId;
+            var accountKey = PrivateKey.generateED25519();
+            var testTokenAmount = 10;
+            var accountId = new AccountCreateTransaction().setKey(accountKey).setInitialBalance(new Hbar(2))
+                .execute(testEnv.client).getReceipt(testEnv.client)
+                .accountId;
 
-        new TokenAssociateTransaction().setAccountId(accountId).setTokenIds(Collections.singletonList(tokenId))
-            .freezeWith(testEnv.client).sign(accountKey).execute(testEnv.client).getReceipt(testEnv.client);
+            var tokenId = new TokenCreateTransaction().setTokenName("ffff").setTokenSymbol("F").setInitialSupply(1000000)
+                .setDecimals(3).setTreasuryAccountId(testEnv.operatorId).setAdminKey(testEnv.operatorKey)
+                .setPauseKey(testEnv.operatorKey).setFreezeDefault(false).execute(testEnv.client)
+                .getReceipt(testEnv.client).tokenId;
 
-        new TransferTransaction().addTokenTransfer(tokenId, accountId, testTokenAmount)
-            .addTokenTransfer(tokenId, testEnv.operatorId, -testTokenAmount).execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TokenAssociateTransaction().setAccountId(accountId).setTokenIds(Collections.singletonList(tokenId))
+                .freezeWith(testEnv.client).sign(accountKey).execute(testEnv.client).getReceipt(testEnv.client);
 
-        new TokenPauseTransaction().setTokenId(tokenId).freezeWith(testEnv.client).execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        assertThrows(ReceiptStatusException.class, () -> {
             new TransferTransaction().addTokenTransfer(tokenId, accountId, testTokenAmount)
-                .addTokenTransfer(tokenId, testEnv.operatorId, -testTokenAmount).freezeWith(testEnv.client)
-                .sign(accountKey).execute(testEnv.client).getReceipt(testEnv.client);
-        });
+                .addTokenTransfer(tokenId, testEnv.operatorId, -testTokenAmount).execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+            new TokenPauseTransaction().setTokenId(tokenId).freezeWith(testEnv.client).execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            assertThrows(ReceiptStatusException.class, () -> {
+                new TransferTransaction().addTokenTransfer(tokenId, accountId, testTokenAmount)
+                    .addTokenTransfer(tokenId, testEnv.operatorId, -testTokenAmount).freezeWith(testEnv.client)
+                    .sign(accountKey).execute(testEnv.client).getReceipt(testEnv.client);
+            });
+
+        }
     }
 
     @Test
     @DisplayName("Cannot pause with no token ID")
     void cannotPauseWithNoTokenId() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
-        assertThrows(PrecheckStatusException.class, () -> {
-            new TokenPauseTransaction().execute(testEnv.client).getReceipt(testEnv.client);
-        });
+            assertThrows(PrecheckStatusException.class, () -> {
+                new TokenPauseTransaction().execute(testEnv.client).getReceipt(testEnv.client);
+            });
 
-        testEnv.close();
+        }
     }
 }
