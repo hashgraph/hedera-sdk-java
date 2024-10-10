@@ -39,7 +39,7 @@ class AccountIdTest {
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
         mainnetClient = Client.forMainnet();
         testnetClient = Client.forTestnet();
         previewnetClient = Client.forPreviewnet();

@@ -138,13 +138,6 @@ extraJavaModuleInfo {
     module("com.google.api.grpc:proto-google-common-protos", "com.google.api.grpc.common")
 
     // Testing only
-    module("com.fasterxml.jackson.core:jackson-annotations", "com.fasterxml.jackson.annotations")
-    module("com.fasterxml.jackson.core:jackson-core", "com.fasterxml.jackson.core")
-    module("com.fasterxml.jackson.core:jackson-databind", "com.fasterxml.jackson.databind") {
-        exportAllPackages()
-        requireAllDefinedDependencies()
-        requires("java.sql")
-    }
     module("io.grpc:grpc-netty-shaded", "io.grpc.netty.shaded") {
         exportAllPackages()
         requireAllDefinedDependencies()
