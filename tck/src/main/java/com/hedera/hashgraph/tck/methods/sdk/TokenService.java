@@ -38,7 +38,6 @@ import com.hedera.hashgraph.tck.methods.sdk.param.TokenCreateParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.TokenResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,7 +116,7 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getName().ifPresent(tokenCreateTransaction::setTokenName);
         params.getSymbol().ifPresent(tokenCreateTransaction::setTokenSymbol);
         params.getDecimals().ifPresent(decimals -> tokenCreateTransaction.setDecimals(decimals.intValue()));
-        params.getInitialSupply().ifPresent(supply -> tokenCreateTransaction.setInitialSupply(supply.longValue()));
+        params.getInitialSupply().ifPresent(tokenCreateTransaction::setInitialSupply);
 
         params.getTreasuryAccountId()
                 .ifPresent(treasuryAccountId ->
@@ -126,8 +125,8 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getFreezeDefault().ifPresent(tokenCreateTransaction::setFreezeDefault);
 
         params.getExpirationTime()
-                .ifPresent(expirationTime ->
-                        tokenCreateTransaction.setExpirationTime(Instant.ofEpochSecond(expirationTime)));
+                .ifPresent(
+                        expirationTime -> tokenCreateTransaction.setExpirationTime(Duration.ofSeconds(expirationTime)));
 
         params.getAutoRenewAccountId()
                 .ifPresent(autoRenewAccountId ->

@@ -85,7 +85,12 @@ public class TokenCreateParams extends JSONRPC2Param {
         var parsedPauseKey = Optional.ofNullable((String) jrpcParams.get("pauseKey"));
         var parsedMetadataKey = Optional.ofNullable((String) jrpcParams.get("metadataKey"));
         var parsedFreezeDefault = Optional.ofNullable((Boolean) jrpcParams.get("freezeDefault"));
-        var parsedExpirationTime = Optional.ofNullable((Long) jrpcParams.get("expirationTime"));
+        Optional<Long> parsedExpirationTime;
+        try {
+            parsedExpirationTime = Optional.ofNullable((Long) jrpcParams.get("expirationTime"));
+        } catch (Exception e) {
+            parsedExpirationTime = Optional.of(((BigInteger) jrpcParams.get("expirationTime")).longValue());
+        }
         var parsedAutoRenewAccountId = Optional.ofNullable((String) jrpcParams.get("autoRenewAccountId"));
         Optional<Long> parsedAutoRenewPeriod;
         try {
