@@ -103,6 +103,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
+        this.contractId = null; // Reset contractId
         return this;
     }
 
@@ -128,6 +129,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
         Objects.requireNonNull(contractId);
         requireNotFrozen();
         this.contractId = contractId;
+        this.fileId = null; // Reset fileId
         return this;
     }
 
