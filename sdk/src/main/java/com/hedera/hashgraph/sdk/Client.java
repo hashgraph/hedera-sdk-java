@@ -1469,7 +1469,7 @@ public final class Client implements AutoCloseable {
         @Nullable
         private JsonElement mirrorNetwork;
 
-        static class ConfigOperator {
+        private static class ConfigOperator {
             @Nullable
             private String accountId;
 
