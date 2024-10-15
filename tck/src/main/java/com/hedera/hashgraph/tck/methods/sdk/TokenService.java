@@ -81,6 +81,14 @@ public class TokenService extends AbstractJSONRPC2Service {
             }
         });
 
+        params.getFreezeKey().ifPresent(key -> {
+            try {
+                tokenCreateTransaction.setWipeKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
         params.getSupplyKey().ifPresent(key -> {
             try {
                 tokenCreateTransaction.setSupplyKey(KeyUtils.getKeyFromString(key));
@@ -116,7 +124,8 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getName().ifPresent(tokenCreateTransaction::setTokenName);
         params.getSymbol().ifPresent(tokenCreateTransaction::setTokenSymbol);
         params.getDecimals().ifPresent(decimals -> tokenCreateTransaction.setDecimals(decimals.intValue()));
-        params.getInitialSupply().ifPresent(tokenCreateTransaction::setInitialSupply);
+        params.getInitialSupply()
+                .ifPresent(initialSupply -> tokenCreateTransaction.setInitialSupply(Long.parseLong(initialSupply)));
 
         params.getTreasuryAccountId()
                 .ifPresent(treasuryAccountId ->
@@ -125,16 +134,16 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getFreezeDefault().ifPresent(tokenCreateTransaction::setFreezeDefault);
 
         params.getExpirationTime()
-                .ifPresent(
-                        expirationTime -> tokenCreateTransaction.setExpirationTime(Duration.ofSeconds(expirationTime)));
+                .ifPresent(expirationTime ->
+                        tokenCreateTransaction.setExpirationTime(Duration.ofSeconds(Long.parseLong(expirationTime))));
 
         params.getAutoRenewAccountId()
                 .ifPresent(autoRenewAccountId ->
                         tokenCreateTransaction.setAutoRenewAccountId(AccountId.fromString(autoRenewAccountId)));
 
         params.getAutoRenewPeriod()
-                .ifPresent(autoRenewPeriodSeconds ->
-                        tokenCreateTransaction.setAutoRenewPeriod(Duration.ofSeconds(autoRenewPeriodSeconds)));
+                .ifPresent(autoRenewPeriodSeconds -> tokenCreateTransaction.setAutoRenewPeriod(
+                        Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
 
         params.getMemo().ifPresent(tokenCreateTransaction::setTokenMemo);
         params.getTokenType().ifPresent(tokenType -> {
@@ -157,7 +166,7 @@ public class TokenService extends AbstractJSONRPC2Service {
             }
         });
 
-        params.getMaxSupply().ifPresent(tokenCreateTransaction::setMaxSupply);
+        params.getMaxSupply().ifPresent(maxSupply -> tokenCreateTransaction.setMaxSupply(Long.valueOf(maxSupply)));
 
         params.getCustomFees().ifPresent(customFees -> {
             List<com.hedera.hashgraph.sdk.CustomFee> customFeeList = new ArrayList<>();
