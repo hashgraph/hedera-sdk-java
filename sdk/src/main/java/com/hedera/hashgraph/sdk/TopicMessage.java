@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.MoreObjects;
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
 import java.time.Instant;
@@ -116,9 +115,9 @@ public final class TopicMessage {
     static TopicMessage ofMany(List<ConsensusTopicResponse> responses) {
         // response should be in the order of oldest to newest (not chunk order)
         var chunks = new TopicMessageChunk[responses.size()];
-        @Var TransactionId transactionId = null;
+        TransactionId transactionId = null;
         var contents = new ByteString[responses.size()];
-        @Var long totalSize = 0;
+        long totalSize = 0;
 
         for (ConsensusTopicResponse r : responses) {
             if (transactionId == null && r.getChunkInfo().hasInitialTransactionID()) {

@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
@@ -28,7 +27,6 @@ import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.time.Instant;
@@ -215,9 +213,9 @@ public abstract class Transaction<T extends Transaction<T>>
             nodeAccountIds.remove(new AccountId(0));
 
             // Verify that transaction bodies match
-            for (@Var int i = 0; i < txCount; i++) {
-                @Var TransactionBody firstTxBody = null;
-                for (@Var int j = 0; j < nodeCount; j++) {
+            for (int i = 0; i < txCount; i++) {
+                TransactionBody firstTxBody = null;
+                for (int j = 0; j < nodeCount; j++) {
                     int k = i * nodeCount + j;
                     var txBody = TransactionBody.parseFrom(innerSignedTransactions.get(k).getBodyBytes());
                     if (firstTxBody == null) {
@@ -255,7 +253,7 @@ public abstract class Transaction<T extends Transaction<T>>
      */
     public static Transaction<?> fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         var txs = new LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>>();
-        @Var TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
+        TransactionBody.DataCase dataCase = TransactionBody.DataCase.DATA_NOT_SET;
 
         var list = TransactionList.parseFrom(bytes);
 
@@ -536,7 +534,7 @@ public abstract class Transaction<T extends Transaction<T>>
                     if (listA.size() != listB.size()) {
                         throwProtoMatchException(methodFieldName, "of size " + listA.size(), "of size " + listB.size());
                     }
-                    for (@Var int i = 0; i < listA.size(); i++) {
+                    for (int i = 0; i < listA.size(); i++) {
                         // System.out.println("comparing " + thisFieldName + "." + methodFieldName + "[" + i + "]");
                         requireProtoMatches(listA.get(i), listB.get(i), ignoreSet, methodFieldName + "[" + i + "]");
                     }
@@ -643,10 +641,6 @@ public abstract class Transaction<T extends Transaction<T>>
      * @return the transaction valid duration
      */
     @Nullable
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP",
-        justification = "A Duration can't actually be mutated"
-    )
     public final Duration getTransactionValidDuration() {
         return transactionValidDuration;
     }
@@ -659,10 +653,6 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param validDuration The duration to be set
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "A Duration can't actually be mutated"
-    )
     public final T setTransactionValidDuration(Duration validDuration) {
         requireNotFrozen();
         Objects.requireNonNull(validDuration);

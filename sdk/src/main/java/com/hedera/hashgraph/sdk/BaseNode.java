@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import io.grpc.ChannelCredentials;
 import io.grpc.ConnectivityState;
 import io.grpc.Grpc;
@@ -307,7 +306,7 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
         }
         hasConnected = (getChannel().getState(true) == ConnectivityState.READY);
         try {
-            for (@Var int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
+            for (int i = 0; i < GET_STATE_MAX_ATTEMPTS && !hasConnected; i++) {
                 Duration currentTimeout = Duration.between(Instant.now(), timeoutTime);
                 if (currentTimeout.isNegative() || currentTimeout.isZero()) {
                     return false;

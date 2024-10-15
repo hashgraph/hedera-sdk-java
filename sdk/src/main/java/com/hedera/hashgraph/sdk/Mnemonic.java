@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.base.Joiner;
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.utils.Bip32Utils;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.digests.SHA512Digest;
@@ -153,8 +152,8 @@ public final class Mnemonic {
 
             words = new ArrayList<>(24);
         }
-        @Var var scratch = 0;
-        @Var var offset = 0;
+        var scratch = 0;
+        var offset = 0;
 
         for (var b : bytes) {
             // shift `bytes` into `scratch`, popping off 11-bit indices when we can
@@ -194,7 +193,6 @@ public final class Mnemonic {
 
     private static int getWordIndex(CharSequence word, boolean isLegacy) {
         var wordList = getWordList(isLegacy);
-        @Var
         var found = -1;
         for (var i = 0; i < wordList.size(); i++) {
             if (word.toString().equals(wordList.get(i))) {
@@ -265,14 +263,14 @@ public final class Mnemonic {
     }
 
     private static int[] convertRadix(int[] nums, int fromRadix, int toRadix, int toLength) {
-        @Var BigInteger num = BigInteger.valueOf(0);
+        BigInteger num = BigInteger.valueOf(0);
         for (int element : nums) {
             num = num.multiply(BigInteger.valueOf(fromRadix));
             num = num.add(BigInteger.valueOf(element));
         }
 
         var result = new int[toLength];
-        for (@Var var i = toLength - 1; i >= 0; i -= 1) {
+        for (var i = toLength - 1; i >= 0; i -= 1) {
             BigInteger tem = num.divide(BigInteger.valueOf(toRadix));
             BigInteger rem = num.mod(BigInteger.valueOf(toRadix));
             num = tem;
@@ -283,7 +281,7 @@ public final class Mnemonic {
     }
 
     private static int crc8(int[] data) {
-        @Var var crc = 0xFF;
+        var crc = 0xFF;
 
         for (var i = 0; i < data.length - 1; i += 1) {
             crc ^= data[i];
@@ -434,8 +432,8 @@ public final class Mnemonic {
             buffer = ByteBuffer.allocate(33);
         }
         // reverse algorithm of `entropyToWords()` below
-        @Var int scratch = 0;
-        @Var int offset = 0;
+        int scratch = 0;
+        int offset = 0;
         for (CharSequence word : words) {
             int index = getWordIndex(word, false);
 
@@ -486,8 +484,8 @@ public final class Mnemonic {
         }
 
         byte[] array = byteBuffer.array();
-        @Var var i = 0;
-        @Var var j = 3;
+        var i = 0;
+        var j = 3;
         byte[] array2 = new byte[data.length - 1];
         //remove all the fill 0s
         while (j < array.length) {

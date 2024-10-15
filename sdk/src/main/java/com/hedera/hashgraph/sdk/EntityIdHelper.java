@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.io.IOException;
@@ -113,7 +112,7 @@ class EntityIdHelper {
      * @param address the string representation
      * @return the decoded address
      */
-    public static byte[] decodeSolidityAddress(@Var String address) {
+    public static byte[] decodeSolidityAddress(String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
@@ -159,16 +158,11 @@ class EntityIdHelper {
     static String checksum(LedgerId ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
         List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
-        @Var
         long s0 = 0; // Sum of even positions (mod 11)
-        @Var
         long s1 = 0; // Sum of odd positions (mod 11)
-        @Var
         long s = 0; // Weighted sum of all positions (mod p3)
-        @Var
         long sh = 0; // Hash of the ledger ID
         @SuppressWarnings("UnusedVariable")
-        @Var
         long c = 0; // The checksum, as a single number
         long p3 = 26 * 26 * 26; // 3 digits in base 26
         long p5 = 26 * 26 * 26 * 26 * 26; // 5 digits in base 26
