@@ -26,7 +26,6 @@ import com.hedera.hashgraph.sdk.proto.FreezeTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.grpc.MethodDescriptor;
 import java.time.Instant;
 import java.time.OffsetTime;
@@ -94,10 +93,6 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      * @param startTime                 the start time
      * @return {@code this}
      */
-    @SuppressFBWarnings(
-        value = "EI_EXPOSE_REP2",
-        justification = "An Instant can't actually be mutated"
-    )
     public FreezeTransaction setStartTime(Instant startTime) {
         requireNotFrozen();
         Objects.requireNonNull(startTime);

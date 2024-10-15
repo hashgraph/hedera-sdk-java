@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
 import com.hedera.hashgraph.sdk.CustomFractionalFee;
@@ -43,99 +42,99 @@ class TokenFeeScheduleUpdateIntegrationTest {
     @Test
     @DisplayName("Can update token fees")
     void canUpdateToken() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setDecimals(3)
-            .setInitialSupply(1000000)
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFreezeKey(testEnv.operatorKey)
-            .setWipeKey(testEnv.operatorKey)
-            .setKycKey(testEnv.operatorKey)
-            .setSupplyKey(testEnv.operatorKey)
-            .setFeeScheduleKey(testEnv.operatorKey)
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setDecimals(3)
+                .setInitialSupply(1000000)
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFreezeKey(testEnv.operatorKey)
+                .setWipeKey(testEnv.operatorKey)
+                .setKycKey(testEnv.operatorKey)
+                .setSupplyKey(testEnv.operatorKey)
+                .setFeeScheduleKey(testEnv.operatorKey)
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        @Var var info = new TokenInfoQuery()
+            var info = new TokenInfoQuery()
             .setTokenId(tokenId)
             .execute(testEnv.client);
 
-        assertThat(info.tokenId).isEqualTo(tokenId);
-        assertThat(info.name).isEqualTo("ffff");
-        assertThat(info.symbol).isEqualTo("F");
-        assertThat(info.decimals).isEqualTo(3);
-        assertThat(testEnv.operatorId).isEqualTo(info.treasuryAccountId);
-        assertThat(info.adminKey).isNotNull();
-        assertThat(info.freezeKey).isNotNull();
-        assertThat(info.wipeKey).isNotNull();
-        assertThat(info.kycKey).isNotNull();
-        assertThat(info.supplyKey).isNotNull();
-        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.defaultFreezeStatus).isNotNull();
-        assertThat(info.defaultFreezeStatus).isFalse();
-        assertThat(info.defaultKycStatus).isNotNull();
-        assertThat(info.defaultKycStatus).isFalse();
-        assertThat(info.customFees.size()).isEqualTo(0);
+            assertThat(info.tokenId).isEqualTo(tokenId);
+            assertThat(info.name).isEqualTo("ffff");
+            assertThat(info.symbol).isEqualTo("F");
+            assertThat(info.decimals).isEqualTo(3);
+            assertThat(testEnv.operatorId).isEqualTo(info.treasuryAccountId);
+            assertThat(info.adminKey).isNotNull();
+            assertThat(info.freezeKey).isNotNull();
+            assertThat(info.wipeKey).isNotNull();
+            assertThat(info.kycKey).isNotNull();
+            assertThat(info.supplyKey).isNotNull();
+            assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.defaultFreezeStatus).isNotNull();
+            assertThat(info.defaultFreezeStatus).isFalse();
+            assertThat(info.defaultKycStatus).isNotNull();
+            assertThat(info.defaultKycStatus).isFalse();
+            assertThat(info.customFees.size()).isEqualTo(0);
 
-        var customFees = new ArrayList<CustomFee>();
-        customFees.add(new CustomFixedFee()
-            .setAmount(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
-        customFees.add(new CustomFractionalFee()
-            .setNumerator(1)
-            .setDenominator(20)
-            .setMin(1)
-            .setMax(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
 
-        new TokenFeeScheduleUpdateTransaction()
-            .setTokenId(tokenId)
-            .setCustomFees(customFees)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TokenFeeScheduleUpdateTransaction()
+                .setTokenId(tokenId)
+                .setCustomFees(customFees)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        info = new TokenInfoQuery()
-            .setTokenId(tokenId)
-            .execute(testEnv.client);
+            info = new TokenInfoQuery()
+                .setTokenId(tokenId)
+                .execute(testEnv.client);
 
-        assertThat(info.tokenId).isEqualTo(tokenId);
-        assertThat(info.name).isEqualTo("ffff");
-        assertThat(info.symbol).isEqualTo("F");
-        assertThat(info.decimals).isEqualTo(3);
-        assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
-        assertThat(info.adminKey).isNotNull();
-        assertThat(info.freezeKey).isNotNull();
-        assertThat(info.wipeKey).isNotNull();
-        assertThat(info.kycKey).isNotNull();
-        assertThat(info.supplyKey).isNotNull();
-        assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
-        assertThat(info.defaultFreezeStatus).isNotNull();
-        assertThat(info.defaultFreezeStatus).isFalse();
-        assertThat(info.defaultKycStatus).isNotNull();
-        assertThat(info.defaultKycStatus).isFalse();
+            assertThat(info.tokenId).isEqualTo(tokenId);
+            assertThat(info.name).isEqualTo("ffff");
+            assertThat(info.symbol).isEqualTo("F");
+            assertThat(info.decimals).isEqualTo(3);
+            assertThat(info.treasuryAccountId).isEqualTo(testEnv.operatorId);
+            assertThat(info.adminKey).isNotNull();
+            assertThat(info.freezeKey).isNotNull();
+            assertThat(info.wipeKey).isNotNull();
+            assertThat(info.kycKey).isNotNull();
+            assertThat(info.supplyKey).isNotNull();
+            assertThat(info.adminKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.freezeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.wipeKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.kycKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.supplyKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.feeScheduleKey.toString()).isEqualTo(testEnv.operatorKey.toString());
+            assertThat(info.defaultFreezeStatus).isNotNull();
+            assertThat(info.defaultFreezeStatus).isFalse();
+            assertThat(info.defaultKycStatus).isNotNull();
+            assertThat(info.defaultKycStatus).isFalse();
 
-        var fees = info.customFees;
-        assertThat(fees.size()).isEqualTo(2);
-        @Var int fixedCount = 0;
-        @Var int fractionalCount = 0;
+            var fees = info.customFees;
+            assertThat(fees.size()).isEqualTo(2);
+            int fixedCount = 0;
+        int fractionalCount = 0;
         for (var fee : fees) {
             if (fee instanceof CustomFixedFee) {
                 fixedCount++;
@@ -156,46 +155,46 @@ class TokenFeeScheduleUpdateIntegrationTest {
         assertThat(fixedCount).isEqualTo(1);
         assertThat(fractionalCount).isEqualTo(1);
 
-        testEnv.close(tokenId);
+        }
     }
 
     @Test
     @DisplayName("Cannot update fee schedule with any key other than fee schedule key")
     void cannotUpdateWithAnyOtherKey() throws Exception {
-        var testEnv = new IntegrationTestEnv(1).useThrowawayAccount();
+        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
 
-        var response = new TokenCreateTransaction()
-            .setTokenName("ffff")
-            .setTokenSymbol("F")
-            .setTreasuryAccountId(testEnv.operatorId)
-            .setAdminKey(testEnv.operatorKey)
-            .setFeeScheduleKey(PrivateKey.generate())
-            .setFreezeDefault(false)
-            .execute(testEnv.client);
+            var response = new TokenCreateTransaction()
+                .setTokenName("ffff")
+                .setTokenSymbol("F")
+                .setTreasuryAccountId(testEnv.operatorId)
+                .setAdminKey(testEnv.operatorKey)
+                .setFeeScheduleKey(PrivateKey.generate())
+                .setFreezeDefault(false)
+                .execute(testEnv.client);
 
-        var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
+            var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-        var customFees = new ArrayList<CustomFee>();
-        customFees.add(new CustomFixedFee()
-            .setAmount(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
-        customFees.add(new CustomFractionalFee()
-            .setNumerator(1)
-            .setDenominator(20)
-            .setMin(1)
-            .setMax(10)
-            .setFeeCollectorAccountId(testEnv.operatorId)
-        );
+            var customFees = new ArrayList<CustomFee>();
+            customFees.add(new CustomFixedFee()
+                .setAmount(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
+            customFees.add(new CustomFractionalFee()
+                .setNumerator(1)
+                .setDenominator(20)
+                .setMin(1)
+                .setMax(10)
+                .setFeeCollectorAccountId(testEnv.operatorId)
+            );
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new TokenFeeScheduleUpdateTransaction()
-                .setTokenId(tokenId)
-                .setCustomFees(customFees)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new TokenFeeScheduleUpdateTransaction()
+                    .setTokenId(tokenId)
+                    .setCustomFees(customFees)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
 
-        testEnv.close(tokenId);
+        }
     }
 }

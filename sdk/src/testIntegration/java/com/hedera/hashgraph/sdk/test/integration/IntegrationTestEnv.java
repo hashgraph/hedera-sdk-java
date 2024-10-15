@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
@@ -40,7 +39,7 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
-public class IntegrationTestEnv {
+public class IntegrationTestEnv implements AutoCloseable {
     static final String LOCAL_CONSENSUS_NODE_ENDPOINT = "127.0.0.1:50211";
     static final String LOCAL_MIRROR_NODE_GRPC_ENDPOINT = "127.0.0.1:5600";
     static final AccountId LOCAL_CONSENSUS_NODE_ACCOUNT_ID = new AccountId(3);
@@ -88,7 +87,7 @@ public class IntegrationTestEnv {
         var network = new HashMap<String, AccountId>();
 
         var nodeCount = Math.min(client.getNetwork().size(), maxNodesPerTransaction);
-        for (@Var int i = 0; i < nodeCount; i++) {
+        for (int i = 0; i < nodeCount; i++) {
             nodeGetter.nextNode(network);
         }
         client.setNetwork(network);
@@ -150,15 +149,8 @@ public class IntegrationTestEnv {
         Assumptions.assumeFalse(isLocalNode);
     }
 
-    public void close(
-        @Nullable TokenId newTokenId,
-        @Nullable AccountId newAccountId,
-        @Nullable PrivateKey newAccountKey
-    ) throws Exception {
-        if (newAccountId != null) {
-            wipeAccountHbars(newAccountId, newAccountKey);
-        }
-
+    @Override
+    public void close() throws Exception {
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
             var hbarsBalance = new AccountBalanceQuery()
                 .setAccountId(operatorId)
@@ -176,35 +168,9 @@ public class IntegrationTestEnv {
         originalClient.close();
     }
 
-    public void wipeAccountHbars(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        var hbarsBalance = new AccountBalanceQuery()
-            .setAccountId(newAccountId)
-            .execute(originalClient)
-            .hbars;
-        new TransferTransaction()
-            .addHbarTransfer(newAccountId, hbarsBalance.negated())
-            .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
-            .freezeWith(originalClient)
-            .sign(Objects.requireNonNull(newAccountKey))
-            .execute(originalClient);
-    }
-
-    public void close() throws Exception {
-        close(null, null, null);
-    }
-
-    public void close(AccountId newAccountId, PrivateKey newAccountKey) throws Exception {
-        close(null, newAccountId, newAccountKey);
-    }
-
-    public void close(TokenId newTokenId) throws Exception {
-        close(newTokenId, null, null);
-    }
-
     private static class TestEnvNodeGetter {
         private final Client client;
         private final List<Map.Entry<String, AccountId>> nodes;
-        @Var
         private int index = 0;
 
         public TestEnvNodeGetter(Client client) {

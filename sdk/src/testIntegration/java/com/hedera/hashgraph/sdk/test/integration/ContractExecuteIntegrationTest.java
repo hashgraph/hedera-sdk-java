@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
@@ -42,153 +41,149 @@ public class ContractExecuteIntegrationTest {
     @Test
     @DisplayName("Can execute contract methods")
     void canExecuteContractMethods() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        @Var var response = new FileCreateTransaction()
+            var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        response = new ContractCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(200000)
-            .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-            .setBytecodeFileId(fileId)
-            .setContractMemo("[e2e::ContractCreateTransaction]")
-            .execute(testEnv.client);
+            response = new ContractCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(200000)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractCreateTransaction]")
+                .execute(testEnv.client);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        var receipt = new ContractExecuteTransaction()
-            .setContractId(contractId)
-            .setGas(100000)
-            .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            var receipt = new ContractExecuteTransaction()
+                .setContractId(contractId)
+                .setGas(100000)
+                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        assertThat(receipt.status).isEqualTo(Status.SUCCESS);
+            assertThat(receipt.status).isEqualTo(Status.SUCCESS);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot execute contract when contract ID is not set")
     void cannotExecuteContractWhenContractIDIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new ContractExecuteTransaction()
-                .setGas(100000)
-                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INVALID_CONTRACT_ID.toString());
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new ContractExecuteTransaction()
+                    .setGas(100000)
+                    .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INVALID_CONTRACT_ID.toString());
 
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot execute contract when contract function parameters are not set")
     void cannotExecuteContractWhenContractFunctionParametersAreNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var response = new FileCreateTransaction()
-            .setKeys(testEnv.operatorKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
-            .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+                .setKeys(testEnv.operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        var contractId = Objects.requireNonNull(
-            new ContractCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setGas(200000)
-                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                .setBytecodeFileId(fileId)
-                .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .contractId
-        );
+            var contractId = Objects.requireNonNull(
+                    new ContractCreateTransaction()
+                        .setAdminKey(testEnv.operatorKey)
+                        .setGas(200000)
+                        .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                        .setBytecodeFileId(fileId)
+                        .setContractMemo("[e2e::ContractCreateTransaction]")
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client).contractId);
 
-        assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-            new ContractExecuteTransaction()
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
+                new ContractExecuteTransaction()
+                    .setContractId(contractId)
+                    .setGas(100000)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.CONTRACT_REVERT_EXECUTED.toString());
+
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
                 .setContractId(contractId)
-                .setGas(100000)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.CONTRACT_REVERT_EXECUTED.toString());
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        testEnv.close();
+        }
     }
 
     @Test
     @DisplayName("Cannot execute contract when gas is not set")
     void cannotExecuteContractWhenGasIsNotSet() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var response = new FileCreateTransaction()
-            .setKeys(testEnv.operatorKey)
-            .setContents(SMART_CONTRACT_BYTECODE)
-            .execute(testEnv.client);
+            var response = new FileCreateTransaction()
+                .setKeys(testEnv.operatorKey)
+                .setContents(SMART_CONTRACT_BYTECODE)
+                .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        var contractId = Objects.requireNonNull(
-            new ContractCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setGas(200000)
-                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
-                .setBytecodeFileId(fileId)
-                .setContractMemo("[e2e::ContractCreateTransaction]")
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .contractId
-        );
+            var contractId = Objects.requireNonNull(
+                    new ContractCreateTransaction()
+                        .setAdminKey(testEnv.operatorKey)
+                        .setGas(200000)
+                        .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera."))
+                        .setBytecodeFileId(fileId)
+                        .setContractMemo("[e2e::ContractCreateTransaction]")
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client).contractId);
 
-        assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-            new ContractExecuteTransaction()
+            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                new ContractExecuteTransaction()
+                    .setContractId(contractId)
+                    .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
+            }).withMessageContaining(Status.INSUFFICIENT_GAS.toString());
+
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
                 .setContractId(contractId)
-                .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-        }).withMessageContaining(Status.INSUFFICIENT_GAS.toString());
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
-
-        testEnv.close();
+        }
     }
 }

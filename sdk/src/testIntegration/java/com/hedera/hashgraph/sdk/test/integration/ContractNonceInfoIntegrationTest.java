@@ -21,7 +21,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
 import com.hedera.hashgraph.sdk.ContractId;
@@ -38,53 +37,53 @@ public class ContractNonceInfoIntegrationTest {
     @Test
     @DisplayName("Contract Create of A nonce, which deploys contract B in CONSTRUCTOR")
     void canIncrementNonceThroughContractConstructor() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        @Var var response = new FileCreateTransaction()
+            var response = new FileCreateTransaction()
             .setKeys(testEnv.operatorKey)
             .setContents(SMART_CONTRACT_BYTECODE)
             .execute(testEnv.client);
 
-        var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
+            var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-        response = new ContractCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setGas(100000)
-            .setBytecodeFileId(fileId)
-            .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
-            .execute(testEnv.client);
+            response = new ContractCreateTransaction()
+                .setAdminKey(testEnv.operatorKey)
+                .setGas(100000)
+                .setBytecodeFileId(fileId)
+                .setContractMemo("[e2e::ContractADeploysContractBInConstructor]")
+                .execute(testEnv.client);
 
-        var contractFunctionResult = response.getRecord(testEnv.client).contractFunctionResult;
+            var contractFunctionResult = response.getRecord(testEnv.client).contractFunctionResult;
 
-        ContractId contractA = contractFunctionResult.contractId;
-        ContractId contractB = contractFunctionResult.contractNonces.stream()
-            .filter(contractNonce -> !contractNonce.contractId.equals(contractA)).findFirst().get().contractId;
+            ContractId contractA = contractFunctionResult.contractId;
+            ContractId contractB = contractFunctionResult.contractNonces.stream()
+                    .filter(contractNonce -> !contractNonce.contractId.equals(contractA)).findFirst().get().contractId;
 
-        ContractNonceInfo contractANonceInfo = contractFunctionResult.contractNonces.stream()
-            .filter(contractNonce -> contractNonce.contractId.equals(contractA)).findFirst().get();
-        ContractNonceInfo contractBNonceInfo = contractFunctionResult.contractNonces.stream()
-            .filter(contractNonce -> contractNonce.contractId.equals(contractB)).findFirst().get();
+            ContractNonceInfo contractANonceInfo = contractFunctionResult.contractNonces.stream()
+                    .filter(contractNonce -> contractNonce.contractId.equals(contractA)).findFirst().get();
+            ContractNonceInfo contractBNonceInfo = contractFunctionResult.contractNonces.stream()
+                    .filter(contractNonce -> contractNonce.contractId.equals(contractB)).findFirst().get();
 
-        // A.nonce = 2
-        assertThat(contractANonceInfo.nonce).isEqualTo(2);
-        // B.nonce = 1
-        assertThat(contractBNonceInfo.nonce).isEqualTo(1);
-        // validate HIP-844 case - signer nonce should be set only for Ethereum transactions
-        assertThat(contractFunctionResult.signerNonce).isEqualTo(0);
+            // A.nonce = 2
+            assertThat(contractANonceInfo.nonce).isEqualTo(2);
+            // B.nonce = 1
+            assertThat(contractBNonceInfo.nonce).isEqualTo(1);
+            // validate HIP-844 case - signer nonce should be set only for Ethereum transactions
+            assertThat(contractFunctionResult.signerNonce).isEqualTo(0);
 
-        var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
+            var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
-        new ContractDeleteTransaction()
-            .setTransferAccountId(testEnv.operatorId)
-            .setContractId(contractId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new ContractDeleteTransaction()
+                .setTransferAccountId(testEnv.operatorId)
+                .setContractId(contractId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        new FileDeleteTransaction()
-            .setFileId(fileId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new FileDeleteTransaction()
+                .setFileId(fileId)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 }

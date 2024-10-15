@@ -19,9 +19,7 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
@@ -43,45 +41,45 @@ public class TopicMessageSubmitIntegrationTest {
     @Test
     @DisplayName("Can submit a topic message")
     void canSubmitATopicMessage() throws Exception {
-        var testEnv = new IntegrationTestEnv(1);
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-        var response = new TopicCreateTransaction()
-            .setAdminKey(testEnv.operatorKey)
-            .setTopicMemo("[e2e::TopicCreateTransaction]")
-            .execute(testEnv.client);
+            var response = new TopicCreateTransaction()
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
-        var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-        @Var var info = new TopicInfoQuery()
+            var info = new TopicInfoQuery()
             .setTopicId(topicId)
             .execute(testEnv.client);
 
-        assertThat(info.topicId).isEqualTo(topicId);
-        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
-        assertThat(info.sequenceNumber).isEqualTo(0);
-        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+            assertThat(info.topicId).isEqualTo(topicId);
+            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+            assertThat(info.sequenceNumber).isEqualTo(0);
+            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
-        new TopicMessageSubmitTransaction()
-            .setTopicId(topicId)
-            .setMessage("Hello, from HCS!")
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TopicMessageSubmitTransaction()
+                    .setTopicId(topicId)
+                    .setMessage("Hello, from HCS!")
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        info = new TopicInfoQuery()
-            .setTopicId(topicId)
-            .execute(testEnv.client);
+            info = new TopicInfoQuery()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client);
 
-        assertThat(info.topicId).isEqualTo(topicId);
-        assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
-        assertThat(info.sequenceNumber).isEqualTo(1);
-        assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+            assertThat(info.topicId).isEqualTo(topicId);
+            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+            assertThat(info.sequenceNumber).isEqualTo(1);
+            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
-        new TopicDeleteTransaction()
-            .setTopicId(topicId)
-            .execute(testEnv.client)
-            .getReceipt(testEnv.client);
+            new TopicDeleteTransaction()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-        testEnv.close();
+        }
     }
 
     @Test
@@ -91,51 +89,51 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertThatNoException().isThrownBy(() -> {
-            var testEnv = new IntegrationTestEnv(2);
+            try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                var response = new TopicCreateTransaction()
+                        .setAdminKey(testEnv.operatorKey)
+                        .setTopicMemo("[e2e::TopicCreateTransaction]")
+                        .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+                var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            Thread.sleep(5000);
+                Thread.sleep(5000);
 
-            @Var var info = new TopicInfoQuery()
+                var info = new TopicInfoQuery()
                 .setTopicId(topicId)
                 .execute(testEnv.client);
 
-            assertThat(info.topicId).isEqualTo(topicId);
-            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
-            assertThat(info.sequenceNumber).isEqualTo(0);
-            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+                assertThat(info.topicId).isEqualTo(topicId);
+                assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+                assertThat(info.sequenceNumber).isEqualTo(0);
+                assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
 
-            var responses = new TopicMessageSubmitTransaction()
-                .setTopicId(topicId)
-                .setMaxChunks(15)
-                .setMessage(Contents.BIG_CONTENTS)
-                .executeAll(testEnv.client);
+                var responses = new TopicMessageSubmitTransaction()
+                        .setTopicId(topicId)
+                        .setMaxChunks(15)
+                        .setMessage(Contents.BIG_CONTENTS)
+                        .executeAll(testEnv.client);
 
-            for (var resp : responses) {
-                resp.getReceipt(testEnv.client);
+                for (var resp : responses) {
+                    resp.getReceipt(testEnv.client);
+                }
+
+                info = new TopicInfoQuery()
+                        .setTopicId(topicId)
+                        .execute(testEnv.client);
+
+                assertThat(info.topicId).isEqualTo(topicId);
+                assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+                assertThat(info.sequenceNumber).isEqualTo(14);
+                assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
+
+                new TopicDeleteTransaction()
+                        .setTopicId(topicId)
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client);
+
             }
-
-            info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
-
-            assertThat(info.topicId).isEqualTo(topicId);
-            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
-            assertThat(info.sequenceNumber).isEqualTo(14);
-            assertThat(info.adminKey).isEqualTo(testEnv.operatorKey);
-
-            new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
         });
     }
 
@@ -146,29 +144,29 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertThatNoException().isThrownBy(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                var response = new TopicCreateTransaction()
+                        .setAdminKey(testEnv.operatorKey)
+                        .setTopicMemo("[e2e::TopicCreateTransaction]")
+                        .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+                var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new TopicMessageSubmitTransaction()
-                    .setMessage(Contents.BIG_CONTENTS)
-                    .setMaxChunks(15)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-            }).withMessageContaining(Status.INVALID_TOPIC_ID.toString());
+                assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                    new TopicMessageSubmitTransaction()
+                            .setMessage(Contents.BIG_CONTENTS)
+                            .setMaxChunks(15)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client);
+                }).withMessageContaining(Status.INVALID_TOPIC_ID.toString());
 
-            new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                new TopicDeleteTransaction()
+                        .setTopicId(topicId)
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client);
 
-            testEnv.close();
+            }
         });
     }
 
@@ -179,28 +177,28 @@ public class TopicMessageSubmitIntegrationTest {
         Assumptions.assumeTrue(!System.getProperty("HEDERA_NETWORK").equals("previewnet"));
 
         assertThatNoException().isThrownBy(() -> {
-            var testEnv = new IntegrationTestEnv(1);
+            try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                var response = new TopicCreateTransaction()
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
-            var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
+                var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new TopicMessageSubmitTransaction()
+                assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
+                    new TopicMessageSubmitTransaction()
+                        .setTopicId(topicId)
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client);
+                }).withMessageContaining(Status.INVALID_TOPIC_MESSAGE.toString());
+
+                new TopicDeleteTransaction()
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-            }).withMessageContaining(Status.INVALID_TOPIC_MESSAGE.toString());
 
-            new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
-            testEnv.close();
+            }
         });
     }
 

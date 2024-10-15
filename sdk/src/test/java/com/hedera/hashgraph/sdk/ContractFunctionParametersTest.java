@@ -255,6 +255,44 @@ public class ContractFunctionParametersTest {
     }
 
     @Test
+    @DisplayName("encodes bytes4 correctly")
+    void bytes4Encoding() {
+        var params = new ContractFunctionParameters()
+            .addBytes4(new byte[]{1, 2, 3, 4});
+        assertThat(
+            "580526ee" +
+                "0102030400000000000000000000000000000000000000000000000000000000"
+        ).isEqualTo(Hex.toHexString(params.toBytes("foo").toByteArray()));
+    }
+
+    @Test
+    @DisplayName("fails to encode bytes4 if length too long")
+    void bytes4EncodingError() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
+            new ContractFunctionParameters().addBytes4(new byte[]{1, 2, 3, 4, 5});
+        });
+    }
+
+    @Test
+    @DisplayName("encodes UTF-8 string as bytes4 correctly")
+    void bytes4UTF8Encoding() {
+        var params = new ContractFunctionParameters()
+            .addBytes4("ABCD".getBytes(StandardCharsets.UTF_8));
+        assertThat(
+            "580526ee" +
+                "4142434400000000000000000000000000000000000000000000000000000000"
+        ).isEqualTo(Hex.toHexString(params.toBytes("foo").toByteArray()));
+    }
+
+    @Test
+    @DisplayName("fails to encode UTF-8 string as bytes4 if length is bigger than 4 bytes")
+    void bytes4UTF8EncodingError() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() -> {
+            new ContractFunctionParameters().addBytes4("ABCDE".getBytes(StandardCharsets.UTF_8));
+        });
+    }
+
+    @Test
     @DisplayName("encodes bytes32 correctly")
     void bytes() {
         var params = new ContractFunctionParameters()
@@ -411,6 +449,24 @@ public class ContractFunctionParametersTest {
     }
 
     @Test
+    @DisplayName("bytes4[] encodes correctly")
+    void fixedBytes4ArrayEncoding() {
+        ContractFunctionParameters params = new ContractFunctionParameters()
+            .addBytes4Array(new byte[][]{
+                {1, 2, 3, 4},
+                {5, 6, 7, 8},
+                {9, 10, 11, 12}
+            });
+        assertThat(
+            "0000000000000000000000000000000000000000000000000000000000000020" + // offset of array
+                "0000000000000000000000000000000000000000000000000000000000000003" + // length of array
+                "0102030400000000000000000000000000000000000000000000000000000000" + // first bytes4
+                "0506070800000000000000000000000000000000000000000000000000000000" + // second bytes4
+                "090a0b0c00000000000000000000000000000000000000000000000000000000"   // third bytes4
+        ).isEqualTo(Hex.toHexString(params.toBytes(null).toByteArray()));
+    }
+
+    @Test
     @DisplayName("bytes32[] encodes correctly")
     void fixedBytesArrayEncoding() {
         // each string should be padded to 32 bytes and have no length prefix
@@ -544,10 +600,10 @@ public class ContractFunctionParametersTest {
     @Test
     void intSizesEncodeCorrectly() throws Exception {
         List<String> snapshotStrings = new ArrayList<>();
-        for (int n = 8; n <= 256; n+= 8) {
+        for (int n = 8; n <= 256; n += 8) {
             var bitWidth = n;
 
-            var argType = ((Supplier<Class<?>>)() -> {
+            var argType = ((Supplier<Class<?>>) () -> {
                 if (bitWidth == 8) {
                     return byte.class;
                 } else if (bitWidth <= 32) {
@@ -559,13 +615,13 @@ public class ContractFunctionParametersTest {
                 }
             }).get();
 
-            var argVal = ((Supplier<Object>)() -> {
+            var argVal = ((Supplier<Object>) () -> {
                 if (bitWidth == 8) {
                     return (byte) (1 << (bitWidth - 1));
                 } else if (bitWidth <= 32) {
-                    return (int) (1 << (bitWidth - 1));
+                    return (1 << (bitWidth - 1));
                 } else if (bitWidth <= 64) {
-                    return (long) (1L << (bitWidth - 1));
+                    return (1L << (bitWidth - 1));
                 } else {
                     return BigInteger.ONE.shiftLeft(bitWidth - 1);
                 }
