@@ -19,8 +19,6 @@
  */
 package com.hedera.hashgraph.sdk;
 
-import com.google.errorprone.annotations.Var;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
@@ -112,7 +110,7 @@ public abstract class PrivateKey extends Key {
     @Deprecated
     public static PrivateKey fromMnemonic(Mnemonic mnemonic, String passphrase) {
         var seed = mnemonic.toSeed(passphrase);
-        @Var PrivateKey derivedKey = fromSeedED25519(seed);
+        PrivateKey derivedKey = fromSeedED25519(seed);
 
         // BIP-44 path with the Hedera Hbar coin-type (omitting key index)
         // we pre-derive most of the path as the mobile wallets don't expose more than the index
@@ -393,7 +391,7 @@ public abstract class PrivateKey extends Key {
             transaction.freeze();
         }
 
-        var builder = (SignedTransaction.Builder) transaction.innerSignedTransactions.get(0);
+        var builder = transaction.innerSignedTransactions.get(0);
         var signature = sign(builder.getBodyBytes().toByteArray());
 
         transaction.addSignature(getPublicKey(), signature);

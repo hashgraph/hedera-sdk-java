@@ -37,8 +37,6 @@ testModuleInfo {
     requires("org.mockito")
 
     requiresStatic("java.annotation")
-    requiresStatic("com.github.spotbugs.annotations")
-    requiresStatic("com.google.errorprone.annotations")
 
     runtimeOnly("io.grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")

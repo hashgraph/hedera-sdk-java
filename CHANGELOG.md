@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.42.0
+
+### Added
+- `addBytes4` and `addBytes4Array` methods for `ContractFunctionParameters`
+- Support ports that are not well known for use with port forwarding
+
+### Fixed
+- `setFileId` resets `contractId`, and similarly, when `setContractId` resets `fileId`
+
 ## 2.41.0
 
 ### Fixed

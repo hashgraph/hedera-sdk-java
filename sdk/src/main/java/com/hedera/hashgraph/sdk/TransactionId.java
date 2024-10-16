@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static java.util.concurrent.CompletableFuture.failedFuture;
 
-import com.google.errorprone.annotations.Var;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java.time.Duration;
@@ -151,7 +150,6 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @return                          the new transaction id
      */
     public static TransactionId fromString(String s) {
-        @Var
         var parts = s.split("/", 2);
 
         var nonce = (parts.length == 2) ? Integer.parseInt(parts[1]) : null;
