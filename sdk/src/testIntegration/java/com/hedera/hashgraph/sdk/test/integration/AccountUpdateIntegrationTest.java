@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountInfoQuery;
 import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
@@ -51,9 +50,9 @@ class AccountUpdateIntegrationTest {
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            @Var var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery()
+            .setAccountId(accountId)
+            .execute(testEnv.client);
 
             assertThat(info.accountId).isEqualTo(accountId);
             assertThat(info.isDeleted).isFalse();

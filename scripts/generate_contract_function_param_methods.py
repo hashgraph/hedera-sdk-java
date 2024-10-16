@@ -47,7 +47,7 @@ def add_with_param_type(bit_width, param_type, map_method_name, exception_commen
         "* @return {@code this}\n"
         "*/\n"
         "public ContractFunctionParameters addInt" + str(bit_width) + "Array(" + param_type + "[] intArray) {\n"
-        "    @Var ByteString arrayBytes = ByteString.copyFrom(\n"
+        "    ByteString arrayBytes = ByteString.copyFrom(\n"
         "        J8Arrays.stream(intArray)." + map_method_name + "(i -> int256(i, " + str(bit_width) + "))\n"
         "        .collect(Collectors.toList()));\n"
         "\n"
@@ -70,7 +70,7 @@ def add_with_param_type(bit_width, param_type, map_method_name, exception_commen
         exception_comment +
         "*/\n"
         "public ContractFunctionParameters addUint" + str(bit_width) + "Array(" + param_type + "[] intArray) {\n"
-        "    @Var ByteString arrayBytes = ByteString.copyFrom(\n"
+        "    ByteString arrayBytes = ByteString.copyFrom(\n"
         "        J8Arrays.stream(intArray)." + map_method_name + "(i -> uint256(i, " + str(bit_width) + "))\n"
         "        .collect(Collectors.toList()));\n"
         "\n"

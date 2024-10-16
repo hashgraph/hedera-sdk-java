@@ -20,7 +20,6 @@
 package com.hedera.hashgraph.sdk;
 
 import com.google.common.annotations.VisibleForTesting;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -111,10 +110,6 @@ abstract class BaseNetwork<
     private LedgerId ledgerId;
 
     @VisibleForTesting
-    @SuppressFBWarnings(
-        value = "URF_UNREAD_FIELD",
-        justification = "this field is used for testing"
-    )
     boolean hasShutDownNow = false;
 
     protected BaseNetwork(ExecutorService executor) {
