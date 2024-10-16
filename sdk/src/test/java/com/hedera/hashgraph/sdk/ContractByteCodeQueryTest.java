@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 public class ContractByteCodeQueryTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll

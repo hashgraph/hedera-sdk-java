@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TokenNftInfoQueryTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
