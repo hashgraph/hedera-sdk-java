@@ -460,29 +460,13 @@ public final class Client implements AutoCloseable {
      * and update the address book if necessary.
      *
      * @param addressBook A list of nodes and their metadata
-     * @param updateAddressBook whether to update the address book of the network
      * @return {@code this}
-     */
-    public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook, boolean updateAddressBook)
-        throws InterruptedException, TimeoutException {
-        network.setNetwork(Network.addressBookToNetwork(addressBook.nodeAddresses));
-        if (updateAddressBook) {
-            network.setAddressBook(addressBook);
-        }
-        return this;
-    }
-
-    /**
-     * Replace all nodes in this Client with the nodes in the Address Book
-     *
-     * @param addressBook A list of nodes and their metadata
-     * @return {@code this}
-     * @throws InterruptedException when a thread is interrupted while it's waiting, sleeping, or otherwise occupied
-     * @throws TimeoutException     when shutting down nodes
      */
     public synchronized Client setNetworkFromAddressBook(NodeAddressBook addressBook)
         throws InterruptedException, TimeoutException {
-        return setNetworkFromAddressBook(addressBook, false);
+        network.setNetwork(Network.addressBookToNetwork(addressBook.nodeAddresses));
+        network.setAddressBook(addressBook);
+        return this;
     }
 
     /**
