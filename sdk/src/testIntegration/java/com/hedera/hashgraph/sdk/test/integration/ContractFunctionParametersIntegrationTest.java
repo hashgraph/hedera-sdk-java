@@ -22,7 +22,6 @@ package com.hedera.hashgraph.sdk.test.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.esaulpaugh.headlong.abi.Address;
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.ContractCallQuery;
 import com.hedera.hashgraph.sdk.ContractCreateTransaction;
 import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
@@ -52,7 +51,7 @@ public class ContractFunctionParametersIntegrationTest {
     public static void beforeAll() throws Exception {
         testEnv = new IntegrationTestEnv(1);
 
-        @Var var response = new FileCreateTransaction().setKeys(testEnv.operatorKey).execute(testEnv.client);
+        var response = new FileCreateTransaction().setKeys(testEnv.operatorKey).execute(testEnv.client);
 
         fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 

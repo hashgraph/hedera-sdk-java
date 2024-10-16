@@ -25,6 +25,5 @@ open module com.hedera.hashgraph.sdk.test.integration {
     requires org.bouncycastle.provider;
     requires org.junit.jupiter.api;
 
-    requires static com.google.errorprone.annotations;
     requires static java.annotation;
 }

@@ -46,7 +46,7 @@ public class SystemDeleteTransactionTest {
 
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
@@ -171,9 +171,7 @@ public class SystemDeleteTransactionTest {
         assertThrows(IllegalStateException.class, () -> tx.setExpirationTime(validStart));
     }
 
-    // ported from C++ SDK, in Java it does not pass
     @Test
-    @Disabled
     void resetFileId() {
         var systemDeleteTransaction = new SystemDeleteTransaction();
         systemDeleteTransaction.setFileId(testFileId);
@@ -183,9 +181,7 @@ public class SystemDeleteTransactionTest {
         assertNotNull(systemDeleteTransaction.getContractId());
     }
 
-    // ported from C++ SDK, in Java it does not pass
     @Test
-    @Disabled
     void resetContractId() {
         var systemDeleteTransaction = new SystemDeleteTransaction();
         systemDeleteTransaction.setContractId(testContractId);

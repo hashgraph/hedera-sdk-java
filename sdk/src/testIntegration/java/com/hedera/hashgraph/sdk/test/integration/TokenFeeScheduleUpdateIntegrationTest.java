@@ -19,7 +19,6 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
-import com.google.errorprone.annotations.Var;
 import com.hedera.hashgraph.sdk.CustomFee;
 import com.hedera.hashgraph.sdk.CustomFixedFee;
 import com.hedera.hashgraph.sdk.CustomFractionalFee;
@@ -62,9 +61,9 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            @Var var info = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .execute(testEnv.client);
+            var info = new TokenInfoQuery()
+            .setTokenId(tokenId)
+            .execute(testEnv.client);
 
             assertThat(info.tokenId).isEqualTo(tokenId);
             assertThat(info.name).isEqualTo("ffff");
@@ -134,27 +133,27 @@ class TokenFeeScheduleUpdateIntegrationTest {
 
             var fees = info.customFees;
             assertThat(fees.size()).isEqualTo(2);
-            @Var int fixedCount = 0;
-            @Var int fractionalCount = 0;
-            for (var fee : fees) {
-                if (fee instanceof CustomFixedFee) {
-                    fixedCount++;
-                    var fixed = (CustomFixedFee) fee;
-                    assertThat(fixed.getAmount()).isEqualTo(10);
-                    assertThat(fixed.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
-                    assertThat(fixed.getDenominatingTokenId()).isNull();
-                } else if (fee instanceof CustomFractionalFee) {
-                    fractionalCount++;
-                    var fractional = (CustomFractionalFee) fee;
-                    assertThat(fractional.getNumerator()).isEqualTo(1);
-                    assertThat(fractional.getDenominator()).isEqualTo(20);
-                    assertThat(fractional.getMin()).isEqualTo(1);
-                    assertThat(fractional.getMax()).isEqualTo(10);
-                    assertThat(fractional.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
-                }
+            int fixedCount = 0;
+        int fractionalCount = 0;
+        for (var fee : fees) {
+            if (fee instanceof CustomFixedFee) {
+                fixedCount++;
+                var fixed = (CustomFixedFee) fee;
+                assertThat(fixed.getAmount()).isEqualTo(10);
+                assertThat(fixed.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
+                assertThat(fixed.getDenominatingTokenId()).isNull();
+            } else if (fee instanceof CustomFractionalFee) {
+                fractionalCount++;
+                var fractional = (CustomFractionalFee) fee;
+                assertThat(fractional.getNumerator()).isEqualTo(1);
+                assertThat(fractional.getDenominator()).isEqualTo(20);
+                assertThat(fractional.getMin()).isEqualTo(1);
+                assertThat(fractional.getMax()).isEqualTo(10);
+                assertThat(fractional.getFeeCollectorAccountId()).isEqualTo(testEnv.operatorId);
             }
-            assertThat(fixedCount).isEqualTo(1);
-            assertThat(fractionalCount).isEqualTo(1);
+        }
+        assertThat(fixedCount).isEqualTo(1);
+        assertThat(fractionalCount).isEqualTo(1);
 
         }
     }

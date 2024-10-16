@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
 public class TopicInfoQueryTest {
     @BeforeAll
     public static void beforeAll() {
-        SnapshotMatcher.start();
+        SnapshotMatcher.start(Snapshot::asJsonString);
     }
 
     @AfterAll
