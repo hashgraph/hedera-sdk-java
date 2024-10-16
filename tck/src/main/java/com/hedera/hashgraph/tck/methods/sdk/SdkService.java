@@ -30,6 +30,7 @@ import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 /**
  * SdkService for managing the {@link Client} setup and reset
@@ -42,6 +43,7 @@ public class SdkService extends AbstractJSONRPC2Service {
 
     @JSONRPC2Method("setup")
     public SetupResponse setup(final SetupParams params) throws Exception {
+        var clientExecutor = Executors.newFixedThreadPool(16);
         String clientType;
         if (params.getNodeIp().isPresent()
                 && params.getNodeAccountId().isPresent()
@@ -50,12 +52,12 @@ public class SdkService extends AbstractJSONRPC2Service {
             Map<String, AccountId> node = new HashMap<>();
             var nodeId = AccountId.fromString(params.getNodeAccountId().get());
             node.put(params.getNodeIp().get(), nodeId);
-            client = Client.forNetwork(node);
+            client = Client.forNetwork(node, clientExecutor);
             clientType = "custom";
             client.setMirrorNetwork(List.of(params.getMirrorNetworkIp().get()));
         } else {
             // Default to testnet
-            client = Client.forTestnet();
+            client = Client.forTestnet(clientExecutor);
             clientType = "testnet";
         }
 
@@ -66,7 +68,8 @@ public class SdkService extends AbstractJSONRPC2Service {
     }
 
     @JSONRPC2Method("reset")
-    public SetupResponse reset() {
+    public SetupResponse reset() throws Exception {
+        client.closeChannels();
         client = null;
         return new SetupResponse("");
     }

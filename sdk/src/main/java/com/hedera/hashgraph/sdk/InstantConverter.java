@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -63,6 +64,13 @@ final class InstantConverter {
         return Timestamp.newBuilder()
             .setSeconds(instant.getEpochSecond())
             .setNanos(instant.getNano())
+            .build();
+    }
+
+    static Timestamp toProtobuf(Duration duration) {
+        return Timestamp.newBuilder()
+            .setSeconds(duration.getSeconds())
+            .setNanos(duration.getNano())
             .build();
     }
 

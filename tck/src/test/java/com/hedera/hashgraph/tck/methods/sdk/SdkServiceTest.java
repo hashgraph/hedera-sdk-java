@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -68,7 +67,7 @@ class SdkServiceTest {
     }
 
     @Test
-    void testReset() throws TimeoutException {
+    void testReset() throws Exception {
         // When
         SetupResponse response = sdkService.reset();
 
