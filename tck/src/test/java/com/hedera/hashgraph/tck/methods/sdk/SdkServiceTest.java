@@ -50,6 +50,11 @@ class SdkServiceTest {
 
         // Then
         assertEquals("Successfully setup custom client.", response.getMessage());
+
+        response = sdkService.reset();
+
+        assertEquals("", response.getMessage());
+        assertNull(sdkService.getClient());
     }
 
     @Test
@@ -64,15 +69,5 @@ class SdkServiceTest {
 
         // then
         assertThrows(Exception.class, () -> sdkService.setup(params));
-    }
-
-    @Test
-    void testReset() throws Exception {
-        // When
-        SetupResponse response = sdkService.reset();
-
-        // Then
-        assertEquals("", response.getMessage());
-        assertNull(sdkService.getClient());
     }
 }
