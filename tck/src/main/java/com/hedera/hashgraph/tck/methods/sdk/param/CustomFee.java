@@ -21,7 +21,6 @@
 package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.tck.methods.JSONRPC2Param;
-import java.math.BigInteger;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -75,16 +74,11 @@ public class CustomFee extends JSONRPC2Param {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class FixedFee {
-        private Long amount;
+        private String amount;
         private Optional<String> denominatingTokenId;
 
         public static FixedFee parse(Map<String, Object> jrpcParams) throws Exception {
-            Long amountParsed;
-            try {
-                amountParsed = (Long) jrpcParams.get("amount");
-            } catch (Exception e) {
-                amountParsed = ((BigInteger) jrpcParams.get("amount")).longValue();
-            }
+            var amountParsed = (String) jrpcParams.get("amount");
             var denominatingTokenIdParsed = Optional.ofNullable((String) jrpcParams.get("denominatingTokenId"));
             return new FixedFee(amountParsed, denominatingTokenIdParsed);
         }
@@ -94,36 +88,16 @@ public class CustomFee extends JSONRPC2Param {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class FractionalFee {
-        private Long numerator;
-        private Long denominator;
-        private Long minimumAmount;
-        private Long maximumAmount;
+        private String numerator;
+        private String denominator;
+        private String minimumAmount;
+        private String maximumAmount;
 
         public static FractionalFee parse(Map<String, Object> jrpcParams) throws Exception {
-            Long numeratorParsed;
-            try {
-                numeratorParsed = (Long) jrpcParams.get("numerator");
-            } catch (Exception e) {
-                numeratorParsed = ((BigInteger) jrpcParams.get("numerator")).longValue();
-            }
-            Long denominatorParsed;
-            try {
-                denominatorParsed = (Long) jrpcParams.get("denominator");
-            } catch (Exception e) {
-                denominatorParsed = ((BigInteger) jrpcParams.get("denominator")).longValue();
-            }
-            Long minimumAmountParsed;
-            try {
-                minimumAmountParsed = (Long) jrpcParams.get("minimumAmount");
-            } catch (Exception e) {
-                minimumAmountParsed = ((BigInteger) jrpcParams.get("minimumAmount")).longValue();
-            }
-            Long maximumAmountParsed;
-            try {
-                maximumAmountParsed = (Long) jrpcParams.get("maximumAmount");
-            } catch (Exception e) {
-                maximumAmountParsed = ((BigInteger) jrpcParams.get("maximumAmount")).longValue();
-            }
+            var numeratorParsed = (String) jrpcParams.get("numerator");
+            var denominatorParsed = (String) jrpcParams.get("denominator");
+            var minimumAmountParsed = (String) jrpcParams.get("minimumAmount");
+            var maximumAmountParsed = (String) jrpcParams.get("maximumAmount");
             return new FractionalFee(numeratorParsed, denominatorParsed, minimumAmountParsed, maximumAmountParsed);
         }
     }
@@ -132,23 +106,13 @@ public class CustomFee extends JSONRPC2Param {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class RoyaltyFee {
-        private Long numerator;
-        private Long denominator;
+        private String numerator;
+        private String denominator;
         private Optional<FixedFee> fallbackFee;
 
         public static RoyaltyFee parse(Map<String, Object> jrpcParams) throws Exception {
-            Long numeratorParsed;
-            try {
-                numeratorParsed = (Long) jrpcParams.get("numerator");
-            } catch (Exception e) {
-                numeratorParsed = ((BigInteger) jrpcParams.get("numerator")).longValue();
-            }
-            Long denominatorParsed;
-            try {
-                denominatorParsed = (Long) jrpcParams.get("denominator");
-            } catch (Exception e) {
-                denominatorParsed = ((BigInteger) jrpcParams.get("denominator")).longValue();
-            }
+            var numeratorParsed = (String) jrpcParams.get("numerator");
+            var denominatorParsed = (String) jrpcParams.get("denominator");
 
             Optional<FixedFee> fallbackFeeParsed = Optional.empty();
             if (jrpcParams.containsKey("fallbackFee")) {
