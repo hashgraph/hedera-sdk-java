@@ -432,7 +432,17 @@ public enum RequestType {
     /**
      * Claim one or more pending airdrops
      */
-    TOKEN_CLAIM_AIRDROP(HederaFunctionality.TokenClaimAirdrop);
+    TOKEN_CLAIM_AIRDROP(HederaFunctionality.TokenClaimAirdrop),
+
+    /**
+     * A message produced as part of Threshold Signature Scheme (TSS) processing.
+     */
+    TSS_MESSAGE(HederaFunctionality.TssMessage),
+
+    /**
+     * Submit a vote as part of the Threshold Signature Scheme (TSS) processing.
+     */
+    TSS_VOTE(HederaFunctionality.TssVote);
 
     final HederaFunctionality code;
 
@@ -524,6 +534,8 @@ public enum RequestType {
             case TokenAirdrop -> TOKEN_AIRDROP;
             case TokenCancelAirdrop -> TOKEN_CANCEL_AIRDROP;
             case TokenClaimAirdrop -> TOKEN_CLAIM_AIRDROP;
+            case TssMessage -> TSS_MESSAGE;
+            case TssVote -> TSS_VOTE;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -613,6 +625,8 @@ public enum RequestType {
             case TOKEN_AIRDROP -> "TOKEN_AIRDROP";
             case TOKEN_CANCEL_AIRDROP -> "TOKEN_CANCEL_AIRDROP";
             case TOKEN_CLAIM_AIRDROP -> "TOKEN_CLAIM_AIRDROP";
+            case TSS_MESSAGE -> "TSS_MESSAGE";
+            case TSS_VOTE -> "TSS_VOTE";
         };
     }
 }
