@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.hedera.hashgraph.tck.methods.sdk.param.SetupParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.SetupResponse;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -51,6 +50,11 @@ class SdkServiceTest {
 
         // Then
         assertEquals("Successfully setup custom client.", response.getMessage());
+
+        response = sdkService.reset();
+
+        assertEquals("", response.getMessage());
+        assertNull(sdkService.getClient());
     }
 
     @Test
@@ -65,15 +69,5 @@ class SdkServiceTest {
 
         // then
         assertThrows(Exception.class, () -> sdkService.setup(params));
-    }
-
-    @Test
-    void testReset() throws TimeoutException {
-        // When
-        SetupResponse response = sdkService.reset();
-
-        // Then
-        assertEquals("", response.getMessage());
-        assertNull(sdkService.getClient());
     }
 }
