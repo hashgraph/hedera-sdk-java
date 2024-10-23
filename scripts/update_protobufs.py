@@ -30,12 +30,12 @@ go_to_script_dir()
 
 
 
-PROTO_GIT_REMOTE = "https://github.com/hashgraph/hedera-protobufs.git"
+PROTO_GIT_REMOTE = "https://github.com/hashgraph/hedera-services.git"
 PROTO_GIT_PATH = os.path.join("hedera-protos-git")
 PROTO_GIT_REF = sys.argv[1] if len(sys.argv)>1   else ""
 
 
-PROTO_IN_PATH = os.path.join(PROTO_GIT_PATH, "services")
+PROTO_IN_PATH = os.path.join(PROTO_GIT_PATH, "hapi/hedera-protobufs/services")
 PROTO_SDK_IN_PATH = os.path.join(PROTO_GIT_PATH, "sdk")
 PROTO_MIRROR_IN_PATH = os.path.join(PROTO_GIT_PATH, "mirror")
 BASIC_TYPES_PATH = os.path.join(PROTO_IN_PATH, "basic_types.proto")
@@ -233,17 +233,6 @@ def clear_dir(dir_path):
 
 def generate_modified_protos():
     do_generate_modified_protos(PROTO_IN_PATH, PROTO_OUT_PATH)
-    do_generate_modified_protos(PROTO_SDK_IN_PATH, PROTO_OUT_PATH)
-    do_generate_modified_protos(PROTO_MIRROR_IN_PATH, PROTO_MIRROR_OUT_PATH)
-
-
-# def do_generate_modified_protos(in_path, out_path):
-#     for name in os.listdir(in_path):
-#         in_file = open(os.path.join(in_path, name), "r")
-#         out_file = open(os.path.join(out_path, name), "w")
-#         out_file.write(do_replacements(in_file.read(), PROTO_REPLACEMENTS))
-#         in_file.close()
-#         out_file.close()
 
 def do_generate_modified_protos(in_path, out_path):
     for root, dirs, files in os.walk(in_path):
