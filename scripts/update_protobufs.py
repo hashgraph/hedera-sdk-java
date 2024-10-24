@@ -46,7 +46,7 @@ FREEZE_TYPE_PATH = os.path.join(PROTO_IN_PATH, "freeze_type.proto")
 MAIN_PATH = os.path.join("..", "sdk", "src", "main")
 PROTO_OUT_PATH = os.path.join(MAIN_PATH, "proto")
 PROTO_MIRROR_OUT_PATH = os.path.join(PROTO_OUT_PATH, "mirror")
-JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hedera", "hashgraph", "sdk")
+JAVA_OUT_PATH = os.path.join(MAIN_PATH, "java", "com", "hiero", "sdk")
 REQUEST_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "RequestType.java")
 STATUS_OUT_PATH = os.path.join(JAVA_OUT_PATH, "Status.java")
 FEE_DATA_TYPE_OUT_PATH = os.path.join(JAVA_OUT_PATH, "FeeDataType.java")
@@ -75,13 +75,13 @@ COMMENT_REPLACEMENTS = (
 
 PROTO_REPLACEMENTS = (
     ("option java_package = \"com.hederahashgraph.api.proto.java\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
+     "option java_package = \"com.hiero.sdk.proto\";"),
 
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
+     "option java_package = \"com.hiero.sdk.proto\";"),
 
     ("option java_package = \"com.hedera.mirror.api.proto\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
+     "option java_package = \"com.hiero.sdk.proto.mirror\";")
 )
 
 PROTO_REPLACEMENTS_IMPORTS = (
@@ -325,7 +325,7 @@ def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
 
 def add_to_FreezeType(original_name, cap_snake_name, comment_lines):
     FreezeType_sections[1] += \
-        generate_enum(original_name, cap_snake_name, comment_lines, "com.hedera.hashgraph.sdk.proto.FreezeType", 1)
+        generate_enum(original_name, cap_snake_name, comment_lines, "com.hiero.sdk.proto.FreezeType", 1)
     FreezeType_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
 
 

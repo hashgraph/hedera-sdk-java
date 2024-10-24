@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 /**
  * Enum for the freeze types.
