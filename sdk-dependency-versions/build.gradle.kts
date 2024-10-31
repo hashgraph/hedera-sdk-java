@@ -23,7 +23,7 @@ plugins {
 }
 
 dependencies.constraints {
-    api("com.esaulpaugh:headlong:12.1.0") {
+    api("com.esaulpaugh:headlong:12.3.2") {
         because("headlong")
     }
     api("com.google.code.gson:gson:2.10.1") {
