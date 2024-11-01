@@ -616,8 +616,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
             @Nullable
             var nodeProxies = client.network.getNodeProxies(accountId);
             if (nodeProxies == null || nodeProxies.size() == 0) {
-                throw new IllegalStateException(
-                    "Some node account IDs did not map to valid nodes in the client's network");
+                continue;
             }
 
             var node = nodeProxies.get(random.nextInt(nodeProxies.size()));
