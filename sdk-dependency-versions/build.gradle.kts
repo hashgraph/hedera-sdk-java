@@ -55,7 +55,7 @@ dependencies.constraints {
     api("com.google.code.findbugs:jsr305:3.0.2") {
         because("java.annotation")
     }
-    api("org.bouncycastle:bcpkix-jdk18on:1.78.1") {
+    api("org.bouncycastle:bcpkix-jdk18on:1.79") {
         because("org.bouncycastle.pkix")
     }
     api("org.bouncycastle:bcprov-jdk18on:1.79") {
