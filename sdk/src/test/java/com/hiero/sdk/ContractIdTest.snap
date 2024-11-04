@@ -1,0 +1,48 @@
+com.hiero.sdk.ContractIdTest.fromBytes=[
+  "0.0.5005"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromEvmAddress=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromEvmAddressWith0x=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromSolidityAddress=[
+  "0.0.5005"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromSolidityAddressWith0x=[
+  "0.0.5005"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromString=[
+  "0.0.5005"
+]
+
+
+com.hiero.sdk.ContractIdTest.fromStringWithEvmAddress=[
+  "1.2.98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
+com.hiero.sdk.ContractIdTest.toBytes=[
+  "188d27"
+]
+
+
+com.hiero.sdk.ContractIdTest.toSolidityAddress2=[
+  "98329e006610472e6b372c080833f6d79ed833cf"
+]
+
+
+com.hiero.sdk.ContractIdTest.toSolidityAddress=[
+  "000000000000000000000000000000000000138d"
+]
