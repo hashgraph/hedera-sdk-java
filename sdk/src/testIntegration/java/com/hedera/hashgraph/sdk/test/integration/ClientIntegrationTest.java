@@ -20,6 +20,7 @@
 package com.hedera.hashgraph.sdk.test.integration;
 
 import com.hedera.hashgraph.sdk.*;
+import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -32,6 +33,39 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class ClientIntegrationTest {
+
+    @Test
+    @DisplayName("fails when all the manually set nodes are not matching the address book")
+    void failsWhenNoNodesAreMatching() throws Exception {
+        var client = Client.forTestnet()
+            .setTransportSecurity(true);
+
+        var nodes = new ArrayList<AccountId>();
+        nodes.add(new AccountId(1000));
+        nodes.add(new AccountId(1001));
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> new AccountBalanceQuery()
+            .setNodeAccountIds(nodes)
+            .setAccountId(new AccountId(7))
+            .execute(client)).withMessageContaining("All node account IDs did not map to valid nodes in the client's network");
+        client.close();
+    }
+
+    @Test
+    @DisplayName("can skip invalid nodes")
+    void canSkipNodes() throws Exception {
+        var client = Client.forTestnet()
+            .setTransportSecurity(true);
+
+        var nodes = new ArrayList<>(client.getNetwork().values().stream().toList());
+        nodes.add(new AccountId(1000));
+        new AccountBalanceQuery()
+            .setNodeAccountIds(nodes)
+            .setAccountId(new AccountId(7))
+            .execute(client);
+
+        client.close();
+    }
+
     @Test
     @DisplayName("setNetwork() functions correctly")
     void testReplaceNodes() throws Exception {
@@ -39,7 +73,7 @@ public class ClientIntegrationTest {
         network.put("0.testnet.hedera.com:50211", new AccountId(3));
         network.put("1.testnet.hedera.com:50211", new AccountId(4));
 
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             testEnv.client
                 .setMaxQueryPayment(new Hbar(2))
@@ -88,7 +122,7 @@ public class ClientIntegrationTest {
     @Test
     @DisplayName("`setMaxNodesPerTransaction()`")
     void testMaxNodesPerTransaction() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             testEnv.client.setMaxNodesPerTransaction(1);
 
@@ -104,7 +138,7 @@ public class ClientIntegrationTest {
 
     @Test
     void ping() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
             var network = testEnv.client.getNetwork();
             var nodes = new ArrayList<>(network.values());
 
@@ -119,7 +153,7 @@ public class ClientIntegrationTest {
 
     @Test
     void pingAll() throws Exception {
-        try(var testEnv = new IntegrationTestEnv()){
+        try (var testEnv = new IntegrationTestEnv()) {
 
             testEnv.client.setMaxNodeAttempts(1);
             testEnv.client.pingAll();
@@ -140,7 +174,7 @@ public class ClientIntegrationTest {
 
     @Test
     void pingAllBadNetwork() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(3)){
+        try (var testEnv = new IntegrationTestEnv(3)) {
 
             // Skip if using local node.
             // Note: this check should be removed once the local node is supporting multiple nodes.
@@ -161,7 +195,6 @@ public class ClientIntegrationTest {
 
             testEnv.client.setNetwork(network);
 
-
             assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> {
                 testEnv.client.pingAll();
             }).withMessageContaining("exceeded maximum attempts");
@@ -177,12 +210,12 @@ public class ClientIntegrationTest {
 
             assertThat(testEnv.client.getNetwork().values().size()).isEqualTo(1);
         }
-        
+
     }
 
     @Test
     void pingAsync() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
             var network = testEnv.client.getNetwork();
             var nodes = new ArrayList<>(network.values());
 
@@ -197,7 +230,7 @@ public class ClientIntegrationTest {
 
     @Test
     void pingAllAsync() throws Exception {
-        try(var testEnv = new IntegrationTestEnv()){
+        try (var testEnv = new IntegrationTestEnv()) {
 
             testEnv.client.setMaxNodeAttempts(1);
             testEnv.client.pingAllAsync().get();
@@ -212,7 +245,7 @@ public class ClientIntegrationTest {
             new AccountBalanceQuery()
                 .setAccountId(node)
                 .execute(testEnv.client);
-            
+
         }
     }
 }
