@@ -1,13 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.Collections;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,14 +10,45 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import org.junit.jupiter.api.Test;
+
 public class ClientCloseTest {
+
+    @Test
+    void doesNotCloseExternalExecutor() throws TimeoutException {
+        var executor = Client.createExecutor();
+        var network = new HashMap<String, AccountId>();
+
+        var client = Client.forNetwork(network, executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forMainnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forTestnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forPreviewnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+    }
+
     @Test
     void closeHandlesNetworkTimeout() {
         var executor = Client.createExecutor();
         var network = mock(Network.class);
         when(network.awaitClose(any(), any())).thenReturn(new TimeoutException("network timeout"));
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("network timeout");
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
@@ -38,7 +61,7 @@ public class ClientCloseTest {
         var network = mock(Network.class);
         when(network.awaitClose(any(), any())).thenReturn(interruptedException);
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
@@ -50,7 +73,7 @@ public class ClientCloseTest {
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = mock(MirrorNetwork.class);
         when(mirrorNetwork.awaitClose(any(), any())).thenReturn(new TimeoutException("mirror timeout"));
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("mirror timeout");
         assertThat(network.hasShutDownNow).isFalse();
@@ -63,7 +86,7 @@ public class ClientCloseTest {
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = mock(MirrorNetwork.class);
         when(mirrorNetwork.awaitClose(any(), any())).thenReturn(interruptedException);
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
         assertThat(network.hasShutDownNow).isFalse();
@@ -74,7 +97,7 @@ public class ClientCloseTest {
         var executor = Client.createExecutor();
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         client.close();
         assertThat(executor.isShutdown()).isTrue();
@@ -86,7 +109,7 @@ public class ClientCloseTest {
         var executor = mock(ThreadPoolExecutor.class);
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         doReturn(true).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
 
@@ -100,7 +123,7 @@ public class ClientCloseTest {
         var executor = mock(ThreadPoolExecutor.class);
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         doReturn(false).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
 
@@ -114,7 +137,7 @@ public class ClientCloseTest {
         var executor = mock(ThreadPoolExecutor.class);
         var network = Network.forNetwork(executor, Collections.emptyMap());
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
-        var client = new Client(executor, network, mirrorNetwork, null, null);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
         doThrow(new InterruptedException()).when(executor).awaitTermination(30 / 2, TimeUnit.SECONDS);
 

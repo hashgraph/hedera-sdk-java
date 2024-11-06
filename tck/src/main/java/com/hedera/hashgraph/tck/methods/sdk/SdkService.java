@@ -69,7 +69,7 @@ public class SdkService extends AbstractJSONRPC2Service {
 
     @JSONRPC2Method("reset")
     public SetupResponse reset() throws Exception {
-        client.closeChannels();
+        client.close();
         client = null;
         return new SetupResponse("");
     }

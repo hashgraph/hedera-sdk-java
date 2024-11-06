@@ -93,6 +93,7 @@ public final class Client implements AutoCloseable {
     private volatile Duration minBackoff = DEFAULT_MIN_BACKOFF;
     private boolean autoValidateChecksums = false;
     private boolean defaultRegenerateTransactionId = true;
+    private final boolean shouldShutdownExecutor;
     // If networkUpdatePeriod is null, any network updates in progress will not complete
     @Nullable
     private Duration networkUpdatePeriod;
@@ -103,21 +104,23 @@ public final class Client implements AutoCloseable {
     /**
      * Constructor.
      *
-     * @param executor      the executor
-     * @param network       the network
-     * @param mirrorNetwork the mirror network
+     * @param executor               the executor
+     * @param network                the network
+     * @param mirrorNetwork          the mirror network
+     * @param shouldShutdownExecutor
      */
     @VisibleForTesting
     Client(
         ExecutorService executor,
         Network network,
         MirrorNetwork mirrorNetwork,
-        @Nullable Duration networkUpdateInitialDelay,
+        @Nullable Duration networkUpdateInitialDelay, boolean shouldShutdownExecutor,
         @Nullable Duration networkUpdatePeriod
     ) {
         this.executor = executor;
         this.network = network;
         this.mirrorNetwork = mirrorNetwork;
+        this.shouldShutdownExecutor = shouldShutdownExecutor;
         this.networkUpdatePeriod = networkUpdatePeriod;
         scheduleNetworkUpdate(networkUpdateInitialDelay);
     }
@@ -149,15 +152,14 @@ public final class Client implements AutoCloseable {
      * chose nodes to send transactions to. For one transaction, at most 1/3 of the nodes will be tried.
      *
      * @param networkMap the map of node IDs to node addresses that make up the network.
-     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
-     *                 clients will close the executor for all the other clients sharing this executor
+     * @param executor runs the grpc requests asynchronously.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forNetwork(Map<String, AccountId> networkMap, ExecutorService executor) {
         var network = Network.forNetwork(executor, networkMap);
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
 
-        return new Client(executor, network, mirrorNetwork, null, null);
+        return new Client(executor, network, mirrorNetwork, null, false, null);
     }
 
 
@@ -175,7 +177,10 @@ public final class Client implements AutoCloseable {
      */
     public static Client forNetwork(Map<String, AccountId> networkMap) {
         var executor = createExecutor();
-        return forNetwork(networkMap, executor);
+        var network = Network.forNetwork(executor, networkMap);
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, new ArrayList<>());
+
+        return new Client(executor, network, mirrorNetwork, null, true, null);
     }
 
     /**
@@ -197,8 +202,7 @@ public final class Client implements AutoCloseable {
      * Construct a Hedera client pre-configured for <a
      * href="https://docs.hedera.com/guides/mainnet/address-book#mainnet-address-book">Mainnet access</a>.
      *
-     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
-     *                 clients will close the executor for all the other clients sharing this executor
+     * @param executor runs the grpc requests asynchronously.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forMainnet(ExecutorService executor) {
@@ -206,15 +210,14 @@ public final class Client implements AutoCloseable {
         var mirrorNetwork = MirrorNetwork.forMainnet(executor);
 
         return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+            false, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
      * Construct a Hedera client pre-configured for <a href="https://docs.hedera.com/guides/testnet/nodes">Testnet
      * access</a>.
      *
-     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
-     *                 clients will close the executor for all the other clients sharing this executor
+     * @param executor runs the grpc requests asynchronously.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forTestnet(ExecutorService executor) {
@@ -222,7 +225,7 @@ public final class Client implements AutoCloseable {
         var mirrorNetwork = MirrorNetwork.forTestnet(executor);
 
         return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+            false, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -230,8 +233,7 @@ public final class Client implements AutoCloseable {
      * href="https://docs.hedera.com/guides/testnet/testnet-nodes#previewnet-node-public-keys">Preview Testnet
      * nodes</a>.
      *
-     * @param executor runs the grpc requests asynchronously. Note that calling `close()` method on one of the
-     *                 clients will close the executor for all the other clients sharing this executor
+     * @param executor runs the grpc requests asynchronously.
      * @return {@link com.hedera.hashgraph.sdk.Client}
      */
     public static Client forPreviewnet(ExecutorService executor) {
@@ -239,7 +241,7 @@ public final class Client implements AutoCloseable {
         var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
 
         return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
-            DEFAULT_NETWORK_UPDATE_PERIOD);
+            false, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
 
@@ -251,7 +253,11 @@ public final class Client implements AutoCloseable {
      */
     public static Client forMainnet() {
         var executor = createExecutor();
-        return forMainnet(executor);
+        var network = Network.forMainnet(executor);
+        var mirrorNetwork = MirrorNetwork.forMainnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            true, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -262,7 +268,11 @@ public final class Client implements AutoCloseable {
      */
     public static Client forTestnet() {
         var executor = createExecutor();
-        return forTestnet(executor);
+        var network = Network.forTestnet(executor);
+        var mirrorNetwork = MirrorNetwork.forTestnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            true, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -274,7 +284,11 @@ public final class Client implements AutoCloseable {
      */
     public static Client forPreviewnet() {
         var executor = createExecutor();
-        return forPreviewnet(executor);
+        var network = Network.forPreviewnet(executor);
+        var mirrorNetwork = MirrorNetwork.forPreviewnet(executor);
+
+        return new Client(executor, network, mirrorNetwork, NETWORK_UPDATE_INITIAL_DELAY,
+            true, DEFAULT_NETWORK_UPDATE_PERIOD);
     }
 
     /**
@@ -1354,34 +1368,6 @@ public final class Client implements AutoCloseable {
     }
 
     /**
-     * Initiates an orderly shutdown of all channels (to the Hedera network),
-     * without closing the ExecutorService {@link #executor}
-     *
-     * @throws TimeoutException if the network doesn't close in time
-     */
-    public synchronized void closeChannels() throws TimeoutException {
-        var closeDeadline = Instant.now().plus(closeTimeout);
-
-        networkUpdatePeriod = null;
-        cancelScheduledNetworkUpdate();
-        cancelAllSubscriptions();
-
-        network.beginClose();
-        mirrorNetwork.beginClose();
-
-        var networkError = network.awaitClose(closeDeadline, null);
-        var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
-
-        if (mirrorNetworkError != null) {
-            if (mirrorNetworkError instanceof TimeoutException ex) {
-                throw ex;
-            } else {
-                throw new RuntimeException(mirrorNetworkError);
-            }
-        }
-    }
-
-    /**
      * Initiates an orderly shutdown of all channels (to the Hedera network) in which preexisting transactions or
      * queries continue but more would be immediately cancelled.
      *
@@ -1405,17 +1391,19 @@ public final class Client implements AutoCloseable {
         var mirrorNetworkError = mirrorNetwork.awaitClose(closeDeadline, networkError);
 
         // https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ExecutorService.html
-        try {
-            executor.shutdown();
-            if (!executor.awaitTermination(timeout.getSeconds() / 2, TimeUnit.SECONDS)) {
-                executor.shutdownNow();
+        if (shouldShutdownExecutor) {
+            try {
+                executor.shutdown();
                 if (!executor.awaitTermination(timeout.getSeconds() / 2, TimeUnit.SECONDS)) {
-                    logger.warn("Pool did not terminate");
+                    executor.shutdownNow();
+                    if (!executor.awaitTermination(timeout.getSeconds() / 2, TimeUnit.SECONDS)) {
+                        logger.warn("Pool did not terminate");
+                    }
                 }
+            } catch (InterruptedException ex) {
+                executor.shutdownNow();
+                Thread.currentThread().interrupt();
             }
-        } catch (InterruptedException ex) {
-            executor.shutdownNow();
-            Thread.currentThread().interrupt();
         }
 
         if (mirrorNetworkError != null) {
