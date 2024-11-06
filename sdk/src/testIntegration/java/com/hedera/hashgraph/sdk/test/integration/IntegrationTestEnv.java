@@ -98,7 +98,6 @@ public class IntegrationTestEnv implements AutoCloseable {
 
     @SuppressWarnings("EmptyCatch")
     private static Client createTestEnvClient() throws Exception {
-
         if (System.getProperty("HEDERA_NETWORK").equals("previewnet")) {
             return Client.forPreviewnet();
         } else if (System.getProperty("HEDERA_NETWORK").equals("testnet")) {
@@ -169,7 +168,7 @@ public class IntegrationTestEnv implements AutoCloseable {
                     .execute(originalClient)
                     .getReceipt(originalClient);
 
-            } finally {
+            } catch (Exception e) {
                 client.close();
             }
         }

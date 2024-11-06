@@ -381,7 +381,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
         if (paymentTx != null) {
             return paymentTx;
         } else {
-            paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            // paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            if (paymentTransactionId == null) {
+                paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
+            }
 
             var newPaymentTx = makePaymentTransaction(
                 paymentTransactionId,
