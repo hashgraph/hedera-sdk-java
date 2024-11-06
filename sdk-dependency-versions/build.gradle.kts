@@ -55,10 +55,10 @@ dependencies.constraints {
     api("com.google.code.findbugs:jsr305:3.0.2") {
         because("java.annotation")
     }
-    api("org.bouncycastle:bcpkix-jdk18on:1.78.1") {
+    api("org.bouncycastle:bcpkix-jdk18on:1.79") {
         because("org.bouncycastle.pkix")
     }
-    api("org.bouncycastle:bcprov-jdk18on:1.78.1") {
+    api("org.bouncycastle:bcprov-jdk18on:1.79") {
         because("org.bouncycastle.provider")
     }
     api("org.slf4j:slf4j-api:2.0.9") {
@@ -69,7 +69,7 @@ dependencies.constraints {
     }
 
     // Testing
-    api("com.fasterxml.jackson.core:jackson-core:2.18.0") {
+    api("com.fasterxml.jackson.core:jackson-core:2.18.1") {
         because("com.fasterxml.jackson.core")
     }
     api("io.github.cdimascio:java-dotenv:5.3.1") {

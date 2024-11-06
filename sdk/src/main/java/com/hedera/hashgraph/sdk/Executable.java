@@ -601,7 +601,7 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         // failure the system can retry with different proxy on each attempt
         if (nodeAccountIds.size() == 1) {
             var nodeProxies = client.network.getNodeProxies(nodeAccountIds.get(0));
-            if (nodeProxies == null || nodeProxies.size() == 0) {
+            if (nodeProxies == null || nodeProxies.isEmpty()) {
                 throw new IllegalStateException("Account ID did not map to valid node in the client's network");
             }
 
@@ -615,14 +615,17 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         for (var accountId : nodeAccountIds) {
             @Nullable
             var nodeProxies = client.network.getNodeProxies(accountId);
-            if (nodeProxies == null || nodeProxies.size() == 0) {
-                throw new IllegalStateException(
-                    "Some node account IDs did not map to valid nodes in the client's network");
+            if (nodeProxies == null || nodeProxies.isEmpty()) {
+                continue;
             }
 
             var node = nodeProxies.get(random.nextInt(nodeProxies.size()));
 
             nodes.add(Objects.requireNonNull(node));
+        }
+        if (nodes.isEmpty()) {
+            throw new IllegalStateException(
+                "All node account IDs did not map to valid nodes in the client's network");
         }
     }
 
