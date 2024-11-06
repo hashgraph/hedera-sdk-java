@@ -1336,6 +1336,13 @@ public abstract class Transaction<T extends Transaction<T>>
 
     @Override
     ExecutionState getExecutionState(Status status, com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+//        if (status == Status.DUPLICATE_TRANSACTION) {
+//            var accountId = new AccountId(12345);
+//            generateTransactionIds(TransactionId.generate(accountId), transactionIds.size());
+//            wipeTransactionLists(transactionIds.size());
+//            return ExecutionState.RETRY;
+//        }
+
         if (status == Status.TRANSACTION_EXPIRED) {
             if ((regenerateTransactionId != null && !regenerateTransactionId) || transactionIds.isLocked()) {
                 return ExecutionState.REQUEST_ERROR;
