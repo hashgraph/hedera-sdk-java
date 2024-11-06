@@ -1,13 +1,5 @@
 package com.hedera.hashgraph.sdk;
 
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.Collections;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -18,7 +10,38 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import org.junit.jupiter.api.Test;
+
 public class ClientCloseTest {
+
+    @Test
+    void doesNotCloseExternalExecutor() throws TimeoutException {
+        var executor = Client.createExecutor();
+        var network = new HashMap<String, AccountId>();
+
+        var client = Client.forNetwork(network, executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forMainnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forTestnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+
+        client = Client.forPreviewnet(executor);
+        client.close();
+        assertThat(executor.isShutdown()).isFalse();
+    }
+
     @Test
     void closeHandlesNetworkTimeout() {
         var executor = Client.createExecutor();

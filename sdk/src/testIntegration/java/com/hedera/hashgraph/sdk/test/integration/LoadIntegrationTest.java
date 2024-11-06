@@ -54,10 +54,10 @@ class LoadIntegrationTest {
             for (int i = 0; i < nThreads; i++) {
                 int finalI = i;
                 threadPoolExecutor.submit(() -> {
-                    var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
-                    client.setOperator(operatorId, operatorPrivateKey);
-                    client.setMaxAttempts(10);
-                    try {
+                    try (var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
+                    ) {
+                        client.setOperator(operatorId, operatorPrivateKey);
+                        client.setMaxAttempts(10);
                         new AccountCreateTransaction()
                             .setKey(PrivateKey.generateED25519())
                             .execute(client)
@@ -65,12 +65,6 @@ class LoadIntegrationTest {
                         System.out.println(finalI);
                     } catch (Exception e) {
                         fail("AccountCreateTransaction failed, " + e);
-                    } finally {
-                        try {
-                            client.closeChannels();
-                        } catch (TimeoutException e) {
-                            throw new RuntimeException(e);
-                        }
                     }
                 });
             }
@@ -90,7 +84,6 @@ class LoadIntegrationTest {
 
             long endTime = System.currentTimeMillis();
             long executionTime = endTime - startTime;
-            System.out.println();
             System.out.println("All tasks have finished execution in " + executionTime + "ms");
             clientExecutor.shutdownNow();
 
