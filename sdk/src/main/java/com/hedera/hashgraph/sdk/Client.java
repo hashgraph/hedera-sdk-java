@@ -22,7 +22,9 @@ package com.hedera.hashgraph.sdk;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
@@ -299,7 +301,7 @@ public final class Client implements AutoCloseable {
      * @throws Exception if the config is incorrect
      */
     public static Client fromConfig(String json) throws Exception {
-        return fromConfig(new StringReader(json));
+        return Config.fromString(json).toClient();
     }
 
     /**
@@ -310,66 +312,16 @@ public final class Client implements AutoCloseable {
      * @throws Exception if the config is incorrect
      */
     public static Client fromConfig(Reader json) throws Exception {
-        Config config = new Gson().fromJson(json, Config.class);
-        Client client;
+        return Config.fromJson(json).toClient();
+    }
 
-        if (config.network == null) {
-            throw new Exception("Network is not set in provided json object");
-        } else if (config.network.isJsonObject()) {
-            var networks = config.network.getAsJsonObject();
-            Map<String, AccountId> nodes = new HashMap<>(networks.size());
-            for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
-                nodes.put(entry.getValue().toString().replace("\"", ""),
-                    AccountId.fromString(entry.getKey().replace("\"", "")));
-            }
-            client = Client.forNetwork(nodes);
-            if (config.networkName != null) {
-                var networkNameString = config.networkName.getAsString();
-                try {
-                    client.setNetworkName(NetworkName.fromString(networkNameString));
-                } catch (Exception ignored) {
-                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString
-                        + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
-                }
-            }
-        } else {
-            String networks = config.network.getAsString();
-            client = switch (networks) {
-                case MAINNET -> Client.forMainnet();
-                case TESTNET -> Client.forTestnet();
-                case PREVIEWNET -> Client.forPreviewnet();
-                default -> throw new JsonParseException("Illegal argument for network.");
-            };
+    private static Map<String, AccountId> getNetworkNodes(JsonObject networks) {
+        Map<String, AccountId> nodes = new HashMap<>(networks.size());
+        for (Map.Entry<String, JsonElement> entry : networks.entrySet()) {
+            nodes.put(entry.getValue().toString().replace("\"", ""),
+                AccountId.fromString(entry.getKey().replace("\"", "")));
         }
-
-        if (config.operator != null) {
-            AccountId operatorAccount = AccountId.fromString(config.operator.accountId);
-            PrivateKey privateKey = PrivateKey.fromString(config.operator.privateKey);
-
-            client.setOperator(operatorAccount, privateKey);
-        }
-
-        //already set in previous set network if?
-        if (config.mirrorNetwork != null) {
-            if (config.mirrorNetwork.isJsonArray()) {
-                var mirrors = config.mirrorNetwork.getAsJsonArray();
-                List<String> listMirrors = new ArrayList<>(mirrors.size());
-                for (var i = 0; i < mirrors.size(); i++) {
-                    listMirrors.add(mirrors.get(i).getAsString().replace("\"", ""));
-                }
-                client.setMirrorNetwork(listMirrors);
-            } else {
-                String mirror = config.mirrorNetwork.getAsString();
-                switch (mirror) {
-                    case MAINNET -> client.mirrorNetwork = MirrorNetwork.forMainnet(client.executor);
-                    case TESTNET -> client.mirrorNetwork = MirrorNetwork.forTestnet(client.executor);
-                    case PREVIEWNET -> client.mirrorNetwork = MirrorNetwork.forPreviewnet(client.executor);
-                    default -> throw new JsonParseException("Illegal argument for mirrorNetwork.");
-                }
-            }
-        }
-
-        return client;
+        return nodes;
     }
 
     /**
@@ -1446,6 +1398,112 @@ public final class Client implements AutoCloseable {
 
             @Nullable
             private String privateKey;
+        }
+
+        private static Config fromString(String json) {
+            return new Gson().fromJson((Reader) new StringReader(json), Config.class);
+        }
+
+        private static Config fromJson(Reader json) {
+            return new Gson().fromJson(json, Config.class);
+        }
+
+        private Client toClient() throws Exception, InterruptedException {
+            Client client = initializeWithNetwork();
+            setOperatorOn(client);
+            setMirrorNetworkOn(client);
+            return client;
+        }
+
+        private Client initializeWithNetwork() throws Exception {
+            if (network == null) {
+                throw new Exception("Network is not set in provided json object");
+            }  
+            
+            Client client;
+            if (network.isJsonObject()) {
+                client = clientFromNetworkJson();
+            } else {;
+                client = clientFromNetworkString();
+            }
+            return client;
+        }
+
+        private Client clientFromNetworkJson() {
+            Client client;
+            var networkJson = network.getAsJsonObject();
+            Map<String, AccountId> nodes = Client.getNetworkNodes(networkJson);
+            client = Client.forNetwork(nodes);
+            setNetworkNameOn(client);
+            return client;
+        }
+
+        private void setNetworkNameOn(Client client) {
+            if (networkName != null) {
+                var networkNameString = networkName.getAsString();
+                try {
+                    client.setNetworkName(NetworkName.fromString(networkNameString));
+                } catch (Exception ignored) {
+                    throw new IllegalArgumentException("networkName in config was \"" + networkNameString
+                        + "\", expected either \"mainnet\", \"testnet\" or \"previewnet\"");
+                }
+            }
+        }
+
+        private Client clientFromNetworkString() {
+            return switch (network.getAsString()) {
+                case MAINNET -> Client.forMainnet();
+                case TESTNET -> Client.forTestnet();
+                case PREVIEWNET -> Client.forPreviewnet();
+                default -> throw new JsonParseException("Illegal argument for network.");
+            };
+        }
+
+        private void setMirrorNetworkOn(Client client) throws InterruptedException {
+            if (mirrorNetwork != null) {
+                setMirrorNetwork(client);
+            }
+        }
+
+        private void setMirrorNetwork(Client client) throws InterruptedException {
+            if (mirrorNetwork.isJsonArray()) {
+                setMirrorNetworksFromJsonArray(client);
+            } else {
+                setMirrorNetworkFromString(client);
+            }
+        }
+
+        private void setMirrorNetworkFromString(Client client) {
+            String mirror = mirrorNetwork.getAsString();
+            switch (mirror) {
+                case Client.MAINNET -> client.mirrorNetwork = MirrorNetwork.forMainnet(client.executor);
+                case Client.TESTNET -> client.mirrorNetwork = MirrorNetwork.forTestnet(client.executor);
+                case Client.PREVIEWNET -> client.mirrorNetwork = MirrorNetwork.forPreviewnet(client.executor);
+                default -> throw new JsonParseException("Illegal argument for mirrorNetwork.");
+            }
+        }
+
+        private void setMirrorNetworksFromJsonArray(Client client) throws InterruptedException {
+            var mirrors = mirrorNetwork.getAsJsonArray();
+            List<String> listMirrors = getListMirrors(mirrors);
+            client.setMirrorNetwork(listMirrors);
+        }
+
+        private List<String> getListMirrors(JsonArray mirrors) {
+            List<String> listMirrors = new ArrayList<>(mirrors.size());
+            for (var i = 0; i < mirrors.size(); i++) {
+                listMirrors.add(mirrors.get(i).getAsString().replace("\"", ""));
+            }
+            return listMirrors;
+        }
+
+        private void setOperatorOn(Client client) {
+            if (operator != null) {
+                AccountId operatorAccount = AccountId.fromString(operator.accountId);
+                PrivateKey privateKey = PrivateKey.fromString(operator.privateKey);
+        
+                client.setOperator(operatorAccount, privateKey);
+            }
         }
     }
 }
