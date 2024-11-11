@@ -40,7 +40,7 @@ dependencies.constraints {
     api("io.grpc:grpc-api:1.64.0") {
         because("io.grpc")
     }
-    api("io.grpc:grpc-inprocess:1.64.0") {
+    api("io.grpc:grpc-inprocess:1.68.1") {
         because("io.grpc.protobuf")
     }
     api("io.grpc:grpc-protobuf:1.64.0") {
