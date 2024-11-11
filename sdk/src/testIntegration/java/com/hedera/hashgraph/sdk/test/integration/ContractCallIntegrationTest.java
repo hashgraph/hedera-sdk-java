@@ -27,6 +27,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
+import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
@@ -62,9 +63,15 @@ public class ContractCallIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            Thread.sleep(2000);
+            var gas = new MirrorNodeContractQuery()
+                .setContractId(contractId)
+                .setFunction("getMessage")
+                .estimate(testEnv.client);
+
             var callQuery = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(200000)
+                .setGas(gas)
                 .setFunction("getMessage")
                 .setQueryPayment(new Hbar(1));
 
@@ -244,9 +251,15 @@ public class ContractCallIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            Thread.sleep(2000);
+            var gas = new MirrorNodeContractQuery()
+                .setContractId(contractId)
+                .setFunction("getMessage")
+                .estimate(testEnv.client);
+
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)
-                    .setGas(100000)
+                    .setGas(gas)
                     .setFunction("getMessage")
                     .setQueryPayment(new Hbar(1));
 
@@ -291,9 +304,15 @@ public class ContractCallIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            Thread.sleep(2000);
+            var gas = new MirrorNodeContractQuery()
+                .setContractId(contractId)
+                .setFunction("getMessage")
+                .estimate(testEnv.client);
+
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)
-                    .setGas(100000)
+                    .setGas(gas)
                     .setFunction("getMessage")
                     .setMaxQueryPayment(Hbar.fromTinybars(1));
 
@@ -337,9 +356,15 @@ public class ContractCallIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            Thread.sleep(2000);
+            var gas = new MirrorNodeContractQuery()
+                .setContractId(contractId)
+                .setFunction("getMessage")
+                .estimate(testEnv.client);
+
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)
-                    .setGas(100000)
+                    .setGas(gas)
                     .setFunction("getMessage")
                     .setMaxQueryPayment(new Hbar(100));
 
@@ -357,7 +382,6 @@ public class ContractCallIntegrationTest {
                 .setFileId(fileId)
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
-
         }
     }
 }

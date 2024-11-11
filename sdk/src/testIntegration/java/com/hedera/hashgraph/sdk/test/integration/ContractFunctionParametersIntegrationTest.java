@@ -32,6 +32,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Objects;
@@ -84,7 +85,11 @@ public class ContractFunctionParametersIntegrationTest {
     @Test
     @DisplayName("Can receive uint8 min value from contract call")
     void canCallContractFunctionUint8Min() throws Exception {
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint8", new ContractFunctionParameters().addUint8((byte) 0x0))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint8", new ContractFunctionParameters().addUint8((byte) 0x0))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -97,7 +102,11 @@ public class ContractFunctionParametersIntegrationTest {
         int uint8Max = 255;
         byte uint8MaxByte = (byte) uint8Max;
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint8", new ContractFunctionParameters().addUint8(uint8MaxByte))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint8", new ContractFunctionParameters().addUint8(uint8MaxByte))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -114,7 +123,11 @@ public class ContractFunctionParametersIntegrationTest {
         byte uint8MaxByte = (byte) uint8Max;
         byte[] uint8Array = {uint8MinByte, uint8MaxByte};
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint8Arr", new ContractFunctionParameters().addUint8Array(uint8Array))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint8Arr", new ContractFunctionParameters().addUint8Array(uint8Array))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -140,7 +153,11 @@ public class ContractFunctionParametersIntegrationTest {
         var uint16Max = "65535";
         int uint16MaxInt = Integer.parseUnsignedInt(uint16Max);
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint16", new ContractFunctionParameters().addUint16(uint16MaxInt))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint16", new ContractFunctionParameters().addUint16(uint16MaxInt))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -157,7 +174,11 @@ public class ContractFunctionParametersIntegrationTest {
         int uint16MaxInt = Integer.parseUnsignedInt(uint16Max);
         int[] uint16Array = {uint16MinInt, uint16MaxInt};
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint16Arr", new ContractFunctionParameters().addUint16Array(uint16Array))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint16Arr", new ContractFunctionParameters().addUint16Array(uint16Array))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -169,7 +190,11 @@ public class ContractFunctionParametersIntegrationTest {
     @Test
     @DisplayName("Can receive uint24 min value from contract call")
     void canCallContractFunctionUint24Min() throws Exception {
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint24", new ContractFunctionParameters().addUint24(0))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint24", new ContractFunctionParameters().addUint24(0)).setQueryPayment(new Hbar(10))
             .execute(testEnv.client);
 
@@ -182,7 +207,11 @@ public class ContractFunctionParametersIntegrationTest {
         var uint24Max = "16777215";
         int uint24MaxInt = Integer.parseUnsignedInt(uint24Max);
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint24", new ContractFunctionParameters().addUint24(uint24MaxInt))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint24", new ContractFunctionParameters().addUint24(uint24MaxInt))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
@@ -199,7 +228,11 @@ public class ContractFunctionParametersIntegrationTest {
         int uint24MaxInt = Integer.parseUnsignedInt(uint24Max);
         int[] uint24Array = {uint24MinInt, uint24MaxInt};
 
-        var response = new ContractCallQuery().setContractId(contractId).setGas(1500000)
+        var gas = new MirrorNodeContractQuery().setContractId(contractId)
+            .setFunction("returnUint24Arr", new ContractFunctionParameters().addUint24Array(uint24Array))
+            .estimate(testEnv.client);
+
+        var response = new ContractCallQuery().setContractId(contractId).setGas(gas)
             .setFunction("returnUint24Arr", new ContractFunctionParameters().addUint24Array(uint24Array))
             .setQueryPayment(new Hbar(10)).execute(testEnv.client);
 
