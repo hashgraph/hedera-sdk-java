@@ -74,7 +74,7 @@ tasks.withType<Javadoc>().configureEach {
 }
 
 tasks.withType<Test>().configureEach {
-    // Set maxParallelForks based on the number of CPU cores, e.g., half the available cores
+    failFast = true
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 }
 
