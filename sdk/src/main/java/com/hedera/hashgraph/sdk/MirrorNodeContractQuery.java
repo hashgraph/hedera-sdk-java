@@ -39,7 +39,7 @@ import org.bouncycastle.util.encoders.Hex;
 public class MirrorNodeContractQuery {
     private ContractId contractId = null;
     private String contractEvmAddress = null;
-    private byte[] functionParameters;
+    private byte[] callData;
     private long blockNumber;
 
     public ContractId getContractId() {
@@ -75,8 +75,8 @@ public class MirrorNodeContractQuery {
         return this;
     }
 
-    public byte[] getFunctionParameters() {
-        return functionParameters;
+    public byte[] getCallData() {
+        return this.callData;
     }
 
     /**
@@ -115,7 +115,7 @@ public class MirrorNodeContractQuery {
      */
     public MirrorNodeContractQuery setFunctionParameters(ByteString functionParameters) {
         Objects.requireNonNull(functionParameters);
-        this.functionParameters = functionParameters.toByteArray();
+        this.callData = functionParameters.toByteArray();
         return this;
     }
 
@@ -139,7 +139,7 @@ public class MirrorNodeContractQuery {
             Objects.requireNonNull(this.contractId);
             this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString()).get();
         }
-        return getEstimateGasFromMirrorNodeAsync(client, this.functionParameters, this.contractEvmAddress).get();
+        return getEstimateGasFromMirrorNodeAsync(client, this.callData, this.contractEvmAddress).get();
     }
 
     /**
@@ -156,7 +156,7 @@ public class MirrorNodeContractQuery {
         }
 
         var blockNum = this.blockNumber == 0 ? "" : String.valueOf(this.blockNumber);
-        return getContractCallResultFromMirrorNodeAsync(client, this.functionParameters, this.contractEvmAddress,
+        return getContractCallResultFromMirrorNodeAsync(client, this.callData, this.contractEvmAddress,
             blockNum).get();
     }
 
@@ -184,7 +184,7 @@ public class MirrorNodeContractQuery {
             .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
     }
 
-    private static String createJsonPayload(byte[] data, String contractAddress, String blockNumber, boolean estimate) {
+    static String createJsonPayload(byte[] data, String contractAddress, String blockNumber, boolean estimate) {
         String hexData = Hex.toHexString(data);
         return String.format("""
             {
@@ -196,14 +196,12 @@ public class MirrorNodeContractQuery {
             """, hexData, contractAddress, estimate, blockNumber);
     }
 
-    private static String parseContractCallResult(String responseBody) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
-
+    static String parseContractCallResult(String responseBody) {
+        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
         return jsonObject.get("result").getAsString();
     }
 
-    private static long parseHexEstimateToLong(String responseBody) {
+    static long parseHexEstimateToLong(String responseBody) {
         return Integer.parseInt(parseContractCallResult(responseBody).substring(2), 16);
     }
 }
