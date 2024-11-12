@@ -407,11 +407,8 @@ class EntityIdHelper {
     }
 
     private static String parseEvmAddressFromMirrorNodeResponse(String responseBody, String memberName) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
-
+        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
         String evmAddress = jsonObject.get(memberName).getAsString();
-
         return evmAddress.substring(evmAddress.lastIndexOf(".") + 1);
     }
 

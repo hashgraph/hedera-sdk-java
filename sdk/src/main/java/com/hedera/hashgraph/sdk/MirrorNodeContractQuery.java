@@ -143,7 +143,8 @@ public class MirrorNodeContractQuery {
     }
 
     /**
-     * Does transient simulation of read-write operations and returns the result in hexadecimal string format
+     * Does transient simulation of read-write operations and returns the result in hexadecimal string format.
+     * The result can be any solidity type.
      *
      * @param client
      * @throws ExecutionException
