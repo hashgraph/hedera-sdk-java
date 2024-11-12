@@ -313,7 +313,7 @@ class EntityIdHelper {
         String apiEndpoint = "/accounts/" + num;
         return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
             .thenApply(response ->
-                EvmAddress.fromString(parseEvmAddressFromMirrorNodeResponse(response, "evm_address")));
+                EvmAddress.fromString(parseStringMirrorNodeResponse(response, "evm_address")));
     }
 
     /**
@@ -338,24 +338,12 @@ class EntityIdHelper {
     }
 
 
-
-
-
-    private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
-
-        String num = jsonObject.get(memberName).getAsString();
-
-        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
-    }
-
     public static CompletableFuture<String> getContractAddressFromMirrorNodeAsync(Client client, String id) {
         String apiEndpoint = "/contracts/" + id;
         CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
 
         return responseFuture.thenApply(response ->
-            parseEvmAddressFromMirrorNodeResponse(response, "evm_address"));
+            parseStringMirrorNodeResponse(response, "evm_address"));
     }
 
     static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint, String jsonBody, boolean isContractCall) {
@@ -406,10 +394,14 @@ class EntityIdHelper {
             });
     }
 
-    private static String parseEvmAddressFromMirrorNodeResponse(String responseBody, String memberName) {
+    private static String parseStringMirrorNodeResponse(String responseBody, String memberName) {
         JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
         String evmAddress = jsonObject.get(memberName).getAsString();
         return evmAddress.substring(evmAddress.lastIndexOf(".") + 1);
+    }
+
+    private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
+        return Long.parseLong(parseStringMirrorNodeResponse(responseBody, memberName));
     }
 
     @FunctionalInterface

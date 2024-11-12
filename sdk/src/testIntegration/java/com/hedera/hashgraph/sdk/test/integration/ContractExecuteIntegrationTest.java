@@ -62,15 +62,14 @@ public class ContractExecuteIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             Thread.sleep(2000);
-            // TODO: estimates lower than actual
+
             var gas = new MirrorNodeContractQuery()
                 .setContractId(contractId)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .estimate(testEnv.client);
-
             var receipt = new ContractExecuteTransaction()
                 .setContractId(contractId)
-                .setGas(gas + 15000)
+                .setGas(gas + 10000)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
