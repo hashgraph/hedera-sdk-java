@@ -36,6 +36,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
@@ -48,6 +50,7 @@ public class IntegrationTestEnv implements AutoCloseable {
     public PublicKey operatorKey;
     public AccountId operatorId;
     public boolean isLocalNode = false;
+    private static ExecutorService clientExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public IntegrationTestEnv() throws Exception {
         this(0);
@@ -104,7 +107,7 @@ public class IntegrationTestEnv implements AutoCloseable {
             network.put(LOCAL_CONSENSUS_NODE_ENDPOINT, LOCAL_CONSENSUS_NODE_ACCOUNT_ID);
 
             return Client
-                .forNetwork(network)
+                .forNetwork(network, clientExecutor)
                 .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
@@ -152,19 +155,23 @@ public class IntegrationTestEnv implements AutoCloseable {
     @Override
     public void close() throws Exception {
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
-            var hbarsBalance = new AccountBalanceQuery()
-                .setAccountId(operatorId)
-                .execute(originalClient)
-                .hbars;
-            new TransferTransaction()
-                .addHbarTransfer(operatorId, hbarsBalance.negated())
-                .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
-                .freezeWith(originalClient)
-                .signWithOperator(client)
-                .execute(originalClient);
-            client.close();
-        }
+            try {
+                var hbarsBalance = new AccountBalanceQuery()
+                    .setAccountId(operatorId)
+                    .execute(originalClient)
+                    .hbars;
+                new TransferTransaction()
+                    .addHbarTransfer(operatorId, hbarsBalance.negated())
+                    .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
+                    .freezeWith(originalClient)
+                    .signWithOperator(client)
+                    .execute(originalClient)
+                    .getReceipt(originalClient);
 
+            } catch (Exception e) {
+                client.close();
+            }
+        }
         originalClient.close();
     }
 

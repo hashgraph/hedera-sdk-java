@@ -73,7 +73,13 @@ tasks.withType<Javadoc>().configureEach {
     }
 }
 
+tasks.withType<Test>().configureEach {
+    failFast = true
+    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+}
+
 tasks.jacocoTestReport {
+    dependsOn(tasks.withType<Test>())
     // make sure to use any/all test coverage data for the report and run all tests before this report is made
     executionData.from(
         tasks.test.map { it.extensions.getByType<JacocoTaskExtension>().destinationFile!! },
