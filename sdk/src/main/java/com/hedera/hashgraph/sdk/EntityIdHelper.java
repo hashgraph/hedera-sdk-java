@@ -42,7 +42,7 @@ import org.bouncycastle.util.encoders.Hex;
 /**
  * Utility class used internally by the sdk.
  */
-class EntityIdHelper {
+public class EntityIdHelper {
     /**
      * The length of a Solidity address in bytes.
      */

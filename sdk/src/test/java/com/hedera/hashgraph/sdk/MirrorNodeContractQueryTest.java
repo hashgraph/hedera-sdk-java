@@ -62,7 +62,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testSetContractIdWithNull_ThrowsException() {
+    void testSetContractIdWithNullThrowsException() {
         assertThrows(NullPointerException.class, () -> query.setContractId(null));
     }
 
@@ -75,7 +75,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testSetContractEvmAddressWithNull_ThrowsException() {
+    void testSetContractEvmAddressWithNullThrowsException() {
         assertThrows(NullPointerException.class, () -> query.setContractEvmAddress(null));
     }
 
@@ -109,8 +109,8 @@ class MirrorNodeContractQueryTest {
     @Test
     void testSetAndGetGas() {
         long gas = 50000;
-        query.setGas(gas);
-        assertEquals(gas, query.getGas());
+        query.setGasLimit(gas);
+        assertEquals(gas, query.getGasLimit());
     }
 
     @Test
@@ -121,7 +121,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testEstimateGasWithMissingContractIdOrEvmAddress_ThrowsException() {
+    void testEstimateGasWithMissingContractIdOrEvmAddressThrowsException() {
         ByteString params = ByteString.copyFromUtf8("gasParams");
         query.setFunctionParameters(params);
 
@@ -129,7 +129,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testCreateJsonPayload_AllFieldsSet() {
+    void testCreateJsonPayloadAllFieldsSet() {
         byte[] data = "testData".getBytes();
         String senderAddress = "0x1234567890abcdef1234567890abcdef12345678";
         String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
@@ -155,7 +155,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testCreateJsonPayload_OnlyRequiredFieldsSet() {
+    void testCreateJsonPayloadOnlyRequiredFieldsSet() {
         byte[] data = "testData".getBytes();
         String senderAddress = "";
         String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
@@ -177,7 +177,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testCreateJsonPayload_SomeOptionalFieldsSet() {
+    void testCreateJsonPayloadSomeOptionalFieldsSet() {
         byte[] data = "testData".getBytes();
         String senderAddress = "0x1234567890abcdef1234567890abcdef12345678";
         String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
@@ -202,7 +202,7 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testCreateJsonPayload_AllOptionalFieldsDefault() {
+    void testCreateJsonPayloadAllOptionalFieldsDefault() {
         byte[] data = "testData".getBytes();
         String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
         String senderAddress = "";

@@ -21,6 +21,7 @@
 package com.hedera.hashgraph.sdk;
 
 import static com.hedera.hashgraph.sdk.EntityIdHelper.getContractAddressFromMirrorNodeAsync;
+import static com.hedera.hashgraph.sdk.EntityIdHelper.getEvmAddressFromMirrorNodeAsync;
 import static com.hedera.hashgraph.sdk.EntityIdHelper.performQueryToMirrorNodeAsync;
 
 import com.google.gson.JsonObject;
@@ -47,8 +48,8 @@ public class MirrorNodeContractQuery {
     private byte[] callData;
     // The amount we are sending to payable functions
     private long value;
-    // The amount of gas we are sending
-    private long gas;
+    // The gas limit
+    private long gasLimit;
     // The gas price
     private long gasPrice;
     // The block number for the simulation
@@ -114,7 +115,7 @@ public class MirrorNodeContractQuery {
      * @return {@code this}
      */
     public MirrorNodeContractQuery setSenderEvmAddress(String senderEvmAddress) {
-        Objects.requireNonNull(sender);
+        Objects.requireNonNull(senderEvmAddress);
         this.senderEvmAddress = senderEvmAddress;
         this.sender = null;
         return this;
@@ -165,31 +166,34 @@ public class MirrorNodeContractQuery {
     }
 
     public long getValue() {
-        return value;
+        return this.value;
     }
 
-    public void setValue(long value) {
+    public MirrorNodeContractQuery setValue(long value) {
         this.value = value;
+        return this;
     }
 
-    public long getGas() {
-        return gas;
+    public long getGasLimit() {
+        return this.gasLimit;
     }
 
-    public void setGas(long gas) {
-        this.gas = gas;
+    public MirrorNodeContractQuery setGasLimit(long gasLimit) {
+        this.gasLimit = gasLimit;
+        return this;
     }
 
     public long getGasPrice() {
         return gasPrice;
     }
 
-    public void setGasPrice(long gasPrice) {
+    public MirrorNodeContractQuery setGasPrice(long gasPrice) {
         this.gasPrice = gasPrice;
+        return this;
     }
 
     public long getBlockNumber() {
-        return blockNumber;
+        return this.blockNumber;
     }
 
     public void setBlockNumber(long blockNumber) {
@@ -204,10 +208,7 @@ public class MirrorNodeContractQuery {
      * @throws InterruptedException
      */
     public long estimate(Client client) throws ExecutionException, InterruptedException {
-        if (this.contractEvmAddress == null) {
-            Objects.requireNonNull(this.contractId);
-            this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString()).get();
-        }
+        fillEvmAddresses(client);
         return getEstimateGasFromMirrorNodeAsync(client).get();
     }
 
@@ -220,38 +221,46 @@ public class MirrorNodeContractQuery {
      * @throws InterruptedException
      */
     public String call(Client client) throws ExecutionException, InterruptedException {
+        fillEvmAddresses(client);
+        var blockNum = this.blockNumber == 0 ? "latest" : String.valueOf(this.blockNumber);
+        return getContractCallResultFromMirrorNodeAsync(client, blockNum).get();
+    }
+
+    private void fillEvmAddresses(Client client) throws ExecutionException, InterruptedException {
         if (this.contractEvmAddress == null) {
             Objects.requireNonNull(this.contractId);
             this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString()).get();
         }
 
-        var blockNum = this.blockNumber == 0 ? "" : String.valueOf(this.blockNumber);
-        return getContractCallResultFromMirrorNodeAsync(client, blockNum).get();
+        if (this.senderEvmAddress == null && this.sender != null) {
+            this.senderEvmAddress = getEvmAddressFromMirrorNodeAsync(client, this.sender.num).get().toString();
+        }
     }
 
-    private CompletableFuture<String> getContractCallResultFromMirrorNodeAsync(Client client ,String blockNumber) {
-        String apiEndpoint = "/contracts/call";
-        String jsonPayload = createJsonPayload(this.callData, this.senderEvmAddress, this.contractEvmAddress, this.gas, this.gasPrice, this.value, blockNumber, false);
-        return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
-            .exceptionally(ex -> {
-                client.getLogger().error("Error in while performing post request to Mirror Node: " + ex.getMessage());
-                throw new CompletionException(ex);
-            })
+    private CompletableFuture<String> getContractCallResultFromMirrorNodeAsync(Client client, String blockNumber) {
+        return executeMirrorNodeRequest(client, blockNumber, false)
             .thenApply(MirrorNodeContractQuery::parseContractCallResult);
     }
 
     public CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client) {
-        String apiEndpoint = "/contracts/call";
-        String jsonPayload = createJsonPayload(this.callData, this.contractEvmAddress, this.contractEvmAddress, this.gas, this.gasPrice, this.value, "latest", true);
-        return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
-            .exceptionally(ex -> {
-                client.getLogger().error("Error in while performing post request to Mirror Node: " + ex.getMessage());
-                throw new CompletionException(ex);
-            })
+        return executeMirrorNodeRequest(client, "latest", true)
             .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
     }
 
-    static String createJsonPayload(byte[] data, String senderAddress, String contractAddress, long gas, long gasPrice, long value, String blockNumber, boolean estimate) {
+    private CompletableFuture<String> executeMirrorNodeRequest(Client client, String blockNumber, boolean estimate) {
+        String apiEndpoint = "/contracts/call";
+        String jsonPayload = createJsonPayload(this.callData, this.senderEvmAddress, this.contractEvmAddress,
+            this.gasLimit, this.gasPrice, this.value, blockNumber, estimate);
+
+        return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
+            .exceptionally(ex -> {
+                client.getLogger().error("Error while performing post request to Mirror Node: " + ex.getMessage());
+                throw new CompletionException(ex);
+            });
+    }
+
+    static String createJsonPayload(byte[] data, String senderAddress, String contractAddress, long gas, long gasPrice,
+        long value, String blockNumber, boolean estimate) {
         String hexData = Hex.toHexString(data);
 
         JsonObject jsonObject = new JsonObject();
