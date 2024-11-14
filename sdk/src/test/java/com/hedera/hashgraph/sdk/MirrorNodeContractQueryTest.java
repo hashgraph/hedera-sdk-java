@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.google.gson.JsonObject;
 import com.google.protobuf.ByteString;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
@@ -99,6 +100,27 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
+    void testSetAndGetValue() {
+        long value = 1000;
+        query.setValue(value);
+        assertEquals(value, query.getValue());
+    }
+
+    @Test
+    void testSetAndGetGas() {
+        long gas = 50000;
+        query.setGas(gas);
+        assertEquals(gas, query.getGas());
+    }
+
+    @Test
+    void testSetAndGetGasPrice() {
+        long gasPrice = 200;
+        query.setGasPrice(gasPrice);
+        assertEquals(gasPrice, query.getGasPrice());
+    }
+
+    @Test
     void testEstimateGasWithMissingContractIdOrEvmAddress_ThrowsException() {
         ByteString params = ByteString.copyFromUtf8("gasParams");
         query.setFunctionParameters(params);
@@ -107,20 +129,98 @@ class MirrorNodeContractQueryTest {
     }
 
     @Test
-    void testCreateJsonPayload() {
+    void testCreateJsonPayload_AllFieldsSet() {
+        byte[] data = "testData".getBytes();
+        String senderAddress = "0x1234567890abcdef1234567890abcdef12345678";
         String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
-        byte[] data = "data".getBytes();
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, contractAddress, "latest", true);
+        long gas = 50000;
+        long gasPrice = 2000;
+        long value = 1000;
+        String blockNumber = "latest";
+        boolean estimate = true;
 
-        String expectedJson = """
-            {
-              "data": "64617461",
-              "to": "0xabcdefabcdefabcdefabcdefabcdefabcdef",
-              "estimate": true,
-              "blockNumber": "latest"
-            }
-            """;
-        assertEquals(expectedJson.trim(), jsonPayload.trim());
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("to", contractAddress);
+        expectedJson.addProperty("estimate", estimate);
+        expectedJson.addProperty("blockNumber", blockNumber);
+        expectedJson.addProperty("from", senderAddress);
+        expectedJson.addProperty("gas", gas);
+        expectedJson.addProperty("gasPrice", gasPrice);
+        expectedJson.addProperty("value", value);
+
+        assertEquals(expectedJson.toString(), jsonPayload);
+    }
+
+    @Test
+    void testCreateJsonPayload_OnlyRequiredFieldsSet() {
+        byte[] data = "testData".getBytes();
+        String senderAddress = "";
+        String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
+        long gas = 0;
+        long gasPrice = 0;
+        long value = 0;
+        String blockNumber = "latest";
+        boolean estimate = true;
+
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("to", contractAddress);
+        expectedJson.addProperty("estimate", estimate);
+        expectedJson.addProperty("blockNumber", blockNumber);
+
+        assertEquals(expectedJson.toString(), jsonPayload);
+    }
+
+    @Test
+    void testCreateJsonPayload_SomeOptionalFieldsSet() {
+        byte[] data = "testData".getBytes();
+        String senderAddress = "0x1234567890abcdef1234567890abcdef12345678";
+        String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
+        long gas = 50000;
+        long gasPrice = 0;
+        long value = 1000;
+        String blockNumber = "latest";
+        boolean estimate = false;
+
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("to", contractAddress);
+        expectedJson.addProperty("estimate", estimate);
+        expectedJson.addProperty("blockNumber", blockNumber);
+        expectedJson.addProperty("from", senderAddress);
+        expectedJson.addProperty("gas", gas);
+        expectedJson.addProperty("value", value);
+
+        assertEquals(expectedJson.toString(), jsonPayload);
+    }
+
+    @Test
+    void testCreateJsonPayload_AllOptionalFieldsDefault() {
+        byte[] data = "testData".getBytes();
+        String contractAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
+        String senderAddress = "";
+        long gas = 0;
+        long gasPrice = 0;
+        long value = 0;
+        String blockNumber = "latest";
+        boolean estimate = false;
+
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+
+        JsonObject expectedJson = new JsonObject();
+        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("to", contractAddress);
+        expectedJson.addProperty("estimate", estimate);
+        expectedJson.addProperty("blockNumber", blockNumber);
+
+        assertEquals(expectedJson.toString(), jsonPayload);
     }
 
     @Test

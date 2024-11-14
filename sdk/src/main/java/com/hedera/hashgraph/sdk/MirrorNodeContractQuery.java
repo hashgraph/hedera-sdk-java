@@ -37,9 +37,21 @@ import org.bouncycastle.util.encoders.Hex;
  * queries, gas estimation, and transient simulation of read-write operations.
  */
 public class MirrorNodeContractQuery {
+    // The contract we are sending the transaction to
     private ContractId contractId = null;
     private String contractEvmAddress = null;
+    // The account we are sending the transaction from
+    private AccountId sender = null;
+    private String senderEvmAddress = null;
+    // The transaction callData
     private byte[] callData;
+    // The amount we are sending to payable functions
+    private long value;
+    // The amount of gas we are sending
+    private long gas;
+    // The gas price
+    private long gasPrice;
+    // The block number for the simulation
     private long blockNumber;
 
     public ContractId getContractId() {
@@ -72,6 +84,39 @@ public class MirrorNodeContractQuery {
         Objects.requireNonNull(contractEvmAddress);
         this.contractEvmAddress = contractEvmAddress;
         this.contractId = null;
+        return this;
+    }
+
+    public AccountId getSender() {
+        return this.sender;
+    }
+
+    /**
+     * Sets the sender of the transaction simulation.
+     *
+     * @param sender The AccountId to be set
+     * @return {@code this}
+     */
+    public MirrorNodeContractQuery setSender(AccountId sender) {
+        Objects.requireNonNull(sender);
+        this.sender = sender;
+        return this;
+    }
+
+    public String getSenderEvmAddress() {
+        return this.senderEvmAddress;
+    }
+
+    /**
+     * Set the 20-byte EVM address of the sender.
+     *
+     * @param senderEvmAddress
+     * @return {@code this}
+     */
+    public MirrorNodeContractQuery setSenderEvmAddress(String senderEvmAddress) {
+        Objects.requireNonNull(sender);
+        this.senderEvmAddress = senderEvmAddress;
+        this.sender = null;
         return this;
     }
 
@@ -119,6 +164,30 @@ public class MirrorNodeContractQuery {
         return this;
     }
 
+    public long getValue() {
+        return value;
+    }
+
+    public void setValue(long value) {
+        this.value = value;
+    }
+
+    public long getGas() {
+        return gas;
+    }
+
+    public void setGas(long gas) {
+        this.gas = gas;
+    }
+
+    public long getGasPrice() {
+        return gasPrice;
+    }
+
+    public void setGasPrice(long gasPrice) {
+        this.gasPrice = gasPrice;
+    }
+
     public long getBlockNumber() {
         return blockNumber;
     }
@@ -139,12 +208,12 @@ public class MirrorNodeContractQuery {
             Objects.requireNonNull(this.contractId);
             this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString()).get();
         }
-        return getEstimateGasFromMirrorNodeAsync(client, this.callData, this.contractEvmAddress).get();
+        return getEstimateGasFromMirrorNodeAsync(client).get();
     }
 
     /**
-     * Does transient simulation of read-write operations and returns the result in hexadecimal string format.
-     * The result can be any solidity type.
+     * Does transient simulation of read-write operations and returns the result in hexadecimal string format. The
+     * result can be any solidity type.
      *
      * @param client
      * @throws ExecutionException
@@ -157,14 +226,12 @@ public class MirrorNodeContractQuery {
         }
 
         var blockNum = this.blockNumber == 0 ? "" : String.valueOf(this.blockNumber);
-        return getContractCallResultFromMirrorNodeAsync(client, this.callData, this.contractEvmAddress,
-            blockNum).get();
+        return getContractCallResultFromMirrorNodeAsync(client, blockNum).get();
     }
 
-    private static CompletableFuture<String> getContractCallResultFromMirrorNodeAsync(Client client, byte[] data,
-        String contractAddress, String blockNumber) {
+    private CompletableFuture<String> getContractCallResultFromMirrorNodeAsync(Client client ,String blockNumber) {
         String apiEndpoint = "/contracts/call";
-        String jsonPayload = createJsonPayload(data, contractAddress, blockNumber, false);
+        String jsonPayload = createJsonPayload(this.callData, this.senderEvmAddress, this.contractEvmAddress, this.gas, this.gasPrice, this.value, blockNumber, false);
         return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
             .exceptionally(ex -> {
                 client.getLogger().error("Error in while performing post request to Mirror Node: " + ex.getMessage());
@@ -173,10 +240,9 @@ public class MirrorNodeContractQuery {
             .thenApply(MirrorNodeContractQuery::parseContractCallResult);
     }
 
-    public static CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client, byte[] data,
-        String contractAddress) {
+    public CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client) {
         String apiEndpoint = "/contracts/call";
-        String jsonPayload = createJsonPayload(data, contractAddress, "latest", true);
+        String jsonPayload = createJsonPayload(this.callData, this.contractEvmAddress, this.contractEvmAddress, this.gas, this.gasPrice, this.value, "latest", true);
         return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
             .exceptionally(ex -> {
                 client.getLogger().error("Error in while performing post request to Mirror Node: " + ex.getMessage());
@@ -185,16 +251,30 @@ public class MirrorNodeContractQuery {
             .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
     }
 
-    static String createJsonPayload(byte[] data, String contractAddress, String blockNumber, boolean estimate) {
+    static String createJsonPayload(byte[] data, String senderAddress, String contractAddress, long gas, long gasPrice, long value, String blockNumber, boolean estimate) {
         String hexData = Hex.toHexString(data);
-        return String.format("""
-            {
-              "data": "%s",
-              "to": "%s",
-              "estimate": %b,
-              "blockNumber": "%s"
-            }
-            """, hexData, contractAddress, estimate, blockNumber);
+
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("data", hexData);
+        jsonObject.addProperty("to", contractAddress);
+        jsonObject.addProperty("estimate", estimate);
+        jsonObject.addProperty("blockNumber", blockNumber);
+
+        // Conditionally add fields if they are set to non-default values
+        if (senderAddress != null && !senderAddress.isEmpty()) {
+            jsonObject.addProperty("from", senderAddress);
+        }
+        if (gas > 0) {
+            jsonObject.addProperty("gas", gas);
+        }
+        if (gasPrice > 0) {
+            jsonObject.addProperty("gasPrice", gasPrice);
+        }
+        if (value > 0) {
+            jsonObject.addProperty("value", value);
+        }
+
+        return jsonObject.toString();
     }
 
     static String parseContractCallResult(String responseBody) {
