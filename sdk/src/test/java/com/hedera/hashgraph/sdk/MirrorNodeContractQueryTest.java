@@ -71,7 +71,7 @@ class MirrorNodeContractQueryTest {
         String evmAddress = "0x1234567890abcdef1234567890abcdef12345678";
         query.setContractEvmAddress(evmAddress);
         assertEquals(evmAddress, query.getContractEvmAddress());
-        assertNull(query.getContractId(), "Setting EVM address should reset ContractId to null.");
+        assertNull(query.getContractId());
     }
 
     @Test
@@ -89,7 +89,7 @@ class MirrorNodeContractQueryTest {
     @Test
     void testSetFunctionWithoutParameters() {
         query.setFunction("myFunction");
-        assertNotNull(query.getCallData(), "Function parameters should not be null after setting a function.");
+        assertNotNull(query.getCallData());
     }
 
     @Test
@@ -139,10 +139,11 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = true;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
+            gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
-        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("data", "testData");
         expectedJson.addProperty("to", contractAddress);
         expectedJson.addProperty("estimate", estimate);
         expectedJson.addProperty("blockNumber", blockNumber);
@@ -165,10 +166,11 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = true;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
+            gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
-        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("data", "testData");
         expectedJson.addProperty("to", contractAddress);
         expectedJson.addProperty("estimate", estimate);
         expectedJson.addProperty("blockNumber", blockNumber);
@@ -187,10 +189,11 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = false;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
+            gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
-        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("data", "testData");
         expectedJson.addProperty("to", contractAddress);
         expectedJson.addProperty("estimate", estimate);
         expectedJson.addProperty("blockNumber", blockNumber);
@@ -212,10 +215,11 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = false;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
+            gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
-        expectedJson.addProperty("data", "7465737444617461");  // "testData" in hex
+        expectedJson.addProperty("data", "testData");
         expectedJson.addProperty("to", contractAddress);
         expectedJson.addProperty("estimate", estimate);
         expectedJson.addProperty("blockNumber", blockNumber);
@@ -235,5 +239,36 @@ class MirrorNodeContractQueryTest {
         String responseBody = "{\"result\": \"0x1234abcdef\"}";
         String parsedResult = MirrorNodeContractQuery.parseContractCallResult(responseBody);
         assertEquals("0x1234abcdef", parsedResult);
+    }
+
+    @Test
+    void shouldSerialize() {
+        ContractId testContractId = new ContractId(0, 0, 1234);
+        String testEvmAddress = "0x1234567890abcdef1234567890abcdef12345678";
+        AccountId testSenderId = new AccountId(0, 0, 5678);
+        String testSenderEvmAddress = "0xabcdefabcdefabcdefabcdefabcdefabcdef";
+        ByteString testCallData = ByteString.copyFromUtf8("testData");
+        String testFunctionName = "myFunction";
+        ContractFunctionParameters testParams = new ContractFunctionParameters().addString("param1");
+
+        long testValue = 1000L;
+        long testGasLimit = 500000L;
+        long testGasPrice = 20L;
+        long testBlockNumber = 123456L;
+
+        var query = new MirrorNodeContractQuery()
+            .setContractId(testContractId)
+            .setContractEvmAddress(testEvmAddress)
+            .setSender(testSenderId)
+            .setSenderEvmAddress(testSenderEvmAddress)
+            .setFunction(testFunctionName, testParams)
+            .setFunctionParameters(testCallData)
+            .setValue(testValue)
+            .setGasLimit(testGasLimit)
+            .setGasPrice(testGasPrice)
+            .setBlockNumber(testBlockNumber);
+
+        SnapshotMatcher.expect(query.toString()
+        ).toMatchSnapshot();
     }
 }

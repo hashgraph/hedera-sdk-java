@@ -27,6 +27,7 @@ import static com.hedera.hashgraph.sdk.EntityIdHelper.performQueryToMirrorNodeAs
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.protobuf.ByteString;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -196,8 +197,9 @@ public class MirrorNodeContractQuery {
         return this.blockNumber;
     }
 
-    public void setBlockNumber(long blockNumber) {
+    public MirrorNodeContractQuery setBlockNumber(long blockNumber) {
         this.blockNumber = blockNumber;
+        return this;
     }
 
     /**
@@ -293,5 +295,20 @@ public class MirrorNodeContractQuery {
 
     static long parseHexEstimateToLong(String responseBody) {
         return Integer.parseInt(parseContractCallResult(responseBody).substring(2), 16);
+    }
+
+    @Override
+    public String toString() {
+        return "MirrorNodeContractQuery{" +
+            "contractId=" + contractId +
+            ", contractEvmAddress='" + contractEvmAddress + '\'' +
+            ", sender=" + sender +
+            ", senderEvmAddress='" + senderEvmAddress + '\'' +
+            ", callData=" + Arrays.toString(callData) +
+            ", value=" + value +
+            ", gasLimit=" + gasLimit +
+            ", gasPrice=" + gasPrice +
+            ", blockNumber=" + blockNumber +
+            '}';
     }
 }
