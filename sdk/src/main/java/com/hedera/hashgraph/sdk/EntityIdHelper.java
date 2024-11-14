@@ -114,7 +114,7 @@ public class EntityIdHelper {
      * @param address the string representation
      * @return the decoded address
      */
-    public static byte[] decodeSolidityAddress(String address) {
+    static byte[] decodeSolidityAddress(String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
@@ -269,7 +269,7 @@ public class EntityIdHelper {
      * @param address
      * @return
      */
-    public static boolean isLongZeroAddress(byte[] address) {
+    static boolean isLongZeroAddress(byte[] address) {
         for (int i = 0; i < 12; i++) {
             if (address[i] != 0) {
                 return false;
@@ -286,11 +286,8 @@ public class EntityIdHelper {
      *
      * @param client
      * @param evmAddress
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
-    public static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
+    static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/accounts/" + evmAddress;
         return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
             .thenApply(response ->
@@ -305,9 +302,6 @@ public class EntityIdHelper {
      *
      * @param client
      * @param num
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
     public static CompletableFuture<EvmAddress> getEvmAddressFromMirrorNodeAsync(Client client, long num) {
         String apiEndpoint = "/accounts/" + num;
@@ -324,9 +318,6 @@ public class EntityIdHelper {
      *
      * @param client
      * @param evmAddress
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
     public static CompletableFuture<Long> getContractNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/contracts/" + evmAddress;
