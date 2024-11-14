@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.44.0
+
+### Fixed
+- Do not shut down externally provided executor
+- Fix `IllegalStateException` when specific node id is not present in address book
+
 ## 2.43.0
 
 ### Changed

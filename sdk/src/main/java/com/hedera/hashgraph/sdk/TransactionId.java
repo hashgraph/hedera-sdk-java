@@ -27,6 +27,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -68,6 +69,7 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private static final long NANOSECONDS_TO_REMOVE = 10000000000L;
 
+    private static final Random randomNanosecs = new Random();
     private static final AtomicLong monotonicTime = new AtomicLong();
 
 
@@ -115,6 +117,7 @@ public final class TransactionId implements Comparable<TransactionId> {
             // between the client and the receiving node and prevented spurious INVALID_TRANSACTION_START.
             currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND - NANOSECONDS_TO_REMOVE;
 
+
             // Get the last recorded timestamp.
             lastTime = monotonicTime.get();
 
@@ -125,7 +128,7 @@ public final class TransactionId implements Comparable<TransactionId> {
             }
         } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
-        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime));
+        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime + randomNanosecs.nextLong(1_000)));
     }
 
     /**
