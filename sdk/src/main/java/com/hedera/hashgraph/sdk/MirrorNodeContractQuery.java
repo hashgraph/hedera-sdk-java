@@ -47,7 +47,7 @@ public class MirrorNodeContractQuery {
     private String senderEvmAddress = null;
     // The transaction callData
     private byte[] callData;
-    // The amount we are sending to payable functions
+    // The amount we are sending to the contract
     private long value;
     // The gas limit
     private long gasLimit;
@@ -170,6 +170,14 @@ public class MirrorNodeContractQuery {
         return this.value;
     }
 
+    /**
+     * Sets the amount of value (in tinybars or wei) to be sent to the contract in the transaction.
+     * <p>
+     * Use this to specify an amount for a payable function call.
+     *
+     * @param value the amount of value to send, in tinybars or wei
+     * @return {@code this}
+     */
     public MirrorNodeContractQuery setValue(long value) {
         this.value = value;
         return this;
@@ -179,6 +187,14 @@ public class MirrorNodeContractQuery {
         return this.gasLimit;
     }
 
+    /**
+     * Sets the gas limit for the contract call.
+     * <p>
+     * This specifies the maximum amount of gas that the transaction can consume.
+     *
+     * @param gasLimit the maximum gas allowed for the transaction
+     * @return {@code this}
+     */
     public MirrorNodeContractQuery setGasLimit(long gasLimit) {
         this.gasLimit = gasLimit;
         return this;
@@ -188,6 +204,14 @@ public class MirrorNodeContractQuery {
         return gasPrice;
     }
 
+    /**
+     * Sets the gas price to be used for the contract call.
+     * <p>
+     * This specifies the price of each unit of gas used in the transaction.
+     *
+     * @param gasPrice the gas price, in tinybars or wei, for each unit of gas
+     * @return {@code this}
+     */
     public MirrorNodeContractQuery setGasPrice(long gasPrice) {
         this.gasPrice = gasPrice;
         return this;
@@ -197,6 +221,14 @@ public class MirrorNodeContractQuery {
         return this.blockNumber;
     }
 
+    /**
+     * Sets the block number for the simulation of the contract call.
+     * <p>
+     * The block number determines the context of the contract call simulation within the blockchain.
+     *
+     * @param blockNumber the block number at which to simulate the contract call
+     * @return {@code this}
+     */
     public MirrorNodeContractQuery setBlockNumber(long blockNumber) {
         this.blockNumber = blockNumber;
         return this;
