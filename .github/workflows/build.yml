@@ -104,7 +104,7 @@ jobs:
 
       - name: Upload coverage to Codecov
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238 # v4.6.0
+        uses: codecov/codecov-action@968872560f81e7bdde9272853e65f2507c0eca7c # v5.0.0
 
       - name: Stop the local node
         run: npx @hashgraph/hedera-local stop
