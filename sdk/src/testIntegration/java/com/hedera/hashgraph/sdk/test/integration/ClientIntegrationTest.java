@@ -21,6 +21,7 @@ package com.hedera.hashgraph.sdk.test.integration;
 
 import com.hedera.hashgraph.sdk.*;
 import java.util.Collections;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
@@ -247,5 +248,18 @@ public class ClientIntegrationTest {
                 .execute(testEnv.client);
 
         }
+    }
+
+    @Test
+    @DisplayName("`forMirrorNetwork()`")
+    void testClientInitWithMirrorNetwork() throws Exception {
+        var mirrorNetworkString = "testnet.mirrornode.hedera.com:443";
+        var client = Client.forMirrorNetwork(List.of(mirrorNetworkString));
+        var mirrorNetwork = client.getMirrorNetwork();
+
+        assertThat(mirrorNetwork).hasSize(1);
+        assertThat(mirrorNetwork.get(0)).isEqualTo(mirrorNetworkString);
+        assertThat(client.getNetwork()).isNotNull();
+        assertThat(client.getNetwork()).isNotEmpty();
     }
 }
