@@ -64,6 +64,7 @@ class MirrorNodeContractQueryIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            // Wait for mirror node to import data
             Thread.sleep(2000);
 
             var gas = new MirrorNodeContractQuery()
@@ -156,6 +157,7 @@ class MirrorNodeContractQueryIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            // Wait for mirror node to import data
             Thread.sleep(2000);
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
@@ -196,6 +198,7 @@ class MirrorNodeContractQueryIntegrationTest {
 
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
+            // Wait for mirror node to import data
             Thread.sleep(2000);
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
@@ -239,6 +242,8 @@ class MirrorNodeContractQueryIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client)
                 .accountId;
+
+            // Wait for mirror node to import data
             Thread.sleep(2000);
 
             var receiverEvmAddress = getEvmAddressFromMirrorNodeAsync(testEnv.client, receiverAccountId.num).get()
