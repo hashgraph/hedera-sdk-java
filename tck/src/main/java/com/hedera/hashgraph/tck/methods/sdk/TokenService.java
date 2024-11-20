@@ -27,6 +27,7 @@ import com.hedera.hashgraph.sdk.CustomFractionalFee;
 import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
@@ -36,6 +37,7 @@ import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.sdk.param.TokenCreateParams;
+import com.hedera.hashgraph.tck.methods.sdk.param.TokenDeleteParams;
 import com.hedera.hashgraph.tck.methods.sdk.param.TokenUpdateParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.TokenResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
@@ -335,6 +337,22 @@ public class TokenService extends AbstractJSONRPC2Service {
 
         TransactionReceipt transactionReceipt =
                 tokenUpdateTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
+
+        return new TokenResponse("", transactionReceipt.status);
+    }
+
+    @JSONRPC2Method("deleteToken")
+    public TokenResponse deleteToken(final TokenDeleteParams params) throws Exception {
+        TokenDeleteTransaction tokenDeleteTransaction = new TokenDeleteTransaction();
+
+        params.getTokenId().ifPresent(tokenId -> tokenDeleteTransaction.setTokenId(TokenId.fromString(tokenId)));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonTransactionParams ->
+                        commonTransactionParams.fillOutTransaction(tokenDeleteTransaction, sdkService.getClient()));
+
+        TransactionReceipt transactionReceipt =
+                tokenDeleteTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", transactionReceipt.status);
     }
