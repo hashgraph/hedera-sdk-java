@@ -20,7 +20,7 @@
 
 open module com.hedera.hashgraph.sdk.test.integration {
     requires com.hedera.hashgraph.sdk;
-    requires headlong;
+    requires com.esaulpaugh.headlong;
     requires org.assertj.core;
     requires org.bouncycastle.provider;
     requires org.junit.jupiter.api;
