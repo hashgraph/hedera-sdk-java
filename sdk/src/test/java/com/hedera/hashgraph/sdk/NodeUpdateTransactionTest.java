@@ -99,7 +99,6 @@ public class NodeUpdateTransactionTest {
             .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
             .setNodeId(TEST_NODE_ID)
             .setAccountId(TEST_ACCOUNT_ID)
-            .setAccountId(TEST_ACCOUNT_ID)
             .setDescription(TEST_DESCRIPTION)
             .setGossipEndpoints(TEST_GOSSIP_ENDPOINTS)
             .setServiceEndpoints(TEST_SERVICE_ENDPOINTS)
@@ -116,6 +115,25 @@ public class NodeUpdateTransactionTest {
         var tx = spawnTestTransaction();
         var tx2 = NodeUpdateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+    @Test
+    void testSerializeDeserialize() throws Exception {
+        var tx = new NodeUpdateTransaction().setDescription(TEST_DESCRIPTION);
+        var tx2 = new NodeUpdateTransaction().setDescription(TEST_DESCRIPTION);
+        var tx2Bytes = tx2.toBytes();
+        NodeUpdateTransaction deserializedTx2 = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
+        assertThat(tx.getGossipCaCertificate()).isEqualTo(deserializedTx2.getGossipCaCertificate());
+        assertThat(tx.getGrpcCertificateHash()).isEqualTo(deserializedTx2.getGrpcCertificateHash());
+    }
+
+    @Test
+    void testSetNull()  {
+        new NodeUpdateTransaction()
+            .setDescription(null)
+            .setAccountId(null)
+            .setGossipCaCertificate(null)
+            .setGrpcCertificateHash(null)
+            .setAdminKey(null);
     }
 
     @Test
