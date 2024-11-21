@@ -64,7 +64,11 @@ extraJavaModuleInfo {
 
     module("com.esaulpaugh:headlong", "com.esaulpaugh.headlong")
     module("com.github.spotbugs:spotbugs-annotations", "com.github.spotbugs.annotations")
-    module("com.google.errorprone:error_prone_annotations", "com.google.errorprone.annotations")
+    module("com.google.errorprone:error_prone_annotations", "com.google.errorprone.annotations") {
+        patchRealModule()
+        exportAllPackages()
+        requireAllDefinedDependencies()
+    }
     module("com.google.guava:failureaccess", "com.google.common.util.concurrent.internal")
     module("com.google.guava:guava", "com.google.common") {
         exportAllPackages()
