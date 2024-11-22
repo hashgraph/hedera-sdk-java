@@ -68,7 +68,7 @@ dependencies {
     implementation(platform("com.hedera.hashgraph:sdk-dependency-versions"))
     // ---------------------------------------------
 
-    implementation("com.hedera.hashgraph:sdk:2.44.0")
+    implementation("com.hedera.hashgraph:sdk:2.45.0-beta.1")
 
     implementation("com.google.android.material:material:1.11.0")
 
