@@ -118,12 +118,13 @@ public class NodeUpdateTransactionTest {
     }
 
     @Test
-    void testNullCertificates() throws Exception {
+    void testNullOptionalValues() throws Exception {
         var tx = new NodeUpdateTransaction();
         var tx2Bytes = tx.toBytes();
         NodeUpdateTransaction deserializedTx = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
         assertThat(deserializedTx.getGossipCaCertificate()).isNull();
         assertThat(deserializedTx.getGrpcCertificateHash()).isNull();
+        assertThat(deserializedTx.getDescription()).isNull();
     }
 
     @Test
