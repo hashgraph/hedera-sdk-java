@@ -464,13 +464,13 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
             serviceEndpoints.add(Endpoint.fromProtobuf(serviceEndpoint));
         }
 
-        var protobufGossipCert = body.getGossipCaCertificate();
-        gossipCaCertificate = protobufGossipCert.equals(BytesValue.getDefaultInstance()) ?
-            null : protobufGossipCert.getValue().toByteArray();
+        if (body.hasGossipCaCertificate()) {
+            gossipCaCertificate = body.getGossipCaCertificate().getValue().toByteArray();
+        }
 
-        var protobufGrpcCert = body.getGrpcCertificateHash();
-        grpcCertificateHash = protobufGrpcCert.equals(BytesValue.getDefaultInstance()) ?
-            null : protobufGrpcCert.getValue().toByteArray();
+        if (body.hasGrpcCertificateHash()) {
+            grpcCertificateHash = body.getGrpcCertificateHash().getValue().toByteArray();
+        }
 
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());

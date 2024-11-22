@@ -116,14 +116,25 @@ public class NodeUpdateTransactionTest {
         var tx2 = NodeUpdateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
+
     @Test
-    void testSerializeDeserialize() throws Exception {
-        var tx = new NodeUpdateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2 = new NodeUpdateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2Bytes = tx2.toBytes();
-        NodeUpdateTransaction deserializedTx2 = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
-        assertThat(tx.getGossipCaCertificate()).isEqualTo(deserializedTx2.getGossipCaCertificate());
-        assertThat(tx.getGrpcCertificateHash()).isEqualTo(deserializedTx2.getGrpcCertificateHash());
+    void testNullCertificates() throws Exception {
+        var tx = new NodeUpdateTransaction();
+        var tx2Bytes = tx.toBytes();
+        NodeUpdateTransaction deserializedTx = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
+        assertThat(deserializedTx.getGossipCaCertificate()).isNull();
+        assertThat(deserializedTx.getGrpcCertificateHash()).isNull();
+    }
+
+    @Test
+    void testEmptyCertificates() throws Exception {
+        var tx = new NodeUpdateTransaction()
+            .setGossipCaCertificate(new byte[]{})
+            .setGrpcCertificateHash(new byte[]{});
+        var tx2Bytes = tx.toBytes();
+        NodeUpdateTransaction deserializedTx = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
+        assertThat(deserializedTx.getGossipCaCertificate()).isEqualTo(new byte[]{});
+        assertThat(deserializedTx.getGrpcCertificateHash()).isEqualTo(new byte[]{});
     }
 
     @Test
