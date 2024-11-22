@@ -240,7 +240,6 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      * @return {@code this}
      */
     public NodeUpdateTransaction setAccountId(AccountId accountId) {
-        Objects.requireNonNull(accountId);
         requireNotFrozen();
         this.accountId = accountId;
         return this;
@@ -262,7 +261,6 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      */
     public NodeUpdateTransaction setDescription(String description) {
         requireNotFrozen();
-        Objects.requireNonNull(description);
         this.description = description;
         return this;
     }
@@ -345,7 +343,7 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      */
     @Nullable
     public byte[] getGossipCaCertificate() {
-        return gossipCaCertificate != null ? Arrays.copyOf(gossipCaCertificate, gossipCaCertificate.length) : null;
+        return gossipCaCertificate;
     }
 
     /**
@@ -356,9 +354,8 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      * @return {@code this}
      */
     public NodeUpdateTransaction setGossipCaCertificate(byte[] gossipCaCertificate) {
-        Objects.requireNonNull(gossipCaCertificate);
         requireNotFrozen();
-        this.gossipCaCertificate = Arrays.copyOf(gossipCaCertificate, gossipCaCertificate.length);
+        this.gossipCaCertificate = gossipCaCertificate;
         return this;
     }
 
@@ -368,7 +365,7 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      */
     @Nullable
     public byte[] getGrpcCertificateHash() {
-        return grpcCertificateHash != null ? Arrays.copyOf(grpcCertificateHash, grpcCertificateHash.length) : null;
+        return grpcCertificateHash;
     }
 
     /**
@@ -379,9 +376,8 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      * @return {@code this}
      */
     public NodeUpdateTransaction setGrpcCertificateHash(byte[] grpcCertificateHash) {
-        Objects.requireNonNull(grpcCertificateHash);
         requireNotFrozen();
-        this.grpcCertificateHash = Arrays.copyOf(grpcCertificateHash, grpcCertificateHash.length);
+        this.grpcCertificateHash = grpcCertificateHash;
         return this;
     }
 
@@ -400,7 +396,6 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
      * @return {@code this}
      */
     public NodeUpdateTransaction setAdminKey(Key adminKey) {
-        Objects.requireNonNull(adminKey);
         requireNotFrozen();
         this.adminKey = adminKey;
         return this;
@@ -469,9 +464,13 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
             serviceEndpoints.add(Endpoint.fromProtobuf(serviceEndpoint));
         }
 
-        gossipCaCertificate = body.getGossipCaCertificate().getValue().toByteArray();
+        if (body.hasGossipCaCertificate()) {
+            gossipCaCertificate = body.getGossipCaCertificate().getValue().toByteArray();
+        }
 
-        grpcCertificateHash = body.getGrpcCertificateHash().getValue().toByteArray();
+        if (body.hasGrpcCertificateHash()) {
+            grpcCertificateHash = body.getGrpcCertificateHash().getValue().toByteArray();
+        }
 
         if (body.hasAdminKey()) {
             adminKey = Key.fromProtobufKey(body.getAdminKey());

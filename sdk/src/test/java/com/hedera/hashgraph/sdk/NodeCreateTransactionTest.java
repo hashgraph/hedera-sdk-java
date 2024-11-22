@@ -123,6 +123,27 @@ public class NodeCreateTransactionTest {
     }
 
     @Test
+    void testSerializeDeserialize() throws Exception {
+        var tx = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
+        var tx2 = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
+        var tx2Bytes = tx2.toBytes();
+        NodeCreateTransaction deserializedTx2 = (NodeCreateTransaction) Transaction.fromBytes(tx2Bytes);
+        assertThat(tx.getGossipCaCertificate()).isEqualTo(deserializedTx2.getGossipCaCertificate());
+        assertThat(tx.getGrpcCertificateHash()).isEqualTo(deserializedTx2.getGrpcCertificateHash());
+    }
+
+    @Test
+    void testSetNull()  {
+        new NodeCreateTransaction()
+            .setDescription(null)
+            .setAccountId(null)
+            .setGossipCaCertificate(null)
+            .setGrpcCertificateHash(null)
+            .setAdminKey(null);
+    }
+
+
+    @Test
     void constructNodeCreateTransactionFromTransactionBodyProtobuf() {
         var transactionBodyBuilder = NodeCreateTransactionBody.newBuilder();
 
