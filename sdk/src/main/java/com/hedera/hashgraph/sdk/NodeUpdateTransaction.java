@@ -454,7 +454,9 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
             accountId = AccountId.fromProtobuf(body.getAccountId());
         }
 
-        description = body.getDescription().getValue();
+        if (body.hasDescription()) {
+            description = body.getDescription().getValue();
+        }
 
         for (var gossipEndpoint : body.getGossipEndpointList()) {
             gossipEndpoints.add(Endpoint.fromProtobuf(gossipEndpoint));
