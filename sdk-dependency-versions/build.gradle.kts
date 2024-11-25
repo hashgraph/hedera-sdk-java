@@ -23,7 +23,7 @@ plugins {
 }
 
 dependencies.constraints {
-    api("com.esaulpaugh:headlong:12.1.0") {
+    api("com.esaulpaugh:headlong:12.3.3") {
         because("headlong")
     }
     api("com.google.code.gson:gson:2.10.1") {
@@ -37,19 +37,19 @@ dependencies.constraints {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("io.grpc:grpc-api:1.64.0") {
+    api("io.grpc:grpc-api:1.68.1") {
         because("io.grpc")
     }
-    api("io.grpc:grpc-inprocess:1.64.0") {
+    api("io.grpc:grpc-inprocess:1.67.1") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-protobuf:1.64.0") {
+    api("io.grpc:grpc-protobuf:1.68.1") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-protobuf-lite:1.64.0") {
+    api("io.grpc:grpc-protobuf-lite:1.68.1") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-stub:1.64.0") {
+    api("io.grpc:grpc-stub:1.68.1") {
         because("io.grpc.stub")
     }
     api("com.google.code.findbugs:jsr305:3.0.2") {

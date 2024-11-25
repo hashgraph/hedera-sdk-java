@@ -21,9 +21,9 @@
 module com.hedera.hashgraph.sdk.full {
     requires transitive com.google.protobuf;
 
+    requires com.esaulpaugh.headlong;
     requires com.google.common;
     requires com.google.gson;
-    requires headlong;
     requires io.grpc.inprocess;
     requires io.grpc.protobuf;
     requires io.grpc.stub;

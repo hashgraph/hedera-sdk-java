@@ -186,6 +186,24 @@ public final class Client implements AutoCloseable {
     }
 
     /**
+     * Set up the client from selected mirror network.
+     *
+     * @param mirrorNetworkList
+     * @return
+     */
+    public static Client forMirrorNetwork(List<String> mirrorNetworkList) throws InterruptedException, TimeoutException {
+        var executor = createExecutor();
+        var network = Network.forNetwork(executor, new HashMap<>());
+        var mirrorNetwork = MirrorNetwork.forNetwork(executor, mirrorNetworkList);
+        var client = new Client(executor, network, mirrorNetwork, null, true, null);
+        var addressBook = new AddressBookQuery()
+            .setFileId(FileId.ADDRESS_BOOK)
+            .execute(client);
+        client.setNetworkFromAddressBook(addressBook);
+        return client;
+    }
+
+    /**
      * Set up the client for the selected network.
      *
      * @param name the selected network
@@ -1418,8 +1436,8 @@ public final class Client implements AutoCloseable {
         private Client initializeWithNetwork() throws Exception {
             if (network == null) {
                 throw new Exception("Network is not set in provided json object");
-            }  
-            
+            }
+
             Client client;
             if (network.isJsonObject()) {
                 client = clientFromNetworkJson();
@@ -1501,7 +1519,6 @@ public final class Client implements AutoCloseable {
             if (operator != null) {
                 AccountId operatorAccount = AccountId.fromString(operator.accountId);
                 PrivateKey privateKey = PrivateKey.fromString(operator.privateKey);
-        
                 client.setOperator(operatorAccount, privateKey);
             }
         }

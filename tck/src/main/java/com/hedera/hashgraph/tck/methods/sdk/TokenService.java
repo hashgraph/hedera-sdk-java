@@ -27,14 +27,18 @@ import com.hedera.hashgraph.sdk.CustomFractionalFee;
 import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
 import com.hedera.hashgraph.sdk.TokenId;
 import com.hedera.hashgraph.sdk.TokenSupplyType;
 import com.hedera.hashgraph.sdk.TokenType;
+import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.sdk.param.TokenCreateParams;
+import com.hedera.hashgraph.tck.methods.sdk.param.TokenDeleteParams;
+import com.hedera.hashgraph.tck.methods.sdk.param.TokenUpdateParams;
 import com.hedera.hashgraph.tck.methods.sdk.response.TokenResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
 import java.time.Duration;
@@ -232,5 +236,124 @@ public class TokenService extends AbstractJSONRPC2Service {
         }
 
         return new TokenResponse(tokenId, transactionReceipt.status);
+    }
+
+    @JSONRPC2Method("updateToken")
+    public TokenResponse updateToken(final TokenUpdateParams params) throws Exception {
+        TokenUpdateTransaction tokenUpdateTransaction = new TokenUpdateTransaction();
+
+        params.getTokenId().ifPresent(tokenId -> tokenUpdateTransaction.setTokenId(TokenId.fromString(tokenId)));
+
+        params.getAdminKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setAdminKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getKycKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setKycKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getFreezeKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setFreezeKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getWipeKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setWipeKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getSupplyKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setSupplyKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getFeeScheduleKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setFeeScheduleKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getPauseKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setPauseKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getMetadataKey().ifPresent(key -> {
+            try {
+                tokenUpdateTransaction.setMetadataKey(KeyUtils.getKeyFromString(key));
+            } catch (InvalidProtocolBufferException e) {
+                throw new IllegalArgumentException(e);
+            }
+        });
+
+        params.getName().ifPresent(tokenUpdateTransaction::setTokenName);
+        params.getSymbol().ifPresent(tokenUpdateTransaction::setTokenSymbol);
+
+        params.getTreasuryAccountId()
+                .ifPresent(treasuryAccountId ->
+                        tokenUpdateTransaction.setTreasuryAccountId(AccountId.fromString(treasuryAccountId)));
+
+        params.getExpirationTime()
+                .ifPresent(expirationTime ->
+                        tokenUpdateTransaction.setExpirationTime(Duration.ofSeconds(Long.parseLong(expirationTime))));
+
+        params.getAutoRenewAccountId()
+                .ifPresent(autoRenewAccountId ->
+                        tokenUpdateTransaction.setAutoRenewAccountId(AccountId.fromString(autoRenewAccountId)));
+
+        params.getAutoRenewPeriod()
+                .ifPresent(autoRenewPeriodSeconds -> tokenUpdateTransaction.setAutoRenewPeriod(
+                        Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
+
+        params.getMemo().ifPresent(tokenUpdateTransaction::setTokenMemo);
+
+        params.getMetadata().ifPresent(metadata -> tokenUpdateTransaction.setTokenMetadata(metadata.getBytes()));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonTransactionParams ->
+                        commonTransactionParams.fillOutTransaction(tokenUpdateTransaction, sdkService.getClient()));
+
+        TransactionReceipt transactionReceipt =
+                tokenUpdateTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
+
+        return new TokenResponse("", transactionReceipt.status);
+    }
+
+    @JSONRPC2Method("deleteToken")
+    public TokenResponse deleteToken(final TokenDeleteParams params) throws Exception {
+        TokenDeleteTransaction tokenDeleteTransaction = new TokenDeleteTransaction();
+
+        params.getTokenId().ifPresent(tokenId -> tokenDeleteTransaction.setTokenId(TokenId.fromString(tokenId)));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonTransactionParams ->
+                        commonTransactionParams.fillOutTransaction(tokenDeleteTransaction, sdkService.getClient()));
+
+        TransactionReceipt transactionReceipt =
+                tokenDeleteTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
+
+        return new TokenResponse("", transactionReceipt.status);
     }
 }

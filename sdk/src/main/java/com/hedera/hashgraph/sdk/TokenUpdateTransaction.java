@@ -142,6 +142,8 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
      */
     @Nullable
     private Instant expirationTime = null;
+    private Duration expirationTimeDuration = null;
+
     /**
      * The new interval at which the auto-renew account will be charged to
      * extend the token's expiry.
@@ -488,6 +490,16 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         requireNotFrozen();
         autoRenewPeriod = null;
         this.expirationTime = expirationTime;
+        this.expirationTimeDuration = null;
+        return this;
+    }
+
+    public TokenUpdateTransaction setExpirationTime(Duration expirationTime) {
+        Objects.requireNonNull(expirationTime);
+        requireNotFrozen();
+        autoRenewPeriod = null;
+        this.expirationTime = null;
+        this.expirationTimeDuration = expirationTime;
         return this;
     }
 
@@ -716,6 +728,9 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
         }
         if (expirationTime != null) {
             builder.setExpiry(InstantConverter.toProtobuf(expirationTime));
+        }
+        if (expirationTimeDuration != null) {
+            builder.setExpiry(InstantConverter.toProtobuf(expirationTimeDuration));
         }
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
