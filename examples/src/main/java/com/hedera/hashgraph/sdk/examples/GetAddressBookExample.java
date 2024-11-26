@@ -27,6 +27,7 @@ import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
+import java.io.ByteArrayInputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.util.Objects;
@@ -86,6 +87,9 @@ class GetAddressBookExample {
          */
         Files.deleteIfExists(FileSystems.getDefault().getPath("address-book.proto.bin"));
         client.close();
+
+        Files.copy(new ByteArrayInputStream(addressBook.toBytes().toByteArray()),
+            FileSystems.getDefault().getPath("address-book.proto.bin"));
 
         System.out.println("Get Address Book Example Complete!");
     }
