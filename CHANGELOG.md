@@ -5,10 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.45.0-beta.1
+## 2.45.0
 
 ### Fixed
-- Fixed a bug where optional fields for `NodeUpdateTransaction` were being set as default values.
+- A bug where optional fields for `NodeUpdateTransaction` were being set as default values.
+-
+### Added
+- New api for creating client with mirror network - `forMirrorNetwork`
 
 ## 2.44.0
 
