@@ -34,6 +34,8 @@ import com.hedera.hashgraph.sdk.ContractId;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
+import com.hedera.hashgraph.sdk.MirrorNodeContractCallQuery;
+import com.hedera.hashgraph.sdk.MirrorNodeContractEstimateGasQuery;
 import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import java.util.Objects;
@@ -67,10 +69,10 @@ class MirrorNodeContractQueryIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("getOwner")
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             var result = new ContractCallQuery()
                 .setContractId(contractId)
@@ -79,17 +81,18 @@ class MirrorNodeContractQueryIntegrationTest {
                 .setQueryPayment(new Hbar(1))
                 .execute(testEnv.client);
 
-            var simulationResult = new MirrorNodeContractQuery()
+            var simulationResult = new MirrorNodeContractCallQuery()
+                .setContractEvmAddress("asdf")
                 .setContractId(contractId)
                 .setFunction("getOwner")
-                .call(testEnv.client);
+                .execute(testEnv.client);
 
             assertThat(result.getAddress(0)).isEqualTo(simulationResult.substring(26));
 
-            gas = new MirrorNodeContractQuery()
+            gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("addOwner", new ContractFunctionParameters().addAddress(ADDRESS))
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             new ContractExecuteTransaction()
                 .setContractId(contractId)
@@ -98,10 +101,10 @@ class MirrorNodeContractQueryIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            new MirrorNodeContractQuery()
+            new MirrorNodeContractCallQuery()
                 .setContractId(contractId)
                 .setFunction("addOwner", new ContractFunctionParameters().addAddress(ADDRESS))
-                .call(testEnv.client);
+                .execute(testEnv.client);
 
             new ContractDeleteTransaction()
                 .setTransferAccountId(testEnv.operatorId)
@@ -123,17 +126,17 @@ class MirrorNodeContractQueryIntegrationTest {
             var contractId = new ContractId(1231456);
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractEstimateGasQuery()
                     .setContractId(contractId)
                     .setFunction("getOwner")
-                    .estimate(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractCallQuery()
                     .setContractId(contractId)
                     .setFunction("getOwner")
-                    .call(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
         }
     }
@@ -161,21 +164,20 @@ class MirrorNodeContractQueryIntegrationTest {
             Thread.sleep(2000);
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractEstimateGasQuery()
                     .setContractId(contractId)
                     .setGasLimit(100)
                     .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(ADDRESS))
-                    .estimate(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractCallQuery()
                     .setContractId(contractId)
                     .setGasLimit(100)
                     .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(ADDRESS))
-                    .call(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
-
         }
     }
 
@@ -202,17 +204,17 @@ class MirrorNodeContractQueryIntegrationTest {
             Thread.sleep(2000);
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractEstimateGasQuery()
                     .setContractId(contractId)
                     .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(ADDRESS))
-                    .estimate(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
 
             assertThatExceptionOfType(ExecutionException.class).isThrownBy(() -> {
-                new MirrorNodeContractQuery()
+                new MirrorNodeContractCallQuery()
                     .setContractId(contractId)
                     .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(ADDRESS))
-                    .call(testEnv.client);
+                    .execute(testEnv.client);
             }).withMessageContaining("Received non-200 response from Mirror Node");
 
         }
@@ -249,19 +251,19 @@ class MirrorNodeContractQueryIntegrationTest {
             var receiverEvmAddress = getEvmAddressFromMirrorNodeAsync(testEnv.client, receiverAccountId.num).get()
                 .toString();
 
-            var owner = new MirrorNodeContractQuery()
+            var owner = new MirrorNodeContractCallQuery()
                 .setContractId(contractId)
                 .setFunction("getOwner")
-                .call(testEnv.client)
+                .execute(testEnv.client)
                 .substring(26);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setGasLimit(1_000_000)
                 .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(receiverEvmAddress))
                 .setSenderEvmAddress(owner)
                 .setValue(123)
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             new ContractExecuteTransaction()
                 .setContractId(contractId)
@@ -271,13 +273,13 @@ class MirrorNodeContractQueryIntegrationTest {
                 .execute(testEnv.client)
                 .getReceipt(testEnv.client);
 
-            new MirrorNodeContractQuery()
+            new MirrorNodeContractCallQuery()
                 .setContractId(contractId)
                 .setGasLimit(1_000_000)
                 .setFunction("addOwnerAndTransfer", new ContractFunctionParameters().addAddress(receiverEvmAddress))
                 .setSenderEvmAddress(owner)
                 .setValue(123)
-                .call(testEnv.client);
+                .execute(testEnv.client);
         }
     }
 }

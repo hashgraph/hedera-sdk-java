@@ -38,7 +38,7 @@ import org.bouncycastle.util.encoders.Hex;
  * MirrorNodeContractQuery returns a result from EVM execution such as cost-free execution of read-only smart contract
  * queries, gas estimation, and transient simulation of read-write operations.
  */
-public class MirrorNodeContractQuery {
+public abstract class MirrorNodeContractQuery<T extends MirrorNodeContractQuery<T>> {
     // The contract we are sending the transaction to
     private ContractId contractId = null;
     private String contractEvmAddress = null;
@@ -56,6 +56,11 @@ public class MirrorNodeContractQuery {
     // The block number for the simulation
     private long blockNumber;
 
+    @SuppressWarnings("unchecked")
+    protected T self() {
+        return (T) this;
+    }
+
     public ContractId getContractId() {
         return this.contractId;
     }
@@ -66,10 +71,10 @@ public class MirrorNodeContractQuery {
      * @param contractId The ContractId to be set
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setContractId(ContractId contractId) {
+    public T setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
         this.contractId = contractId;
-        return this;
+        return self();
     }
 
     public String getContractEvmAddress() {
@@ -82,11 +87,11 @@ public class MirrorNodeContractQuery {
      * @param contractEvmAddress
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setContractEvmAddress(String contractEvmAddress) {
+    public T setContractEvmAddress(String contractEvmAddress) {
         Objects.requireNonNull(contractEvmAddress);
         this.contractEvmAddress = contractEvmAddress;
         this.contractId = null;
-        return this;
+        return self();
     }
 
     public AccountId getSender() {
@@ -99,10 +104,10 @@ public class MirrorNodeContractQuery {
      * @param sender The AccountId to be set
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setSender(AccountId sender) {
+    public T setSender(AccountId sender) {
         Objects.requireNonNull(sender);
         this.sender = sender;
-        return this;
+        return self();
     }
 
     public String getSenderEvmAddress() {
@@ -115,11 +120,11 @@ public class MirrorNodeContractQuery {
      * @param senderEvmAddress
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setSenderEvmAddress(String senderEvmAddress) {
+    public T setSenderEvmAddress(String senderEvmAddress) {
         Objects.requireNonNull(senderEvmAddress);
         this.senderEvmAddress = senderEvmAddress;
         this.sender = null;
-        return this;
+        return self();
     }
 
     public byte[] getCallData() {
@@ -133,7 +138,7 @@ public class MirrorNodeContractQuery {
      * @param params The function parameters to be set
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setFunction(String name, ContractFunctionParameters params) {
+    public T setFunction(String name, ContractFunctionParameters params) {
         Objects.requireNonNull(params);
         return setFunctionParameters(params.toBytes(name));
     }
@@ -147,7 +152,7 @@ public class MirrorNodeContractQuery {
      * @param name The String to be set as the function name
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setFunction(String name) {
+    public T setFunction(String name) {
         return setFunction(name, new ContractFunctionParameters());
     }
 
@@ -160,10 +165,10 @@ public class MirrorNodeContractQuery {
      * @param functionParameters The function parameters to be set
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setFunctionParameters(ByteString functionParameters) {
+    public T setFunctionParameters(ByteString functionParameters) {
         Objects.requireNonNull(functionParameters);
         this.callData = functionParameters.toByteArray();
-        return this;
+        return self();
     }
 
     public long getValue() {
@@ -178,9 +183,9 @@ public class MirrorNodeContractQuery {
      * @param value the amount of value to send, in tinybars or wei
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setValue(long value) {
+    public T setValue(long value) {
         this.value = value;
-        return this;
+        return self();
     }
 
     public long getGasLimit() {
@@ -195,9 +200,9 @@ public class MirrorNodeContractQuery {
      * @param gasLimit the maximum gas allowed for the transaction
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setGasLimit(long gasLimit) {
+    public T setGasLimit(long gasLimit) {
         this.gasLimit = gasLimit;
-        return this;
+        return self();
     }
 
     public long getGasPrice() {
@@ -212,9 +217,9 @@ public class MirrorNodeContractQuery {
      * @param gasPrice the gas price, in tinybars or wei, for each unit of gas
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setGasPrice(long gasPrice) {
+    public T setGasPrice(long gasPrice) {
         this.gasPrice = gasPrice;
-        return this;
+        return self();
     }
 
     public long getBlockNumber() {
@@ -229,9 +234,9 @@ public class MirrorNodeContractQuery {
      * @param blockNumber the block number at which to simulate the contract call
      * @return {@code this}
      */
-    public MirrorNodeContractQuery setBlockNumber(long blockNumber) {
+    public T setBlockNumber(long blockNumber) {
         this.blockNumber = blockNumber;
-        return this;
+        return self();
     }
 
     /**
@@ -241,7 +246,7 @@ public class MirrorNodeContractQuery {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public long estimate(Client client) throws ExecutionException, InterruptedException {
+    protected long estimate(Client client) throws ExecutionException, InterruptedException {
         fillEvmAddresses(client);
         return getEstimateGasFromMirrorNodeAsync(client).get();
     }
@@ -254,7 +259,7 @@ public class MirrorNodeContractQuery {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public String call(Client client) throws ExecutionException, InterruptedException {
+    protected String call(Client client) throws ExecutionException, InterruptedException {
         fillEvmAddresses(client);
         var blockNum = this.blockNumber == 0 ? "latest" : String.valueOf(this.blockNumber);
         return getContractCallResultFromMirrorNodeAsync(client, blockNum).get();
@@ -276,7 +281,7 @@ public class MirrorNodeContractQuery {
             .thenApply(MirrorNodeContractQuery::parseContractCallResult);
     }
 
-    public CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client) {
+    private CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client) {
         return executeMirrorNodeRequest(client, "latest", true)
             .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
     }
@@ -331,7 +336,7 @@ public class MirrorNodeContractQuery {
 
     @Override
     public String toString() {
-        return "MirrorNodeContractQuery{" +
+        return "{" +
             "contractId=" + contractId +
             ", contractEvmAddress='" + contractEvmAddress + '\'' +
             ", sender=" + sender +

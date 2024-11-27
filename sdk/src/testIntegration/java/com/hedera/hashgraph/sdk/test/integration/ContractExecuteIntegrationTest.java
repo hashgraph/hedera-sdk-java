@@ -28,6 +28,7 @@ import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
 import com.hedera.hashgraph.sdk.ContractFunctionParameters;
 import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
+import com.hedera.hashgraph.sdk.MirrorNodeContractEstimateGasQuery;
 import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
@@ -64,10 +65,10 @@ public class ContractExecuteIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("setMessage", new ContractFunctionParameters().addString("new message"))
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
             var receipt = new ContractExecuteTransaction()
                 .setContractId(contractId)
                 .setGas(gas + 10000)

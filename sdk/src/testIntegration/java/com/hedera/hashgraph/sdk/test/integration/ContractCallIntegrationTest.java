@@ -27,6 +27,7 @@ import com.hedera.hashgraph.sdk.FileCreateTransaction;
 import com.hedera.hashgraph.sdk.FileDeleteTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
+import com.hedera.hashgraph.sdk.MirrorNodeContractEstimateGasQuery;
 import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.Status;
@@ -66,10 +67,10 @@ public class ContractCallIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("getMessage")
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             var callQuery = new ContractCallQuery()
                 .setContractId(contractId)
@@ -256,10 +257,10 @@ public class ContractCallIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            long gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("getMessage")
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)
@@ -311,10 +312,10 @@ public class ContractCallIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("getMessage")
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)
@@ -365,10 +366,10 @@ public class ContractCallIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var gas = new MirrorNodeContractQuery()
+            var gas = new MirrorNodeContractEstimateGasQuery()
                 .setContractId(contractId)
                 .setFunction("getMessage")
-                .estimate(testEnv.client);
+                .execute(testEnv.client);
 
             var callQuery = new ContractCallQuery()
                     .setContractId(contractId)

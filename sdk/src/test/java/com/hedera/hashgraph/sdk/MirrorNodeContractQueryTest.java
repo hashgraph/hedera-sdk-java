@@ -36,7 +36,8 @@ import org.mockito.Mockito;
 
 class MirrorNodeContractQueryTest {
 
-    private MirrorNodeContractQuery query;
+    private MirrorNodeContractEstimateGasQuery mirrorNodeContractEstimateGasQuery;
+    private MirrorNodeContractCallQuery mirrorNodeContractCallQuery;
     private ContractId mockContractId;
 
     @BeforeAll
@@ -51,81 +52,108 @@ class MirrorNodeContractQueryTest {
 
     @BeforeEach
     void setUp() {
-        query = new MirrorNodeContractQuery();
+        mirrorNodeContractEstimateGasQuery = new MirrorNodeContractEstimateGasQuery();
+        mirrorNodeContractCallQuery = new MirrorNodeContractCallQuery();
         mockContractId = Mockito.mock(ContractId.class);
     }
 
     @Test
     void testSetAndGetContractId() {
-        query.setContractId(mockContractId);
-        assertEquals(mockContractId, query.getContractId());
+        mirrorNodeContractEstimateGasQuery.setContractId(mockContractId);
+        assertEquals(mockContractId, mirrorNodeContractEstimateGasQuery.getContractId());
+
+        mirrorNodeContractCallQuery.setContractId(mockContractId);
+        assertEquals(mockContractId, mirrorNodeContractCallQuery.getContractId());
     }
 
     @Test
     void testSetContractIdWithNullThrowsException() {
-        assertThrows(NullPointerException.class, () -> query.setContractId(null));
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractEstimateGasQuery.setContractId(null));
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractCallQuery.setContractId(null));
     }
 
     @Test
     void testSetAndGetContractEvmAddress() {
         String evmAddress = "0x1234567890abcdef1234567890abcdef12345678";
-        query.setContractEvmAddress(evmAddress);
-        assertEquals(evmAddress, query.getContractEvmAddress());
-        assertNull(query.getContractId());
+        mirrorNodeContractEstimateGasQuery.setContractEvmAddress(evmAddress);
+        assertEquals(evmAddress, mirrorNodeContractEstimateGasQuery.getContractEvmAddress());
+        assertNull(mirrorNodeContractEstimateGasQuery.getContractId());
+
+        mirrorNodeContractCallQuery.setContractEvmAddress(evmAddress);
+        assertEquals(evmAddress, mirrorNodeContractCallQuery.getContractEvmAddress());
+        assertNull(mirrorNodeContractCallQuery.getContractId());
     }
 
     @Test
     void testSetContractEvmAddressWithNullThrowsException() {
-        assertThrows(NullPointerException.class, () -> query.setContractEvmAddress(null));
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractEstimateGasQuery.setContractEvmAddress(null));
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractCallQuery.setContractEvmAddress(null));
     }
 
     @Test
     void testSetAndGetcallData() {
         ByteString params = ByteString.copyFromUtf8("test");
-        query.setFunctionParameters(params);
-        assertArrayEquals(params.toByteArray(), query.getCallData());
+        mirrorNodeContractEstimateGasQuery.setFunctionParameters(params);
+        assertArrayEquals(params.toByteArray(), mirrorNodeContractEstimateGasQuery.getCallData());
+
+        mirrorNodeContractCallQuery.setFunctionParameters(params);
+        assertArrayEquals(params.toByteArray(), mirrorNodeContractCallQuery.getCallData());
     }
 
     @Test
     void testSetFunctionWithoutParameters() {
-        query.setFunction("myFunction");
-        assertNotNull(query.getCallData());
+        mirrorNodeContractEstimateGasQuery.setFunction("myFunction");
+        assertNotNull(mirrorNodeContractEstimateGasQuery.getCallData());
     }
 
     @Test
     void testSetAndGetBlockNumber() {
         long blockNumber = 123456;
-        query.setBlockNumber(blockNumber);
-        assertEquals(blockNumber, query.getBlockNumber());
+        mirrorNodeContractEstimateGasQuery.setBlockNumber(blockNumber);
+        assertEquals(blockNumber, mirrorNodeContractEstimateGasQuery.getBlockNumber());
+
+        mirrorNodeContractCallQuery.setBlockNumber(blockNumber);
+        assertEquals(blockNumber, mirrorNodeContractCallQuery.getBlockNumber());
     }
 
     @Test
     void testSetAndGetValue() {
         long value = 1000;
-        query.setValue(value);
-        assertEquals(value, query.getValue());
+        mirrorNodeContractEstimateGasQuery.setValue(value);
+        assertEquals(value, mirrorNodeContractEstimateGasQuery.getValue());
+
+        mirrorNodeContractCallQuery.setValue(value);
+        assertEquals(value, mirrorNodeContractCallQuery.getValue());
     }
 
     @Test
     void testSetAndGetGas() {
         long gas = 50000;
-        query.setGasLimit(gas);
-        assertEquals(gas, query.getGasLimit());
+        mirrorNodeContractEstimateGasQuery.setGasLimit(gas);
+        assertEquals(gas, mirrorNodeContractEstimateGasQuery.getGasLimit());
+
+       mirrorNodeContractCallQuery.setGasLimit(gas);
+        assertEquals(gas, mirrorNodeContractCallQuery.getGasLimit());
     }
 
     @Test
     void testSetAndGetGasPrice() {
         long gasPrice = 200;
-        query.setGasPrice(gasPrice);
-        assertEquals(gasPrice, query.getGasPrice());
+        mirrorNodeContractEstimateGasQuery.setGasPrice(gasPrice);
+        assertEquals(gasPrice, mirrorNodeContractEstimateGasQuery.getGasPrice());
+
+        mirrorNodeContractCallQuery.setGasPrice(gasPrice);
+        assertEquals(gasPrice, mirrorNodeContractCallQuery.getGasPrice());
     }
 
     @Test
     void testEstimateGasWithMissingContractIdOrEvmAddressThrowsException() {
         ByteString params = ByteString.copyFromUtf8("gasParams");
-        query.setFunctionParameters(params);
+        mirrorNodeContractEstimateGasQuery.setFunctionParameters(params);
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractEstimateGasQuery.estimate(null));
 
-        assertThrows(NullPointerException.class, () -> query.estimate(null));
+        mirrorNodeContractCallQuery.setFunctionParameters(params);
+        assertThrows(NullPointerException.class, () -> mirrorNodeContractCallQuery.estimate(null));
     }
 
     @Test
@@ -256,7 +284,7 @@ class MirrorNodeContractQueryTest {
         long testGasPrice = 20L;
         long testBlockNumber = 123456L;
 
-        var query = new MirrorNodeContractQuery()
+        var mirrorNodeContractEstimateGasQuery = new MirrorNodeContractEstimateGasQuery()
             .setContractId(testContractId)
             .setContractEvmAddress(testEvmAddress)
             .setSender(testSenderId)
@@ -268,7 +296,20 @@ class MirrorNodeContractQueryTest {
             .setGasPrice(testGasPrice)
             .setBlockNumber(testBlockNumber);
 
-        SnapshotMatcher.expect(query.toString()
+        var mirrorNodeContractCallQuery = new MirrorNodeContractCallQuery()
+            .setContractId(testContractId)
+            .setContractEvmAddress(testEvmAddress)
+            .setSender(testSenderId)
+            .setSenderEvmAddress(testSenderEvmAddress)
+            .setFunction(testFunctionName, testParams)
+            .setFunctionParameters(testCallData)
+            .setValue(testValue)
+            .setGasLimit(testGasLimit)
+            .setGasPrice(testGasPrice)
+            .setBlockNumber(testBlockNumber);
+
+
+        SnapshotMatcher.expect(mirrorNodeContractEstimateGasQuery.toString() + mirrorNodeContractCallQuery.toString()
         ).toMatchSnapshot();
     }
 }
