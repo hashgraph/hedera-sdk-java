@@ -82,7 +82,6 @@ class MirrorNodeContractQueryIntegrationTest {
                 .execute(testEnv.client);
 
             var simulationResult = new MirrorNodeContractCallQuery()
-                .setContractEvmAddress("asdf")
                 .setContractId(contractId)
                 .setFunction("getOwner")
                 .execute(testEnv.client);
