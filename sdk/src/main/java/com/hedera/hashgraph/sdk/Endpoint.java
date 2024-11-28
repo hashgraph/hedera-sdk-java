@@ -53,10 +53,6 @@ public class Endpoint implements Cloneable {
     static Endpoint fromProtobuf(ServiceEndpoint serviceEndpoint) {
         var port = (int) (serviceEndpoint.getPort() & 0x00000000ffffffffL);
 
-        if (port == 0 || port == 50111) {
-            port = 50211;
-        }
-
         return new Endpoint()
             .setAddress(serviceEndpoint.getIpAddressV4().toByteArray())
             .setPort(port)

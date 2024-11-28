@@ -123,13 +123,23 @@ public class NodeCreateTransactionTest {
     }
 
     @Test
-    void testSerializeDeserialize() throws Exception {
-        var tx = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2 = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2Bytes = tx2.toBytes();
-        NodeCreateTransaction deserializedTx2 = (NodeCreateTransaction) Transaction.fromBytes(tx2Bytes);
-        assertThat(tx.getGossipCaCertificate()).isEqualTo(deserializedTx2.getGossipCaCertificate());
-        assertThat(tx.getGrpcCertificateHash()).isEqualTo(deserializedTx2.getGrpcCertificateHash());
+    void testUnrecognizedServicePort() throws Exception {
+        var tx = new NodeCreateTransaction()
+            .setServiceEndpoints(
+         List.of(new Endpoint()
+            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+            .setDomainName("unit.test.com")
+            .setPort(50111)));
+        var tx2Bytes = tx.toBytes();
+        NodeCreateTransaction deserializedTx = (NodeCreateTransaction) Transaction.fromBytes(tx2Bytes);
+        assertThat(tx.getServiceEndpoints()).isEqualTo(deserializedTx.getServiceEndpoints());
+    }
+
+    @Test
+    void testNullOptionalValues() throws Exception {
+        var tx = new NodeCreateTransaction();
+        var tx2 = NodeCreateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
