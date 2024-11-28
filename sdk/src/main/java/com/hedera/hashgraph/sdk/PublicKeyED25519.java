@@ -53,7 +53,7 @@ class PublicKeyED25519 extends PublicKey {
      */
     static PublicKeyED25519 fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
-            // Will throw if the keys is invalid
+            // Will throw if the key is invalid
             new Ed25519PublicKeyParameters(publicKey, 0);
             // If this is a 32 byte string, assume an Ed25519 public key
             return new PublicKeyED25519(publicKey);

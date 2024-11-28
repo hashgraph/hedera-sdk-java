@@ -56,7 +56,7 @@ public class PublicKeyECDSA extends PublicKey {
     static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == 33 || publicKey.length == 65) {
             return new PublicKeyECDSA(
-                // compress the key
+                // compress and validate the key
                 Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true));
         }
 

@@ -20,6 +20,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.utils.Bip32Utils;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -29,13 +35,6 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
-
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * Encapsulate the ED25519 private key.
@@ -52,7 +51,7 @@ class PrivateKeyED25519 extends PrivateKey {
      * @param keyData                   the key data
      * @param chainCode                 the chain code
      */
-    PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
+    private PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
         this.keyData = keyData;
         this.chainCode = chainCode;
     }
@@ -126,7 +125,10 @@ class PrivateKeyED25519 extends PrivateKey {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
-            return new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
+            // TODO
+            var pk = new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
+            pk.getPublicKey();
+            return pk;
         }
 
         // Assume a DER-encoded private key descriptor
