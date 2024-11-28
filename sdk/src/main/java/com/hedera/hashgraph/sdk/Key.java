@@ -61,7 +61,7 @@ public abstract class Key {
                 if (key.getECDSASecp256K1().size() == 20) {
                     return new EvmAddress(key.getECDSASecp256K1().toByteArray());
                 } else {
-                    return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                    return PublicKeyECDSA.fromBytesInternal(key.getECDSASecp256K1().toByteArray());
                 }
             }
             case KEYLIST -> {

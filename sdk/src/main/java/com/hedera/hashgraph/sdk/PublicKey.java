@@ -46,10 +46,10 @@ public abstract class PublicKey extends Key {
             return new PublicKeyED25519(publicKey);
         } else if (publicKey.length == 33) {
             // compressed 33 byte raw form
-            return new PublicKeyECDSA(publicKey);
+            return PublicKeyECDSA.fromBytesInternal(publicKey);
         } else if (publicKey.length == 65) {
             // compress the 65 byte form
-            return new PublicKeyECDSA(
+            return PublicKeyECDSA.fromBytesInternal(
                 Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true)
             );
         }
