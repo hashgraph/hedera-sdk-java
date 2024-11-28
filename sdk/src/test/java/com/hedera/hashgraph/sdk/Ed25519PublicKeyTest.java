@@ -29,6 +29,8 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
@@ -48,6 +50,26 @@ class Ed25519PublicKeyTest {
     }
 
     @Test
+    void keyByteValidation() {
+        byte[] invalidKeyED25519 = new byte[32];
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> PublicKey.fromBytes(invalidKeyED25519));
+
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> PublicKey.fromBytesED25519(invalidKeyED25519));
+
+        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02};
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> PublicKey.fromBytesED25519(malformedKey));
+
+        byte[] validKey = PrivateKey.generateED25519().getPublicKey().toBytes();
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(validKey));
+
+        byte[] validDERKey = PrivateKey.generateED25519().getPublicKey().toBytesDER();
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(validDERKey));
+    }
+
+        @Test
     @DisplayName("public key can be recovered from bytes")
     void keyByteSerialization() {
         PublicKey key1 = PrivateKey.generateED25519().getPublicKey();

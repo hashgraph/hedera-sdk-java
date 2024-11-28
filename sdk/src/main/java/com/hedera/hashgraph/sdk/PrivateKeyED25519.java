@@ -221,7 +221,7 @@ class PrivateKeyED25519 extends PrivateKey {
         byte[] publicKeyData = new byte[Ed25519.PUBLIC_KEY_SIZE];
         Ed25519.generatePublicKey(keyData, 0, publicKeyData, 0);
 
-        publicKey = new PublicKeyED25519(publicKeyData);
+        publicKey = PublicKeyED25519.fromBytesInternal(publicKeyData);
         return publicKey;
     }
 

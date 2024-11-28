@@ -77,7 +77,7 @@ public class ECDSAPublicKeyTest {
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> PublicKey.fromBytesECDSA(invalidKeyECDSA));
 
-        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02}; // Malformed key
+        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02};
         assertThatExceptionOfType(IllegalArgumentException.class)
             .isThrownBy(() -> PublicKey.fromBytesECDSA(malformedKey));
 
@@ -90,7 +90,7 @@ public class ECDSAPublicKeyTest {
         };
         assertDoesNotThrow(() -> PublicKey.fromBytesECDSA(validCompressedKey));
 
-        byte[] validDERKey = PrivateKeyECDSA.generateECDSA().getPublicKey().toBytesDER();
+        byte[] validDERKey = PrivateKey.generateECDSA().getPublicKey().toBytesDER();
         assertDoesNotThrow(() -> PublicKey.fromBytesECDSA(validDERKey));
     }
 
