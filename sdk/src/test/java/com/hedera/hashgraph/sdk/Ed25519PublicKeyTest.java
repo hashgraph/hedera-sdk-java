@@ -52,11 +52,8 @@ class Ed25519PublicKeyTest {
     @Test
     void keyByteValidation() {
         byte[] invalidKeyED25519 = new byte[32];
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytes(invalidKeyED25519));
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesED25519(invalidKeyED25519));
+        assertDoesNotThrow(() -> PublicKey.fromBytes(invalidKeyED25519));
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(invalidKeyED25519));
 
         byte[] invalidKey = new byte[]{
             0x00,

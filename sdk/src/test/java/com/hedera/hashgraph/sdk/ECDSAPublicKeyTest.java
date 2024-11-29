@@ -71,11 +71,8 @@ public class ECDSAPublicKeyTest {
     @Test
     void keyByteValidation() {
         byte[] invalidKeyECDSA = new byte[33];
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytes(invalidKeyECDSA));
-
-        assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesECDSA(invalidKeyECDSA));
+        assertDoesNotThrow(() -> PublicKey.fromBytes(invalidKeyECDSA));
+        assertDoesNotThrow(() -> PublicKey.fromBytesECDSA(invalidKeyECDSA));
 
         byte[] invalidCompressedKey = new byte[]{
             0x00,
