@@ -51,7 +51,7 @@ class PrivateKeyED25519 extends PrivateKey {
      * @param keyData                   the key data
      * @param chainCode                 the chain code
      */
-    private PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
+    PrivateKeyED25519(byte[] keyData, @Nullable KeyParameter chainCode) {
         this.keyData = keyData;
         this.chainCode = chainCode;
     }
@@ -125,10 +125,7 @@ class PrivateKeyED25519 extends PrivateKey {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
             || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
-            // TODO
-            var pk = new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
-            pk.getPublicKey();
-            return pk;
+            return new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
         }
 
         // Assume a DER-encoded private key descriptor
