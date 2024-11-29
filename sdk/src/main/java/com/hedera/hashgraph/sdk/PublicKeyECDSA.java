@@ -34,7 +34,7 @@ import org.bouncycastle.crypto.signers.ECDSASigner;
 /**
  * Encapsulate the ECDSA public key.
  */
-public class PublicKeyECDSA extends PublicKey {
+class PublicKeyECDSA extends PublicKey {
     // Compressed 33 byte form
     private byte[] keyData;
 
@@ -54,6 +54,10 @@ public class PublicKeyECDSA extends PublicKey {
      * @return                          the new key
      */
     static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
+        // Validate the key if it's not all zero public key, see HIP-540
+        if (Arrays.equals(publicKey, new byte[33])) {
+            return new PublicKeyECDSA(publicKey);
+        }
         if (publicKey.length == 33 || publicKey.length == 65) {
             return new PublicKeyECDSA(
                 // compress and validate the key
