@@ -87,7 +87,7 @@ public class NodeUpdateTransactionTest {
 
     private static Endpoint spawnTestEndpoint(byte offset) {
         return new Endpoint()
-            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+            .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
             .setDomainName(offset + "unit.test.com")
             .setPort(42 + offset);
     }
@@ -120,11 +120,20 @@ public class NodeUpdateTransactionTest {
     @Test
     void testNullOptionalValues() throws Exception {
         var tx = new NodeUpdateTransaction();
-        var tx2Bytes = tx.toBytes();
-        NodeUpdateTransaction deserializedTx = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
-        assertThat(deserializedTx.getGossipCaCertificate()).isNull();
-        assertThat(deserializedTx.getGrpcCertificateHash()).isNull();
-        assertThat(deserializedTx.getDescription()).isNull();
+        var tx2 = NodeUpdateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void testUnrecognizedServicePort() throws Exception {
+        var tx = new NodeUpdateTransaction()
+            .setServiceEndpoints(
+                List.of(new Endpoint()
+                    .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
+                    .setDomainName("unit.test.com")
+                    .setPort(50111)));
+        var tx2 = NodeUpdateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
@@ -139,7 +148,7 @@ public class NodeUpdateTransactionTest {
     }
 
     @Test
-    void testSetNull()  {
+    void testSetNull() {
         new NodeUpdateTransaction()
             .setDescription(null)
             .setAccountId(null)
