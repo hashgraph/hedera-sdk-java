@@ -33,7 +33,7 @@ dependencies.constraints {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("com.google.protobuf:protobuf-javalite:4.28.3") {
+    api("com.google.protobuf:protobuf-javalite:4.29.0") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
