@@ -61,7 +61,7 @@ public class NodeCreateTransactionTest {
     private static final byte[] TEST_GRPC_CERTIFICATE_HASH = new byte[]{5, 6, 7, 8, 9};
 
     private static final PublicKey TEST_ADMIN_KEY = PrivateKey.fromString(
-        "302e020100300506032b65700422042062c4b69e9f45a554e5424fb5a6fe5e6ac1f19ead31dc7718c2d980fd1f998d4b")
+            "302e020100300506032b65700422042062c4b69e9f45a554e5424fb5a6fe5e6ac1f19ead31dc7718c2d980fd1f998d4b")
         .getPublicKey();
 
     final Instant TEST_VALID_START = Instant.ofEpochSecond(1554158542);
@@ -83,7 +83,7 @@ public class NodeCreateTransactionTest {
 
     private static Endpoint spawnTestEndpoint(byte offset) {
         return new Endpoint()
-            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+            .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
             .setDomainName(offset + "unit.test.com")
             .setPort(42 + offset);
     }
@@ -131,7 +131,19 @@ public class NodeCreateTransactionTest {
     }
 
     @Test
-    void testSetNull()  {
+    void testUnrecognizedServicePort() throws Exception {
+        var tx = new NodeCreateTransaction()
+            .setServiceEndpoints(
+                List.of(new Endpoint()
+                    .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
+                    .setDomainName("unit.test.com")
+                    .setPort(50111)));
+        var tx2 = NodeCreateTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void testSetNull() {
         new NodeCreateTransaction()
             .setDescription(null)
             .setAccountId(null)
