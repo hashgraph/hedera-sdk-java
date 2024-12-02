@@ -49,7 +49,7 @@ dependencies.constraints {
     api("io.grpc:grpc-protobuf-lite:1.68.2") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-stub:1.68.1") {
+    api("io.grpc:grpc-stub:1.68.2") {
         because("io.grpc.stub")
     }
     api("com.google.code.findbugs:jsr305:3.0.2") {
