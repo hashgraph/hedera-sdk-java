@@ -69,7 +69,7 @@ dependencies.constraints {
     }
 
     // Testing
-    api("com.fasterxml.jackson.core:jackson-core:2.18.1") {
+    api("com.fasterxml.jackson.core:jackson-core:2.18.2") {
         because("com.fasterxml.jackson.core")
     }
     api("io.github.cdimascio:java-dotenv:5.3.1") {
