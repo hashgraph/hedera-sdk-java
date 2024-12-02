@@ -119,7 +119,7 @@ public class AutoCreateAccountTransferTransactionExample {
          * Sign and execute the TransferTransaction transaction using existing Hedera account
          * and key paying for the transaction fee.
          */
-        System.out.println("Transferring Hbar to the the new account...");
+        System.out.println("Transferring Hbar to the new account...");
         TransactionResponse transferTxResponse = transferTx.execute(client);
 
         /*

@@ -97,7 +97,7 @@ public class LoggerFunctionalitiesExample {
          * Step 4:
          * Transfer 10 tinybars from operator's account to newly created account to init it on Hedera network.
          */
-        System.out.println("Transferring Hbar to the the new account...");
+        System.out.println("Transferring Hbar to the new account...");
         new TransferTransaction()
             .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
             .addHbarTransfer(aliasAccountId, Hbar.from(1))
