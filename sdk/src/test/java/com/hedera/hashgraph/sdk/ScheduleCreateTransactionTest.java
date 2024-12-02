@@ -75,4 +75,11 @@ public class ScheduleCreateTransactionTest {
         var tx2 = ScheduleCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
+
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new ScheduleCreateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
 }

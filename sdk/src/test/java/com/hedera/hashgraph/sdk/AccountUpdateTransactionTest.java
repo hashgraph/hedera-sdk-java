@@ -97,6 +97,13 @@ public class AccountUpdateTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new AccountUpdateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerialize2() {
         SnapshotMatcher.expect(spawnTestTransaction2().toString()).toMatchSnapshot();
     }

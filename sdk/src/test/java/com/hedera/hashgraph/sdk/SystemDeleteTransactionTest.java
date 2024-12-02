@@ -72,6 +72,13 @@ public class SystemDeleteTransactionTest {
         SnapshotMatcher.expect(spawnTestTransactionContract().toString()).toMatchSnapshot();
     }
 
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new SystemDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     private SystemDeleteTransaction spawnTestTransactionContract() {
         return new SystemDeleteTransaction().setNodeAccountIds(
                 Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

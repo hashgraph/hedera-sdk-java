@@ -47,6 +47,13 @@ public class TopicMessageSubmitTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TopicMessageSubmitTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
             .setConsensusSubmitMessage(ConsensusSubmitMessageTransactionBody.newBuilder().build()).build();

@@ -54,6 +54,13 @@ public class TokenUnfreezeTransactionTest {
         ).toMatchSnapshot();
     }
 
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenUnfreezeTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     private TokenUnfreezeTransaction spawnTestTransaction() {
         return new TokenUnfreezeTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

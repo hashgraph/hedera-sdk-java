@@ -67,6 +67,13 @@ public class TokenBurnTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenBurnTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerializeNft() {
         SnapshotMatcher.expect(spawnTestTransactionNft().toString()).toMatchSnapshot();
     }

@@ -71,7 +71,14 @@ public class AccountAllowanceDeleteTransactionTest {
     @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
-        var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
+        var tx2 = AccountAllowanceDeleteTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new AccountAllowanceDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 

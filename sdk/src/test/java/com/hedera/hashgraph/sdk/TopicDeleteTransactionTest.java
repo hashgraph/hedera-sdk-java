@@ -65,6 +65,12 @@ public class TopicDeleteTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TopicDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+    @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = TopicDeleteTransaction.fromBytes(tx.toBytes());

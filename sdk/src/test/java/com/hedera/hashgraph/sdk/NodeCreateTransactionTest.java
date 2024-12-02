@@ -122,14 +122,12 @@ public class NodeCreateTransactionTest {
         assertThat(tx).isInstanceOf(NodeCreateTransaction.class);
     }
 
+
     @Test
-    void testSerializeDeserialize() throws Exception {
-        var tx = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2 = new NodeCreateTransaction().setDescription(TEST_DESCRIPTION);
-        var tx2Bytes = tx2.toBytes();
-        NodeCreateTransaction deserializedTx2 = (NodeCreateTransaction) Transaction.fromBytes(tx2Bytes);
-        assertThat(tx.getGossipCaCertificate()).isEqualTo(deserializedTx2.getGossipCaCertificate());
-        assertThat(tx.getGrpcCertificateHash()).isEqualTo(deserializedTx2.getGrpcCertificateHash());
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new NodeCreateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
@@ -141,7 +139,6 @@ public class NodeCreateTransactionTest {
             .setGrpcCertificateHash(null)
             .setAdminKey(null);
     }
-
 
     @Test
     void constructNodeCreateTransactionFromTransactionBodyProtobuf() {

@@ -118,13 +118,10 @@ public class NodeUpdateTransactionTest {
     }
 
     @Test
-    void testNullOptionalValues() throws Exception {
+    void shouldBytesNoSetters() throws Exception {
         var tx = new NodeUpdateTransaction();
-        var tx2Bytes = tx.toBytes();
-        NodeUpdateTransaction deserializedTx = (NodeUpdateTransaction) Transaction.fromBytes(tx2Bytes);
-        assertThat(deserializedTx.getGossipCaCertificate()).isNull();
-        assertThat(deserializedTx.getGrpcCertificateHash()).isNull();
-        assertThat(deserializedTx.getDescription()).isNull();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 
     @Test
