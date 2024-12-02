@@ -363,18 +363,8 @@ abstract class BaseNode<N extends BaseNode<N, KeyT>, KeyT> {
      * @return                          the user agent string
      */
     private String getUserAgent() {
-        var theModule = getClass().getModule();
         var thePackage = getClass().getPackage();
-        String implementationVersion;
-        if (theModule.getName() == null) {
-            // running on classpath
-            implementationVersion =
-                thePackage != null ? thePackage.getImplementationVersion() : null;
-        } else {
-            // running on module path
-            implementationVersion =
-                theModule.getDescriptor().version().map(ModuleDescriptor.Version::toString).orElse(null);
-        }
+        var implementationVersion = thePackage != null ? thePackage.getImplementationVersion() : null;
         return "hedera-sdk-java/" + ((implementationVersion != null) ? ("v" + implementationVersion) : "DEV");
     }
 }
