@@ -131,6 +131,9 @@ public class MirrorNodeContractQueriesExample {
          */
         var gas = new MirrorNodeContractEstimateGasQuery()
             .setContractId(contractId)
+            .setSender(client.getOperatorAccountId())
+            .setGasLimit(30_000)
+            .setGasPrice(1234)
             .setFunction("getMessage")
             .execute(client);
 
@@ -155,22 +158,36 @@ public class MirrorNodeContractQueriesExample {
          */
         var simulationResult = new MirrorNodeContractCallQuery()
             .setContractId(contractId)
+            .setSender(client.getOperatorAccountId())
+            .setGasLimit(30_000)
+            .setBlockNumber(10000)
+            .setGasPrice(1234)
             .setFunction("getMessage")
             .execute(client);
 
-        System.out.println("Simulation result: " + decodeABIHex(simulationResult.substring(2)));
+        System.out.println("Simulation result: " + decodeABIHexString(simulationResult));
         System.out.println("Contract call result: " + result.getString(0));
     }
-    private static String decodeABIHex(String hex) {
+    private static String decodeABIHexString(String hex) {
+        // Trim 0x at the beginning
+        if (hex.startsWith("0x")) {
+            hex = hex.substring(2);
+        }
+
+        // Extract the length of the data by parsing the substring from position 64 to 128 as a hexadecimal integer
+        // This section represents the length of the dynamic data, specifically the number of bytes in the string or array
         int length = Integer.parseInt(hex.substring(64, 128), 16);
 
+        // Using the extracted length, the code calculates the substring containing the actual data starting from position 128.
         String hexStringData = hex.substring(128, 128 + length * 2);
 
         byte[] bytes = new byte[length];
+        // Iterate through the extracted hex data, two characters at a time, converting each pair to a byte and storing it in a byte array.
         for (int i = 0; i < length; i++) {
             bytes[i] = (byte) Integer.parseInt(hexStringData.substring(i * 2, i * 2 + 2), 16);
         }
 
+        // Convert to UTF 8
         return new String(bytes, StandardCharsets.UTF_8);
     }
 }
