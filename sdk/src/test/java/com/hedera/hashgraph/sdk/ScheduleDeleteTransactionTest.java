@@ -72,6 +72,13 @@ public class ScheduleDeleteTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new ScheduleDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
             .setScheduleDelete(ScheduleDeleteTransactionBody.newBuilder().build())

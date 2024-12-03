@@ -76,7 +76,12 @@ public class TopicUpdateTransactionTest {
     void setShouldSerialize() {
         SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
-
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TopicUpdateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
     private TopicUpdateTransaction spawnTestTransaction() {
         return new TopicUpdateTransaction().setNodeAccountIds(
                 Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

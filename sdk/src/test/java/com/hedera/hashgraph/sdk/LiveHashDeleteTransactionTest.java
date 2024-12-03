@@ -48,7 +48,14 @@ class LiveHashDeleteTransactionTest {
     @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
-        var tx2 = LiveHashAddTransaction.fromBytes(tx.toBytes());
+        var tx2 = LiveHashDeleteTransaction.fromBytes(tx.toBytes());
         assertThat(tx2).hasToString(tx.toString());
+    }
+
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new LiveHashDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 }

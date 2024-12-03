@@ -118,9 +118,9 @@ public class NodeUpdateTransactionTest {
     }
 
     @Test
-    void testNullOptionalValues() throws Exception {
+    void shouldBytesNoSetters() throws Exception {
         var tx = new NodeUpdateTransaction();
-        var tx2 = NodeUpdateTransaction.fromBytes(tx.toBytes());
+        var tx2 = Transaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 

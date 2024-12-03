@@ -50,6 +50,13 @@ public class TokenMintTransactionTest {
         ).toMatchSnapshot();
     }
 
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenMintTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     private TokenMintTransaction spawnTestTransaction() {
         return new TokenMintTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

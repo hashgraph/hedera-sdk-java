@@ -72,6 +72,13 @@ public class TokenGrantKycTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenGrantKycTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
             .setTokenGrantKyc(TokenGrantKycTransactionBody.newBuilder().build()).build();

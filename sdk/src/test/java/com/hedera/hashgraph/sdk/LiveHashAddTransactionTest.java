@@ -49,6 +49,13 @@ class LiveHashAddTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new LiveHashAddTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldBytes() throws Exception {
         var tx = spawnTestTransaction();
         var tx2 = LiveHashAddTransaction.fromBytes(tx.toBytes());

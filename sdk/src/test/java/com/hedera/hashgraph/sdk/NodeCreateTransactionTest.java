@@ -122,6 +122,14 @@ public class NodeCreateTransactionTest {
         assertThat(tx).isInstanceOf(NodeCreateTransaction.class);
     }
 
+
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new NodeCreateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     @Test
     void testUnrecognizedServicePort() throws Exception {
         var tx = new NodeCreateTransaction()
@@ -135,13 +143,6 @@ public class NodeCreateTransactionTest {
     }
 
     @Test
-    void testNullOptionalValues() throws Exception {
-        var tx = new NodeCreateTransaction();
-        var tx2 = NodeCreateTransaction.fromBytes(tx.toBytes());
-        assertThat(tx2.toString()).isEqualTo(tx.toString());
-    }
-
-    @Test
     void testSetNull() {
         new NodeCreateTransaction()
             .setDescription(null)
@@ -150,7 +151,6 @@ public class NodeCreateTransactionTest {
             .setGrpcCertificateHash(null)
             .setAdminKey(null);
     }
-
 
     @Test
     void constructNodeCreateTransactionFromTransactionBodyProtobuf() {

@@ -19,6 +19,8 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenCancelAirdropTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
@@ -73,7 +75,12 @@ class TokenCancelAirdropTransactionTest {
             .toString()
         ).toMatchSnapshot();
     }
-
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenCancelAirdropTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
 
     @BeforeEach
     public void setUp() {

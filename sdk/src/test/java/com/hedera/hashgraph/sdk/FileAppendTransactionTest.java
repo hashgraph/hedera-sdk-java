@@ -118,6 +118,13 @@ public class FileAppendTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new FileAppendTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerializeBigContents() {
         var nodeAccountIds = new ArrayList<AccountId>();
         nodeAccountIds.add(AccountId.fromString("0.0.444"));
