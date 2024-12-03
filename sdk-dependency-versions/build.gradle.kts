@@ -86,7 +86,7 @@ dependencies.constraints {
     }
 
     // Examples
-    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.21") {
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.1.0") {
         because("kotlin.stdlib")
     }
 }
