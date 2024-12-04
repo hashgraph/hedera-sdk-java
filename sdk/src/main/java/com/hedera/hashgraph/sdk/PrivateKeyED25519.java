@@ -20,6 +20,12 @@
 package com.hedera.hashgraph.sdk;
 
 import com.hedera.hashgraph.sdk.utils.Bip32Utils;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import javax.annotation.Nullable;
 import org.bouncycastle.asn1.ASN1OctetString;
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
@@ -29,13 +35,6 @@ import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.bouncycastle.crypto.macs.HMac;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
-
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 
 /**
  * Encapsulate the ED25519 private key.
@@ -221,7 +220,7 @@ class PrivateKeyED25519 extends PrivateKey {
         byte[] publicKeyData = new byte[Ed25519.PUBLIC_KEY_SIZE];
         Ed25519.generatePublicKey(keyData, 0, publicKeyData, 0);
 
-        publicKey = new PublicKeyED25519(publicKeyData);
+        publicKey = PublicKeyED25519.fromBytesInternal(publicKeyData);
         return publicKey;
     }
 

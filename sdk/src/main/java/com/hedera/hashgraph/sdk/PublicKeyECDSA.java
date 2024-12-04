@@ -19,23 +19,22 @@
  */
 package com.hedera.hashgraph.sdk;
 
+import static com.hedera.hashgraph.sdk.Crypto.calcKeccak256;
+
 import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.util.Arrays;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.ECPublicKeyParameters;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 
-import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Arrays;
-
-import static com.hedera.hashgraph.sdk.Crypto.calcKeccak256;
-
 /**
  * Encapsulate the ECDSA public key.
  */
-public class PublicKeyECDSA extends PublicKey {
+class PublicKeyECDSA extends PublicKey {
     // Compressed 33 byte form
     private byte[] keyData;
 
@@ -44,7 +43,7 @@ public class PublicKeyECDSA extends PublicKey {
      *
      * @param keyData                   the byte array representing the key
      */
-    PublicKeyECDSA(byte[] keyData) {
+    private PublicKeyECDSA(byte[] keyData) {
         this.keyData = keyData;
     }
 
@@ -55,14 +54,14 @@ public class PublicKeyECDSA extends PublicKey {
      * @return                          the new key
      */
     static PublicKeyECDSA fromBytesInternal(byte[] publicKey) {
-        if (publicKey.length == 33) {
-            // compressed 33 byte raw form
+        // Validate the key if it's not all zero public key, see HIP-540
+        if (Arrays.equals(publicKey, new byte[33])) {
             return new PublicKeyECDSA(publicKey);
-        } else if (publicKey.length == 65) {
-            // compress the 65 byte form
+        }
+        if (publicKey.length == 33 || publicKey.length == 65) {
             return new PublicKeyECDSA(
-                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true)
-            );
+                // compress and validate the key
+                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true));
         }
 
         // Assume a DER-encoded public key descriptor

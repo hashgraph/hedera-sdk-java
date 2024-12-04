@@ -29,6 +29,8 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class Ed25519PublicKeyTest {
     private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
@@ -45,6 +47,33 @@ class Ed25519PublicKeyTest {
         key.signTransaction(transaction);
 
         assertThat(key.getPublicKey().verifyTransaction(transaction)).isTrue();
+    }
+
+    @Test
+    void keyByteValidation() {
+        byte[] invalidKeyED25519 = new byte[32];
+        assertDoesNotThrow(() -> PublicKey.fromBytes(invalidKeyED25519));
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(invalidKeyED25519));
+
+        byte[] invalidKey = new byte[]{
+            0x00,
+            (byte) 0xca, (byte) 0x35, 0x4b, 0x7c, (byte) 0xf4, (byte) 0x87, (byte) 0xd1, (byte) 0xbc, 0x43,
+            0x5a, 0x25, 0x66, 0x77, 0x09, (byte) 0xc1, (byte) 0xab, (byte) 0x98, 0x0c, 0x11, 0x4d,
+            0x35, (byte) 0x94, (byte) 0xe6, 0x25, (byte) 0x9e, (byte) 0x81, 0x2e, 0x6a, 0x70, 0x3d,
+            0x4f, 0x51
+        };
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> PublicKey.fromBytesED25519(invalidKey));
+
+        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02};
+        assertThatExceptionOfType(IllegalArgumentException.class)
+            .isThrownBy(() -> PublicKey.fromBytesED25519(malformedKey));
+
+        byte[] validKey = PrivateKey.generateED25519().getPublicKey().toBytes();
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(validKey));
+
+        byte[] validDERKey = PrivateKey.generateED25519().getPublicKey().toBytesDER();
+        assertDoesNotThrow(() -> PublicKey.fromBytesED25519(validDERKey));
     }
 
     @Test

@@ -23,6 +23,7 @@ import com.google.protobuf.ByteString;
 import com.hedera.hashgraph.sdk.proto.SignaturePair;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 
 import javax.annotation.Nullable;
@@ -40,7 +41,7 @@ class PublicKeyED25519 extends PublicKey {
      *
      * @param keyData                   the byte array representing the key
      */
-    PublicKeyED25519(byte[] keyData) {
+    private PublicKeyED25519(byte[] keyData) {
         this.keyData = keyData;
     }
 
@@ -52,6 +53,11 @@ class PublicKeyED25519 extends PublicKey {
      */
     static PublicKeyED25519 fromBytesInternal(byte[] publicKey) {
         if (publicKey.length == Ed25519.PUBLIC_KEY_SIZE) {
+            // Validate the key if it's not all zero public key, see HIP-540
+            if (!Arrays.equals(publicKey, new byte[32])) {
+                // Will throw if the key is invalid
+                new Ed25519PublicKeyParameters(publicKey, 0);
+            }
             // If this is a 32 byte string, assume an Ed25519 public key
             return new PublicKeyED25519(publicKey);
         }
