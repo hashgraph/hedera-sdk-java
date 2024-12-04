@@ -37,6 +37,7 @@ testing.suites {
         testType = TestSuiteType.INTEGRATION_TEST
         targets.all {
             testTask {
+                failFast = true
                 group = "build"
                 systemProperty("CONFIG_FILE", providers.gradleProperty("CONFIG_FILE").getOrElse(""))
                 systemProperty("HEDERA_NETWORK", providers.gradleProperty("HEDERA_NETWORK").getOrElse(""))
