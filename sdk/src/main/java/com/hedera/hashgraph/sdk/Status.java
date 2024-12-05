@@ -1749,7 +1749,39 @@ public enum Status {
      * The client SHOULD query mirror node to determine the status of the pending
      * airdrop and whether the sender can fulfill the offer.
      */
-    INVALID_TOKEN_IN_PENDING_AIRDROP(ResponseCodeEnum.INVALID_TOKEN_IN_PENDING_AIRDROP);
+    INVALID_TOKEN_IN_PENDING_AIRDROP(ResponseCodeEnum.INVALID_TOKEN_IN_PENDING_AIRDROP),
+
+    /**
+     * A scheduled transaction configured to wait for expiry to execute was given
+     * an expiry time not strictly after the time at which its creation reached
+     * consensus.
+     */
+    SCHEDULE_EXPIRY_MUST_BE_FUTURE(ResponseCodeEnum.SCHEDULE_EXPIRY_MUST_BE_FUTURE),
+
+    /**
+     * A scheduled transaction configured to wait for expiry to execute was given
+     * an expiry time too far in the future after the time at which its creation
+     * reached consensus.
+     */
+    SCHEDULE_EXPIRY_TOO_LONG(ResponseCodeEnum.SCHEDULE_EXPIRY_TOO_LONG),
+
+    /**
+     * A scheduled transaction configured to wait for expiry to execute was given
+     * an expiry time at which there is already too many transactions scheduled to
+     * expire; its creation must be retried with a different expiry.
+     */
+    SCHEDULE_EXPIRY_IS_BUSY(ResponseCodeEnum.SCHEDULE_EXPIRY_IS_BUSY),
+
+    /**
+     * The provided gRPC certificate hash is invalid.
+     */
+    INVALID_GRPC_CERTIFICATE_HASH(ResponseCodeEnum.INVALID_GRPC_CERTIFICATE_HASH),
+
+    /**
+     * A scheduled transaction configured to wait for expiry to execute was not
+     * given an explicit expiration time.
+     */
+    MISSING_EXPIRY_TIME(ResponseCodeEnum.MISSING_EXPIRY_TIME);
 
     final ResponseCodeEnum code;
 
@@ -2087,6 +2119,11 @@ public enum Status {
             case INVALID_PENDING_AIRDROP_ID -> INVALID_PENDING_AIRDROP_ID;
             case TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY -> TOKEN_AIRDROP_WITH_FALLBACK_ROYALTY;
             case INVALID_TOKEN_IN_PENDING_AIRDROP -> INVALID_TOKEN_IN_PENDING_AIRDROP;
+            case SCHEDULE_EXPIRY_MUST_BE_FUTURE -> SCHEDULE_EXPIRY_MUST_BE_FUTURE;
+            case SCHEDULE_EXPIRY_TOO_LONG -> SCHEDULE_EXPIRY_TOO_LONG;
+            case SCHEDULE_EXPIRY_IS_BUSY -> SCHEDULE_EXPIRY_IS_BUSY;
+            case INVALID_GRPC_CERTIFICATE_HASH -> INVALID_GRPC_CERTIFICATE_HASH;
+            case MISSING_EXPIRY_TIME -> MISSING_EXPIRY_TIME;
             case UNRECOGNIZED ->
                 // NOTE: Protobuf deserialization will not give us the code on the wire
                 throw new IllegalArgumentException(
