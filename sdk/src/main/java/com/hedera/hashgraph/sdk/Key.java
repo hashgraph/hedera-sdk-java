@@ -55,13 +55,13 @@ public abstract class Key {
     static Key fromProtobufKey(com.hedera.hashgraph.sdk.proto.Key key) {
         switch (key.getKeyCase()) {
             case ED25519 -> {
-                return new PublicKeyED25519(key.getEd25519().toByteArray());
+                return PublicKeyED25519.fromBytesInternal(key.getEd25519().toByteArray());
             }
             case ECDSA_SECP256K1 -> {
                 if (key.getECDSASecp256K1().size() == 20) {
                     return new EvmAddress(key.getECDSASecp256K1().toByteArray());
                 } else {
-                    return new PublicKeyECDSA(key.getECDSASecp256K1().toByteArray());
+                    return PublicKeyECDSA.fromBytesInternal(key.getECDSASecp256K1().toByteArray());
                 }
             }
             case KEYLIST -> {
