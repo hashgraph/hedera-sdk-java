@@ -509,7 +509,7 @@ class ScheduleCreateIntegrationTest {
                     .setScheduleMemo("HIP-423 Integration Test")
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client))
-                .withMessageContaining(Status.SCHEDULE_EXPIRY_TOO_LONG.toString());
+                .withMessageContaining(Status.SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE.toString());
         }
     }
 
@@ -540,7 +540,7 @@ class ScheduleCreateIntegrationTest {
                         .setScheduleMemo("HIP-423 Integration Test")
                         .execute(testEnv.client)
                         .getReceipt(testEnv.client))
-                .withMessageContaining(Status.SCHEDULE_EXPIRY_MUST_BE_FUTURE.toString());
+                .withMessageContaining(Status.SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME.toString());
         }
     }
 
