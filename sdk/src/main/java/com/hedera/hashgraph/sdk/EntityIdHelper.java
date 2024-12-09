@@ -26,12 +26,14 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpTimeoutException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.DecoderException;
@@ -40,7 +42,7 @@ import org.bouncycastle.util.encoders.Hex;
 /**
  * Utility class used internally by the sdk.
  */
-class EntityIdHelper {
+public class EntityIdHelper {
     /**
      * The length of a Solidity address in bytes.
      */
@@ -112,7 +114,7 @@ class EntityIdHelper {
      * @param address the string representation
      * @return the decoded address
      */
-    public static byte[] decodeSolidityAddress(String address) {
+    static byte[] decodeSolidityAddress(String address) {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
@@ -267,7 +269,7 @@ class EntityIdHelper {
      * @param address
      * @return
      */
-    public static boolean isLongZeroAddress(byte[] address) {
+    static boolean isLongZeroAddress(byte[] address) {
         for (int i = 0; i < 12; i++) {
             if (address[i] != 0) {
                 return false;
@@ -284,13 +286,10 @@ class EntityIdHelper {
      *
      * @param client
      * @param evmAddress
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
-    public static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
+    static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/accounts/" + evmAddress;
-        return performQueryToMirrorNodeAsync(client, apiEndpoint)
+        return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
             .thenApply(response ->
                 parseNumFromMirrorNodeResponse(response, "account"));
     }
@@ -303,15 +302,12 @@ class EntityIdHelper {
      *
      * @param client
      * @param num
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
     public static CompletableFuture<EvmAddress> getEvmAddressFromMirrorNodeAsync(Client client, long num) {
         String apiEndpoint = "/accounts/" + num;
-        return performQueryToMirrorNodeAsync(client, apiEndpoint)
+        return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
             .thenApply(response ->
-                EvmAddress.fromString(parseEvmAddressFromMirrorNodeResponse(response, "evm_address")));
+                EvmAddress.fromString(parseStringMirrorNodeResponse(response, "evm_address")));
     }
 
     /**
@@ -322,20 +318,26 @@ class EntityIdHelper {
      *
      * @param client
      * @param evmAddress
-     * @return
-     * @throws IOException
-     * @throws InterruptedException
      */
     public static CompletableFuture<Long> getContractNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/contracts/" + evmAddress;
 
-        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint);
+        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
 
         return responseFuture.thenApply(response ->
             parseNumFromMirrorNodeResponse(response, "contract_id"));
     }
 
-    private static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint) {
+
+    public static CompletableFuture<String> getContractAddressFromMirrorNodeAsync(Client client, String id) {
+        String apiEndpoint = "/contracts/" + id;
+        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
+
+        return responseFuture.thenApply(response ->
+            parseStringMirrorNodeResponse(response, "evm_address"));
+    }
+
+    static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint, String jsonBody, boolean isContractCall) {
         Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
             .map(url -> url.substring(0, url.indexOf(":")))
             .findFirst();
@@ -347,35 +349,50 @@ class EntityIdHelper {
         String apiUrl = "https://" + mirrorUrl.get() + "/api/v1" + apiEndpoint;
 
         if (client.getLedgerId() == null) {
-            apiUrl = "http://" + mirrorUrl.get() + ":5551/api/v1" + apiEndpoint;
+            if (isContractCall) {
+                apiUrl = "http://" + mirrorUrl.get() + ":8545/api/v1" + apiEndpoint;
+            } else {
+                apiUrl = "http://" + mirrorUrl.get() + ":5551/api/v1" + apiEndpoint;
+            }
         }
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        HttpRequest httpRequest = HttpRequest.newBuilder()
+        var httpBuilder = HttpRequest.newBuilder()
             .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
-            .uri(URI.create(apiUrl))
-            .build();
+            .uri(URI.create(apiUrl));
+
+        if (jsonBody != null) {
+            httpBuilder.header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody));
+        }
+        var httpRequest = httpBuilder.build();
 
         return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
-            .thenApply(HttpResponse::body);
+            .handle((response, ex) -> {
+                if (ex != null) {
+                    if (ex instanceof HttpTimeoutException) {
+                        throw new CompletionException(new RuntimeException("Request to Mirror Node timed out", ex));
+                    } else {
+                        throw new CompletionException(new RuntimeException("Failed to send request to Mirror Node", ex));
+                    }
+                }
+
+                int statusCode = response.statusCode();
+                if (statusCode != 200) {
+                    throw new CompletionException(new RuntimeException("Received non-200 response from Mirror Node: " + response.body()));
+                }
+                return response.body();
+            });
+    }
+
+    private static String parseStringMirrorNodeResponse(String responseBody, String memberName) {
+        JsonObject jsonObject = JsonParser.parseString(responseBody).getAsJsonObject();
+        String evmAddress = jsonObject.get(memberName).getAsString();
+        return evmAddress.substring(evmAddress.lastIndexOf(".") + 1);
     }
 
     private static long parseNumFromMirrorNodeResponse(String responseBody, String memberName) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
-
-        String num = jsonObject.get(memberName).getAsString();
-
-        return Long.parseLong(num.substring(num.lastIndexOf(".") + 1));
-    }
-
-    private static String parseEvmAddressFromMirrorNodeResponse(String responseBody, String memberName) {
-        JsonParser jsonParser = new JsonParser();
-        JsonObject jsonObject = jsonParser.parse(responseBody).getAsJsonObject();
-
-        String evmAddress = jsonObject.get(memberName).getAsString();
-
-        return evmAddress.substring(evmAddress.lastIndexOf(".") + 1);
+        return Long.parseLong(parseStringMirrorNodeResponse(responseBody, memberName));
     }
 
     @FunctionalInterface
