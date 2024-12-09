@@ -92,7 +92,7 @@ jobs:
         run: ./gradlew checkAllModuleInfo --continue --scan
 
       - name: Start Local Node
-        run: npx @hashgraph/hedera-local start -d --network local
+        run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.57.0
 
       - name: Run Unit and Integration Tests
         env:
@@ -150,7 +150,7 @@ jobs:
         run: ./gradlew -p example-android assemble --scan
 
       - name: Start the local node
-        run: npx @hashgraph/hedera-local start -d --network local
+        run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.57.0
 
       - name: Prepare .env for Examples
         run: |
