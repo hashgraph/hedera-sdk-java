@@ -64,7 +64,14 @@ public class TokenPauseTransactionTest {
     @Test
     void shouldBytesNft() throws Exception {
         var tx = spawnTestTransaction();
-        var tx2 = TokenCreateTransaction.fromBytes(tx.toBytes());
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenPauseTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
 

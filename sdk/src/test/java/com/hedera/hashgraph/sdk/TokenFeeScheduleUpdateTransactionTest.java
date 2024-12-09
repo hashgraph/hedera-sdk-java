@@ -71,6 +71,13 @@ public class TokenFeeScheduleUpdateTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenFeeScheduleUpdateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerialize() throws InvalidProtocolBufferException {
         var originalUpdate = spawnTestTransaction();
         byte[] updateBytes = originalUpdate.toBytes();

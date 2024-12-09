@@ -63,6 +63,13 @@ public class ContractCreateTransactionTest {
         ).toMatchSnapshot();
     }
 
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new ContractCreateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     private ContractCreateTransaction spawnTestTransaction() {
         return new ContractCreateTransaction()
             .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

@@ -55,6 +55,13 @@ public class MessageSubmitTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TopicMessageSubmitTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(spawnTestTransaction()
             .toString()

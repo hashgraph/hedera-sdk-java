@@ -29,6 +29,7 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
@@ -69,7 +70,6 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private static final long NANOSECONDS_TO_REMOVE = 10000000000L;
 
-    private static final Random randomNanosecs = new Random();
     private static final AtomicLong monotonicTime = new AtomicLong();
 
 
@@ -128,7 +128,8 @@ public final class TransactionId implements Comparable<TransactionId> {
             }
         } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
-        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime + randomNanosecs.nextLong(1_000)));
+        // NOTE: using ThreadLocalRandom because it's compatible with Android SDK version 26
+        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime + ThreadLocalRandom.current().nextLong(1_000)));
     }
 
     /**

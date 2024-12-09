@@ -104,6 +104,14 @@ public class AccountAllowanceApproveTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new AccountAllowanceApproveTransaction();
+        var tx2 = AccountAllowanceApproveTransaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+
+    @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
             .setCryptoApproveAllowance(CryptoApproveAllowanceTransactionBody.newBuilder().build())

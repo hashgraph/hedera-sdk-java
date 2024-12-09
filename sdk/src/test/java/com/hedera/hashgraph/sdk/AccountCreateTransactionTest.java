@@ -108,6 +108,14 @@ public class AccountCreateTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new AccountCreateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+
+    @Test
     void propertiesTest() {
         var tx = spawnTestTransaction();
 

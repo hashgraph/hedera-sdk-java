@@ -29,27 +29,27 @@ dependencies.constraints {
     api("com.google.code.gson:gson:2.10.1") {
         because("com.google.gson")
     }
-    api("com.google.protobuf:protobuf-java:4.28.3") {
+    api("com.google.protobuf:protobuf-java:4.29.0") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("com.google.protobuf:protobuf-javalite:4.28.3") {
+    api("com.google.protobuf:protobuf-javalite:4.29.0") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
-    api("io.grpc:grpc-api:1.68.1") {
+    api("io.grpc:grpc-api:1.68.2") {
         because("io.grpc")
     }
     api("io.grpc:grpc-inprocess:1.67.1") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-protobuf:1.68.1") {
+    api("io.grpc:grpc-protobuf:1.68.2") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-protobuf-lite:1.68.1") {
+    api("io.grpc:grpc-protobuf-lite:1.68.2") {
         because("io.grpc.protobuf")
     }
-    api("io.grpc:grpc-stub:1.68.1") {
+    api("io.grpc:grpc-stub:1.68.2") {
         because("io.grpc.stub")
     }
     api("com.google.code.findbugs:jsr305:3.0.2") {
@@ -69,7 +69,7 @@ dependencies.constraints {
     }
 
     // Testing
-    api("com.fasterxml.jackson.core:jackson-core:2.18.1") {
+    api("com.fasterxml.jackson.core:jackson-core:2.18.2") {
         because("com.fasterxml.jackson.core")
     }
     api("io.github.cdimascio:java-dotenv:5.3.1") {
@@ -86,7 +86,7 @@ dependencies.constraints {
     }
 
     // Examples
-    api("org.jetbrains.kotlin:kotlin-stdlib:2.0.21") {
+    api("org.jetbrains.kotlin:kotlin-stdlib:2.1.0") {
         because("kotlin.stdlib")
     }
 }

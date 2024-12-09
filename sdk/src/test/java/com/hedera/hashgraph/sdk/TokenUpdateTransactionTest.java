@@ -91,6 +91,13 @@ public class TokenUpdateTransactionTest {
         SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
+    @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new TokenUpdateTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
     private TokenUpdateTransaction spawnTestTransaction() {
         return new TokenUpdateTransaction().setNodeAccountIds(
                 Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))

@@ -40,6 +40,13 @@ public class EthereumTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new EthereumTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void shouldSerialize() {
         SnapshotMatcher.expect(spawnTestTransaction()
             .toString()

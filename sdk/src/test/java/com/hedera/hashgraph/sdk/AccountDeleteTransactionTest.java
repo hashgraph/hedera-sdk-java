@@ -73,6 +73,13 @@ public class AccountDeleteTransactionTest {
     }
 
     @Test
+    void shouldBytesNoSetters() throws Exception {
+        var tx = new AccountDeleteTransaction();
+        var tx2 = Transaction.fromBytes(tx.toBytes());
+        assertThat(tx2.toString()).isEqualTo(tx.toString());
+    }
+
+    @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
             .setCryptoDelete(
