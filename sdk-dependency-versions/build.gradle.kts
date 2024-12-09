@@ -30,11 +30,9 @@ dependencies.constraints {
         because("com.google.gson")
     }
     api("com.google.protobuf:protobuf-java:4.29.1") {
-        // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
     api("com.google.protobuf:protobuf-javalite:4.29.1") {
-        // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
     api("io.grpc:grpc-api:1.68.2") {
