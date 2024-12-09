@@ -29,7 +29,7 @@ dependencies.constraints {
     api("com.google.code.gson:gson:2.10.1") {
         because("com.google.gson")
     }
-    api("com.google.protobuf:protobuf-java:4.29.0") {
+    api("com.google.protobuf:protobuf-java:4.29.1") {
         // shouldn't be updated for now (breaking changes after 4.x.x)
         because("com.google.protobuf")
     }
