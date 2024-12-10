@@ -27,4 +27,5 @@ module com.hedera.hashgraph.examples {
 
     requires static java.annotation;
     requires com.google.protobuf;
+    requires org.bouncycastle.provider;
 }
