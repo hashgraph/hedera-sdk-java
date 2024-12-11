@@ -52,6 +52,11 @@ public final class TransactionReceipt {
     public final ExchangeRate exchangeRate;
 
     /**
+     * Next exchange rate which will take effect when current rate expires
+     */
+    public final ExchangeRate nextExchangeRate;
+
+    /**
      * The account ID, if a new account was created.
      */
     @Nullable
@@ -147,6 +152,7 @@ public final class TransactionReceipt {
         @Nullable TransactionId transactionId,
         Status status,
         ExchangeRate exchangeRate,
+        ExchangeRate nextExchangeRate,
         @Nullable AccountId accountId,
         @Nullable FileId fileId,
         @Nullable ContractId contractId,
@@ -165,6 +171,7 @@ public final class TransactionReceipt {
         this.transactionId = transactionId;
         this.status = status;
         this.exchangeRate = exchangeRate;
+        this.nextExchangeRate = nextExchangeRate;
         this.accountId = accountId;
         this.fileId = fileId;
         this.contractId = contractId;
@@ -199,6 +206,7 @@ public final class TransactionReceipt {
 
         var rate = transactionReceipt.getExchangeRate();
         var exchangeRate = ExchangeRate.fromProtobuf(rate.getCurrentRate());
+        var nextExchangeRate = ExchangeRate.fromProtobuf(rate.getNextRate());
 
         var accountId =
             transactionReceipt.hasAccountID()
@@ -255,6 +263,7 @@ public final class TransactionReceipt {
             transactionId,
             status,
             exchangeRate,
+            nextExchangeRate,
             accountId,
             fileId,
             contractId,
@@ -330,6 +339,13 @@ public final class TransactionReceipt {
                         .setSeconds(exchangeRate.expirationTime.getEpochSecond())
                     )
                 )
+                .setNextRate(com.hedera.hashgraph.sdk.proto.ExchangeRate.newBuilder()
+                    .setHbarEquiv(nextExchangeRate.hbars)
+                    .setCentEquiv(nextExchangeRate.cents)
+                    .setExpirationTime(TimestampSeconds.newBuilder()
+                        .setSeconds(nextExchangeRate.expirationTime.getEpochSecond())
+                    )
+                )
             )
             .setNewTotalSupply(totalSupply);
 
@@ -384,6 +400,7 @@ public final class TransactionReceipt {
             .add("transactionId", transactionId)
             .add("status", status)
             .add("exchangeRate", exchangeRate)
+            .add("nextExchangeRate", nextExchangeRate)
             .add("accountId", accountId)
             .add("fileId", fileId)
             .add("contractId", contractId)
