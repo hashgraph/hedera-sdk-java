@@ -27,6 +27,11 @@ mainModuleInfo {
     runtimeOnly("org.slf4j.simple")
 }
 
+dependencies {
+    implementation("org.bouncycastle:bcpkix-jdk18on:1.78.1")
+    implementation("org.bouncycastle:bcprov-jdk18on:1.78.1")
+}
+
 dependencies.constraints {
     implementation("com.hedera.hashgraph:sdk:2.45.0")
     implementation("com.hedera.hashgraph:sdk-full:2.45.0")
