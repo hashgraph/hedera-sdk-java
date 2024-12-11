@@ -19,10 +19,14 @@
  */
 package com.hedera.hashgraph.sdk.test.integration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
 import com.hedera.hashgraph.sdk.AccountCreateTransaction;
 import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
 import com.hedera.hashgraph.sdk.AccountId;
+import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
 import com.hedera.hashgraph.sdk.Hbar;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
@@ -32,6 +36,7 @@ import com.hedera.hashgraph.sdk.ScheduleId;
 import com.hedera.hashgraph.sdk.ScheduleInfo;
 import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
 import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
+import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
 import com.hedera.hashgraph.sdk.TokenCreateTransaction;
 import com.hedera.hashgraph.sdk.TopicCreateTransaction;
@@ -40,19 +45,19 @@ import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionReceipt;
 import com.hedera.hashgraph.sdk.TransactionResponse;
 import com.hedera.hashgraph.sdk.TransferTransaction;
+import java.nio.charset.StandardCharsets;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Objects;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import java.time.Instant;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.Objects;
+class ScheduleCreateIntegrationTest {
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+    private final int oneDayInSecs = 86400;
 
-public class ScheduleCreateIntegrationTest {
     @Test
     @Disabled
     @DisplayName("Can create schedule")
@@ -179,7 +184,7 @@ public class ScheduleCreateIntegrationTest {
                 .addHbarTransfer(accountId, new Hbar(1).negated())
                 .addHbarTransfer(testEnv.operatorId, new Hbar(1));
 
-            // Schedule the transactoin
+            // Schedule the transaction
             ScheduleCreateTransaction scheduled = transfer.schedule();
 
             receipt = scheduled.execute(testEnv.client).getReceipt(testEnv.client);
@@ -189,8 +194,8 @@ public class ScheduleCreateIntegrationTest {
 
             // Get the schedule info to see if `signatories` is populated with 2/3 signatures
             ScheduleInfo info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
 
             assertThat(info.executedAt).isNull();
 
@@ -226,7 +231,7 @@ public class ScheduleCreateIntegrationTest {
     @Test
     @DisplayName("Can schedule token transfer")
     void canScheduleTokenTransfer() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             PrivateKey key = PrivateKey.generateED25519();
 
@@ -297,7 +302,7 @@ public class ScheduleCreateIntegrationTest {
     @Test
     @DisplayName("Cannot schedule two identical transactions")
     void cannotScheduleTwoTransactions() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var key = PrivateKey.generateED25519();
             var accountId = new AccountCreateTransaction()
@@ -358,9 +363,9 @@ public class ScheduleCreateIntegrationTest {
             keyList.add(key3.getPublicKey());
 
             var response = new AccountCreateTransaction()
-                    .setInitialBalance(new Hbar(100))
-                    .setKey(keyList)
-                    .execute(testEnv.client);
+                .setInitialBalance(new Hbar(100))
+                .setKey(keyList)
+                .execute(testEnv.client);
 
             assertThat(response.getReceipt(testEnv.client).accountId).isNotNull();
 
@@ -392,8 +397,8 @@ public class ScheduleCreateIntegrationTest {
 
             // verify schedule has been created and has 1 of 2 signatures
             var info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(testEnv.client);
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
 
             assertThat(info).isNotNull();
             assertThat(info.scheduleId).isEqualTo(scheduleId);
@@ -418,6 +423,433 @@ public class ScheduleCreateIntegrationTest {
 
             assertThat(info.executedAt).isNotNull();
 
+        }
+    }
+
+    @Test
+    @DisplayName("Can sign schedule")
+    void canSignSchedule() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key.getPublicKey())
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            var scheduleId = transfer
+                .schedule()
+                .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
+                .setScheduleMemo("HIP-423 Integration Test")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            ScheduleInfo info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is not yet executed
+            assertThat(info.executedAt).isNull();
+
+            // Schedule sign
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is executed
+            assertThat(info.executedAt).isNotNull();
+
+            assertThat(scheduleId.getChecksum()).isNull();
+            assertThat(scheduleId.hashCode()).isNotZero();
+            assertThat(scheduleId.compareTo(ScheduleId.fromBytes(scheduleId.toBytes()))).isZero();
+        }
+    }
+
+    @Test
+    @DisplayName("Cannot schedule one year into the future")
+    void cannotScheduleTransactionOneYearIntoTheFuture() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key.getPublicKey())
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() ->
+                    transfer
+                        .schedule()
+                        .setExpirationTime(Instant.now().plus(Duration.ofDays(365)))
+                        .setScheduleMemo("HIP-423 Integration Test")
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client))
+                .withMessageContaining(Status.SCHEDULE_EXPIRATION_TIME_TOO_FAR_IN_FUTURE.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("Cannot schedule in the past")
+    void cannotScheduleTransactionInThePast() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key.getPublicKey())
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() ->
+                    transfer
+                        .schedule()
+                        .setExpirationTime(Instant.now().minusSeconds(10))
+                        .setScheduleMemo("HIP-423 Integration Test")
+                        .execute(testEnv.client)
+                        .getReceipt(testEnv.client))
+                .withMessageContaining(Status.SCHEDULE_EXPIRATION_TIME_MUST_BE_HIGHER_THAN_CONSENSUS_TIME.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("Can sign schedule and wait for expiry")
+    void canSignScheduleAndWaitForExpiry() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key.getPublicKey())
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            var scheduleId = transfer
+                .schedule()
+                .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
+                .setWaitForExpiry(true)
+                .setScheduleMemo("HIP-423 Integration Test")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            ScheduleInfo info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is not yet executed
+            assertThat(info.executedAt).isNull();
+
+            // Schedule sign
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            assertThat(scheduleId.getChecksum()).isNull();
+            assertThat(scheduleId.hashCode()).isNotZero();
+            assertThat(scheduleId.compareTo(ScheduleId.fromBytes(scheduleId.toBytes()))).isZero();
+        }
+    }
+
+    @Test
+    @DisplayName("Can sign with multisig and update signing requirements")
+    void canSignWithMultiSigAndUpdateSigningRequirements() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key1 = PrivateKey.generateED25519();
+            PrivateKey key2 = PrivateKey.generateED25519();
+            PrivateKey key3 = PrivateKey.generateED25519();
+            PrivateKey key4 = PrivateKey.generateED25519();
+
+            KeyList keyList = KeyList.withThreshold(2);
+
+            keyList.add(key1.getPublicKey());
+            keyList.add(key2.getPublicKey());
+            keyList.add(key3.getPublicKey());
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(keyList)
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            var scheduleId = transfer
+                .schedule()
+                .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
+                .setScheduleMemo("HIP-423 Integration Test")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            ScheduleInfo info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is not executed
+            assertThat(info.executedAt).isNull();
+
+            // Sign with one key
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            // Update the signing requirements
+            new AccountUpdateTransaction()
+                .setAccountId(accountId)
+                .setKey(key4.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .sign(key2)
+                .sign(key4)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            // Sign with the updated key
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key4)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is executed
+            assertThat(info.executedAt).isNotNull();
+        }
+    }
+
+    @Test
+    @DisplayName("Can sign with multisig")
+    void canSignWithMultiSig() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key1 = PrivateKey.generateED25519();
+            PrivateKey key2 = PrivateKey.generateED25519();
+            PrivateKey key3 = PrivateKey.generateED25519();
+
+            KeyList keyList = KeyList.withThreshold(2);
+
+            keyList.add(key1.getPublicKey());
+            keyList.add(key2.getPublicKey());
+            keyList.add(key3.getPublicKey());
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(keyList)
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            var scheduleId = transfer
+                .schedule()
+                .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
+                .setScheduleMemo("HIP-423 Integration Test")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            ScheduleInfo info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is not executed
+            assertThat(info.executedAt).isNull();
+
+            // Sign with one key
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            // Update the signing requirements
+            new AccountUpdateTransaction()
+                .setAccountId(accountId)
+                .setKey(key1.getPublicKey())
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            // Sign with one more key
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key2)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is executed
+            assertThat(info.executedAt).isNotNull();
+        }
+    }
+
+    @Test
+    @DisplayName("Can execute with short expiration time")
+    void canExecuteWithShortExpirationTime() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            PrivateKey key1 = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                .setKey(key1)
+                .setInitialBalance(new Hbar(10))
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .accountId;
+
+            // Create the transaction
+            TransferTransaction transfer = new TransferTransaction()
+                .addHbarTransfer(accountId, new Hbar(1).negated())
+                .addHbarTransfer(testEnv.operatorId, new Hbar(1));
+
+            // Schedule the transaction
+            var scheduleId = transfer
+                .schedule()
+                .setExpirationTime(Instant.now().plusSeconds(10))
+                .setWaitForExpiry(true)
+                .setScheduleMemo("HIP-423 Integration Test")
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client)
+                .scheduleId;
+
+            ScheduleInfo info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is not executed
+            assertThat(info.executedAt).isNull();
+
+            // Sign
+            new ScheduleSignTransaction()
+                .setScheduleId(scheduleId)
+                .freezeWith(testEnv.client)
+                .sign(key1)
+                .execute(testEnv.client)
+                .getReceipt(testEnv.client);
+
+            info = new ScheduleInfoQuery()
+                .setScheduleId(scheduleId)
+                .execute(testEnv.client);
+
+            // Verify the transaction is still not executed
+            assertThat(info.executedAt).isNull();
+
+            var accountBalanceBefore = new AccountBalanceQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
+
+            Thread.sleep(10_000);
+
+            var accountBalanceAfter = new AccountBalanceQuery()
+                .setAccountId(accountId)
+                .execute(testEnv.client);
+
+            // Verify the transaction executed after 10 seconds
+            assertThat(accountBalanceBefore.hbars.compareTo(accountBalanceAfter.hbars)).isEqualTo(1);
         }
     }
 }

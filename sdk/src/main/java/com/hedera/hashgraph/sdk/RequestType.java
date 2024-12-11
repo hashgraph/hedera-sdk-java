@@ -442,7 +442,12 @@ public enum RequestType {
     /**
      * Submit a vote as part of the Threshold Signature Scheme (TSS) processing.
      */
-    TSS_VOTE(HederaFunctionality.TssVote);
+    TSS_VOTE(HederaFunctionality.TssVote),
+
+    /**
+     * Submit a node signature as part of the Threshold Signature Scheme (TSS) processing.
+     */
+    TSS_SHARE_SIGNATURE(HederaFunctionality.TssShareSignature);
 
     final HederaFunctionality code;
 
@@ -536,6 +541,7 @@ public enum RequestType {
             case TokenClaimAirdrop -> TOKEN_CLAIM_AIRDROP;
             case TssMessage -> TSS_MESSAGE;
             case TssVote -> TSS_VOTE;
+            case TssShareSignature -> TSS_SHARE_SIGNATURE;
             default -> throw new IllegalStateException("(BUG) unhandled HederaFunctionality");
         };
     }
@@ -627,6 +633,7 @@ public enum RequestType {
             case TOKEN_CLAIM_AIRDROP -> "TOKEN_CLAIM_AIRDROP";
             case TSS_MESSAGE -> "TSS_MESSAGE";
             case TSS_VOTE -> "TSS_VOTE";
+            case TSS_SHARE_SIGNATURE -> "TSS_SHARE_SIGNATURE";
         };
     }
 }
