@@ -218,7 +218,7 @@ public class PrivateKeyECDSA extends PrivateKey {
 
         var q = ECDSA_SECP256K1_DOMAIN.getG().multiply(keyData);
         var publicParams = new ECPublicKeyParameters(q, ECDSA_SECP256K1_DOMAIN);
-        publicKey = new PublicKeyECDSA(publicParams.getQ().getEncoded(true));
+        publicKey = PublicKeyECDSA.fromBytesInternal(publicParams.getQ().getEncoded(true));
         return publicKey;
     }
 

@@ -2438,8 +2438,8 @@ class TokenUpdateIntegrationTest {
             assertThat(tokenInfoBeforeUpdate.feeScheduleKey.toString()).isEqualTo(feeScheduleKey.getPublicKey().toString());
             assertThat(tokenInfoBeforeUpdate.metadataKey.toString()).isEqualTo(metadataKey.getPublicKey().toString());
 
-            // This key is truly invalid, as all Ed25519 public keys must be 32 bytes long
-            var structurallyInvalidKey = PublicKey.fromString("000000000000000000000000000000000000000000000000000000000000000000");
+            // invalid ecdsa key
+            var ecdsaKey = PublicKey.fromBytesECDSA(new byte[33]);
 
             // update all of token’s lower-privilege keys
             // to a structurally invalid key (trying to update keys one by one to check all errors),
@@ -2448,7 +2448,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setWipeKey(structurallyInvalidKey)
+                    .setWipeKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(wipeKey)
@@ -2459,7 +2459,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setKycKey(structurallyInvalidKey)
+                    .setKycKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(kycKey)
@@ -2470,7 +2470,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setFreezeKey(structurallyInvalidKey)
+                    .setFreezeKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(freezeKey)
@@ -2481,7 +2481,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setPauseKey(structurallyInvalidKey)
+                    .setPauseKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(pauseKey)
@@ -2492,7 +2492,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setSupplyKey(structurallyInvalidKey)
+                    .setSupplyKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(supplyKey)
@@ -2503,7 +2503,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setFeeScheduleKey(structurallyInvalidKey)
+                    .setFeeScheduleKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(feeScheduleKey)
@@ -2514,7 +2514,7 @@ class TokenUpdateIntegrationTest {
             assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
                 new TokenUpdateTransaction()
                     .setTokenId(tokenId)
-                    .setMetadataKey(structurallyInvalidKey)
+                    .setMetadataKey(ecdsaKey)
                     .setKeyVerificationMode(TokenKeyValidation.NO_VALIDATION)
                     .freezeWith(testEnv.client)
                     .sign(metadataKey)
