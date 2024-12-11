@@ -33,6 +33,6 @@ dependencies {
 }
 
 dependencies.constraints {
-    implementation("com.hedera.hashgraph:sdk:2.45.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.45.0")
+    implementation("com.hedera.hashgraph:sdk:2.46.0")
+    implementation("com.hedera.hashgraph:sdk-full:2.46.0")
 }
