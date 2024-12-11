@@ -5,11 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.46.0
+
+### Added
+- 2 new queries `MirrorNodeContractCallQuery` and `MirrorNodeContractEstimateGasQuery` for estimation/simulation of contract operations.
+- Support for Long Term Scheduled Transactions (HIP-423).
+- Validation for creating Public keys from bytes.
+-
+### Fixed
+- A bug where service port was overridden for `NodeUpdateTransaction`.
+- Runtime errors using older Android APIs (26+).
+
 ## 2.45.0
 
 ### Fixed
 - A bug where optional fields for `NodeUpdateTransaction` were being set as default values.
--
+
 ### Added
 - New api for creating client with mirror network - `forMirrorNetwork`
 
