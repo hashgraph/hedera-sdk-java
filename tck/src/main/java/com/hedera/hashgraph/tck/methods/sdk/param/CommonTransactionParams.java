@@ -19,11 +19,11 @@
  */
 package com.hedera.hashgraph.tck.methods.sdk.param;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionId;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.Transaction;
+import com.hiero.sdk.TransactionId;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;

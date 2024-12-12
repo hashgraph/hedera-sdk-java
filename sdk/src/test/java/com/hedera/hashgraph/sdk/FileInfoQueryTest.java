@@ -17,9 +17,9 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hiero.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,7 +38,7 @@ public class FileInfoQueryTest {
 
     @Test
     void shouldSerialize() {
-        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        var builder = com.hiero.sdk.proto.Query.newBuilder();
         new FileInfoQuery()
             .setFileId(FileId.fromString("0.0.5005"))
             .onMakeRequest(builder, QueryHeader.newBuilder().build());

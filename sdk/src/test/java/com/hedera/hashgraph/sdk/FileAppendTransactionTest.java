@@ -17,10 +17,10 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.FileAppendTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.FileAppendTransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;

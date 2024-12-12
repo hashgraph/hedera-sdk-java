@@ -17,9 +17,9 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.utils.Bip32Utils;
+import com.hiero.sdk.utils.Bip32Utils;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

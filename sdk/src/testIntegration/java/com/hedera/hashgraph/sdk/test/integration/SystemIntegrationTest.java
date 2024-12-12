@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.SystemDeleteTransaction;
-import com.hedera.hashgraph.sdk.SystemUndeleteTransaction;
+import com.hiero.sdk.ContractCreateTransaction;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.SystemDeleteTransaction;
+import com.hiero.sdk.SystemUndeleteTransaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Instant;

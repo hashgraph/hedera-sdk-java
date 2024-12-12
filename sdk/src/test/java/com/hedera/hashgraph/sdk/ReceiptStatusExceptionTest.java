@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
+import com.hiero.sdk.proto.ResponseCodeEnum;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
@@ -14,7 +14,7 @@ class ReceiptStatusExceptionTest {
         var validStart = Instant.ofEpochSecond(1554158542);
         var txId = new TransactionId(new AccountId(0, 0, 100), validStart);
         var txReceipt = TransactionReceipt.fromProtobuf(
-            com.hedera.hashgraph.sdk.proto.TransactionReceipt
+            com.hiero.sdk.proto.TransactionReceipt
                 .newBuilder()
                 .setStatusValue(ResponseCodeEnum.INSUFFICIENT_TX_FEE_VALUE)
                 .build());

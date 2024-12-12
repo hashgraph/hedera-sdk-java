@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.hedera.hashgraph.sdk.ContractFunctionResultTest.CALL_RESULT_HEX;
-import static com.hedera.hashgraph.sdk.TransactionReceiptTest.spawnReceiptExample;
+import static com.hiero.sdk.ContractFunctionResultTest.CALL_RESULT_HEX;
+import static com.hiero.sdk.TransactionReceiptTest.spawnReceiptExample;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TransactionRecordTest {
@@ -61,7 +61,7 @@ public class TransactionRecordTest {
             "memo",
             3000L,
             new ContractFunctionResult(
-                com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+                com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
                     .setContractID(ContractId.fromString("1.2.3").toProtobuf())
                     .setContractCallResult(ByteString.copyFrom(callResult))
                     .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())

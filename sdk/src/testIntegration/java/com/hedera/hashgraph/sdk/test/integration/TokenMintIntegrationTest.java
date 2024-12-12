@@ -17,18 +17,18 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenSupplyType;
-import com.hedera.hashgraph.sdk.TokenType;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TokenSupplyType;
+import com.hiero.sdk.TokenType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

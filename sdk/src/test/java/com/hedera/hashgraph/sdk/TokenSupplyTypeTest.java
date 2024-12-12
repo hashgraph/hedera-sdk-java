@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.TokenSupplyType;
+import com.hiero.sdk.proto.TokenSupplyType;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -25,22 +25,22 @@ public class TokenSupplyTypeTest {
     @Test
     void fromProtobuf() {
         SnapshotMatcher.expect(
-                com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeInfinite).toString(),
-                com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeFinite).toString())
+                com.hiero.sdk.TokenSupplyType.valueOf(tokenSupplyTypeInfinite).toString(),
+                com.hiero.sdk.TokenSupplyType.valueOf(tokenSupplyTypeFinite).toString())
             .toMatchSnapshot();
     }
 
     @Test
     void toProtobuf() {
         SnapshotMatcher.expect(
-                com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeInfinite).toProtobuf(),
-                com.hedera.hashgraph.sdk.TokenSupplyType.valueOf(tokenSupplyTypeFinite).toProtobuf())
+                com.hiero.sdk.TokenSupplyType.valueOf(tokenSupplyTypeInfinite).toProtobuf(),
+                com.hiero.sdk.TokenSupplyType.valueOf(tokenSupplyTypeFinite).toProtobuf())
             .toMatchSnapshot();
     }
 
     @Test
     void tokenSupplyTestToString() {
-        assertThat(com.hedera.hashgraph.sdk.TokenSupplyType.INFINITE).hasToString("INFINITE");
-        assertThat(com.hedera.hashgraph.sdk.TokenSupplyType.FINITE).hasToString("FINITE");
+        assertThat(com.hiero.sdk.TokenSupplyType.INFINITE).hasToString("INFINITE");
+        assertThat(com.hiero.sdk.TokenSupplyType.FINITE).hasToString("FINITE");
     }
 }

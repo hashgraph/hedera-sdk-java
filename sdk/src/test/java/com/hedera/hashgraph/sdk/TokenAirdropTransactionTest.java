@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -25,9 +25,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenAirdropTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.TokenAirdropTransactionBody;
+import com.hiero.sdk.proto.TokenServiceGrpc;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Instant;
 import java.util.Arrays;

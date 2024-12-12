@@ -17,11 +17,11 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.FixedFee;
-import com.hedera.hashgraph.sdk.proto.Fraction;
-import com.hedera.hashgraph.sdk.proto.RoyaltyFee;
+import com.hiero.sdk.proto.FixedFee;
+import com.hiero.sdk.proto.Fraction;
+import com.hiero.sdk.proto.RoyaltyFee;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

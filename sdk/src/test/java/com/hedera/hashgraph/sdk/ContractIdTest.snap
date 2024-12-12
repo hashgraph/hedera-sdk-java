@@ -1,48 +1,48 @@
-com.hedera.hashgraph.sdk.ContractIdTest.fromBytes=[
+com.hiero.sdk.ContractIdTest.fromBytes=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromEvmAddress=[
+com.hiero.sdk.ContractIdTest.fromEvmAddress=[
   "1.2.98329e006610472e6b372c080833f6d79ed833cf"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromEvmAddressWith0x=[
+com.hiero.sdk.ContractIdTest.fromEvmAddressWith0x=[
   "1.2.98329e006610472e6b372c080833f6d79ed833cf"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromSolidityAddress=[
+com.hiero.sdk.ContractIdTest.fromSolidityAddress=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromSolidityAddressWith0x=[
+com.hiero.sdk.ContractIdTest.fromSolidityAddressWith0x=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromString=[
+com.hiero.sdk.ContractIdTest.fromString=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.fromStringWithEvmAddress=[
+com.hiero.sdk.ContractIdTest.fromStringWithEvmAddress=[
   "1.2.98329e006610472e6b372c080833f6d79ed833cf"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.toBytes=[
+com.hiero.sdk.ContractIdTest.toBytes=[
   "188d27"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.toSolidityAddress2=[
+com.hiero.sdk.ContractIdTest.toSolidityAddress2=[
   "98329e006610472e6b372c080833f6d79ed833cf"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractIdTest.toSolidityAddress=[
+com.hiero.sdk.ContractIdTest.toSolidityAddress=[
   "000000000000000000000000000000000000138d"
 ]

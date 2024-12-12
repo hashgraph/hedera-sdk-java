@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
-import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
+import com.hiero.sdk.proto.ConsensusGetTopicInfoResponse;
+import com.hiero.sdk.proto.ConsensusTopicInfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;

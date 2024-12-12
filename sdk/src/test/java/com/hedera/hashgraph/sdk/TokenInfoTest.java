@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
@@ -232,9 +232,9 @@ public class TokenInfoTest {
             testExpirationTime.getEpochSecond());
         assertThat(tokenInfoProto.getTokenInfo().getMemo()).isEqualTo(testTokenMemo);
         assertThat(tokenInfoProto.getTokenInfo().getTokenType()).isEqualTo(
-            com.hedera.hashgraph.sdk.proto.TokenType.valueOf(testTokenType.name()));
+            com.hiero.sdk.proto.TokenType.valueOf(testTokenType.name()));
         assertThat(tokenInfoProto.getTokenInfo().getSupplyType()).isEqualTo(
-            com.hedera.hashgraph.sdk.proto.TokenSupplyType.valueOf(testTokenSupplyType.name()));
+            com.hiero.sdk.proto.TokenSupplyType.valueOf(testTokenSupplyType.name()));
         assertThat(tokenInfoProto.getTokenInfo().getMaxSupply()).isEqualTo(testTokenMaxSupply);
         assertThat(tokenInfoProto.getTokenInfo().getFeeScheduleKey().getEd25519().toByteArray()).isEqualTo(
             testFeeScheduleKey.toBytesRaw());

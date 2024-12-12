@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import java.util.ArrayList;
 import java.util.Collections;

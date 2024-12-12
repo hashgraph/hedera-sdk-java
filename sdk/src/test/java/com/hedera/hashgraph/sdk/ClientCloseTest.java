@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

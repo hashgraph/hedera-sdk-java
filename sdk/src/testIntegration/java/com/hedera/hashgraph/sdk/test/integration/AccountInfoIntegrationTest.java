@@ -17,16 +17,16 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountInfoFlow;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.Transaction;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountInfoFlow;
+import com.hiero.sdk.AccountInfoQuery;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PublicKey;
+import com.hiero.sdk.Transaction;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -105,7 +105,7 @@ class AccountInfoIntegrationTest {
 
             assertThatExceptionOfType(RuntimeException.class).isThrownBy(() -> {
                 info.execute(testEnv.client);
-            }).withMessage("com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
+            }).withMessage("com.hiero.sdk.MaxQueryPaymentExceededException: cost for AccountInfoQuery, of " + cost.toString() + ", without explicit payment is greater than the maximum allowed payment of 1 tℏ");
 
         }
     }

@@ -17,21 +17,21 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.ContractCreateFlow;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.Key;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenSupplyType;
-import com.hedera.hashgraph.sdk.TokenType;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.ContractCreateFlow;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.ContractId;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.Key;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenId;
+import com.hiero.sdk.TokenSupplyType;
+import com.hiero.sdk.TokenType;
 import java.util.concurrent.TimeoutException;
 
 /**

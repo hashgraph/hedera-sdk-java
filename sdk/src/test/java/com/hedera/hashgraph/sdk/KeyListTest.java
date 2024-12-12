@@ -1,7 +1,7 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.Key;
+import com.hiero.sdk.proto.Key;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ class KeyListTest {
         var protoKey1 = Key.newBuilder().setEd25519(ByteString.copyFrom(mTestPublicKey1.toBytes())).build();
         var protoKey3 = Key.newBuilder().setEd25519(ByteString.copyFrom(mTestPublicKey2.toBytes())).build();
         var protoKey2 = Key.newBuilder().setEd25519(ByteString.copyFrom(mTestPublicKey3.toBytes())).build();
-        var protoKeyList = com.hedera.hashgraph.sdk.proto.KeyList.newBuilder()
+        var protoKeyList = com.hiero.sdk.proto.KeyList.newBuilder()
             .addAllKeys(List.of(protoKey1, protoKey2, protoKey3)).build();
 
         // When

@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.Status;
+import com.hiero.sdk.FileContentsQuery;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.MaxQueryPaymentExceededException;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

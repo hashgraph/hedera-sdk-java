@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,7 +44,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Function;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -397,12 +397,12 @@ class ClientTest {
         client.close();
     }
 
-    com.hedera.hashgraph.sdk.proto.NodeAddress nodeAddress(long accountNum, String rsaPubKeyHex, byte[] certHash, byte[] ipv4) {
-        com.hedera.hashgraph.sdk.proto.NodeAddress.Builder builder = com.hedera.hashgraph.sdk.proto.NodeAddress.newBuilder()
-            .setNodeAccountId(com.hedera.hashgraph.sdk.proto.AccountID.newBuilder()
+    com.hiero.sdk.proto.NodeAddress nodeAddress(long accountNum, String rsaPubKeyHex, byte[] certHash, byte[] ipv4) {
+        com.hiero.sdk.proto.NodeAddress.Builder builder = com.hiero.sdk.proto.NodeAddress.newBuilder()
+            .setNodeAccountId(com.hiero.sdk.proto.AccountID.newBuilder()
                 .setAccountNum(accountNum)
                 .build())
-            .addServiceEndpoint(com.hedera.hashgraph.sdk.proto.ServiceEndpoint.newBuilder()
+            .addServiceEndpoint(com.hiero.sdk.proto.ServiceEndpoint.newBuilder()
                 .setIpAddressV4(ByteString.copyFrom(ipv4))
                 .setPort(PORT_NODE_PLAIN)
                 .build())
@@ -420,7 +420,7 @@ class ClientTest {
             Function<Integer, NodeAddress> nodeAddress = accountNum -> client.network.network.get(new AccountId(accountNum)).get(0).getAddressBookEntry();
 
             // reconfigure client network from addressbook (add new nodes)
-            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
+            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hiero.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "10001", new byte[] {1, 0, 1}, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "10002", new byte[] {1, 0, 2}, new byte[] {10, 0, 0, 2}))
                 .build().toByteString()));
@@ -432,7 +432,7 @@ class ClientTest {
             assertThat(nodeAddress.apply(10002).publicKey).isEqualTo("10002");
 
             // reconfigure client network from addressbook without `certHash`
-            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
+            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hiero.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "10001", null, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "10002", null, new byte[] {10, 0, 0, 2}))
                 .build().toByteString()));
@@ -444,7 +444,7 @@ class ClientTest {
             assertThat(nodeAddress.apply(10002).publicKey).isEqualTo("10002");
 
             // reconfigure client network from addressbook (update existing nodes)
-            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hedera.hashgraph.sdk.proto.NodeAddressBook.newBuilder()
+            client.setNetworkFromAddressBook(NodeAddressBook.fromBytes(com.hiero.sdk.proto.NodeAddressBook.newBuilder()
                 .addNodeAddress(nodeAddress(10001, "810001", new byte[] {8, 1, 0, 1}, new byte[] {10, 0, 0, 1}))
                 .addNodeAddress(nodeAddress(10002, "810002", new byte[] {8, 1, 0, 2}, new byte[] {10, 0, 0, 2}))
                 .build().toByteString()));

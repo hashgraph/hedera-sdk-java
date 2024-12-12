@@ -17,14 +17,14 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.FileAppendTransaction;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.KeyList;
+import com.hiero.sdk.FileAppendTransaction;
+import com.hiero.sdk.FileContentsQuery;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.FileInfoQuery;
+import com.hiero.sdk.KeyList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.time.Duration;

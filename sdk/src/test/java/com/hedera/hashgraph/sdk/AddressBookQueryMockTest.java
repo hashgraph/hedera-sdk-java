@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.mirror.NetworkServiceGrpc;
+import com.hiero.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
@@ -17,7 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatException;
 
@@ -57,13 +57,13 @@ class AddressBookQueryMockTest {
     @CsvSource({"sync", "async"})
     void addressBookQueryWorks(String executeVersion) throws Throwable {
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .setLimit(3)
                 .build()
         );
         addressBookServiceStub.responses.add(
-            new com.hedera.hashgraph.sdk.NodeAddress()
+            new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
                 .toProtobuf()
         );
@@ -87,12 +87,12 @@ class AddressBookQueryMockTest {
     @Test
     void networkUpdatePeriodWorks() throws Throwable {
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .build()
         );
         addressBookServiceStub.responses.add(
-            new com.hedera.hashgraph.sdk.NodeAddress()
+            new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
                 .setAddresses(Collections.singletonList(spawnEndpoint()))
                 .toProtobuf()
@@ -119,18 +119,18 @@ class AddressBookQueryMockTest {
     })
     void addressBookQueryRetries(String executeVersion, Status.Code code, String description) throws Throwable {
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .build()
         );
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .build()
         );
         addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
         addressBookServiceStub.responses.add(
-            new com.hedera.hashgraph.sdk.NodeAddress()
+            new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
                 .toProtobuf()
         );
@@ -154,7 +154,7 @@ class AddressBookQueryMockTest {
         "async, INVALID_ARGUMENT, "
     })
     void addressBookQueryFails(String executeVersion, Status.Code code, String description) {
-        addressBookServiceStub.requests.add(com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
             .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
             .build()
         );
@@ -182,12 +182,12 @@ class AddressBookQueryMockTest {
         addressBookQuery.setMaxAttempts(2);
 
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .build()
         );
         addressBookServiceStub.requests.add(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery.newBuilder()
+            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .build()
         );
@@ -203,13 +203,13 @@ class AddressBookQueryMockTest {
 
     private static class AddressBookQueryStub extends NetworkServiceGrpc.NetworkServiceImplBase {
 
-        private final Queue<com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery> requests = new ArrayDeque<>();
+        private final Queue<com.hiero.sdk.proto.mirror.AddressBookQuery> requests = new ArrayDeque<>();
         private final Queue<Object> responses = new ArrayDeque<>();
 
         @Override
         public void getNodes(
-            com.hedera.hashgraph.sdk.proto.mirror.AddressBookQuery addressBookQuery,
-            StreamObserver<com.hedera.hashgraph.sdk.proto.NodeAddress> streamObserver
+            com.hiero.sdk.proto.mirror.AddressBookQuery addressBookQuery,
+            StreamObserver<com.hiero.sdk.proto.NodeAddress> streamObserver
         ) {
             var request = requests.poll();
             assertThat(request).isNotNull();
@@ -224,7 +224,7 @@ class AddressBookQueryMockTest {
                     return;
                 }
 
-                streamObserver.onNext((com.hedera.hashgraph.sdk.proto.NodeAddress) response);
+                streamObserver.onNext((com.hiero.sdk.proto.NodeAddress) response);
             }
             streamObserver.onCompleted();
         }

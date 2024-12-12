@@ -21,9 +21,9 @@ package com.hedera.hashgraph.tck.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.Key;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
+import com.hiero.sdk.Key;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PublicKey;
 
 public final class KeyUtils {
 

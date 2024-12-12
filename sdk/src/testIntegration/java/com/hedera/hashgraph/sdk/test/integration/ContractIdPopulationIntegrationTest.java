@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.ContractId;
-import com.hedera.hashgraph.sdk.ContractInfoQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
+import com.hiero.sdk.ContractCreateTransaction;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.ContractId;
+import com.hiero.sdk.ContractInfoQuery;
+import com.hiero.sdk.FileCreateTransaction;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -108,7 +108,7 @@ class ContractIdPopulationIntegrationTest {
             var newContractId = idMirror.populateContractNumAsync(testEnv.client).get();
 
             assertThat(contractId.num).isEqualTo(newContractId.num);
-    
+
         }
     }
 }

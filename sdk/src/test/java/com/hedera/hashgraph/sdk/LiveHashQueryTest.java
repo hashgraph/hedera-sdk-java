@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hiero.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +21,7 @@ public class LiveHashQueryTest {
 
     @Test
     void shouldSerialize() {
-        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        var builder = com.hiero.sdk.proto.Query.newBuilder();
         new LiveHashQuery()
             .setAccountId(AccountId.fromString("0.0.100"))
             .setHash(hash)

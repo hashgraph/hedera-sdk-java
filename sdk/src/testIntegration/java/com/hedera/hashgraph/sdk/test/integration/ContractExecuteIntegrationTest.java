@@ -17,22 +17,22 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.MirrorNodeContractEstimateGasQuery;
-import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
+import com.hiero.sdk.ContractCreateTransaction;
+import com.hiero.sdk.ContractDeleteTransaction;
+import com.hiero.sdk.ContractExecuteTransaction;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.MirrorNodeContractEstimateGasQuery;
+import com.hiero.sdk.MirrorNodeContractQuery;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

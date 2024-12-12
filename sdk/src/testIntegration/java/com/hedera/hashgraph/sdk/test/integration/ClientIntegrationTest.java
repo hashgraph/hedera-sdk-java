@@ -17,9 +17,9 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hiero.sdk.*;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;

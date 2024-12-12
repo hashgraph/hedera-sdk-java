@@ -17,14 +17,14 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenClaimAirdropTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.TokenClaimAirdropTransactionBody;
+import com.hiero.sdk.proto.TokenServiceGrpc;
+import com.hiero.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Instant;
 import java.util.ArrayList;

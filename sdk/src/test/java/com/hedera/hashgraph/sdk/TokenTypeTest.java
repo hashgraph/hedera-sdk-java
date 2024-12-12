@@ -17,9 +17,9 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.TokenType;
+import com.hiero.sdk.proto.TokenType;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,16 +43,16 @@ public class TokenTypeTest {
     @Test
     void fromProtobuf() {
         SnapshotMatcher.expect(
-                com.hedera.hashgraph.sdk.TokenType.valueOf(tokenTypeFungible).toString(),
-                com.hedera.hashgraph.sdk.TokenType.valueOf(tokenTypeNonFungible).toString())
+                com.hiero.sdk.TokenType.valueOf(tokenTypeFungible).toString(),
+                com.hiero.sdk.TokenType.valueOf(tokenTypeNonFungible).toString())
             .toMatchSnapshot();
     }
 
     @Test
     void toProtobuf() {
         SnapshotMatcher.expect(
-                com.hedera.hashgraph.sdk.TokenType.valueOf(tokenTypeFungible).toProtobuf(),
-                com.hedera.hashgraph.sdk.TokenType.valueOf(tokenTypeNonFungible).toProtobuf())
+                com.hiero.sdk.TokenType.valueOf(tokenTypeFungible).toProtobuf(),
+                com.hiero.sdk.TokenType.valueOf(tokenTypeNonFungible).toProtobuf())
             .toMatchSnapshot();
     }
 }

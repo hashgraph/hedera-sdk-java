@@ -17,17 +17,17 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TokenCreateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.TokenCreateTransactionBody;
+import com.hiero.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
@@ -167,7 +167,7 @@ public class TokenCreateTransactionTest {
             .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setSupplyKey(testSupplyKey.toProtobufKey())
             .setAdminKey(testAdminKey.toProtobufKey()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
             .setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
+                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
                     .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setDecimals(testDecimals).setFreezeDefault(testFreezeDefault).setFreezeKey(testFreezeKey.toProtobufKey())
             .setWipeKey(testWipeKey.toProtobufKey()).setSymbol(testTokenSymbol).setKycKey(testKycKey.toProtobufKey())
@@ -210,10 +210,10 @@ public class TokenCreateTransactionTest {
             .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setSupplyKey(testSupplyKey.toProtobufKey())
             .setMaxSupply(testMaxSupply).setAdminKey(testAdminKey.toProtobufKey())
             .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf()).setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
+                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
                     .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
-            .setTokenType(com.hedera.hashgraph.sdk.proto.TokenType.NON_FUNGIBLE_UNIQUE)
-            .setSupplyType(com.hedera.hashgraph.sdk.proto.TokenSupplyType.FINITE)
+            .setTokenType(com.hiero.sdk.proto.TokenType.NON_FUNGIBLE_UNIQUE)
+            .setSupplyType(com.hiero.sdk.proto.TokenSupplyType.FINITE)
             .setFreezeKey(testFreezeKey.toProtobufKey()).setWipeKey(testWipeKey.toProtobufKey())
             .setSymbol(testTokenSymbol).setKycKey(testKycKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
             .setMetadataKey(testMetadataKey.toProtobufKey())

@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.logger.LogLevel;
-import com.hedera.hashgraph.sdk.logger.Logger;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.TokenServiceGrpc;
+import com.hiero.sdk.logger.LogLevel;
+import com.hiero.sdk.logger.Logger;
+import com.hiero.sdk.proto.ConsensusServiceGrpc;
+import com.hiero.sdk.proto.CryptoServiceGrpc;
+import com.hiero.sdk.proto.FileServiceGrpc;
+import com.hiero.sdk.proto.SmartContractServiceGrpc;
+import com.hiero.sdk.proto.TokenServiceGrpc;
 import io.grpc.MethodDescriptor;
 import io.grpc.Server;
 import io.grpc.ServerMethodDefinition;

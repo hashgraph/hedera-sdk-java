@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.base">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -34,7 +34,7 @@ import "transaction.proto";
  * (allowing it to tailor the payment transaction accordingly). If the payment in the query fails
  * the precheck, then the response may have some fields blank. The state proof is only available for
  * some types of information. It is available for a Record, but not a receipt. It is available for
- * the information in each kind of *GetInfo request. 
+ * the information in each kind of *GetInfo request.
  */
 enum ResponseType {
     /**
@@ -61,7 +61,7 @@ enum ResponseType {
 /**
  * Each query from the client to the node will contain the QueryHeader, which gives the requested
  * response type, and includes a payment transaction that will compensate the node for responding to
- * the query. The payment can be blank if the query is free. 
+ * the query. The payment can be blank if the query is free.
  */
 message QueryHeader {
     /**

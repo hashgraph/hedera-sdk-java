@@ -17,16 +17,16 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import static com.hedera.hashgraph.sdk.test.integration.IntegrationTestEnv.LOCAL_CONSENSUS_NODE_ACCOUNT_ID;
+import static com.hiero.sdk.test.integration.IntegrationTestEnv.LOCAL_CONSENSUS_NODE_ACCOUNT_ID;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Endpoint;
-import com.hedera.hashgraph.sdk.NodeCreateTransaction;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PrivateKeyECDSA;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.Endpoint;
+import com.hiero.sdk.NodeCreateTransaction;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PrivateKeyECDSA;
 import java.util.HashMap;
 import java.util.List;
 import org.bouncycastle.util.encoders.Hex;

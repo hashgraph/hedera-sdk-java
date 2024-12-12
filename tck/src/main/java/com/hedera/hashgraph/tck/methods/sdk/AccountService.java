@@ -20,14 +20,14 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HbarUnit;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountDeleteTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.AccountUpdateTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.HbarUnit;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TransactionReceipt;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;

@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TransactionReceiptQuery;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.TransactionReceiptQuery;
+import com.hiero.sdk.TransferTransaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -81,7 +81,7 @@ class AccountIdPopulationIntegrationTest {
             var accountId = idMirror.populateAccountNumAsync(testEnv.client).get();
 
             assertThat(newAccountId.num).isEqualTo(accountId.num);
-    
+
             }
     }
 

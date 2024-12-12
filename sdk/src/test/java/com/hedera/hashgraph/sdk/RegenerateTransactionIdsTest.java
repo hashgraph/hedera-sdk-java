@@ -17,13 +17,13 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hiero.sdk.proto.ResponseCodeEnum;
+import com.hiero.sdk.proto.SignedTransaction;
+import com.hiero.sdk.proto.Transaction;
+import com.hiero.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import org.junit.jupiter.api.Test;
 

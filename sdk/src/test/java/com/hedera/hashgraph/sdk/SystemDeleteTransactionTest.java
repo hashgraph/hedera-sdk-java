@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SystemDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TimestampSeconds;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.SystemDeleteTransactionBody;
+import com.hiero.sdk.proto.TimestampSeconds;
+import com.hiero.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

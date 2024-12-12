@@ -17,13 +17,13 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import org.junit.jupiter.api.Test;
 
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_MIRROR_TLS;
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
-import static com.hedera.hashgraph.sdk.BaseNodeAddress.PORT_NODE_TLS;
+import static com.hiero.sdk.BaseNodeAddress.PORT_MIRROR_TLS;
+import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_TLS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

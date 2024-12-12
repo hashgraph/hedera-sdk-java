@@ -17,9 +17,9 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
+import com.hiero.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -45,7 +45,7 @@ public class TransactionRecordQueryTest {
 
     @Test
     void shouldSerialize() {
-        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        var builder = com.hiero.sdk.proto.Query.newBuilder();
         spawnQuery().onMakeRequest(builder, QueryHeader.newBuilder().build());
         SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
     }

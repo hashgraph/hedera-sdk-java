@@ -1,7 +1,7 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.CryptoDeleteTransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

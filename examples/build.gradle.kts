@@ -36,7 +36,7 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
             mainModule = "com.hedera.hashgraph.examples"
             mainClass =
-                "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
+                "com.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
@@ -82,7 +82,7 @@ abstract class RunAllExample : DefaultTask() {
                 workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
                 mainModule = "com.hedera.hashgraph.examples"
-                mainClass = "com.hedera.hashgraph.sdk.examples.$className"
+                mainClass = "com.hiero.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
                 // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"

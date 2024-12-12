@@ -17,20 +17,20 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.ContractCallQuery;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.MaxQueryPaymentExceededException;
-import com.hedera.hashgraph.sdk.MirrorNodeContractEstimateGasQuery;
-import com.hedera.hashgraph.sdk.MirrorNodeContractQuery;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.Status;
+import com.hiero.sdk.ContractCallQuery;
+import com.hiero.sdk.ContractCreateTransaction;
+import com.hiero.sdk.ContractDeleteTransaction;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.MaxQueryPaymentExceededException;
+import com.hiero.sdk.MirrorNodeContractEstimateGasQuery;
+import com.hiero.sdk.MirrorNodeContractQuery;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.Status;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

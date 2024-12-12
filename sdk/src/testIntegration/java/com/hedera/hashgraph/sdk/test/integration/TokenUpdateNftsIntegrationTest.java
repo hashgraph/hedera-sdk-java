@@ -17,23 +17,23 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.NftId;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateNftsTransaction;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.NftId;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenId;
+import com.hiero.sdk.TokenInfoQuery;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TokenNftInfoQuery;
+import com.hiero.sdk.TokenType;
+import com.hiero.sdk.TokenUpdateNftsTransaction;
 import java.util.List;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;

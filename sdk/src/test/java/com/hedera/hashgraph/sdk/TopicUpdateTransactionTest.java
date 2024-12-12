@@ -17,14 +17,14 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.CryptoDeleteTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import com.hiero.sdk.proto.CryptoDeleteTransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -114,7 +114,7 @@ public class TopicUpdateTransactionTest {
             .setMemo(StringValue.newBuilder().setValue(testTopicMemo).build())
             .setExpirationTime(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setAdminKey(testAdminKey.toProtobufKey()).setSubmitKey(testSubmitKey.toProtobufKey()).setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
+                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
                     .build()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf()).build();
 
         var tx = TransactionBody.newBuilder().setConsensusUpdateTopic(transactionBody).build();

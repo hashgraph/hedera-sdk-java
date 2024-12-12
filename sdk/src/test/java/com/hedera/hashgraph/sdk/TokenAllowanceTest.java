@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import org.junit.jupiter.api.Test;
 

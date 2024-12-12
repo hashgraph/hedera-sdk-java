@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionList;
+import com.hiero.sdk.proto.CryptoTransferTransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.TransactionList;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -142,9 +142,9 @@ public class CryptoTransferTransactionTest {
 
     @Test
     void transactionBodiesMustMatch() throws InvalidProtocolBufferException {
-        com.hedera.hashgraph.sdk.proto.Transaction tx1 = TransactionList.parseFrom(spawnTestTransaction().toBytes())
+        com.hiero.sdk.proto.Transaction tx1 = TransactionList.parseFrom(spawnTestTransaction().toBytes())
             .getTransactionList(0);
-        com.hedera.hashgraph.sdk.proto.Transaction tx2 = TransactionList.parseFrom(spawnModifiedTestTransaction().toBytes())
+        com.hiero.sdk.proto.Transaction tx2 = TransactionList.parseFrom(spawnModifiedTestTransaction().toBytes())
             .getTransactionList(1);
         var brokenTxList = TransactionList.newBuilder()
             .addTransactionList(tx1)

@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.FeeSchedules;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileId;
+import com.hiero.sdk.FeeSchedules;
+import com.hiero.sdk.FileContentsQuery;
+import com.hiero.sdk.FileId;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

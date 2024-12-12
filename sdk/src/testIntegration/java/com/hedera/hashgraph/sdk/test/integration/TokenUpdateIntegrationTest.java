@@ -17,22 +17,22 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
-import com.hedera.hashgraph.sdk.TokenKeyValidation;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
+import com.hiero.sdk.KeyList;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PublicKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenInfoQuery;
+import com.hiero.sdk.TokenKeyValidation;
+import com.hiero.sdk.TokenType;
+import com.hiero.sdk.TokenUpdateTransaction;
 import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

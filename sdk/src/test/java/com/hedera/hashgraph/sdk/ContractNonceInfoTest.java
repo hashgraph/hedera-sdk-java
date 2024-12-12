@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.github.jsonSnapshot.SnapshotMatcher;
@@ -8,8 +8,8 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ContractNonceInfoTest {
-    private final com.hedera.hashgraph.sdk.proto.ContractNonceInfo info =
-        com.hedera.hashgraph.sdk.proto.ContractNonceInfo.newBuilder()
+    private final com.hiero.sdk.proto.ContractNonceInfo info =
+        com.hiero.sdk.proto.ContractNonceInfo.newBuilder()
             .setContractId(new ContractId(1).toProtobuf())
             .setNonce(2)
             .build();

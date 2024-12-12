@@ -1,15 +1,15 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.FileID;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
-import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hiero.sdk.proto.FileID;
+import com.hiero.sdk.proto.Response;
+import com.hiero.sdk.proto.ResponseCodeEnum;
+import com.hiero.sdk.proto.SignedTransaction;
+import com.hiero.sdk.proto.Transaction;
+import com.hiero.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.TransactionGetReceiptResponse;
+import com.hiero.sdk.proto.TransactionReceipt;
+import com.hiero.sdk.proto.TransactionResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

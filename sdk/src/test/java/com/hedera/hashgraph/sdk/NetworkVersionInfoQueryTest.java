@@ -1,8 +1,8 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
-import com.hedera.hashgraph.sdk.proto.Transaction;
+import com.hiero.sdk.proto.QueryHeader;
+import com.hiero.sdk.proto.Transaction;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -21,7 +21,7 @@ public class NetworkVersionInfoQueryTest {
 
     @Test
     void shouldSerialize() {
-        var builder = com.hedera.hashgraph.sdk.proto.Query.newBuilder();
+        var builder = com.hiero.sdk.proto.Query.newBuilder();
         new NetworkVersionInfoQuery()
             .setMaxQueryPayment(Hbar.fromTinybars(100_000))
             .onMakeRequest(

@@ -17,13 +17,13 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import com.hedera.hashgraph.sdk.proto.KeyList;
-import com.hedera.hashgraph.sdk.proto.LiveHash;
+import com.hiero.sdk.proto.CryptoGetInfoResponse;
+import com.hiero.sdk.proto.KeyList;
+import com.hiero.sdk.proto.LiveHash;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

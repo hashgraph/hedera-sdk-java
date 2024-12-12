@@ -18,7 +18,7 @@
  *
  */
 
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -97,7 +97,7 @@ class PendingAirdropIdTest {
     @Test
     void testToProtobufWithTokenId() {
         PendingAirdropId pendingAirdropId = new PendingAirdropId(sender, receiver, tokenId);
-        com.hedera.hashgraph.sdk.proto.PendingAirdropId proto = pendingAirdropId.toProtobuf();
+        com.hiero.sdk.proto.PendingAirdropId proto = pendingAirdropId.toProtobuf();
 
         assertNotNull(proto);
         assertEquals(sender.toProtobuf(), proto.getSenderId());
@@ -108,7 +108,7 @@ class PendingAirdropIdTest {
     @Test
     void testToProtobufWithNftId() {
         PendingAirdropId pendingAirdropId = new PendingAirdropId(sender, receiver, nftId);
-        com.hedera.hashgraph.sdk.proto.PendingAirdropId proto = pendingAirdropId.toProtobuf();
+        com.hiero.sdk.proto.PendingAirdropId proto = pendingAirdropId.toProtobuf();
 
         assertNotNull(proto);
         assertEquals(sender.toProtobuf(), proto.getSenderId());
@@ -118,7 +118,7 @@ class PendingAirdropIdTest {
 
     @Test
     void testFromProtobufWithTokenId() {
-        com.hedera.hashgraph.sdk.proto.PendingAirdropId proto = com.hedera.hashgraph.sdk.proto.PendingAirdropId.newBuilder()
+        com.hiero.sdk.proto.PendingAirdropId proto = com.hiero.sdk.proto.PendingAirdropId.newBuilder()
             .setSenderId(sender.toProtobuf())
             .setReceiverId(receiver.toProtobuf())
             .setFungibleTokenType(tokenId.toProtobuf())
@@ -135,7 +135,7 @@ class PendingAirdropIdTest {
 
     @Test
     void testFromProtobufWithNftId() {
-        com.hedera.hashgraph.sdk.proto.PendingAirdropId proto = com.hedera.hashgraph.sdk.proto.PendingAirdropId.newBuilder()
+        com.hiero.sdk.proto.PendingAirdropId proto = com.hiero.sdk.proto.PendingAirdropId.newBuilder()
             .setSenderId(sender.toProtobuf())
             .setReceiverId(receiver.toProtobuf())
             .setNonFungibleToken(nftId.toProtobuf())

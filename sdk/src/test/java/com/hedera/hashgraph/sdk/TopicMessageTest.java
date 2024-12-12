@@ -1,9 +1,9 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
+import com.hiero.sdk.proto.ConsensusMessageChunkInfo;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.mirror.ConsensusTopicResponse;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;

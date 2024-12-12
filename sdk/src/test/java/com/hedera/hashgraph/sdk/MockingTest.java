@@ -17,28 +17,28 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.CryptoGetAccountBalanceResponse;
-import com.hedera.hashgraph.sdk.proto.CryptoGetInfoResponse;
-import com.hedera.hashgraph.sdk.proto.CryptoServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.FileServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Query;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.proto.ResponseHeader;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.SmartContractServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
-import com.hedera.hashgraph.sdk.proto.TransactionGetRecordResponse;
-import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
-import com.hedera.hashgraph.sdk.proto.TransactionRecord;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hiero.sdk.proto.AccountID;
+import com.hiero.sdk.proto.CryptoGetAccountBalanceResponse;
+import com.hiero.sdk.proto.CryptoGetInfoResponse;
+import com.hiero.sdk.proto.CryptoServiceGrpc;
+import com.hiero.sdk.proto.FileServiceGrpc;
+import com.hiero.sdk.proto.Query;
+import com.hiero.sdk.proto.Response;
+import com.hiero.sdk.proto.ResponseCodeEnum;
+import com.hiero.sdk.proto.ResponseHeader;
+import com.hiero.sdk.proto.SignedTransaction;
+import com.hiero.sdk.proto.SmartContractServiceGrpc;
+import com.hiero.sdk.proto.Transaction;
+import com.hiero.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.TransactionGetReceiptResponse;
+import com.hiero.sdk.proto.TransactionGetRecordResponse;
+import com.hiero.sdk.proto.TransactionReceipt;
+import com.hiero.sdk.proto.TransactionRecord;
+import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.junit.jupiter.api.Assertions;
@@ -96,10 +96,10 @@ public class MockingTest {
         var server = new TestServer("getReceiptRetry" + sync, service);
         server.client.setMaxAttempts(3);
 
-        service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
+        service.buffer.enqueueResponse(TestResponse.transaction(com.hiero.sdk.Status.PLATFORM_NOT_ACTIVE));
         service.buffer.enqueueResponse(TestResponse.transactionOk());
 
-        com.hedera.hashgraph.sdk.TransactionResponse transactionResponse;
+        com.hiero.sdk.TransactionResponse transactionResponse;
         if (sync.equals("sync")) {
             transactionResponse = new AccountCreateTransaction().execute(server.client);
         } else {
@@ -115,7 +115,7 @@ public class MockingTest {
                         .build()
                 ).build()
             ))
-            .enqueueResponse(TestResponse.receipt(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE))
+            .enqueueResponse(TestResponse.receipt(com.hiero.sdk.Status.PLATFORM_NOT_ACTIVE))
             .enqueueResponse(TestResponse.successfulReceipt());
 
         if (sync.equals("sync")) {
@@ -132,10 +132,10 @@ public class MockingTest {
         var server = new TestServer("getRecordRetry" + sync, service);
         server.client.setMaxAttempts(3);
 
-        service.buffer.enqueueResponse(TestResponse.transaction(com.hedera.hashgraph.sdk.Status.PLATFORM_NOT_ACTIVE));
+        service.buffer.enqueueResponse(TestResponse.transaction(com.hiero.sdk.Status.PLATFORM_NOT_ACTIVE));
         service.buffer.enqueueResponse(TestResponse.transactionOk());
 
-        com.hedera.hashgraph.sdk.TransactionResponse transactionResponse;
+        com.hiero.sdk.TransactionResponse transactionResponse;
         if (sync.equals("sync")) {
             transactionResponse = new AccountCreateTransaction().execute(server.client);
         } else {
@@ -246,11 +246,11 @@ public class MockingTest {
         Assertions.assertEquals(3, cryptoService.buffer.queryRequestsReceived.size());
         Assertions.assertEquals(3, fileService.buffer.transactionRequestsReceived.size());
         Assertions.assertEquals(1, contractService.buffer.transactionRequestsReceived.size());
-        var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
+        var transactions = new ArrayList<com.hiero.sdk.Transaction<?>>();
         for (var request : fileService.buffer.transactionRequestsReceived) {
-            transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(request.toByteArray()));
+            transactions.add(com.hiero.sdk.Transaction.fromBytes(request.toByteArray()));
         }
-        transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(
+        transactions.add(com.hiero.sdk.Transaction.fromBytes(
             contractService.buffer.transactionRequestsReceived.get(0).toByteArray()
         ));
 
@@ -496,7 +496,7 @@ public class MockingTest {
         "PLATFORM_TRANSACTION_NOT_CREATED, 3, async",
         "TRANSACTION_EXPIRED, 3, async"
     })
-    void shouldRetryFunctionsCorrectly(com.hedera.hashgraph.sdk.Status status, int numberOfErrors, String sync) throws Exception {
+    void shouldRetryFunctionsCorrectly(com.hiero.sdk.Status status, int numberOfErrors, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("shouldRetryFunctionsCorrectly" + status + numberOfErrors + sync, service);
 
@@ -534,7 +534,7 @@ public class MockingTest {
         "PLATFORM_TRANSACTION_NOT_CREATED, async",
         "PLATFORM_NOT_ACTIVE, async",
     })
-    void hitsClientMaxAttemptsCorrectly(com.hedera.hashgraph.sdk.Status status, String sync) throws Exception {
+    void hitsClientMaxAttemptsCorrectly(com.hiero.sdk.Status status, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("shouldRetryFunctionsCorrectly" + status + sync, service);
 
@@ -606,9 +606,9 @@ public class MockingTest {
             .execute(server.client);
 
         Assertions.assertEquals(4, service.buffer.transactionRequestsReceived.size());
-        var transactions = new ArrayList<com.hedera.hashgraph.sdk.Transaction<?>>();
+        var transactions = new ArrayList<com.hiero.sdk.Transaction<?>>();
         for (var request : service.buffer.transactionRequestsReceived) {
-            transactions.add(com.hedera.hashgraph.sdk.Transaction.fromBytes(request.toByteArray()));
+            transactions.add(com.hiero.sdk.Transaction.fromBytes(request.toByteArray()));
         }
         Assertions.assertEquals(new Hbar(2), transactions.get(0).getMaxTransactionFee());
         Assertions.assertEquals(new Hbar(5), transactions.get(1).getMaxTransactionFee());
@@ -699,7 +699,7 @@ public class MockingTest {
                     TransactionGetReceiptResponse.newBuilder()
                         .setHeader(
                             ResponseHeader.newBuilder()
-                                .setNodeTransactionPrecheckCode(com.hedera.hashgraph.sdk.Status.RECEIPT_NOT_FOUND.code)
+                                .setNodeTransactionPrecheckCode(com.hiero.sdk.Status.RECEIPT_NOT_FOUND.code)
                         )
                 ).build()
         );

@@ -21,18 +21,18 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.CustomFixedFee;
-import com.hedera.hashgraph.sdk.CustomFractionalFee;
-import com.hedera.hashgraph.sdk.CustomRoyaltyFee;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TokenSupplyType;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TokenUpdateTransaction;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.CustomFixedFee;
+import com.hiero.sdk.CustomFractionalFee;
+import com.hiero.sdk.CustomRoyaltyFee;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenDeleteTransaction;
+import com.hiero.sdk.TokenId;
+import com.hiero.sdk.TokenSupplyType;
+import com.hiero.sdk.TokenType;
+import com.hiero.sdk.TokenUpdateTransaction;
+import com.hiero.sdk.TransactionReceipt;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
@@ -173,7 +173,7 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getMaxSupply().ifPresent(maxSupply -> tokenCreateTransaction.setMaxSupply(Long.valueOf(maxSupply)));
 
         params.getCustomFees().ifPresent(customFees -> {
-            List<com.hedera.hashgraph.sdk.CustomFee> customFeeList = new ArrayList<>();
+            List<com.hiero.sdk.CustomFee> customFeeList = new ArrayList<>();
             for (var customFee : customFees) {
                 // set fixed fees
                 customFee.getFixedFee().ifPresent(fixedFee -> {

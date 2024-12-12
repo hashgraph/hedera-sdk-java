@@ -17,13 +17,13 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.Key;
-import com.hedera.hashgraph.sdk.proto.KeyList;
-import com.hedera.hashgraph.sdk.proto.ThresholdKey;
+import com.hiero.sdk.proto.Key;
+import com.hiero.sdk.proto.KeyList;
+import com.hiero.sdk.proto.ThresholdKey;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigInteger;
 import java.util.List;
 
-import static com.hedera.hashgraph.sdk.Key.fromBytes;
+import static com.hiero.sdk.Key.fromBytes;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -147,12 +147,12 @@ class KeyTest {
         var protoKey = Key.newBuilder().setKeyList(protoKeyList).build();
 
         // when
-        var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
+        var cut = com.hiero.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+        assertThat(cut.getClass()).isEqualTo(com.hiero.sdk.KeyList.class);
 
-        var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var keyList = (com.hiero.sdk.KeyList) cut;
         var actual = keyList.toProtobufKey().getKeyList();
 
         assertThat(actual.getKeysCount()).isEqualTo(2);
@@ -179,12 +179,12 @@ class KeyTest {
         var protoKey = Key.newBuilder().setThresholdKey(protoThresholdKey).build();
 
         // when
-        var cut = com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey);
+        var cut = com.hiero.sdk.Key.fromProtobufKey(protoKey);
 
         // then
-        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+        assertThat(cut.getClass()).isEqualTo(com.hiero.sdk.KeyList.class);
 
-        var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var thresholdKey = (com.hiero.sdk.KeyList) cut;
         var actual = thresholdKey.toProtobufKey().getThresholdKey();
 
         assertThat(actual.getThreshold()).isEqualTo(1);
@@ -199,7 +199,7 @@ class KeyTest {
         byte[] keyBytes = {0, 1, 2};
         var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> com.hedera.hashgraph.sdk.Key.fromProtobufKey(protoKey)
+            () -> com.hiero.sdk.Key.fromProtobufKey(protoKey)
         );
     }
 
@@ -238,7 +238,7 @@ class KeyTest {
         var key3 = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12");
 
-        var keyList = com.hedera.hashgraph.sdk.KeyList.withThreshold(1);
+        var keyList = com.hiero.sdk.KeyList.withThreshold(1);
         keyList.add(key1);
         keyList.addAll(List.of(key2, key3));
 
@@ -253,7 +253,7 @@ class KeyTest {
         assertThat(arr[1]).isEqualTo(key2);
         assertThat(arr[2]).isEqualTo(key3);
 
-        arr = new com.hedera.hashgraph.sdk.Key[]{null, null, null};
+        arr = new com.hiero.sdk.Key[]{null, null, null};
         keyList.toArray(arr);
         assertThat(arr[0]).isEqualTo(key1);
         assertThat(arr[1]).isEqualTo(key2);
@@ -319,9 +319,9 @@ class KeyTest {
 
         var cut = fromBytes(bytes);
 
-        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+        assertThat(cut.getClass()).isEqualTo(com.hiero.sdk.KeyList.class);
 
-        var keyList = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var keyList = (com.hiero.sdk.KeyList) cut;
         var actual = keyList.toProtobufKey().getKeyList();
 
         assertThat(actual.getKeysCount()).isEqualTo(2);
@@ -349,9 +349,9 @@ class KeyTest {
 
         var cut = fromBytes(bytes);
 
-        assertThat(cut.getClass()).isEqualTo(com.hedera.hashgraph.sdk.KeyList.class);
+        assertThat(cut.getClass()).isEqualTo(com.hiero.sdk.KeyList.class);
 
-        var thresholdKey = (com.hedera.hashgraph.sdk.KeyList) cut;
+        var thresholdKey = (com.hiero.sdk.KeyList) cut;
         var actual = thresholdKey.toProtobufKey().getThresholdKey();
 
         assertThat(actual.getThreshold()).isEqualTo(1);

@@ -17,15 +17,15 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.NftId;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
-import com.hedera.hashgraph.sdk.TokenType;
+import com.hiero.sdk.NftId;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TokenNftInfoQuery;
+import com.hiero.sdk.TokenType;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

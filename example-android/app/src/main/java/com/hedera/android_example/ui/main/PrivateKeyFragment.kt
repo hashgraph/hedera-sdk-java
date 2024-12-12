@@ -26,7 +26,7 @@ import android.os.Bundle
 import android.view.View
 import com.hedera.android_example.R
 import androidx.fragment.app.Fragment
-import com.hedera.hashgraph.sdk.PrivateKey
+import com.hiero.sdk.PrivateKey
 
 class PrivateKeyFragment : Fragment() {
     private  lateinit var privateKey: TextView

@@ -23,10 +23,10 @@ import static com.hedera.hashgraph.tck.util.KeyUtils.KeyType.*;
 import static com.hedera.hashgraph.tck.util.KeyUtils.getKeyFromString;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.Key;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
+import com.hiero.sdk.Key;
+import com.hiero.sdk.KeyList;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PublicKey;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2RequestException;

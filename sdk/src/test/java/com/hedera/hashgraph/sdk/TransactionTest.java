@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.SignedTransaction;
+import com.hiero.sdk.proto.TokenAssociateTransactionBody;
+import com.hiero.sdk.proto.TransactionBody;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.hedera.hashgraph.sdk.Transaction.fromBytes;
+import static com.hiero.sdk.Transaction.fromBytes;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
@@ -93,7 +93,7 @@ public class TransactionTest {
             .build();
         var signedTransactionBodyProto = TransactionBody.parseFrom(signedTransactionProto.getBodyBytes());
 
-        var transactionSignedProto = com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+        var transactionSignedProto = com.hiero.sdk.proto.Transaction.newBuilder()
             .setSignedTransactionBytes(signedTransactionBodyProto.toByteString()).build();
         var transactionSignedBodyProto = TransactionBody.parseFrom(transactionSignedProto.getSignedTransactionBytes());
 

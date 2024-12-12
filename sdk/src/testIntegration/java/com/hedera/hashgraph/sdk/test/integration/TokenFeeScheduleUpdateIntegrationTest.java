@@ -17,17 +17,17 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.CustomFee;
-import com.hedera.hashgraph.sdk.CustomFixedFee;
-import com.hedera.hashgraph.sdk.CustomFractionalFee;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenFeeScheduleUpdateTransaction;
-import com.hedera.hashgraph.sdk.TokenInfoQuery;
+import com.hiero.sdk.CustomFee;
+import com.hiero.sdk.CustomFixedFee;
+import com.hiero.sdk.CustomFractionalFee;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenFeeScheduleUpdateTransaction;
+import com.hiero.sdk.TokenInfoQuery;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

@@ -17,39 +17,39 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.FileAppendTransaction;
-import com.hedera.hashgraph.sdk.FileContentsQuery;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.FileInfoQuery;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.Transaction;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransferTransaction;
-import com.hedera.hashgraph.sdk.proto.AccountAmount;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
-import com.hedera.hashgraph.sdk.proto.Duration;
-import com.hedera.hashgraph.sdk.proto.SignatureMap;
-import com.hedera.hashgraph.sdk.proto.SignaturePair;
-import com.hedera.hashgraph.sdk.proto.SignedTransaction;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
-import com.hedera.hashgraph.sdk.proto.TransactionList;
-import com.hedera.hashgraph.sdk.proto.TransferList;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountDeleteTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.FileAppendTransaction;
+import com.hiero.sdk.FileContentsQuery;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.FileInfoQuery;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.KeyList;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.TopicCreateTransaction;
+import com.hiero.sdk.TopicDeleteTransaction;
+import com.hiero.sdk.TopicInfoQuery;
+import com.hiero.sdk.TopicMessageSubmitTransaction;
+import com.hiero.sdk.Transaction;
+import com.hiero.sdk.TransactionId;
+import com.hiero.sdk.TransferTransaction;
+import com.hiero.sdk.proto.AccountAmount;
+import com.hiero.sdk.proto.AccountID;
+import com.hiero.sdk.proto.CryptoTransferTransactionBody;
+import com.hiero.sdk.proto.Duration;
+import com.hiero.sdk.proto.SignatureMap;
+import com.hiero.sdk.proto.SignaturePair;
+import com.hiero.sdk.proto.SignedTransaction;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.TransactionID;
+import com.hiero.sdk.proto.TransactionList;
+import com.hiero.sdk.proto.TransferList;
 import java.util.Objects;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -876,7 +876,7 @@ public class TransactionIntegrationTest {
             var byts = signedBuilder.build().toByteString();
 
             byts = TransactionList.newBuilder()
-                    .addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .addTransactionList(com.hiero.sdk.proto.Transaction.newBuilder()
                             .setSignedTransactionBytes(byts)
                             .build())
                     .build().toByteString();

@@ -18,14 +18,14 @@
  *
  */
 
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.junit.jupiter.api.Assertions.fail;
 
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.PrivateKey;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;

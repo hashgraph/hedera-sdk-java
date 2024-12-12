@@ -17,28 +17,28 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.AccountAllowanceApproveTransaction;
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
-import com.hedera.hashgraph.sdk.TokenPauseTransaction;
-import com.hedera.hashgraph.sdk.TokenRejectTransaction;
-import com.hedera.hashgraph.sdk.TokenSupplyType;
-import com.hedera.hashgraph.sdk.TokenType;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.AccountAllowanceApproveTransaction;
+import com.hiero.sdk.AccountBalanceQuery;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.TokenAssociateTransaction;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TokenDeleteTransaction;
+import com.hiero.sdk.TokenFreezeTransaction;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TokenNftInfoQuery;
+import com.hiero.sdk.TokenPauseTransaction;
+import com.hiero.sdk.TokenRejectTransaction;
+import com.hiero.sdk.TokenSupplyType;
+import com.hiero.sdk.TokenType;
+import com.hiero.sdk.TransactionId;
+import com.hiero.sdk.TransferTransaction;
 import java.util.Collections;
 import java.util.List;
 
@@ -995,7 +995,7 @@ public class TokenRejectIntegrationTest {
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
             }).withMessageContaining("EMPTY_TOKEN_REFERENCE_LIST");
-        
+
         }
     }
 

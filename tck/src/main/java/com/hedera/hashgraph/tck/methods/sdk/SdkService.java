@@ -19,9 +19,9 @@
  */
 package com.hedera.hashgraph.tck.methods.sdk;
 
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.PrivateKey;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;

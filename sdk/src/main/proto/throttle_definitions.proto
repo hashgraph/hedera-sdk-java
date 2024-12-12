@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -77,9 +77,9 @@ message ThrottleBucket {
  * A list of throttle buckets which, simultaneously enforced, define the system's throttling policy.
  * <ol>
  * <li> When an operation appears in more than one throttling bucket, all its buckets must have room
- * or it will be throttled.</li> 
+ * or it will be throttled.</li>
  * <li>An operation assigned to no buckets is always throttled.</li>
- * </ol> 
+ * </ol>
  */
 message ThrottleDefinitions {
   repeated ThrottleBucket throttleBuckets = 1;

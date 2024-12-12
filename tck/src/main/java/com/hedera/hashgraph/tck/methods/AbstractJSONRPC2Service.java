@@ -21,8 +21,8 @@ package com.hedera.hashgraph.tck.methods;
 
 import static com.hedera.hashgraph.tck.methods.JSONRPC2Error.HEDERA_ERROR;
 
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2ParamsException;
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2RequestException;

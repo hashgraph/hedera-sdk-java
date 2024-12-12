@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.ProxyStaker;
+import com.hiero.sdk.proto.ProxyStaker;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -24,7 +24,7 @@ public class ProxyStakerTest {
 
     @Test
     void fromProtobuf() {
-        SnapshotMatcher.expect(com.hedera.hashgraph.sdk.ProxyStaker.fromProtobuf(proxyStaker).toString())
+        SnapshotMatcher.expect(com.hiero.sdk.ProxyStaker.fromProtobuf(proxyStaker).toString())
             .toMatchSnapshot();
     }
 }

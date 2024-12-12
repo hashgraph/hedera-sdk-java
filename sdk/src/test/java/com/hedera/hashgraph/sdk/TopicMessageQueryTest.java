@@ -17,20 +17,20 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.primitives.Longs;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.AccountID;
-import com.hedera.hashgraph.sdk.proto.ConsensusMessageChunkInfo;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TopicID;
-import com.hedera.hashgraph.sdk.proto.TransactionID;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicQuery;
-import com.hedera.hashgraph.sdk.proto.mirror.ConsensusTopicResponse;
+import com.hiero.sdk.proto.AccountID;
+import com.hiero.sdk.proto.ConsensusMessageChunkInfo;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.TopicID;
+import com.hiero.sdk.proto.TransactionID;
+import com.hiero.sdk.proto.mirror.ConsensusServiceGrpc;
+import com.hiero.sdk.proto.mirror.ConsensusTopicQuery;
+import com.hiero.sdk.proto.mirror.ConsensusTopicResponse;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import io.grpc.Server;
 import io.grpc.Status;

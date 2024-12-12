@@ -19,7 +19,7 @@
  */
 package com.hedera.hashgraph.tck.methods;
 
-import com.hedera.hashgraph.sdk.Status;
+import com.hiero.sdk.Status;
 
 /**
  * Custom JSON-RPC error definitions

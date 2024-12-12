@@ -1,6 +1,6 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.HederaFunctionality;
+import com.hiero.sdk.proto.HederaFunctionality;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

@@ -1,0 +1,10 @@
+com.hiero.sdk.TokenSupplyTypeTest.fromProtobuf=[
+  "INFINITE",
+  "FINITE"
+]
+
+
+com.hiero.sdk.TokenSupplyTypeTest.toProtobuf=[
+  "INFINITE",
+  "FINITE"
+]

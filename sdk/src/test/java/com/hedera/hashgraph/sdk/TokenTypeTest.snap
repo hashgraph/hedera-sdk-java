@@ -1,10 +1,10 @@
-com.hedera.hashgraph.sdk.TokenTypeTest.fromProtobuf=[
+com.hiero.sdk.TokenTypeTest.fromProtobuf=[
   "FUNGIBLE_COMMON",
   "NON_FUNGIBLE_UNIQUE"
 ]
 
 
-com.hedera.hashgraph.sdk.TokenTypeTest.toProtobuf=[
+com.hiero.sdk.TokenTypeTest.toProtobuf=[
   "FUNGIBLE_COMMON",
   "NON_FUNGIBLE_UNIQUE"
 ]

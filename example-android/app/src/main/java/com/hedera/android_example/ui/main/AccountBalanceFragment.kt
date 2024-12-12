@@ -30,10 +30,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.hedera.android_example.R
-import com.hedera.hashgraph.sdk.AccountBalanceQuery
-import com.hedera.hashgraph.sdk.AccountId
-import com.hedera.hashgraph.sdk.Client
-import com.hedera.hashgraph.sdk.PrecheckStatusException
+import com.hiero.sdk.AccountBalanceQuery
+import com.hiero.sdk.AccountId
+import com.hiero.sdk.Client
+import com.hiero.sdk.PrecheckStatusException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

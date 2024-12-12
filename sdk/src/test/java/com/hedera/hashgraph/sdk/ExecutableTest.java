@@ -17,14 +17,14 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.logger.LogLevel;
-import com.hedera.hashgraph.sdk.logger.Logger;
-import com.hedera.hashgraph.sdk.proto.QueryHeader;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.ResponseCodeEnum;
-import com.hedera.hashgraph.sdk.proto.ResponseHeader;
+import com.hiero.sdk.logger.LogLevel;
+import com.hiero.sdk.logger.Logger;
+import com.hiero.sdk.proto.QueryHeader;
+import com.hiero.sdk.proto.Response;
+import com.hiero.sdk.proto.ResponseCodeEnum;
+import com.hiero.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import org.junit.jupiter.api.BeforeEach;
@@ -273,8 +273,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
@@ -292,13 +292,13 @@ class ExecutableTest {
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
-            com.hedera.hashgraph.sdk.proto.TransactionResponse
+            com.hiero.sdk.proto.TransactionResponse
                 .newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
             client);
 
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
@@ -318,8 +318,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(4),
                     TransactionId.withValidStart(new AccountId(4), now),
@@ -336,13 +336,13 @@ class ExecutableTest {
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
-            com.hedera.hashgraph.sdk.proto.TransactionResponse
+            com.hiero.sdk.proto.TransactionResponse
                 .newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
             client);
 
         verify(node3).channelFailedToConnect(any(Instant.class));
@@ -375,8 +375,8 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hedera.hashgraph.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
+                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
                     new AccountId(3),
                     TransactionId.withValidStart(new AccountId(3), now),
@@ -393,13 +393,13 @@ class ExecutableTest {
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
-            com.hedera.hashgraph.sdk.proto.TransactionResponse
+            com.hiero.sdk.proto.TransactionResponse
                 .newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hedera.hashgraph.sdk.TransactionResponse resp = (com.hedera.hashgraph.sdk.TransactionResponse) tx.execute(
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
             client);
 
         verify(node3, times(2)).channelFailedToConnect(any(Instant.class));
@@ -492,7 +492,7 @@ class ExecutableTest {
         AtomicInteger i = new AtomicInteger();
         var tx = new DummyQuery() {
             @Override
-            Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.Response response) {
+            Status mapResponseStatus(com.hiero.sdk.proto.Response response) {
                 return Status.RECEIPT_NOT_FOUND;
             }
 
@@ -508,10 +508,10 @@ class ExecutableTest {
         );
         tx.setNodeAccountIds(nodeAccountIds);
 
-        var receipt = com.hedera.hashgraph.sdk.proto.TransactionReceipt.newBuilder()
+        var receipt = com.hiero.sdk.proto.TransactionReceipt.newBuilder()
             .setStatus(ResponseCodeEnum.OK)
             .build();
-        var receiptResp = com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse.newBuilder()
+        var receiptResp = com.hiero.sdk.proto.TransactionGetReceiptResponse.newBuilder()
             .setReceipt(receipt)
             .build();
 
@@ -531,7 +531,7 @@ class ExecutableTest {
 
         var tx = new DummyTransaction() {
             @Override
-            Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+            Status mapResponseStatus(com.hiero.sdk.proto.TransactionResponse response) {
                 return Status.ACCOUNT_DELETED;
             }
         };
@@ -543,7 +543,7 @@ class ExecutableTest {
         tx.setNodeAccountIds(nodeAccountIds);
 
         var txResp =
-            com.hedera.hashgraph.sdk.proto.TransactionResponse
+            com.hiero.sdk.proto.TransactionResponse
                 .newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.ACCOUNT_DELETED)
                 .build();
@@ -579,7 +579,7 @@ class ExecutableTest {
 
     static class DummyTransaction<T extends Transaction<T>>
         extends
-        Executable<T, com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse, com.hedera.hashgraph.sdk.TransactionResponse> {
+        Executable<T, com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse, com.hiero.sdk.TransactionResponse> {
 
         @Override
         void onExecute(Client client) {
@@ -593,25 +593,25 @@ class ExecutableTest {
 
         @Nullable
         @Override
-        com.hedera.hashgraph.sdk.proto.Transaction makeRequest() {
+        com.hiero.sdk.proto.Transaction makeRequest() {
             return null;
         }
 
         @Nullable
         @Override
-        TransactionResponse mapResponse(com.hedera.hashgraph.sdk.proto.TransactionResponse response, AccountId nodeId,
-            com.hedera.hashgraph.sdk.proto.Transaction request) {
+        TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response, AccountId nodeId,
+            com.hiero.sdk.proto.Transaction request) {
             return null;
         }
 
         @Override
-        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.TransactionResponse response) {
+        Status mapResponseStatus(com.hiero.sdk.proto.TransactionResponse response) {
             return Status.OK;
         }
 
         @Nullable
         @Override
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Transaction, com.hedera.hashgraph.sdk.proto.TransactionResponse> getMethodDescriptor() {
+        MethodDescriptor<com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse> getMethodDescriptor() {
             return null;
         }
 
@@ -629,22 +629,22 @@ class ExecutableTest {
 
         @Override
         TransactionReceipt mapResponse(Response response, AccountId nodeId,
-            com.hedera.hashgraph.sdk.proto.Query request) {
+            com.hiero.sdk.proto.Query request) {
             return null;
         }
 
         @Override
-        Status mapResponseStatus(com.hedera.hashgraph.sdk.proto.Response response) {
+        Status mapResponseStatus(com.hiero.sdk.proto.Response response) {
             return Status.OK;
         }
 
         @Override
-        MethodDescriptor<com.hedera.hashgraph.sdk.proto.Query, Response> getMethodDescriptor() {
+        MethodDescriptor<com.hiero.sdk.proto.Query, Response> getMethodDescriptor() {
             return null;
         }
 
         @Override
-        void onMakeRequest(com.hedera.hashgraph.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
+        void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         }
 
         @Override
@@ -653,7 +653,7 @@ class ExecutableTest {
         }
 
         @Override
-        QueryHeader mapRequestHeader(com.hedera.hashgraph.sdk.proto.Query request) {
+        QueryHeader mapRequestHeader(com.hiero.sdk.proto.Query request) {
             return null;
         }
 

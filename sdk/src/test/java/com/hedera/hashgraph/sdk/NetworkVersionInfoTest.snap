@@ -1,3 +1,3 @@
-com.hedera.hashgraph.sdk.NetworkVersionInfoTest.shouldSerialize=[
-  "com.hedera.hashgraph.sdk.NetworkVersionInfo"
+com.hiero.sdk.NetworkVersionInfoTest.shouldSerialize=[
+  "com.hiero.sdk.NetworkVersionInfo"
 ]

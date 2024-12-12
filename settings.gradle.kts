@@ -6,7 +6,7 @@ rootProject.name = "hedera-sdk-java"
 javaModules {
     module("sdk") { group = "com.hedera.hashgraph" }
     module("sdk-full") { group = "com.hedera.hashgraph" }
-    module("tck") { group = "com.hedera.hashgraph.sdk.tck" }
+    module("tck") { group = "com.hiero.sdk.tck" }
 }
 
 includeBuild("examples")

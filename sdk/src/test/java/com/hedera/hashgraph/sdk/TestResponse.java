@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.TransactionGetReceiptResponse;
-import com.hedera.hashgraph.sdk.proto.TransactionReceipt;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hiero.sdk.proto.Response;
+import com.hiero.sdk.proto.TransactionGetReceiptResponse;
+import com.hiero.sdk.proto.TransactionReceipt;
+import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.StatusRuntimeException;
 
 import javax.annotation.Nullable;

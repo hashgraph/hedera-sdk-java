@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.Query;
-import com.hedera.hashgraph.sdk.proto.Response;
-import com.hedera.hashgraph.sdk.proto.Transaction;
-import com.hedera.hashgraph.sdk.proto.TransactionResponse;
+import com.hiero.sdk.proto.Query;
+import com.hiero.sdk.proto.Response;
+import com.hiero.sdk.proto.Transaction;
+import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 

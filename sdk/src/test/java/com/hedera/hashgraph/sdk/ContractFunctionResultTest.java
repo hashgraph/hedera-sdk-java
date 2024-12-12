@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
@@ -57,7 +57,7 @@ public class ContractFunctionResultTest {
     @DisplayName("provides results correctly")
     void providesResultsCorrectly() {
         var result = new ContractFunctionResult(
-            com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+            com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
                 .setContractID(ContractId.fromString("1.2.3").toProtobuf())
                 .setContractCallResult(ByteString.copyFrom(callResult))
                 .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())
@@ -116,7 +116,7 @@ public class ContractFunctionResultTest {
     @DisplayName("can get string array result")
     void canGetStringArrayResult() {
         var result = new ContractFunctionResult(
-            com.hedera.hashgraph.sdk.proto.ContractFunctionResult.newBuilder()
+            com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
                 .setContractCallResult(ByteString.copyFrom(stringArrayCallResult))
         );
 

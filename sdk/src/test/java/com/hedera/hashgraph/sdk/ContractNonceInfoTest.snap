@@ -1,19 +1,19 @@
-com.hedera.hashgraph.sdk.ContractNonceInfoTest.fromBytes=[
+com.hiero.sdk.ContractNonceInfoTest.fromBytes=[
   "ContractNonceInfo{contractId=0.0.1, nonce=2}"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractNonceInfoTest.fromProtobuf=[
+com.hiero.sdk.ContractNonceInfoTest.fromProtobuf=[
   "ContractNonceInfo{contractId=0.0.1, nonce=2}"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractNonceInfoTest.toBytes=[
+com.hiero.sdk.ContractNonceInfoTest.toBytes=[
   "0a0218011002"
 ]
 
 
-com.hedera.hashgraph.sdk.ContractNonceInfoTest.toProtobuf=[
+com.hiero.sdk.ContractNonceInfoTest.toProtobuf=[
   {
     "memoizedHashCode": 0,
     "memoizedSerializedSize": 2147483647,

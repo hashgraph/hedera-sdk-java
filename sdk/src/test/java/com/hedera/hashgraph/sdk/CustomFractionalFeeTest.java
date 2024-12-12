@@ -1,7 +1,7 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
-import com.hedera.hashgraph.sdk.proto.Fraction;
-import com.hedera.hashgraph.sdk.proto.FractionalFee;
+import com.hiero.sdk.proto.Fraction;
+import com.hiero.sdk.proto.FractionalFee;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

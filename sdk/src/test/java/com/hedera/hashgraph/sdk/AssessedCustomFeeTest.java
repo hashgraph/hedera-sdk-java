@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
@@ -20,8 +20,8 @@ public class AssessedCustomFeeTest {
         new AccountId(14, 15, 16)
     );
 
-    private final com.hedera.hashgraph.sdk.proto.AssessedCustomFee fee =
-        com.hedera.hashgraph.sdk.proto.AssessedCustomFee.newBuilder()
+    private final com.hiero.sdk.proto.AssessedCustomFee fee =
+        com.hiero.sdk.proto.AssessedCustomFee.newBuilder()
             .setAmount(amount)
             .setTokenId(tokenId.toProtobuf())
             .setFeeCollectorAccountId(feeCollector.toProtobuf())

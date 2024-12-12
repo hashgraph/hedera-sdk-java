@@ -17,11 +17,11 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import com.hedera.hashgraph.sdk.proto.ContractCallTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.ContractCallTransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;

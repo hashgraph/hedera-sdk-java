@@ -17,28 +17,28 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import static com.hedera.hashgraph.sdk.test.integration.EntityHelper.fungibleInitialBalance;
-import static com.hedera.hashgraph.sdk.test.integration.EntityHelper.mitedNfts;
+import static com.hiero.sdk.test.integration.EntityHelper.fungibleInitialBalance;
+import static com.hiero.sdk.test.integration.EntityHelper.mitedNfts;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.PendingAirdropId;
-import com.hedera.hashgraph.sdk.PendingAirdropRecord;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenAirdropTransaction;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenClaimAirdropTransaction;
-import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
-import com.hedera.hashgraph.sdk.TokenFreezeTransaction;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TokenPauseTransaction;
+import com.hiero.sdk.AccountBalanceQuery;
+import com.hiero.sdk.PendingAirdropId;
+import com.hiero.sdk.PendingAirdropRecord;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenAirdropTransaction;
+import com.hiero.sdk.TokenAssociateTransaction;
+import com.hiero.sdk.TokenClaimAirdropTransaction;
+import com.hiero.sdk.TokenDeleteTransaction;
+import com.hiero.sdk.TokenFreezeTransaction;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TokenPauseTransaction;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.junit.jupiter.api.DisplayName;

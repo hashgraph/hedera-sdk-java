@@ -17,20 +17,20 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountInfoQuery;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractInfoQuery;
-import com.hedera.hashgraph.sdk.PrecheckStatusException;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenMintTransaction;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.AccountBalanceQuery;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.AccountInfoQuery;
+import com.hiero.sdk.ContractDeleteTransaction;
+import com.hiero.sdk.ContractInfoQuery;
+import com.hiero.sdk.PrecheckStatusException;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenAssociateTransaction;
+import com.hiero.sdk.TokenMintTransaction;
+import com.hiero.sdk.TransferTransaction;
 import java.util.ArrayList;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -193,7 +193,7 @@ class TokenManualAssociationIntegrationTest {
     @DisplayName("Can execute token associate transaction even when token IDs are not set")
     void canExecuteTokenAssociateTransactionEvenWhenTokenIDsAreNotSet() throws Exception {
         try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
-        
+
             var accountKey = PrivateKey.generateED25519();
             var accountMaxAutomaticTokenAssociations = 0;
             var accountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);
@@ -212,7 +212,7 @@ class TokenManualAssociationIntegrationTest {
     @DisplayName("Cannot Manually associate Account with a Token when Account ID is not set")
     void cannotAssociateAccountWithTokensWhenAccountIDIsNotSet() throws Exception {
         try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
-        
+
             var accountKey = PrivateKey.generateED25519();
             var accountMaxAutomaticTokenAssociations = 0;
             var accountId = EntityHelper.createAccount(testEnv, accountKey, accountMaxAutomaticTokenAssociations);

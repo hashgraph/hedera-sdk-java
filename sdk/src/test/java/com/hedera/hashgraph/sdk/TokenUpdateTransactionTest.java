@@ -17,7 +17,7 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk;
+package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -25,10 +25,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.Timestamp;
-import com.hedera.hashgraph.sdk.proto.TokenUpdateTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.Timestamp;
+import com.hiero.sdk.proto.TokenUpdateTransactionBody;
+import com.hiero.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
@@ -136,13 +136,13 @@ public class TokenUpdateTransactionTest {
             .setFreezeKey(testFreezeKey.toProtobufKey()).setWipeKey(testWipeKey.toProtobufKey())
             .setSupplyKey(testSupplyKey.toProtobufKey()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
             .setAutoRenewPeriod(
-                com.hedera.hashgraph.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
+                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
                     .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
             .setMemo(StringValue.newBuilder().setValue(testTokenMemo).build())
             .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
             .setMetadataKey(testMetadataKey.toProtobufKey())
             .setMetadata(BytesValue.of(ByteString.copyFrom(testMetadata)))
-            .setKeyVerificationMode(com.hedera.hashgraph.sdk.proto.TokenKeyValidation.NO_VALIDATION).build();
+            .setKeyVerificationMode(com.hiero.sdk.proto.TokenKeyValidation.NO_VALIDATION).build();
 
         var tx = TransactionBody.newBuilder().setTokenUpdate(transactionBody).build();
         var tokenUpdateTransaction = new TokenUpdateTransaction(tx);

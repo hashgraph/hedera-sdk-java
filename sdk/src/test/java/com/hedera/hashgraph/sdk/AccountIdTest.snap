@@ -1,88 +1,88 @@
-com.hedera.hashgraph.sdk.AccountIdTest.fromBytes=[
+com.hiero.sdk.AccountIdTest.fromBytes=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAlias=[
+com.hiero.sdk.AccountIdTest.fromBytesAlias=[
   "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromBytesAliasEvmAddress=[
+com.hiero.sdk.AccountIdTest.fromBytesAliasEvmAddress=[
   "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromBytesEvmAddress=[
+com.hiero.sdk.AccountIdTest.fromBytesEvmAddress=[
   "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromSolidityAddress=[
+com.hiero.sdk.AccountIdTest.fromSolidityAddress=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromSolidityAddressWith0x=[
+com.hiero.sdk.AccountIdTest.fromSolidityAddressWith0x=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromString=[
+com.hiero.sdk.AccountIdTest.fromString=[
   "0.0.5005"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasEvmAddress=[
+com.hiero.sdk.AccountIdTest.fromStringWithAliasEvmAddress=[
   "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithAliasKey=[
+com.hiero.sdk.AccountIdTest.fromStringWithAliasKey=[
   "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnMainnet=[
+com.hiero.sdk.AccountIdTest.fromStringWithChecksumOnMainnet=[
   "0.0.123-vfmkw"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnPreviewnet=[
+com.hiero.sdk.AccountIdTest.fromStringWithChecksumOnPreviewnet=[
   "0.0.123-ogizo"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithChecksumOnTestnet=[
+com.hiero.sdk.AccountIdTest.fromStringWithChecksumOnTestnet=[
   "0.0.123-esxsf"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.fromStringWithEvmAddress=[
+com.hiero.sdk.AccountIdTest.fromStringWithEvmAddress=[
   "0.0.302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.toBytes=[
+com.hiero.sdk.AccountIdTest.toBytes=[
   "188d27"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.toBytesAlias=[
+com.hiero.sdk.AccountIdTest.toBytesAlias=[
   "22221220114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.toBytesAliasEvmAddress=[
+com.hiero.sdk.AccountIdTest.toBytesAliasEvmAddress=[
   "2214302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.toBytesEvmAddress=[
+com.hiero.sdk.AccountIdTest.toBytesEvmAddress=[
   "2214302a300506032b6570032100114e6abc371b82da"
 ]
 
 
-com.hedera.hashgraph.sdk.AccountIdTest.toSolidityAddress=[
+com.hiero.sdk.AccountIdTest.toSolidityAddress=[
   "000000000000000000000000000000000000138d"
 ]

@@ -1,4 +1,4 @@
-package com.hedera.hashgraph.sdk.logger;
+package com.hiero.sdk.logger;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -17,19 +17,19 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PublicKey;
-import com.hedera.hashgraph.sdk.TokenId;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.AccountBalanceQuery;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.Client;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PublicKey;
+import com.hiero.sdk.TokenId;
+import com.hiero.sdk.TransferTransaction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

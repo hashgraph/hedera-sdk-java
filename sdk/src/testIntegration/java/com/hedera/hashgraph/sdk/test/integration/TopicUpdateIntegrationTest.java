@@ -17,12 +17,12 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicDeleteTransaction;
-import com.hedera.hashgraph.sdk.TopicInfoQuery;
-import com.hedera.hashgraph.sdk.TopicUpdateTransaction;
+import com.hiero.sdk.TopicCreateTransaction;
+import com.hiero.sdk.TopicDeleteTransaction;
+import com.hiero.sdk.TopicInfoQuery;
+import com.hiero.sdk.TopicUpdateTransaction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

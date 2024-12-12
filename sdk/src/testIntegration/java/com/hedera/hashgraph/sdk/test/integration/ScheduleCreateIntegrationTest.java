@@ -17,34 +17,34 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.AccountBalanceQuery;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.KeyList;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import com.hedera.hashgraph.sdk.ScheduleCreateTransaction;
-import com.hedera.hashgraph.sdk.ScheduleId;
-import com.hedera.hashgraph.sdk.ScheduleInfo;
-import com.hedera.hashgraph.sdk.ScheduleInfoQuery;
-import com.hedera.hashgraph.sdk.ScheduleSignTransaction;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
-import com.hedera.hashgraph.sdk.TokenCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicCreateTransaction;
-import com.hedera.hashgraph.sdk.TopicMessageSubmitTransaction;
-import com.hedera.hashgraph.sdk.TransactionId;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
-import com.hedera.hashgraph.sdk.TransactionResponse;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.AccountBalanceQuery;
+import com.hiero.sdk.AccountCreateTransaction;
+import com.hiero.sdk.AccountDeleteTransaction;
+import com.hiero.sdk.AccountId;
+import com.hiero.sdk.AccountUpdateTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.KeyList;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.ReceiptStatusException;
+import com.hiero.sdk.ScheduleCreateTransaction;
+import com.hiero.sdk.ScheduleId;
+import com.hiero.sdk.ScheduleInfo;
+import com.hiero.sdk.ScheduleInfoQuery;
+import com.hiero.sdk.ScheduleSignTransaction;
+import com.hiero.sdk.Status;
+import com.hiero.sdk.TokenAssociateTransaction;
+import com.hiero.sdk.TokenCreateTransaction;
+import com.hiero.sdk.TopicCreateTransaction;
+import com.hiero.sdk.TopicMessageSubmitTransaction;
+import com.hiero.sdk.TransactionId;
+import com.hiero.sdk.TransactionReceipt;
+import com.hiero.sdk.TransactionResponse;
+import com.hiero.sdk.TransferTransaction;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;

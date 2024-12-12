@@ -17,23 +17,23 @@
  * limitations under the License.
  *
  */
-package com.hedera.hashgraph.sdk.test.integration;
+package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.esaulpaugh.headlong.rlp.RLPEncoder;
 import com.esaulpaugh.headlong.util.Integers;
-import com.hedera.hashgraph.sdk.ContractCreateTransaction;
-import com.hedera.hashgraph.sdk.ContractDeleteTransaction;
-import com.hedera.hashgraph.sdk.ContractExecuteTransaction;
-import com.hedera.hashgraph.sdk.ContractFunctionParameters;
-import com.hedera.hashgraph.sdk.EthereumTransaction;
-import com.hedera.hashgraph.sdk.FileCreateTransaction;
-import com.hedera.hashgraph.sdk.FileDeleteTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.PrivateKey;
-import com.hedera.hashgraph.sdk.PrivateKeyECDSA;
-import com.hedera.hashgraph.sdk.TransferTransaction;
+import com.hiero.sdk.ContractCreateTransaction;
+import com.hiero.sdk.ContractDeleteTransaction;
+import com.hiero.sdk.ContractExecuteTransaction;
+import com.hiero.sdk.ContractFunctionParameters;
+import com.hiero.sdk.EthereumTransaction;
+import com.hiero.sdk.FileCreateTransaction;
+import com.hiero.sdk.FileDeleteTransaction;
+import com.hiero.sdk.Hbar;
+import com.hiero.sdk.PrivateKey;
+import com.hiero.sdk.PrivateKeyECDSA;
+import com.hiero.sdk.TransferTransaction;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Objects;
