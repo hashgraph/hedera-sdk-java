@@ -37,7 +37,7 @@ dependencies.constraints {
     api("com.fasterxml.jackson.core:jackson-core:2.18.2") { because("com.fasterxml.jackson.core") }
 
     api("com.google.protobuf:protoc:3.25.4")
-    api("io.grpc:protoc-gen-grpc-java:1.66.0")
+    api("io.grpc:protoc-gen-grpc-java:1.69.0")
 
     // Examples
     api("org.jetbrains.kotlin:kotlin-stdlib:2.1.0") { because("kotlin.stdlib") }
