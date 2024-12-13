@@ -34,7 +34,7 @@ dependencies.constraints {
     api("org.junit.jupiter:junit-jupiter-api:5.11.3") { because("org.junit.jupiter.api") }
     api("org.mockito:mockito-core:5.14.2") { because("org.mockito") }
     api("com.google.guava:guava:33.3.1-android") { because("com.google.common") }
-    api("com.fasterxml.jackson.core:jackson-core:2.18.0") { because("com.fasterxml.jackson.core") }
+    api("com.fasterxml.jackson.core:jackson-core:2.18.2") { because("com.fasterxml.jackson.core") }
 
     api("com.google.protobuf:protoc:3.25.4")
     api("io.grpc:protoc-gen-grpc-java:1.66.0")
