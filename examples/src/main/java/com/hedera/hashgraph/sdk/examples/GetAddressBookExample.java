@@ -23,8 +23,8 @@ import com.hedera.hashgraph.sdk.AddressBookQuery;
 import com.hedera.hashgraph.sdk.Client;
 import com.hedera.hashgraph.sdk.FileId;
 import com.hedera.hashgraph.sdk.NodeAddressBook;
-import com.hedera.hashgraph.sdk.logger.LogLevel;
-import com.hedera.hashgraph.sdk.logger.Logger;
+import com.hiero.sdk.logger.LogLevel;
+import com.hiero.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.ByteArrayInputStream;

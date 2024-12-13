@@ -33,9 +33,9 @@ module com.hedera.hashgraph.sdk {
     requires org.slf4j;
     requires static transitive java.annotation;
 
-    exports com.hedera.hashgraph.sdk;
-    exports com.hedera.hashgraph.sdk.logger;
-    exports com.hedera.hashgraph.sdk.proto;
+    exports com.hiero.sdk;
+    exports com.hiero.sdk.logger;
+    exports com.hiero.sdk.proto;
 
-    opens com.hedera.hashgraph.sdk;
+    opens com.hiero.sdk;
 }

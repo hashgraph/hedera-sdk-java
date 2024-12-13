@@ -75,13 +75,13 @@ COMMENT_REPLACEMENTS = (
 
 PROTO_REPLACEMENTS = (
     ("option java_package = \"com.hederahashgraph.api.proto.java\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
+     "option java_package = \"com.hiero.sdk.proto\";"),
 
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
+     "option java_package = \"com.hiero.sdk.proto\";"),
 
     ("option java_package = \"com.hedera.mirror.api.proto\";",
-     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
+     "option java_package = \"com.hiero.sdk.proto.mirror\";")
 )
 
 PROTO_REPLACEMENTS_IMPORTS = (

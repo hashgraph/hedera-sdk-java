@@ -18,7 +18,7 @@
  *
  */
 
-open module com.hedera.hashgraph.sdk.test.integration {
+open module com.hiero.sdk.test.integration {
     requires com.hedera.hashgraph.sdk;
     requires com.esaulpaugh.headlong;
     requires org.assertj.core;

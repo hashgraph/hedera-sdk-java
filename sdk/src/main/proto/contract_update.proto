@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.contract">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -33,12 +33,12 @@ import "google/protobuf/wrappers.proto";
 
 /**
  * At consensus, updates the fields of a smart contract to the given values.
- * 
+ *
  * If no value is given for a field, that field is left unchanged on the contract. For an immutable
  * smart contract (that is, a contract created without an adminKey), only the expirationTime may be
  * updated; setting any other field in this case will cause the transaction status to resolve to
  * MODIFYING_IMMUTABLE_CONTRACT.
- * 
+ *
  * --- Signing Requirements ---
  * 1. Whether or not a contract has an admin key, its expiry can be extended with only the
  *    transaction payer's signature.
@@ -109,7 +109,7 @@ message ContractUpdateTransactionBody {
     google.protobuf.Int32Value max_automatic_token_associations = 11;
 
     /**
-     * If set to the sentinel <tt>0.0.0</tt> AccountID, this field removes the contract's auto-renew 
+     * If set to the sentinel <tt>0.0.0</tt> AccountID, this field removes the contract's auto-renew
      * account. Otherwise it updates the contract's auto-renew account to the referenced account.
      */
     AccountID auto_renew_account_id = 12;

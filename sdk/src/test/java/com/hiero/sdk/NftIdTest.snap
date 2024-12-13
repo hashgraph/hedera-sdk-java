@@ -1,0 +1,33 @@
+com.hiero.sdk.NftIdTest.fromBytes=[
+  "0.0.5005/574489"
+]
+
+
+com.hiero.sdk.NftIdTest.fromString2=[
+  "0.0.5005/1234"
+]
+
+
+com.hiero.sdk.NftIdTest.fromString=[
+  "0.0.5005/1234"
+]
+
+
+com.hiero.sdk.NftIdTest.fromStringWithChecksumOnMainnet=[
+  "0.0.123-vfmkw/7584"
+]
+
+
+com.hiero.sdk.NftIdTest.fromStringWithChecksumOnPreviewnet=[
+  "0.0.123-ogizo/487302"
+]
+
+
+com.hiero.sdk.NftIdTest.fromStringWithChecksumOnTestnet=[
+  "0.0.123-esxsf/584903"
+]
+
+
+com.hiero.sdk.NftIdTest.toBytes=[
+  "0a03188d2710b826"
+]

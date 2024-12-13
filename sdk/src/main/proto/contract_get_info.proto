@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.contract">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -121,15 +121,15 @@ message ContractGetInfoResponse {
         bool deleted = 10;
 
         /**
-         * [DEPRECATED] The metadata of the tokens associated to the contract. This field was 
-         * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed 
-         * an account to be associated to an unlimited number of tokens. This scale makes it more 
+         * [DEPRECATED] The metadata of the tokens associated to the contract. This field was
+         * deprecated by <a href="https://hips.hedera.com/hip/hip-367">HIP-367</a>, which allowed
+         * an account to be associated to an unlimited number of tokens. This scale makes it more
          * efficient for users to consult mirror nodes to review their token associations.
          */
         repeated TokenRelationship tokenRelationships = 11 [deprecated = true];
 
         /**
-         * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
+         * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
          */
         bytes ledger_id = 12;
 

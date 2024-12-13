@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.network">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -31,9 +31,9 @@ import "query_header.proto";
 import "response_header.proto";
 
 /**
- * Gets the time in nanoseconds spent in <tt>handleTransaction</tt> for one or more 
- * TransactionIDs (assuming they have reached consensus "recently", since only a limited 
- * number of execution times are kept in-memory, depending on the value of the node-local 
+ * Gets the time in nanoseconds spent in <tt>handleTransaction</tt> for one or more
+ * TransactionIDs (assuming they have reached consensus "recently", since only a limited
+ * number of execution times are kept in-memory, depending on the value of the node-local
  * property <tt>stats.executionTimesToTrack</tt>).
  */
 message NetworkGetExecutionTimeQuery {

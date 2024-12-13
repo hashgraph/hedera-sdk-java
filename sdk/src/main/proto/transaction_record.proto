@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -120,12 +120,12 @@ message TransactionRecord {
 
     /**
      * In the record of a CryptoCreate transaction triggered by a user transaction with a
-     * (previously unused) alias, the new account's alias. 
+     * (previously unused) alias, the new account's alias.
      */
      bytes alias = 16;
 
     /**
-     * The keccak256 hash of the ethereumData. This field will only be populated for 
+     * The keccak256 hash of the ethereumData. This field will only be populated for
      * EthereumTransaction.
      */
     bytes ethereum_hash = 17;

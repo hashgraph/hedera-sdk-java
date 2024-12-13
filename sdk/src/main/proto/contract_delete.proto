@@ -21,7 +21,7 @@ package proto;
  * limitations under the License.
  * ‍
  */
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.contract">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -30,10 +30,10 @@ import "basic_types.proto";
 /**
  * At consensus, marks a contract as deleted and transfers its remaining hBars, if any, to a
  * designated receiver. After a contract is deleted, it can no longer be called.
- * 
+ *
  * If the target contract is immutable (that is, was created without an admin key), then this
  * transaction resolves to MODIFYING_IMMUTABLE_CONTRACT.
- * 
+ *
  * --- Signing Requirements ---
  * 1. The admin key of the target contract must sign.
  * 2. If the transfer account or contract has receiverSigRequired, its associated key must also sign
@@ -57,7 +57,7 @@ message ContractDeleteTransactionBody {
     }
 
     /**
-     * If set to true, means this is a "synthetic" system transaction being used to 
+     * If set to true, means this is a "synthetic" system transaction being used to
      * alert mirror nodes that the contract is being permanently removed from the ledger.
      * <b>IMPORTANT:</b> User transactions cannot set this field to true, as permanent
      * removal is always managed by the ledger itself. Any ContractDeleteTransactionBody

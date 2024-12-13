@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "com.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.base">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -35,7 +35,7 @@ import "transaction_body.proto";
  * appear in the transaction. For example, a CryptoTransfer will first have a Signature
  * corresponding to the Key for the paying account, followed by a Signature corresponding to the Key
  * for each account that is sending or receiving cryptocurrency in the transfer. Each Transaction
- * should not have more than 50 levels. 
+ * should not have more than 50 levels.
  * The SignatureList field is deprecated and succeeded by SignatureMap.
  */
 message Transaction {
@@ -49,12 +49,12 @@ message Transaction {
      * SignatureMap field
      */
     SignatureList sigs = 2 [deprecated = true];
-    
+
     /**
      * The signatures on the body with the new format, to authorize the transaction
      */
     SignatureMap sigMap = 3 [deprecated = true];
-    
+
     /**
      * TransactionBody serialized into bytes, which needs to be signed
      */
