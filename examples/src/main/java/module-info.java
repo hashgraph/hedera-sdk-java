@@ -19,13 +19,9 @@
  */
 
 module com.hedera.hashgraph.examples {
-    requires com.hedera.hashgraph.sdk;
-    // requires com.hedera.hashgraph.sdk.full;
-
+    requires com.hedera.hashgraph.sdk; // .full;
     requires com.google.gson;
-    requires java.dotenv;
-
-    requires static java.annotation;
-    requires com.google.protobuf;
+    requires io.github.cdimascio.dotenv.java;
     requires org.bouncycastle.provider;
+    requires static java.annotation;
 }
