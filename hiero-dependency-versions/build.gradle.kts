@@ -36,7 +36,7 @@ dependencies.constraints {
     api("com.google.guava:guava:33.3.1-android") { because("com.google.common") }
     api("com.fasterxml.jackson.core:jackson-core:2.18.2") { because("com.fasterxml.jackson.core") }
 
-    api("com.google.protobuf:protoc:3.25.4")
+    api("com.google.protobuf:protoc:4.29.1")
     api("io.grpc:protoc-gen-grpc-java:1.69.0")
 
     // Examples
