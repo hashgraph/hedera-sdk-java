@@ -32,7 +32,7 @@ dependencies.constraints {
     api("org.apache.commons:commons-lang3:3.17.0") { because("org.apache.commons.lang3") }
     api("org.assertj:assertj-core:3.26.3") { because("org.assertj.core") }
     api("org.junit.jupiter:junit-jupiter-api:5.10.2") { because("org.junit.jupiter.api") }
-    api("org.mockito:mockito-core:5.8.0") { because("org.mockito") }
+    api("org.mockito:mockito-core:5.14.2") { because("org.mockito") }
     api("com.google.guava:guava:33.3.1-android") { because("com.google.common") }
     api("com.fasterxml.jackson.core:jackson-core:2.18.0") { because("com.fasterxml.jackson.core") }
 
