@@ -13,7 +13,7 @@ dependencies.constraints {
     api("com.google.code.gson:gson:2.10.1") { because("com.google.gson") }
     api("com.google.protobuf:protobuf-java:4.29.1") { because("com.google.protobuf") }
     api("com.google.protobuf:protobuf-javalite:4.29.1") { because("com.google.protobuf") }
-    api("io.grpc:grpc-api:1.68.2") { because("io.grpc") }
+    api("io.grpc:grpc-api:1.69.0") { because("io.grpc") }
     api("io.grpc:grpc-inprocess:1.67.1") { because("io.grpc.inprocess") }
     api("io.grpc:grpc-protobuf:1.68.2") { because("io.grpc.protobuf") }
     api("io.grpc:grpc-protobuf-lite:1.68.2") { because("io.grpc.protobuf.lite") }
