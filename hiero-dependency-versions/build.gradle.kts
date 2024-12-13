@@ -10,7 +10,7 @@ group = "com.hedera.hashgraph"
 
 dependencies.constraints {
     api("com.esaulpaugh:headlong:12.3.3") { because("com.esaulpaugh.headlong") }
-    api("com.google.code.gson:gson:2.10.1") { because("com.google.gson") }
+    api("com.google.code.gson:gson:2.11.0") { because("com.google.gson") }
     api("com.google.protobuf:protobuf-java:4.29.1") { because("com.google.protobuf") }
     api("com.google.protobuf:protobuf-javalite:4.29.1") { because("com.google.protobuf") }
     api("io.grpc:grpc-api:1.69.0") { because("io.grpc") }
