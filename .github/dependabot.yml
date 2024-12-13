@@ -1,7 +1,7 @@
 version: 2
 updates:
 - package-ecosystem: gradle
-  directory: "/sdk-dependency-versions"
+  directory: "/hiero-dependency-versions"
   schedule:
     interval: weekly
   open-pull-requests-limit: 10

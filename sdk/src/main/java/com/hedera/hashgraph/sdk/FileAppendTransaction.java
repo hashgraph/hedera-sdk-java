@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.ByteString;
@@ -28,10 +10,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * <p>A transaction specifically to append data to a file on the network.
@@ -62,7 +43,9 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    FileAppendTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hedera.hashgraph.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
 
         initFromTransactionBody();
@@ -116,7 +99,7 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      *
      * @param contents the contents to append to the file.
      * @return {@code this}
-     * @see #setContents(String) for an overload which takes {@link String}.
+     * @see #setContents(String) for an overload which takes String.
      */
     public FileAppendTransaction setContents(byte[] contents) {
         return setData(contents);
@@ -127,12 +110,11 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      *
      * @param contents the contents to append to the file.
      * @return {@code this}
-     * @see #setContents(String) for an overload which takes {@link String}.
+     * @see #setContents(String) for an overload which takes String.
      */
     public FileAppendTransaction setContents(ByteString contents) {
         return setData(contents);
     }
-
 
     /**
      * <p>Encode the given {@link String} as UTF-8 and append it to file as identified by
@@ -174,12 +156,13 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
 
         if (!innerSignedTransactions.isEmpty()) {
             try {
-                for (var i = 0; i < innerSignedTransactions.size();
-                    i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
-                    data = data.concat(
-                        TransactionBody.parseFrom(innerSignedTransactions.get(i).getBodyBytes())
-                            .getFileAppend().getContents()
-                    );
+                for (var i = 0;
+                        i < innerSignedTransactions.size();
+                        i += nodeAccountIds.isEmpty() ? 1 : nodeAccountIds.size()) {
+                    data = data.concat(TransactionBody.parseFrom(
+                                    innerSignedTransactions.get(i).getBodyBytes())
+                            .getFileAppend()
+                            .getContents());
                 }
             } catch (InvalidProtocolBufferException exc) {
                 throw new IllegalArgumentException(exc.getMessage());
@@ -205,7 +188,13 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
     }
 
     @Override
-    void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total) {
+    void onFreezeChunk(
+            TransactionBody.Builder body,
+            @Nullable TransactionID initialTransactionId,
+            int startIndex,
+            int endIndex,
+            int chunk,
+            int total) {
         body.setFileAppend(build().setContents(data.substring(startIndex, endIndex)));
     }
 
