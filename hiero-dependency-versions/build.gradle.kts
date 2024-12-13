@@ -16,7 +16,7 @@ dependencies.constraints {
     api("io.grpc:grpc-api:1.69.0") { because("io.grpc") }
     api("io.grpc:grpc-inprocess:1.67.1") { because("io.grpc.inprocess") }
     api("io.grpc:grpc-protobuf:1.68.2") { because("io.grpc.protobuf") }
-    api("io.grpc:grpc-protobuf-lite:1.68.2") { because("io.grpc.protobuf.lite") }
+    api("io.grpc:grpc-protobuf-lite:1.69.0") { because("io.grpc.protobuf.lite") }
     api("io.grpc:grpc-stub:1.68.2") { because("io.grpc.stub") }
     api("com.google.code.findbugs:jsr305:3.0.2") { because("java.annotation") }
     api("org.bouncycastle:bcpkix-jdk18on:1.79") { because("org.bouncycastle.pkix") }
