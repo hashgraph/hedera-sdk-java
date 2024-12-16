@@ -90,7 +90,7 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: Code Quality Checks
-        run: ./gradlew qualityCheck --continue --scan
+        run: ./gradlew qualityCheck :examples:qualityCheck --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.57.0
@@ -101,7 +101,7 @@ jobs:
           OPERATOR_ID: '0.0.1022'
           HEDERA_NETWORK: 'localhost'
         run: |
-          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK testIntegration --scan
+          ./gradlew -POPERATOR_ID=$OPERATOR_ID -POPERATOR_KEY=$OPERATOR_KEY -PHEDERA_NETWORK=$HEDERA_NETWORK jacocoTestReport --scan
 
       - name: Upload coverage to Codecov
         if: ${{ github.event_name == 'push' || (github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]') }}
