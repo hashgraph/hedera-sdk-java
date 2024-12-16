@@ -17,25 +17,21 @@
  * limitations under the License.
  *
  */
+package com.hiero.tck.methods;
 
-module com.hiero.sdk {
-    requires transitive com.google.protobuf;
-    requires com.esaulpaugh.headlong;
-    requires com.google.common;
-    requires com.google.gson;
-    requires io.grpc.inprocess;
-    requires io.grpc.protobuf.lite;
-    requires io.grpc.stub;
-    requires io.grpc;
-    requires java.net.http;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.slf4j;
-    requires static transitive java.annotation;
+import com.hiero.sdk.Status;
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
+/**
+ * Custom JSON-RPC error definitions
+ */
+public class JSONRPC2Error {
+    private JSONRPC2Error() {
+        // static utility class
+    }
 
-    opens com.hiero.sdk;
+    public static final int HEDERA_STATUS_CODE = -32001;
+    public static final com.thetransactioncompany.jsonrpc2.JSONRPC2Error HEDERA_ERROR =
+            new com.thetransactioncompany.jsonrpc2.JSONRPC2Error(HEDERA_STATUS_CODE, "Hedera error");
+
+    public record ErrorData(Status status, String message) {}
 }

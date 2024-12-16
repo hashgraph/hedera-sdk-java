@@ -17,25 +17,18 @@
  * limitations under the License.
  *
  */
+package com.hiero.tck.annotation;
 
-module com.hiero.sdk {
-    requires transitive com.google.protobuf;
-    requires com.esaulpaugh.headlong;
-    requires com.google.common;
-    requires com.google.gson;
-    requires io.grpc.inprocess;
-    requires io.grpc.protobuf.lite;
-    requires io.grpc.stub;
-    requires io.grpc;
-    requires java.net.http;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.slf4j;
-    requires static transitive java.annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.springframework.stereotype.Component;
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
-
-    opens com.hiero.sdk;
-}
+/**
+ * Marks classes as JSON-RPC services.
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@Component
+public @interface JSONRPC2Service {}

@@ -17,25 +17,13 @@
  * limitations under the License.
  *
  */
+package com.hiero.tck.methods.sdk.response;
 
-module com.hiero.sdk {
-    requires transitive com.google.protobuf;
-    requires com.esaulpaugh.headlong;
-    requires com.google.common;
-    requires com.google.gson;
-    requires io.grpc.inprocess;
-    requires io.grpc.protobuf.lite;
-    requires io.grpc.stub;
-    requires io.grpc;
-    requires java.net.http;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.slf4j;
-    requires static transitive java.annotation;
+import com.hiero.sdk.Status;
+import lombok.Data;
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
-
-    opens com.hiero.sdk;
+@Data
+public class AccountResponse {
+    private final String accountId;
+    private final Status status;
 }

@@ -19,7 +19,7 @@
  */
 
 open module com.hiero.sdk.test.integration {
-    requires com.hedera.hashgraph.sdk;
+    requires com.hiero.sdk;
     requires com.esaulpaugh.headlong;
     requires org.assertj.core;
     requires org.bouncycastle.provider;

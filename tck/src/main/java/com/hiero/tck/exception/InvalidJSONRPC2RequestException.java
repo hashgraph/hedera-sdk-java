@@ -17,25 +17,14 @@
  * limitations under the License.
  *
  */
+package com.hiero.tck.exception;
 
-module com.hiero.sdk {
-    requires transitive com.google.protobuf;
-    requires com.esaulpaugh.headlong;
-    requires com.google.common;
-    requires com.google.gson;
-    requires io.grpc.inprocess;
-    requires io.grpc.protobuf.lite;
-    requires io.grpc.stub;
-    requires io.grpc;
-    requires java.net.http;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.slf4j;
-    requires static transitive java.annotation;
+/**
+ * Thrown when the server cannot process the request
+ */
+public class InvalidJSONRPC2RequestException extends Exception {
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
-
-    opens com.hiero.sdk;
+    public InvalidJSONRPC2RequestException(String message) {
+        super(message);
+    }
 }

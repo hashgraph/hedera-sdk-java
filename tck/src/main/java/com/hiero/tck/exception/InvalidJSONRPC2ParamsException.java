@@ -17,25 +17,27 @@
  * limitations under the License.
  *
  */
+package com.hiero.tck.exception;
 
-module com.hiero.sdk {
-    requires transitive com.google.protobuf;
-    requires com.esaulpaugh.headlong;
-    requires com.google.common;
-    requires com.google.gson;
-    requires io.grpc.inprocess;
-    requires io.grpc.protobuf.lite;
-    requires io.grpc.stub;
-    requires io.grpc;
-    requires java.net.http;
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
-    requires org.slf4j;
-    requires static transitive java.annotation;
+/**
+ * Thrown when the server cannot parse the given parameters.
+ * This error should be thrown from the param parser
+ */
+public class InvalidJSONRPC2ParamsException extends Exception {
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
+    public InvalidJSONRPC2ParamsException() {
+        super();
+    }
 
-    opens com.hiero.sdk;
+    public InvalidJSONRPC2ParamsException(String message) {
+        super(message);
+    }
+
+    public InvalidJSONRPC2ParamsException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public InvalidJSONRPC2ParamsException(Throwable cause) {
+        super(cause);
+    }
 }
