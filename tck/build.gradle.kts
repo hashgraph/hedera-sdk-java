@@ -54,6 +54,7 @@ tasks.withType<ResolveMainClassName> { setGroup(null) }
 
 // Configure dependency analysis without using Java Modules
 tasks.qualityGate { dependsOn(tasks.named("projectHealth")) }
+
 tasks.qualityCheck { dependsOn(tasks.named("projectHealth")) }
 
 dependencyAnalysis {
@@ -61,9 +62,7 @@ dependencyAnalysis {
         onAny {
             severity("fail")
             exclude("com.google.protobuf:protobuf-javalite")
-            onUnusedDependencies {
-                exclude(":sdk")
-            }
+            onUnusedDependencies { exclude(":sdk") }
         }
     }
 }
