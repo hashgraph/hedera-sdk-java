@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -58,19 +40,19 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
 
         AccountAmount toProtobuf() {
             return AccountAmount.newBuilder()
-                .setAccountID(accountId.toProtobuf())
-                .setAmount(amount.toTinybars())
-                .setIsApproval(isApproved)
-                .build();
+                    .setAccountID(accountId.toProtobuf())
+                    .setAmount(amount.toTinybars())
+                    .setIsApproval(isApproved)
+                    .build();
         }
 
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
-                .add("accountId", accountId)
-                .add("amount", amount)
-                .add("isApproved", isApproved)
-                .toString();
+                    .add("accountId", accountId)
+                    .add("amount", amount)
+                    .add("isApproved", isApproved)
+                    .toString();
         }
     }
 
@@ -87,9 +69,8 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
      * @param txs Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
-    TransferTransaction(
-        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
-        throws InvalidProtocolBufferException {
+    TransferTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -197,7 +178,8 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
 
         var builder = CryptoTransferTransactionBody.newBuilder();
 
-        this.hbarTransfers.sort(Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
+        this.hbarTransfers.sort(
+                Comparator.comparing((HbarTransfer a) -> a.accountId).thenComparing(a -> a.isApproved));
         var hbarTransfersList = TransferList.newBuilder();
         for (var transfer : hbarTransfers) {
             hbarTransfersList.addAccountAmounts(transfer.toProtobuf());
@@ -242,10 +224,9 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
 
         for (var transfer : body.getTransfers().getAccountAmountsList()) {
             hbarTransfers.add(new HbarTransfer(
-                AccountId.fromProtobuf(transfer.getAccountID()),
-                Hbar.fromTinybars(transfer.getAmount()),
-                transfer.getIsApproval()
-            ));
+                    AccountId.fromProtobuf(transfer.getAccountID()),
+                    Hbar.fromTinybars(transfer.getAmount()),
+                    transfer.getIsApproval()));
         }
 
         for (var tokenTransferList : body.getTokenTransfersList()) {
@@ -253,22 +234,22 @@ public class TransferTransaction extends AbstractTokenTransferTransaction<Transf
 
             for (var transfer : tokenTransferList.getTransfersList()) {
                 tokenTransfers.add(new TokenTransfer(
-                    token,
-                    AccountId.fromProtobuf(transfer.getAccountID()),
-                    transfer.getAmount(),
-                    tokenTransferList.hasExpectedDecimals() ? tokenTransferList.getExpectedDecimals().getValue() : null,
-                    transfer.getIsApproval()
-                ));
+                        token,
+                        AccountId.fromProtobuf(transfer.getAccountID()),
+                        transfer.getAmount(),
+                        tokenTransferList.hasExpectedDecimals()
+                                ? tokenTransferList.getExpectedDecimals().getValue()
+                                : null,
+                        transfer.getIsApproval()));
             }
 
             for (var transfer : tokenTransferList.getNftTransfersList()) {
                 nftTransfers.add(new TokenNftTransfer(
-                    token,
-                    AccountId.fromProtobuf(transfer.getSenderAccountID()),
-                    AccountId.fromProtobuf(transfer.getReceiverAccountID()),
-                    transfer.getSerialNumber(),
-                    transfer.getIsApproval()
-                ));
+                        token,
+                        AccountId.fromProtobuf(transfer.getSenderAccountID()),
+                        AccountId.fromProtobuf(transfer.getReceiverAccountID()),
+                        transfer.getSerialNumber(),
+                        transfer.getIsApproval()));
             }
         }
     }

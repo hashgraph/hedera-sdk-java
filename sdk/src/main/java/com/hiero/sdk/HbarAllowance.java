@@ -1,31 +1,12 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.CryptoAllowance;
 import com.hiero.sdk.proto.GrantedCryptoAllowance;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * An approved allowance of hbar transfers for a spender.
@@ -72,10 +53,9 @@ public class HbarAllowance {
      */
     static HbarAllowance fromProtobuf(CryptoAllowance allowanceProto) {
         return new HbarAllowance(
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            Hbar.fromTinybars(allowanceProto.getAmount())
-        );
+                allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+                allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+                Hbar.fromTinybars(allowanceProto.getAmount()));
     }
 
     /**
@@ -86,10 +66,9 @@ public class HbarAllowance {
      */
     static HbarAllowance fromProtobuf(GrantedCryptoAllowance allowanceProto) {
         return new HbarAllowance(
-            null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            Hbar.fromTinybars(allowanceProto.getAmount())
-        );
+                null,
+                allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+                Hbar.fromTinybars(allowanceProto.getAmount()));
     }
 
     /**
@@ -124,8 +103,7 @@ public class HbarAllowance {
      * @return                          the protobuf
      */
     CryptoAllowance toProtobuf() {
-        var builder = CryptoAllowance.newBuilder()
-            .setAmount(amount.toTinybars());
+        var builder = CryptoAllowance.newBuilder().setAmount(amount.toTinybars());
         if (ownerAccountId != null) {
             builder.setOwner(ownerAccountId.toProtobuf());
         }
@@ -141,8 +119,7 @@ public class HbarAllowance {
      * @return                          the granted crypto allowance
      */
     GrantedCryptoAllowance toGrantedProtobuf() {
-        var builder = GrantedCryptoAllowance.newBuilder()
-            .setAmount(amount.toTinybars());
+        var builder = GrantedCryptoAllowance.newBuilder().setAmount(amount.toTinybars());
         if (spenderAccountId != null) {
             builder.setSpender(spenderAccountId.toProtobuf());
         }
@@ -161,9 +138,9 @@ public class HbarAllowance {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("ownerAccountId", ownerAccountId)
-            .add("spenderAccountId", spenderAccountId)
-            .add("amount", amount)
-            .toString();
+                .add("ownerAccountId", ownerAccountId)
+                .add("spenderAccountId", spenderAccountId)
+                .add("amount", amount)
+                .toString();
     }
 }

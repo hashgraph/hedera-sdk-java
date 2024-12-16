@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -27,14 +9,13 @@ import com.hiero.sdk.proto.Transaction;
 import com.hiero.sdk.proto.TransactionBody;
 import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * This transaction type is for deleting an account allowance.
@@ -49,8 +30,7 @@ public class AccountAllowanceDeleteTransaction extends com.hiero.sdk.Transaction
     /**
      * Constructor.
      */
-    public AccountAllowanceDeleteTransaction() {
-    }
+    public AccountAllowanceDeleteTransaction() {}
 
     /**
      * Constructor.
@@ -59,8 +39,8 @@ public class AccountAllowanceDeleteTransaction extends com.hiero.sdk.Transaction
      * @throws InvalidProtocolBufferException   when there is an issue with the protobuf
      */
     AccountAllowanceDeleteTransaction(
-        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs
-    ) throws InvalidProtocolBufferException {
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -79,9 +59,9 @@ public class AccountAllowanceDeleteTransaction extends com.hiero.sdk.Transaction
         var body = sourceTransactionBody.getCryptoDeleteAllowance();
         for (var allowanceProto : body.getNftAllowancesList()) {
             getNftSerials(
-                AccountId.fromProtobuf(allowanceProto.getOwner()),
-                TokenId.fromProtobuf(allowanceProto.getTokenId())
-            ).addAll(allowanceProto.getSerialNumbersList());
+                            AccountId.fromProtobuf(allowanceProto.getOwner()),
+                            TokenId.fromProtobuf(allowanceProto.getTokenId()))
+                    .addAll(allowanceProto.getSerialNumbersList());
         }
     }
 
@@ -118,12 +98,8 @@ public class AccountAllowanceDeleteTransaction extends com.hiero.sdk.Transaction
     @Deprecated
     public AccountAllowanceDeleteTransaction deleteAllTokenAllowances(TokenId tokenId, AccountId ownerAccountId) {
         requireNotFrozen();
-        tokenAllowances.add(new TokenAllowance(
-            Objects.requireNonNull(tokenId),
-            Objects.requireNonNull(ownerAccountId),
-            null,
-            0
-        ));
+        tokenAllowances.add(
+                new TokenAllowance(Objects.requireNonNull(tokenId), Objects.requireNonNull(ownerAccountId), null, 0));
         return this;
     }
 
@@ -196,19 +172,10 @@ public class AccountAllowanceDeleteTransaction extends com.hiero.sdk.Transaction
      * @return                          list of nft serial numbers
      */
     private List<Long> newNftSerials(
-        @Nullable AccountId ownerAccountId,
-        TokenId tokenId,
-        Map<TokenId, Integer> innerMap
-    ) {
+            @Nullable AccountId ownerAccountId, TokenId tokenId, Map<TokenId, Integer> innerMap) {
         innerMap.put(tokenId, nftAllowances.size());
-        TokenNftAllowance newAllowance = new TokenNftAllowance(
-            tokenId,
-            ownerAccountId,
-            null,
-            null,
-            new ArrayList<>(),
-            null
-        );
+        TokenNftAllowance newAllowance =
+                new TokenNftAllowance(tokenId, ownerAccountId, null, null, new ArrayList<>(), null);
         nftAllowances.add(newAllowance);
         return newAllowance.serialNumbers;
     }

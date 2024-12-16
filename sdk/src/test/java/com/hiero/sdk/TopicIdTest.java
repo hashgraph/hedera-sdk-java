@@ -1,27 +1,7 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TopicId;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
@@ -51,12 +31,15 @@ class TopicIdTest {
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
-        SnapshotMatcher.expect(TopicId.fromBytes(new TopicId(5005).toBytes()).toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TopicId.fromBytes(new TopicId(5005).toBytes()).toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void fromSolidityAddress() {
-        SnapshotMatcher.expect(TokenId.fromSolidityAddress("000000000000000000000000000000000000138D").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TokenId.fromSolidityAddress("000000000000000000000000000000000000138D")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test

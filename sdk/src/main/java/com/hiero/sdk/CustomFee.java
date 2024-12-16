@@ -1,36 +1,16 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Base class for custom fees.
  */
-abstract public class CustomFee {
+public abstract class CustomFee {
     /**
      * The account to receive the custom fee
      */
@@ -45,8 +25,7 @@ abstract public class CustomFee {
     /**
      * Constructor.
      */
-    CustomFee() {
-    }
+    CustomFee() {}
 
     /**
      * Convert the protobuf object to a custom fee object.
@@ -66,7 +45,8 @@ abstract public class CustomFee {
                 return CustomRoyaltyFee.fromProtobuf(customFee.getRoyaltyFee());
 
             default:
-                throw new IllegalStateException("CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
+                throw new IllegalStateException(
+                        "CustomFee#fromProtobuf: unhandled fee case: " + customFee.getFeeCase());
         }
     }
 
@@ -88,7 +68,8 @@ abstract public class CustomFee {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static CustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.CustomFee.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                com.hiero.sdk.proto.CustomFee.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -179,7 +160,7 @@ abstract public class CustomFee {
      */
     protected MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(this)
-            .add("feeCollectorAccountId", feeCollectorAccountId)
-            .add("allCollectorsAreExempt", allCollectorsAreExempt);
+                .add("feeCollectorAccountId", feeCollectorAccountId)
+                .add("allCollectorsAreExempt", allCollectorsAreExempt);
     }
 }

@@ -1,12 +1,10 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.TokenAllowance;
-import com.hiero.sdk.TokenId;
-import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.Test;
 
 public class TokenAllowanceTest {
 
@@ -17,8 +15,8 @@ public class TokenAllowanceTest {
 
     @Test
     void constructWithTokenIdOwnerSpenderAmount() {
-        TokenAllowance tokenAllowance = new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId,
-            testAmount);
+        TokenAllowance tokenAllowance =
+                new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId, testAmount);
 
         assertThat(tokenAllowance.tokenId).isEqualTo(testTokenId);
         assertThat(tokenAllowance.ownerAccountId).isEqualTo(testOwnerAccountId);
@@ -28,8 +26,8 @@ public class TokenAllowanceTest {
 
     @Test
     void fromProtobuf() {
-        var tokenAllowanceProtobuf = new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId,
-            testAmount).toProtobuf();
+        var tokenAllowanceProtobuf =
+                new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId, testAmount).toProtobuf();
         var tokenAllowance = TokenAllowance.fromProtobuf(tokenAllowanceProtobuf);
 
         assertThat(tokenAllowance.tokenId).isEqualTo(testTokenId);
@@ -40,8 +38,8 @@ public class TokenAllowanceTest {
 
     @Test
     void toProtobuf() {
-        var tokenAllowanceProtobuf = new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId,
-            testAmount).toProtobuf();
+        var tokenAllowanceProtobuf =
+                new TokenAllowance(testTokenId, testOwnerAccountId, testSpenderAccountId, testAmount).toProtobuf();
 
         assertTrue(tokenAllowanceProtobuf.hasTokenId());
         assertThat(TokenId.fromProtobuf(tokenAllowanceProtobuf.getTokenId())).isEqualTo(testTokenId);
@@ -51,6 +49,5 @@ public class TokenAllowanceTest {
 
         assertTrue(tokenAllowanceProtobuf.hasSpender());
         assertThat(AccountId.fromProtobuf(tokenAllowanceProtobuf.getSpender())).isEqualTo(testSpenderAccountId);
-
     }
 }

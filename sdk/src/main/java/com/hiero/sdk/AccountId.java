@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -35,7 +17,8 @@ import org.bouncycastle.util.encoders.Hex;
  * The ID for a cryptocurrency account on Hedera.
  */
 public final class AccountId implements Comparable<AccountId> {
-    private static final Pattern ALIAS_ID_REGEX = Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.((?:[0-9a-fA-F][0-9a-fA-F])+)$");
+    private static final Pattern ALIAS_ID_REGEX =
+            Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.((?:[0-9a-fA-F][0-9a-fA-F])+)$");
 
     /**
      * The shard number
@@ -117,13 +100,12 @@ public final class AccountId implements Comparable<AccountId> {
      */
     @SuppressWarnings("InconsistentOverloads")
     AccountId(
-        @Nonnegative long shard,
-        @Nonnegative long realm,
-        @Nonnegative long num,
-        @Nullable String checksum,
-        @Nullable PublicKey aliasKey,
-        @Nullable EvmAddress evmAddress
-    ) {
+            @Nonnegative long shard,
+            @Nonnegative long realm,
+            @Nonnegative long num,
+            @Nullable String checksum,
+            @Nullable PublicKey aliasKey,
+            @Nullable EvmAddress evmAddress) {
         this.shard = shard;
         this.realm = realm;
         this.num = num;
@@ -140,8 +122,7 @@ public final class AccountId implements Comparable<AccountId> {
      * @throws IllegalArgumentException when the account id and checksum are invalid
      */
     public static AccountId fromString(String id) {
-        if ((id.startsWith("0x") && id.length() == 42) || id.length() == 40)
-            return fromEvmAddress(id);
+        if ((id.startsWith("0x") && id.length() == 42) || id.length() == 40) return fromEvmAddress(id);
 
         try {
             return EntityIdHelper.fromString(id, AccountId::new);
@@ -149,19 +130,18 @@ public final class AccountId implements Comparable<AccountId> {
             var match = ALIAS_ID_REGEX.matcher(id);
             if (!match.find()) {
                 throw new IllegalArgumentException(
-                    "Invalid Account ID \"" + id + "\": format should look like 0.0.123 or 0.0.123-vfmkw or 0.0.1337BEEF (where 1337BEEF is a hex-encoded, DER-format public key)"
-                );
+                        "Invalid Account ID \"" + id
+                                + "\": format should look like 0.0.123 or 0.0.123-vfmkw or 0.0.1337BEEF (where 1337BEEF is a hex-encoded, DER-format public key)");
             } else {
                 byte[] aliasBytes = Hex.decode(match.group(3));
                 boolean isEvmAddress = aliasBytes.length == 20;
                 return new AccountId(
-                    Long.parseLong(match.group(1)),
-                    Long.parseLong(match.group(2)),
-                    0,
-                    null,
-                    isEvmAddress ? null : PublicKey.fromBytesDER(aliasBytes),
-                    isEvmAddress ? EvmAddress.fromBytes(aliasBytes) : null
-                );
+                        Long.parseLong(match.group(1)),
+                        Long.parseLong(match.group(2)),
+                        0,
+                        null,
+                        isEvmAddress ? null : PublicKey.fromBytesDER(aliasBytes),
+                        isEvmAddress ? EvmAddress.fromBytes(aliasBytes) : null);
             }
         }
     }
@@ -207,14 +187,7 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id object
      */
     public static AccountId fromEvmAddress(EvmAddress evmAddress, @Nonnegative long shard, @Nonnegative long realm) {
-        return new AccountId(
-            shard,
-            realm,
-            0,
-            null,
-            null,
-            evmAddress
-        );
+        return new AccountId(shard, realm, 0, null, null, evmAddress);
     }
 
     /**
@@ -245,18 +218,17 @@ public final class AccountId implements Comparable<AccountId> {
             if (accountId.getAlias().size() == 20) {
                 evmAddress = EvmAddress.fromAliasBytes(accountId.getAlias());
             } else {
-               aliasKey = PublicKey.fromAliasBytes(accountId.getAlias());
+                aliasKey = PublicKey.fromAliasBytes(accountId.getAlias());
             }
         }
         Objects.requireNonNull(accountId);
         return new AccountId(
-            accountId.getShardNum(),
-            accountId.getRealmNum(),
-            accountId.getAccountNum(),
-            null,
-            aliasKey,
-            evmAddress
-        );
+                accountId.getShardNum(),
+                accountId.getRealmNum(),
+                accountId.getAccountNum(),
+                null,
+                aliasKey,
+                evmAddress);
     }
 
     /**
@@ -285,14 +257,12 @@ public final class AccountId implements Comparable<AccountId> {
      * @return                          the account id builder
      */
     AccountID toProtobuf() {
-        var accountIdBuilder = AccountID.newBuilder()
-            .setShardNum(shard)
-            .setRealmNum(realm);
+        var accountIdBuilder = AccountID.newBuilder().setShardNum(shard).setRealmNum(realm);
         if (aliasKey != null) {
             accountIdBuilder.setAlias(aliasKey.toProtobufKey().toByteString());
         } else if (evmAddress != null) {
             accountIdBuilder.setAlias(ByteString.copyFrom(evmAddress.toBytes()));
-        }else {
+        } else {
             accountIdBuilder.setAccountNum(num);
         }
         return accountIdBuilder.build();
@@ -324,14 +294,13 @@ public final class AccountId implements Comparable<AccountId> {
     @Deprecated
     public CompletableFuture<AccountId> populateAccountNumAsync(Client client) {
         return EntityIdHelper.getAccountNumFromMirrorNodeAsync(client, evmAddress.toString())
-            .thenApply(accountNumFromMirrorNode ->
-                new AccountId(
-                    this.shard,
-                    this.realm,
-                    accountNumFromMirrorNode,
-                    this.checksum,
-                    this.aliasKey,
-                    this.evmAddress));
+                .thenApply(accountNumFromMirrorNode -> new AccountId(
+                        this.shard,
+                        this.realm,
+                        accountNumFromMirrorNode,
+                        this.checksum,
+                        this.aliasKey,
+                        this.evmAddress));
     }
 
     /**
@@ -356,14 +325,8 @@ public final class AccountId implements Comparable<AccountId> {
     @Deprecated
     public CompletableFuture<AccountId> populateAccountEvmAddressAsync(Client client) {
         return EntityIdHelper.getEvmAddressFromMirrorNodeAsync(client, num)
-            .thenApply(evmAddressFromMirrorNode ->
-                new AccountId(
-                    this.shard,
-                    this.realm,
-                    this.num,
-                    this.checksum,
-                    this.aliasKey,
-                    evmAddressFromMirrorNode));
+                .thenApply(evmAddressFromMirrorNode -> new AccountId(
+                        this.shard, this.realm, this.num, this.checksum, this.aliasKey, evmAddressFromMirrorNode));
     }
 
     /**
@@ -426,7 +389,8 @@ public final class AccountId implements Comparable<AccountId> {
      */
     public String toStringWithChecksum(Client client) {
         if (aliasKey != null || evmAddress != null) {
-            throw new IllegalStateException("toStringWithChecksum cannot be applied to AccountId with aliasKey or evmAddress");
+            throw new IllegalStateException(
+                    "toStringWithChecksum cannot be applied to AccountId with aliasKey or evmAddress");
         } else {
             return EntityIdHelper.toStringWithChecksum(shard, realm, num, client, checksum);
         }
@@ -442,9 +406,7 @@ public final class AccountId implements Comparable<AccountId> {
             aliasBytes = evmAddress.toBytes();
         }
 
-        return Objects.hash(
-            shard, realm, num, Arrays.hashCode(aliasBytes)
-        );
+        return Objects.hash(shard, realm, num, Arrays.hashCode(aliasBytes));
     }
 
     @Override
@@ -464,9 +426,11 @@ public final class AccountId implements Comparable<AccountId> {
         if ((evmAddress == null) != (otherId.evmAddress == null)) {
             return false;
         }
-        return shard == otherId.shard && realm == otherId.realm && num == otherId.num &&
-            (aliasKey == null || aliasKey.equals(otherId.aliasKey)) &&
-            (evmAddress == null || evmAddress.equals(otherId.evmAddress));
+        return shard == otherId.shard
+                && realm == otherId.realm
+                && num == otherId.num
+                && (aliasKey == null || aliasKey.equals(otherId.aliasKey))
+                && (evmAddress == null || evmAddress.equals(otherId.evmAddress));
     }
 
     @Override

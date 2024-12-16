@@ -1,27 +1,7 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.Splitter;
-
-import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.Objects;
@@ -46,7 +26,9 @@ public final class Hbar implements Comparable<Hbar> {
      * A constant value of the minimum number of hbars.
      */
     public static final Hbar MIN = Hbar.from(-50_000_000_000L);
-    private static final Pattern FROM_STRING_PATTERN = Pattern.compile("^((?:\\+|\\-)?\\d+(?:\\.\\d+)?)(\\ (tℏ|μℏ|mℏ|ℏ|kℏ|Mℏ|Gℏ))?$");
+
+    private static final Pattern FROM_STRING_PATTERN =
+            Pattern.compile("^((?:\\+|\\-)?\\d+(?:\\.\\d+)?)(\\ (tℏ|μℏ|mℏ|ℏ|kℏ|Mℏ|Gℏ))?$");
     private final long valueInTinybar;
 
     /**
@@ -93,7 +75,8 @@ public final class Hbar implements Comparable<Hbar> {
         var tinybars = amount.multiply(BigDecimal.valueOf(unit.tinybar));
 
         if (tinybars.doubleValue() % 1 != 0) {
-            throw new IllegalArgumentException("Amount and Unit combination results in a fractional value for tinybar.  Ensure tinybar value is a whole number.");
+            throw new IllegalArgumentException(
+                    "Amount and Unit combination results in a fractional value for tinybar.  Ensure tinybar value is a whole number.");
         }
 
         valueInTinybar = tinybars.longValue();
@@ -105,7 +88,8 @@ public final class Hbar implements Comparable<Hbar> {
                 return unit;
             }
         }
-        throw new IllegalArgumentException("Attempted to convert string to Hbar, but unit symbol \"" + symbolString + "\" was not recognized");
+        throw new IllegalArgumentException(
+                "Attempted to convert string to Hbar, but unit symbol \"" + symbolString + "\" was not recognized");
     }
 
     /**
@@ -117,7 +101,8 @@ public final class Hbar implements Comparable<Hbar> {
     public static Hbar fromString(CharSequence text) {
         var matcher = FROM_STRING_PATTERN.matcher(text);
         if (!matcher.matches()) {
-            throw new IllegalArgumentException("Attempted to convert string to Hbar, but \"" + text + "\" was not correctly formatted");
+            throw new IllegalArgumentException(
+                    "Attempted to convert string to Hbar, but \"" + text + "\" was not correctly formatted");
         }
         var parts = Splitter.on(' ').splitToList(text.toString());
         return new Hbar(new BigDecimal(parts.get(0)), parts.size() == 2 ? getUnit(parts.get(1)) : HbarUnit.HBAR);
@@ -243,7 +228,7 @@ public final class Hbar implements Comparable<Hbar> {
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

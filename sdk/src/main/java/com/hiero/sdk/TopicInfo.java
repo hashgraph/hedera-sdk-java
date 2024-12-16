@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -26,7 +8,6 @@ import com.hiero.sdk.proto.ConsensusGetTopicInfoResponse;
 import com.hiero.sdk.proto.ConsensusTopicInfo;
 import java.time.Duration;
 import java.time.Instant;
-
 import javax.annotation.Nullable;
 
 /**
@@ -89,17 +70,16 @@ public final class TopicInfo {
     public final LedgerId ledgerId;
 
     private TopicInfo(
-        TopicId topicId,
-        String topicMemo,
-        ByteString runningHash,
-        long sequenceNumber,
-        Instant expirationTime,
-        @Nullable Key adminKey,
-        @Nullable Key submitKey,
-        Duration autoRenewPeriod,
-        @Nullable AccountId autoRenewAccountId,
-        LedgerId ledgerId
-    ) {
+            TopicId topicId,
+            String topicMemo,
+            ByteString runningHash,
+            long sequenceNumber,
+            Instant expirationTime,
+            @Nullable Key adminKey,
+            @Nullable Key submitKey,
+            Duration autoRenewPeriod,
+            @Nullable AccountId autoRenewAccountId,
+            LedgerId ledgerId) {
         this.topicId = topicId;
         this.topicMemo = topicMemo;
         this.runningHash = runningHash;
@@ -121,30 +101,24 @@ public final class TopicInfo {
     static TopicInfo fromProtobuf(ConsensusGetTopicInfoResponse topicInfoResponse) {
         var topicInfo = topicInfoResponse.getTopicInfo();
 
-        var adminKey = topicInfo.hasAdminKey()
-            ? Key.fromProtobufKey(topicInfo.getAdminKey())
-            : null;
+        var adminKey = topicInfo.hasAdminKey() ? Key.fromProtobufKey(topicInfo.getAdminKey()) : null;
 
-        var submitKey = topicInfo.hasSubmitKey()
-            ? Key.fromProtobufKey(topicInfo.getSubmitKey())
-            : null;
+        var submitKey = topicInfo.hasSubmitKey() ? Key.fromProtobufKey(topicInfo.getSubmitKey()) : null;
 
-        var autoRenewAccountId = topicInfo.hasAutoRenewAccount()
-            ? AccountId.fromProtobuf(topicInfo.getAutoRenewAccount())
-            : null;
+        var autoRenewAccountId =
+                topicInfo.hasAutoRenewAccount() ? AccountId.fromProtobuf(topicInfo.getAutoRenewAccount()) : null;
 
         return new TopicInfo(
-            TopicId.fromProtobuf(topicInfoResponse.getTopicID()),
-            topicInfo.getMemo(),
-            topicInfo.getRunningHash(),
-            topicInfo.getSequenceNumber(),
-            InstantConverter.fromProtobuf(topicInfo.getExpirationTime()),
-            adminKey,
-            submitKey,
-            DurationConverter.fromProtobuf(topicInfo.getAutoRenewPeriod()),
-            autoRenewAccountId,
-            LedgerId.fromByteString(topicInfo.getLedgerId())
-        );
+                TopicId.fromProtobuf(topicInfoResponse.getTopicID()),
+                topicInfo.getMemo(),
+                topicInfo.getRunningHash(),
+                topicInfo.getSequenceNumber(),
+                InstantConverter.fromProtobuf(topicInfo.getExpirationTime()),
+                adminKey,
+                submitKey,
+                DurationConverter.fromProtobuf(topicInfo.getAutoRenewPeriod()),
+                autoRenewAccountId,
+                LedgerId.fromByteString(topicInfo.getLedgerId()));
     }
 
     /**
@@ -155,7 +129,8 @@ public final class TopicInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TopicInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                ConsensusGetTopicInfoResponse.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -164,16 +139,16 @@ public final class TopicInfo {
      * @return                          the protobuf representation
      */
     ConsensusGetTopicInfoResponse toProtobuf() {
-        var topicInfoResponseBuilder = ConsensusGetTopicInfoResponse.newBuilder()
-            .setTopicID(topicId.toProtobuf());
+        var topicInfoResponseBuilder =
+                ConsensusGetTopicInfoResponse.newBuilder().setTopicID(topicId.toProtobuf());
 
         var topicInfoBuilder = ConsensusTopicInfo.newBuilder()
-            .setMemo(topicMemo)
-            .setRunningHash(runningHash)
-            .setSequenceNumber(sequenceNumber)
-            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .setLedgerId(ledgerId.toByteString());
+                .setMemo(topicMemo)
+                .setRunningHash(runningHash)
+                .setSequenceNumber(sequenceNumber)
+                .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+                .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+                .setLedgerId(ledgerId.toByteString());
 
         if (adminKey != null) {
             topicInfoBuilder.setAdminKey(adminKey.toProtobufKey());
@@ -193,17 +168,17 @@ public final class TopicInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("topicId", topicId)
-            .add("topicMemo", topicMemo)
-            .add("runningHash", runningHash.toByteArray())
-            .add("sequenceNumber", sequenceNumber)
-            .add("expirationTime", expirationTime)
-            .add("adminKey", adminKey)
-            .add("submitKey", submitKey)
-            .add("autoRenewPeriod", autoRenewPeriod)
-            .add("autoRenewAccountId", autoRenewAccountId)
-            .add("ledgerId", ledgerId)
-            .toString();
+                .add("topicId", topicId)
+                .add("topicMemo", topicMemo)
+                .add("runningHash", runningHash.toByteArray())
+                .add("sequenceNumber", sequenceNumber)
+                .add("expirationTime", expirationTime)
+                .add("adminKey", adminKey)
+                .add("submitKey", submitKey)
+                .add("autoRenewPeriod", autoRenewPeriod)
+                .add("autoRenewAccountId", autoRenewAccountId)
+                .add("ledgerId", ledgerId)
+                .toString();
     }
 
     /**

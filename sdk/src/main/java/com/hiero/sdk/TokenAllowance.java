@@ -1,30 +1,11 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.GrantedTokenAllowance;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * An approved allowance of token transfers for a spender.
@@ -61,11 +42,10 @@ public class TokenAllowance {
      * @param amount                    the token allowance
      */
     TokenAllowance(
-        @Nullable TokenId tokenId,
-        @Nullable AccountId ownerAccountId,
-        @Nullable AccountId spenderAccountId,
-        long amount
-    ) {
+            @Nullable TokenId tokenId,
+            @Nullable AccountId ownerAccountId,
+            @Nullable AccountId spenderAccountId,
+            long amount) {
         this.tokenId = tokenId;
         this.ownerAccountId = ownerAccountId;
         this.spenderAccountId = spenderAccountId;
@@ -80,11 +60,10 @@ public class TokenAllowance {
      */
     static TokenAllowance fromProtobuf(com.hiero.sdk.proto.TokenAllowance allowanceProto) {
         return new TokenAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            allowanceProto.getAmount()
-        );
+                allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+                allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+                allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+                allowanceProto.getAmount());
     }
 
     /**
@@ -95,11 +74,10 @@ public class TokenAllowance {
      */
     static TokenAllowance fromProtobuf(GrantedTokenAllowance allowanceProto) {
         return new TokenAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            allowanceProto.getAmount()
-        );
+                allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+                null,
+                allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+                allowanceProto.getAmount());
     }
 
     /**
@@ -137,8 +115,7 @@ public class TokenAllowance {
      * @return                          the protobuf representation
      */
     com.hiero.sdk.proto.TokenAllowance toProtobuf() {
-        var builder = com.hiero.sdk.proto.TokenAllowance.newBuilder()
-            .setAmount(amount);
+        var builder = com.hiero.sdk.proto.TokenAllowance.newBuilder().setAmount(amount);
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }
@@ -157,8 +134,7 @@ public class TokenAllowance {
      * @return                          the protobuf representation
      */
     GrantedTokenAllowance toGrantedProtobuf() {
-        var builder = GrantedTokenAllowance.newBuilder()
-            .setAmount(amount);
+        var builder = GrantedTokenAllowance.newBuilder().setAmount(amount);
         if (tokenId != null) {
             builder.setTokenId(tokenId.toProtobuf());
         }
@@ -180,10 +156,10 @@ public class TokenAllowance {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("ownerAccountId", ownerAccountId)
-            .add("spenderAccountId", spenderAccountId)
-            .add("amount", amount)
-            .toString();
+                .add("tokenId", tokenId)
+                .add("ownerAccountId", ownerAccountId)
+                .add("spenderAccountId", spenderAccountId)
+                .add("amount", amount)
+                .toString();
     }
 }

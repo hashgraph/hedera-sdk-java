@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,18 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.Iterables;
 import com.google.protobuf.ByteString;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFee;
-import com.hiero.sdk.CustomFixedFee;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.TokenCreateTransaction;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenSupplyType;
-import com.hiero.sdk.TokenType;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
 import com.hiero.sdk.proto.SchedulableTransactionBody;
 import com.hiero.sdk.proto.Timestamp;
 import com.hiero.sdk.proto.TokenCreateTransactionBody;
@@ -52,31 +22,31 @@ import org.junit.jupiter.api.Test;
 
 public class TokenCreateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final PublicKey testAdminKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
+            .getPublicKey();
     private static final PublicKey testKycKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
+            .getPublicKey();
     private static final PublicKey testFreezeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
+            .getPublicKey();
     private static final PublicKey testWipeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
+            .getPublicKey();
     private static final PublicKey testSupplyKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
+            .getPublicKey();
     private static final PublicKey testFeeScheduleKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
+            .getPublicKey();
     private static final PublicKey testPauseKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
+            .getPublicKey();
     private static final PublicKey testMetadataKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
+            .getPublicKey();
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.8.8");
     private static final long testInitialSupply = 30;
@@ -88,10 +58,11 @@ public class TokenCreateTransactionTest {
     private static final String testTokenMemo = "test memo";
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.now();
-    private static final List<CustomFee> testCustomFees = Collections.singletonList(
-        new CustomFixedFee().setFeeCollectorAccountId(AccountId.fromString("0.0.543")).setAmount(3)
+    private static final List<CustomFee> testCustomFees = Collections.singletonList(new CustomFixedFee()
+            .setFeeCollectorAccountId(AccountId.fromString("0.0.543"))
+            .setAmount(3)
             .setDenominatingTokenId(TokenId.fromString("4.3.2")));
-    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
+    private static final byte[] testMetadata = new byte[] {1, 2, 3, 4, 5};
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -122,17 +93,32 @@ public class TokenCreateTransactionTest {
     }
 
     private TokenCreateTransaction spawnTestTransactionFungible() {
-        return new TokenCreateTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setInitialSupply(testInitialSupply).setFeeScheduleKey(testFeeScheduleKey).setSupplyKey(testSupplyKey)
-            .setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
-            .setAutoRenewPeriod(testAutoRenewPeriod).setDecimals(testDecimals).setFreezeDefault(testFreezeDefault)
-            .setFreezeKey(testFreezeKey).setWipeKey(testWipeKey).setTokenSymbol(testTokenSymbol).setKycKey(testKycKey)
-            .setPauseKey(testPauseKey).setMetadataKey(testMetadataKey).setExpirationTime(validStart)
-            .setTreasuryAccountId(testTreasuryAccountId).setTokenName(testTokenName).setTokenMemo(testTokenMemo)
-            .setCustomFees(testCustomFees).setMaxTransactionFee(new Hbar(1)).setTokenMetadata(testMetadata).freeze()
-            .sign(unusedPrivateKey);
+        return new TokenCreateTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setInitialSupply(testInitialSupply)
+                .setFeeScheduleKey(testFeeScheduleKey)
+                .setSupplyKey(testSupplyKey)
+                .setAdminKey(testAdminKey)
+                .setAutoRenewAccountId(testAutoRenewAccountId)
+                .setAutoRenewPeriod(testAutoRenewPeriod)
+                .setDecimals(testDecimals)
+                .setFreezeDefault(testFreezeDefault)
+                .setFreezeKey(testFreezeKey)
+                .setWipeKey(testWipeKey)
+                .setTokenSymbol(testTokenSymbol)
+                .setKycKey(testKycKey)
+                .setPauseKey(testPauseKey)
+                .setMetadataKey(testMetadataKey)
+                .setExpirationTime(validStart)
+                .setTreasuryAccountId(testTreasuryAccountId)
+                .setTokenName(testTokenName)
+                .setTokenMemo(testTokenMemo)
+                .setCustomFees(testCustomFees)
+                .setMaxTransactionFee(new Hbar(1))
+                .setTokenMetadata(testMetadata)
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -143,17 +129,31 @@ public class TokenCreateTransactionTest {
     }
 
     private TokenCreateTransaction spawnTestTransactionNft() {
-        return new TokenCreateTransaction().setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setFeeScheduleKey(testFeeScheduleKey).setSupplyKey(testSupplyKey).setMaxSupply(testMaxSupply)
-            .setAdminKey(testAdminKey).setAutoRenewAccountId(testAutoRenewAccountId)
-            .setAutoRenewPeriod(testAutoRenewPeriod).setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setSupplyType(TokenSupplyType.FINITE).setFreezeKey(testFreezeKey).setWipeKey(testWipeKey)
-            .setTokenSymbol(testTokenSymbol).setKycKey(testKycKey).setPauseKey(testPauseKey)
-            .setMetadataKey(testMetadataKey).setExpirationTime(validStart).setTreasuryAccountId(testTreasuryAccountId)
-            .setTokenName(testTokenName).setTokenMemo(testTokenMemo).setMaxTransactionFee(new Hbar(1))
-            .setTokenMetadata(testMetadata).freeze().sign(unusedPrivateKey);
+        return new TokenCreateTransaction()
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setFeeScheduleKey(testFeeScheduleKey)
+                .setSupplyKey(testSupplyKey)
+                .setMaxSupply(testMaxSupply)
+                .setAdminKey(testAdminKey)
+                .setAutoRenewAccountId(testAutoRenewAccountId)
+                .setAutoRenewPeriod(testAutoRenewPeriod)
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setFreezeKey(testFreezeKey)
+                .setWipeKey(testWipeKey)
+                .setTokenSymbol(testTokenSymbol)
+                .setKycKey(testKycKey)
+                .setPauseKey(testPauseKey)
+                .setMetadataKey(testMetadataKey)
+                .setExpirationTime(validStart)
+                .setTreasuryAccountId(testTreasuryAccountId)
+                .setTokenName(testTokenName)
+                .setTokenMemo(testTokenMemo)
+                .setMaxTransactionFee(new Hbar(1))
+                .setTokenMetadata(testMetadata)
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -166,7 +166,8 @@ public class TokenCreateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenCreation(TokenCreateTransactionBody.newBuilder().build()).build();
+                .setTokenCreation(TokenCreateTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -175,19 +176,33 @@ public class TokenCreateTransactionTest {
 
     @Test
     void constructTokenCreateTransactionFungibleFromTransactionBodyProtobuf() {
-        var transactionBody = TokenCreateTransactionBody.newBuilder().setInitialSupply(testInitialSupply)
-            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setSupplyKey(testSupplyKey.toProtobufKey())
-            .setAdminKey(testAdminKey.toProtobufKey()).setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
-            .setAutoRenewPeriod(
-                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
-                    .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
-            .setDecimals(testDecimals).setFreezeDefault(testFreezeDefault).setFreezeKey(testFreezeKey.toProtobufKey())
-            .setWipeKey(testWipeKey.toProtobufKey()).setSymbol(testTokenSymbol).setKycKey(testKycKey.toProtobufKey())
-            .setPauseKey(testPauseKey.toProtobufKey()).setMetadataKey(testMetadataKey.toProtobufKey())
-            .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()))
-            .setTreasury(testTreasuryAccountId.toProtobuf()).setName(testTokenName).setMemo(testTokenMemo)
-            .addCustomFees(Iterables.getLast(testCustomFees).toProtobuf())
-            .setMetadata(ByteString.copyFrom(testMetadata)).build();
+        var transactionBody = TokenCreateTransactionBody.newBuilder()
+                .setInitialSupply(testInitialSupply)
+                .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey())
+                .setSupplyKey(testSupplyKey.toProtobufKey())
+                .setAdminKey(testAdminKey.toProtobufKey())
+                .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
+                .setAutoRenewPeriod(com.hiero.sdk.proto.Duration.newBuilder()
+                        .setSeconds(testAutoRenewPeriod.toSeconds())
+                        .build())
+                .setExpiry(Timestamp.newBuilder()
+                        .setSeconds(testExpirationTime.getEpochSecond())
+                        .build())
+                .setDecimals(testDecimals)
+                .setFreezeDefault(testFreezeDefault)
+                .setFreezeKey(testFreezeKey.toProtobufKey())
+                .setWipeKey(testWipeKey.toProtobufKey())
+                .setSymbol(testTokenSymbol)
+                .setKycKey(testKycKey.toProtobufKey())
+                .setPauseKey(testPauseKey.toProtobufKey())
+                .setMetadataKey(testMetadataKey.toProtobufKey())
+                .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()))
+                .setTreasury(testTreasuryAccountId.toProtobuf())
+                .setName(testTokenName)
+                .setMemo(testTokenMemo)
+                .addCustomFees(Iterables.getLast(testCustomFees).toProtobuf())
+                .setMetadata(ByteString.copyFrom(testMetadata))
+                .build();
 
         var tx = TransactionBody.newBuilder().setTokenCreation(transactionBody).build();
         var tokenCreateTransaction = new TokenCreateTransaction(tx);
@@ -205,32 +220,44 @@ public class TokenCreateTransactionTest {
         assertThat(tokenCreateTransaction.getKycKey()).isEqualTo(testKycKey);
         assertThat(tokenCreateTransaction.getPauseKey()).isEqualTo(testPauseKey);
         assertThat(tokenCreateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
-        assertThat(tokenCreateTransaction.getExpirationTime().getEpochSecond()).isEqualTo(
-            testExpirationTime.getEpochSecond());
+        assertThat(tokenCreateTransaction.getExpirationTime().getEpochSecond())
+                .isEqualTo(testExpirationTime.getEpochSecond());
         assertThat(tokenCreateTransaction.getTreasuryAccountId()).isEqualTo(testTreasuryAccountId);
         assertThat(tokenCreateTransaction.getTokenName()).isEqualTo(testTokenName);
         assertThat(tokenCreateTransaction.getTokenMemo()).isEqualTo(testTokenMemo);
         assertThat(tokenCreateTransaction.getTokenType()).isEqualTo(TokenType.FUNGIBLE_COMMON);
-        assertThat(Iterables.getLast(tokenCreateTransaction.getCustomFees()).toBytes()).isEqualTo(
-            Iterables.getLast(testCustomFees).toBytes());
+        assertThat(Iterables.getLast(tokenCreateTransaction.getCustomFees()).toBytes())
+                .isEqualTo(Iterables.getLast(testCustomFees).toBytes());
         assertThat(tokenCreateTransaction.getTokenMetadata()).isEqualTo(testMetadata);
     }
 
     @Test
     void constructTokenCreateTransactionNftFromTransactionBodyProtobuf() {
         var transactionBody = TokenCreateTransactionBody.newBuilder()
-            .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey()).setSupplyKey(testSupplyKey.toProtobufKey())
-            .setMaxSupply(testMaxSupply).setAdminKey(testAdminKey.toProtobufKey())
-            .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf()).setAutoRenewPeriod(
-                com.hiero.sdk.proto.Duration.newBuilder().setSeconds(testAutoRenewPeriod.toSeconds())
-                    .build()).setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()).build())
-            .setTokenType(com.hiero.sdk.proto.TokenType.NON_FUNGIBLE_UNIQUE)
-            .setSupplyType(com.hiero.sdk.proto.TokenSupplyType.FINITE)
-            .setFreezeKey(testFreezeKey.toProtobufKey()).setWipeKey(testWipeKey.toProtobufKey())
-            .setSymbol(testTokenSymbol).setKycKey(testKycKey.toProtobufKey()).setPauseKey(testPauseKey.toProtobufKey())
-            .setMetadataKey(testMetadataKey.toProtobufKey())
-            .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()))
-            .setTreasury(testTreasuryAccountId.toProtobuf()).setName(testTokenName).setMemo(testTokenMemo).build();
+                .setFeeScheduleKey(testFeeScheduleKey.toProtobufKey())
+                .setSupplyKey(testSupplyKey.toProtobufKey())
+                .setMaxSupply(testMaxSupply)
+                .setAdminKey(testAdminKey.toProtobufKey())
+                .setAutoRenewAccount(testAutoRenewAccountId.toProtobuf())
+                .setAutoRenewPeriod(com.hiero.sdk.proto.Duration.newBuilder()
+                        .setSeconds(testAutoRenewPeriod.toSeconds())
+                        .build())
+                .setExpiry(Timestamp.newBuilder()
+                        .setSeconds(testExpirationTime.getEpochSecond())
+                        .build())
+                .setTokenType(com.hiero.sdk.proto.TokenType.NON_FUNGIBLE_UNIQUE)
+                .setSupplyType(com.hiero.sdk.proto.TokenSupplyType.FINITE)
+                .setFreezeKey(testFreezeKey.toProtobufKey())
+                .setWipeKey(testWipeKey.toProtobufKey())
+                .setSymbol(testTokenSymbol)
+                .setKycKey(testKycKey.toProtobufKey())
+                .setPauseKey(testPauseKey.toProtobufKey())
+                .setMetadataKey(testMetadataKey.toProtobufKey())
+                .setExpiry(Timestamp.newBuilder().setSeconds(testExpirationTime.getEpochSecond()))
+                .setTreasury(testTreasuryAccountId.toProtobuf())
+                .setName(testTokenName)
+                .setMemo(testTokenMemo)
+                .build();
 
         var tx = TransactionBody.newBuilder().setTokenCreation(transactionBody).build();
         var tokenCreateTransaction = new TokenCreateTransaction(tx);
@@ -249,8 +276,8 @@ public class TokenCreateTransactionTest {
         assertThat(tokenCreateTransaction.getKycKey()).isEqualTo(testKycKey);
         assertThat(tokenCreateTransaction.getPauseKey()).isEqualTo(testPauseKey);
         assertThat(tokenCreateTransaction.getMetadataKey()).isEqualTo(testMetadataKey);
-        assertThat(tokenCreateTransaction.getExpirationTime().getEpochSecond()).isEqualTo(
-            testExpirationTime.getEpochSecond());
+        assertThat(tokenCreateTransaction.getExpirationTime().getEpochSecond())
+                .isEqualTo(testExpirationTime.getEpochSecond());
         assertThat(tokenCreateTransaction.getTreasuryAccountId()).isEqualTo(testTreasuryAccountId);
         assertThat(tokenCreateTransaction.getTokenName()).isEqualTo(testTokenName);
         assertThat(tokenCreateTransaction.getTokenMemo()).isEqualTo(testTokenMemo);

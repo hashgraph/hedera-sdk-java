@@ -1,37 +1,16 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.BoolValue;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.proto.GrantedNftAllowance;
 import com.hiero.sdk.proto.NftAllowance;
 import com.hiero.sdk.proto.NftRemoveAllowance;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Class to encapsulate the nft methods for token allowance's.
@@ -60,7 +39,8 @@ public class TokenNftAllowance {
      * The account ID of the spender who is granted approvedForAll allowance and granting
      * approval on an NFT serial to another spender.
      */
-    @Nullable AccountId delegatingSpender;
+    @Nullable
+    AccountId delegatingSpender;
 
     /**
      * The list of serial numbers that the spender is permitted to transfer.
@@ -85,13 +65,12 @@ public class TokenNftAllowance {
      * @param allSerials                grant for all serial's
      */
     TokenNftAllowance(
-        @Nullable TokenId tokenId,
-        @Nullable AccountId ownerAccountId,
-        @Nullable AccountId spenderAccountId,
-        @Nullable AccountId delegatingSpender,
-        Collection<Long> serialNumbers,
-        @Nullable Boolean allSerials
-    ) {
+            @Nullable TokenId tokenId,
+            @Nullable AccountId ownerAccountId,
+            @Nullable AccountId spenderAccountId,
+            @Nullable AccountId delegatingSpender,
+            Collection<Long> serialNumbers,
+            @Nullable Boolean allSerials) {
         this.tokenId = tokenId;
         this.ownerAccountId = ownerAccountId;
         this.spenderAccountId = spenderAccountId;
@@ -108,13 +87,12 @@ public class TokenNftAllowance {
      */
     static TokenNftAllowance copyFrom(TokenNftAllowance allowance) {
         return new TokenNftAllowance(
-            allowance.tokenId,
-            allowance.ownerAccountId,
-            allowance.spenderAccountId,
-            allowance.delegatingSpender,
-            allowance.serialNumbers,
-            allowance.allSerials
-        );
+                allowance.tokenId,
+                allowance.ownerAccountId,
+                allowance.spenderAccountId,
+                allowance.delegatingSpender,
+                allowance.serialNumbers,
+                allowance.allSerials);
     }
 
     /**
@@ -125,13 +103,16 @@ public class TokenNftAllowance {
      */
     static TokenNftAllowance fromProtobuf(NftAllowance allowanceProto) {
         return new TokenNftAllowance(
-            allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
-            allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
-            allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
-            allowanceProto.hasDelegatingSpender() ? AccountId.fromProtobuf(allowanceProto.getDelegatingSpender()) : null,
-            allowanceProto.getSerialNumbersList(),
-            allowanceProto.hasApprovedForAll() ? allowanceProto.getApprovedForAll().getValue() : null
-        );
+                allowanceProto.hasTokenId() ? TokenId.fromProtobuf(allowanceProto.getTokenId()) : null,
+                allowanceProto.hasOwner() ? AccountId.fromProtobuf(allowanceProto.getOwner()) : null,
+                allowanceProto.hasSpender() ? AccountId.fromProtobuf(allowanceProto.getSpender()) : null,
+                allowanceProto.hasDelegatingSpender()
+                        ? AccountId.fromProtobuf(allowanceProto.getDelegatingSpender())
+                        : null,
+                allowanceProto.getSerialNumbersList(),
+                allowanceProto.hasApprovedForAll()
+                        ? allowanceProto.getApprovedForAll().getValue()
+                        : null);
     }
 
     /**
@@ -187,7 +168,8 @@ public class TokenNftAllowance {
         }
         builder.addAllSerialNumbers(serialNumbers);
         if (allSerials != null) {
-            builder.setApprovedForAll(BoolValue.newBuilder().setValue(allSerials).build());
+            builder.setApprovedForAll(
+                    BoolValue.newBuilder().setValue(allSerials).build());
         }
         return builder.build();
     }
@@ -221,10 +203,10 @@ public class TokenNftAllowance {
     @Override
     public String toString() {
         var stringHelper = MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("ownerAccountId", ownerAccountId)
-            .add("spenderAccountId", spenderAccountId)
-            .add("delegatingSpender", delegatingSpender);
+                .add("tokenId", tokenId)
+                .add("ownerAccountId", ownerAccountId)
+                .add("spenderAccountId", spenderAccountId)
+                .add("delegatingSpender", delegatingSpender);
         if (allSerials != null) {
             stringHelper.add("allSerials", allSerials);
         } else {

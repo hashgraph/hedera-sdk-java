@@ -1,30 +1,11 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.hiero.sdk.proto.AccountAmount;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * A token transfer record.
@@ -37,6 +18,7 @@ public class TokenTransfer {
 
     @Nullable
     Integer expectedDecimals;
+
     long amount;
 
     boolean isApproved;
@@ -62,7 +44,8 @@ public class TokenTransfer {
      * @param expectedDecimals          the expected decimals
      * @param isApproved                is it approved
      */
-    TokenTransfer(TokenId tokenId, AccountId accountId, long amount, @Nullable Integer expectedDecimals, boolean isApproved) {
+    TokenTransfer(
+            TokenId tokenId, AccountId accountId, long amount, @Nullable Integer expectedDecimals, boolean isApproved) {
         this.tokenId = tokenId;
         this.accountId = accountId;
         this.amount = amount;
@@ -84,12 +67,13 @@ public class TokenTransfer {
 
             for (var transfer : tokenTransferList.getTransfersList()) {
                 transfers.add(new TokenTransfer(
-                    tokenId,
-                    AccountId.fromProtobuf(transfer.getAccountID()),
-                    transfer.getAmount(),
-                    tokenTransferList.hasExpectedDecimals() ? tokenTransferList.getExpectedDecimals().getValue() : null,
-                    transfer.getIsApproval()
-                ));
+                        tokenId,
+                        AccountId.fromProtobuf(transfer.getAccountID()),
+                        transfer.getAmount(),
+                        tokenTransferList.hasExpectedDecimals()
+                                ? tokenTransferList.getExpectedDecimals().getValue()
+                                : null,
+                        transfer.getIsApproval()));
             }
         }
 
@@ -103,20 +87,20 @@ public class TokenTransfer {
      */
     AccountAmount toProtobuf() {
         return AccountAmount.newBuilder()
-            .setAccountID(accountId.toProtobuf())
-            .setAmount(amount)
-            .setIsApproval(isApproved)
-            .build();
+                .setAccountID(accountId.toProtobuf())
+                .setAmount(amount)
+                .setIsApproval(isApproved)
+                .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("accountId", accountId)
-            .add("amount", amount)
-            .add("expectedDecimals", expectedDecimals)
-            .add("isApproved", isApproved)
-            .toString();
+                .add("tokenId", tokenId)
+                .add("accountId", accountId)
+                .add("amount", amount)
+                .add("expectedDecimals", expectedDecimals)
+                .add("isApproved", isApproved)
+                .toString();
     }
 }

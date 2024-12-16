@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.proto.Query;
@@ -46,6 +28,7 @@ public class TokenNftInfoQuery extends com.hiero.sdk.Query<List<TokenNftInfo>, T
      */
     @Nullable
     private NftId nftId = null;
+
     @Nullable
     private TokenId tokenId = null;
     /**
@@ -53,14 +36,14 @@ public class TokenNftInfoQuery extends com.hiero.sdk.Query<List<TokenNftInfo>, T
      */
     @Nullable
     private AccountId accountId = null;
+
     private long start = 0;
     private long end = 0;
 
     /**
      * Constructor.
      */
-    public TokenNftInfoQuery() {
-    }
+    public TokenNftInfoQuery() {}
 
     /**
      * Sets the NFT ID for which information is requested.
@@ -203,9 +186,11 @@ public class TokenNftInfoQuery extends com.hiero.sdk.Query<List<TokenNftInfo>, T
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (nftId != null ? 1 : 0) + (tokenId != null ? 1 : 0) + (accountId != null ? 1 : 0);
         if (modesEnabled > 1) {
-            throw new IllegalStateException("TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but multiple of these modes have been selected");
+            throw new IllegalStateException(
+                    "TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but multiple of these modes have been selected");
         } else if (modesEnabled == 0) {
-            throw new IllegalStateException("TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but none of these modes have been selected");
+            throw new IllegalStateException(
+                    "TokenNftInfoQuery must be one of byNftId, byTokenId, or byAccountId, but none of these modes have been selected");
         }
         return super.onExecuteAsync(client);
     }
@@ -213,7 +198,7 @@ public class TokenNftInfoQuery extends com.hiero.sdk.Query<List<TokenNftInfo>, T
     @Override
     void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         var builder = TokenGetNftInfoQuery.newBuilder();
-        if(nftId != null) {
+        if (nftId != null) {
             builder.setNftID(nftId.toProtobuf());
         }
         queryBuilder.setTokenGetNftInfo(builder.setHeader(header));
@@ -231,7 +216,8 @@ public class TokenNftInfoQuery extends com.hiero.sdk.Query<List<TokenNftInfo>, T
 
     @Override
     List<TokenNftInfo> mapResponse(Response response, AccountId nodeId, com.hiero.sdk.proto.Query request) {
-        return Collections.singletonList(TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft()));
+        return Collections.singletonList(
+                TokenNftInfo.fromProtobuf(response.getTokenGetNftInfo().getNft()));
     }
 
     @Override

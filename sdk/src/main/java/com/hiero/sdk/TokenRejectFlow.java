@@ -1,27 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
@@ -46,12 +27,12 @@ public class TokenRejectFlow {
     /**
      * A list of one or more token rejections (a fungible/common token type).
      */
-    private List<TokenId> tokenIds  = new ArrayList<>();
+    private List<TokenId> tokenIds = new ArrayList<>();
 
     /**
      * A list of one or more token rejections (a single specific serialized non-fungible/unique token).
      */
-    private List<NftId> nftIds  = new ArrayList<>();
+    private List<NftId> nftIds = new ArrayList<>();
 
     @Nullable
     private List<AccountId> nodeAccountIds = null;
@@ -215,7 +196,6 @@ public class TokenRejectFlow {
         return this;
     }
 
-
     private void fillOutTransaction(final Transaction<?> transaction) {
         if (nodeAccountIds != null) {
             transaction.setNodeAccountIds(nodeAccountIds);
@@ -232,9 +212,9 @@ public class TokenRejectFlow {
 
     private TokenRejectTransaction createTokenRejectTransaction() {
         var tokenRejectTransaction = new TokenRejectTransaction()
-            .setOwnerId(ownerId)
-            .setTokenIds(tokenIds)
-            .setNftIds(nftIds);
+                .setOwnerId(ownerId)
+                .setTokenIds(tokenIds)
+                .setNftIds(nftIds);
 
         fillOutTransaction(tokenRejectTransaction);
 
@@ -242,13 +222,13 @@ public class TokenRejectFlow {
     }
 
     private TokenDissociateTransaction createTokenDissociateTransaction() {
-        List<TokenId> tokenIdsToReject = Stream.concat(tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
-            .distinct()
-            .collect(Collectors.toList());
+        List<TokenId> tokenIdsToReject = Stream.concat(
+                        tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
+                .distinct()
+                .collect(Collectors.toList());
 
-        var tokenDissociateTransaction = new TokenDissociateTransaction()
-            .setAccountId(ownerId)
-            .setTokenIds(tokenIdsToReject);
+        var tokenDissociateTransaction =
+                new TokenDissociateTransaction().setAccountId(ownerId).setTokenIds(tokenIdsToReject);
 
         fillOutTransaction(tokenDissociateTransaction);
 
@@ -277,7 +257,7 @@ public class TokenRejectFlow {
      * @throws TimeoutException        when the transaction times out
      */
     public TransactionResponse execute(Client client, Duration timeoutPerTransaction)
-        throws PrecheckStatusException, TimeoutException {
+            throws PrecheckStatusException, TimeoutException {
         try {
             var tokenRejectTxResponse = createTokenRejectTransaction().execute(client, timeoutPerTransaction);
             tokenRejectTxResponse.getReceipt(client, timeoutPerTransaction);
@@ -309,9 +289,11 @@ public class TokenRejectFlow {
      * @return the response
      */
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
-        return createTokenRejectTransaction().executeAsync(client, timeoutPerTransaction)
-            .thenCompose(tokenRejectResponse -> tokenRejectResponse.getReceiptQuery().executeAsync(client, timeoutPerTransaction))
-            .thenCompose(receipt -> createTokenDissociateTransaction().executeAsync(client, timeoutPerTransaction));
+        return createTokenRejectTransaction()
+                .executeAsync(client, timeoutPerTransaction)
+                .thenCompose(tokenRejectResponse ->
+                        tokenRejectResponse.getReceiptQuery().executeAsync(client, timeoutPerTransaction))
+                .thenCompose(receipt -> createTokenDissociateTransaction().executeAsync(client, timeoutPerTransaction));
     }
 
     /**
@@ -331,8 +313,8 @@ public class TokenRejectFlow {
      * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
      * @param callback              a BiConsumer which handles the result or error.
      */
-    public void executeAsync(Client client, Duration timeoutPerTransaction,
-        BiConsumer<TransactionResponse, Throwable> callback) {
+    public void executeAsync(
+            Client client, Duration timeoutPerTransaction, BiConsumer<TransactionResponse, Throwable> callback) {
         ConsumerHelper.biConsumer(executeAsync(client, timeoutPerTransaction), callback);
     }
 
@@ -355,8 +337,11 @@ public class TokenRejectFlow {
      * @param onSuccess             a Consumer which consumes the result on success.
      * @param onFailure             a Consumer which consumes the error on failure.
      */
-    public void executeAsync(Client client, Duration timeoutPerTransaction, Consumer<TransactionResponse> onSuccess,
-        Consumer<Throwable> onFailure) {
+    public void executeAsync(
+            Client client,
+            Duration timeoutPerTransaction,
+            Consumer<TransactionResponse> onSuccess,
+            Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(executeAsync(client, timeoutPerTransaction), onSuccess, onFailure);
     }
 }

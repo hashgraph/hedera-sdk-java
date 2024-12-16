@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -24,10 +6,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.ContractGetInfoResponse;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 /**
  * Current information on the smart contract instance, including its balance.
@@ -136,21 +117,20 @@ public final class ContractInfo {
      * @param ledgerId                  the ledger id
      */
     private ContractInfo(
-        ContractId contractId,
-        AccountId accountId,
-        String contractAccountId,
-        @Nullable Key adminKey,
-        Instant expirationTime,
-        Duration autoRenewPeriod,
-        @Nullable AccountId autoRenewAccountId,
-        long storage,
-        String contractMemo,
-        Hbar balance,
-        boolean isDeleted,
-        Map<TokenId, TokenRelationship> tokenRelationships,
-        LedgerId ledgerId,
-        @Nullable StakingInfo stakingInfo
-    ) {
+            ContractId contractId,
+            AccountId accountId,
+            String contractAccountId,
+            @Nullable Key adminKey,
+            Instant expirationTime,
+            Duration autoRenewPeriod,
+            @Nullable AccountId autoRenewAccountId,
+            long storage,
+            String contractMemo,
+            Hbar balance,
+            boolean isDeleted,
+            Map<TokenId, TokenRelationship> tokenRelationships,
+            LedgerId ledgerId,
+            @Nullable StakingInfo stakingInfo) {
         this.contractId = contractId;
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
@@ -174,35 +154,32 @@ public final class ContractInfo {
      * @return                          the contract object
      */
     static ContractInfo fromProtobuf(ContractGetInfoResponse.ContractInfo contractInfo) {
-        var adminKey = contractInfo.hasAdminKey()
-            ? Key.fromProtobufKey(contractInfo.getAdminKey())
-            : null;
+        var adminKey = contractInfo.hasAdminKey() ? Key.fromProtobufKey(contractInfo.getAdminKey()) : null;
 
         var tokenRelationships = new HashMap<TokenId, TokenRelationship>(contractInfo.getTokenRelationshipsCount());
 
         for (var relationship : contractInfo.getTokenRelationshipsList()) {
             tokenRelationships.put(
-                TokenId.fromProtobuf(relationship.getTokenId()),
-                TokenRelationship.fromProtobuf(relationship)
-            );
+                    TokenId.fromProtobuf(relationship.getTokenId()), TokenRelationship.fromProtobuf(relationship));
         }
 
         return new ContractInfo(
-            ContractId.fromProtobuf(contractInfo.getContractID()),
-            AccountId.fromProtobuf(contractInfo.getAccountID()),
-            contractInfo.getContractAccountID(),
-            adminKey,
-            InstantConverter.fromProtobuf(contractInfo.getExpirationTime()),
-            DurationConverter.fromProtobuf(contractInfo.getAutoRenewPeriod()),
-            contractInfo.hasAutoRenewAccountId() ? AccountId.fromProtobuf(contractInfo.getAutoRenewAccountId()) : null,
-            contractInfo.getStorage(),
-            contractInfo.getMemo(),
-            Hbar.fromTinybars(contractInfo.getBalance()),
-            contractInfo.getDeleted(),
-            tokenRelationships,
-            LedgerId.fromByteString(contractInfo.getLedgerId()),
-            contractInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(contractInfo.getStakingInfo()) : null
-        );
+                ContractId.fromProtobuf(contractInfo.getContractID()),
+                AccountId.fromProtobuf(contractInfo.getAccountID()),
+                contractInfo.getContractAccountID(),
+                adminKey,
+                InstantConverter.fromProtobuf(contractInfo.getExpirationTime()),
+                DurationConverter.fromProtobuf(contractInfo.getAutoRenewPeriod()),
+                contractInfo.hasAutoRenewAccountId()
+                        ? AccountId.fromProtobuf(contractInfo.getAutoRenewAccountId())
+                        : null,
+                contractInfo.getStorage(),
+                contractInfo.getMemo(),
+                Hbar.fromTinybars(contractInfo.getBalance()),
+                contractInfo.getDeleted(),
+                tokenRelationships,
+                LedgerId.fromByteString(contractInfo.getLedgerId()),
+                contractInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(contractInfo.getStakingInfo()) : null);
     }
 
     /**
@@ -213,7 +190,8 @@ public final class ContractInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ContractInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(ContractGetInfoResponse.ContractInfo.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     /**
@@ -223,15 +201,15 @@ public final class ContractInfo {
      */
     ContractGetInfoResponse.ContractInfo toProtobuf() {
         var contractInfoBuilder = ContractGetInfoResponse.ContractInfo.newBuilder()
-            .setContractID(contractId.toProtobuf())
-            .setAccountID(accountId.toProtobuf())
-            .setContractAccountID(contractAccountId)
-            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .setStorage(storage)
-            .setMemo(contractMemo)
-            .setBalance(balance.toTinybars())
-            .setLedgerId(ledgerId.toByteString());
+                .setContractID(contractId.toProtobuf())
+                .setAccountID(accountId.toProtobuf())
+                .setContractAccountID(contractAccountId)
+                .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+                .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+                .setStorage(storage)
+                .setMemo(contractMemo)
+                .setBalance(balance.toTinybars())
+                .setLedgerId(ledgerId.toByteString());
 
         if (adminKey != null) {
             contractInfoBuilder.setAdminKey(adminKey.toProtobufKey());
@@ -251,21 +229,21 @@ public final class ContractInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("contractId", contractId)
-            .add("accountId", accountId)
-            .add("contractAccountId", contractAccountId)
-            .add("adminKey", adminKey)
-            .add("expirationTime", expirationTime)
-            .add("autoRenewPeriod", autoRenewPeriod)
-            .add("autoRenewAccountId", autoRenewAccountId)
-            .add("storage", storage)
-            .add("contractMemo", contractMemo)
-            .add("balance", balance)
-            .add("isDeleted", isDeleted)
-            .add("tokenRelationships", tokenRelationships)
-            .add("ledgerId", ledgerId)
-            .add("stakingInfo", stakingInfo)
-            .toString();
+                .add("contractId", contractId)
+                .add("accountId", accountId)
+                .add("contractAccountId", contractAccountId)
+                .add("adminKey", adminKey)
+                .add("expirationTime", expirationTime)
+                .add("autoRenewPeriod", autoRenewPeriod)
+                .add("autoRenewAccountId", autoRenewAccountId)
+                .add("storage", storage)
+                .add("contractMemo", contractMemo)
+                .add("balance", balance)
+                .add("isDeleted", isDeleted)
+                .add("tokenRelationships", tokenRelationships)
+                .add("ledgerId", ledgerId)
+                .add("stakingInfo", stakingInfo)
+                .toString();
     }
 
     /**

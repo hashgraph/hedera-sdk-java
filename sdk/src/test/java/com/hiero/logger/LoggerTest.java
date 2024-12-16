@@ -1,14 +1,15 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.logger;
-
-import com.hiero.sdk.logger.LogLevel;
-import com.hiero.sdk.logger.Logger;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import com.hiero.sdk.logger.LogLevel;
+import com.hiero.sdk.logger.Logger;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 class LoggerTest {
 

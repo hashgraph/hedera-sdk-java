@@ -1,7 +1,6 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.LiveHashQuery;
 import com.hiero.sdk.proto.QueryHeader;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
@@ -25,9 +24,10 @@ public class LiveHashQueryTest {
     void shouldSerialize() {
         var builder = com.hiero.sdk.proto.Query.newBuilder();
         new LiveHashQuery()
-            .setAccountId(AccountId.fromString("0.0.100"))
-            .setHash(hash)
-            .onMakeRequest(builder, QueryHeader.newBuilder().build());
-        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .setAccountId(AccountId.fromString("0.0.100"))
+                .setHash(hash)
+                .onMakeRequest(builder, QueryHeader.newBuilder().build());
+        SnapshotMatcher.expect(builder.build().toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

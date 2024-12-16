@@ -90,7 +90,7 @@ jobs:
         run: ./gradlew assemble --scan
 
       - name: Code Quality Checks
-        run: ./gradlew qualityCheck :examples:qualityCheck --continue --scan
+        run: ./gradlew qualityCheck --continue --scan
 
       - name: Start Local Node
         run: npx @hashgraph/hedera-local start -d --network local --network-tag=0.57.0

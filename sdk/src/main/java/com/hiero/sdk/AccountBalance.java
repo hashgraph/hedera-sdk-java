@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -24,11 +6,10 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hiero.sdk.proto.TokenBalance;
-
-import javax.annotation.Nonnegative;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import javax.annotation.Nonnegative;
 
 /**
  * This class represents the account balance object
@@ -69,8 +50,12 @@ public class AccountBalance {
         Map<TokenId, Long> map = new HashMap<>();
         Map<TokenId, Integer> decimalMap = new HashMap<>();
         for (int i = 0; i < protobuf.getTokenBalancesCount(); i++) {
-            map.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getBalance());
-            decimalMap.put(TokenId.fromProtobuf(balanceList.get(i).getTokenId()), balanceList.get(i).getDecimals());
+            map.put(
+                    TokenId.fromProtobuf(balanceList.get(i).getTokenId()),
+                    balanceList.get(i).getBalance());
+            decimalMap.put(
+                    TokenId.fromProtobuf(balanceList.get(i).getTokenId()),
+                    balanceList.get(i).getDecimals());
         }
 
         return new AccountBalance(Hbar.fromTinybars(protobuf.getBalance()), map, decimalMap);
@@ -93,15 +78,13 @@ public class AccountBalance {
      * @return                          the protobuf object
      */
     CryptoGetAccountBalanceResponse toProtobuf() {
-        var protobuf = CryptoGetAccountBalanceResponse.newBuilder()
-            .setBalance(hbars.toTinybars());
+        var protobuf = CryptoGetAccountBalanceResponse.newBuilder().setBalance(hbars.toTinybars());
 
         for (var entry : tokens.entrySet()) {
             protobuf.addTokenBalances(TokenBalance.newBuilder()
-                .setTokenId(entry.getKey().toProtobuf())
-                .setBalance(entry.getValue())
-                .setDecimals(Objects.requireNonNull(tokenDecimals.get(entry.getKey())))
-            );
+                    .setTokenId(entry.getKey().toProtobuf())
+                    .setBalance(entry.getValue())
+                    .setDecimals(Objects.requireNonNull(tokenDecimals.get(entry.getKey()))));
         }
 
         return protobuf.build();
@@ -119,8 +102,8 @@ public class AccountBalance {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("hbars", hbars)
-            .add("tokens", tokens)
-            .toString();
+                .add("hbars", hbars)
+                .add("tokens", tokens)
+                .toString();
     }
 }

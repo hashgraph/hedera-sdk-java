@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -38,13 +20,11 @@ public abstract class Key {
     static final ASN1ObjectIdentifier ID_EC_PUBLIC_KEY = new ASN1ObjectIdentifier("1.2.840.10045.2.1");
 
     static final X9ECParameters ECDSA_SECP256K1_CURVE = SECNamedCurves.getByName("secp256k1");
-    static final ECDomainParameters ECDSA_SECP256K1_DOMAIN =
-        new ECDomainParameters(
+    static final ECDomainParameters ECDSA_SECP256K1_DOMAIN = new ECDomainParameters(
             ECDSA_SECP256K1_CURVE.getCurve(),
             ECDSA_SECP256K1_CURVE.getG(),
             ECDSA_SECP256K1_CURVE.getN(),
-            ECDSA_SECP256K1_CURVE.getH()
-        );
+            ECDSA_SECP256K1_CURVE.getH());
 
     /**
      * Create a specific key type from the protobuf.
@@ -61,14 +41,16 @@ public abstract class Key {
                 if (key.getECDSASecp256K1().size() == 20) {
                     return new EvmAddress(key.getECDSASecp256K1().toByteArray());
                 } else {
-                    return PublicKeyECDSA.fromBytesInternal(key.getECDSASecp256K1().toByteArray());
+                    return PublicKeyECDSA.fromBytesInternal(
+                            key.getECDSASecp256K1().toByteArray());
                 }
             }
             case KEYLIST -> {
                 return KeyList.fromProtobuf(key.getKeyList(), null);
             }
             case THRESHOLDKEY -> {
-                return KeyList.fromProtobuf(key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold());
+                return KeyList.fromProtobuf(
+                        key.getThresholdKey().getKeys(), key.getThresholdKey().getThreshold());
             }
             case CONTRACTID -> {
                 return ContractId.fromProtobuf(key.getContractID());

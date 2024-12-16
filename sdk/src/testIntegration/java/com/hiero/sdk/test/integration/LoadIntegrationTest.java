@@ -1,23 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
 
 import static org.junit.jupiter.api.Assertions.fail;
@@ -29,7 +10,6 @@ import com.hiero.sdk.PrivateKey;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -54,14 +34,13 @@ class LoadIntegrationTest {
             for (int i = 0; i < nThreads; i++) {
                 int finalI = i;
                 threadPoolExecutor.submit(() -> {
-                    try (var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor);
-                    ) {
+                    try (var client = Client.forNetwork(testEnv.client.getNetwork(), clientExecutor); ) {
                         client.setOperator(operatorId, operatorPrivateKey);
                         client.setMaxAttempts(10);
                         new AccountCreateTransaction()
-                            .setKey(PrivateKey.generateED25519())
-                            .execute(client)
-                            .getReceipt(client);
+                                .setKey(PrivateKey.generateED25519())
+                                .execute(client)
+                                .getReceipt(client);
                         System.out.println(finalI);
                     } catch (Exception e) {
                         fail("AccountCreateTransaction failed, " + e);
@@ -86,7 +65,6 @@ class LoadIntegrationTest {
             long executionTime = endTime - startTime;
             System.out.println("All tasks have finished execution in " + executionTime + "ms");
             clientExecutor.shutdownNow();
-
         }
     }
 }

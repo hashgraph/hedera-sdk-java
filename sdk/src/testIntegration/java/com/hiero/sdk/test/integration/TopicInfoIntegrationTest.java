@@ -1,23 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2021 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hiero.sdk.Hbar;
 import com.hiero.sdk.MaxQueryPaymentExceededException;
@@ -25,13 +10,9 @@ import com.hiero.sdk.PrecheckStatusException;
 import com.hiero.sdk.TopicCreateTransaction;
 import com.hiero.sdk.TopicDeleteTransaction;
 import com.hiero.sdk.TopicInfoQuery;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicInfoIntegrationTest {
 
@@ -41,23 +22,20 @@ public class TopicInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var info = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .execute(testEnv.client);
+            var info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
@@ -67,28 +45,26 @@ public class TopicInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var infoQuery = new TopicInfoQuery()
-                .setTopicId(topicId);
+            var infoQuery = new TopicInfoQuery().setTopicId(topicId);
 
             var cost = infoQuery.getCost(testEnv.client);
 
-                assertThat(cost).isNotNull();
+            assertThat(cost).isNotNull();
 
             var info = infoQuery.execute(testEnv.client);
 
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
-                new TopicDeleteTransaction()
-                        .setTopicId(topicId)
-                        .execute(testEnv.client)
-                        .getReceipt(testEnv.client);
-
+            new TopicDeleteTransaction()
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
@@ -98,15 +74,13 @@ public class TopicInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var infoQuery = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .setMaxQueryPayment(new Hbar(1000));
+            var infoQuery = new TopicInfoQuery().setTopicId(topicId).setMaxQueryPayment(new Hbar(1000));
 
             var cost = infoQuery.getCost(testEnv.client);
 
@@ -114,13 +88,12 @@ public class TopicInfoIntegrationTest {
 
             var info = infoQuery.execute(testEnv.client);
 
-                assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
+            assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
 
-                new TopicDeleteTransaction()
+            new TopicDeleteTransaction()
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -130,25 +103,22 @@ public class TopicInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var infoQuery = new TopicInfoQuery()
-                .setTopicId(topicId)
-                .setMaxQueryPayment(Hbar.fromTinybars(1));
+            var infoQuery = new TopicInfoQuery().setTopicId(topicId).setMaxQueryPayment(Hbar.fromTinybars(1));
 
             assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
                 infoQuery.execute(testEnv.client);
             });
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
+                    .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -158,29 +128,28 @@ public class TopicInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new TopicCreateTransaction()
-                .setAdminKey(testEnv.operatorKey)
-                .setTopicMemo("[e2e::TopicCreateTransaction]")
-                .execute(testEnv.client);
+                    .setAdminKey(testEnv.operatorKey)
+                    .setTopicMemo("[e2e::TopicCreateTransaction]")
+                    .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
 
-            var infoQuery = new TopicInfoQuery()
-                .setTopicId(topicId);
+            var infoQuery = new TopicInfoQuery().setTopicId(topicId);
 
             var cost = infoQuery.getCost(testEnv.client);
 
             assertThat(cost).isNotNull();
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-            }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
+                    })
+                    .satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
             new TopicDeleteTransaction()
-                .setTopicId(topicId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setTopicId(topicId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
-
 }

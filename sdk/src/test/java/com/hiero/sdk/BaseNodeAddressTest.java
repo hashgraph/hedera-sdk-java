@@ -1,32 +1,13 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.BaseNodeAddress;
-import org.junit.jupiter.api.Test;
 
 import static com.hiero.sdk.BaseNodeAddress.PORT_MIRROR_TLS;
 import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_TLS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import org.junit.jupiter.api.Test;
 
 public class BaseNodeAddressTest {
     @Test
@@ -97,7 +78,9 @@ public class BaseNodeAddressTest {
         assertThat(mirrorNodeAddressSecure.getPort()).isEqualTo(PORT_MIRROR_TLS);
         assertThat(mirrorNodeAddressSecure).hasToString("mainnet-public.mirrornode.hedera.com:443");
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("this is a random string with spaces:443"));
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:notarealport"));
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> BaseNodeAddress.fromString("this is a random string with spaces:443"));
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> BaseNodeAddress.fromString("mainnet-public.mirrornode.hedera.com:notarealport"));
     }
 }

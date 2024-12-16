@@ -1,32 +1,13 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * The fees for a specific transaction or query based on the fee data.
@@ -35,8 +16,10 @@ import java.util.Objects;
  */
 public class TransactionFeeSchedule implements Cloneable {
     private RequestType requestType;
+
     @Nullable
     private FeeData feeData;
+
     private List<FeeData> fees;
 
     /**
@@ -56,8 +39,11 @@ public class TransactionFeeSchedule implements Cloneable {
      */
     static TransactionFeeSchedule fromProtobuf(com.hiero.sdk.proto.TransactionFeeSchedule transactionFeeSchedule) {
         var returnFeeSchedule = new TransactionFeeSchedule()
-            .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
-            .setFeeData(transactionFeeSchedule.hasFeeData() ? FeeData.fromProtobuf(transactionFeeSchedule.getFeeData()) : null);
+                .setRequestType(RequestType.valueOf(transactionFeeSchedule.getHederaFunctionality()))
+                .setFeeData(
+                        transactionFeeSchedule.hasFeeData()
+                                ? FeeData.fromProtobuf(transactionFeeSchedule.getFeeData())
+                                : null);
         for (var feeData : transactionFeeSchedule.getFeesList()) {
             returnFeeSchedule.addFee(FeeData.fromProtobuf(feeData));
         }
@@ -72,7 +58,8 @@ public class TransactionFeeSchedule implements Cloneable {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TransactionFeeSchedule fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.TransactionFeeSchedule.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(com.hiero.sdk.proto.TransactionFeeSchedule.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     /**
@@ -145,8 +132,8 @@ public class TransactionFeeSchedule implements Cloneable {
      *         com.hiero.sdk.proto.TransactionFeeSchedule}
      */
     com.hiero.sdk.proto.TransactionFeeSchedule toProtobuf() {
-        var returnBuilder = com.hiero.sdk.proto.TransactionFeeSchedule.newBuilder()
-            .setHederaFunctionality(getRequestType().code);
+        var returnBuilder =
+                com.hiero.sdk.proto.TransactionFeeSchedule.newBuilder().setHederaFunctionality(getRequestType().code);
         if (feeData != null) {
             returnBuilder.setFeeData(feeData.toProtobuf());
         }
@@ -159,10 +146,10 @@ public class TransactionFeeSchedule implements Cloneable {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("requestType", getRequestType())
-            .add("feeData", getFeeData())
-            .add("fees", getFees())
-            .toString();
+                .add("requestType", getRequestType())
+                .add("feeData", getFeeData())
+                .add("fees", getFees())
+                .toString();
     }
 
     /**

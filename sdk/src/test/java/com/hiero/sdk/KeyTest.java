@@ -1,47 +1,22 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.Crypto;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PrivateKeyECDSA;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.PublicKeyECDSA;
-import com.hiero.sdk.PublicKeyED25519;
-import com.hiero.sdk.proto.Key;
-import com.hiero.sdk.proto.KeyList;
-import com.hiero.sdk.proto.ThresholdKey;
-import org.bouncycastle.util.encoders.Hex;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigInteger;
-import java.util.List;
 
 import static com.hiero.sdk.Key.fromBytes;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
+
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.hiero.sdk.proto.Key;
+import com.hiero.sdk.proto.KeyList;
+import com.hiero.sdk.proto.ThresholdKey;
+import java.math.BigInteger;
+import java.util.List;
+import org.bouncycastle.util.encoders.Hex;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class KeyTest {
     @Test
@@ -81,8 +56,8 @@ class KeyTest {
         System.arraycopy(signature, 0, r, 0, 32);
         final byte[] s = new byte[32];
         System.arraycopy(signature, 32, s, 0, 32);
-        var recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r,s,message);
-        assertThat(recId).isBetween(0,1);
+        var recId = ((PrivateKeyECDSA) privateKey).getRecoveryId(r, s, message);
+        assertThat(recId).isBetween(0, 1);
     }
 
     @Test
@@ -97,25 +72,25 @@ class KeyTest {
         final byte[] s = new byte[32];
         System.arraycopy(signature, 32, s, 0, 32);
         // recover public key with recId > 1
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> Crypto.recoverPublicKeyECDSAFromSignature(2, BigInteger.ONE, BigInteger.ONE, Crypto.calcKeccak256(message))
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Crypto.recoverPublicKeyECDSAFromSignature(
+                        2, BigInteger.ONE, BigInteger.ONE, Crypto.calcKeccak256(message)));
         // recover public key with negative 'r' or 's'
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> Crypto.recoverPublicKeyECDSAFromSignature(0, BigInteger.valueOf(-1), BigInteger.ONE, Crypto.calcKeccak256(message))
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> Crypto.recoverPublicKeyECDSAFromSignature(
+                        0, BigInteger.valueOf(-1), BigInteger.ONE, Crypto.calcKeccak256(message)));
         // calculate recId with wrong message
         var wrongMessage = "Hello".getBytes(UTF_8);
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> ((PrivateKeyECDSA) privateKey).getRecoveryId(r,s,wrongMessage)
-        );
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> ((PrivateKeyECDSA) privateKey).getRecoveryId(r, s, wrongMessage));
     }
 
     @Test
     @DisplayName("can convert from protobuf ED25519 key to PublicKey")
     void fromProtoKeyEd25519() {
         var keyBytes = Hex.decode("0011223344556677889900112233445566778899001122334455667788990011");
-        var protoKey = Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
+        var protoKey =
+                Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
 
         var cut = PublicKey.fromProtobufKey(protoKey);
 
@@ -139,7 +114,7 @@ class KeyTest {
     @DisplayName("can convert from protobuf key list to PublicKey")
     void fromProtoKeyKeyList() {
         // given
-        var keyBytes = new byte[][]{
+        var keyBytes = new byte[][] {
             Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
             Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
         };
@@ -170,7 +145,7 @@ class KeyTest {
     @DisplayName("can convert from protobuf threshold key to PublicKey")
     void fromProtoKeyThresholdKey() {
         // given
-        var keyBytes = new byte[][]{
+        var keyBytes = new byte[][] {
             Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
             Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
         };
@@ -203,20 +178,20 @@ class KeyTest {
     @DisplayName("Throws given unsupported key")
     void throwsUnsupportedKey() {
         byte[] keyBytes = {0, 1, 2};
-        var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> com.hiero.sdk.Key.fromProtobufKey(protoKey)
-        );
+        var protoKey =
+                Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
+        assertThatExceptionOfType(IllegalStateException.class)
+                .isThrownBy(() -> com.hiero.sdk.Key.fromProtobufKey(protoKey));
     }
 
     @Test
     @DisplayName("Key equals")
     void keyEquals() {
         var key1 = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
         var key2 = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
         assertThat(key2.toString()).isEqualTo(key1.toString());
         assertThat(key2.getPublicKey()).isEqualTo(key1.getPublicKey());
@@ -227,7 +202,7 @@ class KeyTest {
     @DisplayName("Key has hash")
     void keyHash() {
         var key = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
         assertThatNoException().isThrownBy(key::hashCode);
     }
@@ -236,13 +211,13 @@ class KeyTest {
     @DisplayName("KeyList methods")
     void keyListMethods() {
         var key1 = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
         var key2 = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11");
 
         var key3 = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12");
+                "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12");
 
         var keyList = com.hiero.sdk.KeyList.withThreshold(1);
         keyList.add(key1);
@@ -259,7 +234,7 @@ class KeyTest {
         assertThat(arr[1]).isEqualTo(key2);
         assertThat(arr[2]).isEqualTo(key3);
 
-        arr = new com.hiero.sdk.Key[]{null, null, null};
+        arr = new com.hiero.sdk.Key[] {null, null, null};
         keyList.toArray(arr);
         assertThat(arr[0]).isEqualTo(key1);
         assertThat(arr[1]).isEqualTo(key2);
@@ -286,7 +261,8 @@ class KeyTest {
     @DisplayName("can convert from bytes ED25519 key to Key")
     void fromBytesEd25519() throws InvalidProtocolBufferException {
         var keyBytes = Hex.decode("0011223344556677889900112233445566778899001122334455667788990011");
-        var protoKey = Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
+        var protoKey =
+                Key.newBuilder().setEd25519(ByteString.copyFrom(keyBytes)).build();
         var bytes = protoKey.toByteArray();
 
         var cut = fromBytes(bytes);
@@ -309,7 +285,7 @@ class KeyTest {
     @Test
     @DisplayName("can convert from bytes key list to Key")
     void fromBytesKeyList() throws InvalidProtocolBufferException {
-        var keyBytes = new byte[][]{
+        var keyBytes = new byte[][] {
             Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
             Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
         };
@@ -338,7 +314,7 @@ class KeyTest {
     @Test
     @DisplayName("can convert from bytes threshold key to Key")
     void fromBytesThresholdKey() throws InvalidProtocolBufferException {
-        var keyBytes = new byte[][]{
+        var keyBytes = new byte[][] {
             Hex.decode("0011223344556677889900112233445566778899001122334455667788990011"),
             Hex.decode("aa11223344556677889900112233445566778899001122334455667788990011")
         };
@@ -370,11 +346,10 @@ class KeyTest {
     @DisplayName("Throws given unsupported key")
     void throwsUnsupportedKeyFromBytes() {
         byte[] keyBytes = {0, 1, 2};
-        var protoKey = Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
+        var protoKey =
+                Key.newBuilder().setRSA3072(ByteString.copyFrom(keyBytes)).build();
         var bytes = protoKey.toByteArray();
 
-        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-            () -> fromBytes(bytes)
-        );
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> fromBytes(bytes));
     }
 }

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -85,12 +67,11 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
 
             for (var transfer : tokenTransfer.getNftTransfersList()) {
                 transfers.add(new TokenNftTransfer(
-                    tokenId,
-                    AccountId.fromProtobuf(transfer.getSenderAccountID()),
-                    AccountId.fromProtobuf(transfer.getReceiverAccountID()),
-                    transfer.getSerialNumber(),
-                    transfer.getIsApproval()
-                ));
+                        tokenId,
+                        AccountId.fromProtobuf(transfer.getSenderAccountID()),
+                        AccountId.fromProtobuf(transfer.getReceiverAccountID()),
+                        transfer.getSerialNumber(),
+                        transfer.getIsApproval()));
             }
         }
 
@@ -106,14 +87,11 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
      */
     @Deprecated
     public static TokenNftTransfer fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(
-            List.of(
-                TokenTransferList.newBuilder()
-                    .setToken(TokenID.newBuilder().build())
-                    .addNftTransfers(NftTransfer.parseFrom(bytes))
-                    .build()
-            )
-        ).get(0);
+        return fromProtobuf(List.of(TokenTransferList.newBuilder()
+                        .setToken(TokenID.newBuilder().build())
+                        .addNftTransfers(NftTransfer.parseFrom(bytes))
+                        .build()))
+                .get(0);
     }
 
     /**
@@ -123,22 +101,22 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
      */
     NftTransfer toProtobuf() {
         return NftTransfer.newBuilder()
-            .setSenderAccountID(sender.toProtobuf())
-            .setReceiverAccountID(receiver.toProtobuf())
-            .setSerialNumber(serial)
-            .setIsApproval(isApproved)
-            .build();
+                .setSenderAccountID(sender.toProtobuf())
+                .setReceiverAccountID(receiver.toProtobuf())
+                .setSerialNumber(serial)
+                .setIsApproval(isApproved)
+                .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("sender", sender)
-            .add("receiver", receiver)
-            .add("serial", serial)
-            .add("isApproved", isApproved)
-            .toString();
+                .add("tokenId", tokenId)
+                .add("sender", sender)
+                .add("receiver", receiver)
+                .add("serial", serial)
+                .add("isApproved", isApproved)
+                .toString();
     }
 
     /**
@@ -173,13 +151,15 @@ public class TokenNftTransfer implements Comparable<TokenNftTransfer> {
             return false;
         }
         TokenNftTransfer that = (TokenNftTransfer) o;
-        return serial == that.serial && isApproved == that.isApproved && tokenId.equals(that.tokenId) && sender.equals(
-            that.sender) && receiver.equals(that.receiver);
+        return serial == that.serial
+                && isApproved == that.isApproved
+                && tokenId.equals(that.tokenId)
+                && sender.equals(that.sender)
+                && receiver.equals(that.receiver);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(tokenId, sender, receiver, serial, isApproved);
     }
-
 }

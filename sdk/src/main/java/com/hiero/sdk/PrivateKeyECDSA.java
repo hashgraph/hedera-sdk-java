@@ -1,25 +1,12 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.utils.Bip32Utils;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import javax.annotation.Nullable;
 import org.bouncycastle.asn1.*;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.asn1.sec.ECPrivateKey;
@@ -35,12 +22,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.signers.ECDSASigner;
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator;
 import org.bouncycastle.util.Arrays;
-
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
 /**
  * Encapsulate the ECDSA private key.
@@ -276,10 +257,11 @@ public class PrivateKeyECDSA extends PrivateKey {
         byte[] bytes = n.toByteArray();
         byte[] bytes32 = new byte[32];
         System.arraycopy(
-            bytes, Math.max(0, bytes.length - 32),
-            bytes32, Math.max(0, 32 - bytes.length),
-            Math.min(32, bytes.length)
-        );
+                bytes,
+                Math.max(0, bytes.length - 32),
+                bytes32,
+                Math.max(0, 32 - bytes.length),
+                Math.min(32, bytes.length));
         return bytes32;
     }
 
@@ -292,11 +274,11 @@ public class PrivateKeyECDSA extends PrivateKey {
     public byte[] toBytesDER() {
         try {
             return new ECPrivateKey(
-                256,
-                keyData,
-                new DERBitString(getPublicKey().toBytesRaw()),
-                new X962Parameters(ID_ECDSA_SECP256K1)
-            ).getEncoded("DER");
+                            256,
+                            keyData,
+                            new DERBitString(getPublicKey().toBytesRaw()),
+                            new X962Parameters(ID_ECDSA_SECP256K1))
+                    .getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

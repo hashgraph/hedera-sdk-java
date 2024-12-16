@@ -1,16 +1,14 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFractionalFee;
-import com.hiero.sdk.FeeAssessmentMethod;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.hiero.sdk.proto.Fraction;
 import com.hiero.sdk.proto.FractionalFee;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomFractionalFeeTest {
     private static final boolean allCollectorsAreExempt = true;
@@ -22,11 +20,11 @@ public class CustomFractionalFeeTest {
     private static final FeeAssessmentMethod feeAssessmentMethod = FeeAssessmentMethod.EXCLUSIVE;
 
     private final FractionalFee fee = FractionalFee.newBuilder()
-        .setFractionalAmount(Fraction.newBuilder().setNumerator(numerator).setDenominator(denominator))
-        .setMinimumAmount(minAmount)
-        .setMaximumAmount(maxAmount)
-        .setNetOfTransfers(true)
-        .build();
+            .setFractionalAmount(Fraction.newBuilder().setNumerator(numerator).setDenominator(denominator))
+            .setMinimumAmount(minAmount)
+            .setMaximumAmount(maxAmount)
+            .setNetOfTransfers(true)
+            .build();
 
     @BeforeAll
     public static void beforeAll() {
@@ -46,8 +44,8 @@ public class CustomFractionalFeeTest {
     @Test
     void deepCloneSubclass() {
         var customFractionalFee = new CustomFractionalFee()
-            .setFeeCollectorAccountId(feeCollectorAccountId)
-            .setAllCollectorsAreExempt(allCollectorsAreExempt);
+                .setFeeCollectorAccountId(feeCollectorAccountId)
+                .setAllCollectorsAreExempt(allCollectorsAreExempt);
         var clonedCustomFractionalFee = customFractionalFee.deepCloneSubclass();
 
         assertThat(clonedCustomFractionalFee.getFeeCollectorAccountId()).isEqualTo(feeCollectorAccountId);
@@ -56,7 +54,9 @@ public class CustomFractionalFeeTest {
 
     @Test
     void toProtobuf() {
-        SnapshotMatcher.expect(CustomFractionalFee.fromProtobuf(fee).toProtobuf().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(
+                        CustomFractionalFee.fromProtobuf(fee).toProtobuf().toString())
+                .toMatchSnapshot();
     }
 
     @Test

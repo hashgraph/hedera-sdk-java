@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.NetworkVersionInfo;
-import com.hiero.sdk.SemanticVersion;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class NetworkVersionInfoTest {
     @BeforeAll
@@ -21,10 +20,7 @@ public class NetworkVersionInfoTest {
     }
 
     NetworkVersionInfo spawnNetworkVerionInfoExample() {
-        return new NetworkVersionInfo(
-            new SemanticVersion(1, 2, 3),
-            new SemanticVersion(4, 5, 6)
-        );
+        return new NetworkVersionInfo(new SemanticVersion(1, 2, 3), new SemanticVersion(4, 5, 6));
     }
 
     @Test
@@ -33,7 +29,8 @@ public class NetworkVersionInfoTest {
         byte[] networkVersionInfoBytes = originalNetworkVersionInfo.toBytes();
         var copyNetworkVersionInfo = NetworkVersionInfo.fromBytes(networkVersionInfoBytes);
         assertThat(originalNetworkVersionInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(copyNetworkVersionInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalNetworkVersionInfo.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(copyNetworkVersionInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalNetworkVersionInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

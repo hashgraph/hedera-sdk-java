@@ -1,17 +1,16 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.ConsumerHelper;
-import org.junit.jupiter.api.Test;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import org.junit.jupiter.api.Test;
 
 class ConsumerHelperTest {
     @Test
@@ -37,6 +36,7 @@ class ConsumerHelperTest {
         verify(onSuccess, times(1)).accept(value);
         verify(onFailure, times(0)).accept(any());
     }
+
     @Test
     void twoConsumersWithError() {
         var exception = new RuntimeException("Exception");

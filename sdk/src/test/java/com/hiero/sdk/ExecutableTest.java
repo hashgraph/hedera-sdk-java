@@ -1,40 +1,15 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Client;
-import com.hiero.sdk.Executable;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.hiero.sdk.Executable.GrpcRequest;
-import com.hiero.sdk.ExecutionState;
-import com.hiero.sdk.MaxAttemptsExceededException;
-import com.hiero.sdk.Network;
-import com.hiero.sdk.Node;
-import com.hiero.sdk.PrecheckStatusException;
-import com.hiero.sdk.Query;
-import com.hiero.sdk.Status;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.TransactionReceipt;
-import com.hiero.sdk.TransactionReceiptQuery;
-import com.hiero.sdk.TransactionResponse;
 import com.hiero.sdk.logger.LogLevel;
 import com.hiero.sdk.logger.Logger;
 import com.hiero.sdk.proto.QueryHeader;
@@ -43,12 +18,6 @@ import com.hiero.sdk.proto.ResponseCodeEnum;
 import com.hiero.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.stubbing.Answer;
-
-import javax.annotation.Nullable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -58,14 +27,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import javax.annotation.Nullable;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
 
 class ExecutableTest {
     Client client;
@@ -91,11 +57,7 @@ class ExecutableTest {
         when(network.getNodeProxies(new AccountId(4))).thenReturn(List.of(node4));
         when(network.getNodeProxies(new AccountId(5))).thenReturn(List.of(node5));
 
-        nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
     }
 
     @Test
@@ -111,7 +73,6 @@ class ExecutableTest {
         var node = tx.getNodeForExecute(1);
         Assertions.assertThat(node).isEqualTo(node3);
     }
-
 
     @Test
     void calloptionsShouldRespectGrpcDeadline() {
@@ -290,33 +251,28 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(
+                    com.hiero.sdk.proto.TransactionResponse response,
+                    AccountId nodeId,
+                    com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
-                    new AccountId(3),
-                    TransactionId.withValidStart(new AccountId(3), now),
-                    new byte[]{1, 2, 3},
-                    null)
-                    .setValidateStatus(true);
+                                new AccountId(3),
+                                TransactionId.withValidStart(new AccountId(3), now),
+                                new byte[] {1, 2, 3},
+                                null)
+                        .setValidateStatus(true);
             }
         };
 
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
-        var txResp =
-            com.hiero.sdk.proto.TransactionResponse
-                .newBuilder()
+        var txResp = com.hiero.sdk.proto.TransactionResponse.newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
-            client);
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(client);
 
         assertThat(resp.nodeId).isEqualTo(new AccountId(3));
         assertThat(resp.getValidateStatus()).isTrue();
@@ -335,32 +291,27 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(
+                    com.hiero.sdk.proto.TransactionResponse response,
+                    AccountId nodeId,
+                    com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
-                    new AccountId(4),
-                    TransactionId.withValidStart(new AccountId(4), now),
-                    new byte[]{1, 2, 3},
-                    null);
+                        new AccountId(4),
+                        TransactionId.withValidStart(new AccountId(4), now),
+                        new byte[] {1, 2, 3},
+                        null);
             }
         };
 
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
-        var txResp =
-            com.hiero.sdk.proto.TransactionResponse
-                .newBuilder()
+        var txResp = com.hiero.sdk.proto.TransactionResponse.newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
-            client);
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(client);
 
         verify(node3).channelFailedToConnect(any(Instant.class));
         verify(node4).channelFailedToConnect(any(Instant.class));
@@ -381,8 +332,8 @@ class ExecutableTest {
 
         when(node3.channelFailedToConnect(any(Instant.class))).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
         when(node4.channelFailedToConnect(any(Instant.class))).thenAnswer((Answer<Boolean>) inv -> i.get() == 0);
-        when(node5.channelFailedToConnect(any(Instant.class))).thenAnswer(
-            (Answer<Boolean>) inv -> i.getAndIncrement() == 0);
+        when(node5.channelFailedToConnect(any(Instant.class)))
+                .thenAnswer((Answer<Boolean>) inv -> i.getAndIncrement() == 0);
 
         when(node3.getRemainingTimeForBackoff()).thenReturn(500L);
         when(node4.getRemainingTimeForBackoff()).thenReturn(600L);
@@ -392,32 +343,27 @@ class ExecutableTest {
         var tx = new DummyTransaction() {
             @Nullable
             @Override
-            TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response,
-                AccountId nodeId, com.hiero.sdk.proto.Transaction request) {
+            TransactionResponse mapResponse(
+                    com.hiero.sdk.proto.TransactionResponse response,
+                    AccountId nodeId,
+                    com.hiero.sdk.proto.Transaction request) {
                 return new TransactionResponse(
-                    new AccountId(3),
-                    TransactionId.withValidStart(new AccountId(3), now),
-                    new byte[]{1, 2, 3},
-                    null);
+                        new AccountId(3),
+                        TransactionId.withValidStart(new AccountId(3), now),
+                        new byte[] {1, 2, 3},
+                        null);
             }
         };
 
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
-        var txResp =
-            com.hiero.sdk.proto.TransactionResponse
-                .newBuilder()
+        var txResp = com.hiero.sdk.proto.TransactionResponse.newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
                 .build();
 
         tx.blockingUnaryCall = (grpcRequest) -> txResp;
-        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(
-            client);
+        com.hiero.sdk.TransactionResponse resp = (com.hiero.sdk.TransactionResponse) tx.execute(client);
 
         verify(node3, times(2)).channelFailedToConnect(any(Instant.class));
         verify(node4).channelFailedToConnect(any(Instant.class));
@@ -436,11 +382,7 @@ class ExecutableTest {
         when(node5.channelFailedToConnect(any(Instant.class))).thenReturn(true);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
         assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(() -> tx.execute(client));
     }
@@ -456,11 +398,7 @@ class ExecutableTest {
         when(node4.channelFailedToConnect(any(Instant.class))).thenReturn(false);
 
         var tx = new DummyTransaction();
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
         tx.blockingUnaryCall = (grpcRequest) -> {
@@ -480,11 +418,10 @@ class ExecutableTest {
     @Test
     void testChannelFailedToConnectTimeout() {
         TransactionResponse transactionResponse = new TransactionResponse(
-            new AccountId(3),
-            TransactionId.withValidStart(new AccountId(3), java.time.Instant.now()),
-            new byte[]{1, 2, 3},
-            null
-        );
+                new AccountId(3),
+                TransactionId.withValidStart(new AccountId(3), java.time.Instant.now()),
+                new byte[] {1, 2, 3},
+                null);
         var tx = new DummyTransaction();
 
         tx.blockingUnaryCall = (grpcRequest) -> {
@@ -494,8 +431,8 @@ class ExecutableTest {
         when(node3.isHealthy()).thenReturn(true);
         when(node3.channelFailedToConnect(any(Instant.class))).thenReturn(true);
 
-        assertThatExceptionOfType(MaxAttemptsExceededException.class).isThrownBy(
-            () -> transactionResponse.getReceipt(client, Duration.ofSeconds(2)));
+        assertThatExceptionOfType(MaxAttemptsExceededException.class)
+                .isThrownBy(() -> transactionResponse.getReceipt(client, Duration.ofSeconds(2)));
     }
 
     @Test
@@ -518,19 +455,15 @@ class ExecutableTest {
                 return i.getAndIncrement() == 0 ? ExecutionState.RETRY : ExecutionState.SUCCESS;
             }
         };
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
         var receipt = com.hiero.sdk.proto.TransactionReceipt.newBuilder()
-            .setStatus(ResponseCodeEnum.OK)
-            .build();
+                .setStatus(ResponseCodeEnum.OK)
+                .build();
         var receiptResp = com.hiero.sdk.proto.TransactionGetReceiptResponse.newBuilder()
-            .setReceipt(receipt)
-            .build();
+                .setReceipt(receipt)
+                .build();
 
         var resp = Response.newBuilder().setTransactionGetReceipt(receiptResp).build();
         tx.blockingUnaryCall = (grpcRequest) -> resp;
@@ -539,7 +472,6 @@ class ExecutableTest {
         verify(node3).channelFailedToConnect(any(Instant.class));
         verify(node4).channelFailedToConnect(any(Instant.class));
     }
-
 
     @Test
     void executeUserError() throws PrecheckStatusException, TimeoutException {
@@ -552,16 +484,10 @@ class ExecutableTest {
                 return Status.ACCOUNT_DELETED;
             }
         };
-        var nodeAccountIds = Arrays.asList(
-            new AccountId(3),
-            new AccountId(4),
-            new AccountId(5)
-        );
+        var nodeAccountIds = Arrays.asList(new AccountId(3), new AccountId(4), new AccountId(5));
         tx.setNodeAccountIds(nodeAccountIds);
 
-        var txResp =
-            com.hiero.sdk.proto.TransactionResponse
-                .newBuilder()
+        var txResp = com.hiero.sdk.proto.TransactionResponse.newBuilder()
                 .setNodeTransactionPrecheckCode(ResponseCodeEnum.ACCOUNT_DELETED)
                 .build();
 
@@ -575,12 +501,14 @@ class ExecutableTest {
     void shouldRetryReturnsCorrectStates() {
         var tx = new DummyTransaction();
 
-        Assertions.assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null)).isEqualTo(
-            ExecutionState.SERVER_ERROR);
-        Assertions.assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.SERVER_ERROR);
+        Assertions.assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null))
+                .isEqualTo(ExecutionState.SERVER_ERROR);
+        Assertions.assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null))
+                .isEqualTo(ExecutionState.SERVER_ERROR);
         Assertions.assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.RETRY);
         Assertions.assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.SUCCESS);
-        Assertions.assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.REQUEST_ERROR);
+        Assertions.assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null))
+                .isEqualTo(ExecutionState.REQUEST_ERROR);
     }
 
     @Test
@@ -595,12 +523,11 @@ class ExecutableTest {
     }
 
     static class DummyTransaction<T extends Transaction<T>>
-        extends
-            Executable<T, com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse, TransactionResponse> {
+            extends Executable<
+                    T, com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse, TransactionResponse> {
 
         @Override
-        void onExecute(Client client) {
-        }
+        void onExecute(Client client) {}
 
         @Nullable
         @Override
@@ -616,8 +543,10 @@ class ExecutableTest {
 
         @Nullable
         @Override
-        TransactionResponse mapResponse(com.hiero.sdk.proto.TransactionResponse response, AccountId nodeId,
-            com.hiero.sdk.proto.Transaction request) {
+        TransactionResponse mapResponse(
+                com.hiero.sdk.proto.TransactionResponse response,
+                AccountId nodeId,
+                com.hiero.sdk.proto.Transaction request) {
             return null;
         }
 
@@ -628,7 +557,8 @@ class ExecutableTest {
 
         @Nullable
         @Override
-        MethodDescriptor<com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse> getMethodDescriptor() {
+        MethodDescriptor<com.hiero.sdk.proto.Transaction, com.hiero.sdk.proto.TransactionResponse>
+                getMethodDescriptor() {
             return null;
         }
 
@@ -641,12 +571,10 @@ class ExecutableTest {
 
     static class DummyQuery extends Query<TransactionReceipt, TransactionReceiptQuery> {
         @Override
-        void onExecute(Client client) {
-        }
+        void onExecute(Client client) {}
 
         @Override
-        TransactionReceipt mapResponse(Response response, AccountId nodeId,
-            com.hiero.sdk.proto.Query request) {
+        TransactionReceipt mapResponse(Response response, AccountId nodeId, com.hiero.sdk.proto.Query request) {
             return null;
         }
 
@@ -661,8 +589,7 @@ class ExecutableTest {
         }
 
         @Override
-        void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
-        }
+        void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {}
 
         @Override
         ResponseHeader mapResponseHeader(Response response) {
@@ -675,7 +602,6 @@ class ExecutableTest {
         }
 
         @Override
-        void validateChecksums(Client client) {
-        }
+        void validateChecksums(Client client) {}
     }
 }

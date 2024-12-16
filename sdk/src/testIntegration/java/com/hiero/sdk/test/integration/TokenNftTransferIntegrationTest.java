@@ -1,23 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2021 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hiero.sdk.AccountCreateTransaction;
 import com.hiero.sdk.Hbar;
@@ -32,67 +17,63 @@ import com.hiero.sdk.TokenType;
 import com.hiero.sdk.TokenWipeTransaction;
 import com.hiero.sdk.TransactionResponse;
 import com.hiero.sdk.TransferTransaction;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class TokenNftTransferIntegrationTest {
     @Test
     @DisplayName("Can transfer NFTs")
     void canTransferNfts() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var key = PrivateKey.generateED25519();
 
             TransactionResponse response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+                    .setKey(key)
+                    .setInitialBalance(new Hbar(1))
+                    .execute(testEnv.client);
 
             var accountId = response.getReceipt(testEnv.client).accountId;
             assertThat(accountId).isNotNull();
 
             response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setFreezeKey(testEnv.operatorKey)
-                .setWipeKey(testEnv.operatorKey)
-                .setKycKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
-                .setFreezeDefault(false)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setKycKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(testEnv.client);
 
             var tokenId = response.getReceipt(testEnv.client).tokenId;
             assertThat(tokenId).isNotNull();
 
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(tokenId)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             new TokenAssociateTransaction()
-                .setAccountId(accountId)
-                .setTokenIds(Collections.singletonList(tokenId))
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setAccountId(accountId)
+                    .setTokenIds(Collections.singletonList(tokenId))
+                    .freezeWith(testEnv.client)
+                    .signWithOperator(testEnv.client)
+                    .sign(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             new TokenGrantKycTransaction()
-                .setAccountId(accountId)
-                .setTokenId(tokenId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setAccountId(accountId)
+                    .setTokenId(tokenId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
             var transfer = new TransferTransaction();
@@ -102,59 +83,58 @@ class TokenNftTransferIntegrationTest {
             transfer.execute(testEnv.client).getReceipt(testEnv.client);
 
             new TokenWipeTransaction()
-                .setTokenId(tokenId)
-                .setAccountId(accountId)
-                .setSerials(serialsToTransfer)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setTokenId(tokenId)
+                    .setAccountId(accountId)
+                    .setSerials(serialsToTransfer)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
     @Test
     @DisplayName("Cannot transfer NFTs you don't own")
     void cannotTransferUnownedNfts() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var key = PrivateKey.generateED25519();
 
             TransactionResponse response = new AccountCreateTransaction()
-            .setKey(key)
-            .setInitialBalance(new Hbar(1))
-            .execute(testEnv.client);
+                    .setKey(key)
+                    .setInitialBalance(new Hbar(1))
+                    .execute(testEnv.client);
 
             var accountId = response.getReceipt(testEnv.client).accountId;
             assertThat(accountId).isNotNull();
 
             response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setFreezeKey(testEnv.operatorKey)
-                .setWipeKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
-                .setFreezeDefault(false)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setFreezeKey(testEnv.operatorKey)
+                    .setWipeKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .setFreezeDefault(false)
+                    .execute(testEnv.client);
 
             var tokenId = response.getReceipt(testEnv.client).tokenId;
             assertThat(tokenId).isNotNull();
 
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(tokenId)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             new TokenAssociateTransaction()
-                .setAccountId(accountId)
-                .setTokenIds(Collections.singletonList(tokenId))
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setAccountId(accountId)
+                    .setTokenIds(Collections.singletonList(tokenId))
+                    .freezeWith(testEnv.client)
+                    .signWithOperator(testEnv.client)
+                    .sign(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             var serialsToTransfer = new ArrayList<Long>(mintReceipt.serials.subList(0, 4));
             var transfer = new TransferTransaction();
@@ -164,10 +144,11 @@ class TokenNftTransferIntegrationTest {
             }
             transfer.freezeWith(testEnv.client).sign(key);
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-                transfer.execute(testEnv.client).getReceipt(testEnv.client);
-            }).withMessageContaining(Status.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO.toString());
-
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                    .isThrownBy(() -> {
+                        transfer.execute(testEnv.client).getReceipt(testEnv.client);
+                    })
+                    .withMessageContaining(Status.SENDER_DOES_NOT_OWN_NFT_SERIAL_NO.toString());
         }
     }
 }

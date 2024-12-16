@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -50,7 +32,8 @@ public class TokenAirdropTransaction extends AbstractTokenTransferTransaction<To
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    TokenAirdropTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    TokenAirdropTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -108,22 +91,22 @@ public class TokenAirdropTransaction extends AbstractTokenTransferTransaction<To
 
             for (var transfer : tokenTransferList.getTransfersList()) {
                 tokenTransfers.add(new TokenTransfer(
-                    token,
-                    AccountId.fromProtobuf(transfer.getAccountID()),
-                    transfer.getAmount(),
-                    tokenTransferList.hasExpectedDecimals() ? tokenTransferList.getExpectedDecimals().getValue() : null,
-                    transfer.getIsApproval()
-                ));
+                        token,
+                        AccountId.fromProtobuf(transfer.getAccountID()),
+                        transfer.getAmount(),
+                        tokenTransferList.hasExpectedDecimals()
+                                ? tokenTransferList.getExpectedDecimals().getValue()
+                                : null,
+                        transfer.getIsApproval()));
             }
 
             for (var transfer : tokenTransferList.getNftTransfersList()) {
                 nftTransfers.add(new TokenNftTransfer(
-                    token,
-                    AccountId.fromProtobuf(transfer.getSenderAccountID()),
-                    AccountId.fromProtobuf(transfer.getReceiverAccountID()),
-                    transfer.getSerialNumber(),
-                    transfer.getIsApproval()
-                ));
+                        token,
+                        AccountId.fromProtobuf(transfer.getSenderAccountID()),
+                        AccountId.fromProtobuf(transfer.getReceiverAccountID()),
+                        transfer.getSerialNumber(),
+                        transfer.getIsApproval()));
             }
         }
     }

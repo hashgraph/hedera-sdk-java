@@ -1,37 +1,16 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.TransactionId;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
+import java.util.Objects;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 class TransactionIdTest {
     @BeforeAll
@@ -46,12 +25,16 @@ class TransactionIdTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
     void shouldSerialize2() {
-        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled/3").toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(TransactionId.fromString("0.0.23847@1588539964.632521325?scheduled/3")
+                        .toString())
+                .toMatchSnapshot();
     }
 
     @Test
@@ -167,7 +150,6 @@ class TransactionIdTest {
         transactionId2 = new TransactionId(null, Instant.ofEpochSecond(1588539965));
         assertThat(transactionId1.compareTo(transactionId2)).isEqualTo(-1);
 
-
         transactionId1 = new TransactionId(null, null);
         transactionId2 = new TransactionId(null, null);
         assertThat(transactionId1).isEqualByComparingTo(transactionId2);
@@ -175,13 +157,11 @@ class TransactionIdTest {
 
     @Test
     void shouldFail() {
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> TransactionId.fromString("0.0.23847.1588539964.632521325/4")
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> TransactionId.fromString("0.0.23847.1588539964.632521325/4"));
 
-        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(
-            () -> TransactionId.fromString("0.0.23847@1588539964/4")
-        );
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> TransactionId.fromString("0.0.23847@1588539964/4"));
     }
 
     @Test

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static java.util.concurrent.CompletableFuture.completedFuture;
@@ -27,7 +9,6 @@ import com.hiero.sdk.proto.TransactionID;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeoutException;
@@ -71,7 +52,6 @@ public final class TransactionId implements Comparable<TransactionId> {
     private static final long NANOSECONDS_TO_REMOVE = 10000000000L;
 
     private static final AtomicLong monotonicTime = new AtomicLong();
-
 
     /**
      * No longer part of the public API. Use `Transaction.withValidStart()` instead.
@@ -117,7 +97,6 @@ public final class TransactionId implements Comparable<TransactionId> {
             // between the client and the receiving node and prevented spurious INVALID_TRANSACTION_START.
             currentTime = System.currentTimeMillis() * NANOSECONDS_PER_MILLISECOND - NANOSECONDS_TO_REMOVE;
 
-
             // Get the last recorded timestamp.
             lastTime = monotonicTime.get();
 
@@ -129,7 +108,10 @@ public final class TransactionId implements Comparable<TransactionId> {
         } while (!monotonicTime.compareAndSet(lastTime, currentTime));
 
         // NOTE: using ThreadLocalRandom because it's compatible with Android SDK version 26
-        return new TransactionId(accountId, Instant.ofEpochSecond(0, currentTime + ThreadLocalRandom.current().nextLong(1_000)));
+        return new TransactionId(
+                accountId,
+                Instant.ofEpochSecond(
+                        0, currentTime + ThreadLocalRandom.current().nextLong(1_000)));
     }
 
     /**
@@ -140,11 +122,13 @@ public final class TransactionId implements Comparable<TransactionId> {
      */
     static TransactionId fromProtobuf(TransactionID transactionID) {
         var accountId = transactionID.hasAccountID() ? AccountId.fromProtobuf(transactionID.getAccountID()) : null;
-        var validStart = transactionID.hasTransactionValidStart() ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart()) : null;
+        var validStart = transactionID.hasTransactionValidStart()
+                ? InstantConverter.fromProtobuf(transactionID.getTransactionValidStart())
+                : null;
 
         return new TransactionId(accountId, validStart)
-            .setScheduled(transactionID.getScheduled())
-            .setNonce((transactionID.getNonce() != 0) ? transactionID.getNonce() : null);
+                .setScheduled(transactionID.getScheduled())
+                .setNonce((transactionID.getNonce() != 0) ? transactionID.getNonce() : null);
     }
 
     /**
@@ -176,9 +160,9 @@ public final class TransactionId implements Comparable<TransactionId> {
             throw new IllegalArgumentException("expecting {account}@{seconds}.{nanos}");
         }
 
-        @Nullable Instant validStart = Instant.ofEpochSecond(
-            Long.parseLong(validStartParts[0]),
-            Long.parseLong(validStartParts[1]));
+        @Nullable
+        Instant validStart =
+                Instant.ofEpochSecond(Long.parseLong(validStartParts[0]), Long.parseLong(validStartParts[1]));
 
         return new TransactionId(accountId, validStart).setScheduled(scheduled).setNonce(nonce);
     }
@@ -244,7 +228,8 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionReceipt getReceipt(Client client)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         return getReceipt(client, client.getRequestTimeout());
     }
 
@@ -258,10 +243,9 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        var receipt = new TransactionReceiptQuery()
-            .setTransactionId(this)
-            .execute(client, timeout);
+    public TransactionReceipt getReceipt(Client client, Duration timeout)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        var receipt = new TransactionReceiptQuery().setTransactionId(this).execute(client, timeout);
 
         if (receipt.status != Status.SUCCESS) {
             throw new ReceiptStatusException(this, receipt);
@@ -289,15 +273,15 @@ public final class TransactionId implements Comparable<TransactionId> {
      */
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client, Duration timeout) {
         return new TransactionReceiptQuery()
-            .setTransactionId(this)
-            .executeAsync(client, timeout)
-            .thenCompose(receipt -> {
-                if (receipt.status != Status.SUCCESS) {
-                    return failedFuture(new ReceiptStatusException(this, receipt));
-                }
+                .setTransactionId(this)
+                .executeAsync(client, timeout)
+                .thenCompose(receipt -> {
+                    if (receipt.status != Status.SUCCESS) {
+                        return failedFuture(new ReceiptStatusException(this, receipt));
+                    }
 
-                return completedFuture(receipt);
-            });
+                    return completedFuture(receipt);
+                });
     }
 
     /**
@@ -340,7 +324,8 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
+    public void getReceiptAsync(
+            Client client, Duration timeout, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(getReceiptAsync(client, timeout), onSuccess, onFailure);
     }
 
@@ -353,7 +338,8 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionRecord getRecord(Client client)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         return getRecord(client, client.getRequestTimeout());
     }
 
@@ -367,12 +353,11 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionRecord getRecord(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionRecord getRecord(Client client, Duration timeout)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client, timeout);
 
-        return new TransactionRecordQuery()
-            .setTransactionId(this)
-            .execute(client, timeout);
+        return new TransactionRecordQuery().setTransactionId(this).execute(client, timeout);
     }
 
     /**
@@ -394,9 +379,9 @@ public final class TransactionId implements Comparable<TransactionId> {
      */
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client, Duration timeout) {
         // note: we get the receipt first to ensure consensus has been reached
-        return getReceiptAsync(client, timeout).thenCompose(receipt -> new TransactionRecordQuery()
-            .setTransactionId(this)
-            .executeAsync(client, timeout));
+        return getReceiptAsync(client, timeout)
+                .thenCompose(receipt ->
+                        new TransactionRecordQuery().setTransactionId(this).executeAsync(client, timeout));
     }
 
     /**
@@ -439,7 +424,8 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
+    public void getRecordAsync(
+            Client client, Duration timeout, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(getRecordAsync(client, timeout), onSuccess, onFailure);
     }
 
@@ -449,9 +435,7 @@ public final class TransactionId implements Comparable<TransactionId> {
      * @return                          the protobuf representation
      */
     TransactionID toProtobuf() {
-        var id = TransactionID.newBuilder()
-            .setScheduled(scheduled)
-            .setNonce((nonce != null) ? nonce : 0);
+        var id = TransactionID.newBuilder().setScheduled(scheduled).setNonce((nonce != null) ? nonce : 0);
 
         if (accountId != null) {
             id.setAccountID(accountId.toProtobuf());
@@ -466,8 +450,8 @@ public final class TransactionId implements Comparable<TransactionId> {
 
     private String toStringPostfix() {
         Objects.requireNonNull(validStart);
-        return "@" + validStart.getEpochSecond() + "." + String.format("%09d", validStart.getNano()) +
-            (scheduled ? "?scheduled" : "") + ((nonce != null) ? "/" + nonce : "");
+        return "@" + validStart.getEpochSecond() + "." + String.format("%09d", validStart.getNano())
+                + (scheduled ? "?scheduled" : "") + ((nonce != null) ? "/" + nonce : "");
     }
 
     @Override
@@ -503,7 +487,7 @@ public final class TransactionId implements Comparable<TransactionId> {
     }
 
     @Override
-    public boolean equals( Object object) {
+    public boolean equals(Object object) {
         if (!(object instanceof TransactionId)) {
             return false;
         }

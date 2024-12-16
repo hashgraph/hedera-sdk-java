@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.utils.Bip32Utils;
@@ -123,7 +105,7 @@ class PrivateKeyED25519 extends PrivateKey {
      */
     static PrivateKey fromBytesInternal(byte[] privateKey) {
         if ((privateKey.length == Ed25519.SECRET_KEY_SIZE)
-            || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
+                || (privateKey.length == Ed25519.SECRET_KEY_SIZE + Ed25519.PUBLIC_KEY_SIZE)) {
             // If this is a 32 or 64 byte string, assume an Ed25519 private key
             return new PrivateKeyED25519(Arrays.copyOfRange(privateKey, 0, Ed25519.SECRET_KEY_SIZE), null);
         }
@@ -151,17 +133,15 @@ class PrivateKeyED25519 extends PrivateKey {
             } else {
                 Arrays.fill(seed, entropy.length, entropy.length + 4, (byte) 0);
             }
-            Arrays.fill(seed, entropy.length + 4, seed.length, Long.valueOf(index).byteValue());
+            Arrays.fill(
+                    seed, entropy.length + 4, seed.length, Long.valueOf(index).byteValue());
         }
         System.arraycopy(entropy, 0, seed, 0, entropy.length);
 
         byte[] salt = new byte[1];
         salt[0] = -1;
         PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
-        pbkdf2.init(
-            seed,
-            salt,
-            2048);
+        pbkdf2.init(seed, salt, 2048);
 
         KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(256);
         return key.getKey();
@@ -249,10 +229,8 @@ class PrivateKeyED25519 extends PrivateKey {
     @Override
     public byte[] toBytesDER() {
         try {
-            return new PrivateKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
-                new DEROctetString(keyData)
-            ).getEncoded("DER");
+            return new PrivateKeyInfo(new AlgorithmIdentifier(ID_ED25519), new DEROctetString(keyData))
+                    .getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

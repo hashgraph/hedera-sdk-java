@@ -1,32 +1,13 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.ContractLoginfo;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The log information for an event returned by a smart contract function call.
@@ -76,11 +57,10 @@ public final class ContractLogInfo {
      */
     static ContractLogInfo fromProtobuf(com.hiero.sdk.proto.ContractLoginfo logInfo) {
         return new ContractLogInfo(
-            ContractId.fromProtobuf(logInfo.getContractID()),
-            logInfo.getBloom(),
-            logInfo.getTopicList(),
-            logInfo.getData()
-        );
+                ContractId.fromProtobuf(logInfo.getContractID()),
+                logInfo.getBloom(),
+                logInfo.getTopicList(),
+                logInfo.getData());
     }
 
     /**
@@ -101,8 +81,8 @@ public final class ContractLogInfo {
      */
     com.hiero.sdk.proto.ContractLoginfo toProtobuf() {
         var contractLogInfo = com.hiero.sdk.proto.ContractLoginfo.newBuilder()
-            .setContractID(contractId.toProtobuf())
-            .setBloom(bloom);
+                .setContractID(contractId.toProtobuf())
+                .setBloom(bloom);
 
         for (ByteString topic : topics) {
             contractLogInfo.addTopic(topic);
@@ -123,8 +103,8 @@ public final class ContractLogInfo {
     @Override
     public String toString() {
         var stringHelper = MoreObjects.toStringHelper(this)
-            .add("contractId", contractId)
-            .add("bloom", Hex.toHexString(bloom.toByteArray()));
+                .add("contractId", contractId)
+                .add("bloom", Hex.toHexString(bloom.toByteArray()));
 
         var topicList = new ArrayList<>();
 
@@ -132,8 +112,6 @@ public final class ContractLogInfo {
             topicList.add(Hex.toHexString(topic.toByteArray()));
         }
 
-        return stringHelper
-            .add("topics", topicList)
-            .toString();
+        return stringHelper.add("topics", topicList).toString();
     }
 }

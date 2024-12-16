@@ -1,42 +1,12 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFee;
-import com.hiero.sdk.CustomFixedFee;
-import com.hiero.sdk.TokenAssociateTransaction;
-import com.hiero.sdk.TokenBurnTransaction;
-import com.hiero.sdk.TokenCreateTransaction;
-import com.hiero.sdk.TokenDissociateTransaction;
-import com.hiero.sdk.TokenFeeScheduleUpdateTransaction;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenMintTransaction;
-import com.hiero.sdk.TokenWipeTransaction;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Objects;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 // A number of transactions take List<>s as inputs.
 // If the list parameter is used directly/naively, it can break encapsulation.
@@ -121,15 +91,15 @@ public class ListInputTest {
     void tokenMintListTest() {
         var tx = new TokenMintTransaction();
         var list = new ArrayList<byte[]>();
-        list.add(new byte[]{0});
+        list.add(new byte[] {0});
         tx.setMetadata(list);
         var v1 = new ArrayList<>(tx.getMetadata());
-        list.add(new byte[]{1});
+        list.add(new byte[] {1});
         var v2 = new ArrayList<>(tx.getMetadata());
         assertEquals(v1.toString(), v2.toString());
 
         var list2 = tx.getMetadata();
-        list2.add(new byte[]{2});
+        list2.add(new byte[] {2});
         var v3 = tx.getMetadata();
         assertEquals(v1.toString(), v3.toString());
     }

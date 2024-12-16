@@ -9,6 +9,6 @@ javaModules {
     module("tck") { group = "com.hiero.sdk.tck" }
 }
 
-//includeBuild("examples")
+// includeBuild("examples")
 //
-//includeBuild("example-android")
+// includeBuild("example-android")

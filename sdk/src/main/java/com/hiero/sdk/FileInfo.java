@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.FileGetInfoResponse;
 import java.time.Instant;
-
 import javax.annotation.Nullable;
 
 /**
@@ -70,14 +51,13 @@ public final class FileInfo {
     public final LedgerId ledgerId;
 
     private FileInfo(
-        FileId fileId,
-        long size,
-        Instant expirationTime,
-        boolean isDeleted,
-        @Nullable KeyList keys,
-        String fileMemo,
-        LedgerId ledgerId
-    ) {
+            FileId fileId,
+            long size,
+            Instant expirationTime,
+            boolean isDeleted,
+            @Nullable KeyList keys,
+            String fileMemo,
+            LedgerId ledgerId) {
         this.fileId = fileId;
         this.size = size;
         this.expirationTime = expirationTime;
@@ -94,19 +74,16 @@ public final class FileInfo {
      * @return                          the new file info object
      */
     static FileInfo fromProtobuf(FileGetInfoResponse.FileInfo fileInfo) {
-        @Nullable KeyList keys = fileInfo.hasKeys() ?
-            KeyList.fromProtobuf(fileInfo.getKeys(), null) :
-            null;
+        @Nullable KeyList keys = fileInfo.hasKeys() ? KeyList.fromProtobuf(fileInfo.getKeys(), null) : null;
 
         return new FileInfo(
-            FileId.fromProtobuf(fileInfo.getFileID()),
-            fileInfo.getSize(),
-            InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
-            fileInfo.getDeleted(),
-            keys,
-            fileInfo.getMemo(),
-            LedgerId.fromByteString(fileInfo.getLedgerId())
-        );
+                FileId.fromProtobuf(fileInfo.getFileID()),
+                fileInfo.getSize(),
+                InstantConverter.fromProtobuf(fileInfo.getExpirationTime()),
+                fileInfo.getDeleted(),
+                keys,
+                fileInfo.getMemo(),
+                LedgerId.fromByteString(fileInfo.getLedgerId()));
     }
 
     /**
@@ -117,7 +94,8 @@ public final class FileInfo {
      * @throws InvalidProtocolBufferException   when there is an issue with the protobuf
      */
     public static FileInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                FileGetInfoResponse.FileInfo.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -127,12 +105,12 @@ public final class FileInfo {
      */
     FileGetInfoResponse.FileInfo toProtobuf() {
         var fileInfoBuilder = FileGetInfoResponse.FileInfo.newBuilder()
-            .setFileID(fileId.toProtobuf())
-            .setSize(size)
-            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setDeleted(isDeleted)
-            .setMemo(fileMemo)
-            .setLedgerId(ledgerId.toByteString());
+                .setFileID(fileId.toProtobuf())
+                .setSize(size)
+                .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+                .setDeleted(isDeleted)
+                .setMemo(fileMemo)
+                .setLedgerId(ledgerId.toByteString());
 
         if (keys != null) {
             var keyList = com.hiero.sdk.proto.KeyList.newBuilder();
@@ -150,14 +128,14 @@ public final class FileInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("fileId", fileId)
-            .add("size", size)
-            .add("expirationTime", expirationTime)
-            .add("isDeleted", isDeleted)
-            .add("keys", keys)
-            .add("fileMemo", fileMemo)
-            .add("ledgerId", ledgerId)
-            .toString();
+                .add("fileId", fileId)
+                .add("size", size)
+                .add("expirationTime", expirationTime)
+                .add("isDeleted", isDeleted)
+                .add("keys", keys)
+                .add("fileMemo", fileMemo)
+                .add("ledgerId", ledgerId)
+                .toString();
     }
 
     /**

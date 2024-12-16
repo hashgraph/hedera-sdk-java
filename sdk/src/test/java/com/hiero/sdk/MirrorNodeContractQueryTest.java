@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -27,12 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.gson.JsonObject;
 import com.google.protobuf.ByteString;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.ContractFunctionParameters;
-import com.hiero.sdk.ContractId;
-import com.hiero.sdk.MirrorNodeContractCallQuery;
-import com.hiero.sdk.MirrorNodeContractEstimateGasQuery;
-import com.hiero.sdk.MirrorNodeContractQuery;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -138,7 +114,7 @@ class MirrorNodeContractQueryTest {
         mirrorNodeContractEstimateGasQuery.setGasLimit(gas);
         assertEquals(gas, mirrorNodeContractEstimateGasQuery.getGasLimit());
 
-       mirrorNodeContractCallQuery.setGasLimit(gas);
+        mirrorNodeContractCallQuery.setGasLimit(gas);
         assertEquals(gas, mirrorNodeContractCallQuery.getGasLimit());
     }
 
@@ -173,8 +149,8 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = true;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
-            gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(
+                data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
         expectedJson.addProperty("data", "7465737444617461");
@@ -200,8 +176,8 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = true;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
-            gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(
+                data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
         expectedJson.addProperty("data", "7465737444617461");
@@ -223,8 +199,8 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = false;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
-            gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(
+                data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
         expectedJson.addProperty("data", "7465737444617461");
@@ -249,8 +225,8 @@ class MirrorNodeContractQueryTest {
         String blockNumber = "latest";
         boolean estimate = false;
 
-        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(data, senderAddress, contractAddress, gas,
-            gasPrice, value, blockNumber, estimate);
+        String jsonPayload = MirrorNodeContractQuery.createJsonPayload(
+                data, senderAddress, contractAddress, gas, gasPrice, value, blockNumber, estimate);
 
         JsonObject expectedJson = new JsonObject();
         expectedJson.addProperty("data", "7465737444617461");
@@ -291,31 +267,30 @@ class MirrorNodeContractQueryTest {
         long testBlockNumber = 123456L;
 
         var mirrorNodeContractEstimateGasQuery = new MirrorNodeContractEstimateGasQuery()
-            .setContractId(testContractId)
-            .setContractEvmAddress(testEvmAddress)
-            .setSender(testSenderId)
-            .setSenderEvmAddress(testSenderEvmAddress)
-            .setFunction(testFunctionName, testParams)
-            .setFunctionParameters(testCallData)
-            .setValue(testValue)
-            .setGasLimit(testGasLimit)
-            .setGasPrice(testGasPrice)
-            .setBlockNumber(testBlockNumber);
+                .setContractId(testContractId)
+                .setContractEvmAddress(testEvmAddress)
+                .setSender(testSenderId)
+                .setSenderEvmAddress(testSenderEvmAddress)
+                .setFunction(testFunctionName, testParams)
+                .setFunctionParameters(testCallData)
+                .setValue(testValue)
+                .setGasLimit(testGasLimit)
+                .setGasPrice(testGasPrice)
+                .setBlockNumber(testBlockNumber);
 
         var mirrorNodeContractCallQuery = new MirrorNodeContractCallQuery()
-            .setContractId(testContractId)
-            .setContractEvmAddress(testEvmAddress)
-            .setSender(testSenderId)
-            .setSenderEvmAddress(testSenderEvmAddress)
-            .setFunction(testFunctionName, testParams)
-            .setFunctionParameters(testCallData)
-            .setValue(testValue)
-            .setGasLimit(testGasLimit)
-            .setGasPrice(testGasPrice)
-            .setBlockNumber(testBlockNumber);
+                .setContractId(testContractId)
+                .setContractEvmAddress(testEvmAddress)
+                .setSender(testSenderId)
+                .setSenderEvmAddress(testSenderEvmAddress)
+                .setFunction(testFunctionName, testParams)
+                .setFunctionParameters(testCallData)
+                .setValue(testValue)
+                .setGasLimit(testGasLimit)
+                .setGasPrice(testGasPrice)
+                .setBlockNumber(testBlockNumber);
 
-
-        SnapshotMatcher.expect(mirrorNodeContractEstimateGasQuery.toString() + mirrorNodeContractCallQuery.toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(mirrorNodeContractEstimateGasQuery.toString() + mirrorNodeContractCallQuery.toString())
+                .toMatchSnapshot();
     }
 }

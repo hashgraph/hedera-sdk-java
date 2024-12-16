@@ -1,82 +1,52 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFee;
-import com.hiero.sdk.CustomFixedFee;
-import com.hiero.sdk.CustomFractionalFee;
-import com.hiero.sdk.LedgerId;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenInfo;
-import com.hiero.sdk.TokenSupplyType;
-import com.hiero.sdk.TokenType;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 // TODO: update this, test deepClone()
 
 public class TokenInfoTest {
     /*
-     if we will init PrivateKey using method `PrivateKey.fromSeedECDSAsecp256k1(byte[] seed)` (like in C++ SDK, for example)
-     => we will get public key each time we run tests on different machines
-     => io.github.jsonSnapshot.SnapshotMatcher will fail tests
-     => we need to init PrivateKey fromString to get the same key each time
-     => `toProtobuf()` tests uses getEd25519() method to assert equality
-     */
+    if we will init PrivateKey using method `PrivateKey.fromSeedECDSAsecp256k1(byte[] seed)` (like in C++ SDK, for example)
+    => we will get public key each time we run tests on different machines
+    => io.github.jsonSnapshot.SnapshotMatcher will fail tests
+    => we need to init PrivateKey fromString to get the same key each time
+    => `toProtobuf()` tests uses getEd25519() method to assert equality
+    */
     private static final PublicKey testAdminKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e11")
+            .getPublicKey();
     private static final PublicKey testKycKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e12")
+            .getPublicKey();
     private static final PublicKey testFreezeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e13")
+            .getPublicKey();
     private static final PublicKey testWipeKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e14")
+            .getPublicKey();
     private static final PublicKey testSupplyKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e15")
+            .getPublicKey();
     private static final PublicKey testFeeScheduleKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e16")
+            .getPublicKey();
     private static final PublicKey testPauseKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e17")
+            .getPublicKey();
     private static final PublicKey testMetadataKey = PrivateKey.fromString(
-            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
-        .getPublicKey();
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e18")
+            .getPublicKey();
     private static final TokenId testTokenId = TokenId.fromString("0.6.9");
     private static final AccountId testTreasuryAccountId = AccountId.fromString("7.7.7");
     private static final AccountId testAutoRenewAccountId = AccountId.fromString("8.9.0");
@@ -89,10 +59,16 @@ public class TokenInfoTest {
     private static final Boolean testTokenKycStatus = true;
     private static final boolean testTokenIsDeleted = false;
     private static final List<CustomFee> testTokenCustomFees = Arrays.asList(
-        new CustomFixedFee().setFeeCollectorAccountId(new AccountId(4322)).setDenominatingTokenId(new TokenId(483902))
-            .setAmount(10),
-        new CustomFractionalFee().setFeeCollectorAccountId(new AccountId(389042)).setNumerator(3).setDenominator(7)
-            .setMin(3).setMax(100));
+            new CustomFixedFee()
+                    .setFeeCollectorAccountId(new AccountId(4322))
+                    .setDenominatingTokenId(new TokenId(483902))
+                    .setAmount(10),
+            new CustomFractionalFee()
+                    .setFeeCollectorAccountId(new AccountId(389042))
+                    .setNumerator(3)
+                    .setDenominator(7)
+                    .setMin(3)
+                    .setMax(100));
     private static final TokenType testTokenType = TokenType.FUNGIBLE_COMMON;
     private static final TokenSupplyType testTokenSupplyType = TokenSupplyType.FINITE;
     private static final long testTokenMaxSupply = 1000000L;
@@ -100,7 +76,7 @@ public class TokenInfoTest {
     private static final LedgerId testTokenLedgerId = LedgerId.MAINNET;
     private static final Duration testAutoRenewPeriod = Duration.ofHours(10);
     private static final Instant testExpirationTime = Instant.ofEpochSecond(1554158542);
-    private static final byte[] testMetadata = new byte[]{1, 2, 3, 4, 5};
+    private static final byte[] testMetadata = new byte[] {1, 2, 3, 4, 5};
 
     @BeforeAll
     public static void beforeAll() {
@@ -113,12 +89,35 @@ public class TokenInfoTest {
     }
 
     private static TokenInfo spawnTokenInfoExample() {
-        return new TokenInfo(testTokenId, testTokenName, testTokenSymbol, testTokenDecimals, testTokenTotalSupply,
-            testTreasuryAccountId, testAdminKey, testKycKey, testFreezeKey, testWipeKey, testSupplyKey,
-            testFeeScheduleKey, testTokenFreezeStatus, testTokenKycStatus, testTokenIsDeleted, testAutoRenewAccountId,
-            testAutoRenewPeriod, testExpirationTime, testTokenMemo, testTokenCustomFees, testTokenType,
-            testTokenSupplyType, testTokenMaxSupply, testPauseKey, testTokenPauseStatus, testMetadata, testMetadataKey,
-            testTokenLedgerId);
+        return new TokenInfo(
+                testTokenId,
+                testTokenName,
+                testTokenSymbol,
+                testTokenDecimals,
+                testTokenTotalSupply,
+                testTreasuryAccountId,
+                testAdminKey,
+                testKycKey,
+                testFreezeKey,
+                testWipeKey,
+                testSupplyKey,
+                testFeeScheduleKey,
+                testTokenFreezeStatus,
+                testTokenKycStatus,
+                testTokenIsDeleted,
+                testAutoRenewAccountId,
+                testAutoRenewPeriod,
+                testExpirationTime,
+                testTokenMemo,
+                testTokenCustomFees,
+                testTokenType,
+                testTokenSupplyType,
+                testTokenMaxSupply,
+                testPauseKey,
+                testTokenPauseStatus,
+                testMetadata,
+                testMetadataKey,
+                testTokenLedgerId);
     }
 
     @Test
@@ -216,48 +215,51 @@ public class TokenInfoTest {
         assertThat(tokenInfoProto.getTokenInfo().getTreasury().getShardNum()).isEqualTo(testTreasuryAccountId.shard);
         assertThat(tokenInfoProto.getTokenInfo().getTreasury().getRealmNum()).isEqualTo(testTreasuryAccountId.realm);
         assertThat(tokenInfoProto.getTokenInfo().getTreasury().getAccountNum()).isEqualTo(testTreasuryAccountId.num);
-        assertThat(tokenInfoProto.getTokenInfo().getAdminKey().getEd25519().toByteArray()).isEqualTo(
-            testAdminKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getKycKey().getEd25519().toByteArray()).isEqualTo(
-            testKycKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getFreezeKey().getEd25519().toByteArray()).isEqualTo(
-            testFreezeKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getWipeKey().getEd25519().toByteArray()).isEqualTo(
-            testWipeKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getSupplyKey().getEd25519().toByteArray()).isEqualTo(
-            testSupplyKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getDefaultFreezeStatus()).isEqualTo(
-            TokenInfo.freezeStatusToProtobuf(testTokenFreezeStatus));
-        assertThat(tokenInfoProto.getTokenInfo().getDefaultKycStatus()).isEqualTo(
-            TokenInfo.kycStatusToProtobuf(testTokenKycStatus));
+        assertThat(tokenInfoProto.getTokenInfo().getAdminKey().getEd25519().toByteArray())
+                .isEqualTo(testAdminKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getKycKey().getEd25519().toByteArray())
+                .isEqualTo(testKycKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getFreezeKey().getEd25519().toByteArray())
+                .isEqualTo(testFreezeKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getWipeKey().getEd25519().toByteArray())
+                .isEqualTo(testWipeKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getSupplyKey().getEd25519().toByteArray())
+                .isEqualTo(testSupplyKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getDefaultFreezeStatus())
+                .isEqualTo(TokenInfo.freezeStatusToProtobuf(testTokenFreezeStatus));
+        assertThat(tokenInfoProto.getTokenInfo().getDefaultKycStatus())
+                .isEqualTo(TokenInfo.kycStatusToProtobuf(testTokenKycStatus));
         assertThat(tokenInfoProto.getTokenInfo().getDeleted()).isEqualTo(testTokenIsDeleted);
-        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getShardNum()).isEqualTo(
-            testAutoRenewAccountId.shard);
-        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getRealmNum()).isEqualTo(
-            testAutoRenewAccountId.realm);
-        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getAccountNum()).isEqualTo(
-            testAutoRenewAccountId.num);
-        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewPeriod().getSeconds()).isEqualTo(
-            testAutoRenewPeriod.toSeconds());
-        assertThat(tokenInfoProto.getTokenInfo().getExpiry().getSeconds()).isEqualTo(
-            testExpirationTime.getEpochSecond());
+        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getShardNum())
+                .isEqualTo(testAutoRenewAccountId.shard);
+        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getRealmNum())
+                .isEqualTo(testAutoRenewAccountId.realm);
+        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewAccount().getAccountNum())
+                .isEqualTo(testAutoRenewAccountId.num);
+        assertThat(tokenInfoProto.getTokenInfo().getAutoRenewPeriod().getSeconds())
+                .isEqualTo(testAutoRenewPeriod.toSeconds());
+        assertThat(tokenInfoProto.getTokenInfo().getExpiry().getSeconds())
+                .isEqualTo(testExpirationTime.getEpochSecond());
         assertThat(tokenInfoProto.getTokenInfo().getMemo()).isEqualTo(testTokenMemo);
-        assertThat(tokenInfoProto.getTokenInfo().getTokenType()).isEqualTo(
-            com.hiero.sdk.proto.TokenType.valueOf(testTokenType.name()));
-        assertThat(tokenInfoProto.getTokenInfo().getSupplyType()).isEqualTo(
-            com.hiero.sdk.proto.TokenSupplyType.valueOf(testTokenSupplyType.name()));
+        assertThat(tokenInfoProto.getTokenInfo().getTokenType())
+                .isEqualTo(com.hiero.sdk.proto.TokenType.valueOf(testTokenType.name()));
+        assertThat(tokenInfoProto.getTokenInfo().getSupplyType())
+                .isEqualTo(com.hiero.sdk.proto.TokenSupplyType.valueOf(testTokenSupplyType.name()));
         assertThat(tokenInfoProto.getTokenInfo().getMaxSupply()).isEqualTo(testTokenMaxSupply);
-        assertThat(tokenInfoProto.getTokenInfo().getFeeScheduleKey().getEd25519().toByteArray()).isEqualTo(
-            testFeeScheduleKey.toBytesRaw());
+        assertThat(tokenInfoProto
+                        .getTokenInfo()
+                        .getFeeScheduleKey()
+                        .getEd25519()
+                        .toByteArray())
+                .isEqualTo(testFeeScheduleKey.toBytesRaw());
         assertThat(tokenInfoProto.getTokenInfo().getCustomFeesList()).hasSize(testTokenCustomFees.size());
-        assertThat(tokenInfoProto.getTokenInfo().getPauseKey().getEd25519().toByteArray()).isEqualTo(
-            testPauseKey.toBytesRaw());
-        assertThat(tokenInfoProto.getTokenInfo().getPauseStatus()).isEqualTo(
-            TokenInfo.pauseStatusToProtobuf(testTokenPauseStatus));
-        assertThat(tokenInfoProto.getTokenInfo().getMetadata().toByteArray()).isEqualTo(
-            testMetadata);
-        assertThat(tokenInfoProto.getTokenInfo().getMetadataKey().getEd25519().toByteArray()).isEqualTo(
-            testMetadataKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getPauseKey().getEd25519().toByteArray())
+                .isEqualTo(testPauseKey.toBytesRaw());
+        assertThat(tokenInfoProto.getTokenInfo().getPauseStatus())
+                .isEqualTo(TokenInfo.pauseStatusToProtobuf(testTokenPauseStatus));
+        assertThat(tokenInfoProto.getTokenInfo().getMetadata().toByteArray()).isEqualTo(testMetadata);
+        assertThat(tokenInfoProto.getTokenInfo().getMetadataKey().getEd25519().toByteArray())
+                .isEqualTo(testMetadataKey.toBytesRaw());
         assertThat(tokenInfoProto.getTokenInfo().getLedgerId()).isEqualTo(testTokenLedgerId.toByteString());
     }
 

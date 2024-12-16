@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -62,8 +44,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      */
     @Nullable
     protected List<Transaction> paymentTransactions = null;
+
     @Nullable
     private Client.Operator paymentOperator = null;
+
     @Nullable
     private Hbar queryPayment = null;
 
@@ -91,20 +75,16 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      * @return                          the new payment transaction
      */
     private static Transaction makePaymentTransaction(
-        TransactionId paymentTransactionId,
-        AccountId nodeId,
-        Client.Operator operator,
-        Hbar paymentAmount
-    ) {
+            TransactionId paymentTransactionId, AccountId nodeId, Client.Operator operator, Hbar paymentAmount) {
         return new TransferTransaction()
-            .setTransactionId(paymentTransactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId))
-            .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
-            .addHbarTransfer(operator.accountId, paymentAmount.negated())
-            .addHbarTransfer(nodeId, paymentAmount)
-            .freeze()
-            .signWith(operator.publicKey, operator.transactionSigner)
-            .makeRequest();
+                .setTransactionId(paymentTransactionId)
+                .setNodeAccountIds(Collections.singletonList(nodeId))
+                .setMaxTransactionFee(new Hbar(1)) // 1 Hbar
+                .addHbarTransfer(operator.accountId, paymentAmount.negated())
+                .addHbarTransfer(nodeId, paymentAmount)
+                .freeze()
+                .signWith(operator.publicKey, operator.transactionSigner)
+                .makeRequest();
     }
 
     /**
@@ -171,7 +151,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      */
     public Hbar getCost(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException {
         initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).execute(client, timeout);
+        return getCostExecutable()
+                .setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds()))
+                .execute(client, timeout);
     }
 
     /**
@@ -193,7 +175,9 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
      */
     public CompletableFuture<Hbar> getCostAsync(Client client, Duration timeout) {
         initWithNodeIds(client);
-        return getCostExecutable().setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds())).executeAsync(client, timeout);
+        return getCostExecutable()
+                .setNodeAccountIds(Objects.requireNonNull(getNodeAccountIds()))
+                .executeAsync(client, timeout);
     }
 
     /**
@@ -291,7 +275,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
         if (operator == null) {
             throw new IllegalStateException(
-                "`client` must have an `operator` or an explicit payment transaction must be provided");
+                    "`client` must have an `operator` or an explicit payment transaction must be provided");
         }
 
         return operator;
@@ -328,27 +312,29 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             return CompletableFuture.completedFuture(null);
         }
 
-        return CompletableFuture.supplyAsync(() -> {
-                if (grpcCostQuery.getCost() == null) {
-                    // No payment was specified so we need to go ask
-                    // This is a query in its own right so we use a nested future here
-                    return getCostAsync(client).thenCompose(cost -> {
-                        grpcCostQuery.setCost(cost);
+        return CompletableFuture.supplyAsync(
+                        () -> {
+                            if (grpcCostQuery.getCost() == null) {
+                                // No payment was specified so we need to go ask
+                                // This is a query in its own right so we use a nested future here
+                                return getCostAsync(client).thenCompose(cost -> {
+                                    grpcCostQuery.setCost(cost);
 
-                        if (grpcCostQuery.shouldError()) {
-                            return CompletableFuture.failedFuture(grpcCostQuery.mapError());
-                        }
+                                    if (grpcCostQuery.shouldError()) {
+                                        return CompletableFuture.failedFuture(grpcCostQuery.mapError());
+                                    }
 
-                        return CompletableFuture.completedFuture(null);
-                    });
-                }
+                                    return CompletableFuture.completedFuture(null);
+                                });
+                            }
 
-                return CompletableFuture.completedFuture(null);
-            }, client.executor)
-            .thenCompose(x -> x)
-            .thenAccept((paymentAmount) -> {
-                grpcCostQuery.finish();
-            });
+                            return CompletableFuture.completedFuture(null);
+                        },
+                        client.executor)
+                .thenCompose(x -> x)
+                .thenAccept((paymentAmount) -> {
+                    grpcCostQuery.finish();
+                });
     }
 
     private void initWithNodeIds(Client client) {
@@ -386,11 +372,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             }
 
             var newPaymentTx = makePaymentTransaction(
-                paymentTransactionId,
-                nodeAccountIds.get(index),
-                paymentOperator,
-                Objects.requireNonNull(chosenQueryPayment)
-            );
+                    paymentTransactionId,
+                    nodeAccountIds.get(index),
+                    paymentOperator,
+                    Objects.requireNonNull(chosenQueryPayment));
             paymentTransactions.set(index, newPaymentTx);
             return newPaymentTx;
         }
@@ -405,7 +390,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
         // Delegate to the derived class to apply the header because the common header struct is
         // within the nested type
-        onMakeRequest(builder, headerBuilder.setResponseType(ResponseType.ANSWER_ONLY).build());
+        onMakeRequest(
+                builder, headerBuilder.setResponseType(ResponseType.ANSWER_ONLY).build());
 
         return builder.build();
     }
@@ -454,7 +440,8 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     public String toString() {
         var request = makeRequest();
 
-        StringBuilder builder = new StringBuilder(request.toString().replaceAll("(?m)^# com.hiero.sdk.proto.Query.*", ""));
+        StringBuilder builder =
+                new StringBuilder(request.toString().replaceAll("(?m)^# com.hiero.sdk.proto.Query.*", ""));
 
         var queryHeader = mapRequestHeader(request);
         if (queryHeader.hasPayment()) {
@@ -462,7 +449,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
 
             try {
                 // the replaceAll() is for removing the class name from Transaction Body
-                builder.append(TransactionBody.parseFrom(queryHeader.getPayment().getBodyBytes()).toString().replaceAll("(?m)^# com.hiero.sdk.proto.TransactionBuilder.*", ""));
+                builder.append(
+                        TransactionBody.parseFrom(queryHeader.getPayment().getBodyBytes())
+                                .toString()
+                                .replaceAll("(?m)^# com.hiero.sdk.proto.TransactionBuilder.*", ""));
             } catch (InvalidProtocolBufferException e) {
                 throw new RuntimeException(e);
             }
@@ -530,8 +520,7 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
     @SuppressWarnings("NullableDereference")
     private class QueryCostQuery extends Query<Hbar, QueryCostQuery> {
         @Override
-        void validateChecksums(Client client) throws BadEntityIdException {
-        }
+        void validateChecksums(Client client) throws BadEntityIdException {}
 
         @Override
         void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
@@ -543,10 +532,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, com.
             // now go back to sleep
             // without this, an error of MISSING_QUERY_HEADER is returned
             headerBuilder.setPayment(new TransferTransaction()
-                .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
-                .setTransactionId(TransactionId.withValidStart(new AccountId(0), Instant.ofEpochSecond(0)))
-                .freeze()
-                .makeRequest());
+                    .setNodeAccountIds(Collections.singletonList(new AccountId(0)))
+                    .setTransactionId(TransactionId.withValidStart(new AccountId(0), Instant.ofEpochSecond(0)))
+                    .freeze()
+                    .makeRequest());
 
             Query.this.onMakeRequest(queryBuilder, headerBuilder.build());
         }

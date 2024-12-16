@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static com.hiero.sdk.Crypto.calcKeccak256;
@@ -60,8 +42,8 @@ class PublicKeyECDSA extends PublicKey {
         }
         if (publicKey.length == 33 || publicKey.length == 65) {
             return new PublicKeyECDSA(
-                // compress and validate the key
-                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true));
+                    // compress and validate the key
+                    Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true));
         }
 
         // Assume a DER-encoded public key descriptor
@@ -88,10 +70,10 @@ class PublicKeyECDSA extends PublicKey {
         var hash = calcKeccak256(message);
 
         ECDSASigner signer = new ECDSASigner();
-        signer.init(false, new ECPublicKeyParameters(
-            Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(keyData),
-            Key.ECDSA_SECP256K1_DOMAIN
-        ));
+        signer.init(
+                false,
+                new ECPublicKeyParameters(
+                        Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(keyData), Key.ECDSA_SECP256K1_DOMAIN));
 
         BigInteger r = new BigInteger(1, Arrays.copyOf(signature, 32));
         BigInteger s = new BigInteger(1, Arrays.copyOfRange(signature, 32, 64));
@@ -102,25 +84,23 @@ class PublicKeyECDSA extends PublicKey {
     @Override
     com.hiero.sdk.proto.Key toProtobufKey() {
         return com.hiero.sdk.proto.Key.newBuilder()
-            .setECDSASecp256K1(ByteString.copyFrom(keyData))
-            .build();
+                .setECDSASecp256K1(ByteString.copyFrom(keyData))
+                .build();
     }
 
     @Override
     SignaturePair toSignaturePairProtobuf(byte[] signature) {
         return SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(keyData))
-            .setECDSASecp256K1(ByteString.copyFrom(signature))
-            .build();
+                .setPubKeyPrefix(ByteString.copyFrom(keyData))
+                .setECDSASecp256K1(ByteString.copyFrom(signature))
+                .build();
     }
 
     @Override
     public byte[] toBytesDER() {
         try {
-            return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_EC_PUBLIC_KEY, ID_ECDSA_SECP256K1),
-                keyData
-            ).getEncoded("DER");
+            return new SubjectPublicKeyInfo(new AlgorithmIdentifier(ID_EC_PUBLIC_KEY, ID_ECDSA_SECP256K1), keyData)
+                    .getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -139,8 +119,8 @@ class PublicKeyECDSA extends PublicKey {
     @Override
     public EvmAddress toEvmAddress() {
         // Calculate the Keccak-256 hash of the uncompressed key without "04" prefix
-        byte[] uncompressed = Key.ECDSA_SECP256K1_CURVE
-            .getCurve().decodePoint(toBytesRaw()).getEncoded(false);
+        byte[] uncompressed =
+                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(toBytesRaw()).getEncoded(false);
         byte[] keccakBytes = calcKeccak256(Arrays.copyOfRange(uncompressed, 1, uncompressed.length));
 
         // Return the last 20 bytes
@@ -148,7 +128,7 @@ class PublicKeyECDSA extends PublicKey {
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

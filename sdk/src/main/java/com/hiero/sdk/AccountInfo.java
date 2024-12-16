@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static java.util.stream.Collectors.toList;
@@ -196,28 +178,27 @@ public final class AccountInfo {
      * @param ledgerId                      the ledger id
      */
     private AccountInfo(
-        AccountId accountId,
-        String contractAccountId,
-        boolean isDeleted,
-        @Nullable AccountId proxyAccountId,
-        long proxyReceived,
-        Key key,
-        long balance,
-        long sendRecordThreshold,
-        long receiveRecordThreshold,
-        boolean receiverSignatureRequired,
-        Instant expirationTime,
-        Duration autoRenewPeriod,
-        List<LiveHash> liveHashes,
-        Map<TokenId, TokenRelationship> tokenRelationships,
-        String accountMemo,
-        long ownedNfts,
-        int maxAutomaticTokenAssociations,
-        @Nullable PublicKey aliasKey,
-        LedgerId ledgerId,
-        long ethereumNonce,
-        @Nullable StakingInfo stakingInfo
-    ) {
+            AccountId accountId,
+            String contractAccountId,
+            boolean isDeleted,
+            @Nullable AccountId proxyAccountId,
+            long proxyReceived,
+            Key key,
+            long balance,
+            long sendRecordThreshold,
+            long receiveRecordThreshold,
+            boolean receiverSignatureRequired,
+            Instant expirationTime,
+            Duration autoRenewPeriod,
+            List<LiveHash> liveHashes,
+            Map<TokenId, TokenRelationship> tokenRelationships,
+            String accountMemo,
+            long ownedNfts,
+            int maxAutomaticTokenAssociations,
+            @Nullable PublicKey aliasKey,
+            LedgerId ledgerId,
+            long ethereumNonce,
+            @Nullable StakingInfo stakingInfo) {
         this.accountId = accountId;
         this.contractAccountId = contractAccountId;
         this.isDeleted = isDeleted;
@@ -254,12 +235,12 @@ public final class AccountInfo {
         var accountId = AccountId.fromProtobuf(accountInfo.getAccountID());
 
         var proxyAccountId = accountInfo.getProxyAccountID().getAccountNum() > 0
-            ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
-            : null;
+                ? AccountId.fromProtobuf(accountInfo.getProxyAccountID())
+                : null;
 
         var liveHashes = Arrays.stream(accountInfo.getLiveHashesList().toArray())
-            .map((liveHash) -> LiveHash.fromProtobuf((com.hiero.sdk.proto.LiveHash) liveHash))
-            .collect(toList());
+                .map((liveHash) -> LiveHash.fromProtobuf((com.hiero.sdk.proto.LiveHash) liveHash))
+                .collect(toList());
 
         Map<TokenId, TokenRelationship> relationships = new HashMap<>();
 
@@ -268,32 +249,30 @@ public final class AccountInfo {
             relationships.put(tokenId, TokenRelationship.fromProtobuf(relationship));
         }
 
-        @Nullable
-        var aliasKey = PublicKey.fromAliasBytes(accountInfo.getAlias());
+        @Nullable var aliasKey = PublicKey.fromAliasBytes(accountInfo.getAlias());
 
         return new AccountInfo(
-            accountId,
-            accountInfo.getContractAccountID(),
-            accountInfo.getDeleted(),
-            proxyAccountId,
-            accountInfo.getProxyReceived(),
-            Key.fromProtobufKey(accountInfo.getKey()),
-            accountInfo.getBalance(),
-            accountInfo.getGenerateSendRecordThreshold(),
-            accountInfo.getGenerateReceiveRecordThreshold(),
-            accountInfo.getReceiverSigRequired(),
-            InstantConverter.fromProtobuf(accountInfo.getExpirationTime()),
-            DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
-            liveHashes,
-            relationships,
-            accountInfo.getMemo(),
-            accountInfo.getOwnedNfts(),
-            accountInfo.getMaxAutomaticTokenAssociations(),
-            aliasKey,
-            LedgerId.fromByteString(accountInfo.getLedgerId()),
-            accountInfo.getEthereumNonce(),
-            accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null
-        );
+                accountId,
+                accountInfo.getContractAccountID(),
+                accountInfo.getDeleted(),
+                proxyAccountId,
+                accountInfo.getProxyReceived(),
+                Key.fromProtobufKey(accountInfo.getKey()),
+                accountInfo.getBalance(),
+                accountInfo.getGenerateSendRecordThreshold(),
+                accountInfo.getGenerateReceiveRecordThreshold(),
+                accountInfo.getReceiverSigRequired(),
+                InstantConverter.fromProtobuf(accountInfo.getExpirationTime()),
+                DurationConverter.fromProtobuf(accountInfo.getAutoRenewPeriod()),
+                liveHashes,
+                relationships,
+                accountInfo.getMemo(),
+                accountInfo.getOwnedNfts(),
+                accountInfo.getMaxAutomaticTokenAssociations(),
+                aliasKey,
+                LedgerId.fromByteString(accountInfo.getLedgerId()),
+                accountInfo.getEthereumNonce(),
+                accountInfo.hasStakingInfo() ? StakingInfo.fromProtobuf(accountInfo.getStakingInfo()) : null);
     }
 
     /**
@@ -304,7 +283,8 @@ public final class AccountInfo {
      * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
     public static AccountInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                CryptoGetInfoResponse.AccountInfo.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -314,26 +294,26 @@ public final class AccountInfo {
      */
     CryptoGetInfoResponse.AccountInfo toProtobuf() {
         var hashes = Arrays.stream(liveHashes.toArray())
-            .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
-            .collect(toList());
+                .map((liveHash) -> ((LiveHash) liveHash).toProtobuf())
+                .collect(toList());
 
         var accountInfoBuilder = CryptoGetInfoResponse.AccountInfo.newBuilder()
-            .setAccountID(accountId.toProtobuf())
-            .setDeleted(isDeleted)
-            .setProxyReceived(proxyReceived.toTinybars())
-            .setKey(key.toProtobufKey())
-            .setBalance(balance.toTinybars())
-            .setGenerateSendRecordThreshold(sendRecordThreshold.toTinybars())
-            .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())
-            .setReceiverSigRequired(isReceiverSignatureRequired)
-            .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
-            .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
-            .addAllLiveHashes(hashes)
-            .setMemo(accountMemo)
-            .setOwnedNfts(ownedNfts)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setLedgerId(ledgerId.toByteString())
-            .setEthereumNonce(ethereumNonce);
+                .setAccountID(accountId.toProtobuf())
+                .setDeleted(isDeleted)
+                .setProxyReceived(proxyReceived.toTinybars())
+                .setKey(key.toProtobufKey())
+                .setBalance(balance.toTinybars())
+                .setGenerateSendRecordThreshold(sendRecordThreshold.toTinybars())
+                .setGenerateReceiveRecordThreshold(receiveRecordThreshold.toTinybars())
+                .setReceiverSigRequired(isReceiverSignatureRequired)
+                .setExpirationTime(InstantConverter.toProtobuf(expirationTime))
+                .setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod))
+                .addAllLiveHashes(hashes)
+                .setMemo(accountMemo)
+                .setOwnedNfts(ownedNfts)
+                .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+                .setLedgerId(ledgerId.toByteString())
+                .setEthereumNonce(ethereumNonce);
 
         if (contractAccountId != null) {
             accountInfoBuilder.setContractAccountID(contractAccountId);
@@ -357,28 +337,28 @@ public final class AccountInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("accountId", accountId)
-            .add("contractAccountId", contractAccountId)
-            .add("deleted", isDeleted)
-            .add("proxyAccountId", proxyAccountId)
-            .add("proxyReceived", proxyReceived)
-            .add("key", key)
-            .add("balance", balance)
-            .add("sendRecordThreshold", sendRecordThreshold)
-            .add("receiveRecordThreshold", receiveRecordThreshold)
-            .add("receiverSignatureRequired", isReceiverSignatureRequired)
-            .add("expirationTime", expirationTime)
-            .add("autoRenewPeriod", autoRenewPeriod)
-            .add("liveHashes", liveHashes)
-            .add("tokenRelationships", tokenRelationships)
-            .add("accountMemo", accountMemo)
-            .add("ownedNfts", ownedNfts)
-            .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
-            .add("aliasKey", aliasKey)
-            .add("ledgerId", ledgerId)
-            .add("ethereumNonce", ethereumNonce)
-            .add("stakingInfo", stakingInfo)
-            .toString();
+                .add("accountId", accountId)
+                .add("contractAccountId", contractAccountId)
+                .add("deleted", isDeleted)
+                .add("proxyAccountId", proxyAccountId)
+                .add("proxyReceived", proxyReceived)
+                .add("key", key)
+                .add("balance", balance)
+                .add("sendRecordThreshold", sendRecordThreshold)
+                .add("receiveRecordThreshold", receiveRecordThreshold)
+                .add("receiverSignatureRequired", isReceiverSignatureRequired)
+                .add("expirationTime", expirationTime)
+                .add("autoRenewPeriod", autoRenewPeriod)
+                .add("liveHashes", liveHashes)
+                .add("tokenRelationships", tokenRelationships)
+                .add("accountMemo", accountMemo)
+                .add("ownedNfts", ownedNfts)
+                .add("maxAutomaticTokenAssociations", maxAutomaticTokenAssociations)
+                .add("aliasKey", aliasKey)
+                .add("ledgerId", ledgerId)
+                .add("ethereumNonce", ethereumNonce)
+                .add("stakingInfo", stakingInfo)
+                .toString();
     }
 
     /**

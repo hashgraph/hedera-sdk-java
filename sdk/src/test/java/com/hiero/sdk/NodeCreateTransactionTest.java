@@ -1,36 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.protobuf.ByteString;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Endpoint;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.NodeCreateTransaction;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
 import com.hiero.sdk.proto.NodeCreateTransactionBody;
 import com.hiero.sdk.proto.SchedulableTransactionBody;
 import com.hiero.sdk.proto.TransactionBody;
@@ -45,32 +19,28 @@ import org.junit.jupiter.api.Test;
 public class NodeCreateTransactionTest {
 
     private static final PrivateKey TEST_PRIVATE_KEY = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
     private static final AccountId TEST_ACCOUNT_ID = AccountId.fromString("0.6.9");
 
     private static final String TEST_DESCRIPTION = "Test description";
 
-    private static final List<Endpoint> TEST_GOSSIP_ENDPOINTS = List.of(
-        spawnTestEndpoint((byte) 0),
-        spawnTestEndpoint((byte) 1),
-        spawnTestEndpoint((byte) 2)
-    );
+    private static final List<Endpoint> TEST_GOSSIP_ENDPOINTS =
+            List.of(spawnTestEndpoint((byte) 0), spawnTestEndpoint((byte) 1), spawnTestEndpoint((byte) 2));
 
     private static final List<Endpoint> TEST_SERVICE_ENDPOINTS = List.of(
-        spawnTestEndpoint((byte) 3),
-        spawnTestEndpoint((byte) 4),
-        spawnTestEndpoint((byte) 5),
-        spawnTestEndpoint((byte) 6)
-    );
+            spawnTestEndpoint((byte) 3),
+            spawnTestEndpoint((byte) 4),
+            spawnTestEndpoint((byte) 5),
+            spawnTestEndpoint((byte) 6));
 
-    private static final byte[] TEST_GOSSIP_CA_CERTIFICATE = new byte[]{0, 1, 2, 3, 4};
+    private static final byte[] TEST_GOSSIP_CA_CERTIFICATE = new byte[] {0, 1, 2, 3, 4};
 
-    private static final byte[] TEST_GRPC_CERTIFICATE_HASH = new byte[]{5, 6, 7, 8, 9};
+    private static final byte[] TEST_GRPC_CERTIFICATE_HASH = new byte[] {5, 6, 7, 8, 9};
 
     private static final PublicKey TEST_ADMIN_KEY = PrivateKey.fromString(
-            "302e020100300506032b65700422042062c4b69e9f45a554e5424fb5a6fe5e6ac1f19ead31dc7718c2d980fd1f998d4b")
-        .getPublicKey();
+                    "302e020100300506032b65700422042062c4b69e9f45a554e5424fb5a6fe5e6ac1f19ead31dc7718c2d980fd1f998d4b")
+            .getPublicKey();
 
     final Instant TEST_VALID_START = Instant.ofEpochSecond(1554158542);
 
@@ -91,26 +61,25 @@ public class NodeCreateTransactionTest {
 
     private static Endpoint spawnTestEndpoint(byte offset) {
         return new Endpoint()
-            .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
-            .setDomainName(offset + "unit.test.com")
-            .setPort(42 + offset);
+                .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+                .setDomainName(offset + "unit.test.com")
+                .setPort(42 + offset);
     }
 
     private NodeCreateTransaction spawnTestTransaction() {
         return new NodeCreateTransaction()
-            .setNodeAccountIds(
-                Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
-            .setAccountId(TEST_ACCOUNT_ID)
-            .setDescription(TEST_DESCRIPTION)
-            .setGossipEndpoints(TEST_GOSSIP_ENDPOINTS)
-            .setServiceEndpoints(TEST_SERVICE_ENDPOINTS)
-            .setGossipCaCertificate(TEST_GOSSIP_CA_CERTIFICATE)
-            .setGrpcCertificateHash(TEST_GRPC_CERTIFICATE_HASH)
-            .setAdminKey(TEST_ADMIN_KEY)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(TEST_PRIVATE_KEY);
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), TEST_VALID_START))
+                .setAccountId(TEST_ACCOUNT_ID)
+                .setDescription(TEST_DESCRIPTION)
+                .setGossipEndpoints(TEST_GOSSIP_ENDPOINTS)
+                .setServiceEndpoints(TEST_SERVICE_ENDPOINTS)
+                .setGossipCaCertificate(TEST_GOSSIP_CA_CERTIFICATE)
+                .setGrpcCertificateHash(TEST_GRPC_CERTIFICATE_HASH)
+                .setAdminKey(TEST_ADMIN_KEY)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(TEST_PRIVATE_KEY);
     }
 
     @Test
@@ -123,13 +92,13 @@ public class NodeCreateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setNodeCreate(NodeCreateTransactionBody.newBuilder().build()).build();
+                .setNodeCreate(NodeCreateTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
         assertThat(tx).isInstanceOf(NodeCreateTransaction.class);
     }
-
 
     @Test
     void shouldBytesNoSetters() throws Exception {
@@ -141,11 +110,10 @@ public class NodeCreateTransactionTest {
     @Test
     void testUnrecognizedServicePort() throws Exception {
         var tx = new NodeCreateTransaction()
-            .setServiceEndpoints(
-                List.of(new Endpoint()
-                    .setAddress(new byte[]{0x00, 0x01, 0x02, 0x03})
-                    .setDomainName("unit.test.com")
-                    .setPort(50111)));
+                .setServiceEndpoints(List.of(new Endpoint()
+                        .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+                        .setDomainName("unit.test.com")
+                        .setPort(50111)));
         var tx2 = NodeCreateTransaction.fromBytes(tx.toBytes());
         assertThat(tx2.toString()).isEqualTo(tx.toString());
     }
@@ -153,11 +121,11 @@ public class NodeCreateTransactionTest {
     @Test
     void testSetNull() {
         new NodeCreateTransaction()
-            .setDescription(null)
-            .setAccountId(null)
-            .setGossipCaCertificate(null)
-            .setGrpcCertificateHash(null)
-            .setAdminKey(null);
+                .setDescription(null)
+                .setAccountId(null)
+                .setGossipCaCertificate(null)
+                .setGrpcCertificateHash(null)
+                .setAdminKey(null);
     }
 
     @Test
@@ -179,7 +147,9 @@ public class NodeCreateTransactionTest {
         transactionBodyBuilder.setGrpcCertificateHash(ByteString.copyFrom(TEST_GRPC_CERTIFICATE_HASH));
         transactionBodyBuilder.setAdminKey(TEST_ADMIN_KEY.toProtobufKey());
 
-        var tx = TransactionBody.newBuilder().setNodeCreate(transactionBodyBuilder.build()).build();
+        var tx = TransactionBody.newBuilder()
+                .setNodeCreate(transactionBodyBuilder.build())
+                .build();
         var nodeCreateTransaction = new NodeCreateTransaction(tx);
 
         assertThat(nodeCreateTransaction.getAccountId()).isEqualTo(TEST_ACCOUNT_ID);

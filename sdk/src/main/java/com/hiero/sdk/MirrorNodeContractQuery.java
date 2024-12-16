@@ -1,23 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static com.hiero.sdk.EntityIdHelper.getContractAddressFromMirrorNodeAsync;
@@ -268,38 +249,55 @@ public abstract class MirrorNodeContractQuery<T extends MirrorNodeContractQuery<
     private void fillEvmAddresses(Client client) throws ExecutionException, InterruptedException {
         if (this.contractEvmAddress == null) {
             Objects.requireNonNull(this.contractId);
-            this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString()).get();
+            this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString())
+                    .get();
         }
 
         if (this.senderEvmAddress == null && this.sender != null) {
-            this.senderEvmAddress = getEvmAddressFromMirrorNodeAsync(client, this.sender.num).get().toString();
+            this.senderEvmAddress = getEvmAddressFromMirrorNodeAsync(client, this.sender.num)
+                    .get()
+                    .toString();
         }
     }
 
     private CompletableFuture<String> getContractCallResultFromMirrorNodeAsync(Client client, String blockNumber) {
         return executeMirrorNodeRequest(client, blockNumber, false)
-            .thenApply(MirrorNodeContractQuery::parseContractCallResult);
+                .thenApply(MirrorNodeContractQuery::parseContractCallResult);
     }
 
     private CompletableFuture<Long> getEstimateGasFromMirrorNodeAsync(Client client) {
         return executeMirrorNodeRequest(client, "latest", true)
-            .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
+                .thenApply(MirrorNodeContractQuery::parseHexEstimateToLong);
     }
 
     private CompletableFuture<String> executeMirrorNodeRequest(Client client, String blockNumber, boolean estimate) {
         String apiEndpoint = "/contracts/call";
-        String jsonPayload = createJsonPayload(this.callData, this.senderEvmAddress, this.contractEvmAddress,
-            this.gasLimit, this.gasPrice, this.value, blockNumber, estimate);
+        String jsonPayload = createJsonPayload(
+                this.callData,
+                this.senderEvmAddress,
+                this.contractEvmAddress,
+                this.gasLimit,
+                this.gasPrice,
+                this.value,
+                blockNumber,
+                estimate);
 
         return performQueryToMirrorNodeAsync(client, apiEndpoint, jsonPayload, true)
-            .exceptionally(ex -> {
-                client.getLogger().error("Error while performing post request to Mirror Node: " + ex.getMessage());
-                throw new CompletionException(ex);
-            });
+                .exceptionally(ex -> {
+                    client.getLogger().error("Error while performing post request to Mirror Node: " + ex.getMessage());
+                    throw new CompletionException(ex);
+                });
     }
 
-    static String createJsonPayload(byte[] data, String senderAddress, String contractAddress, long gas, long gasPrice,
-        long value, String blockNumber, boolean estimate) {
+    static String createJsonPayload(
+            byte[] data,
+            String senderAddress,
+            String contractAddress,
+            long gas,
+            long gasPrice,
+            long value,
+            String blockNumber,
+            boolean estimate) {
         String hexData = Hex.toHexString(data);
 
         JsonObject jsonObject = new JsonObject();
@@ -336,16 +334,15 @@ public abstract class MirrorNodeContractQuery<T extends MirrorNodeContractQuery<
 
     @Override
     public String toString() {
-        return "{" +
-            "contractId=" + contractId +
-            ", contractEvmAddress='" + contractEvmAddress + '\'' +
-            ", sender=" + sender +
-            ", senderEvmAddress='" + senderEvmAddress + '\'' +
-            ", callData=" + Arrays.toString(callData) +
-            ", value=" + value +
-            ", gasLimit=" + gasLimit +
-            ", gasPrice=" + gasPrice +
-            ", blockNumber=" + blockNumber +
-            '}';
+        return "{" + "contractId="
+                + contractId + ", contractEvmAddress='"
+                + contractEvmAddress + '\'' + ", sender="
+                + sender + ", senderEvmAddress='"
+                + senderEvmAddress + '\'' + ", callData="
+                + Arrays.toString(callData) + ", value="
+                + value + ", gasLimit="
+                + gasLimit + ", gasPrice="
+                + gasPrice + ", blockNumber="
+                + blockNumber + '}';
     }
 }

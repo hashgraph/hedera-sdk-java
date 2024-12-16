@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -32,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
-import org.bouncycastle.util.Arrays;
 
 /**
  * A transaction to create a new node in the network address book.
@@ -163,9 +144,8 @@ public class NodeCreateTransaction extends Transaction<NodeCreateTransaction> {
      * @param txs Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
-    NodeCreateTransaction(
-        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
-        throws InvalidProtocolBufferException {
+    NodeCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }

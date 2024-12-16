@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.proto.CryptoServiceGrpc;
@@ -25,11 +7,10 @@ import com.hiero.sdk.proto.Response;
 import com.hiero.sdk.proto.ResponseHeader;
 import com.hiero.sdk.proto.TransactionGetRecordQuery;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Get the record for a transaction.
@@ -44,14 +25,14 @@ import java.util.Objects;
 public final class TransactionRecordQuery extends Query<TransactionRecord, TransactionRecordQuery> {
     @Nullable
     private TransactionId transactionId = null;
+
     private boolean includeChildren = false;
     private boolean includeDuplicates = false;
 
     /**
      * Constructor.
      */
-    public TransactionRecordQuery() {
-    }
+    public TransactionRecordQuery() {}
 
     /**
      * Extract the transaction id.
@@ -131,8 +112,8 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
     @Override
     void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         var builder = TransactionGetRecordQuery.newBuilder()
-            .setIncludeChildRecords(includeChildren)
-            .setIncludeDuplicates(includeDuplicates);
+                .setIncludeChildRecords(includeChildren)
+                .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -155,12 +136,11 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
         var recordResponse = response.getTransactionGetRecord();
         List<TransactionRecord> children = mapRecordList(recordResponse.getChildTransactionRecordsList());
         List<TransactionRecord> duplicates = mapRecordList(recordResponse.getDuplicateTransactionRecordsList());
-        return TransactionRecord.fromProtobuf(recordResponse.getTransactionRecord(), children, duplicates, transactionId);
+        return TransactionRecord.fromProtobuf(
+                recordResponse.getTransactionRecord(), children, duplicates, transactionId);
     }
 
-    private List<TransactionRecord> mapRecordList(
-        List<com.hiero.sdk.proto.TransactionRecord> protoRecordList
-    ) {
+    private List<TransactionRecord> mapRecordList(List<com.hiero.sdk.proto.TransactionRecord> protoRecordList) {
         List<TransactionRecord> outList = new ArrayList<>(protoRecordList.size());
         for (var protoRecord : protoRecordList) {
             outList.add(TransactionRecord.fromProtobuf(protoRecord));
@@ -197,8 +177,10 @@ public final class TransactionRecordQuery extends Query<TransactionRecord, Trans
                 return ExecutionState.REQUEST_ERROR;
         }
 
-        var receiptStatus =
-            Status.valueOf(response.getTransactionGetRecord().getTransactionRecord().getReceipt().getStatus());
+        var receiptStatus = Status.valueOf(response.getTransactionGetRecord()
+                .getTransactionRecord()
+                .getReceipt()
+                .getStatus());
 
         switch (receiptStatus) {
             case BUSY:

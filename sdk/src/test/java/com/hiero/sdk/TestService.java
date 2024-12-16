@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.proto.Query;
@@ -25,21 +7,19 @@ import com.hiero.sdk.proto.Transaction;
 import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
-
-import javax.annotation.Nullable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import javax.annotation.Nullable;
 
 public interface TestService {
 
     private static <ResponseTypeT> void respond(
-        StreamObserver<ResponseTypeT> streamObserver,
-        @Nullable ResponseTypeT normalResponse,
-        @Nullable StatusRuntimeException errorResponse,
-        String exceptionString
-    ) {
+            StreamObserver<ResponseTypeT> streamObserver,
+            @Nullable ResponseTypeT normalResponse,
+            @Nullable StatusRuntimeException errorResponse,
+            String exceptionString) {
         if (normalResponse != null) {
             streamObserver.onNext(normalResponse);
             streamObserver.onCompleted();
@@ -52,7 +32,8 @@ public interface TestService {
 
     Buffer getBuffer();
 
-    default void respondToTransaction(Transaction request, StreamObserver<TransactionResponse> streamObserver, TestResponse response) {
+    default void respondToTransaction(
+            Transaction request, StreamObserver<TransactionResponse> streamObserver, TestResponse response) {
         getBuffer().transactionRequestsReceived.add(request);
 
         var exceptionString = "TestService tried to respond to transaction with query response";
@@ -66,8 +47,10 @@ public interface TestService {
         respond(streamObserver, response.queryResponse, response.errorResponse, exceptionString);
     }
 
-    default void respondToTransactionFromQueue(Transaction request, StreamObserver<TransactionResponse> streamObserver) {
-        respondToTransaction(request, streamObserver, getBuffer().responsesToSend.remove());
+    default void respondToTransactionFromQueue(
+            Transaction request, StreamObserver<TransactionResponse> streamObserver) {
+        respondToTransaction(
+                request, streamObserver, getBuffer().responsesToSend.remove());
     }
 
     default void respondToQueryFromQueue(Query request, StreamObserver<Response> streamObserver) {

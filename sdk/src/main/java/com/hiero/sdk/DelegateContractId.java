@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.ContractID;
-
-import javax.annotation.Nullable;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * The ID for a smart contract instance on Hedera.
@@ -106,12 +87,12 @@ public final class DelegateContractId extends ContractId {
     @Override
     com.hiero.sdk.proto.Key toProtobufKey() {
         return com.hiero.sdk.proto.Key.newBuilder()
-            .setDelegatableContractId(toProtobuf())
-            .build();
+                .setDelegatableContractId(toProtobuf())
+                .build();
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -125,7 +106,5 @@ public final class DelegateContractId extends ContractId {
         } else {
             return false;
         }
-
     }
 }
-

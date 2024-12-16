@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -73,11 +55,10 @@ public final class TransactionResponse {
      * @param scheduledTransactionId    the scheduled transaction id
      */
     TransactionResponse(
-        AccountId nodeId,
-        TransactionId transactionId,
-        byte[] transactionHash,
-        @Nullable TransactionId scheduledTransactionId
-    ) {
+            AccountId nodeId,
+            TransactionId transactionId,
+            byte[] transactionHash,
+            @Nullable TransactionId scheduledTransactionId) {
         this.nodeId = nodeId;
         this.transactionId = transactionId;
         this.transactionHash = transactionHash;
@@ -111,7 +92,8 @@ public final class TransactionResponse {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionReceipt getReceipt(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionReceipt getReceipt(Client client)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         return getReceipt(client, client.getRequestTimeout());
     }
 
@@ -125,10 +107,9 @@ public final class TransactionResponse {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionReceipt getReceipt(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
-        var receipt = getReceiptQuery()
-            .execute(client, timeout)
-            .validateStatus(validateStatus);
+    public TransactionReceipt getReceipt(Client client, Duration timeout)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+        var receipt = getReceiptQuery().execute(client, timeout).validateStatus(validateStatus);
 
         return receipt;
     }
@@ -140,8 +121,8 @@ public final class TransactionResponse {
      */
     public TransactionReceiptQuery getReceiptQuery() {
         return new TransactionReceiptQuery()
-            .setTransactionId(transactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId));
+                .setTransactionId(transactionId)
+                .setNodeAccountIds(Collections.singletonList(nodeId));
     }
 
     /**
@@ -162,15 +143,13 @@ public final class TransactionResponse {
      * @return                          the transaction receipt
      */
     public CompletableFuture<TransactionReceipt> getReceiptAsync(Client client, Duration timeout) {
-        return getReceiptQuery()
-            .executeAsync(client, timeout)
-            .thenCompose(receipt -> {
-                try {
-                    return CompletableFuture.completedFuture(receipt.validateStatus(validateStatus));
-                } catch (ReceiptStatusException e) {
-                    return CompletableFuture.failedFuture(e);
-                }
-            });
+        return getReceiptQuery().executeAsync(client, timeout).thenCompose(receipt -> {
+            try {
+                return CompletableFuture.completedFuture(receipt.validateStatus(validateStatus));
+            } catch (ReceiptStatusException e) {
+                return CompletableFuture.failedFuture(e);
+            }
+        });
     }
 
     /**
@@ -213,7 +192,8 @@ public final class TransactionResponse {
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void getReceiptAsync(Client client, Duration timeout, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
+    public void getReceiptAsync(
+            Client client, Duration timeout, Consumer<TransactionReceipt> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(getReceiptAsync(client, timeout), onSuccess, onFailure);
     }
 
@@ -226,7 +206,8 @@ public final class TransactionResponse {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionRecord getRecord(Client client) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionRecord getRecord(Client client)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         return getRecord(client, client.getRequestTimeout());
     }
 
@@ -240,7 +221,8 @@ public final class TransactionResponse {
      * @throws PrecheckStatusException      when the precheck fails
      * @throws ReceiptStatusException       when there is an issue with the receipt
      */
-    public TransactionRecord getRecord(Client client, Duration timeout) throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
+    public TransactionRecord getRecord(Client client, Duration timeout)
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException {
         getReceipt(client, timeout);
         return getRecordQuery().execute(client, timeout);
     }
@@ -252,8 +234,8 @@ public final class TransactionResponse {
      */
     public TransactionRecordQuery getRecordQuery() {
         return new TransactionRecordQuery()
-            .setTransactionId(transactionId)
-            .setNodeAccountIds(Collections.singletonList(nodeId));
+                .setTransactionId(transactionId)
+                .setNodeAccountIds(Collections.singletonList(nodeId));
     }
 
     /**
@@ -274,7 +256,8 @@ public final class TransactionResponse {
      * @return                          future result of the transaction record
      */
     public CompletableFuture<TransactionRecord> getRecordAsync(Client client, Duration timeout) {
-        return getReceiptAsync(client, timeout).thenCompose((receipt) -> getRecordQuery().executeAsync(client, timeout));
+        return getReceiptAsync(client, timeout)
+                .thenCompose((receipt) -> getRecordQuery().executeAsync(client, timeout));
     }
 
     /**
@@ -317,16 +300,17 @@ public final class TransactionResponse {
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void getRecordAsync(Client client, Duration timeout, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
+    public void getRecordAsync(
+            Client client, Duration timeout, Consumer<TransactionRecord> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(getRecordAsync(client, timeout), onSuccess, onFailure);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("nodeId", nodeId)
-            .add("transactionHash", Hex.toHexString(transactionHash))
-            .add("transactionId", transactionId)
-            .toString();
+                .add("nodeId", nodeId)
+                .add("transactionHash", Hex.toHexString(transactionHash))
+                .add("transactionId", transactionId)
+                .toString();
     }
 }

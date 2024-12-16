@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -118,10 +100,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
         var match = EVM_ADDRESS_REGEX.matcher(id);
         if (match.find()) {
             return new ContractId(
-                Long.parseLong(match.group(1)),
-                Long.parseLong(match.group(2)),
-                Hex.decode(match.group(3))
-            );
+                    Long.parseLong(match.group(1)), Long.parseLong(match.group(2)), Hex.decode(match.group(3)));
         } else {
             return EntityIdHelper.fromString(id, ContractId::new);
         }
@@ -151,10 +130,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
      */
     public static ContractId fromEvmAddress(@Nonnegative long shard, @Nonnegative long realm, String evmAddress) {
         return new ContractId(
-            shard,
-            realm,
-            Hex.decode(evmAddress.startsWith("0x") ? evmAddress.substring(2) : evmAddress)
-        );
+                shard, realm, Hex.decode(evmAddress.startsWith("0x") ? evmAddress.substring(2) : evmAddress));
     }
 
     /**
@@ -167,10 +143,9 @@ public class ContractId extends Key implements Comparable<ContractId> {
         Objects.requireNonNull(contractId);
         if (contractId.hasEvmAddress()) {
             return new ContractId(
-                contractId.getShardNum(),
-                contractId.getRealmNum(),
-                contractId.getEvmAddress().toByteArray()
-            );
+                    contractId.getShardNum(),
+                    contractId.getRealmNum(),
+                    contractId.getEvmAddress().toByteArray());
         } else {
             return new ContractId(contractId.getShardNum(), contractId.getRealmNum(), contractId.getContractNum());
         }
@@ -206,9 +181,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
      * @return                          the protobuf object
      */
     ContractID toProtobuf() {
-        var builder = ContractID.newBuilder()
-            .setShardNum(shard)
-            .setRealmNum(realm);
+        var builder = ContractID.newBuilder().setShardNum(shard).setRealmNum(realm);
         if (evmAddress != null) {
             builder.setEvmAddress(ByteString.copyFrom(evmAddress));
         } else {
@@ -245,8 +218,8 @@ public class ContractId extends Key implements Comparable<ContractId> {
         EvmAddress address = new EvmAddress(this.evmAddress);
 
         return EntityIdHelper.getContractNumFromMirrorNodeAsync(client, address.toString())
-            .thenApply(contractNumFromMirrorNode ->
-                new ContractId(this.shard, this.realm, contractNumFromMirrorNode, checksum));
+                .thenApply(contractNumFromMirrorNode ->
+                        new ContractId(this.shard, this.realm, contractNumFromMirrorNode, checksum));
     }
 
     /**
@@ -281,9 +254,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
 
     @Override
     com.hiero.sdk.proto.Key toProtobufKey() {
-        return com.hiero.sdk.proto.Key.newBuilder()
-            .setContractID(toProtobuf())
-            .build();
+        return com.hiero.sdk.proto.Key.newBuilder().setContractID(toProtobuf()).build();
     }
 
     @Override
@@ -320,7 +291,7 @@ public class ContractId extends Key implements Comparable<ContractId> {
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

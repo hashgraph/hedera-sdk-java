@@ -1,30 +1,11 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * A custom transfer fee that was assessed during the handling of a CryptoTransfer.
@@ -53,11 +34,10 @@ public class AssessedCustomFee {
     public final List<AccountId> payerAccountIdList;
 
     AssessedCustomFee(
-        long amount,
-        @Nullable TokenId tokenId,
-        @Nullable AccountId feeCollectorAccountId,
-        List<AccountId> payerAccountIdList
-    ) {
+            long amount,
+            @Nullable TokenId tokenId,
+            @Nullable AccountId feeCollectorAccountId,
+            List<AccountId> payerAccountIdList) {
         this.amount = amount;
         this.tokenId = tokenId;
         this.feeCollectorAccountId = feeCollectorAccountId;
@@ -76,11 +56,12 @@ public class AssessedCustomFee {
             payerList.add(AccountId.fromProtobuf(payerId));
         }
         return new AssessedCustomFee(
-            assessedCustomFee.getAmount(),
-            assessedCustomFee.hasTokenId() ? TokenId.fromProtobuf(assessedCustomFee.getTokenId()) : null,
-            assessedCustomFee.hasFeeCollectorAccountId() ? AccountId.fromProtobuf(assessedCustomFee.getFeeCollectorAccountId()) : null,
-            payerList
-        );
+                assessedCustomFee.getAmount(),
+                assessedCustomFee.hasTokenId() ? TokenId.fromProtobuf(assessedCustomFee.getTokenId()) : null,
+                assessedCustomFee.hasFeeCollectorAccountId()
+                        ? AccountId.fromProtobuf(assessedCustomFee.getFeeCollectorAccountId())
+                        : null,
+                payerList);
     }
 
     /**
@@ -91,17 +72,18 @@ public class AssessedCustomFee {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static AssessedCustomFee fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.AssessedCustomFee.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(com.hiero.sdk.proto.AssessedCustomFee.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("amount", amount)
-            .add("tokenId", tokenId)
-            .add("feeCollectorAccountId", feeCollectorAccountId)
-            .add("payerAccountIdList", payerAccountIdList)
-            .toString();
+                .add("amount", amount)
+                .add("tokenId", tokenId)
+                .add("feeCollectorAccountId", feeCollectorAccountId)
+                .add("payerAccountIdList", payerAccountIdList)
+                .toString();
     }
 
     /**

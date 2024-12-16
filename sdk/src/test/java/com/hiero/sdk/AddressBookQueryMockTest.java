@@ -1,35 +1,30 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.AddressBookQuery;
-import com.hiero.sdk.Client;
-import com.hiero.sdk.Endpoint;
-import com.hiero.sdk.FileId;
+import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatException;
+
 import com.hiero.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.Server;
 import io.grpc.Status;
 import io.grpc.inprocess.InProcessServerBuilder;
 import io.grpc.stub.StreamObserver;
+import java.time.Duration;
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
-import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.Collections;
-import java.util.List;
-import java.util.Queue;
-
-import static com.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatException;
-
 class AddressBookQueryMockTest {
 
     private Client client;
-    final private AddressBookQueryStub addressBookServiceStub = new AddressBookQueryStub();
+    private final AddressBookQueryStub addressBookServiceStub = new AddressBookQueryStub();
     private Server server;
     private AddressBookQuery addressBookQuery;
 
@@ -38,10 +33,10 @@ class AddressBookQueryMockTest {
         client = Client.forNetwork(Collections.emptyMap());
         client.setMirrorNetwork(List.of("in-process:test"));
         server = InProcessServerBuilder.forName("test")
-            .addService(addressBookServiceStub)
-            .directExecutor()
-            .build()
-            .start();
+                .addService(addressBookServiceStub)
+                .directExecutor()
+                .build()
+                .start();
         addressBookQuery = new AddressBookQuery();
         addressBookQuery.setFileId(FileId.ADDRESS_BOOK);
     }
@@ -61,47 +56,39 @@ class AddressBookQueryMockTest {
     @ParameterizedTest(name = "[{0}] AddressBookQuery works")
     @CsvSource({"sync", "async"})
     void addressBookQueryWorks(String executeVersion) throws Throwable {
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
                 .setLimit(3)
-                .build()
-        );
-        addressBookServiceStub.responses.add(
-            new com.hiero.sdk.NodeAddress()
+                .build());
+        addressBookServiceStub.responses.add(new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
-                .toProtobuf()
-        );
+                .toProtobuf());
 
         addressBookQuery.setLimit(3);
 
-        var nodes = executeVersion.equals("sync") ?
-            addressBookQuery.execute(client) :
-            addressBookQuery.executeAsync(client).get();
+        var nodes = executeVersion.equals("sync")
+                ? addressBookQuery.execute(client)
+                : addressBookQuery.executeAsync(client).get();
         assertThat(nodes.nodeAddresses).hasSize(1);
         assertThat(nodes.nodeAddresses.get(0).accountId).isEqualTo(AccountId.fromString("0.0.3"));
     }
 
     Endpoint spawnEndpoint() {
         return new Endpoint()
-            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
-            .setDomainName("unit.test.com")
-            .setPort(PORT_NODE_PLAIN);
+                .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03})
+                .setDomainName("unit.test.com")
+                .setPort(PORT_NODE_PLAIN);
     }
 
     @Test
     void networkUpdatePeriodWorks() throws Throwable {
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-                .build()
-        );
-        addressBookServiceStub.responses.add(
-            new com.hiero.sdk.NodeAddress()
+                .build());
+        addressBookServiceStub.responses.add(new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
                 .setAddresses(Collections.singletonList(spawnEndpoint()))
-                .toProtobuf()
-        );
+                .toProtobuf());
 
         client.setNetworkUpdatePeriod(Duration.ofSeconds(1));
         Thread.sleep(1400);
@@ -123,26 +110,21 @@ class AddressBookQueryMockTest {
         "async, UNAVAILABLE, "
     })
     void addressBookQueryRetries(String executeVersion, Status.Code code, String description) throws Throwable {
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-                .build()
-        );
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+                .build());
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-                .build()
-        );
-        addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
+                .build());
         addressBookServiceStub.responses.add(
-            new com.hiero.sdk.NodeAddress()
+                code.toStatus().withDescription(description).asRuntimeException());
+        addressBookServiceStub.responses.add(new com.hiero.sdk.NodeAddress()
                 .setAccountId(AccountId.fromString("0.0.3"))
-                .toProtobuf()
-        );
+                .toProtobuf());
 
-        var nodes = executeVersion.equals("sync") ?
-            addressBookQuery.execute(client) :
-            addressBookQuery.executeAsync(client).get();
+        var nodes = executeVersion.equals("sync")
+                ? addressBookQuery.execute(client)
+                : addressBookQuery.executeAsync(client).get();
         assertThat(nodes.nodeAddresses).hasSize(1);
         assertThat(nodes.nodeAddresses.get(0).accountId).isEqualTo(AccountId.fromString("0.0.3"));
     }
@@ -160,15 +142,15 @@ class AddressBookQueryMockTest {
     })
     void addressBookQueryFails(String executeVersion, Status.Code code, String description) {
         addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
-            .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-            .build()
-        );
-        addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
+                .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
+                .build());
+        addressBookServiceStub.responses.add(
+                code.toStatus().withDescription(description).asRuntimeException());
 
         assertThatException().isThrownBy(() -> {
-            var result = executeVersion.equals("sync") ?
-                addressBookQuery.execute(client) :
-                addressBookQuery.executeAsync(client).get();
+            var result = executeVersion.equals("sync")
+                    ? addressBookQuery.execute(client)
+                    : addressBookQuery.executeAsync(client).get();
         });
     }
 
@@ -183,26 +165,25 @@ class AddressBookQueryMockTest {
         "async, RESOURCE_EXHAUSTED, ",
         "async, UNAVAILABLE, "
     })
-    void addressBookQueryStopsAtMaxAttempts(String executeVersion, Status.Code code, String description) throws Throwable {
+    void addressBookQueryStopsAtMaxAttempts(String executeVersion, Status.Code code, String description)
+            throws Throwable {
         addressBookQuery.setMaxAttempts(2);
 
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-                .build()
-        );
-        addressBookServiceStub.requests.add(
-            com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
+                .build());
+        addressBookServiceStub.requests.add(com.hiero.sdk.proto.mirror.AddressBookQuery.newBuilder()
                 .setFileId(FileId.ADDRESS_BOOK.toProtobuf())
-                .build()
-        );
-        addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
-        addressBookServiceStub.responses.add(code.toStatus().withDescription(description).asRuntimeException());
+                .build());
+        addressBookServiceStub.responses.add(
+                code.toStatus().withDescription(description).asRuntimeException());
+        addressBookServiceStub.responses.add(
+                code.toStatus().withDescription(description).asRuntimeException());
 
         assertThatException().isThrownBy(() -> {
-            var result = executeVersion.equals("sync") ?
-                addressBookQuery.execute(client) :
-                addressBookQuery.executeAsync(client).get();
+            var result = executeVersion.equals("sync")
+                    ? addressBookQuery.execute(client)
+                    : addressBookQuery.executeAsync(client).get();
         });
     }
 
@@ -213,9 +194,8 @@ class AddressBookQueryMockTest {
 
         @Override
         public void getNodes(
-            com.hiero.sdk.proto.mirror.AddressBookQuery addressBookQuery,
-            StreamObserver<com.hiero.sdk.proto.NodeAddress> streamObserver
-        ) {
+                com.hiero.sdk.proto.mirror.AddressBookQuery addressBookQuery,
+                StreamObserver<com.hiero.sdk.proto.NodeAddress> streamObserver) {
             var request = requests.poll();
             assertThat(request).isNotNull();
             assertThat(addressBookQuery).isEqualTo(request);

@@ -1,16 +1,13 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.StakingInfo;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class StakingInfoTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -26,25 +23,11 @@ public class StakingInfoTest {
     }
 
     StakingInfo spawnStakingInfoAccountExample() {
-        return new StakingInfo(
-            true,
-            validStart,
-            Hbar.from(5),
-            Hbar.from(10),
-            AccountId.fromString("1.2.3"),
-            null
-        );
+        return new StakingInfo(true, validStart, Hbar.from(5), Hbar.from(10), AccountId.fromString("1.2.3"), null);
     }
 
     StakingInfo spawnStakingInfoNodeExample() {
-        return new StakingInfo(
-            true,
-            validStart,
-            Hbar.from(5),
-            Hbar.from(10),
-            null,
-            3L
-        );
+        return new StakingInfo(true, validStart, Hbar.from(5), Hbar.from(10), null, 3L);
     }
 
     @Test
@@ -53,8 +36,9 @@ public class StakingInfoTest {
         byte[] stakingInfoBytes = originalStakingInfo.toBytes();
         var copyStakingInfo = StakingInfo.fromBytes(stakingInfoBytes);
         assertThat(copyStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 
     @Test
@@ -63,7 +47,8 @@ public class StakingInfoTest {
         byte[] stakingInfoBytes = originalStakingInfo.toBytes();
         var copyStakingInfo = StakingInfo.fromBytes(stakingInfoBytes);
         assertThat(copyStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalStakingInfo.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

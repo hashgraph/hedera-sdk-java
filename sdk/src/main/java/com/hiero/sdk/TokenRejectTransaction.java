@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -49,12 +31,12 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
     /**
      * A list of one or more token rejections (a fungible/common token type).
      */
-    private List<TokenId> tokenIds  = new ArrayList<>();
+    private List<TokenId> tokenIds = new ArrayList<>();
 
     /**
      * A list of one or more token rejections (a single specific serialized non-fungible/unique token).
      */
-    private List<NftId> nftIds  = new ArrayList<>();
+    private List<NftId> nftIds = new ArrayList<>();
 
     /**
      * Constructor
@@ -67,9 +49,8 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
      * @param txs Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
-    TokenRejectTransaction(
-        LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
-        throws InvalidProtocolBufferException {
+    TokenRejectTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -180,11 +161,14 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
         }
 
         for (TokenId tokenId : tokenIds) {
-            builder.addRejections(TokenReference.newBuilder().setFungibleToken(tokenId.toProtobuf()).build());
+            builder.addRejections(TokenReference.newBuilder()
+                    .setFungibleToken(tokenId.toProtobuf())
+                    .build());
         }
 
         for (NftId nftId : nftIds) {
-            builder.addRejections(TokenReference.newBuilder().setNft(nftId.toProtobuf()).build());
+            builder.addRejections(
+                    TokenReference.newBuilder().setNft(nftId.toProtobuf()).build());
         }
 
         return builder;

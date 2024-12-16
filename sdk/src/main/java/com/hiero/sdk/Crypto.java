@@ -1,24 +1,20 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import javax.annotation.Nullable;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.ShortBufferException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import org.bouncycastle.asn1.sec.SECNamedCurves;
 import org.bouncycastle.asn1.x9.X9ECParameters;
 import org.bouncycastle.asn1.x9.X9IntegerConverter;
@@ -31,21 +27,6 @@ import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
 import org.bouncycastle.math.ec.ECAlgorithms;
 import org.bouncycastle.math.ec.ECPoint;
-
-import javax.annotation.Nullable;
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.security.AlgorithmParameters;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Utility class used internally by the sdk.
@@ -61,16 +42,15 @@ final class Crypto {
 
     static final X9ECParameters ECDSA_SECP256K1_CURVE = SECNamedCurves.getByName("secp256k1");
     static final ECDomainParameters ECDSA_SECP256K1_DOMAIN = new ECDomainParameters(
-        ECDSA_SECP256K1_CURVE.getCurve(),
-        ECDSA_SECP256K1_CURVE.getG(),
-        ECDSA_SECP256K1_CURVE.getN(),
-        ECDSA_SECP256K1_CURVE.getH());
+            ECDSA_SECP256K1_CURVE.getCurve(),
+            ECDSA_SECP256K1_CURVE.getG(),
+            ECDSA_SECP256K1_CURVE.getN(),
+            ECDSA_SECP256K1_CURVE.getH());
 
     /**
      * Constructor.
      */
-    private Crypto() {
-    }
+    private Crypto() {}
 
     /**
      * Derive a sha 256 key.
@@ -169,8 +149,7 @@ final class Crypto {
         int mode = forDecrypt ? Cipher.DECRYPT_MODE : Cipher.ENCRYPT_MODE;
 
         try {
-            aesCipher.init(mode, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"),
-                new IvParameterSpec(iv));
+            aesCipher.init(mode, new SecretKeySpec(cipherKey.getKey(), 0, 16, "AES"), new IvParameterSpec(iv));
         } catch (InvalidKeyException e) {
             throw new Error("platform does not support AES-128 ciphers", e);
         } catch (InvalidAlgorithmParameterException e) {
@@ -328,7 +307,7 @@ final class Crypto {
     private static ECPoint decompressKey(BigInteger xBN, boolean yBit) {
         var X_9_INTEGER_CONVERTER = new X9IntegerConverter();
         byte[] compEnc = X_9_INTEGER_CONVERTER.integerToBytes(
-            xBN, 1 + X_9_INTEGER_CONVERTER.getByteLength(ECDSA_SECP256K1_DOMAIN.getCurve()));
+                xBN, 1 + X_9_INTEGER_CONVERTER.getByteLength(ECDSA_SECP256K1_DOMAIN.getCurve()));
         compEnc[0] = (byte) (yBit ? 0x03 : 0x02);
         try {
             return ECDSA_SECP256K1_DOMAIN.getCurve().decodePoint(compEnc);

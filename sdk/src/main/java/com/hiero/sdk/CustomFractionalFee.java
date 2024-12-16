@@ -1,27 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.proto.Fraction;
 import com.hiero.sdk.proto.FractionalFee;
-
 import java.util.Objects;
 
 /**
@@ -38,8 +19,7 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     /**
      * Constructor.
      */
-    public CustomFractionalFee() {
-    }
+    public CustomFractionalFee() {}
 
     /**
      * Create a custom fractional fee from a fee protobuf.
@@ -50,22 +30,22 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     static CustomFractionalFee fromProtobuf(FractionalFee fractionalFee) {
         var fraction = fractionalFee.getFractionalAmount();
         return new CustomFractionalFee()
-            .setNumerator(fraction.getNumerator())
-            .setDenominator(fraction.getDenominator())
-            .setMin(fractionalFee.getMinimumAmount())
-            .setMax(fractionalFee.getMaximumAmount())
-            .setAssessmentMethod(FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers()));
+                .setNumerator(fraction.getNumerator())
+                .setDenominator(fraction.getDenominator())
+                .setMin(fractionalFee.getMinimumAmount())
+                .setMax(fractionalFee.getMaximumAmount())
+                .setAssessmentMethod(FeeAssessmentMethod.valueOf(fractionalFee.getNetOfTransfers()));
     }
 
     @Override
     CustomFractionalFee deepCloneSubclass() {
         return new CustomFractionalFee()
-            .setNumerator(numerator)
-            .setDenominator(denominator)
-            .setMin(min)
-            .setMax(max)
-            .setAssessmentMethod(assessmentMethod)
-            .finishDeepClone(this);
+                .setNumerator(numerator)
+                .setDenominator(denominator)
+                .setMin(min)
+                .setMax(max)
+                .setAssessmentMethod(assessmentMethod)
+                .finishDeepClone(this);
     }
 
     /**
@@ -180,12 +160,12 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
     @Override
     public String toString() {
         return toStringHelper()
-            .add("numerator", getNumerator())
-            .add("denominator", getDenominator())
-            .add("min", getMin())
-            .add("max", getMax())
-            .add("assessmentMethod", getAssessmentMethod())
-            .toString();
+                .add("numerator", getNumerator())
+                .add("denominator", getDenominator())
+                .add("min", getMin())
+                .add("max", getMax())
+                .add("assessmentMethod", getAssessmentMethod())
+                .toString();
     }
 
     /**
@@ -195,21 +175,17 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
      */
     FractionalFee toFractionalFeeProtobuf() {
         return FractionalFee.newBuilder()
-            .setMinimumAmount(getMin())
-            .setMaximumAmount(getMax())
-            .setFractionalAmount(
-                Fraction.newBuilder()
-                    .setNumerator(getNumerator())
-                    .setDenominator(getDenominator())
-            )
-            .setNetOfTransfers(assessmentMethod.code)
-            .build();
+                .setMinimumAmount(getMin())
+                .setMaximumAmount(getMax())
+                .setFractionalAmount(
+                        Fraction.newBuilder().setNumerator(getNumerator()).setDenominator(getDenominator()))
+                .setNetOfTransfers(assessmentMethod.code)
+                .build();
     }
 
     @Override
     com.hiero.sdk.proto.CustomFee toProtobuf() {
-        var customFeeBuilder = com.hiero.sdk.proto.CustomFee.newBuilder()
-            .setFractionalFee(toFractionalFeeProtobuf());
+        var customFeeBuilder = com.hiero.sdk.proto.CustomFee.newBuilder().setFractionalFee(toFractionalFeeProtobuf());
         return finishToProtobuf(customFeeBuilder);
     }
 }

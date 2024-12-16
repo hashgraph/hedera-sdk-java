@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -28,10 +10,9 @@ import com.hiero.sdk.proto.TokenKycStatus;
 import com.hiero.sdk.proto.TokenPauseStatus;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Gets information about a fungible or non-fungible token instance.
@@ -197,35 +178,34 @@ public class TokenInfo {
     public final LedgerId ledgerId;
 
     TokenInfo(
-        TokenId tokenId,
-        String name,
-        String symbol,
-        int decimals,
-        long totalSupply,
-        AccountId treasuryAccountId,
-        @Nullable Key adminKey,
-        @Nullable Key kycKey,
-        @Nullable Key freezeKey,
-        @Nullable Key wipeKey,
-        @Nullable Key supplyKey,
-        @Nullable Key feeScheduleKey,
-        @Nullable Boolean defaultFreezeStatus,
-        @Nullable Boolean defaultKycStatus,
-        boolean isDeleted,
-        @Nullable AccountId autoRenewAccount,
-        @Nullable Duration autoRenewPeriod,
-        @Nullable Instant expirationTime,
-        String tokenMemo,
-        List<CustomFee> customFees,
-        TokenType tokenType,
-        TokenSupplyType supplyType,
-        long maxSupply,
-        @Nullable Key pauseKey,
-        @Nullable Boolean pauseStatus,
-        byte[] metadata,
-        @Nullable Key metadataKey,
-        LedgerId ledgerId
-    ) {
+            TokenId tokenId,
+            String name,
+            String symbol,
+            int decimals,
+            long totalSupply,
+            AccountId treasuryAccountId,
+            @Nullable Key adminKey,
+            @Nullable Key kycKey,
+            @Nullable Key freezeKey,
+            @Nullable Key wipeKey,
+            @Nullable Key supplyKey,
+            @Nullable Key feeScheduleKey,
+            @Nullable Boolean defaultFreezeStatus,
+            @Nullable Boolean defaultKycStatus,
+            boolean isDeleted,
+            @Nullable AccountId autoRenewAccount,
+            @Nullable Duration autoRenewPeriod,
+            @Nullable Instant expirationTime,
+            String tokenMemo,
+            List<CustomFee> customFees,
+            TokenType tokenType,
+            TokenSupplyType supplyType,
+            long maxSupply,
+            @Nullable Key pauseKey,
+            @Nullable Boolean pauseStatus,
+            byte[] metadata,
+            @Nullable Key metadataKey,
+            LedgerId ledgerId) {
         this.tokenId = tokenId;
         this.name = name;
         this.symbol = symbol;
@@ -299,35 +279,34 @@ public class TokenInfo {
         var info = response.getTokenInfo();
 
         return new TokenInfo(
-            TokenId.fromProtobuf(info.getTokenId()),
-            info.getName(),
-            info.getSymbol(),
-            info.getDecimals(),
-            info.getTotalSupply(),
-            AccountId.fromProtobuf(info.getTreasury()),
-            info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null,
-            info.hasKycKey() ? Key.fromProtobufKey(info.getKycKey()) : null,
-            info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey()) : null,
-            info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey()) : null,
-            info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey()) : null,
-            info.hasFeeScheduleKey() ? Key.fromProtobufKey(info.getFeeScheduleKey()) : null,
-            freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
-            kycStatusFromProtobuf(info.getDefaultKycStatus()),
-            info.getDeleted(),
-            info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount()) : null,
-            info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
-            info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
-            info.getMemo(),
-            customFeesFromProto(info),
-            TokenType.valueOf(info.getTokenType()),
-            TokenSupplyType.valueOf(info.getSupplyType()),
-            info.getMaxSupply(),
-            info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
-            pauseStatusFromProtobuf(info.getPauseStatus()),
-            info.getMetadata().toByteArray(),
-            info.hasMetadataKey() ? Key.fromProtobufKey(info.getMetadataKey()) : null,
-            LedgerId.fromByteString(info.getLedgerId())
-        );
+                TokenId.fromProtobuf(info.getTokenId()),
+                info.getName(),
+                info.getSymbol(),
+                info.getDecimals(),
+                info.getTotalSupply(),
+                AccountId.fromProtobuf(info.getTreasury()),
+                info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null,
+                info.hasKycKey() ? Key.fromProtobufKey(info.getKycKey()) : null,
+                info.hasFreezeKey() ? Key.fromProtobufKey(info.getFreezeKey()) : null,
+                info.hasWipeKey() ? Key.fromProtobufKey(info.getWipeKey()) : null,
+                info.hasSupplyKey() ? Key.fromProtobufKey(info.getSupplyKey()) : null,
+                info.hasFeeScheduleKey() ? Key.fromProtobufKey(info.getFeeScheduleKey()) : null,
+                freezeStatusFromProtobuf(info.getDefaultFreezeStatus()),
+                kycStatusFromProtobuf(info.getDefaultKycStatus()),
+                info.getDeleted(),
+                info.hasAutoRenewAccount() ? AccountId.fromProtobuf(info.getAutoRenewAccount()) : null,
+                info.hasAutoRenewPeriod() ? DurationConverter.fromProtobuf(info.getAutoRenewPeriod()) : null,
+                info.hasExpiry() ? InstantConverter.fromProtobuf(info.getExpiry()) : null,
+                info.getMemo(),
+                customFeesFromProto(info),
+                TokenType.valueOf(info.getTokenType()),
+                TokenSupplyType.valueOf(info.getSupplyType()),
+                info.getMaxSupply(),
+                info.hasPauseKey() ? Key.fromProtobufKey(info.getPauseKey()) : null,
+                pauseStatusFromProtobuf(info.getPauseStatus()),
+                info.getMetadata().toByteArray(),
+                info.hasMetadataKey() ? Key.fromProtobufKey(info.getMetadataKey()) : null,
+                LedgerId.fromByteString(info.getLedgerId()));
     }
 
     /**
@@ -362,7 +341,9 @@ public class TokenInfo {
      * @return                          the protobuf
      */
     static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
-        return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
+        return freezeStatus == null
+                ? TokenFreezeStatus.FreezeNotApplicable
+                : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
     /**
@@ -372,7 +353,9 @@ public class TokenInfo {
      * @return                          the protobuf
      */
     static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
-        return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
+        return kycStatus == null
+                ? TokenKycStatus.KycNotApplicable
+                : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
     /**
@@ -382,7 +365,9 @@ public class TokenInfo {
      * @return                          the protobuf
      */
     static TokenPauseStatus pauseStatusToProtobuf(@Nullable Boolean pauseStatus) {
-        return pauseStatus == null ? TokenPauseStatus.PauseNotApplicable : pauseStatus ? TokenPauseStatus.Paused : TokenPauseStatus.Unpaused;
+        return pauseStatus == null
+                ? TokenPauseStatus.PauseNotApplicable
+                : pauseStatus ? TokenPauseStatus.Paused : TokenPauseStatus.Unpaused;
     }
 
     /**
@@ -392,21 +377,21 @@ public class TokenInfo {
      */
     TokenGetInfoResponse toProtobuf() {
         var tokenInfoBuilder = com.hiero.sdk.proto.TokenInfo.newBuilder()
-            .setTokenId(tokenId.toProtobuf())
-            .setName(name)
-            .setSymbol(symbol)
-            .setDecimals(decimals)
-            .setTotalSupply(totalSupply)
-            .setTreasury(treasuryAccountId.toProtobuf())
-            .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
-            .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
-            .setDeleted(isDeleted)
-            .setMemo(tokenMemo)
-            .setTokenType(tokenType.code)
-            .setSupplyType(supplyType.code)
-            .setMaxSupply(maxSupply)
-            .setPauseStatus(pauseStatusToProtobuf(pauseStatus))
-            .setLedgerId(ledgerId.toByteString());
+                .setTokenId(tokenId.toProtobuf())
+                .setName(name)
+                .setSymbol(symbol)
+                .setDecimals(decimals)
+                .setTotalSupply(totalSupply)
+                .setTreasury(treasuryAccountId.toProtobuf())
+                .setDefaultFreezeStatus(freezeStatusToProtobuf(defaultFreezeStatus))
+                .setDefaultKycStatus(kycStatusToProtobuf(defaultKycStatus))
+                .setDeleted(isDeleted)
+                .setMemo(tokenMemo)
+                .setTokenType(tokenType.code)
+                .setSupplyType(supplyType.code)
+                .setMaxSupply(maxSupply)
+                .setPauseStatus(pauseStatusToProtobuf(pauseStatus))
+                .setLedgerId(ledgerId.toByteString());
         if (adminKey != null) {
             tokenInfoBuilder.setAdminKey(adminKey.toProtobufKey());
         }
@@ -452,35 +437,35 @@ public class TokenInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("name", name)
-            .add("symbol", symbol)
-            .add("decimals", decimals)
-            .add("totalSupply", totalSupply)
-            .add("treasuryAccountId", treasuryAccountId)
-            .add("adminKey", adminKey)
-            .add("kycKey", kycKey)
-            .add("freezeKey", freezeKey)
-            .add("wipeKey", wipeKey)
-            .add("supplyKey", supplyKey)
-            .add("feeScheduleKey", feeScheduleKey)
-            .add("defaultFreezeStatus", defaultFreezeStatus)
-            .add("defaultKycStatus", defaultKycStatus)
-            .add("isDeleted", isDeleted)
-            .add("autoRenewAccount", autoRenewAccount)
-            .add("autoRenewPeriod", autoRenewPeriod)
-            .add("expirationTime", expirationTime)
-            .add("tokenMemo", tokenMemo)
-            .add("customFees", customFees)
-            .add("tokenType", tokenType)
-            .add("supplyType", supplyType)
-            .add("maxSupply", maxSupply)
-            .add("pauseKey", pauseKey)
-            .add("pauseStatus", pauseStatus)
-            .add("metadata", metadata)
-            .add("metadataKey", metadataKey)
-            .add("ledgerId", ledgerId)
-            .toString();
+                .add("tokenId", tokenId)
+                .add("name", name)
+                .add("symbol", symbol)
+                .add("decimals", decimals)
+                .add("totalSupply", totalSupply)
+                .add("treasuryAccountId", treasuryAccountId)
+                .add("adminKey", adminKey)
+                .add("kycKey", kycKey)
+                .add("freezeKey", freezeKey)
+                .add("wipeKey", wipeKey)
+                .add("supplyKey", supplyKey)
+                .add("feeScheduleKey", feeScheduleKey)
+                .add("defaultFreezeStatus", defaultFreezeStatus)
+                .add("defaultKycStatus", defaultKycStatus)
+                .add("isDeleted", isDeleted)
+                .add("autoRenewAccount", autoRenewAccount)
+                .add("autoRenewPeriod", autoRenewPeriod)
+                .add("expirationTime", expirationTime)
+                .add("tokenMemo", tokenMemo)
+                .add("customFees", customFees)
+                .add("tokenType", tokenType)
+                .add("supplyType", supplyType)
+                .add("maxSupply", maxSupply)
+                .add("pauseKey", pauseKey)
+                .add("pauseStatus", pauseStatus)
+                .add("metadata", metadata)
+                .add("metadataKey", metadataKey)
+                .add("ledgerId", ledgerId)
+                .toString();
     }
 
     /**

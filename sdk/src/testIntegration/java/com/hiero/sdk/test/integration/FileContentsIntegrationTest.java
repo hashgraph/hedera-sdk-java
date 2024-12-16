@@ -1,23 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hiero.sdk.FileContentsQuery;
 import com.hiero.sdk.FileCreateTransaction;
@@ -26,161 +11,143 @@ import com.hiero.sdk.Hbar;
 import com.hiero.sdk.MaxQueryPaymentExceededException;
 import com.hiero.sdk.PrecheckStatusException;
 import com.hiero.sdk.Status;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class FileContentsIntegrationTest {
 
     @Test
     @DisplayName("Can query file contents")
     void canQueryFileContents() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            var contents = new FileContentsQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]");
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
     @Test
     @DisplayName("Can query empty file contents")
     void canQueryEmptyFileContents() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .execute(testEnv.client);
+            var response =
+                    new FileCreateTransaction().setKeys(testEnv.operatorKey).execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contents = new FileContentsQuery()
-                .setFileId(fileId)
-                .execute(testEnv.client);
+            var contents = new FileContentsQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(contents.size()).isEqualTo(0);
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
     @Test
     @DisplayName("Cannot query file contents when file ID is not set")
     void cannotQueryFileContentsWhenFileIDIsNotSet() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new FileContentsQuery()
-                    .execute(testEnv.client);
-            }).withMessageContaining(Status.INVALID_FILE_ID.toString());
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        new FileContentsQuery().execute(testEnv.client);
+                    })
+                    .withMessageContaining(Status.INVALID_FILE_ID.toString());
         }
     }
 
     @Test
     @DisplayName("Can get cost, even with a big max")
     void getCostBigMaxQueryFileContents() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(new Hbar(1000));
+            var contentsQuery = new FileContentsQuery().setFileId(fileId).setMaxQueryPayment(new Hbar(1000));
 
             var contents = contentsQuery.execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]");
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
     @Test
     @DisplayName("Error, max is smaller than set payment.")
     void getCostSmallMaxQueryFileContents() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(Hbar.fromTinybars(1));
+            var contentsQuery = new FileContentsQuery().setFileId(fileId).setMaxQueryPayment(Hbar.fromTinybars(1));
 
             assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
                 contentsQuery.execute(testEnv.client);
             });
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
     @Test
     @DisplayName("Insufficient tx fee error.")
     void getCostInsufficientTxFeeQueryFileContents() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var response = new FileCreateTransaction()
-                .setKeys(testEnv.operatorKey)
-                .setContents("[e2e::FileCreateTransaction]")
-                .execute(testEnv.client);
+                    .setKeys(testEnv.operatorKey)
+                    .setContents("[e2e::FileCreateTransaction]")
+                    .execute(testEnv.client);
 
             var fileId = Objects.requireNonNull(response.getReceipt(testEnv.client).fileId);
 
-            var contentsQuery = new FileContentsQuery()
-                .setFileId(fileId)
-                .setMaxQueryPayment(new Hbar(100));
+            var contentsQuery = new FileContentsQuery().setFileId(fileId).setMaxQueryPayment(new Hbar(100));
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-            }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        contentsQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
+                    })
+                    .satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
 
             new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setFileId(fileId)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 }

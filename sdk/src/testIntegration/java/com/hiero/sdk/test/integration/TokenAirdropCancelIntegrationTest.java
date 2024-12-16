@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
 
 import static com.hiero.sdk.test.integration.EntityHelper.fungibleInitialBalance;
@@ -59,10 +41,10 @@ class TokenAirdropCancelIntegrationTest {
             var nftID = EntityHelper.createNft(testEnv);
             // mint some NFTs
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(nftID)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(nftID)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             var nftSerials = mintReceipt.serials;
 
             // create receiver with 0 auto associations
@@ -71,38 +53,35 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
-                .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
+                    .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // sender cancels the tokens
             record = new TokenCancelAirdropTransaction()
-                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .addPendingAirdrop(record.pendingAirdropRecords.get(1).getPendingAirdropId())
-                .addPendingAirdrop(record.pendingAirdropRecords.get(2).getPendingAirdropId())
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(1).getPendingAirdropId())
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(2).getPendingAirdropId())
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
             assertEquals(0, record.pendingAirdropRecords.size());
 
             // verify the receiver does not hold the tokens via query
-            var receiverAccountBalance = new AccountBalanceQuery()
-                .setAccountId(receiverAccountId)
-                .execute(testEnv.client);
+            var receiverAccountBalance =
+                    new AccountBalanceQuery().setAccountId(receiverAccountId).execute(testEnv.client);
             assertNull(receiverAccountBalance.tokens.get(tokenID));
             assertNull(receiverAccountBalance.tokens.get(nftID));
 
             // verify the operator does hold the tokens
-            var operatorBalance = new AccountBalanceQuery()
-                .setAccountId(testEnv.operatorId)
-                .execute(testEnv.client);
+            var operatorBalance =
+                    new AccountBalanceQuery().setAccountId(testEnv.operatorId).execute(testEnv.client);
             assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
             assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
-
         }
     }
 
@@ -120,33 +99,32 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // associate
             new TokenAssociateTransaction()
-                .setAccountId(receiverAccountId)
-                .setTokenIds(Collections.singletonList(tokenID))
-                .freezeWith(testEnv.client)
-                .sign(receiverAccountKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setAccountId(receiverAccountId)
+                    .setTokenIds(Collections.singletonList(tokenID))
+                    .freezeWith(testEnv.client)
+                    .sign(receiverAccountKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             // freeze the token
             new TokenFreezeTransaction()
-                .setAccountId(receiverAccountId)
-                .setTokenId(tokenID)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setAccountId(receiverAccountId)
+                    .setTokenId(tokenID)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             // cancel
             new TokenCancelAirdropTransaction()
-                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
-
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
         }
     }
 
@@ -164,20 +142,22 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // pause the token
-            new TokenPauseTransaction().setTokenId(tokenID).execute(testEnv.client).getReceipt(testEnv.client);
+            new TokenPauseTransaction()
+                    .setTokenId(tokenID)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             // cancel
             new TokenCancelAirdropTransaction()
-                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
-
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
         }
     }
 
@@ -195,20 +175,22 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // delete the token
-            new TokenDeleteTransaction().setTokenId(tokenID).execute(testEnv.client).getReceipt(testEnv.client);
+            new TokenDeleteTransaction()
+                    .setTokenId(tokenID)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             // cancel
             new TokenCancelAirdropTransaction()
-                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
-
+                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
         }
     }
 
@@ -222,10 +204,10 @@ class TokenAirdropCancelIntegrationTest {
             var nftID = EntityHelper.createNft(testEnv);
             // mint some NFTs
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(nftID)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(nftID)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             var nftSerials = mintReceipt.serials;
 
             // create receiver1 with 0 auto associations
@@ -253,7 +235,8 @@ class TokenAirdropCancelIntegrationTest {
             assertEquals(6, record.pendingAirdropRecords.size());
 
             // cancel the tokens signing with receiver1 and receiver2
-            var pendingAirdropIDs = record.pendingAirdropRecords.stream().map(PendingAirdropRecord::getPendingAirdropId)
+            var pendingAirdropIDs = record.pendingAirdropRecords.stream()
+                    .map(PendingAirdropRecord::getPendingAirdropId)
                     .toList();
             record = new TokenCancelAirdropTransaction()
                     .setPendingAirdropIds(pendingAirdropIDs)
@@ -264,26 +247,22 @@ class TokenAirdropCancelIntegrationTest {
             assertEquals(0, record.pendingAirdropRecords.size());
 
             // verify receiver1 does not hold the tokens via query
-            var receiverAccountBalance = new AccountBalanceQuery()
-                    .setAccountId(receiver1AccountId)
-                    .execute(testEnv.client);
+            var receiverAccountBalance =
+                    new AccountBalanceQuery().setAccountId(receiver1AccountId).execute(testEnv.client);
             assertNull(receiverAccountBalance.tokens.get(tokenID));
             assertNull(receiverAccountBalance.tokens.get(nftID));
 
             // verify receiver2 does not hold the tokens via query
-            var receiver2AccountBalance = new AccountBalanceQuery()
-                    .setAccountId(receiver1AccountId)
-                    .execute(testEnv.client);
+            var receiver2AccountBalance =
+                    new AccountBalanceQuery().setAccountId(receiver1AccountId).execute(testEnv.client);
             assertNull(receiver2AccountBalance.tokens.get(tokenID));
             assertNull(receiver2AccountBalance.tokens.get(nftID));
 
             // verify the operator does hold the tokens
-            var operatorBalance = new AccountBalanceQuery()
-                    .setAccountId(testEnv.operatorId)
-                    .execute(testEnv.client);
+            var operatorBalance =
+                    new AccountBalanceQuery().setAccountId(testEnv.operatorId).execute(testEnv.client);
             assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
             assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
-
         }
     }
 
@@ -297,10 +276,10 @@ class TokenAirdropCancelIntegrationTest {
             var nftID = EntityHelper.createNft(testEnv);
             // mint some NFTs
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(nftID)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(nftID)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
             var nftSerials = mintReceipt.serials;
 
             // create receiver with 0 auto associations
@@ -309,20 +288,20 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop some of the tokens to the receiver
             var record1 = new TokenAirdropTransaction()
-                .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addNftTransfer(nftID.nft(nftSerials.get(0)), testEnv.operatorId, receiverAccountId)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
             // airdrop some of the tokens to the receiver
             var record2 = new TokenAirdropTransaction()
-                .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addNftTransfer(nftID.nft(nftSerials.get(1)), testEnv.operatorId, receiverAccountId)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
             // airdrop some of the tokens to the receiver
             var record3 = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // get the PendingIds from the records
             var pendingAirdropIDs = new ArrayList<PendingAirdropId>();
@@ -332,27 +311,24 @@ class TokenAirdropCancelIntegrationTest {
 
             // cancel the all the tokens with the receiver
             var record = new TokenCancelAirdropTransaction()
-                .setPendingAirdropIds(pendingAirdropIDs)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .setPendingAirdropIds(pendingAirdropIDs)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // verify in the transaction record the pending airdrop ids for nft and ft - should no longer exist
             assertEquals(0, record.pendingAirdropRecords.size());
 
             // verify the receiver does not hold the tokens via query
-            var receiverAccountBalance = new AccountBalanceQuery()
-                .setAccountId(receiverAccountId)
-                .execute(testEnv.client);
+            var receiverAccountBalance =
+                    new AccountBalanceQuery().setAccountId(receiverAccountId).execute(testEnv.client);
             assertNull(receiverAccountBalance.tokens.get(tokenID));
             assertNull(receiverAccountBalance.tokens.get(nftID));
 
             // verify the operator does hold the tokens
-            var operatorBalance = new AccountBalanceQuery()
-                .setAccountId(testEnv.operatorId)
-                .execute(testEnv.client);
+            var operatorBalance =
+                    new AccountBalanceQuery().setAccountId(testEnv.operatorId).execute(testEnv.client);
             assertEquals(fungibleInitialBalance, operatorBalance.tokens.get(tokenID));
             assertEquals(mitedNfts, operatorBalance.tokens.get(nftID));
-
         }
     }
 
@@ -370,10 +346,10 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // create receiver with 0 auto associations
             var randomAccountKey = PrivateKey.generateED25519();
@@ -381,14 +357,16 @@ class TokenAirdropCancelIntegrationTest {
 
             // cancel the tokens with the random account which has not created pending airdrops
             // fails with INVALID_SIGNATURE
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new TokenCancelAirdropTransaction()
-                    .setTransactionId(TransactionId.generate(randomAccount))
-                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                    .execute(testEnv.client)
-                    .getRecord(testEnv.client);
-            }).withMessageContaining(Status.INVALID_SIGNATURE.toString());
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        new TokenCancelAirdropTransaction()
+                                .setTransactionId(TransactionId.generate(randomAccount))
+                                .addPendingAirdrop(
+                                        record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                                .execute(testEnv.client)
+                                .getRecord(testEnv.client);
+                    })
+                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
 
@@ -406,26 +384,28 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // cancel the tokens with the receiver
             new TokenCancelAirdropTransaction()
-                .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
-
-            // cancel the tokens with the receiver again
-            // fails with INVALID_PENDING_AIRDROP_ID
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> {
-                new TokenCancelAirdropTransaction()
                     .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
                     .execute(testEnv.client)
                     .getRecord(testEnv.client);
-            }).withMessageContaining(Status.INVALID_PENDING_AIRDROP_ID.toString());
 
+            // cancel the tokens with the receiver again
+            // fails with INVALID_PENDING_AIRDROP_ID
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                    .isThrownBy(() -> {
+                        new TokenCancelAirdropTransaction()
+                                .addPendingAirdrop(
+                                        record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                                .execute(testEnv.client)
+                                .getRecord(testEnv.client);
+                    })
+                    .withMessageContaining(Status.INVALID_PENDING_AIRDROP_ID.toString());
         }
     }
 
@@ -436,12 +416,13 @@ class TokenAirdropCancelIntegrationTest {
 
             // cancel the tokens with the receiver without setting pendingAirdropIds
             // fails with EMPTY_PENDING_AIRDROP_ID_LIST
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new TokenCancelAirdropTransaction()
-                    .execute(testEnv.client)
-                    .getRecord(testEnv.client);
-            }).withMessageContaining(Status.EMPTY_PENDING_AIRDROP_ID_LIST.toString());
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        new TokenCancelAirdropTransaction()
+                                .execute(testEnv.client)
+                                .getRecord(testEnv.client);
+                    })
+                    .withMessageContaining(Status.EMPTY_PENDING_AIRDROP_ID_LIST.toString());
         }
     }
 
@@ -459,21 +440,24 @@ class TokenAirdropCancelIntegrationTest {
 
             // airdrop the tokens
             var record = new TokenAirdropTransaction()
-                .addTokenTransfer(tokenID, receiverAccountId, amount)
-                .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
-                .execute(testEnv.client)
-                .getRecord(testEnv.client);
+                    .addTokenTransfer(tokenID, receiverAccountId, amount)
+                    .addTokenTransfer(tokenID, testEnv.operatorId, -amount)
+                    .execute(testEnv.client)
+                    .getRecord(testEnv.client);
 
             // cancel the tokens with duplicate pending airdrop token ids
             // fails with PENDING_AIRDROP_ID_REPEATED
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                new TokenCancelAirdropTransaction()
-                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                    .addPendingAirdrop(record.pendingAirdropRecords.get(0).getPendingAirdropId())
-                    .execute(testEnv.client)
-                    .getRecord(testEnv.client);
-            }).withMessageContaining(Status.PENDING_AIRDROP_ID_REPEATED.toString());
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        new TokenCancelAirdropTransaction()
+                                .addPendingAirdrop(
+                                        record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                                .addPendingAirdrop(
+                                        record.pendingAirdropRecords.get(0).getPendingAirdropId())
+                                .execute(testEnv.client)
+                                .getRecord(testEnv.client);
+                    })
+                    .withMessageContaining(Status.PENDING_AIRDROP_ID_REPEATED.toString());
         }
     }
 }

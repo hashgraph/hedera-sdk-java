@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.BoolValue;
@@ -31,10 +13,9 @@ import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Change properties for the given account.
@@ -55,20 +36,28 @@ import java.util.Objects;
 public final class AccountUpdateTransaction extends Transaction<AccountUpdateTransaction> {
     @Nullable
     private AccountId accountId = null;
+
     @Nullable
     private AccountId proxyAccountId = null;
+
     @Nullable
     private Key key = null;
+
     @Nullable
     private Instant expirationTime = null;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     @Nullable
     private Boolean receiverSigRequired = null;
+
     @Nullable
     private String accountMemo = null;
+
     @Nullable
     private Integer maxAutomaticTokenAssociations = null;
+
     @Nullable
     private Key aliasKey;
 
@@ -84,8 +73,7 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
     /**
      * Constructor.
      */
-    public AccountUpdateTransaction() {
-    }
+    public AccountUpdateTransaction() {}
 
     /**
      * Constructor.
@@ -93,7 +81,9 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
      * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    AccountUpdateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    AccountUpdateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -485,7 +475,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
             accountMemo = body.getMemo().getValue();
         }
         if (body.hasMaxAutomaticTokenAssociations()) {
-            maxAutomaticTokenAssociations = body.getMaxAutomaticTokenAssociations().getValue();
+            maxAutomaticTokenAssociations =
+                    body.getMaxAutomaticTokenAssociations().getValue();
         }
 
         if (body.hasDeclineReward()) {
@@ -545,7 +536,8 @@ public final class AccountUpdateTransaction extends Transaction<AccountUpdateTra
         }
 
         if (declineStakingReward != null) {
-            builder.setDeclineReward(BoolValue.newBuilder().setValue(declineStakingReward).build());
+            builder.setDeclineReward(
+                    BoolValue.newBuilder().setValue(declineStakingReward).build());
         }
 
         return builder;

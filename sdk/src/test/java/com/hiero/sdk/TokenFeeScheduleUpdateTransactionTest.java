@@ -1,46 +1,18 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFee;
-import com.hiero.sdk.CustomFixedFee;
-import com.hiero.sdk.CustomFractionalFee;
-import com.hiero.sdk.FeeAssessmentMethod;
-import com.hiero.sdk.TokenFeeScheduleUpdateTransaction;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
 import com.hiero.sdk.proto.SchedulableTransactionBody;
 import com.hiero.sdk.proto.TokenFeeScheduleUpdateTransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TokenFeeScheduleUpdateTransactionTest {
     final Instant validStart = Instant.ofEpochSecond(1554158542);
@@ -58,25 +30,23 @@ public class TokenFeeScheduleUpdateTransactionTest {
     private TokenFeeScheduleUpdateTransaction spawnTestTransaction() {
         var customFees = new ArrayList<CustomFee>();
         customFees.add(new CustomFixedFee()
-            .setFeeCollectorAccountId(new AccountId(4322))
-            .setDenominatingTokenId(new TokenId(483902))
-            .setAmount(10)
-        );
+                .setFeeCollectorAccountId(new AccountId(4322))
+                .setDenominatingTokenId(new TokenId(483902))
+                .setAmount(10));
         customFees.add(new CustomFractionalFee()
-            .setFeeCollectorAccountId(new AccountId(389042))
-            .setNumerator(3)
-            .setDenominator(7)
-            .setMin(3)
-            .setMax(100)
-            .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE)
-        );
+                .setFeeCollectorAccountId(new AccountId(389042))
+                .setNumerator(3)
+                .setDenominator(7)
+                .setMin(3)
+                .setMax(100)
+                .setAssessmentMethod(FeeAssessmentMethod.EXCLUSIVE));
 
         return new TokenFeeScheduleUpdateTransaction()
-            .setTokenId(new TokenId(8798))
-            .setCustomFees(customFees)
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .freeze();
+                .setTokenId(new TokenId(8798))
+                .setCustomFees(customFees)
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .freeze();
     }
 
     @Test
@@ -98,8 +68,9 @@ public class TokenFeeScheduleUpdateTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenFeeScheduleUpdate(TokenFeeScheduleUpdateTransactionBody.newBuilder().build())
-            .build();
+                .setTokenFeeScheduleUpdate(
+                        TokenFeeScheduleUpdateTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 

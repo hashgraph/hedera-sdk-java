@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2022 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -27,12 +9,10 @@ import com.hiero.sdk.proto.SmartContractServiceGrpc;
 import com.hiero.sdk.proto.TransactionBody;
 import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Execute an Ethereum transaction on Hedera
@@ -45,10 +25,10 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
     /**
      * Constructor
      */
-    public EthereumTransaction() {
-    }
+    public EthereumTransaction() {}
 
-    EthereumTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    EthereumTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -74,7 +54,6 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
      * @param ethereumData raw ethereum transaction bytes
      * @return {@code this}
      */
-
     public EthereumTransaction setEthereumData(byte[] ethereumData) {
         Objects.requireNonNull(ethereumData);
         requireNotFrozen();
@@ -103,7 +82,6 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
      * @param fileId File ID of an HFS file containing the callData
      * @return {@code this}
      */
-
     public EthereumTransaction setCallDataFileId(FileId fileId) {
         Objects.requireNonNull(fileId);
         requireNotFrozen();
@@ -157,8 +135,8 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
 
     private EthereumTransactionBody.Builder build() {
         var builder = EthereumTransactionBody.newBuilder()
-            .setEthereumData(ByteString.copyFrom(ethereumData))
-            .setMaxGasAllowance(maxGasAllowanceHbar.toTinybars());
+                .setEthereumData(ByteString.copyFrom(ethereumData))
+                .setMaxGasAllowance(maxGasAllowanceHbar.toTinybars());
         if (callDataFileId != null) {
             builder.setCallData(callDataFileId.toProtobuf());
         }

@@ -1,23 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.hiero.sdk.Hbar;
 import com.hiero.sdk.MaxQueryPaymentExceededException;
@@ -29,13 +14,9 @@ import com.hiero.sdk.TokenInfoQuery;
 import com.hiero.sdk.TokenMintTransaction;
 import com.hiero.sdk.TokenSupplyType;
 import com.hiero.sdk.TokenType;
+import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Objects;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 class TokenInfoIntegrationTest {
 
@@ -53,28 +34,26 @@ class TokenInfoIntegrationTest {
             var key7 = PrivateKey.generateED25519();
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setDecimals(3)
-                .setInitialSupply(1000000)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(key1)
-                .setFreezeKey(key2)
-                .setWipeKey(key3)
-                .setKycKey(key4)
-                .setSupplyKey(key5)
-                .setPauseKey(key6)
-                .setMetadataKey(key7)
-                .setFreezeDefault(false)
-                .freezeWith(testEnv.client)
-                .sign(key1)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setDecimals(3)
+                    .setInitialSupply(1000000)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(key1)
+                    .setFreezeKey(key2)
+                    .setWipeKey(key3)
+                    .setKycKey(key4)
+                    .setSupplyKey(key5)
+                    .setPauseKey(key6)
+                    .setMetadataKey(key7)
+                    .setFreezeDefault(false)
+                    .freezeWith(testEnv.client)
+                    .sign(key1)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var info = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .execute(testEnv.client);
+            var info = new TokenInfoQuery().setTokenId(tokenId).execute(testEnv.client);
 
             assertThat(info.tokenId).isEqualTo(tokenId);
             assertThat(info.name).isEqualTo("ffff");
@@ -94,7 +73,8 @@ class TokenInfoIntegrationTest {
             assertThat(info.kycKey.toString()).isEqualTo(key4.getPublicKey().toString());
             assertThat(info.supplyKey.toString()).isEqualTo(key5.getPublicKey().toString());
             assertThat(info.pauseKey.toString()).isEqualTo(key6.getPublicKey().toString());
-            assertThat(info.metadataKey.toString()).isEqualTo(key7.getPublicKey().toString());
+            assertThat(info.metadataKey.toString())
+                    .isEqualTo(key7.getPublicKey().toString());
             assertThat(info.defaultFreezeStatus).isNotNull();
             assertThat(info.defaultFreezeStatus).isFalse();
             assertThat(info.defaultKycStatus).isNotNull();
@@ -103,12 +83,11 @@ class TokenInfoIntegrationTest {
             assertThat(info.supplyType).isEqualTo(TokenSupplyType.INFINITE);
 
             new TokenDeleteTransaction()
-                .setTokenId(tokenId)
-                .freezeWith(testEnv.client)
-                .sign(key1)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
-
+                    .setTokenId(tokenId)
+                    .freezeWith(testEnv.client)
+                    .sign(key1)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
         }
     }
 
@@ -118,16 +97,14 @@ class TokenInfoIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var info = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .execute(testEnv.client);
+            var info = new TokenInfoQuery().setTokenId(tokenId).execute(testEnv.client);
 
             assertThat(info.tokenId).isEqualTo(tokenId);
             assertThat(info.name).isEqualTo("ffff");
@@ -146,39 +123,36 @@ class TokenInfoIntegrationTest {
             assertThat(info.defaultKycStatus).isNull();
             assertThat(info.tokenType).isEqualTo(TokenType.FUNGIBLE_COMMON);
             assertThat(info.supplyType).isEqualTo(TokenSupplyType.INFINITE);
-
         }
     }
 
     @Test
     @DisplayName("Can query NFT")
     void canQueryNfts() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-                .setSupplyType(TokenSupplyType.FINITE)
-                .setMaxSupply(5000)
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .setSupplyKey(testEnv.operatorKey)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                    .setSupplyType(TokenSupplyType.FINITE)
+                    .setMaxSupply(5000)
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .setSupplyKey(testEnv.operatorKey)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
             var mintReceipt = new TokenMintTransaction()
-                .setTokenId(tokenId)
-                .setMetadata(NftMetadataGenerator.generate((byte) 10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .setTokenId(tokenId)
+                    .setMetadata(NftMetadataGenerator.generate((byte) 10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
             assertThat(mintReceipt.serials.size()).isEqualTo(10);
 
-            var info = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .execute(testEnv.client);
+            var info = new TokenInfoQuery().setTokenId(tokenId).execute(testEnv.client);
 
             assertThat(info.tokenId).isEqualTo(tokenId);
             assertThat(info.name).isEqualTo("ffff");
@@ -198,106 +172,96 @@ class TokenInfoIntegrationTest {
             assertThat(info.tokenType).isEqualTo(TokenType.NON_FUNGIBLE_UNIQUE);
             assertThat(info.supplyType).isEqualTo(TokenSupplyType.FINITE);
             assertThat(info.maxSupply).isEqualTo(5000);
-
         }
     }
 
     @Test
     @DisplayName("Get cost of token info query")
     void getCostQueryTokenInfo() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var infoQuery = new TokenInfoQuery()
-                    .setTokenId(tokenId);
+            var infoQuery = new TokenInfoQuery().setTokenId(tokenId);
 
             var cost = infoQuery.getCost(testEnv.client);
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
-
         }
     }
 
     @Test
     @DisplayName("Get cost of token info query, with big max")
     void getCostBigMaxQueryTokenInfo() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var infoQuery = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .setMaxQueryPayment(new Hbar(1000));
+            var infoQuery = new TokenInfoQuery().setTokenId(tokenId).setMaxQueryPayment(new Hbar(1000));
 
             var cost = infoQuery.getCost(testEnv.client);
 
             infoQuery.setQueryPayment(cost).execute(testEnv.client);
-
         }
     }
 
     @Test
     @DisplayName("Can query token info when all keys are different")
     void getCostSmallMaxTokenInfo() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var infoQuery = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .setMaxQueryPayment(Hbar.fromTinybars(1));
+            var infoQuery = new TokenInfoQuery().setTokenId(tokenId).setMaxQueryPayment(Hbar.fromTinybars(1));
 
             assertThatExceptionOfType(MaxQueryPaymentExceededException.class).isThrownBy(() -> {
                 infoQuery.execute(testEnv.client);
             });
-
         }
     }
 
     @Test
     @DisplayName("Throws insufficient transaction fee error")
     void getCostInsufficientTxFeeQueryTokenInfo() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()){
+        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
 
             var response = new TokenCreateTransaction()
-                .setTokenName("ffff")
-                .setTokenSymbol("F")
-                .setTreasuryAccountId(testEnv.operatorId)
-                .setAdminKey(testEnv.operatorKey)
-                .execute(testEnv.client);
+                    .setTokenName("ffff")
+                    .setTokenSymbol("F")
+                    .setTreasuryAccountId(testEnv.operatorId)
+                    .setAdminKey(testEnv.operatorKey)
+                    .execute(testEnv.client);
 
             var tokenId = Objects.requireNonNull(response.getReceipt(testEnv.client).tokenId);
 
-            var infoQuery = new TokenInfoQuery()
-                .setTokenId(tokenId)
-                .setMaxQueryPayment(new Hbar(1000));
+            var infoQuery = new TokenInfoQuery().setTokenId(tokenId).setMaxQueryPayment(new Hbar(1000));
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> {
-                infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
-            }).satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> {
+                        infoQuery.setQueryPayment(Hbar.fromTinybars(1)).execute(testEnv.client);
+                    })
+                    .satisfies(error -> assertThat(error.status.toString()).isEqualTo("INSUFFICIENT_TX_FEE"));
         }
     }
 }

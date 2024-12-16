@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -74,8 +56,7 @@ public class FeeComponents implements Cloneable {
     /**
      * Constructor.
      */
-    public FeeComponents() {
-    }
+    public FeeComponents() {}
 
     /**
      * Create a fee components object from a protobuf.
@@ -85,17 +66,17 @@ public class FeeComponents implements Cloneable {
      */
     static FeeComponents fromProtobuf(com.hiero.sdk.proto.FeeComponents feeComponents) {
         return new FeeComponents()
-            .setMin(feeComponents.getMin())
-            .setMax(feeComponents.getMax())
-            .setConstant(feeComponents.getConstant())
-            .setTransactionBandwidthByte(feeComponents.getBpt())
-            .setTransactionVerification(feeComponents.getVpt())
-            .setTransactionRamByteHour(feeComponents.getRbh())
-            .setTransactionStorageByteHour(feeComponents.getSbh())
-            .setContractTransactionGas(feeComponents.getGas())
-            .setTransferVolumeHbar(feeComponents.getTv())
-            .setResponseMemoryByte(feeComponents.getBpr())
-            .setResponseDiskByte(feeComponents.getSbpr());
+                .setMin(feeComponents.getMin())
+                .setMax(feeComponents.getMax())
+                .setConstant(feeComponents.getConstant())
+                .setTransactionBandwidthByte(feeComponents.getBpt())
+                .setTransactionVerification(feeComponents.getVpt())
+                .setTransactionRamByteHour(feeComponents.getRbh())
+                .setTransactionStorageByteHour(feeComponents.getSbh())
+                .setContractTransactionGas(feeComponents.getGas())
+                .setTransferVolumeHbar(feeComponents.getTv())
+                .setResponseMemoryByte(feeComponents.getBpr())
+                .setResponseDiskByte(feeComponents.getSbpr());
     }
 
     /**
@@ -106,7 +87,8 @@ public class FeeComponents implements Cloneable {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static FeeComponents fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.FeeComponents.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                com.hiero.sdk.proto.FeeComponents.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -336,35 +318,35 @@ public class FeeComponents implements Cloneable {
      */
     com.hiero.sdk.proto.FeeComponents toProtobuf() {
         return com.hiero.sdk.proto.FeeComponents.newBuilder()
-            .setMin(getMin())
-            .setMax(getMax())
-            .setConstant(getConstant())
-            .setBpt(getTransactionBandwidthByte())
-            .setVpt(getTransactionVerification())
-            .setRbh(getTransactionRamByteHour())
-            .setSbh(getTransactionStorageByteHour())
-            .setGas(getContractTransactionGas())
-            .setTv(getTransferVolumeHbar())
-            .setBpr(getResponseMemoryByte())
-            .setSbpr(getResponseDiskByte())
-            .build();
+                .setMin(getMin())
+                .setMax(getMax())
+                .setConstant(getConstant())
+                .setBpt(getTransactionBandwidthByte())
+                .setVpt(getTransactionVerification())
+                .setRbh(getTransactionRamByteHour())
+                .setSbh(getTransactionStorageByteHour())
+                .setGas(getContractTransactionGas())
+                .setTv(getTransferVolumeHbar())
+                .setBpr(getResponseMemoryByte())
+                .setSbpr(getResponseDiskByte())
+                .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("min", getMin())
-            .add("max", getMax())
-            .add("constant", getConstant())
-            .add("transactionBandwidthByte", getTransactionBandwidthByte())
-            .add("transactionVerification", getTransactionVerification())
-            .add("transactionRamByteHour", getTransactionRamByteHour())
-            .add("transactionStorageByteHour", getTransactionStorageByteHour())
-            .add("contractTransactionGas", getContractTransactionGas())
-            .add("transferVolumeHbar", getTransferVolumeHbar())
-            .add("responseMemoryByte", getResponseMemoryByte())
-            .add("responseDiskByte", getResponseDiskByte())
-            .toString();
+                .add("min", getMin())
+                .add("max", getMax())
+                .add("constant", getConstant())
+                .add("transactionBandwidthByte", getTransactionBandwidthByte())
+                .add("transactionVerification", getTransactionVerification())
+                .add("transactionRamByteHour", getTransactionRamByteHour())
+                .add("transactionStorageByteHour", getTransactionStorageByteHour())
+                .add("contractTransactionGas", getContractTransactionGas())
+                .add("transferVolumeHbar", getTransferVolumeHbar())
+                .add("responseMemoryByte", getResponseMemoryByte())
+                .add("responseDiskByte", getResponseDiskByte())
+                .toString();
     }
 
     /**

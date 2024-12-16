@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -80,24 +62,35 @@ public class ContractCreateFlow {
     static final int FILE_CREATE_MAX_BYTES = 2048;
 
     private String bytecode = "";
+
     @Nullable
     private Integer maxChunks = null;
+
     @Nullable
     private Key adminKey = null;
+
     private long gas = 0;
     private Hbar initialBalance = Hbar.ZERO;
+
     @Nullable
     private AccountId proxyAccountId = null;
+
     private int maxAutomaticTokenAssociations = 0;
+
     @Nullable
     private Duration autoRenewPeriod = null;
+
     @Nullable
     private AccountId autoRenewAccountId = null;
+
     private byte[] constructorParameters = {};
+
     @Nullable
     private String contractMemo = null;
+
     @Nullable
     private List<AccountId> nodeAccountIds = null;
+
     private String createBytecode = "";
     private String appendBytecode = "";
 
@@ -124,8 +117,7 @@ public class ContractCreateFlow {
     /**
      * Constructor
      */
-    public ContractCreateFlow() {
-    }
+    public ContractCreateFlow() {}
 
     /**
      * Extract the hex-encoded bytecode of the contract.
@@ -568,8 +560,8 @@ public class ContractCreateFlow {
 
     private FileCreateTransaction createFileCreateTransaction(Client client) {
         var fileCreateTx = new FileCreateTransaction()
-            .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()))
-            .setContents(createBytecode);
+                .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()))
+                .setContents(createBytecode);
         if (nodeAccountIds != null) {
             fileCreateTx.setNodeAccountIds(nodeAccountIds);
         }
@@ -577,9 +569,7 @@ public class ContractCreateFlow {
     }
 
     private FileAppendTransaction createFileAppendTransaction(FileId fileId) {
-        var fileAppendTx = new FileAppendTransaction()
-            .setFileId(fileId)
-            .setContents(appendBytecode);
+        var fileAppendTx = new FileAppendTransaction().setFileId(fileId).setContents(appendBytecode);
         if (maxChunks != null) {
             fileAppendTx.setMaxChunks(maxChunks);
         }
@@ -591,12 +581,12 @@ public class ContractCreateFlow {
 
     private ContractCreateTransaction createContractCreateTransaction(FileId fileId) {
         var contractCreateTx = new ContractCreateTransaction()
-            .setBytecodeFileId(fileId)
-            .setConstructorParameters(constructorParameters)
-            .setGas(gas)
-            .setInitialBalance(initialBalance)
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setDeclineStakingReward(declineStakingReward);
+                .setBytecodeFileId(fileId)
+                .setConstructorParameters(constructorParameters)
+                .setGas(gas)
+                .setInitialBalance(initialBalance)
+                .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+                .setDeclineStakingReward(declineStakingReward);
         if (adminKey != null) {
             contractCreateTx.setAdminKey(adminKey);
         }
@@ -639,8 +629,8 @@ public class ContractCreateFlow {
      */
     TransactionReceiptQuery createTransactionReceiptQuery(TransactionResponse response) {
         return new TransactionReceiptQuery()
-            .setNodeAccountIds(Collections.singletonList(response.nodeId))
-            .setTransactionId(response.transactionId);
+                .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                .setTransactionId(response.transactionId);
     }
 
     /**
@@ -665,23 +655,20 @@ public class ContractCreateFlow {
      * @throws TimeoutException        when the transaction times out
      */
     public TransactionResponse execute(Client client, Duration timeoutPerTransaction)
-        throws PrecheckStatusException, TimeoutException {
+            throws PrecheckStatusException, TimeoutException {
         try {
             splitBytecode();
             var fileId = createFileCreateTransaction(client)
-                .execute(client, timeoutPerTransaction)
-                .getReceipt(client, timeoutPerTransaction)
-                .fileId;
+                    .execute(client, timeoutPerTransaction)
+                    .getReceipt(client, timeoutPerTransaction)
+                    .fileId;
             Objects.requireNonNull(fileId);
             if (!appendBytecode.isEmpty()) {
-                createFileAppendTransaction(fileId)
-                    .execute(client, timeoutPerTransaction);
+                createFileAppendTransaction(fileId).execute(client, timeoutPerTransaction);
             }
             var response = createContractCreateTransaction(fileId).execute(client, timeoutPerTransaction);
             response.getReceipt(client, timeoutPerTransaction);
-            new FileDeleteTransaction()
-                .setFileId(fileId)
-                .execute(client, timeoutPerTransaction);
+            new FileDeleteTransaction().setFileId(fileId).execute(client, timeoutPerTransaction);
             return response;
         } catch (ReceiptStatusException e) {
             throw new RuntimeException(e);
@@ -707,26 +694,30 @@ public class ContractCreateFlow {
      */
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
         splitBytecode();
-        return createFileCreateTransaction(client).executeAsync(client, timeoutPerTransaction)
-            .thenCompose(fileCreateResponse -> createTransactionReceiptQuery(fileCreateResponse)
+        return createFileCreateTransaction(client)
                 .executeAsync(client, timeoutPerTransaction)
-                .thenApply(receipt -> receipt.fileId)).thenCompose(fileId -> {
-                CompletableFuture<Void> appendFuture =
-                    appendBytecode.isEmpty() ? CompletableFuture.completedFuture(null) :
-                        createFileAppendTransaction(fileId).executeAsync(client, timeoutPerTransaction)
-                            .thenApply(ignored -> null);
-                return appendFuture.thenCompose(
-                    ignored -> createContractCreateTransaction(fileId).executeAsync(client, timeoutPerTransaction)
-                        .thenApply(contractCreateResponse -> {
-                            createTransactionReceiptQuery(contractCreateResponse).executeAsync(client,
-                                timeoutPerTransaction).thenRun(() -> {
-                                new FileDeleteTransaction()
-                                    .setFileId(fileId)
-                                    .executeAsync(client, timeoutPerTransaction);
-                            });
-                            return contractCreateResponse;
-                        }));
-            });
+                .thenCompose(fileCreateResponse -> createTransactionReceiptQuery(fileCreateResponse)
+                        .executeAsync(client, timeoutPerTransaction)
+                        .thenApply(receipt -> receipt.fileId))
+                .thenCompose(fileId -> {
+                    CompletableFuture<Void> appendFuture = appendBytecode.isEmpty()
+                            ? CompletableFuture.completedFuture(null)
+                            : createFileAppendTransaction(fileId)
+                                    .executeAsync(client, timeoutPerTransaction)
+                                    .thenApply(ignored -> null);
+                    return appendFuture.thenCompose(ignored -> createContractCreateTransaction(fileId)
+                            .executeAsync(client, timeoutPerTransaction)
+                            .thenApply(contractCreateResponse -> {
+                                createTransactionReceiptQuery(contractCreateResponse)
+                                        .executeAsync(client, timeoutPerTransaction)
+                                        .thenRun(() -> {
+                                            new FileDeleteTransaction()
+                                                    .setFileId(fileId)
+                                                    .executeAsync(client, timeoutPerTransaction);
+                                        });
+                                return contractCreateResponse;
+                            }));
+                });
     }
 
     /**
@@ -746,8 +737,8 @@ public class ContractCreateFlow {
      * @param timeoutPerTransaction The timeout after which each transaction's execution attempt will be cancelled.
      * @param callback              a BiConsumer which handles the result or error.
      */
-    public void executeAsync(Client client, Duration timeoutPerTransaction,
-        BiConsumer<TransactionResponse, Throwable> callback) {
+    public void executeAsync(
+            Client client, Duration timeoutPerTransaction, BiConsumer<TransactionResponse, Throwable> callback) {
         ConsumerHelper.biConsumer(executeAsync(client, timeoutPerTransaction), callback);
     }
 
@@ -770,8 +761,11 @@ public class ContractCreateFlow {
      * @param onSuccess             a Consumer which consumes the result on success.
      * @param onFailure             a Consumer which consumes the error on failure.
      */
-    public void executeAsync(Client client, Duration timeoutPerTransaction, Consumer<TransactionResponse> onSuccess,
-        Consumer<Throwable> onFailure) {
+    public void executeAsync(
+            Client client,
+            Duration timeoutPerTransaction,
+            Consumer<TransactionResponse> onSuccess,
+            Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(executeAsync(client, timeoutPerTransaction), onSuccess, onFailure);
     }
 }

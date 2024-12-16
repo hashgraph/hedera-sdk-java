@@ -1,53 +1,32 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
-
-import com.hiero.sdk.*;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import java.time.Duration;
-import java.time.Instant;
-
-import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import com.hiero.sdk.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Objects;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 class AccountCreateIntegrationTest {
     @Test
     @DisplayName("Can create account with only initial balance and key")
     void canCreateAccountWithOnlyInitialBalanceAndKey() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var key = PrivateKey.generateED25519();
 
             var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setInitialBalance(new Hbar(1))
-                .execute(testEnv.client);
+                    .setKey(key)
+                    .setInitialBalance(new Hbar(1))
+                    .execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isEqualTo(accountId);
             assertThat(info.isDeleted).isFalse();
@@ -56,26 +35,21 @@ class AccountCreateIntegrationTest {
             assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
             assertThat(info.proxyAccountId).isNull();
             assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
-
         }
     }
 
     @Test
     @DisplayName("Can create account with no initial balance")
     void canCreateAccountWithNoInitialBalance() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction()
-                .setKey(key)
-                .execute(testEnv.client);
+            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isEqualTo(accountId);
             assertThat(info.isDeleted).isFalse();
@@ -84,7 +58,6 @@ class AccountCreateIntegrationTest {
             assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
             assertThat(info.proxyAccountId).isNull();
             assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
-
         }
     }
 
@@ -93,57 +66,54 @@ class AccountCreateIntegrationTest {
     void canNotCreateAccountWithNoKey() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            assertThatExceptionOfType(PrecheckStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
-                    .setInitialBalance(new Hbar(1))
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client)).withMessageContaining(Status.KEY_REQUIRED.toString());
-
+            assertThatExceptionOfType(PrecheckStatusException.class)
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setInitialBalance(new Hbar(1))
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining(Status.KEY_REQUIRED.toString());
         }
     }
 
     @Test
     @DisplayName("Can create account using aliasKey")
     void canCreateWithAliasKey() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var key = PrivateKey.generateED25519();
 
             var aliasId = key.toAccountId(0, 0);
 
             new TransferTransaction()
-                .addHbarTransfer(testEnv.operatorId, new Hbar(10).negated())
-                .addHbarTransfer(aliasId, new Hbar(10))
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client);
+                    .addHbarTransfer(testEnv.operatorId, new Hbar(10).negated())
+                    .addHbarTransfer(aliasId, new Hbar(10))
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client);
 
-            var info = new AccountInfoQuery()
-                .setAccountId(aliasId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(aliasId).execute(testEnv.client);
 
             assertThat(key.getPublicKey()).isEqualTo(info.aliasKey);
-
         }
     }
 
     @Test
     @DisplayName("Regenerates TransactionIds in response to expiration")
     void managesExpiration() throws Exception {
-        try(var testEnv = new IntegrationTestEnv(1)){
+        try (var testEnv = new IntegrationTestEnv(1)) {
 
             var key = PrivateKey.generateED25519();
 
             var response = new AccountCreateTransaction()
-                .setKey(key)
-                .setTransactionId(new TransactionId(testEnv.operatorId, Instant.now().minusSeconds(40)))
-                .setTransactionValidDuration(Duration.ofSeconds(30))
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(key)
+                    .setTransactionId(
+                            new TransactionId(testEnv.operatorId, Instant.now().minusSeconds(40)))
+                    .setTransactionValidDuration(Duration.ofSeconds(30))
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isEqualTo(accountId);
             assertThat(info.isDeleted).isFalse();
@@ -152,7 +122,6 @@ class AccountCreateIntegrationTest {
             assertThat(info.autoRenewPeriod).isEqualTo(Duration.ofDays(90));
             assertThat(info.proxyAccountId).isNull();
             assertThat(info.proxyReceived).isEqualTo(Hbar.ZERO);
-
         }
     }
 
@@ -168,28 +137,25 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var accountId = new AccountCreateTransaction()
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)
-                .accountId;
+                    .setKey(adminKey)
+                    .setAlias(evmAddress)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
 
             assertThat(accountId).isNotNull();
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isNotNull();
             assertThat(info.contractAccountId).hasToString(evmAddress.toString());
             assertThat(info.key).isEqualTo(adminKey.getPublicKey());
-
         }
     }
 
@@ -205,29 +171,27 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var accountId = new AccountCreateTransaction()
-                .setReceiverSignatureRequired(true)
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .sign(adminKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client).accountId;
+                    .setReceiverSignatureRequired(true)
+                    .setKey(adminKey)
+                    .setAlias(evmAddress)
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
 
             assertThat(accountId).isNotNull();
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isNotNull();
             assertThat(info.contractAccountId).hasToString(evmAddress.toString());
             assertThat(info.key).isEqualTo(adminKey.getPublicKey());
-
         }
     }
 
@@ -241,18 +205,19 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
-                .setReceiverSignatureRequired(true)
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)).withMessageContaining(Status.INVALID_SIGNATURE.toString());
-
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setReceiverSignatureRequired(true)
+                            .setKey(adminKey)
+                            .setAlias(evmAddress)
+                            .freezeWith(testEnv.client)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
 
@@ -267,31 +232,29 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
             var evmAddress = key.getPublicKey().toEvmAddress();
 
             var accountId = new AccountCreateTransaction()
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client).accountId;
+                    .setKey(adminKey)
+                    .setAlias(evmAddress)
+                    .freezeWith(testEnv.client)
+                    .sign(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
 
             assertThat(accountId).isNotNull();
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isNotNull();
             assertThat(info.contractAccountId).hasToString(evmAddress.toString());
             assertThat(info.key).isEqualTo(adminKey.getPublicKey());
-
         }
     }
 
@@ -304,21 +267,22 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
             var evmAddress = key.getPublicKey().toEvmAddress();
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
-                .setReceiverSignatureRequired(true)
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)).withMessageContaining(Status.INVALID_SIGNATURE.toString());
-
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setReceiverSignatureRequired(true)
+                            .setKey(adminKey)
+                            .setAlias(evmAddress)
+                            .freezeWith(testEnv.client)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
 
@@ -333,38 +297,37 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
             var evmAddress = key.getPublicKey().toEvmAddress();
 
             var accountId = new AccountCreateTransaction()
-                .setReceiverSignatureRequired(true)
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .sign(adminKey)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client).accountId;
+                    .setReceiverSignatureRequired(true)
+                    .setKey(adminKey)
+                    .setAlias(evmAddress)
+                    .freezeWith(testEnv.client)
+                    .sign(key)
+                    .sign(adminKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
 
             assertThat(accountId).isNotNull();
 
-            var info = new AccountInfoQuery()
-                .setAccountId(accountId)
-                .execute(testEnv.client);
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
 
             assertThat(info.accountId).isNotNull();
             assertThat(info.contractAccountId).hasToString(evmAddress.toString());
             assertThat(info.key).isEqualTo(adminKey.getPublicKey());
-
         }
     }
 
     @Test
-    @DisplayName("Cannot create account with alias different from admin key and receiver sig required without signature")
+    @DisplayName(
+            "Cannot create account with alias different from admin key and receiver sig required without signature")
     void cannotCreateAccountWithAliasWithReceiverSigRequiredWithoutSignature() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -372,22 +335,23 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKey(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKey(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
             var evmAddress = key.getPublicKey().toEvmAddress();
 
-            assertThatExceptionOfType(ReceiptStatusException.class).isThrownBy(() -> new AccountCreateTransaction()
-                .setReceiverSignatureRequired(true)
-                .setKey(adminKey)
-                .setAlias(evmAddress)
-                .freezeWith(testEnv.client)
-                .sign(key)
-                .execute(testEnv.client)
-                .getReceipt(testEnv.client)).withMessageContaining(Status.INVALID_SIGNATURE.toString());
-
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setReceiverSignatureRequired(true)
+                            .setKey(adminKey)
+                            .setAlias(evmAddress)
+                            .freezeWith(testEnv.client)
+                            .sign(key)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
 }

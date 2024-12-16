@@ -19,8 +19,8 @@
  */
 
 open module com.hiero.sdk.test.integration {
-    requires com.hiero.sdk;
     requires com.esaulpaugh.headlong;
+    requires com.hiero.sdk;
     requires org.assertj.core;
     requires org.bouncycastle.provider;
     requires org.junit.jupiter.api;

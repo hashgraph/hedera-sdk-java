@@ -1,27 +1,7 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.google.common.base.MoreObjects;
 import com.hiero.sdk.proto.FixedFee;
-
 import javax.annotation.Nullable;
 
 /**
@@ -39,8 +19,7 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
     /**
      * Constructor.
      */
-    public CustomFixedFee() {
-    }
+    public CustomFixedFee() {}
 
     /**
      * Create a custom fixed fee from a fixed fee protobuf.
@@ -49,8 +28,7 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
      * @return                          the new custom fixed fee object
      */
     static CustomFixedFee fromProtobuf(FixedFee fixedFee) {
-        var returnFee = new CustomFixedFee()
-            .setAmount(fixedFee.getAmount());
+        var returnFee = new CustomFixedFee().setAmount(fixedFee.getAmount());
         if (fixedFee.hasDenominatingTokenId()) {
             returnFee.setDenominatingTokenId(TokenId.fromProtobuf(fixedFee.getDenominatingTokenId()));
         }
@@ -60,9 +38,9 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
     @Override
     CustomFixedFee deepCloneSubclass() {
         return new CustomFixedFee()
-            .setAmount(amount)
-            .setDenominatingTokenId(denominatingTokenId)
-            .finishDeepClone(this);
+                .setAmount(amount)
+                .setDenominatingTokenId(denominatingTokenId)
+                .finishDeepClone(this);
     }
 
     /**
@@ -148,9 +126,9 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
     @Override
     public String toString() {
         return toStringHelper()
-            .add("amount", getAmount())
-            .add("demoninatingTokenId", getDenominatingTokenId())
-            .toString();
+                .add("amount", getAmount())
+                .add("demoninatingTokenId", getDenominatingTokenId())
+                .toString();
     }
 
     /**
@@ -159,8 +137,7 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
      * @return                          the protobuf converted object
      */
     FixedFee toFixedFeeProtobuf() {
-        var fixedFeeBuilder = FixedFee.newBuilder()
-            .setAmount(getAmount());
+        var fixedFeeBuilder = FixedFee.newBuilder().setAmount(getAmount());
         if (getDenominatingTokenId() != null) {
             fixedFeeBuilder.setDenominatingTokenId(getDenominatingTokenId().toProtobuf());
         }
@@ -169,8 +146,7 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
 
     @Override
     com.hiero.sdk.proto.CustomFee toProtobuf() {
-        var customFeeBuilder = com.hiero.sdk.proto.CustomFee.newBuilder()
-            .setFixedFee(toFixedFeeProtobuf());
+        var customFeeBuilder = com.hiero.sdk.proto.CustomFee.newBuilder().setFixedFee(toFixedFeeProtobuf());
         return finishToProtobuf(customFeeBuilder);
     }
 }

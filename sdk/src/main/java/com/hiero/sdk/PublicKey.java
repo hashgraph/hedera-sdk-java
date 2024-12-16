@@ -1,34 +1,15 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.SignaturePair;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nullable;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
 import org.bouncycastle.util.encoders.Hex;
-
-import javax.annotation.Nonnegative;
-import javax.annotation.Nullable;
 
 /**
  * A public key on the Hedera™ network.
@@ -50,8 +31,7 @@ public abstract class PublicKey extends Key {
         } else if (publicKey.length == 65) {
             // compress the 65 byte form
             return PublicKeyECDSA.fromBytesInternal(
-                Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true)
-            );
+                    Key.ECDSA_SECP256K1_CURVE.getCurve().decodePoint(publicKey).getEncoded(true));
         }
 
         // Assume a DER-encoded private key descriptor
@@ -135,7 +115,7 @@ public abstract class PublicKey extends Key {
      * @return                          the new key
      */
     private static PublicKey fromSubjectKeyInfo(SubjectPublicKeyInfo subjectPublicKeyInfo) {
-        if(subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
+        if (subjectPublicKeyInfo.getAlgorithm().equals(new AlgorithmIdentifier(ID_ED25519))) {
             return PublicKeyED25519.fromSubjectKeyInfoInternal(subjectPublicKeyInfo);
         } else {
             // assume ECDSA
@@ -202,7 +182,9 @@ public abstract class PublicKey extends Key {
                 if (sigPair.getPubKeyPrefix().equals(ByteString.copyFrom(toBytesRaw()))) {
                     found = true;
 
-                    if (!verify(signedTransaction.getBodyBytes().toByteArray(), extractSignatureFromProtobuf(sigPair).toByteArray())) {
+                    if (!verify(
+                            signedTransaction.getBodyBytes().toByteArray(),
+                            extractSignatureFromProtobuf(sigPair).toByteArray())) {
                         return false;
                     }
                 }

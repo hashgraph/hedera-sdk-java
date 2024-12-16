@@ -1,34 +1,14 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.hiero.sdk.proto.SignaturePair;
+import java.io.IOException;
+import java.util.Arrays;
 import org.bouncycastle.asn1.x509.AlgorithmIdentifier;
 import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.math.ec.rfc8032.Ed25519;
-
-import javax.annotation.Nullable;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Encapsulate the ED25519 public key.
@@ -89,25 +69,22 @@ class PublicKeyED25519 extends PublicKey {
     @Override
     com.hiero.sdk.proto.Key toProtobufKey() {
         return com.hiero.sdk.proto.Key.newBuilder()
-            .setEd25519(ByteString.copyFrom(keyData))
-            .build();
+                .setEd25519(ByteString.copyFrom(keyData))
+                .build();
     }
 
     @Override
     SignaturePair toSignaturePairProtobuf(byte[] signature) {
         return SignaturePair.newBuilder()
-            .setPubKeyPrefix(ByteString.copyFrom(keyData))
-            .setEd25519(ByteString.copyFrom(signature))
-            .build();
+                .setPubKeyPrefix(ByteString.copyFrom(keyData))
+                .setEd25519(ByteString.copyFrom(signature))
+                .build();
     }
 
     @Override
     public byte[] toBytesDER() {
         try {
-            return new SubjectPublicKeyInfo(
-                new AlgorithmIdentifier(ID_ED25519),
-                keyData
-            ).getEncoded("DER");
+            return new SubjectPublicKeyInfo(new AlgorithmIdentifier(ID_ED25519), keyData).getEncoded("DER");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -129,7 +106,7 @@ class PublicKeyED25519 extends PublicKey {
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

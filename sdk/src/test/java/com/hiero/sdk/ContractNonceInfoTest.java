@@ -1,8 +1,7 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.ContractId;
-import com.hiero.sdk.ContractNonceInfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
@@ -10,8 +9,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class ContractNonceInfoTest {
-    private final com.hiero.sdk.proto.ContractNonceInfo info =
-        com.hiero.sdk.proto.ContractNonceInfo.newBuilder()
+    private final com.hiero.sdk.proto.ContractNonceInfo info = com.hiero.sdk.proto.ContractNonceInfo.newBuilder()
             .setContractId(new ContractId(1).toProtobuf())
             .setNonce(2)
             .build();
@@ -28,25 +26,25 @@ public class ContractNonceInfoTest {
 
     @Test
     void fromProtobuf() {
-        SnapshotMatcher.expect(ContractNonceInfo.fromProtobuf(info).toString())
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(ContractNonceInfo.fromProtobuf(info).toString()).toMatchSnapshot();
     }
 
     @Test
     void toProtobuf() {
         SnapshotMatcher.expect(ContractNonceInfo.fromProtobuf(info).toProtobuf())
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 
     @Test
     void toBytes() {
-        SnapshotMatcher.expect(Hex.toHexString(ContractNonceInfo.fromProtobuf(info).toBytes()))
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(
+                        Hex.toHexString(ContractNonceInfo.fromProtobuf(info).toBytes()))
+                .toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(ContractNonceInfo.fromBytes(info.toByteArray()).toString())
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 }

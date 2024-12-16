@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.TokenFreezeStatus;
 import com.hiero.sdk.proto.TokenKycStatus;
-
 import javax.annotation.Nullable;
 
 /**
@@ -74,14 +55,13 @@ public class TokenRelationship {
     public final boolean automaticAssociation;
 
     TokenRelationship(
-        TokenId tokenId,
-        String symbol,
-        long balance,
-        @Nullable Boolean kycStatus,
-        @Nullable Boolean freezeStatus,
-        int decimals,
-        boolean automaticAssociation
-    ) {
+            TokenId tokenId,
+            String symbol,
+            long balance,
+            @Nullable Boolean kycStatus,
+            @Nullable Boolean freezeStatus,
+            int decimals,
+            boolean automaticAssociation) {
         this.tokenId = tokenId;
         this.symbol = symbol;
         this.balance = balance;
@@ -121,14 +101,13 @@ public class TokenRelationship {
      */
     static TokenRelationship fromProtobuf(com.hiero.sdk.proto.TokenRelationship tokenRelationship) {
         return new TokenRelationship(
-            TokenId.fromProtobuf(tokenRelationship.getTokenId()),
-            tokenRelationship.getSymbol(),
-            tokenRelationship.getBalance(),
-            kycStatusFromProtobuf(tokenRelationship.getKycStatus()),
-            freezeStatusFromProtobuf(tokenRelationship.getFreezeStatus()),
-            tokenRelationship.getDecimals(),
-            tokenRelationship.getAutomaticAssociation()
-        );
+                TokenId.fromProtobuf(tokenRelationship.getTokenId()),
+                tokenRelationship.getSymbol(),
+                tokenRelationship.getBalance(),
+                kycStatusFromProtobuf(tokenRelationship.getKycStatus()),
+                freezeStatusFromProtobuf(tokenRelationship.getFreezeStatus()),
+                tokenRelationship.getDecimals(),
+                tokenRelationship.getAutomaticAssociation());
     }
 
     /**
@@ -139,7 +118,8 @@ public class TokenRelationship {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static TokenRelationship fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.TokenRelationship.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(com.hiero.sdk.proto.TokenRelationship.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     /**
@@ -149,7 +129,9 @@ public class TokenRelationship {
      * @return                          the freeze status
      */
     static TokenFreezeStatus freezeStatusToProtobuf(@Nullable Boolean freezeStatus) {
-        return freezeStatus == null ? TokenFreezeStatus.FreezeNotApplicable : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
+        return freezeStatus == null
+                ? TokenFreezeStatus.FreezeNotApplicable
+                : freezeStatus ? TokenFreezeStatus.Frozen : TokenFreezeStatus.Unfrozen;
     }
 
     /**
@@ -159,7 +141,9 @@ public class TokenRelationship {
      * @return                          the kyc status
      */
     static TokenKycStatus kycStatusToProtobuf(@Nullable Boolean kycStatus) {
-        return kycStatus == null ? TokenKycStatus.KycNotApplicable : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
+        return kycStatus == null
+                ? TokenKycStatus.KycNotApplicable
+                : kycStatus ? TokenKycStatus.Granted : TokenKycStatus.Revoked;
     }
 
     /**
@@ -169,27 +153,27 @@ public class TokenRelationship {
      */
     com.hiero.sdk.proto.TokenRelationship toProtobuf() {
         return com.hiero.sdk.proto.TokenRelationship.newBuilder()
-            .setTokenId(tokenId.toProtobuf())
-            .setSymbol(symbol)
-            .setBalance(balance)
-            .setKycStatus(kycStatusToProtobuf(kycStatus))
-            .setFreezeStatus(freezeStatusToProtobuf(freezeStatus))
-            .setDecimals(decimals)
-            .setAutomaticAssociation(automaticAssociation)
-            .build();
+                .setTokenId(tokenId.toProtobuf())
+                .setSymbol(symbol)
+                .setBalance(balance)
+                .setKycStatus(kycStatusToProtobuf(kycStatus))
+                .setFreezeStatus(freezeStatusToProtobuf(freezeStatus))
+                .setDecimals(decimals)
+                .setAutomaticAssociation(automaticAssociation)
+                .build();
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("tokenId", tokenId)
-            .add("symbol", symbol)
-            .add("balance", balance)
-            .add("kycStatus", kycStatus)
-            .add("freezeStatus", freezeStatus)
-            .add("decimals", decimals)
-            .add("automaticAssociation", automaticAssociation)
-            .toString();
+                .add("tokenId", tokenId)
+                .add("symbol", symbol)
+                .add("balance", balance)
+                .add("kycStatus", kycStatus)
+                .add("freezeStatus", freezeStatus)
+                .add("decimals", decimals)
+                .add("automaticAssociation", automaticAssociation)
+                .toString();
     }
 
     /**

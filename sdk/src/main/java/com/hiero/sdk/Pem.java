@@ -1,24 +1,11 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import javax.annotation.Nullable;
+import javax.crypto.Cipher;
 import org.bouncycastle.asn1.ASN1Primitive;
 import org.bouncycastle.asn1.nist.NISTObjectIdentifiers;
 import org.bouncycastle.asn1.pkcs.EncryptedPrivateKeyInfo;
@@ -42,12 +29,6 @@ import org.bouncycastle.pkcs.PKCSException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 
-import javax.annotation.Nullable;
-import javax.crypto.Cipher;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
-
 /**
  * Internal utility class for handling PEM objects.
  * <br>
@@ -62,8 +43,7 @@ final class Pem {
     /**
      * Constructor.
      */
-    private Pem() {
-    }
+    private Pem() {}
 
     /**
      * For some reason, this generates PEM encodings that we ourselves can import, but OpenSSL
@@ -74,8 +54,7 @@ final class Pem {
     static void writeEncryptedPrivateKey(PrivateKeyInfo pkInfo, Writer out, String passphrase) throws IOException {
         byte[] salt = Crypto.randomBytes(Crypto.SALT_LEN);
 
-        KeyParameter derivedKey = Crypto.deriveKeySha256(
-            passphrase, salt, Crypto.ITERATIONS, Crypto.CBC_DK_LEN);
+        KeyParameter derivedKey = Crypto.deriveKeySha256(passphrase, salt, Crypto.ITERATIONS, Crypto.CBC_DK_LEN);
 
         byte[] iv = Crypto.randomBytes(Crypto.IV_LEN);
 
@@ -88,19 +67,19 @@ final class Pem {
 
         // So this is basically a reimplementation of that minus the excess OO
         PBES2Parameters parameters = new PBES2Parameters(
-            new KeyDerivationFunc(
-                PKCSObjectIdentifiers.id_PBKDF2,
-                new PBKDF2Params(
-                    salt,
-                    Crypto.ITERATIONS,
-                    Crypto.CBC_DK_LEN,
-                    new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256))),
-            new EncryptionScheme(NISTObjectIdentifiers.id_aes128_CBC,
-                ASN1Primitive.fromByteArray(cipher.getParameters().getEncoded())));
+                new KeyDerivationFunc(
+                        PKCSObjectIdentifiers.id_PBKDF2,
+                        new PBKDF2Params(
+                                salt,
+                                Crypto.ITERATIONS,
+                                Crypto.CBC_DK_LEN,
+                                new AlgorithmIdentifier(PKCSObjectIdentifiers.id_hmacWithSHA256))),
+                new EncryptionScheme(
+                        NISTObjectIdentifiers.id_aes128_CBC,
+                        ASN1Primitive.fromByteArray(cipher.getParameters().getEncoded())));
 
         EncryptedPrivateKeyInfo encryptedPrivateKeyInfo = new EncryptedPrivateKeyInfo(
-            new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, parameters),
-            encryptedKey);
+                new AlgorithmIdentifier(PKCSObjectIdentifiers.id_PBES2, parameters), encryptedKey);
 
         PemWriter writer = new PemWriter(out);
         writer.writeObject(new PemObject(TYPE_ENCRYPTED_PRIVATE_KEY, encryptedPrivateKeyInfo.getEncoded()));
@@ -116,30 +95,31 @@ final class Pem {
      * @throws IOException              if IO operations fail
      */
     static PrivateKeyInfo readPrivateKey(Reader input, @Nullable String passphrase) throws IOException {
-        try (final var parser = new PEMParser(input)){
+        try (final var parser = new PEMParser(input)) {
             Object parsedObject = parser.readObject();
             var password = (passphrase != null) ? passphrase.toCharArray() : "".toCharArray();
             if (parsedObject == null) {
                 throw new BadKeyException("PEM file did not contain a private key");
             } else if (parsedObject instanceof PKCS8EncryptedPrivateKeyInfo) {
                 var decryptProvider = new JceOpenSSLPKCS8DecryptorProviderBuilder()
-                    .setProvider(new BouncyCastleProvider())
-                    .build(password);
+                        .setProvider(new BouncyCastleProvider())
+                        .build(password);
                 var encryptedPrivateKeyInfo = (PKCS8EncryptedPrivateKeyInfo) parsedObject;
                 return encryptedPrivateKeyInfo.decryptPrivateKeyInfo(decryptProvider);
-            } else if (parsedObject instanceof PrivateKeyInfo){
+            } else if (parsedObject instanceof PrivateKeyInfo) {
                 return (PrivateKeyInfo) parsedObject;
             } else if (parsedObject instanceof PEMEncryptedKeyPair) {
                 var decryptProvider = new JcePEMDecryptorProviderBuilder()
-                    .setProvider(new BouncyCastleProvider())
-                    .build(password);
+                        .setProvider(new BouncyCastleProvider())
+                        .build(password);
                 var encryptedKeyPair = (PEMEncryptedKeyPair) parsedObject;
                 return encryptedKeyPair.decryptKeyPair(decryptProvider).getPrivateKeyInfo();
             } else if (parsedObject instanceof PEMKeyPair) {
                 var keyPair = (PEMKeyPair) parsedObject;
                 return keyPair.getPrivateKeyInfo();
             } else {
-                throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: " + parsedObject.getClass().getName());
+                throw new BadKeyException("PEM file contained something the SDK didn't know what to do with: "
+                        + parsedObject.getClass().getName());
             }
         } catch (PKCSException e) {
             if (e.getMessage().contains("password empty")) {

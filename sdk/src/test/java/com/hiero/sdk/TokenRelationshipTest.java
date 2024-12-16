@@ -1,13 +1,12 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenRelationship;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class TokenRelationshipTest {
     @BeforeAll
@@ -21,15 +20,7 @@ public class TokenRelationshipTest {
     }
 
     TokenRelationship spawnTokenRelationshipExample() {
-        return new TokenRelationship(
-            TokenId.fromString("1.2.3"),
-            "ABC",
-            55,
-            true,
-            true,
-            4,
-            true
-        );
+        return new TokenRelationship(TokenId.fromString("1.2.3"), "ABC", 55, true, true, 4, true);
     }
 
     @Test
@@ -38,7 +29,8 @@ public class TokenRelationshipTest {
         byte[] tokenRelationshipBytes = originalTokenRelationship.toBytes();
         var copyTokenRelationship = TokenRelationship.fromBytes(tokenRelationshipBytes);
         assertThat(copyTokenRelationship.toString().replaceAll("@[A-Za-z0-9]+", ""))
-            .isEqualTo(originalTokenRelationship.toString().replaceAll("@[A-Za-z0-9]+", ""));
-        SnapshotMatcher.expect(originalTokenRelationship.toString().replaceAll("@[A-Za-z0-9]+", "")).toMatchSnapshot();
+                .isEqualTo(originalTokenRelationship.toString().replaceAll("@[A-Za-z0-9]+", ""));
+        SnapshotMatcher.expect(originalTokenRelationship.toString().replaceAll("@[A-Za-z0-9]+", ""))
+                .toMatchSnapshot();
     }
 }

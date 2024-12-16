@@ -1,44 +1,15 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Client;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.HbarUnit;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.PublicKeyECDSA;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.TransferTransaction;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import java.math.BigDecimal;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import java.math.BigDecimal;
+import java.util.Collections;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class ECDSAPublicKeyTest {
     @Test
@@ -84,26 +55,82 @@ public class ECDSAPublicKeyTest {
         assertDoesNotThrow(() -> PublicKey.fromBytes(invalidKeyECDSA));
         assertDoesNotThrow(() -> PublicKey.fromBytesECDSA(invalidKeyECDSA));
 
-        byte[] invalidCompressedKey = new byte[]{
+        byte[] invalidCompressedKey = new byte[] {
             0x00,
-            (byte) 0xca, (byte) 0x35, 0x4b, 0x7c, (byte) 0xf4, (byte) 0x87, (byte) 0xd1, (byte) 0xbc, 0x43,
-            0x5a, 0x25, 0x66, 0x77, 0x09, (byte) 0xc1, (byte) 0xab, (byte) 0x98, 0x0c, 0x11, 0x4d,
-            0x35, (byte) 0x94, (byte) 0xe6, 0x25, (byte) 0x9e, (byte) 0x81, 0x2e, 0x6a, 0x70, 0x3d,
-            0x4f, 0x51
+            (byte) 0xca,
+            (byte) 0x35,
+            0x4b,
+            0x7c,
+            (byte) 0xf4,
+            (byte) 0x87,
+            (byte) 0xd1,
+            (byte) 0xbc,
+            0x43,
+            0x5a,
+            0x25,
+            0x66,
+            0x77,
+            0x09,
+            (byte) 0xc1,
+            (byte) 0xab,
+            (byte) 0x98,
+            0x0c,
+            0x11,
+            0x4d,
+            0x35,
+            (byte) 0x94,
+            (byte) 0xe6,
+            0x25,
+            (byte) 0x9e,
+            (byte) 0x81,
+            0x2e,
+            0x6a,
+            0x70,
+            0x3d,
+            0x4f,
+            0x51
         };
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesECDSA(invalidCompressedKey));
+                .isThrownBy(() -> PublicKey.fromBytesECDSA(invalidCompressedKey));
 
-        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02};
+        byte[] malformedKey = new byte[] {0x00, 0x01, 0x02};
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesECDSA(malformedKey));
+                .isThrownBy(() -> PublicKey.fromBytesECDSA(malformedKey));
 
-        byte[] validCompressedKey = new byte[]{
+        byte[] validCompressedKey = new byte[] {
             0x02, // Prefix for compressed keys
-            (byte) 0xca, (byte) 0x35, 0x4b, 0x7c, (byte) 0xf4, (byte) 0x87, (byte) 0xd1, (byte) 0xbc, 0x43,
-            0x5a, 0x25, 0x66, 0x77, 0x09, (byte) 0xc1, (byte) 0xab, (byte) 0x98, 0x0c, 0x1f, 0x4d,
-            0x35, (byte) 0x94, (byte) 0xe6, 0x25, (byte) 0x9e, (byte) 0x81, 0x2e, 0x6a, 0x75, 0x3d,
-            0x4f, 0x59
+            (byte) 0xca,
+            (byte) 0x35,
+            0x4b,
+            0x7c,
+            (byte) 0xf4,
+            (byte) 0x87,
+            (byte) 0xd1,
+            (byte) 0xbc,
+            0x43,
+            0x5a,
+            0x25,
+            0x66,
+            0x77,
+            0x09,
+            (byte) 0xc1,
+            (byte) 0xab,
+            (byte) 0x98,
+            0x0c,
+            0x1f,
+            0x4d,
+            0x35,
+            (byte) 0x94,
+            (byte) 0xe6,
+            0x25,
+            (byte) 0x9e,
+            (byte) 0x81,
+            0x2e,
+            0x6a,
+            0x75,
+            0x3d,
+            0x4f,
+            0x59
         };
         assertDoesNotThrow(() -> PublicKey.fromBytesECDSA(validCompressedKey));
 
@@ -132,11 +159,10 @@ public class ECDSAPublicKeyTest {
         var receiverAccount = AccountId.fromString("0.0.3");
         var transferAmount = Hbar.from(new BigDecimal("0.0001"), HbarUnit.HBAR);
         var privateKey = PrivateKey.generateECDSA();
-        var client = Client.forTestnet()
-            .setOperator(senderAccount, privateKey);
+        var client = Client.forTestnet().setOperator(senderAccount, privateKey);
         var tx = new TransferTransaction()
-            .addHbarTransfer(senderAccount, transferAmount.negated())
-            .addHbarTransfer(receiverAccount, transferAmount);
+                .addHbarTransfer(senderAccount, transferAmount.negated())
+                .addHbarTransfer(receiverAccount, transferAmount);
 
         tx.freezeWith(client);
         tx.signWithOperator(client);
@@ -227,13 +253,16 @@ public class ECDSAPublicKeyTest {
     @DisplayName("DER import test vectors")
     void DERImportTestVectors() {
         // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
-        var PUBLIC_KEY_DER1 = "302d300706052b8104000a032200028173079d2e996ef6b2d064fc82d5fc7094367211e28422bec50a2f75c365f5fd";
+        var PUBLIC_KEY_DER1 =
+                "302d300706052b8104000a032200028173079d2e996ef6b2d064fc82d5fc7094367211e28422bec50a2f75c365f5fd";
         var PUBLIC_KEY1 = "028173079d2e996ef6b2d064fc82d5fc7094367211e28422bec50a2f75c365f5fd";
 
-        var PUBLIC_KEY_DER2 = "3036301006072a8648ce3d020106052b8104000a032200036843f5cb338bbb4cdb21b0da4ea739d910951d6e8a5f703d313efe31afe788f4";
+        var PUBLIC_KEY_DER2 =
+                "3036301006072a8648ce3d020106052b8104000a032200036843f5cb338bbb4cdb21b0da4ea739d910951d6e8a5f703d313efe31afe788f4";
         var PUBLIC_KEY2 = "036843f5cb338bbb4cdb21b0da4ea739d910951d6e8a5f703d313efe31afe788f4";
 
-        var PUBLIC_KEY_DER3 = "3056301006072a8648ce3d020106052b8104000a03420004aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a6597795f855ddcad2377e22259d1fcb4e0f1d35e8f2056300c15070bcbfce3759cc9d";
+        var PUBLIC_KEY_DER3 =
+                "3056301006072a8648ce3d020106052b8104000a03420004aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a6597795f855ddcad2377e22259d1fcb4e0f1d35e8f2056300c15070bcbfce3759cc9d";
         var PUBLIC_KEY3 = "03aaac1c3ac1bea0245b8e00ce1e2018f9eab61b6331fbef7266f2287750a65977";
 
         var ecdsaPublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -40,14 +22,14 @@ import javax.annotation.Nullable;
 public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteTransaction> {
     @Nullable
     private FileId fileId;
+
     @Nullable
     private ContractId contractId;
 
     /**
      * Constructor.
      */
-    public SystemUndeleteTransaction() {
-    }
+    public SystemUndeleteTransaction() {}
 
     /**
      * Constructor.
@@ -56,7 +38,9 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    SystemUndeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    SystemUndeleteTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
     }
@@ -166,11 +150,11 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     CompletableFuture<Void> onExecuteAsync(Client client) {
         int modesEnabled = (fileId != null ? 1 : 0) + (contractId != null ? 1 : 0);
         if (modesEnabled != 1) {
-            throw new IllegalStateException("SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
+            throw new IllegalStateException(
+                    "SystemDeleteTransaction must have exactly 1 of the following fields set: contractId, fileId");
         }
         return super.onExecuteAsync(client);
     }
-
 
     @Override
     MethodDescriptor<com.hiero.sdk.proto.Transaction, TransactionResponse> getMethodDescriptor() {

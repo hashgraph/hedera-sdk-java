@@ -19,7 +19,7 @@ plugins {
     id("org.hiero.gradle.report.test-logger")
 }
 
-description = "Hedera SDK TCK Server"
+description = "Hiero SDK TCK Server"
 
 version = "0.0.1"
 
@@ -41,7 +41,6 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")
     implementation("org.springframework:spring-webmvc")
-    runtimeOnly("io.grpc:grpc-netty-shaded")
     runtimeOnly("org.springframework.boot:spring-boot-starter-web")
     compileOnly("org.projectlombok:lombok")
 
@@ -55,7 +54,6 @@ tasks.withType<ResolveMainClassName> { setGroup(null) }
 
 // Configure dependency analysis without using Java Modules
 tasks.qualityGate { dependsOn(tasks.named("projectHealth")) }
-
 tasks.qualityCheck { dependsOn(tasks.named("projectHealth")) }
 
 dependencyAnalysis {
@@ -63,6 +61,9 @@ dependencyAnalysis {
         onAny {
             severity("fail")
             exclude("com.google.protobuf:protobuf-javalite")
+            onUnusedDependencies {
+                exclude(":sdk")
+            }
         }
     }
 }

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -64,7 +46,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @param txs                       Compound list of transaction id's list of (AccountId, Transaction) records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs) throws InvalidProtocolBufferException {
+    ChunkedTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, com.hiero.sdk.proto.Transaction>> txs)
+            throws InvalidProtocolBufferException {
         super(txs);
     }
 
@@ -184,7 +167,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     @Override
     public byte[] getTransactionHash() {
         if (outerTransactions.size() > nodeAccountIds.size()) {
-            throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
+            throw new IllegalStateException(
+                    "a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
         return super.getTransactionHash();
@@ -193,7 +177,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     @Override
     public Map<AccountId, byte[]> getTransactionHashPerNode() {
         if (outerTransactions.size() > nodeAccountIds.size()) {
-            throw new IllegalStateException("a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
+            throw new IllegalStateException(
+                    "a single transaction hash can not be calculated for a chunked transaction, try calling `getAllTransactionHashesPerNode`");
         }
 
         return super.getTransactionHashPerNode();
@@ -206,7 +191,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      */
     public final List<Map<AccountId, byte[]>> getAllTransactionHashesPerNode() {
         if (!this.isFrozen()) {
-            throw new IllegalStateException("transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
+            throw new IllegalStateException(
+                    "transaction must have been frozen before calculating the hash will be stable, try calling `freeze`");
         }
 
         transactionIds.setLocked(true);
@@ -224,8 +210,11 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
             for (var nodeIndex = 0; nodeIndex < nodeCount; ++nodeIndex) {
                 hashes.put(
-                    nodeAccountIds.get(nodeIndex),
-                    hash(outerTransactions.get(offset + nodeIndex).getSignedTransactionBytes().toByteArray()));
+                        nodeAccountIds.get(nodeIndex),
+                        hash(outerTransactions
+                                .get(offset + nodeIndex)
+                                .getSignedTransactionBytes()
+                                .toByteArray()));
             }
 
             transactionHashes.add(hashes);
@@ -237,7 +226,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     @Override
     public T addSignature(PublicKey publicKey, byte[] signature) {
         if (data.size() > chunkSize) {
-            throw new IllegalStateException("Cannot manually add signature to chunked transaction with length greater than " + chunkSize);
+            throw new IllegalStateException(
+                    "Cannot manually add signature to chunked transaction with length greater than " + chunkSize);
         }
         return super.addSignature(publicKey, signature);
     }
@@ -245,7 +235,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     @Override
     public Map<AccountId, Map<PublicKey, byte[]>> getSignatures() {
         if (data.size() > chunkSize) {
-            throw new IllegalStateException("Cannot call getSignatures() on a chunked transaction with length greater than " + chunkSize);
+            throw new IllegalStateException(
+                    "Cannot call getSignatures() on a chunked transaction with length greater than " + chunkSize);
         }
         return super.getSignatures();
     }
@@ -289,7 +280,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     @Override
-    public TransactionResponse execute(Client client, Duration timeoutPerChunk) throws TimeoutException, PrecheckStatusException {
+    public TransactionResponse execute(Client client, Duration timeoutPerChunk)
+            throws TimeoutException, PrecheckStatusException {
         return executeAll(client, timeoutPerChunk).get(0);
     }
 
@@ -314,7 +306,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @throws TimeoutException         when the transaction times out
      * @throws PrecheckStatusException  when the precheck fails
      */
-    public List<TransactionResponse> executeAll(Client client, Duration timeoutPerChunk) throws PrecheckStatusException, TimeoutException {
+    public List<TransactionResponse> executeAll(Client client, Duration timeoutPerChunk)
+            throws PrecheckStatusException, TimeoutException {
         freezeAndSign(client);
 
         var responses = new ArrayList<TransactionResponse>(transactionIds.size());
@@ -324,9 +317,9 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
 
             if (shouldGetReceipt()) {
                 new TransactionReceiptQuery()
-                    .setNodeAccountIds(Collections.singletonList(response.nodeId))
-                    .setTransactionId(response.transactionId)
-                    .execute(client, timeoutPerChunk);
+                        .setNodeAccountIds(Collections.singletonList(response.nodeId))
+                        .setTransactionId(response.transactionId)
+                        .execute(client, timeoutPerChunk);
             }
 
             responses.add(response);
@@ -356,21 +349,20 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         freezeAndSign(client);
 
         CompletableFuture<List<com.hiero.sdk.TransactionResponse>> future =
-            CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
+                CompletableFuture.supplyAsync(() -> new ArrayList<>(transactionIds.size()));
 
         for (var i = 0; i < transactionIds.size(); i++) {
             future = future.thenCompose(list -> {
                 var responseFuture = super.executeAsync(client, timeoutPerChunk);
 
                 Function<TransactionResponse, ? extends CompletionStage<TransactionResponse>> receiptFuture =
-                    (TransactionResponse response) -> response.getReceiptAsync(client, timeoutPerChunk)
-                        .thenApply(receipt -> response);
+                        (TransactionResponse response) -> response.getReceiptAsync(client, timeoutPerChunk)
+                                .thenApply(receipt -> response);
 
-                Function<TransactionResponse, List<TransactionResponse>> addToList =
-                    (response) -> {
-                        list.add(response);
-                        return list;
-                    };
+                Function<TransactionResponse, List<TransactionResponse>> addToList = (response) -> {
+                    list.add(response);
+                    return list;
+                };
 
                 if (shouldGetReceipt()) {
                     return responseFuture.thenCompose(receiptFuture).thenApply(addToList);
@@ -400,7 +392,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @param timeout The timeout after which the execution attempt will be cancelled.
      * @param callback a BiConsumer which handles the result or error.
      */
-    public void executeAllAsync(Client client, Duration timeout, BiConsumer<List<TransactionResponse>, Throwable> callback) {
+    public void executeAllAsync(
+            Client client, Duration timeout, BiConsumer<List<TransactionResponse>, Throwable> callback) {
         ConsumerHelper.biConsumer(executeAllAsync(client, timeout), callback);
     }
 
@@ -411,7 +404,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void executeAllAsync(Client client, Consumer<List<TransactionResponse>> onSuccess, Consumer<Throwable> onFailure) {
+    public void executeAllAsync(
+            Client client, Consumer<List<TransactionResponse>> onSuccess, Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(executeAllAsync(client), onSuccess, onFailure);
     }
 
@@ -423,7 +417,11 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
      * @param onSuccess a Consumer which consumes the result on success.
      * @param onFailure a Consumer which consumes the error on failure.
      */
-    public void executeAllAsync(Client client, Duration timeout, Consumer<List<TransactionResponse>> onSuccess, Consumer<Throwable> onFailure) {
+    public void executeAllAsync(
+            Client client,
+            Duration timeout,
+            Consumer<List<TransactionResponse>> onSuccess,
+            Consumer<Throwable> onFailure) {
         ConsumerHelper.twoConsumers(executeAllAsync(client, timeout), onSuccess, onFailure);
     }
 
@@ -437,25 +435,18 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         requireNotFrozen();
         if (!nodeAccountIds.isEmpty()) {
             throw new IllegalStateException(
-                "The underlying transaction for a scheduled transaction cannot have node account IDs set"
-            );
+                    "The underlying transaction for a scheduled transaction cannot have node account IDs set");
         }
         if (data.size() > chunkSize) {
-            throw new IllegalStateException("Cannot schedule a chunked transaction with length greater than " + chunkSize);
+            throw new IllegalStateException(
+                    "Cannot schedule a chunked transaction with length greater than " + chunkSize);
         }
 
         var bodyBuilder = spawnBodyBuilder(null);
 
         onFreeze(bodyBuilder);
 
-        onFreezeChunk(
-            bodyBuilder,
-            null,
-            0,
-            data.size(),
-            1,
-            1
-        );
+        onFreezeChunk(bodyBuilder, null, 0, data.size(), 1, 1);
 
         return doSchedule(bodyBuilder);
     }
@@ -469,8 +460,7 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
         }
 
         if (requiredChunks > maxChunks) {
-            throw new IllegalArgumentException(
-                "message of " + this.data.size() + " bytes requires " + requiredChunks
+            throw new IllegalArgumentException("message of " + this.data.size() + " bytes requires " + requiredChunks
                     + " chunks but the maximum allowed chunks is " + maxChunks + ", try using setMaxChunks");
         }
         return requiredChunks;
@@ -492,26 +482,23 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
                 }
 
                 onFreezeChunk(
-                    Objects.requireNonNull(frozenBodyBuilder).setTransactionID(transactionIds.get(i).toProtobuf()),
-                    transactionIds.get(0).toProtobuf(),
-                    startIndex,
-                    endIndex,
-                    i,
-                    requiredChunks
-                );
+                        Objects.requireNonNull(frozenBodyBuilder)
+                                .setTransactionID(transactionIds.get(i).toProtobuf()),
+                        transactionIds.get(0).toProtobuf(),
+                        startIndex,
+                        endIndex,
+                        i,
+                        requiredChunks);
             }
 
             // For each node we add a transaction with that node
             for (var nodeId : nodeAccountIds) {
                 sigPairLists.add(SignatureMap.newBuilder());
                 innerSignedTransactions.add(SignedTransaction.newBuilder()
-                    .setBodyBytes(
-                        frozenBodyBuilder
-                            .setNodeAccountID(nodeId.toProtobuf())
-                            .build()
-                            .toByteString()
-                    )
-                );
+                        .setBodyBytes(frozenBodyBuilder
+                                .setNodeAccountID(nodeId.toProtobuf())
+                                .build()
+                                .toByteString()));
                 outerTransactions.add(null);
             }
         }
@@ -520,7 +507,13 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     /**
      * A common base for file and topic message transactions.
      */
-    abstract void onFreezeChunk(TransactionBody.Builder body, @Nullable TransactionID initialTransactionId, int startIndex, int endIndex, int chunk, int total);
+    abstract void onFreezeChunk(
+            TransactionBody.Builder body,
+            @Nullable TransactionID initialTransactionId,
+            int startIndex,
+            int endIndex,
+            int chunk,
+            int total);
 
     /**
      * Should the receipt be retrieved?

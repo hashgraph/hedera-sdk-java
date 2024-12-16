@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
@@ -26,10 +8,9 @@ import com.hiero.sdk.proto.QueryHeader;
 import com.hiero.sdk.proto.Response;
 import com.hiero.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Requests a livehash associated to an account.
@@ -37,13 +18,13 @@ import java.util.Objects;
 public final class LiveHashQuery extends Query<LiveHash, LiveHashQuery> {
     @Nullable
     private AccountId accountId = null;
+
     private byte[] hash = {};
 
     /**
      * Constructor.
      */
-    public LiveHashQuery() {
-    }
+    public LiveHashQuery() {}
 
     /**
      * Extract the account id.

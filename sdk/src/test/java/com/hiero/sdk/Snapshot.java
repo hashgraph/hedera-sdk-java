@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -7,13 +8,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.core.util.Separators;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import javax.annotation.Nonnull;
 
 final class Snapshot {
     private static final ObjectMapper objectMapper = buildObjectMapper();
@@ -40,8 +39,7 @@ final class Snapshot {
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        objectMapper.setVisibility(
-            objectMapper
+        objectMapper.setVisibility(objectMapper
                 .getSerializationConfig()
                 .getDefaultVisibilityChecker()
                 .withFieldVisibility(JsonAutoDetect.Visibility.ANY)
@@ -55,18 +53,18 @@ final class Snapshot {
      * Modified copy of {@code io.github.jsonSnapshot.SnapshotMatcher#buildDefaultPrettyPrinter}
      */
     private static PrettyPrinter buildDefaultPrettyPrinter() {
-        DefaultPrettyPrinter pp =
-            new DefaultPrettyPrinter() {
-                @Override
-                @Nonnull
-                public DefaultPrettyPrinter createInstance() {
-                    return this;
-                }
-                @Override
-                public void writeObjectFieldValueSeparator(JsonGenerator jg) throws IOException {
-                    jg.writeRaw(": ");
-                }
-            };
+        DefaultPrettyPrinter pp = new DefaultPrettyPrinter() {
+            @Override
+            @Nonnull
+            public DefaultPrettyPrinter createInstance() {
+                return this;
+            }
+
+            @Override
+            public void writeObjectFieldValueSeparator(JsonGenerator jg) throws IOException {
+                jg.writeRaw(": ");
+            }
+        };
         DefaultPrettyPrinter.Indenter lfOnlyIndenter = new DefaultIndenter("  ", "\n");
         pp.indentArraysWith(lfOnlyIndenter);
         pp.indentObjectsWith(lfOnlyIndenter);

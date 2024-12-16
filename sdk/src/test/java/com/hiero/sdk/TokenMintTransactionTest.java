@@ -1,37 +1,29 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.google.common.collect.Iterables;
-import com.google.protobuf.ByteString;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenMintTransaction;
-import com.hiero.sdk.TokenUpdateTransaction;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.proto.SchedulableTransactionBody;
-import com.hiero.sdk.proto.TokenMintTransactionBody;
-import com.hiero.sdk.proto.TransactionBody;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.google.common.collect.Iterables;
+import com.google.protobuf.ByteString;
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.TokenMintTransactionBody;
+import com.hiero.sdk.proto.TransactionBody;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+
 public class TokenMintTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final Long testAmount = 10L;
-    private static final List<byte[]> testMetadataList = List.of(new byte[]{1, 2, 3, 4, 5});
-    private static final ByteString testMetadataByteString = ByteString.copyFrom(new byte[]{1, 2, 3, 4, 5});
+    private static final List<byte[]> testMetadataList = List.of(new byte[] {1, 2, 3, 4, 5});
+    private static final ByteString testMetadataByteString = ByteString.copyFrom(new byte[] {1, 2, 3, 4, 5});
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
@@ -46,16 +38,12 @@ public class TokenMintTransactionTest {
 
     @Test
     void shouldSerialize() {
-        SnapshotMatcher.expect(spawnTestTransaction()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     @Test
     void shouldSerializeMetadata() {
-        SnapshotMatcher.expect(spawnMetadataTestTransaction()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnMetadataTestTransaction().toString()).toMatchSnapshot();
     }
 
     @Test
@@ -67,24 +55,24 @@ public class TokenMintTransactionTest {
 
     private TokenMintTransaction spawnTestTransaction() {
         return new TokenMintTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(testTokenId)
-            .setAmount(testAmount)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(testTokenId)
+                .setAmount(testAmount)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     private TokenMintTransaction spawnMetadataTestTransaction() {
         return new TokenMintTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("1.2.3"))
-            .setMetadata(testMetadataList)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(TokenId.fromString("1.2.3"))
+                .setMetadata(testMetadataList)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -104,8 +92,8 @@ public class TokenMintTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenMint(TokenMintTransactionBody.newBuilder().build())
-            .build();
+                .setTokenMint(TokenMintTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -115,18 +103,18 @@ public class TokenMintTransactionTest {
     @Test
     void constructTokenMintTransactionFromTransactionBodyProtobuf() {
         var transactionBody = TokenMintTransactionBody.newBuilder()
-            .setToken(testTokenId.toProtobuf())
-            .setAmount(testAmount)
-            .addMetadata(testMetadataByteString)
-            .build();
+                .setToken(testTokenId.toProtobuf())
+                .setAmount(testAmount)
+                .addMetadata(testMetadataByteString)
+                .build();
 
         var tx = TransactionBody.newBuilder().setTokenMint(transactionBody).build();
         var tokenMintTransaction = new TokenMintTransaction(tx);
 
         assertThat(tokenMintTransaction.getTokenId()).isEqualTo(testTokenId);
         assertThat(tokenMintTransaction.getAmount()).isEqualTo(testAmount);
-        assertThat(Iterables.getLast(tokenMintTransaction.getMetadata())).isEqualTo(
-            testMetadataByteString.toByteArray());
+        assertThat(Iterables.getLast(tokenMintTransaction.getMetadata()))
+                .isEqualTo(testMetadataByteString.toByteArray());
     }
 
     @Test
@@ -168,7 +156,7 @@ public class TokenMintTransactionTest {
     @Test
     void addMetadata() {
         var tokenMintTransaction = new TokenMintTransaction().addMetadata(Iterables.getLast(testMetadataList));
-        assertThat(Iterables.getLast(tokenMintTransaction.getMetadata())).isEqualTo(
-            Iterables.getLast(testMetadataList));
+        assertThat(Iterables.getLast(tokenMintTransaction.getMetadata()))
+                .isEqualTo(Iterables.getLast(testMetadataList));
     }
 }

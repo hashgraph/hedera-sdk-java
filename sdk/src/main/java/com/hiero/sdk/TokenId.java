@@ -1,30 +1,11 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.TokenID;
-
+import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 /**
  * Constructs a TokenId.
@@ -145,7 +126,7 @@ public class TokenId implements Comparable<TokenId> {
     /**
      * Extract the solidity address as a string.
      *
-      * @return                         the solidity address as a string
+     * @return                         the solidity address as a string
      */
     public String toSolidityAddress() {
         return EntityIdHelper.toSolidityAddress(shard, realm, num);
@@ -158,10 +139,10 @@ public class TokenId implements Comparable<TokenId> {
      */
     TokenID toProtobuf() {
         return TokenID.newBuilder()
-            .setShardNum(shard)
-            .setRealmNum(realm)
-            .setTokenNum(num)
-            .build();
+                .setShardNum(shard)
+                .setRealmNum(realm)
+                .setTokenNum(num)
+                .build();
     }
 
     /**
@@ -224,7 +205,7 @@ public class TokenId implements Comparable<TokenId> {
     }
 
     @Override
-    public boolean equals( Object o) {
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }

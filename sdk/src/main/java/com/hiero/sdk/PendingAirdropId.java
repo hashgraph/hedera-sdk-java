@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -33,8 +15,10 @@ import javax.annotation.Nullable;
 public class PendingAirdropId {
     private AccountId sender;
     private AccountId receiver;
+
     @Nullable
     private TokenId tokenId;
+
     @Nullable
     private NftId nftId;
 
@@ -92,20 +76,22 @@ public class PendingAirdropId {
 
     static PendingAirdropId fromProtobuf(com.hiero.sdk.proto.PendingAirdropId pendingAirdropId) {
         if (pendingAirdropId.hasFungibleTokenType()) {
-            return new PendingAirdropId(AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
-                AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
-                TokenId.fromProtobuf(pendingAirdropId.getFungibleTokenType()));
+            return new PendingAirdropId(
+                    AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
+                    AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
+                    TokenId.fromProtobuf(pendingAirdropId.getFungibleTokenType()));
         } else {
-            return new PendingAirdropId(AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
-                AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
-                NftId.fromProtobuf(pendingAirdropId.getNonFungibleToken()));
+            return new PendingAirdropId(
+                    AccountId.fromProtobuf(pendingAirdropId.getSenderId()),
+                    AccountId.fromProtobuf(pendingAirdropId.getReceiverId()),
+                    NftId.fromProtobuf(pendingAirdropId.getNonFungibleToken()));
         }
     }
 
     com.hiero.sdk.proto.PendingAirdropId toProtobuf() {
         var builder = com.hiero.sdk.proto.PendingAirdropId.newBuilder()
-            .setSenderId(sender.toProtobuf())
-            .setReceiverId(receiver.toProtobuf());
+                .setSenderId(sender.toProtobuf())
+                .setReceiverId(receiver.toProtobuf());
 
         if (tokenId != null) {
             builder.setFungibleTokenType(tokenId.toProtobuf());
@@ -118,10 +104,10 @@ public class PendingAirdropId {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("sender", sender)
-            .add("receiver", receiver)
-            .add("tokenId", tokenId)
-            .add("nftId", nftId)
-            .toString();
+                .add("sender", sender)
+                .add("receiver", receiver)
+                .add("tokenId", tokenId)
+                .add("nftId", nftId)
+                .toString();
     }
 }

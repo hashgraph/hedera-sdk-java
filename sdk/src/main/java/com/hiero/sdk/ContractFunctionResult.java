@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.esaulpaugh.headlong.abi.Tuple;
@@ -32,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -44,7 +25,7 @@ import org.bouncycastle.util.encoders.Hex;
  * <a href="https://github.com/hashgraph/hedera-sdk-java/issues/298">this Github issue</a>.
  */
 public final class ContractFunctionResult {
-    private static final ByteString errorPrefix = ByteString.copyFrom(new byte[]{8, -61, 121, -96});
+    private static final ByteString errorPrefix = ByteString.copyFrom(new byte[] {8, -61, 121, -96});
 
     /**
      * The ID of the contract that was invoked.
@@ -136,8 +117,12 @@ public final class ContractFunctionResult {
     ContractFunctionResult(ContractFunctionResultOrBuilder inner) {
         contractId = ContractId.fromProtobuf(inner.getContractID());
 
-        evmAddress = inner.hasEvmAddress() ?
-            new ContractId(contractId.shard, contractId.realm, inner.getEvmAddress().getValue().toByteArray()) : null;
+        evmAddress = inner.hasEvmAddress()
+                ? new ContractId(
+                        contractId.shard,
+                        contractId.realm,
+                        inner.getEvmAddress().getValue().toByteArray())
+                : null;
 
         String errMsg = inner.getErrorMessage();
         errorMessage = !errMsg.isEmpty() ? errMsg : null;
@@ -158,9 +143,13 @@ public final class ContractFunctionResult {
 
         gasUsed = inner.getGasUsed();
 
-        logs = inner.getLogInfoList().stream().map(ContractLogInfo::fromProtobuf).collect(Collectors.toList());
+        logs = inner.getLogInfoList().stream()
+                .map(ContractLogInfo::fromProtobuf)
+                .collect(Collectors.toList());
 
-        createdContractIds = inner.getCreatedContractIDsList().stream().map(ContractId::fromProtobuf).collect(Collectors.toList());
+        createdContractIds = inner.getCreatedContractIDsList().stream()
+                .map(ContractId::fromProtobuf)
+                .collect(Collectors.toList());
 
         stateChanges = new ArrayList<ContractStateChange>();
         // for (var stateChangeProto : inner.getStateChangesList()) {
@@ -175,7 +164,9 @@ public final class ContractFunctionResult {
 
         senderAccountId = inner.hasSenderId() ? AccountId.fromProtobuf(inner.getSenderId()) : null;
 
-        contractNonces = inner.getContractNoncesList().stream().map(ContractNonceInfo::fromProtobuf).collect(Collectors.toList());
+        contractNonces = inner.getContractNoncesList().stream()
+                .map(ContractNonceInfo::fromProtobuf)
+                .collect(Collectors.toList());
 
         signerNonce = inner.getSignerNonce().getValue();
     }
@@ -213,7 +204,8 @@ public final class ContractFunctionResult {
         for (int i = 0; i < count; i++) {
             var strOffset = getIntValueAt(offset + 32 + (i * 32));
             var len = getIntValueAt(offset + strOffset + 32);
-            var str = getByteString(offset + strOffset + 32 + 32, offset + strOffset + 32 + 32 + len).toStringUtf8();
+            var str = getByteString(offset + strOffset + 32 + 32, offset + strOffset + 32 + 32 + len)
+                    .toStringUtf8();
             strings.add(str);
         }
 
@@ -428,17 +420,16 @@ public final class ContractFunctionResult {
      */
     com.hiero.sdk.proto.ContractFunctionResult toProtobuf() {
         var contractFunctionResult = com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
-            .setContractID(contractId.toProtobuf())
-            .setContractCallResult(rawResult)
-            .setBloom(bloom)
-            .setGasUsed(gasUsed)
-            .setSignerNonce(Int64Value.of(this.signerNonce));
+                .setContractID(contractId.toProtobuf())
+                .setContractCallResult(rawResult)
+                .setBloom(bloom)
+                .setGasUsed(gasUsed)
+                .setSignerNonce(Int64Value.of(this.signerNonce));
 
         if (evmAddress != null) {
             contractFunctionResult.setEvmAddress(BytesValue.newBuilder()
-                .setValue(ByteString.copyFrom(Objects.requireNonNull(evmAddress.evmAddress)))
-                .build()
-            );
+                    .setValue(ByteString.copyFrom(Objects.requireNonNull(evmAddress.evmAddress)))
+                    .build());
         }
 
         if (errorMessage != null) {
@@ -471,22 +462,22 @@ public final class ContractFunctionResult {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("contractId", contractId)
-            .add("evmAddress", evmAddress)
-            .add("errorMessage", errorMessage)
-            .add("bloom", Hex.toHexString(bloom.toByteArray()))
-            .add("gasUsed", gasUsed)
-            .add("logs", logs)
-            .add("createdContractIds", createdContractIds)
-            .add("stateChanges", stateChanges)
-            .add("gas", gas)
-            .add("hbarAmount", hbarAmount)
-            .add("contractFunctionparametersBytes", Hex.toHexString(contractFunctionParametersBytes))
-            .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
-            .add("senderAccountId", senderAccountId)
-            .add("contractNonces", contractNonces)
-            .add("signerNonce", signerNonce)
-            .toString();
+                .add("contractId", contractId)
+                .add("evmAddress", evmAddress)
+                .add("errorMessage", errorMessage)
+                .add("bloom", Hex.toHexString(bloom.toByteArray()))
+                .add("gasUsed", gasUsed)
+                .add("logs", logs)
+                .add("createdContractIds", createdContractIds)
+                .add("stateChanges", stateChanges)
+                .add("gas", gas)
+                .add("hbarAmount", hbarAmount)
+                .add("contractFunctionparametersBytes", Hex.toHexString(contractFunctionParametersBytes))
+                .add("rawResult", Hex.toHexString(rawResult.toByteArray()))
+                .add("senderAccountId", senderAccountId)
+                .add("contractNonces", contractNonces)
+                .add("signerNonce", signerNonce)
+                .toString();
     }
 
     public Tuple getResult(String types) {

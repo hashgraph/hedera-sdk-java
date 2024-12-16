@@ -1,33 +1,7 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
-import org.bouncycastle.util.encoders.Hex;
-import org.bouncycastle.util.io.pem.PemObject;
-import org.bouncycastle.util.io.pem.PemWriter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nullable;
-import javax.net.ssl.X509TrustManager;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -36,6 +10,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import javax.annotation.Nullable;
+import javax.net.ssl.X509TrustManager;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Internal class used by node.
@@ -58,7 +39,8 @@ class HederaTrustManager implements X509TrustManager {
     HederaTrustManager(@Nullable ByteString certHash, boolean verifyCertificate) {
         if (certHash == null || certHash.isEmpty()) {
             if (verifyCertificate) {
-                throw new IllegalStateException("transport security and certificate verification are enabled, but no applicable address book was found");
+                throw new IllegalStateException(
+                        "transport security and certificate verification are enabled, but no applicable address book was found");
             }
 
             logger.warn("skipping certificate check since no cert hash was found");
@@ -70,7 +52,8 @@ class HederaTrustManager implements X509TrustManager {
 
     @Override
     public void checkClientTrusted(X509Certificate[] chain, String authType) {
-        throw new UnsupportedOperationException("Attempted to use HederaTrustManager to verify a client, but this trust manager is for verifying server only");
+        throw new UnsupportedOperationException(
+                "Attempted to use HederaTrustManager to verify a client, but this trust manager is for verifying server only");
     }
 
     @Override
@@ -82,10 +65,8 @@ class HederaTrustManager implements X509TrustManager {
         for (var cert : chain) {
             byte[] pem;
 
-            try (
-                var outputStream = new ByteArrayOutputStream();
-                var pemWriter = new PemWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))
-            ) {
+            try (var outputStream = new ByteArrayOutputStream();
+                    var pemWriter = new PemWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8))) {
                 pemWriter.writeObject(new PemObject(CERTIFICATE, cert.getEncoded()));
                 pemWriter.flush();
 

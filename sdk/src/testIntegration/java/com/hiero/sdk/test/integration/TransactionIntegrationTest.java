@@ -1,23 +1,9 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import com.google.protobuf.ByteString;
 import com.hiero.sdk.AccountCreateTransaction;
@@ -50,16 +36,11 @@ import com.hiero.sdk.proto.TransactionBody;
 import com.hiero.sdk.proto.TransactionID;
 import com.hiero.sdk.proto.TransactionList;
 import com.hiero.sdk.proto.TransferList;
+import java.util.Arrays;
 import java.util.Objects;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.util.Arrays;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 
 public class TransactionIntegrationTest {
 
@@ -71,9 +52,9 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var transaction = new AccountCreateTransaction()
-                .setKey(key)
-                .freezeWith(testEnv.client)
-                .signWithOperator(testEnv.client);
+                    .setKey(key)
+                    .freezeWith(testEnv.client)
+                    .signWithOperator(testEnv.client);
 
             var expectedHash = transaction.getTransactionHashPerNode();
 
@@ -92,7 +73,6 @@ public class TransactionIntegrationTest {
             assertThat(transactionId.getRecord(testEnv.client)).isNotNull();
             assertThat(transactionId.getRecordAsync(testEnv.client).get()).isNotNull();
         }
-
     }
 
     /**
@@ -107,22 +87,20 @@ public class TransactionIntegrationTest {
             var adminKey = PrivateKey.generateECDSA();
             var publicKey = adminKey.getPublicKey();
 
-            var accountCreateTransaction = new AccountCreateTransaction()
-                    .setKey(publicKey)
-                    .setInitialBalance(new Hbar(1L));
+            var accountCreateTransaction =
+                    new AccountCreateTransaction().setKey(publicKey).setInitialBalance(new Hbar(1L));
 
             var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             assertThat(expectedNodeAccountIds).isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds());
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
-            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-                    accountCreateTransactionDeserialized::getTransactionId);
-
+            assertThatExceptionOfType(IllegalStateException.class)
+                    .isThrownBy(accountCreateTransactionDeserialized::getTransactionId);
         }
     }
 
@@ -131,7 +109,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
+    @DisplayName(
+            "incomplete transaction with node account ids can be serialized into bytes, deserialized and be equal to the original one")
     void canSerializeWithNodeAccountIdsDeserializeCompareFields() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -149,15 +128,16 @@ public class TransactionIntegrationTest {
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             assertThat(expectedNodeAccountIds.size())
-                    .isEqualTo(accountCreateTransactionDeserialized.getNodeAccountIds().size());
+                    .isEqualTo(accountCreateTransactionDeserialized
+                            .getNodeAccountIds()
+                            .size());
             assertThat(expectedBalance).isEqualTo(accountCreateTransactionDeserialized.getInitialBalance());
-            assertThatExceptionOfType(IllegalStateException.class).isThrownBy(
-                    accountCreateTransactionDeserialized::getTransactionId);
-
+            assertThatExceptionOfType(IllegalStateException.class)
+                    .isThrownBy(accountCreateTransactionDeserialized::getTransactionId);
         }
     }
 
@@ -173,18 +153,15 @@ public class TransactionIntegrationTest {
             var adminKey = PrivateKey.generateECDSA();
             var publicKey = adminKey.getPublicKey();
 
-            var accountCreateTransaction = new AccountCreateTransaction()
-                    .setKey(publicKey)
-                    .setInitialBalance(new Hbar(1L));
+            var accountCreateTransaction =
+                    new AccountCreateTransaction().setKey(publicKey).setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(
-                            transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-            var txReceipt = accountCreateTransactionDeserialized
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
+            var txReceipt =
+                    accountCreateTransactionDeserialized.execute(testEnv.client).getReceipt(testEnv.client);
 
             new AccountDeleteTransaction()
                     .setAccountId(txReceipt.accountId)
@@ -192,7 +169,6 @@ public class TransactionIntegrationTest {
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client);
-
         }
     }
 
@@ -216,13 +192,11 @@ public class TransactionIntegrationTest {
                     .setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(
-                            transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-            var txReceipt = accountCreateTransactionDeserialized
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
+            var txReceipt =
+                    accountCreateTransactionDeserialized.execute(testEnv.client).getReceipt(testEnv.client);
 
             new AccountDeleteTransaction()
                     .setAccountId(txReceipt.accountId)
@@ -230,7 +204,6 @@ public class TransactionIntegrationTest {
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client);
-
         }
     }
 
@@ -246,15 +219,14 @@ public class TransactionIntegrationTest {
             var adminKey = PrivateKey.generateECDSA();
             var publicKey = adminKey.getPublicKey();
 
-            var accountCreateTransaction = new AccountCreateTransaction()
-                    .setKey(publicKey);
+            var accountCreateTransaction = new AccountCreateTransaction().setKey(publicKey);
 
             var expectedBalance = new Hbar(1L);
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
                     .setInitialBalance(new Hbar(1L))
@@ -271,7 +243,6 @@ public class TransactionIntegrationTest {
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client);
-
         }
     }
 
@@ -280,7 +251,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName(
+            "incomplete transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeEditExecuteCompareFieldsIncompleteTransactionWithNodeAccountIds() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -296,8 +268,8 @@ public class TransactionIntegrationTest {
             var expectedBalance = new Hbar(1L);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var txReceipt = accountCreateTransactionDeserialized
                     .setInitialBalance(new Hbar(1L))
@@ -313,7 +285,6 @@ public class TransactionIntegrationTest {
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client);
-
         }
     }
 
@@ -348,14 +319,14 @@ public class TransactionIntegrationTest {
                     .sign(adminKey);
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
-            AccountCreateTransaction accountCreateTransactionDeserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            AccountCreateTransaction accountCreateTransactionDeserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = accountCreateTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
 
-            AccountCreateTransaction accountCreateTransactionReserialized = (AccountCreateTransaction) Transaction
-                    .fromBytes(transactionBytesReserialized);
+            AccountCreateTransaction accountCreateTransactionReserialized =
+                    (AccountCreateTransaction) Transaction.fromBytes(transactionBytesReserialized);
 
             var txResponse = accountCreateTransactionReserialized.execute(testEnv.client);
 
@@ -367,7 +338,6 @@ public class TransactionIntegrationTest {
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client);
-
         }
     }
 
@@ -405,10 +375,7 @@ public class TransactionIntegrationTest {
 
             var deleteTransaction2 = Transaction.fromBytes(updateBytes);
 
-            deleteTransaction2
-                    .addSignature(key.getPublicKey(), sig1)
-                    .execute(testEnv.client);
-
+            deleteTransaction2.addSignature(key.getPublicKey(), sig1).execute(testEnv.client);
         }
     }
 
@@ -417,7 +384,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    @DisplayName(
+            "file append chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
     void canFreezeSignSerializeDeserializeAndCompareFileAppendChunkedTransaction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -432,9 +400,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new FileInfoQuery()
-            .setFileId(fileId)
-            .execute(testEnv.client);
+            var info = new FileInfoQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -450,12 +416,11 @@ public class TransactionIntegrationTest {
                     .sign(privateKey);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized =
+                    (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
-
         }
     }
 
@@ -464,7 +429,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName(
+            "incomplete file append chunked transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteFileAppendChunkedTransaction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -477,9 +443,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new FileInfoQuery()
-            .setFileId(fileId)
-            .execute(testEnv.client);
+            var info = new FileInfoQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -488,27 +452,20 @@ public class TransactionIntegrationTest {
             assertThat(info.keys.getThreshold()).isNull();
             assertThat(info.keys).isEqualTo(KeyList.of(testEnv.operatorKey));
 
-            var fileAppendTransaction = new FileAppendTransaction()
-                    .setFileId(fileId)
-                    .setContents(Contents.BIG_CONTENTS);
+            var fileAppendTransaction =
+                    new FileAppendTransaction().setFileId(fileId).setContents(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized =
+                    (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
-            fileAppendTransactionDeserialized
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
+            fileAppendTransactionDeserialized.execute(testEnv.client).getReceipt(testEnv.client);
 
-            var contents = new FileContentsQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            var contents = new FileContentsQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
-            info = new FileInfoQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            info = new FileInfoQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(13522);
@@ -521,7 +478,6 @@ public class TransactionIntegrationTest {
                     .setFileId(fileId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -530,7 +486,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName(
+            "incomplete file append chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteFileAppendChunkedTransactionWithNodeAccountIds() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -545,9 +502,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new FileInfoQuery()
-            .setFileId(fileId)
-            .execute(testEnv.client);
+            var info = new FileInfoQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(28);
@@ -562,23 +517,19 @@ public class TransactionIntegrationTest {
                     .setContents(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = fileAppendTransaction.toBytes();
-            FileAppendTransaction fileAppendTransactionDeserialized = (FileAppendTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            FileAppendTransaction fileAppendTransactionDeserialized =
+                    (FileAppendTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             fileAppendTransactionDeserialized
                     .setTransactionId(TransactionId.generate(testEnv.client.getOperatorAccountId()))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
 
-            var contents = new FileContentsQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            var contents = new FileContentsQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(contents.toStringUtf8()).isEqualTo("[e2e::FileCreateTransaction]" + Contents.BIG_CONTENTS);
 
-            info = new FileInfoQuery()
-                    .setFileId(fileId)
-                    .execute(testEnv.client);
+            info = new FileInfoQuery().setFileId(fileId).execute(testEnv.client);
 
             assertThat(info.fileId).isEqualTo(fileId);
             assertThat(info.size).isEqualTo(13522);
@@ -591,7 +542,6 @@ public class TransactionIntegrationTest {
                     .setFileId(fileId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -600,7 +550,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("topic message submit chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
+    @DisplayName(
+            "topic message submit chunked transaction can be frozen, signed, serialized into bytes, deserialized and be equal to the original one")
     void canFreezeSignSerializeDeserializeAndCompareTopicMessageSubmitChunkedTransaction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -615,9 +566,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new TopicInfoQuery()
-            .setTopicId(topicId)
-            .execute(testEnv.client);
+            var info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -632,8 +581,8 @@ public class TransactionIntegrationTest {
                     .sign(privateKey);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction fileAppendTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction fileAppendTransactionDeserialized =
+                    (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var transactionBytesReserialized = fileAppendTransactionDeserialized.toBytes();
             assertThat(transactionBytesSerialized).isEqualTo(transactionBytesReserialized);
@@ -642,7 +591,6 @@ public class TransactionIntegrationTest {
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -651,7 +599,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete topic message submit chunked transaction can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName(
+            "incomplete topic message submit chunked transaction can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransaction() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
@@ -664,9 +613,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new TopicInfoQuery()
-            .setTopicId(topicId)
-            .execute(testEnv.client);
+            var info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -679,8 +626,8 @@ public class TransactionIntegrationTest {
                     .setMessage(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized =
+                    (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
 
@@ -688,9 +635,7 @@ public class TransactionIntegrationTest {
                 resp.getReceipt(testEnv.client);
             }
 
-            info = new TopicInfoQuery()
-                    .setTopicId(topicId)
-                    .execute(testEnv.client);
+            info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -701,7 +646,6 @@ public class TransactionIntegrationTest {
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -710,7 +654,8 @@ public class TransactionIntegrationTest {
      * @url https://hips.hedera.com/hip/hip-745
      */
     @Test
-    @DisplayName("incomplete topic message submit chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
+    @DisplayName(
+            "incomplete topic message submit chunked transaction with node account ids can be serialized into bytes, deserialized, edited and executed")
     void canSerializeDeserializeExecuteIncompleteTopicMessageSubmitChunkedTransactionWithNodeAccountIds()
             throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
@@ -726,9 +671,7 @@ public class TransactionIntegrationTest {
 
             Thread.sleep(5000);
 
-            var info = new TopicInfoQuery()
-            .setTopicId(topicId)
-            .execute(testEnv.client);
+            var info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -742,8 +685,8 @@ public class TransactionIntegrationTest {
                     .setMessage(Contents.BIG_CONTENTS);
 
             var transactionBytesSerialized = topicMessageSubmitTransaction.toBytes();
-            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized = (TopicMessageSubmitTransaction) Transaction
-                    .fromBytes(transactionBytesSerialized);
+            TopicMessageSubmitTransaction topicMessageSubmitTransactionDeserialized =
+                    (TopicMessageSubmitTransaction) Transaction.fromBytes(transactionBytesSerialized);
 
             var responses = topicMessageSubmitTransactionDeserialized.executeAll(testEnv.client);
 
@@ -751,9 +694,7 @@ public class TransactionIntegrationTest {
                 resp.getReceipt(testEnv.client);
             }
 
-            info = new TopicInfoQuery()
-                    .setTopicId(topicId)
-                    .execute(testEnv.client);
+            info = new TopicInfoQuery().setTopicId(topicId).execute(testEnv.client);
 
             assertThat(info.topicId).isEqualTo(topicId);
             assertThat(info.topicMemo).isEqualTo("[e2e::TopicCreateTransaction]");
@@ -764,7 +705,6 @@ public class TransactionIntegrationTest {
                     .setTopicId(topicId)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client);
-
         }
     }
 
@@ -798,32 +738,29 @@ public class TransactionIntegrationTest {
                             .build())
                     .setTransactionFee(200_000_000)
                     .setTransactionValidDuration(
-                            Duration.newBuilder()
-                                    .setSeconds(120)
-                                    .build())
+                            Duration.newBuilder().setSeconds(120).build())
                     .setGenerateRecord(false)
                     .setMemo("")
-                    .setCryptoTransfer(
-                            CryptoTransferTransactionBody.newBuilder()
-                                    .setTransfers(TransferList.newBuilder()
-                                            .addAccountAmounts(AccountAmount.newBuilder()
-                                                    .setAccountID(AccountID.newBuilder()
-                                                            .setAccountNum(47439)
-                                                            .setRealmNum(0)
-                                                            .setShardNum(0)
-                                                            .build())
-                                                    .setAmount(10)
+                    .setCryptoTransfer(CryptoTransferTransactionBody.newBuilder()
+                            .setTransfers(TransferList.newBuilder()
+                                    .addAccountAmounts(AccountAmount.newBuilder()
+                                            .setAccountID(AccountID.newBuilder()
+                                                    .setAccountNum(47439)
+                                                    .setRealmNum(0)
+                                                    .setShardNum(0)
                                                     .build())
-                                            .addAccountAmounts(AccountAmount.newBuilder()
-                                                    .setAccountID(AccountID.newBuilder()
-                                                            .setAccountNum(542348)
-                                                            .setRealmNum(0)
-                                                            .setShardNum(0)
-                                                            .build())
-                                                    .setAmount(-10)
-                                                    .build())
+                                            .setAmount(10)
                                             .build())
-                                    .build());
+                                    .addAccountAmounts(AccountAmount.newBuilder()
+                                            .setAccountID(AccountID.newBuilder()
+                                                    .setAccountNum(542348)
+                                                    .setRealmNum(0)
+                                                    .setShardNum(0)
+                                                    .build())
+                                            .setAmount(-10)
+                                            .build())
+                                    .build())
+                            .build());
             var bodyBytes = transactionBodyBuilder.build().toByteString();
 
             var key1 = PrivateKey.fromString(
@@ -879,14 +816,17 @@ public class TransactionIntegrationTest {
                     .addTransactionList(com.hiero.sdk.proto.Transaction.newBuilder()
                             .setSignedTransactionBytes(byts)
                             .build())
-                    .build().toByteString();
+                    .build()
+                    .toByteString();
 
             var tx = (TransferTransaction) Transaction.fromBytes(byts.toByteArray());
 
             try (var testEnv = new IntegrationTestEnv(1)) {
 
-                assertThat(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars()).isEqualTo(-10);
-                assertThat(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars()).isEqualTo(10);
+                assertThat(tx.getHbarTransfers().get(new AccountId(542348)).toTinybars())
+                        .isEqualTo(-10);
+                assertThat(tx.getHbarTransfers().get(new AccountId(47439)).toTinybars())
+                        .isEqualTo(10);
 
                 assertThat(tx.getNodeAccountIds()).isNotNull();
                 assertThat(tx.getNodeAccountIds().size()).isEqualTo(1);
@@ -907,7 +847,6 @@ public class TransactionIntegrationTest {
                 var resp = tx.execute(testEnv.client);
 
                 resp.getReceipt(testEnv.client);
-
             }
         });
     }

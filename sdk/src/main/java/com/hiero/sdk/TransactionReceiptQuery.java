@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.hiero.sdk.proto.CryptoServiceGrpc;
@@ -25,11 +7,10 @@ import com.hiero.sdk.proto.Response;
 import com.hiero.sdk.proto.ResponseHeader;
 import com.hiero.sdk.proto.TransactionGetReceiptQuery;
 import io.grpc.MethodDescriptor;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import javax.annotation.Nullable;
 
 /**
  * Get the receipt of a transaction, given its transaction ID.
@@ -39,19 +20,18 @@ import java.util.Objects;
  *
  * <p>This query is free.
  */
-public final class TransactionReceiptQuery
-    extends Query<TransactionReceipt, TransactionReceiptQuery> {
+public final class TransactionReceiptQuery extends Query<TransactionReceipt, TransactionReceiptQuery> {
 
     @Nullable
     private TransactionId transactionId = null;
+
     private boolean includeChildren = false;
     private boolean includeDuplicates = false;
 
     /**
      * Constructor.
      */
-    public TransactionReceiptQuery() {
-    }
+    public TransactionReceiptQuery() {}
 
     /**
      * Extract the transaction id.
@@ -136,8 +116,8 @@ public final class TransactionReceiptQuery
     @Override
     void onMakeRequest(com.hiero.sdk.proto.Query.Builder queryBuilder, QueryHeader header) {
         var builder = TransactionGetReceiptQuery.newBuilder()
-            .setIncludeChildReceipts(includeChildren)
-            .setIncludeDuplicates(includeDuplicates);
+                .setIncludeChildReceipts(includeChildren)
+                .setIncludeDuplicates(includeDuplicates);
         if (transactionId != null) {
             builder.setTransactionID(transactionId.toProtobuf());
         }
@@ -157,7 +137,8 @@ public final class TransactionReceiptQuery
         var receiptResponse = response.getTransactionGetReceipt();
         var duplicates = mapReceiptList(receiptResponse.getDuplicateTransactionReceiptsList());
         var children = mapReceiptList(receiptResponse.getChildTransactionReceiptsList());
-        return TransactionReceipt.fromProtobuf(response.getTransactionGetReceipt().getReceipt(), duplicates, children, transactionId);
+        return TransactionReceipt.fromProtobuf(
+                response.getTransactionGetReceipt().getReceipt(), duplicates, children, transactionId);
     }
 
     /**
@@ -167,8 +148,7 @@ public final class TransactionReceiptQuery
      * @return                          the list of transaction receipts
      */
     private static List<TransactionReceipt> mapReceiptList(
-        List<com.hiero.sdk.proto.TransactionReceipt> protoReceiptList
-    ) {
+            List<com.hiero.sdk.proto.TransactionReceipt> protoReceiptList) {
         List<TransactionReceipt> outList = new ArrayList<>(protoReceiptList.size());
         for (var protoReceipt : protoReceiptList) {
             outList.add(TransactionReceipt.fromProtobuf(protoReceipt));
@@ -209,7 +189,7 @@ public final class TransactionReceiptQuery
         }
 
         var receiptStatus =
-            Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
+                Status.valueOf(response.getTransactionGetReceipt().getReceipt().getStatus());
 
         switch (receiptStatus) {
             case BUSY:

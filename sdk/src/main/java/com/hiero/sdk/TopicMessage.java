@@ -1,33 +1,14 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.hiero.sdk.proto.mirror.ConsensusTopicResponse;
-import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.List;
+import javax.annotation.Nullable;
 
 /**
  * Topic message records.
@@ -72,13 +53,12 @@ public final class TopicMessage {
      * @param transactionId             the transaction id
      */
     TopicMessage(
-        Instant lastConsensusTimestamp,
-        byte[] message,
-        byte[] lastRunningHash,
-        long lastSequenceNumber,
-        @Nullable TopicMessageChunk[] chunks,
-        @Nullable TransactionId transactionId
-    ) {
+            Instant lastConsensusTimestamp,
+            byte[] message,
+            byte[] lastRunningHash,
+            long lastSequenceNumber,
+            @Nullable TopicMessageChunk[] chunks,
+            @Nullable TransactionId transactionId) {
         this.consensusTimestamp = lastConsensusTimestamp;
         this.contents = message;
         this.runningHash = lastRunningHash;
@@ -95,15 +75,14 @@ public final class TopicMessage {
      */
     static TopicMessage ofSingle(ConsensusTopicResponse response) {
         return new TopicMessage(
-            InstantConverter.fromProtobuf(response.getConsensusTimestamp()),
-            response.getMessage().toByteArray(),
-            response.getRunningHash().toByteArray(),
-            response.getSequenceNumber(),
-            new TopicMessageChunk[]{new TopicMessageChunk(response)},
-            response.hasChunkInfo() && response.getChunkInfo().hasInitialTransactionID() ?
-                TransactionId.fromProtobuf(response.getChunkInfo().getInitialTransactionID()) :
-                null
-        );
+                InstantConverter.fromProtobuf(response.getConsensusTimestamp()),
+                response.getMessage().toByteArray(),
+                response.getRunningHash().toByteArray(),
+                response.getSequenceNumber(),
+                new TopicMessageChunk[] {new TopicMessageChunk(response)},
+                response.hasChunkInfo() && response.getChunkInfo().hasInitialTransactionID()
+                        ? TransactionId.fromProtobuf(response.getChunkInfo().getInitialTransactionID())
+                        : null);
     }
 
     /**
@@ -140,22 +119,21 @@ public final class TopicMessage {
         var lastReceived = responses.get(responses.size() - 1);
 
         return new TopicMessage(
-            InstantConverter.fromProtobuf(lastReceived.getConsensusTimestamp()),
-            wholeMessage.array(),
-            lastReceived.getRunningHash().toByteArray(),
-            lastReceived.getSequenceNumber(),
-            chunks,
-            transactionId
-        );
+                InstantConverter.fromProtobuf(lastReceived.getConsensusTimestamp()),
+                wholeMessage.array(),
+                lastReceived.getRunningHash().toByteArray(),
+                lastReceived.getSequenceNumber(),
+                chunks,
+                transactionId);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("consensusTimestamp", consensusTimestamp)
-            .add("contents", new String(contents, StandardCharsets.UTF_8))
-            .add("runningHash", runningHash)
-            .add("sequenceNumber", sequenceNumber)
-            .toString();
+                .add("consensusTimestamp", consensusTimestamp)
+                .add("contents", new String(contents, StandardCharsets.UTF_8))
+                .add("runningHash", runningHash)
+                .add("sequenceNumber", sequenceNumber)
+                .toString();
     }
 }

@@ -1,46 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.AccountBalance;
-import com.hiero.sdk.AccountBalanceQuery;
-import com.hiero.sdk.AccountCreateTransaction;
-import com.hiero.sdk.AccountDeleteTransaction;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.AccountInfoFlow;
-import com.hiero.sdk.ContractCreateFlow;
-import com.hiero.sdk.ContractCreateTransaction;
-import com.hiero.sdk.FileAppendTransaction;
-import com.hiero.sdk.FileCreateTransaction;
-import com.hiero.sdk.FileDeleteTransaction;
-import com.hiero.sdk.FileId;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.MaxAttemptsExceededException;
-import com.hiero.sdk.PrecheckStatusException;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenMintTransaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.TransactionReceiptQuery;
 import com.hiero.sdk.proto.AccountID;
 import com.hiero.sdk.proto.CryptoGetAccountBalanceResponse;
 import com.hiero.sdk.proto.CryptoGetInfoResponse;
@@ -61,13 +23,6 @@ import com.hiero.sdk.proto.TransactionRecord;
 import com.hiero.sdk.proto.TransactionResponse;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -77,27 +32,36 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Supplier;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class MockingTest {
     @Test
     void testSucceedsWithCorrectHbars() throws PrecheckStatusException, TimeoutException, InterruptedException {
         List<Object> responses1 = List.of(
-            Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
-            (Function<Object, Object>) o -> Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
-            Response.newBuilder()
-                .setCryptogetAccountBalance(
-                    CryptoGetAccountBalanceResponse.newBuilder()
-                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.OK).build())
-                        .setAccountID(AccountID.newBuilder().setAccountNum(10).build())
-                        .setBalance(100)
-                        .build()
-                ).build()
-        );
+                Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
+                (Function<Object, Object>)
+                        o -> Status.Code.UNAVAILABLE.toStatus().asRuntimeException(),
+                Response.newBuilder()
+                        .setCryptogetAccountBalance(CryptoGetAccountBalanceResponse.newBuilder()
+                                .setHeader(ResponseHeader.newBuilder()
+                                        .setNodeTransactionPrecheckCode(ResponseCodeEnum.OK)
+                                        .build())
+                                .setAccountID(
+                                        AccountID.newBuilder().setAccountNum(10).build())
+                                .setBalance(100)
+                                .build())
+                        .build());
 
         var responses = List.of(responses1);
 
         try (var mocker = Mocker.withResponses(responses)) {
-            var balance = new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client);
+            var balance =
+                    new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client);
 
             Assertions.assertEquals(balance.hbars, Hbar.fromTinybars(100));
         }
@@ -123,20 +87,22 @@ public class MockingTest {
         if (sync.equals("sync")) {
             transactionResponse = new AccountCreateTransaction().execute(server.client);
         } else {
-            transactionResponse = new AccountCreateTransaction().executeAsync(server.client).get();
+            transactionResponse =
+                    new AccountCreateTransaction().executeAsync(server.client).get();
         }
 
         service.buffer
-            .enqueueResponse(TestResponse.query(
-                Response.newBuilder().setTransactionGetReceipt(
-                    TransactionGetReceiptResponse.newBuilder()
-                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE))
-                        .setReceipt(TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build())
-                        .build()
-                ).build()
-            ))
-            .enqueueResponse(TestResponse.receipt(com.hiero.sdk.Status.PLATFORM_NOT_ACTIVE))
-            .enqueueResponse(TestResponse.successfulReceipt());
+                .enqueueResponse(TestResponse.query(Response.newBuilder()
+                        .setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
+                                .setHeader(ResponseHeader.newBuilder()
+                                        .setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE))
+                                .setReceipt(TransactionReceipt.newBuilder()
+                                        .setStatus(ResponseCodeEnum.SUCCESS)
+                                        .build())
+                                .build())
+                        .build()))
+                .enqueueResponse(TestResponse.receipt(com.hiero.sdk.Status.PLATFORM_NOT_ACTIVE))
+                .enqueueResponse(TestResponse.successfulReceipt());
 
         if (sync.equals("sync")) {
             transactionResponse.getReceipt(server.client);
@@ -159,40 +125,43 @@ public class MockingTest {
         if (sync.equals("sync")) {
             transactionResponse = new AccountCreateTransaction().execute(server.client);
         } else {
-            transactionResponse = new AccountCreateTransaction().executeAsync(server.client).get();
+            transactionResponse =
+                    new AccountCreateTransaction().executeAsync(server.client).get();
         }
 
         service.buffer
-            .enqueueResponse(TestResponse.successfulReceipt()) // for inner getReceipt
-            .enqueueResponse(TestResponse.successfulReceipt()) // for inner getCost
-            .enqueueResponse(TestResponse.query(
-                Response.newBuilder().setTransactionGetRecord(
-                    TransactionGetRecordResponse.newBuilder()
-                        .setHeader(ResponseHeader.newBuilder().setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE).build())
-                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
-                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build()
-                        ).build()
-                    ).build()
-                ).build()
-            ))
-            .enqueueResponse(TestResponse.query(
-                Response.newBuilder().setTransactionGetRecord(
-                    TransactionGetRecordResponse.newBuilder()
-                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
-                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.PLATFORM_NOT_ACTIVE).build()
-                        ).build()
-                    ).build()
-                ).build()
-            ))
-            .enqueueResponse(TestResponse.query(
-                Response.newBuilder().setTransactionGetRecord(
-                    TransactionGetRecordResponse.newBuilder()
-                        .setTransactionRecord(TransactionRecord.newBuilder().setReceipt(
-                            TransactionReceipt.newBuilder().setStatus(ResponseCodeEnum.SUCCESS).build()
-                        ).build()
-                    ).build()
-                ).build()
-            ));
+                .enqueueResponse(TestResponse.successfulReceipt()) // for inner getReceipt
+                .enqueueResponse(TestResponse.successfulReceipt()) // for inner getCost
+                .enqueueResponse(TestResponse.query(Response.newBuilder()
+                        .setTransactionGetRecord(TransactionGetRecordResponse.newBuilder()
+                                .setHeader(ResponseHeader.newBuilder()
+                                        .setNodeTransactionPrecheckCode(ResponseCodeEnum.PLATFORM_NOT_ACTIVE)
+                                        .build())
+                                .setTransactionRecord(TransactionRecord.newBuilder()
+                                        .setReceipt(TransactionReceipt.newBuilder()
+                                                .setStatus(ResponseCodeEnum.SUCCESS)
+                                                .build())
+                                        .build())
+                                .build())
+                        .build()))
+                .enqueueResponse(TestResponse.query(Response.newBuilder()
+                        .setTransactionGetRecord(TransactionGetRecordResponse.newBuilder()
+                                .setTransactionRecord(TransactionRecord.newBuilder()
+                                        .setReceipt(TransactionReceipt.newBuilder()
+                                                .setStatus(ResponseCodeEnum.PLATFORM_NOT_ACTIVE)
+                                                .build())
+                                        .build())
+                                .build())
+                        .build()))
+                .enqueueResponse(TestResponse.query(Response.newBuilder()
+                        .setTransactionGetRecord(TransactionGetRecordResponse.newBuilder()
+                                .setTransactionRecord(TransactionRecord.newBuilder()
+                                        .setReceipt(TransactionReceipt.newBuilder()
+                                                .setStatus(ResponseCodeEnum.SUCCESS)
+                                                .build())
+                                        .build())
+                                .build())
+                        .build()));
 
         if (sync.equals("sync")) {
             transactionResponse.getRecord(server.client);
@@ -215,7 +184,8 @@ public class MockingTest {
         var cryptoService = new TestCryptoService();
         var fileService = new TestFileService();
         var contractService = new TestContractService();
-        var server = new TestServer("contractCreateFlow" + versionToTest + stakeType, cryptoService, fileService, contractService);
+        var server = new TestServer(
+                "contractCreateFlow" + versionToTest + stakeType, cryptoService, fileService, contractService);
 
         var fileId = FileId.fromString("1.2.3");
         var maxAutomaticTokenAssociations = 101;
@@ -223,31 +193,36 @@ public class MockingTest {
         var stakedNode = 13L;
         var declineStakingReward = true;
 
-
-        cryptoService.buffer.enqueueResponse(TestResponse.query(
-            Response.newBuilder().setTransactionGetReceipt(
-                TransactionGetReceiptResponse.newBuilder().setReceipt(
-                    TransactionReceipt.newBuilder().setFileID(fileId.toProtobuf()).setStatus(ResponseCodeEnum.SUCCESS).build()
-                ).build()
-            ).build()
-        )).enqueueResponse(TestResponse.successfulReceipt()).enqueueResponse(TestResponse.successfulReceipt());
-        fileService.buffer
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk());
+        cryptoService
+                .buffer
+                .enqueueResponse(TestResponse.query(Response.newBuilder()
+                        .setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
+                                .setReceipt(TransactionReceipt.newBuilder()
+                                        .setFileID(fileId.toProtobuf())
+                                        .setStatus(ResponseCodeEnum.SUCCESS)
+                                        .build())
+                                .build())
+                        .build()))
+                .enqueueResponse(TestResponse.successfulReceipt())
+                .enqueueResponse(TestResponse.successfulReceipt());
+        fileService
+                .buffer
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk());
 
         contractService.buffer.enqueueResponse(TestResponse.transactionOk());
 
         var flow = new ContractCreateFlow()
-            .setBytecode(BIG_BYTECODE)
-            .setContractMemo("memo goes here")
-            .setConstructorParameters(new byte[]{1, 2, 3})
-            .setAutoRenewPeriod(Duration.ofMinutes(1))
-            .setAdminKey(adminKey)
-            .setGas(100)
-            .setInitialBalance(new Hbar(3))
-            .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
-            .setDeclineStakingReward(declineStakingReward);
+                .setBytecode(BIG_BYTECODE)
+                .setContractMemo("memo goes here")
+                .setConstructorParameters(new byte[] {1, 2, 3})
+                .setAutoRenewPeriod(Duration.ofMinutes(1))
+                .setAdminKey(adminKey)
+                .setGas(100)
+                .setInitialBalance(new Hbar(3))
+                .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
+                .setDeclineStakingReward(declineStakingReward);
 
         if (stakeType.equals("stakedAccount")) {
             flow.setStakedAccountId(stakedAccountId);
@@ -271,14 +246,12 @@ public class MockingTest {
             transactions.add(com.hiero.sdk.Transaction.fromBytes(request.toByteArray()));
         }
         transactions.add(com.hiero.sdk.Transaction.fromBytes(
-            contractService.buffer.transactionRequestsReceived.get(0).toByteArray()
-        ));
+                contractService.buffer.transactionRequestsReceived.get(0).toByteArray()));
 
         Assertions.assertInstanceOf(FileCreateTransaction.class, transactions.get(0));
         Assertions.assertEquals(
-            ContractCreateFlow.FILE_CREATE_MAX_BYTES,
-            ((FileCreateTransaction) transactions.get(0)).getContents().size()
-        );
+                ContractCreateFlow.FILE_CREATE_MAX_BYTES,
+                ((FileCreateTransaction) transactions.get(0)).getContents().size());
 
         Assertions.assertTrue(cryptoService.buffer.queryRequestsReceived.get(0).hasTransactionGetReceipt());
 
@@ -286,15 +259,14 @@ public class MockingTest {
         var fileAppendTx = (FileAppendTransaction) transactions.get(1);
         Assertions.assertEquals(fileId, fileAppendTx.getFileId());
         Assertions.assertEquals(
-            BIG_BYTECODE.length() - ContractCreateFlow.FILE_CREATE_MAX_BYTES,
-            fileAppendTx.getContents().size()
-        );
+                BIG_BYTECODE.length() - ContractCreateFlow.FILE_CREATE_MAX_BYTES,
+                fileAppendTx.getContents().size());
 
         Assertions.assertInstanceOf(ContractCreateTransaction.class, transactions.get(3));
         var contractCreateTx = (ContractCreateTransaction) transactions.get(3);
         Assertions.assertEquals("memo goes here", contractCreateTx.getContractMemo());
         Assertions.assertEquals(fileId, contractCreateTx.getBytecodeFileId());
-        Assertions.assertEquals(ByteString.copyFrom(new byte[]{1, 2, 3}), contractCreateTx.getConstructorParameters());
+        Assertions.assertEquals(ByteString.copyFrom(new byte[] {1, 2, 3}), contractCreateTx.getConstructorParameters());
         Assertions.assertEquals(Duration.ofMinutes(1), contractCreateTx.getAutoRenewPeriod());
         Assertions.assertEquals(adminKey, contractCreateTx.getAdminKey());
         Assertions.assertEquals(100, contractCreateTx.getGas());
@@ -313,7 +285,6 @@ public class MockingTest {
         server.close();
     }
 
-
     @Test
     void accountInfoFlowFunctions() throws Throwable {
         var BIG_BYTES = makeBigString(1000).getBytes(StandardCharsets.UTF_8);
@@ -323,11 +294,11 @@ public class MockingTest {
         var cost = Hbar.from(1);
 
         Supplier<TokenMintTransaction> makeTx = () -> new TokenMintTransaction()
-            .setTokenId(TokenId.fromString("1.2.3"))
-            .setAmount(5)
-            .setTransactionId(TransactionId.generate(accountId))
-            .setNodeAccountIds(List.of(AccountId.fromString("0.0.3")))
-            .freeze();
+                .setTokenId(TokenId.fromString("1.2.3"))
+                .setAmount(5)
+                .setTransactionId(TransactionId.generate(accountId))
+                .setNodeAccountIds(List.of(AccountId.fromString("0.0.3")))
+                .freeze();
 
         var properlySignedTx = makeTx.get().sign(privateKey);
         var improperlySignedTx = makeTx.get().sign(otherPrivateKey);
@@ -338,56 +309,41 @@ public class MockingTest {
         var server = new TestServer("accountInfoFlow", cryptoService);
 
         for (int i = 0; i < 8; i++) {
-            cryptoService.buffer.enqueueResponse(
-                TestResponse.query(
-                    Response.newBuilder().setCryptoGetInfo(
-                        CryptoGetInfoResponse.newBuilder()
-                            .setHeader(
-                                ResponseHeader.newBuilder()
+            cryptoService.buffer.enqueueResponse(TestResponse.query(Response.newBuilder()
+                    .setCryptoGetInfo(CryptoGetInfoResponse.newBuilder()
+                            .setHeader(ResponseHeader.newBuilder()
                                     .setCost(cost.toTinybars())
-                                    .build()
-                            ).build()
-                    ).build()
-                )
-            );
-            cryptoService.buffer.enqueueResponse(
-                TestResponse.query(
-                    Response.newBuilder().setCryptoGetInfo(
-                        CryptoGetInfoResponse.newBuilder()
-                            .setAccountInfo(
-                                CryptoGetInfoResponse.AccountInfo.newBuilder()
+                                    .build())
+                            .build())
+                    .build()));
+            cryptoService.buffer.enqueueResponse(TestResponse.query(Response.newBuilder()
+                    .setCryptoGetInfo(CryptoGetInfoResponse.newBuilder()
+                            .setAccountInfo(CryptoGetInfoResponse.AccountInfo.newBuilder()
                                     .setKey(privateKey.getPublicKey().toProtobufKey())
-                                    .build()
-                            ).build()
-                    ).build()
-                )
-            );
+                                    .build())
+                            .build())
+                    .build()));
         }
 
-        Assertions.assertTrue(
-            AccountInfoFlow.verifyTransactionSignature(server.client, accountId, properlySignedTx)
-        );
+        Assertions.assertTrue(AccountInfoFlow.verifyTransactionSignature(server.client, accountId, properlySignedTx));
         Assertions.assertFalse(
-            AccountInfoFlow.verifyTransactionSignature(server.client, accountId, improperlySignedTx)
-        );
+                AccountInfoFlow.verifyTransactionSignature(server.client, accountId, improperlySignedTx));
         Assertions.assertTrue(
-            AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, properBigBytesSignature)
-        );
+                AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, properBigBytesSignature));
         Assertions.assertFalse(
-            AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, improperBigBytesSignature)
-        );
+                AccountInfoFlow.verifySignature(server.client, accountId, BIG_BYTES, improperBigBytesSignature));
         Assertions.assertTrue(
-            AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, properlySignedTx).get()
-        );
+                AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, properlySignedTx)
+                        .get());
         Assertions.assertFalse(
-            AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, improperlySignedTx).get()
-        );
+                AccountInfoFlow.verifyTransactionSignatureAsync(server.client, accountId, improperlySignedTx)
+                        .get());
         Assertions.assertTrue(
-            AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, properBigBytesSignature).get()
-        );
+                AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, properBigBytesSignature)
+                        .get());
         Assertions.assertFalse(
-            AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, improperBigBytesSignature).get()
-        );
+                AccountInfoFlow.verifySignatureAsync(server.client, accountId, BIG_BYTES, improperBigBytesSignature)
+                        .get());
 
         Assertions.assertEquals(16, cryptoService.buffer.queryRequestsReceived.size());
         for (int i = 0; i < 16; i += 2) {
@@ -396,11 +352,14 @@ public class MockingTest {
 
             Assertions.assertTrue(costQueryRequest.hasCryptoGetInfo());
             Assertions.assertTrue(costQueryRequest.getCryptoGetInfo().hasHeader());
-            Assertions.assertTrue(costQueryRequest.getCryptoGetInfo().getHeader().hasPayment());
+            Assertions.assertTrue(
+                    costQueryRequest.getCryptoGetInfo().getHeader().hasPayment());
 
             Assertions.assertTrue(queryRequest.hasCryptoGetInfo());
             Assertions.assertTrue(queryRequest.getCryptoGetInfo().hasAccountID());
-            Assertions.assertEquals(accountId, AccountId.fromProtobuf(queryRequest.getCryptoGetInfo().getAccountID()));
+            Assertions.assertEquals(
+                    accountId,
+                    AccountId.fromProtobuf(queryRequest.getCryptoGetInfo().getAccountID()));
         }
         server.close();
     }
@@ -412,7 +371,9 @@ public class MockingTest {
         var responses = List.of(responses1);
 
         try (var mocker = Mocker.withResponses(responses)) {
-            Assertions.assertThrows(RuntimeException.class, () -> new AccountBalanceQuery().setAccountId(new AccountId(10)).execute(mocker.client));
+            Assertions.assertThrows(RuntimeException.class, () -> new AccountBalanceQuery()
+                    .setAccountId(new AccountId(10))
+                    .execute(mocker.client));
         }
     }
 
@@ -427,27 +388,26 @@ public class MockingTest {
         "RESOURCE_EXHAUSTED, , async",
         "UNAVAILABLE, , async"
     })
-    void shouldRetryExceptionallyFunctionsCorrectly(Status.Code code, String description, String sync) throws Exception {
+    void shouldRetryExceptionallyFunctionsCorrectly(Status.Code code, String description, String sync)
+            throws Exception {
         var service = new TestCryptoService();
-        var server = new TestServer("executableRetry" + code + (description != null ? description.replace(" ", "") : "NULL") + sync, service);
+        var server = new TestServer(
+                "executableRetry" + code + (description != null ? description.replace(" ", "") : "NULL") + sync,
+                service);
 
-        var exception = Status.fromCode(code)
-            .withDescription(description)
-            .asRuntimeException();
+        var exception = Status.fromCode(code).withDescription(description).asRuntimeException();
 
-        service.buffer
-            .enqueueResponse(TestResponse.error(exception))
-            .enqueueResponse(TestResponse.transactionOk());
+        service.buffer.enqueueResponse(TestResponse.error(exception)).enqueueResponse(TestResponse.transactionOk());
 
         if (sync.equals("sync")) {
             new AccountCreateTransaction()
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .execute(server.client);
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .execute(server.client);
         } else {
             new AccountCreateTransaction()
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .executeAsync(server.client)
-                .get();
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .executeAsync(server.client)
+                    .get();
         }
 
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
@@ -456,12 +416,8 @@ public class MockingTest {
         server.close();
     }
 
-
     @ParameterizedTest(name = "[{2}] Executable should make max {1} attempts when there are {0} errors, and error")
-    @CsvSource({
-        "2, 2, sync",
-        "2, 2, async"
-    })
+    @CsvSource({"2, 2, sync", "2, 2, async"})
     void hitsTxMaxAttemptsCorrectly(Integer numberOfErrors, Integer maxAttempts, String sync) throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("executableMaxAttemptsSync" + numberOfErrors + maxAttempts + sync, service);
@@ -477,23 +433,23 @@ public class MockingTest {
         if (sync.equals("sync")) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
-                    .setMaxAttempts(maxAttempts)
-                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                    .execute(server.client);
+                        .setMaxAttempts(maxAttempts)
+                        .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                        .execute(server.client);
             });
         } else {
             new AccountCreateTransaction()
-                .setMaxAttempts(maxAttempts)
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .executeAsync(server.client)
-                .handle((response, error) -> {
-                    Assertions.assertNotNull(error);
-                    System.out.println(error);
-                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+                    .setMaxAttempts(maxAttempts)
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .executeAsync(server.client)
+                    .handle((response, error) -> {
+                        Assertions.assertNotNull(error);
+                        System.out.println(error);
+                        Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
-                    return null;
-                })
-                .get();
+                        return null;
+                    })
+                    .get();
         }
 
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
@@ -530,13 +486,13 @@ public class MockingTest {
 
         if (sync.equals("sync")) {
             new AccountCreateTransaction()
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .execute(server.client);
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .execute(server.client);
         } else {
             new AccountCreateTransaction()
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .executeAsync(server.client)
-                .get();
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .executeAsync(server.client)
+                    .get();
         }
 
         Assertions.assertEquals(numberOfErrors + 1, service.buffer.transactionRequestsReceived.size());
@@ -567,20 +523,20 @@ public class MockingTest {
         if (sync.equals("sync")) {
             Assertions.assertThrows(MaxAttemptsExceededException.class, () -> {
                 new AccountCreateTransaction()
-                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                    .execute(server.client);
+                        .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                        .execute(server.client);
             });
         } else {
             new AccountCreateTransaction()
-                .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
-                .executeAsync(server.client)
-                .handle((response, error) -> {
-                    Assertions.assertNotNull(error);
-                    Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
+                    .setNodeAccountIds(List.of(AccountId.fromString("1.1.1"), AccountId.fromString("2.2.2")))
+                    .executeAsync(server.client)
+                    .handle((response, error) -> {
+                        Assertions.assertNotNull(error);
+                        Assertions.assertTrue(error.getCause() instanceof MaxAttemptsExceededException);
 
-                    return null;
-                })
-                .get();
+                        return null;
+                    })
+                    .get();
         }
         Assertions.assertEquals(2, service.buffer.transactionRequestsReceived.size());
         assertFirstTwoRequestsNotDirectedAtSameNode(service);
@@ -588,7 +544,8 @@ public class MockingTest {
         server.close();
     }
 
-    private static void assertFirstTwoRequestsNotDirectedAtSameNode(TestCryptoService service) throws InvalidProtocolBufferException {
+    private static void assertFirstTwoRequestsNotDirectedAtSameNode(TestCryptoService service)
+            throws InvalidProtocolBufferException {
         var requests = service.buffer.transactionRequestsReceived;
         var signedTx0 = SignedTransaction.parseFrom(requests.get(0).getSignedTransactionBytes());
         var signedTx1 = SignedTransaction.parseFrom(requests.get(1).getSignedTransactionBytes());
@@ -604,26 +561,20 @@ public class MockingTest {
         var server = new TestServer("maxTransactionFee", service);
 
         service.buffer
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk())
-            .enqueueResponse(TestResponse.transactionOk());
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk())
+                .enqueueResponse(TestResponse.transactionOk());
 
-        new AccountDeleteTransaction()
-            .execute(server.client);
+        new AccountDeleteTransaction().execute(server.client);
 
-        new AccountDeleteTransaction()
-            .setMaxTransactionFee(new Hbar(5))
-            .execute(server.client);
+        new AccountDeleteTransaction().setMaxTransactionFee(new Hbar(5)).execute(server.client);
 
         server.client.setDefaultMaxTransactionFee(new Hbar(1));
 
-        new AccountDeleteTransaction()
-            .execute(server.client);
+        new AccountDeleteTransaction().execute(server.client);
 
-        new AccountDeleteTransaction()
-            .setMaxTransactionFee(new Hbar(3))
-            .execute(server.client);
+        new AccountDeleteTransaction().setMaxTransactionFee(new Hbar(3)).execute(server.client);
 
         Assertions.assertEquals(4, service.buffer.transactionRequestsReceived.size());
         var transactions = new ArrayList<com.hiero.sdk.Transaction<?>>();
@@ -646,18 +597,15 @@ public class MockingTest {
         var server = new TestServer("queryPayment", service);
 
         var response = Response.newBuilder()
-            .setCryptogetAccountBalance(
-                new AccountBalance(
-                    new Hbar(0),
-                    new HashMap<TokenId, Long>(),
-                    new HashMap<TokenId, Integer>()
-                ).toProtobuf()
-            ).build();
+                .setCryptogetAccountBalance(
+                        new AccountBalance(new Hbar(0), new HashMap<TokenId, Long>(), new HashMap<TokenId, Integer>())
+                                .toProtobuf())
+                .build();
 
         service.buffer
-            .enqueueResponse(TestResponse.query(response))
-            .enqueueResponse(TestResponse.query(response))
-            .enqueueResponse(TestResponse.query(response));
+                .enqueueResponse(TestResponse.query(response))
+                .enqueueResponse(TestResponse.query(response))
+                .enqueueResponse(TestResponse.query(response));
 
         // TODO: this will take some work, since I have to contend with Query's getCost behavior
         // TODO: actually, because AccountBalanceQuery is free, I'll need some other query type to test this.
@@ -677,10 +625,10 @@ public class MockingTest {
         var aliceKey = PrivateKey.generateED25519();
 
         var transaction = new AccountCreateTransaction()
-            .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))
-            .setNodeAccountIds(server.client.network.getNodeAccountIdsForExecute())
-            .freeze()
-            .sign(aliceKey);
+                .setTransactionId(TransactionId.generate(Objects.requireNonNull(server.client.getOperatorAccountId())))
+                .setNodeAccountIds(server.client.network.getNodeAccountIdsForExecute())
+                .freeze()
+                .sign(aliceKey);
 
         // This will cause the SDK Transaction to populate the sigPairLists list
         transaction.getTransactionHashPerNode();
@@ -695,11 +643,13 @@ public class MockingTest {
         // Now we must go through the laborious process of digging info out of the response.  =(
         Assertions.assertEquals(1, service.buffer.transactionRequestsReceived.size());
         var request = service.buffer.transactionRequestsReceived.get(0);
-        var sigPairList = SignedTransaction.parseFrom(request.getSignedTransactionBytes()).getSigMap().getSigPairList();
+        var sigPairList = SignedTransaction.parseFrom(request.getSignedTransactionBytes())
+                .getSigMap()
+                .getSigPairList();
         Assertions.assertEquals(2, sigPairList.size());
         Assertions.assertNotEquals(
-            sigPairList.get(0).getEd25519().toString(),
-            sigPairList.get(1).getEd25519().toString());
+                sigPairList.get(0).getEd25519().toString(),
+                sigPairList.get(1).getEd25519().toString());
 
         server.close();
     }
@@ -713,16 +663,11 @@ public class MockingTest {
         server.client.setMaxBackoff(Duration.ofSeconds(8));
         server.client.setMinBackoff(Duration.ofSeconds(1));
 
-        var noReceiptResponse = TestResponse.query(
-            Response.newBuilder()
-                .setTransactionGetReceipt(
-                    TransactionGetReceiptResponse.newBuilder()
-                        .setHeader(
-                            ResponseHeader.newBuilder()
-                                .setNodeTransactionPrecheckCode(com.hiero.sdk.Status.RECEIPT_NOT_FOUND.code)
-                        )
-                ).build()
-        );
+        var noReceiptResponse = TestResponse.query(Response.newBuilder()
+                .setTransactionGetReceipt(TransactionGetReceiptResponse.newBuilder()
+                        .setHeader(ResponseHeader.newBuilder()
+                                .setNodeTransactionPrecheckCode(com.hiero.sdk.Status.RECEIPT_NOT_FOUND.code)))
+                .build());
 
         service.buffer.enqueueResponse(noReceiptResponse);
         service.buffer.enqueueResponse(noReceiptResponse);
@@ -801,7 +746,8 @@ public class MockingTest {
         }
     }
 
-    private static class TestContractService extends SmartContractServiceGrpc.SmartContractServiceImplBase implements TestService {
+    private static class TestContractService extends SmartContractServiceGrpc.SmartContractServiceImplBase
+            implements TestService {
         public Buffer buffer = new Buffer();
 
         @Override
@@ -815,4 +761,3 @@ public class MockingTest {
         }
     }
 }
-

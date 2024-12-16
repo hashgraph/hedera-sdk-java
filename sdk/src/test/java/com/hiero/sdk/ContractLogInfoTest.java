@@ -1,25 +1,23 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hiero.sdk.ContractId;
-import com.hiero.sdk.ContractLogInfo;
 import com.hiero.sdk.proto.ContractLoginfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.nio.charset.StandardCharsets;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.nio.charset.StandardCharsets;
-
 public class ContractLogInfoTest {
     private static final ContractLoginfo info = ContractLoginfo.newBuilder()
-        .setContractID(new ContractId(10).toProtobuf())
-        .setBloom(ByteString.copyFrom("bloom", StandardCharsets.UTF_8))
-        .addTopic(ByteString.copyFrom("bloom", StandardCharsets.UTF_8))
-        .setData(ByteString.copyFrom("data", StandardCharsets.UTF_8))
-        .build();
+            .setContractID(new ContractId(10).toProtobuf())
+            .setBloom(ByteString.copyFrom("bloom", StandardCharsets.UTF_8))
+            .addTopic(ByteString.copyFrom("bloom", StandardCharsets.UTF_8))
+            .setData(ByteString.copyFrom("data", StandardCharsets.UTF_8))
+            .build();
 
     @BeforeAll
     public static void beforeAll() {
@@ -33,25 +31,25 @@ public class ContractLogInfoTest {
 
     @Test
     void fromProtobuf() {
-        SnapshotMatcher.expect(ContractLogInfo.fromProtobuf(info).toString())
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(ContractLogInfo.fromProtobuf(info).toString()).toMatchSnapshot();
     }
 
     @Test
     void toProtobuf() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(ContractLogInfo.fromProtobuf(info).toProtobuf().toString())
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 
     @Test
     void fromBytes() throws InvalidProtocolBufferException {
         SnapshotMatcher.expect(ContractLogInfo.fromBytes(info.toByteArray()).toString())
-            .toMatchSnapshot();
+                .toMatchSnapshot();
     }
 
     @Test
     void toBytes() {
-        SnapshotMatcher.expect(Hex.toHexString(ContractLogInfo.fromProtobuf(info).toBytes()))
-            .toMatchSnapshot();
+        SnapshotMatcher.expect(
+                        Hex.toHexString(ContractLogInfo.fromProtobuf(info).toBytes()))
+                .toMatchSnapshot();
     }
 }

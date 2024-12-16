@@ -1,23 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -25,10 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.NftId;
-import com.hiero.sdk.PendingAirdropId;
-import com.hiero.sdk.TokenId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -123,10 +100,10 @@ class PendingAirdropIdTest {
     @Test
     void testFromProtobufWithTokenId() {
         com.hiero.sdk.proto.PendingAirdropId proto = com.hiero.sdk.proto.PendingAirdropId.newBuilder()
-            .setSenderId(sender.toProtobuf())
-            .setReceiverId(receiver.toProtobuf())
-            .setFungibleTokenType(tokenId.toProtobuf())
-            .build();
+                .setSenderId(sender.toProtobuf())
+                .setReceiverId(receiver.toProtobuf())
+                .setFungibleTokenType(tokenId.toProtobuf())
+                .build();
 
         PendingAirdropId pendingAirdropId = PendingAirdropId.fromProtobuf(proto);
 
@@ -140,10 +117,10 @@ class PendingAirdropIdTest {
     @Test
     void testFromProtobufWithNftId() {
         com.hiero.sdk.proto.PendingAirdropId proto = com.hiero.sdk.proto.PendingAirdropId.newBuilder()
-            .setSenderId(sender.toProtobuf())
-            .setReceiverId(receiver.toProtobuf())
-            .setNonFungibleToken(nftId.toProtobuf())
-            .build();
+                .setSenderId(sender.toProtobuf())
+                .setReceiverId(receiver.toProtobuf())
+                .setNonFungibleToken(nftId.toProtobuf())
+                .build();
 
         PendingAirdropId pendingAirdropId = PendingAirdropId.fromProtobuf(proto);
 

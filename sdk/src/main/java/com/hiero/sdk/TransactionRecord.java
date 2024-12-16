@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
@@ -26,16 +8,15 @@ import com.hiero.sdk.proto.AccountAmount;
 import com.hiero.sdk.proto.NftTransfer;
 import com.hiero.sdk.proto.TokenTransferList;
 import com.hiero.sdk.proto.TransferList;
-import org.bouncycastle.util.encoders.Hex;
 import java.time.Instant;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The complete record for a transaction on Hedera that has reached consensus.
@@ -212,31 +193,30 @@ public final class TransactionRecord {
     public final List<PendingAirdropRecord> pendingAirdropRecords;
 
     TransactionRecord(
-        TransactionReceipt transactionReceipt,
-        ByteString transactionHash,
-        Instant consensusTimestamp,
-        TransactionId transactionId,
-        String transactionMemo,
-        long transactionFee,
-        @Nullable ContractFunctionResult contractFunctionResult,
-        List<Transfer> transfers,
-        Map<TokenId, Map<AccountId, Long>> tokenTransfers,
-        List<TokenTransfer> tokenTransferList,
-        Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
-        @Nullable ScheduleId scheduleRef,
-        List<AssessedCustomFee> assessedCustomFees,
-        List<TokenAssociation> automaticTokenAssociations,
-        @Nullable PublicKey aliasKey,
-        List<TransactionRecord> children,
-        List<TransactionRecord> duplicates,
-        @Nullable Instant parentConsensusTimestamp,
-        ByteString ethereumHash,
-        List<Transfer> paidStakingRewards,
-        @Nullable ByteString prngBytes,
-        @Nullable Integer prngNumber,
-        ByteString evmAddress,
-        List<PendingAirdropRecord> pendingAirdropRecords
-    ) {
+            TransactionReceipt transactionReceipt,
+            ByteString transactionHash,
+            Instant consensusTimestamp,
+            TransactionId transactionId,
+            String transactionMemo,
+            long transactionFee,
+            @Nullable ContractFunctionResult contractFunctionResult,
+            List<Transfer> transfers,
+            Map<TokenId, Map<AccountId, Long>> tokenTransfers,
+            List<TokenTransfer> tokenTransferList,
+            Map<TokenId, List<TokenNftTransfer>> tokenNftTransfers,
+            @Nullable ScheduleId scheduleRef,
+            List<AssessedCustomFee> assessedCustomFees,
+            List<TokenAssociation> automaticTokenAssociations,
+            @Nullable PublicKey aliasKey,
+            List<TransactionRecord> children,
+            List<TransactionRecord> duplicates,
+            @Nullable Instant parentConsensusTimestamp,
+            ByteString ethereumHash,
+            List<Transfer> paidStakingRewards,
+            @Nullable ByteString prngBytes,
+            @Nullable Integer prngNumber,
+            ByteString evmAddress,
+            List<PendingAirdropRecord> pendingAirdropRecords) {
         this.receipt = transactionReceipt;
         this.transactionHash = transactionHash;
         this.consensusTimestamp = consensusTimestamp;
@@ -275,12 +255,12 @@ public final class TransactionRecord {
      * @return the new transaction record
      */
     static TransactionRecord fromProtobuf(
-        com.hiero.sdk.proto.TransactionRecord transactionRecord,
-        List<TransactionRecord> children,
-        List<TransactionRecord> duplicates,
-        @Nullable TransactionId transactionId
-    ) {
-        var transfers = new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
+            com.hiero.sdk.proto.TransactionRecord transactionRecord,
+            List<TransactionRecord> children,
+            List<TransactionRecord> duplicates,
+            @Nullable TransactionId transactionId) {
+        var transfers =
+                new ArrayList<Transfer>(transactionRecord.getTransferList().getAccountAmountsCount());
         for (var accountAmount : transactionRecord.getTransferList().getAccountAmountsList()) {
             transfers.add(Transfer.fromProtobuf(accountAmount));
         }
@@ -292,13 +272,17 @@ public final class TransactionRecord {
         var nftTransfersList = TokenNftTransfer.fromProtobuf(transactionRecord.getTokenTransferListsList());
 
         for (var transfer : tokenTransfersList) {
-            var current = tokenTransfers.containsKey(transfer.tokenId) ? tokenTransfers.get(transfer.tokenId) : new HashMap<AccountId, Long>();
+            var current = tokenTransfers.containsKey(transfer.tokenId)
+                    ? tokenTransfers.get(transfer.tokenId)
+                    : new HashMap<AccountId, Long>();
             current.put(transfer.accountId, transfer.amount);
             tokenTransfers.put(transfer.tokenId, current);
         }
 
         for (var transfer : nftTransfersList) {
-            var current = tokenNftTransfers.containsKey(transfer.tokenId) ? tokenNftTransfers.get(transfer.tokenId) : new ArrayList<TokenNftTransfer>();
+            var current = tokenNftTransfers.containsKey(transfer.tokenId)
+                    ? tokenNftTransfers.get(transfer.tokenId)
+                    : new ArrayList<TokenNftTransfer>();
             current.add(transfer);
             tokenNftTransfers.put(transfer.tokenId, current);
         }
@@ -309,13 +293,14 @@ public final class TransactionRecord {
         }
 
         // HACK: This is a bit bad, any takers to clean this up
-        var contractFunctionResult = transactionRecord.hasContractCallResult() ?
-            new ContractFunctionResult(transactionRecord.getContractCallResult()) :
-            transactionRecord.hasContractCreateResult() ?
-                new ContractFunctionResult(transactionRecord.getContractCreateResult()) :
-                null;
+        var contractFunctionResult = transactionRecord.hasContractCallResult()
+                ? new ContractFunctionResult(transactionRecord.getContractCallResult())
+                : transactionRecord.hasContractCreateResult()
+                        ? new ContractFunctionResult(transactionRecord.getContractCreateResult())
+                        : null;
 
-        var automaticTokenAssociations = new ArrayList<TokenAssociation>(transactionRecord.getAutomaticTokenAssociationsCount());
+        var automaticTokenAssociations =
+                new ArrayList<TokenAssociation>(transactionRecord.getAutomaticTokenAssociationsCount());
         for (var tokenAssociation : transactionRecord.getAutomaticTokenAssociationsList()) {
             automaticTokenAssociations.add(TokenAssociation.fromProtobuf(tokenAssociation));
         }
@@ -327,37 +312,37 @@ public final class TransactionRecord {
             paidStakingRewards.add(Transfer.fromProtobuf(reward));
         }
 
-        List<PendingAirdropRecord> pendingAirdropRecords = transactionRecord.getNewPendingAirdropsList()
-            .stream().map(PendingAirdropRecord::fromProtobuf)
-            .collect(Collectors.toList());
+        List<PendingAirdropRecord> pendingAirdropRecords = transactionRecord.getNewPendingAirdropsList().stream()
+                .map(PendingAirdropRecord::fromProtobuf)
+                .collect(Collectors.toList());
 
         return new TransactionRecord(
-            TransactionReceipt.fromProtobuf(transactionRecord.getReceipt(), transactionId),
-            transactionRecord.getTransactionHash(),
-            InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
-            TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
-            transactionRecord.getMemo(),
-            transactionRecord.getTransactionFee(),
-            contractFunctionResult,
-            transfers,
-            tokenTransfers,
-            tokenTransfersList,
-            tokenNftTransfers,
-            transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
-            fees,
-            automaticTokenAssociations,
-            aliasKey,
-            children,
-            duplicates,
-            transactionRecord.hasParentConsensusTimestamp() ?
-                InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp()) : null,
-            transactionRecord.getEthereumHash(),
-            paidStakingRewards,
-            transactionRecord.hasPrngBytes() ? transactionRecord.getPrngBytes() : null,
-            transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null,
-            transactionRecord.getEvmAddress(),
-            pendingAirdropRecords
-        );
+                TransactionReceipt.fromProtobuf(transactionRecord.getReceipt(), transactionId),
+                transactionRecord.getTransactionHash(),
+                InstantConverter.fromProtobuf(transactionRecord.getConsensusTimestamp()),
+                TransactionId.fromProtobuf(transactionRecord.getTransactionID()),
+                transactionRecord.getMemo(),
+                transactionRecord.getTransactionFee(),
+                contractFunctionResult,
+                transfers,
+                tokenTransfers,
+                tokenTransfersList,
+                tokenNftTransfers,
+                transactionRecord.hasScheduleRef() ? ScheduleId.fromProtobuf(transactionRecord.getScheduleRef()) : null,
+                fees,
+                automaticTokenAssociations,
+                aliasKey,
+                children,
+                duplicates,
+                transactionRecord.hasParentConsensusTimestamp()
+                        ? InstantConverter.fromProtobuf(transactionRecord.getParentConsensusTimestamp())
+                        : null,
+                transactionRecord.getEthereumHash(),
+                paidStakingRewards,
+                transactionRecord.hasPrngBytes() ? transactionRecord.getPrngBytes() : null,
+                transactionRecord.hasPrngNumber() ? transactionRecord.getPrngNumber() : null,
+                transactionRecord.getEvmAddress(),
+                pendingAirdropRecords);
     }
 
     /**
@@ -378,7 +363,8 @@ public final class TransactionRecord {
      * @throws InvalidProtocolBufferException when there is an issue with the protobuf
      */
     public static TransactionRecord fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(com.hiero.sdk.proto.TransactionRecord.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     /**
@@ -405,41 +391,39 @@ public final class TransactionRecord {
         }
 
         var transactionRecord = com.hiero.sdk.proto.TransactionRecord.newBuilder()
-            .setReceipt(receipt.toProtobuf())
-            .setTransactionHash(transactionHash)
-            .setConsensusTimestamp(InstantConverter.toProtobuf(consensusTimestamp))
-            .setTransactionID(transactionId.toProtobuf())
-            .setMemo(transactionMemo)
-            .setTransactionFee(transactionFee.toTinybars())
-            .setTransferList(transferList)
-            .setEthereumHash(ethereumHash)
-            .setEvmAddress(evmAddress);
+                .setReceipt(receipt.toProtobuf())
+                .setTransactionHash(transactionHash)
+                .setConsensusTimestamp(InstantConverter.toProtobuf(consensusTimestamp))
+                .setTransactionID(transactionId.toProtobuf())
+                .setMemo(transactionMemo)
+                .setTransactionFee(transactionFee.toTinybars())
+                .setTransferList(transferList)
+                .setEthereumHash(ethereumHash)
+                .setEvmAddress(evmAddress);
 
         for (var tokenEntry : tokenTransfers.entrySet()) {
-            var tokenTransfersList = TokenTransferList.newBuilder()
-                .setToken(tokenEntry.getKey().toProtobuf());
+            var tokenTransfersList =
+                    TokenTransferList.newBuilder().setToken(tokenEntry.getKey().toProtobuf());
             for (var aaEntry : tokenEntry.getValue().entrySet()) {
                 tokenTransfersList.addTransfers(AccountAmount.newBuilder()
-                    .setAccountID(aaEntry.getKey().toProtobuf())
-                    .setAmount(aaEntry.getValue()).build()
-                );
+                        .setAccountID(aaEntry.getKey().toProtobuf())
+                        .setAmount(aaEntry.getValue())
+                        .build());
             }
 
             transactionRecord.addTokenTransferLists(tokenTransfersList);
         }
 
         for (var nftEntry : tokenNftTransfers.entrySet()) {
-            var nftTransferList = TokenTransferList.newBuilder()
-                .setToken(nftEntry.getKey().toProtobuf());
+            var nftTransferList =
+                    TokenTransferList.newBuilder().setToken(nftEntry.getKey().toProtobuf());
             for (var aaEntry : nftEntry.getValue()) {
-                nftTransferList.addNftTransfers(
-                    NftTransfer.newBuilder()
+                nftTransferList.addNftTransfers(NftTransfer.newBuilder()
                         .setSenderAccountID(aaEntry.sender.toProtobuf())
                         .setReceiverAccountID(aaEntry.receiver.toProtobuf())
                         .setSerialNumber(aaEntry.serial)
                         .setIsApproval(aaEntry.isApproved)
-                        .build()
-                );
+                        .build());
             }
 
             transactionRecord.addTokenTransferLists(nftTransferList);
@@ -483,7 +467,8 @@ public final class TransactionRecord {
 
         if (pendingAirdropRecords != null) {
             for (PendingAirdropRecord pendingAirdropRecord : pendingAirdropRecords) {
-                transactionRecord.addNewPendingAirdrops(pendingAirdropRecords.indexOf(pendingAirdropRecord), pendingAirdropRecord.toProtobuf());
+                transactionRecord.addNewPendingAirdrops(
+                        pendingAirdropRecords.indexOf(pendingAirdropRecord), pendingAirdropRecord.toProtobuf());
             }
         }
 
@@ -493,30 +478,30 @@ public final class TransactionRecord {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("receipt", receipt)
-            .add("transactionHash", Hex.toHexString(transactionHash.toByteArray()))
-            .add("consensusTimestamp", consensusTimestamp)
-            .add("transactionId", transactionId)
-            .add("transactionMemo", transactionMemo)
-            .add("transactionFee", transactionFee)
-            .add("contractFunctionResult", contractFunctionResult)
-            .add("transfers", transfers)
-            .add("tokenTransfers", tokenTransfers)
-            .add("tokenNftTransfers", tokenNftTransfers)
-            .add("scheduleRef", scheduleRef)
-            .add("assessedCustomFees", assessedCustomFees)
-            .add("automaticTokenAssociations", automaticTokenAssociations)
-            .add("aliasKey", aliasKey)
-            .add("children", children)
-            .add("duplicates", duplicates)
-            .add("parentConsensusTimestamp", parentConsensusTimestamp)
-            .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
-            .add("paidStakingRewards", paidStakingRewards)
-            .add("prngBytes", prngBytes != null ? Hex.toHexString(prngBytes.toByteArray()) : null)
-            .add("prngNumber", prngNumber)
-            .add("evmAddress", Hex.toHexString(evmAddress.toByteArray()))
-            .add("pendingAirdropRecords", pendingAirdropRecords.toString())
-            .toString();
+                .add("receipt", receipt)
+                .add("transactionHash", Hex.toHexString(transactionHash.toByteArray()))
+                .add("consensusTimestamp", consensusTimestamp)
+                .add("transactionId", transactionId)
+                .add("transactionMemo", transactionMemo)
+                .add("transactionFee", transactionFee)
+                .add("contractFunctionResult", contractFunctionResult)
+                .add("transfers", transfers)
+                .add("tokenTransfers", tokenTransfers)
+                .add("tokenNftTransfers", tokenNftTransfers)
+                .add("scheduleRef", scheduleRef)
+                .add("assessedCustomFees", assessedCustomFees)
+                .add("automaticTokenAssociations", automaticTokenAssociations)
+                .add("aliasKey", aliasKey)
+                .add("children", children)
+                .add("duplicates", duplicates)
+                .add("parentConsensusTimestamp", parentConsensusTimestamp)
+                .add("ethereumHash", Hex.toHexString(ethereumHash.toByteArray()))
+                .add("paidStakingRewards", paidStakingRewards)
+                .add("prngBytes", prngBytes != null ? Hex.toHexString(prngBytes.toByteArray()) : null)
+                .add("prngNumber", prngNumber)
+                .add("evmAddress", Hex.toHexString(evmAddress.toByteArray()))
+                .add("pendingAirdropRecords", pendingAirdropRecords.toString())
+                .toString();
     }
 
     /**

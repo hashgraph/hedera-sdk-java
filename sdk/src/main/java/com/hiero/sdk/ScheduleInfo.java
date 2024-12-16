@@ -1,30 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hiero.sdk.proto.SchedulableTransactionBody;
-import com.hiero.sdk.proto.ScheduleGetInfoResponse;
 import java.time.Instant;
-
 import javax.annotation.Nullable;
 
 /**
@@ -130,20 +110,19 @@ public final class ScheduleInfo {
      * @param waitForExpiry             the wait for expiry field
      */
     ScheduleInfo(
-        ScheduleId scheduleId,
-        AccountId creatorAccountId,
-        AccountId payerAccountId,
-        SchedulableTransactionBody transactionBody,
-        KeyList signers,
-        @Nullable Key adminKey,
-        @Nullable TransactionId scheduledTransactionId,
-        String memo,
-        @Nullable Instant expirationTime,
-        @Nullable Instant executed,
-        @Nullable Instant deleted,
-        LedgerId ledgerId,
-        boolean waitForExpiry
-    ) {
+            ScheduleId scheduleId,
+            AccountId creatorAccountId,
+            AccountId payerAccountId,
+            SchedulableTransactionBody transactionBody,
+            KeyList signers,
+            @Nullable Key adminKey,
+            @Nullable TransactionId scheduledTransactionId,
+            String memo,
+            @Nullable Instant expirationTime,
+            @Nullable Instant executed,
+            @Nullable Instant deleted,
+            LedgerId ledgerId,
+            boolean waitForExpiry) {
         this.scheduleId = scheduleId;
         this.creatorAccountId = creatorAccountId;
         this.payerAccountId = payerAccountId;
@@ -170,25 +149,23 @@ public final class ScheduleInfo {
         var creatorAccountId = AccountId.fromProtobuf(info.getCreatorAccountID());
         var payerAccountId = AccountId.fromProtobuf(info.getPayerAccountID());
         var adminKey = info.hasAdminKey() ? Key.fromProtobufKey(info.getAdminKey()) : null;
-        var scheduledTransactionId = info.hasScheduledTransactionID() ?
-            TransactionId.fromProtobuf(info.getScheduledTransactionID()) :
-            null;
+        var scheduledTransactionId =
+                info.hasScheduledTransactionID() ? TransactionId.fromProtobuf(info.getScheduledTransactionID()) : null;
 
         return new ScheduleInfo(
-            scheduleId,
-            creatorAccountId,
-            payerAccountId,
-            info.getScheduledTransactionBody(),
-            KeyList.fromProtobuf(info.getSigners(), null),
-            adminKey,
-            scheduledTransactionId,
-            info.getMemo(),
-            info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null,
-            info.hasExecutionTime() ? InstantConverter.fromProtobuf(info.getExecutionTime()) : null,
-            info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null,
-            LedgerId.fromByteString(info.getLedgerId()),
-            info.getWaitForExpiry()
-        );
+                scheduleId,
+                creatorAccountId,
+                payerAccountId,
+                info.getScheduledTransactionBody(),
+                KeyList.fromProtobuf(info.getSigners(), null),
+                adminKey,
+                scheduledTransactionId,
+                info.getMemo(),
+                info.hasExpirationTime() ? InstantConverter.fromProtobuf(info.getExpirationTime()) : null,
+                info.hasExecutionTime() ? InstantConverter.fromProtobuf(info.getExecutionTime()) : null,
+                info.hasDeletionTime() ? InstantConverter.fromProtobuf(info.getDeletionTime()) : null,
+                LedgerId.fromByteString(info.getLedgerId()),
+                info.getWaitForExpiry());
     }
 
     /**
@@ -199,7 +176,8 @@ public final class ScheduleInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(com.hiero.sdk.proto.ScheduleInfo.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(
+                com.hiero.sdk.proto.ScheduleInfo.parseFrom(bytes).toBuilder().build());
     }
 
     /**
@@ -230,16 +208,15 @@ public final class ScheduleInfo {
             info.setDeletionTime(InstantConverter.toProtobuf(deletedAt));
         }
 
-        return info
-            .setScheduleID(scheduleId.toProtobuf())
-            .setCreatorAccountID(creatorAccountId.toProtobuf())
-            .setScheduledTransactionBody(transactionBody)
-            .setPayerAccountID(payerAccountId.toProtobuf())
-            .setSigners(signatories.toProtobuf())
-            .setMemo(memo)
-            .setLedgerId(ledgerId.toByteString())
-            .setWaitForExpiry(waitForExpiry)
-            .build();
+        return info.setScheduleID(scheduleId.toProtobuf())
+                .setCreatorAccountID(creatorAccountId.toProtobuf())
+                .setScheduledTransactionBody(transactionBody)
+                .setPayerAccountID(payerAccountId.toProtobuf())
+                .setSigners(signatories.toProtobuf())
+                .setMemo(memo)
+                .setLedgerId(ledgerId.toByteString())
+                .setWaitForExpiry(waitForExpiry)
+                .build();
     }
 
     /**
@@ -254,19 +231,19 @@ public final class ScheduleInfo {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("scheduleId", scheduleId)
-            .add("scheduledTransactionId", scheduledTransactionId)
-            .add("creatorAccountId", creatorAccountId)
-            .add("payerAccountId", payerAccountId)
-            .add("signatories", signatories)
-            .add("adminKey", adminKey)
-            .add("expirationTime", expirationTime)
-            .add("memo", memo)
-            .add("executedAt", executedAt)
-            .add("deletedAt", deletedAt)
-            .add("ledgerId", ledgerId)
-            .add("waitForExpiry", waitForExpiry)
-            .toString();
+                .add("scheduleId", scheduleId)
+                .add("scheduledTransactionId", scheduledTransactionId)
+                .add("creatorAccountId", creatorAccountId)
+                .add("payerAccountId", payerAccountId)
+                .add("signatories", signatories)
+                .add("adminKey", adminKey)
+                .add("expirationTime", expirationTime)
+                .add("memo", memo)
+                .add("executedAt", executedAt)
+                .add("deletedAt", deletedAt)
+                .add("ledgerId", ledgerId)
+                .add("waitForExpiry", waitForExpiry)
+                .toString();
     }
 
     /**

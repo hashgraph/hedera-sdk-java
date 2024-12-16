@@ -1,50 +1,22 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Client;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.HbarUnit;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.PublicKeyED25519;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.TransferTransaction;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
-
-import java.math.BigDecimal;
-import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
+import java.math.BigDecimal;
+import java.util.Collections;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
 class Ed25519PublicKeyTest {
-    private static final String TEST_KEY_STR = "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
+    private static final String TEST_KEY_STR =
+            "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
     private static final String TEST_KEY_STR_RAW = "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7";
 
     @Test
@@ -66,19 +38,47 @@ class Ed25519PublicKeyTest {
         Assertions.assertDoesNotThrow(() -> PublicKey.fromBytes(invalidKeyED25519));
         assertDoesNotThrow(() -> PublicKey.fromBytesED25519(invalidKeyED25519));
 
-        byte[] invalidKey = new byte[]{
+        byte[] invalidKey = new byte[] {
             0x00,
-            (byte) 0xca, (byte) 0x35, 0x4b, 0x7c, (byte) 0xf4, (byte) 0x87, (byte) 0xd1, (byte) 0xbc, 0x43,
-            0x5a, 0x25, 0x66, 0x77, 0x09, (byte) 0xc1, (byte) 0xab, (byte) 0x98, 0x0c, 0x11, 0x4d,
-            0x35, (byte) 0x94, (byte) 0xe6, 0x25, (byte) 0x9e, (byte) 0x81, 0x2e, 0x6a, 0x70, 0x3d,
-            0x4f, 0x51
+            (byte) 0xca,
+            (byte) 0x35,
+            0x4b,
+            0x7c,
+            (byte) 0xf4,
+            (byte) 0x87,
+            (byte) 0xd1,
+            (byte) 0xbc,
+            0x43,
+            0x5a,
+            0x25,
+            0x66,
+            0x77,
+            0x09,
+            (byte) 0xc1,
+            (byte) 0xab,
+            (byte) 0x98,
+            0x0c,
+            0x11,
+            0x4d,
+            0x35,
+            (byte) 0x94,
+            (byte) 0xe6,
+            0x25,
+            (byte) 0x9e,
+            (byte) 0x81,
+            0x2e,
+            0x6a,
+            0x70,
+            0x3d,
+            0x4f,
+            0x51
         };
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesED25519(invalidKey));
+                .isThrownBy(() -> PublicKey.fromBytesED25519(invalidKey));
 
-        byte[] malformedKey = new byte[]{0x00, 0x01, 0x02};
+        byte[] malformedKey = new byte[] {0x00, 0x01, 0x02};
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> PublicKey.fromBytesED25519(malformedKey));
+                .isThrownBy(() -> PublicKey.fromBytesED25519(malformedKey));
 
         byte[] validKey = PrivateKey.generateED25519().getPublicKey().toBytes();
         assertDoesNotThrow(() -> PublicKey.fromBytesED25519(validKey));
@@ -133,11 +133,10 @@ class Ed25519PublicKeyTest {
         var receiverAccount = AccountId.fromString("0.0.3");
         var transferAmount = Hbar.from(new BigDecimal("0.0001"), HbarUnit.HBAR);
         var privateKey = PrivateKey.generateED25519();
-        var client = Client.forTestnet()
-            .setOperator(senderAccount, privateKey);
+        var client = Client.forTestnet().setOperator(senderAccount, privateKey);
         var tx = new TransferTransaction()
-            .addHbarTransfer(senderAccount, transferAmount.negated())
-            .addHbarTransfer(receiverAccount, transferAmount);
+                .addHbarTransfer(senderAccount, transferAmount.negated())
+                .addHbarTransfer(receiverAccount, transferAmount);
 
         tx.freezeWith(client);
         tx.signWithOperator(client);
@@ -195,12 +194,13 @@ class Ed25519PublicKeyTest {
 
     @ParameterizedTest
     @DisplayName("public key can be recovered from external string")
-    @ValueSource(strings = {
-        // ASN1 encoded hex
-        "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
-        // raw hex
-        "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
-    })
+    @ValueSource(
+            strings = {
+                // ASN1 encoded hex
+                "302a300506032b6570032100e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
+                // raw hex
+                "e0c8ec2758a5879ffac226a13c0c516b799e72e35141a0dd828f94d37988a4b7",
+            })
     void externalKeyDeserialize(String keyStr) {
         PublicKey key = PublicKey.fromString(keyStr);
         assertThat(key).isNotNull();
@@ -239,7 +239,8 @@ class Ed25519PublicKeyTest {
     @DisplayName("DER import test vectors")
     void DERImportTestVectors() {
         // https://github.com/hashgraph/hedera-sdk-reference/issues/93#issue-1665972122
-        var PUBLIC_KEY_DER1 = "302a300506032b65700321008ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
+        var PUBLIC_KEY_DER1 =
+                "302a300506032b65700321008ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
         var PUBLIC_KEY1 = "8ccd31b53d1835b467aac795dab19b274dd3b37e3daf12fcec6bc02bac87b53d";
 
         var ed25519PublicKey1 = PublicKey.fromStringDER(PUBLIC_KEY_DER1);

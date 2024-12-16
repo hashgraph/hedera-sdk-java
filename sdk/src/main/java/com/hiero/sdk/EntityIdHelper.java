@@ -1,27 +1,8 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -53,16 +34,15 @@ public class EntityIdHelper {
      */
     static final int SOLIDITY_ADDRESS_LEN_HEX = SOLIDITY_ADDRESS_LEN * 2;
 
-    private static final Pattern ENTITY_ID_REGEX = Pattern.compile(
-        "(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
+    private static final Pattern ENTITY_ID_REGEX =
+            Pattern.compile("(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([a-z]{5}))?$");
 
     static final Duration MIRROR_NODE_CONNECTION_TIMEOUT = Duration.ofSeconds(30);
 
     /**
      * Constructor.
      */
-    private EntityIdHelper() {
-    }
+    private EntityIdHelper() {}
 
     /**
      * Generate an R object from a string.
@@ -76,14 +56,13 @@ public class EntityIdHelper {
         var match = ENTITY_ID_REGEX.matcher(idString);
         if (!match.find()) {
             throw new IllegalArgumentException(
-                "Invalid ID \"" + idString + "\": format should look like 0.0.123 or 0.0.123-vfmkw"
-            );
+                    "Invalid ID \"" + idString + "\": format should look like 0.0.123 or 0.0.123-vfmkw");
         }
         return constructObjectWithIdNums.apply(
-            Long.parseLong(match.group(1)),
-            Long.parseLong(match.group(2)),
-            Long.parseLong(match.group(3)),
-            match.group(4));
+                Long.parseLong(match.group(1)),
+                Long.parseLong(match.group(2)),
+                Long.parseLong(match.group(3)),
+                match.group(4));
     }
 
     /**
@@ -100,8 +79,7 @@ public class EntityIdHelper {
 
     private static <R> R fromSolidityAddress(byte[] address, WithIdNums<R> withAddress) {
         if (address.length != SOLIDITY_ADDRESS_LEN) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
+            throw new IllegalArgumentException("Solidity addresses must be 20 bytes or 40 hex chars");
         }
 
         var buf = ByteBuffer.wrap(address);
@@ -118,8 +96,7 @@ public class EntityIdHelper {
         address = address.startsWith("0x") ? address.substring(2) : address;
 
         if (address.length() != SOLIDITY_ADDRESS_LEN_HEX) {
-            throw new IllegalArgumentException(
-                "Solidity addresses must be 20 bytes or 40 hex chars");
+            throw new IllegalArgumentException("Solidity addresses must be 20 bytes or 40 hex chars");
         }
 
         try {
@@ -142,8 +119,7 @@ public class EntityIdHelper {
             throw new IllegalStateException("shard out of 32-bit range " + shard);
         }
 
-        return Hex.toHexString(
-            ByteBuffer.allocate(20)
+        return Hex.toHexString(ByteBuffer.allocate(20)
                 .putInt((int) shard)
                 .putLong(realm)
                 .putLong(num)
@@ -159,7 +135,8 @@ public class EntityIdHelper {
      */
     static String checksum(LedgerId ledgerId, String addr) {
         StringBuilder answer = new StringBuilder();
-        List<Integer> d = new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
+        List<Integer> d =
+                new ArrayList<>(); // Digits with 10 for ".", so if addr == "0.0.123" then d == [0, 10, 0, 10, 1, 2, 3]
         long s0 = 0; // Sum of even positions (mod 11)
         long s1 = 0; // Sum of odd positions (mod 11)
         long s = 0; // Weighted sum of all positions (mod p3)
@@ -169,7 +146,7 @@ public class EntityIdHelper {
         long p3 = 26 * 26 * 26; // 3 digits in base 26
         long p5 = 26 * 26 * 26 * 26 * 26; // 5 digits in base 26
         long asciiA = Character.codePointAt("a", 0); // 97
-        long m = 1_000_003; //min prime greater than a million. Used for the final permutation.
+        long m = 1_000_003; // min prime greater than a million. Used for the final permutation.
         long w = 31; // Sum s of digit values weights them by powers of w. Should be coprime to p5.
 
         List<Byte> h = new ArrayList<>(ledgerId.toBytes().length + 6);
@@ -216,16 +193,14 @@ public class EntityIdHelper {
      * @throws BadEntityIdException
      */
     static void validate(long shard, long realm, long num, Client client, @Nullable String checksum)
-        throws BadEntityIdException {
+            throws BadEntityIdException {
         if (client.getNetworkName() == null) {
             throw new IllegalStateException(
-                "Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
+                    "Can't validate checksum without knowing which network the ID is for.  Ensure client's network name is set.");
         }
         if (checksum != null) {
-            String expectedChecksum = EntityIdHelper.checksum(
-                client.getLedgerId(),
-                EntityIdHelper.toString(shard, realm, num)
-            );
+            String expectedChecksum =
+                    EntityIdHelper.checksum(client.getLedgerId(), EntityIdHelper.toString(shard, realm, num));
             if (!checksum.equals(expectedChecksum)) {
                 throw new BadEntityIdException(shard, realm, num, checksum, expectedChecksum);
             }
@@ -256,11 +231,11 @@ public class EntityIdHelper {
      */
     static String toStringWithChecksum(long shard, long realm, long num, Client client, @Nullable String checksum) {
         if (client.getLedgerId() != null) {
-            return "" + shard + "." + realm + "." + num + "-" + checksum(client.getLedgerId(),
-                EntityIdHelper.toString(shard, realm, num));
+            return "" + shard + "." + realm + "." + num + "-"
+                    + checksum(client.getLedgerId(), EntityIdHelper.toString(shard, realm, num));
         } else {
             throw new IllegalStateException(
-                "Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's ledgerId is set.");
+                    "Can't derive checksum for ID without knowing which network the ID is for.  Ensure client's ledgerId is set.");
         }
     }
 
@@ -290,8 +265,7 @@ public class EntityIdHelper {
     static CompletableFuture<Long> getAccountNumFromMirrorNodeAsync(Client client, String evmAddress) {
         String apiEndpoint = "/accounts/" + evmAddress;
         return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
-            .thenApply(response ->
-                parseNumFromMirrorNodeResponse(response, "account"));
+                .thenApply(response -> parseNumFromMirrorNodeResponse(response, "account"));
     }
 
     /**
@@ -306,8 +280,7 @@ public class EntityIdHelper {
     public static CompletableFuture<EvmAddress> getEvmAddressFromMirrorNodeAsync(Client client, long num) {
         String apiEndpoint = "/accounts/" + num;
         return performQueryToMirrorNodeAsync(client, apiEndpoint, null, false)
-            .thenApply(response ->
-                EvmAddress.fromString(parseStringMirrorNodeResponse(response, "evm_address")));
+                .thenApply(response -> EvmAddress.fromString(parseStringMirrorNodeResponse(response, "evm_address")));
     }
 
     /**
@@ -324,23 +297,21 @@ public class EntityIdHelper {
 
         CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
 
-        return responseFuture.thenApply(response ->
-            parseNumFromMirrorNodeResponse(response, "contract_id"));
+        return responseFuture.thenApply(response -> parseNumFromMirrorNodeResponse(response, "contract_id"));
     }
-
 
     public static CompletableFuture<String> getContractAddressFromMirrorNodeAsync(Client client, String id) {
         String apiEndpoint = "/contracts/" + id;
         CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
 
-        return responseFuture.thenApply(response ->
-            parseStringMirrorNodeResponse(response, "evm_address"));
+        return responseFuture.thenApply(response -> parseStringMirrorNodeResponse(response, "evm_address"));
     }
 
-    static CompletableFuture<String> performQueryToMirrorNodeAsync(Client client, String apiEndpoint, String jsonBody, boolean isContractCall) {
+    static CompletableFuture<String> performQueryToMirrorNodeAsync(
+            Client client, String apiEndpoint, String jsonBody, boolean isContractCall) {
         Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
-            .map(url -> url.substring(0, url.indexOf(":")))
-            .findFirst();
+                .map(url -> url.substring(0, url.indexOf(":")))
+                .findFirst();
 
         if (mirrorUrl.isEmpty()) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Mirror URL not found"));
@@ -357,32 +328,33 @@ public class EntityIdHelper {
         }
 
         HttpClient httpClient = HttpClient.newHttpClient();
-        var httpBuilder = HttpRequest.newBuilder()
-            .timeout(MIRROR_NODE_CONNECTION_TIMEOUT)
-            .uri(URI.create(apiUrl));
+        var httpBuilder =
+                HttpRequest.newBuilder().timeout(MIRROR_NODE_CONNECTION_TIMEOUT).uri(URI.create(apiUrl));
 
         if (jsonBody != null) {
-            httpBuilder.header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(jsonBody));
+            httpBuilder.header("Content-Type", "application/json").POST(HttpRequest.BodyPublishers.ofString(jsonBody));
         }
         var httpRequest = httpBuilder.build();
 
-        return httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
-            .handle((response, ex) -> {
-                if (ex != null) {
-                    if (ex instanceof HttpTimeoutException) {
-                        throw new CompletionException(new RuntimeException("Request to Mirror Node timed out", ex));
-                    } else {
-                        throw new CompletionException(new RuntimeException("Failed to send request to Mirror Node", ex));
+        return httpClient
+                .sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString())
+                .handle((response, ex) -> {
+                    if (ex != null) {
+                        if (ex instanceof HttpTimeoutException) {
+                            throw new CompletionException(new RuntimeException("Request to Mirror Node timed out", ex));
+                        } else {
+                            throw new CompletionException(
+                                    new RuntimeException("Failed to send request to Mirror Node", ex));
+                        }
                     }
-                }
 
-                int statusCode = response.statusCode();
-                if (statusCode != 200) {
-                    throw new CompletionException(new RuntimeException("Received non-200 response from Mirror Node: " + response.body()));
-                }
-                return response.body();
-            });
+                    int statusCode = response.statusCode();
+                    if (statusCode != 200) {
+                        throw new CompletionException(
+                                new RuntimeException("Received non-200 response from Mirror Node: " + response.body()));
+                    }
+                    return response.body();
+                });
     }
 
     private static String parseStringMirrorNodeResponse(String responseBody, String memberName) {

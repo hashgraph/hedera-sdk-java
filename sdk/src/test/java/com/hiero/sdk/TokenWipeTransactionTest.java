@@ -1,51 +1,24 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
-
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Hbar;
-import com.hiero.sdk.PrivateKey;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TokenWipeTransaction;
-import com.hiero.sdk.Transaction;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.proto.SchedulableTransactionBody;
-import com.hiero.sdk.proto.TokenWipeAccountTransactionBody;
-import com.hiero.sdk.proto.TransactionBody;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.hiero.sdk.proto.SchedulableTransactionBody;
+import com.hiero.sdk.proto.TokenWipeAccountTransactionBody;
+import com.hiero.sdk.proto.TransactionBody;
+import io.github.jsonSnapshot.SnapshotMatcher;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TokenWipeTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
-        "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+            "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
     private static final AccountId testAccountId = AccountId.fromString("0.6.9");
     private static final TokenId testTokenId = TokenId.fromString("4.2.0");
     private static final long testAmount = 4L;
@@ -64,9 +37,7 @@ public class TokenWipeTransactionTest {
 
     @Test
     void shouldSerializeFungible() {
-        SnapshotMatcher.expect(spawnTestTransaction()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransaction().toString()).toMatchSnapshot();
     }
 
     @Test
@@ -78,34 +49,32 @@ public class TokenWipeTransactionTest {
 
     private TokenWipeTransaction spawnTestTransaction() {
         return new TokenWipeTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("0.0.111"))
-            .setAccountId(testAccountId)
-            .setAmount(testAmount)
-            .setSerials(testSerialNumbers)
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(TokenId.fromString("0.0.111"))
+                .setAccountId(testAccountId)
+                .setAmount(testAmount)
+                .setSerials(testSerialNumbers)
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
     void shouldSerializeNft() {
-        SnapshotMatcher.expect(spawnTestTransactionNft()
-            .toString()
-        ).toMatchSnapshot();
+        SnapshotMatcher.expect(spawnTestTransactionNft().toString()).toMatchSnapshot();
     }
 
     private TokenWipeTransaction spawnTestTransactionNft() {
         return new TokenWipeTransaction()
-            .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
-            .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-            .setTokenId(TokenId.fromString("0.0.111"))
-            .setAccountId(testAccountId)
-            .setSerials(Collections.singletonList(444L))
-            .setMaxTransactionFee(new Hbar(1))
-            .freeze()
-            .sign(unusedPrivateKey);
+                .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
+                .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
+                .setTokenId(TokenId.fromString("0.0.111"))
+                .setAccountId(testAccountId)
+                .setSerials(Collections.singletonList(444L))
+                .setMaxTransactionFee(new Hbar(1))
+                .freeze()
+                .sign(unusedPrivateKey);
     }
 
     @Test
@@ -125,8 +94,8 @@ public class TokenWipeTransactionTest {
     @Test
     void fromScheduledTransaction() {
         var transactionBody = SchedulableTransactionBody.newBuilder()
-            .setTokenWipe(TokenWipeAccountTransactionBody.newBuilder().build())
-            .build();
+                .setTokenWipe(TokenWipeAccountTransactionBody.newBuilder().build())
+                .build();
 
         var tx = Transaction.fromScheduledTransaction(transactionBody);
 
@@ -135,9 +104,12 @@ public class TokenWipeTransactionTest {
 
     @Test
     void constructTokenWipeTransactionFromTransactionBodyProtobuf() {
-        var transactionBody = TokenWipeAccountTransactionBody.newBuilder().setToken(testTokenId.toProtobuf())
-            .setAccount(testAccountId.toProtobuf()).setAmount(testAmount).addAllSerialNumbers(testSerialNumbers)
-            .build();
+        var transactionBody = TokenWipeAccountTransactionBody.newBuilder()
+                .setToken(testTokenId.toProtobuf())
+                .setAccount(testAccountId.toProtobuf())
+                .setAmount(testAmount)
+                .addAllSerialNumbers(testSerialNumbers)
+                .build();
 
         var txBody = TransactionBody.newBuilder().setTokenWipe(transactionBody).build();
         var tokenWipeTransaction = new TokenWipeTransaction(txBody);

@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,10 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.Client;
-import com.hiero.sdk.MirrorNetwork;
-import com.hiero.sdk.Network;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +52,9 @@ public class ClientCloseTest {
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
         var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
-        assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("network timeout");
+        assertThatExceptionOfType(TimeoutException.class)
+                .isThrownBy(client::close)
+                .withMessage("network timeout");
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
     }
 
@@ -68,7 +67,9 @@ public class ClientCloseTest {
         var mirrorNetwork = MirrorNetwork.forNetwork(executor, Collections.emptyList());
         var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(client::close)
+                .withCause(interruptedException);
         assertThat(mirrorNetwork.hasShutDownNow).isTrue();
     }
 
@@ -80,7 +81,9 @@ public class ClientCloseTest {
         when(mirrorNetwork.awaitClose(any(), any())).thenReturn(new TimeoutException("mirror timeout"));
         var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
-        assertThatExceptionOfType(TimeoutException.class).isThrownBy(client::close).withMessage("mirror timeout");
+        assertThatExceptionOfType(TimeoutException.class)
+                .isThrownBy(client::close)
+                .withMessage("mirror timeout");
         assertThat(network.hasShutDownNow).isFalse();
     }
 
@@ -93,7 +96,9 @@ public class ClientCloseTest {
         when(mirrorNetwork.awaitClose(any(), any())).thenReturn(interruptedException);
         var client = new Client(executor, network, mirrorNetwork, null, true, null);
 
-        assertThatExceptionOfType(RuntimeException.class).isThrownBy(client::close).withCause(interruptedException);
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(client::close)
+                .withCause(interruptedException);
         assertThat(network.hasShutDownNow).isFalse();
     }
 
@@ -156,7 +161,7 @@ public class ClientCloseTest {
         var network = Network.forNetwork(executor, Collections.emptyMap());
 
         assertThatExceptionOfType(IllegalStateException.class)
-            .isThrownBy(network::getRandomNode)
-            .withMessage("No healthy node was found");
+                .isThrownBy(network::getRandomNode)
+                .withMessage("No healthy node was found");
     }
 }

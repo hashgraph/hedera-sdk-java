@@ -1,31 +1,20 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.google.protobuf.ByteString;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.ContractId;
-import com.hiero.sdk.ExchangeRate;
-import com.hiero.sdk.FileId;
-import com.hiero.sdk.ScheduleId;
-import com.hiero.sdk.Status;
-import com.hiero.sdk.TokenId;
-import com.hiero.sdk.TopicId;
-import com.hiero.sdk.TransactionId;
-import com.hiero.sdk.TransactionReceipt;
-import io.github.jsonSnapshot.SnapshotMatcher;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
+import com.google.protobuf.ByteString;
+import io.github.jsonSnapshot.SnapshotMatcher;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class TransactionReceiptTest {
-    final static Instant time = Instant.ofEpochSecond(1554158542);
+    static final Instant time = Instant.ofEpochSecond(1554158542);
 
     @BeforeAll
     public static void beforeAll() {
@@ -39,24 +28,23 @@ public class TransactionReceiptTest {
 
     static TransactionReceipt spawnReceiptExample() {
         return new TransactionReceipt(
-            null,
-            Status.SCHEDULE_ALREADY_DELETED,
-            new ExchangeRate(3, 4, time),
-            AccountId.fromString("1.2.3"),
-            FileId.fromString("4.5.6"),
-            ContractId.fromString("3.2.1"),
-            TopicId.fromString("9.8.7"),
-            TokenId.fromString("6.5.4"),
-            3L,
-            ByteString.copyFrom("how now brown cow", StandardCharsets.UTF_8),
-            30L,
-            ScheduleId.fromString("1.1.1"),
-            TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
-            List.of(1L, 2L, 3L),
-            1,
-            new ArrayList<>(),
-            new ArrayList<>()
-        );
+                null,
+                Status.SCHEDULE_ALREADY_DELETED,
+                new ExchangeRate(3, 4, time),
+                AccountId.fromString("1.2.3"),
+                FileId.fromString("4.5.6"),
+                ContractId.fromString("3.2.1"),
+                TopicId.fromString("9.8.7"),
+                TokenId.fromString("6.5.4"),
+                3L,
+                ByteString.copyFrom("how now brown cow", StandardCharsets.UTF_8),
+                30L,
+                ScheduleId.fromString("1.1.1"),
+                TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
+                List.of(1L, 2L, 3L),
+                1,
+                new ArrayList<>(),
+                new ArrayList<>());
     }
 
     @Test

@@ -1,27 +1,8 @@
-/*-
- *
- * Hedera C++ SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License")
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.CustomFixedFee;
-import com.hiero.sdk.CustomRoyaltyFee;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.hiero.sdk.proto.FixedFee;
 import com.hiero.sdk.proto.Fraction;
 import com.hiero.sdk.proto.RoyaltyFee;
@@ -29,8 +10,6 @@ import io.github.jsonSnapshot.SnapshotMatcher;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomRoyaltyFeeTest {
     private static final boolean allCollectorsAreExempt = true;
@@ -40,9 +19,10 @@ public class CustomRoyaltyFeeTest {
     private static final CustomFixedFee fallbackFee = new CustomFixedFee().setAmount(6);
 
     private final RoyaltyFee fee = RoyaltyFee.newBuilder()
-        .setExchangeValueFraction(Fraction.newBuilder().setNumerator(numerator).setDenominator(denominator))
-        .setFallbackFee(FixedFee.newBuilder().setAmount(6).build())
-        .build();
+            .setExchangeValueFraction(
+                    Fraction.newBuilder().setNumerator(numerator).setDenominator(denominator))
+            .setFallbackFee(FixedFee.newBuilder().setAmount(6).build())
+            .build();
 
     @BeforeAll
     public static void beforeAll() {
@@ -62,8 +42,8 @@ public class CustomRoyaltyFeeTest {
     @Test
     void deepCloneSubclass() {
         var customRoyaltyFee = new CustomRoyaltyFee()
-            .setFeeCollectorAccountId(feeCollectorAccountId)
-            .setAllCollectorsAreExempt(allCollectorsAreExempt);
+                .setFeeCollectorAccountId(feeCollectorAccountId)
+                .setAllCollectorsAreExempt(allCollectorsAreExempt);
         var clonedCustomRoyaltyFee = customRoyaltyFee.deepCloneSubclass();
 
         assertThat(clonedCustomRoyaltyFee.getFeeCollectorAccountId()).isEqualTo(feeCollectorAccountId);
@@ -72,7 +52,8 @@ public class CustomRoyaltyFeeTest {
 
     @Test
     void toProtobuf() {
-        SnapshotMatcher.expect(CustomRoyaltyFee.fromProtobuf(fee).toProtobuf().toString()).toMatchSnapshot();
+        SnapshotMatcher.expect(CustomRoyaltyFee.fromProtobuf(fee).toProtobuf().toString())
+                .toMatchSnapshot();
     }
 
     @Test

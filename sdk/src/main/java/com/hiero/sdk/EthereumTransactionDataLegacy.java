@@ -1,32 +1,13 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2022 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.esaulpaugh.headlong.rlp.RLPDecoder;
 import com.esaulpaugh.headlong.rlp.RLPEncoder;
 import com.esaulpaugh.headlong.rlp.RLPItem;
 import com.google.common.base.MoreObjects;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.math.BigInteger;
 import java.util.List;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * The ethereum transaction data, in the legacy format
@@ -36,7 +17,7 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
     /**
      * ID of the chain
      */
-    public byte[] chainId = new byte[]{};
+    public byte[] chainId = new byte[] {};
 
     /**
      * Transaction's nonce
@@ -84,16 +65,15 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
     public byte[] s;
 
     EthereumTransactionDataLegacy(
-        byte[] nonce,
-        byte[] gasPrice,
-        byte[] gasLimit,
-        byte[] to,
-        byte[] value,
-        byte[] callData,
-        byte[] v,
-        byte[] r,
-        byte[] s
-    ) {
+            byte[] nonce,
+            byte[] gasPrice,
+            byte[] gasLimit,
+            byte[] to,
+            byte[] value,
+            byte[] callData,
+            byte[] v,
+            byte[] r,
+            byte[] s) {
         super(callData);
 
         this.nonce = nonce;
@@ -129,16 +109,15 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
         }
 
         return new EthereumTransactionDataLegacy(
-            rlpList.get(0).data(),
-            rlpList.get(1).asBytes(),
-            rlpList.get(2).data(),
-            rlpList.get(3).data(),
-            rlpList.get(4).data(),
-            rlpList.get(5).data(),
-            rlpList.get(6).asBytes(),
-            rlpList.get(7).data(),
-            rlpList.get(8).data()
-        );
+                rlpList.get(0).data(),
+                rlpList.get(1).asBytes(),
+                rlpList.get(2).data(),
+                rlpList.get(3).data(),
+                rlpList.get(4).data(),
+                rlpList.get(5).data(),
+                rlpList.get(6).asBytes(),
+                rlpList.get(7).data(),
+                rlpList.get(8).data());
     }
 
     public byte[] toBytes() {
@@ -147,16 +126,16 @@ public class EthereumTransactionDataLegacy extends EthereumTransactionData {
 
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("chainId", Hex.toHexString(this.chainId))
-            .add("nonce", Hex.toHexString(this.nonce))
-            .add("gasPrice", Hex.toHexString(this.gasPrice))
-            .add("gasLimit", Hex.toHexString(this.gasLimit))
-            .add("to", Hex.toHexString(this.to))
-            .add("value", Hex.toHexString(this.value))
-            .add("recoveryId", this.recoveryId)
-            .add("v", Hex.toHexString(this.v))
-            .add("r", Hex.toHexString(this.r))
-            .add("s", Hex.toHexString(this.s))
-            .toString();
+                .add("chainId", Hex.toHexString(this.chainId))
+                .add("nonce", Hex.toHexString(this.nonce))
+                .add("gasPrice", Hex.toHexString(this.gasPrice))
+                .add("gasLimit", Hex.toHexString(this.gasLimit))
+                .add("to", Hex.toHexString(this.to))
+                .add("value", Hex.toHexString(this.value))
+                .add("recoveryId", this.recoveryId)
+                .add("v", Hex.toHexString(this.v))
+                .add("r", Hex.toHexString(this.r))
+                .add("s", Hex.toHexString(this.s))
+                .toString();
     }
 }

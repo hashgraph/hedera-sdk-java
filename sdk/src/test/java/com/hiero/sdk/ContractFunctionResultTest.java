@@ -1,58 +1,36 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;
-import com.hiero.sdk.AccountId;
-import com.hiero.sdk.ContractFunctionResult;
-import com.hiero.sdk.ContractId;
-import com.hiero.sdk.ContractNonceInfo;
+import java.math.BigInteger;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigInteger;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ContractFunctionResultTest {
     static final String CALL_RESULT_HEX = "00000000000000000000000000000000000000000000000000000000ffffffff"
-        + "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-        + "00000000000000000000000011223344556677889900aabbccddeeff00112233"
-        + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
-        + "00000000000000000000000000000000000000000000000000000000000000c0"
-        + "0000000000000000000000000000000000000000000000000000000000000100"
-        + "000000000000000000000000000000000000000000000000000000000000000d"
-        + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
-        + "0000000000000000000000000000000000000000000000000000000000000014"
-        + "48656c6c6f2c20776f726c642c20616761696e21000000000000000000000000";
+            + "7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            + "00000000000000000000000011223344556677889900aabbccddeeff00112233"
+            + "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+            + "00000000000000000000000000000000000000000000000000000000000000c0"
+            + "0000000000000000000000000000000000000000000000000000000000000100"
+            + "000000000000000000000000000000000000000000000000000000000000000d"
+            + "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
+            + "0000000000000000000000000000000000000000000000000000000000000014"
+            + "48656c6c6f2c20776f726c642c20616761696e21000000000000000000000000";
 
-    private static final String STRING_ARRAY_RESULT_HEX = "0000000000000000000000000000000000000000000000000000000000000020"
-        + "0000000000000000000000000000000000000000000000000000000000000002"
-        + "0000000000000000000000000000000000000000000000000000000000000040"
-        + "0000000000000000000000000000000000000000000000000000000000000080"
-        + "000000000000000000000000000000000000000000000000000000000000000C"
-        + "72616E646F6D2062797465730000000000000000000000000000000000000000"
-        + "000000000000000000000000000000000000000000000000000000000000000C"
-        + "72616E646F6D2062797465730000000000000000000000000000000000000000";
+    private static final String STRING_ARRAY_RESULT_HEX =
+            "0000000000000000000000000000000000000000000000000000000000000020"
+                    + "0000000000000000000000000000000000000000000000000000000000000002"
+                    + "0000000000000000000000000000000000000000000000000000000000000040"
+                    + "0000000000000000000000000000000000000000000000000000000000000080"
+                    + "000000000000000000000000000000000000000000000000000000000000000C"
+                    + "72616E646F6D2062797465730000000000000000000000000000000000000000"
+                    + "000000000000000000000000000000000000000000000000000000000000000C"
+                    + "72616E646F6D2062797465730000000000000000000000000000000000000000";
 
     private static final byte[] callResult = Hex.decode(CALL_RESULT_HEX);
     private static final byte[] stringArrayCallResult = Hex.decode(STRING_ARRAY_RESULT_HEX);
@@ -60,11 +38,12 @@ public class ContractFunctionResultTest {
     @Test
     @DisplayName("provides results correctly")
     void providesResultsCorrectly() {
-        var result = new ContractFunctionResult(
-            com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
+        var result = new ContractFunctionResult(com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
                 .setContractID(ContractId.fromString("1.2.3").toProtobuf())
                 .setContractCallResult(ByteString.copyFrom(callResult))
-                .setEvmAddress(BytesValue.newBuilder().setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf"))).build())
+                .setEvmAddress(BytesValue.newBuilder()
+                        .setValue(ByteString.copyFrom(Hex.decode("98329e006610472e6B372C080833f6D79ED833cf")))
+                        .build())
                 // .addStateChanges(
                 //     new ContractStateChange(
                 //         ContractId.fromString("1.2.3"),
@@ -77,10 +56,7 @@ public class ContractFunctionResultTest {
                 //         )
                 //     ).toProtobuf())
                 .setSenderId(AccountId.fromString("1.2.3").toProtobuf())
-                .addContractNonces(
-                    new ContractNonceInfo(ContractId.fromString("1.2.3"), 10L)
-                        .toProtobuf())
-        );
+                .addContractNonces(new ContractNonceInfo(ContractId.fromString("1.2.3"), 10L).toProtobuf()));
 
         // interpretation varies based on width
         assertThat(result.getBool(0)).isTrue();
@@ -104,7 +80,8 @@ public class ContractFunctionResultTest {
         assertThat(result.senderAccountId).isEqualTo(AccountId.fromString("1.2.3"));
 
         assertThat(result.contractId).isEqualTo(ContractId.fromString("1.2.3"));
-        assertThat(result.evmAddress).isEqualTo(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"));
+        assertThat(result.evmAddress)
+                .isEqualTo(ContractId.fromEvmAddress(1, 2, "98329e006610472e6B372C080833f6D79ED833cf"));
         // assertThat(result.stateChanges.size()).isEqualTo(1);
         // ContractStateChange resultStateChange = result.stateChanges.get(0);
         // assertThat(resultStateChange.contractId).isEqualTo(ContractId.fromString("1.2.3"));
@@ -119,10 +96,8 @@ public class ContractFunctionResultTest {
     @Test
     @DisplayName("can get string array result")
     void canGetStringArrayResult() {
-        var result = new ContractFunctionResult(
-            com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
-                .setContractCallResult(ByteString.copyFrom(stringArrayCallResult))
-        );
+        var result = new ContractFunctionResult(com.hiero.sdk.proto.ContractFunctionResult.newBuilder()
+                .setContractCallResult(ByteString.copyFrom(stringArrayCallResult)));
 
         var strings = result.getStringArray(0);
         assertThat(strings.get(0)).isEqualTo("random bytes");
@@ -131,7 +106,5 @@ public class ContractFunctionResultTest {
 
     @Test
     @DisplayName("Can to/from bytes with state changes")
-    void canToFromBytesStateChanges() {
-
-    }
+    void canToFromBytesStateChanges() {}
 }

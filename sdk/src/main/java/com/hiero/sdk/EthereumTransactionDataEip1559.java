@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2022 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 import com.esaulpaugh.headlong.rlp.RLPDecoder;
@@ -92,19 +74,18 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
     public byte[] s;
 
     EthereumTransactionDataEip1559(
-        byte[] chainId,
-        byte[] nonce,
-        byte[] maxPriorityGas,
-        byte[] maxGas,
-        byte[] gasLimit,
-        byte[] to,
-        byte[] value,
-        byte[] callData,
-        byte[] accessList,
-        byte[] recoveryId,
-        byte[] r,
-        byte[] s
-    ) {
+            byte[] chainId,
+            byte[] nonce,
+            byte[] maxPriorityGas,
+            byte[] maxGas,
+            byte[] gasLimit,
+            byte[] to,
+            byte[] value,
+            byte[] callData,
+            byte[] accessList,
+            byte[] recoveryId,
+            byte[] r,
+            byte[] s) {
         super(callData);
 
         this.chainId = chainId;
@@ -145,41 +126,51 @@ public class EthereumTransactionDataEip1559 extends EthereumTransactionData {
         }
 
         return new EthereumTransactionDataEip1559(
-            rlpList.get(0).data(),
-            rlpList.get(1).data(),
-            rlpList.get(2).data(),
-            rlpList.get(3).data(),
-            rlpList.get(4).data(),
-            rlpList.get(5).data(),
-            rlpList.get(6).data(),
-            rlpList.get(7).data(),
-            rlpList.get(8).data(),
-            rlpList.get(9).data(),
-            rlpList.get(10).data(),
-            rlpList.get(11).data()
-        );
+                rlpList.get(0).data(),
+                rlpList.get(1).data(),
+                rlpList.get(2).data(),
+                rlpList.get(3).data(),
+                rlpList.get(4).data(),
+                rlpList.get(5).data(),
+                rlpList.get(6).data(),
+                rlpList.get(7).data(),
+                rlpList.get(8).data(),
+                rlpList.get(9).data(),
+                rlpList.get(10).data(),
+                rlpList.get(11).data());
     }
 
     public byte[] toBytes() {
-        return RLPEncoder.sequence(Integers.toBytes(0x02), List.of(
-            chainId, nonce, maxPriorityGas, maxGas, gasLimit, to,
-            value, callData, new ArrayList<String>(), recoveryId, r, s
-        ));
+        return RLPEncoder.sequence(
+                Integers.toBytes(0x02),
+                List.of(
+                        chainId,
+                        nonce,
+                        maxPriorityGas,
+                        maxGas,
+                        gasLimit,
+                        to,
+                        value,
+                        callData,
+                        new ArrayList<String>(),
+                        recoveryId,
+                        r,
+                        s));
     }
 
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("chainId", Hex.toHexString(chainId))
-            .add("nonce", Hex.toHexString(nonce))
-            .add("maxPriorityGas", Hex.toHexString(maxPriorityGas))
-            .add("maxGas", Hex.toHexString(maxGas))
-            .add("gasLimit", Hex.toHexString(gasLimit))
-            .add("to", Hex.toHexString(to))
-            .add("value", Hex.toHexString(value))
-            .add("accessList", Hex.toHexString(accessList))
-            .add("recoveryId", Hex.toHexString(recoveryId))
-            .add("r", Hex.toHexString(r))
-            .add("s", Hex.toHexString(s))
-            .toString();
+                .add("chainId", Hex.toHexString(chainId))
+                .add("nonce", Hex.toHexString(nonce))
+                .add("maxPriorityGas", Hex.toHexString(maxPriorityGas))
+                .add("maxGas", Hex.toHexString(maxGas))
+                .add("gasLimit", Hex.toHexString(gasLimit))
+                .add("to", Hex.toHexString(to))
+                .add("value", Hex.toHexString(value))
+                .add("accessList", Hex.toHexString(accessList))
+                .add("recoveryId", Hex.toHexString(recoveryId))
+                .add("r", Hex.toHexString(r))
+                .add("s", Hex.toHexString(s))
+                .toString();
     }
 }

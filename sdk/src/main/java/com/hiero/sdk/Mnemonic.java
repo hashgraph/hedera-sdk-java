@@ -1,32 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.google.common.base.Joiner;
 import com.hiero.sdk.utils.Bip32Utils;
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.digests.SHA512Digest;
-import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
-import org.bouncycastle.crypto.params.KeyParameter;
-
-import javax.annotation.Nullable;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,12 +19,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.annotation.Nullable;
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.digests.SHA512Digest;
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator;
+import org.bouncycastle.crypto.params.KeyParameter;
 
 /**
  * BIP-39 24-word mnemonic phrases compatible with the Android and iOS mobile wallets.
@@ -56,6 +37,7 @@ public final class Mnemonic {
     // but the implementation is meant to wait until free space is needed
     @Nullable
     private static SoftReference<List<String>> bip39WordList = null;
+
     @Nullable
     private static SoftReference<List<String>> legacyWordList = null;
 
@@ -205,24 +187,17 @@ public final class Mnemonic {
     private static List<String> getWordList(boolean isLegacy) {
         if (isLegacy) {
             return getSpecificWordList(
-                () -> legacyWordList,
-                () -> readWordList(true),
-                (newWordList) -> legacyWordList = newWordList
-            );
+                    () -> legacyWordList, () -> readWordList(true), (newWordList) -> legacyWordList = newWordList);
         } else {
             return getSpecificWordList(
-                () -> bip39WordList,
-                () -> readWordList(false),
-                (newWordList) -> bip39WordList = newWordList
-            );
+                    () -> bip39WordList, () -> readWordList(false), (newWordList) -> bip39WordList = newWordList);
         }
     }
 
     private static synchronized List<String> getSpecificWordList(
-        Supplier<SoftReference<List<String>>> getCurrentWordList,
-        Supplier<List<String>> getNewWordList,
-        Consumer<SoftReference<List<String>>> setCurrentWordList
-    ) {
+            Supplier<SoftReference<List<String>>> getCurrentWordList,
+            Supplier<List<String>> getNewWordList,
+            Consumer<SoftReference<List<String>>> setCurrentWordList) {
         var localWordList = getCurrentWordList.get();
         if (localWordList == null || localWordList.get() == null) {
             List<String> words = getNewWordList.get();
@@ -237,7 +212,8 @@ public final class Mnemonic {
     private static List<String> readWordList(boolean isLegacy) {
         if (isLegacy) {
             InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("legacy-english.txt");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
+            try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
                 ArrayList<String> words = new ArrayList<>(4096);
 
                 for (String word = reader.readLine(); word != null; word = reader.readLine()) {
@@ -249,7 +225,8 @@ public final class Mnemonic {
             }
         } else {
             InputStream wordStream = Mnemonic.class.getClassLoader().getResourceAsStream("bip39-english.txt");
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
+            try (BufferedReader reader =
+                    new BufferedReader(new InputStreamReader(Objects.requireNonNull(wordStream), UTF_8))) {
                 ArrayList<String> words = new ArrayList<>(2048);
 
                 for (String word = reader.readLine(); word != null; word = reader.readLine()) {
@@ -410,10 +387,7 @@ public final class Mnemonic {
 
         // BIP-39 seed generation
         PKCS5S2ParametersGenerator pbkdf2 = new PKCS5S2ParametersGenerator(new SHA512Digest());
-        pbkdf2.init(
-            toString().getBytes(UTF_8),
-            salt.getBytes(UTF_8),
-            2048);
+        pbkdf2.init(toString().getBytes(UTF_8), salt.getBytes(UTF_8), 2048);
 
         KeyParameter key = (KeyParameter) pbkdf2.generateDerivedParameters(512);
         return key.getKey();
@@ -422,8 +396,7 @@ public final class Mnemonic {
     private byte[] wordsToEntropyAndChecksum() {
         if (words.size() != 24 && words.size() != 12) {
             // should be checked in `validate()`
-            throw new IllegalStateException(
-                "(BUG) expected 24-word mnemonic, got " + words.size() + " words");
+            throw new IllegalStateException("(BUG) expected 24-word mnemonic, got " + words.size() + " words");
         }
         ByteBuffer buffer;
         if (words.size() == 12) {
@@ -473,7 +446,7 @@ public final class Mnemonic {
         for (var i = 0; i < data.length - 1; i += 1) {
             result[i] = data[i] ^ crc;
         }
-        //int to byte conversion
+        // int to byte conversion
         ByteBuffer byteBuffer = ByteBuffer.allocate(result.length * 4);
         IntBuffer intBuffer = byteBuffer.asIntBuffer();
         intBuffer.put(result);
@@ -487,7 +460,7 @@ public final class Mnemonic {
         var i = 0;
         var j = 3;
         byte[] array2 = new byte[data.length - 1];
-        //remove all the fill 0s
+        // remove all the fill 0s
         while (j < array.length) {
             array2[i] = array[j];
             i++;
@@ -550,7 +523,7 @@ public final class Mnemonic {
         var seed = this.toSeed(passphrase);
         PrivateKey derivedKey = PrivateKey.fromSeedED25519(seed);
 
-        for (int i : new int[]{44, 3030, 0, 0, index}) {
+        for (int i : new int[] {44, 3030, 0, 0, index}) {
             derivedKey = derivedKey.derive(i);
         }
 
@@ -569,9 +542,7 @@ public final class Mnemonic {
      *                        e.g. "m/44'/60'/0'/0/0"
      * @return an array of integers designed to be used with PrivateKey#derive
      */
-    private int[] calculateDerivationPathValues(String derivationPath)
-        throws IllegalArgumentException
-    {
+    private int[] calculateDerivationPathValues(String derivationPath) throws IllegalArgumentException {
         if (derivationPath == null || derivationPath.isEmpty()) {
             throw new IllegalArgumentException("Derivation path cannot be null or empty");
         }
@@ -642,12 +613,8 @@ public final class Mnemonic {
      */
     public PrivateKey toStandardECDSAsecp256k1PrivateKey(String passphrase, int index) {
         // Harden the first 3 indexes
-        final int[] derivationPathValues = new int[]{
-            Bip32Utils.toHardenedIndex(44),
-            Bip32Utils.toHardenedIndex(3030),
-            Bip32Utils.toHardenedIndex(0),
-            0,
-            index
+        final int[] derivationPathValues = new int[] {
+            Bip32Utils.toHardenedIndex(44), Bip32Utils.toHardenedIndex(3030), Bip32Utils.toHardenedIndex(0), 0, index
         };
         return toStandardECDSAsecp256k1PrivateKeyImpl(passphrase, derivationPathValues);
     }

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +10,6 @@ import com.hiero.sdk.Client;
 import com.hiero.sdk.Hbar;
 import com.hiero.sdk.PrivateKey;
 import com.hiero.sdk.PublicKey;
-import com.hiero.sdk.TokenId;
 import com.hiero.sdk.TransferTransaction;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,7 +19,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import javax.annotation.Nullable;
 import org.junit.jupiter.api.Assumptions;
 
 public class IntegrationTestEnv implements AutoCloseable {
@@ -50,7 +30,8 @@ public class IntegrationTestEnv implements AutoCloseable {
     public PublicKey operatorKey;
     public AccountId operatorId;
     public boolean isLocalNode = false;
-    private static ExecutorService clientExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static ExecutorService clientExecutor =
+            Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     public IntegrationTestEnv() throws Exception {
         this(0);
@@ -106,9 +87,8 @@ public class IntegrationTestEnv implements AutoCloseable {
             var network = new HashMap<String, AccountId>();
             network.put(LOCAL_CONSENSUS_NODE_ENDPOINT, LOCAL_CONSENSUS_NODE_ACCOUNT_ID);
 
-            return Client
-                .forNetwork(network, clientExecutor)
-                .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
+            return Client.forNetwork(network, clientExecutor)
+                    .setMirrorNetwork(List.of(LOCAL_MIRROR_NODE_GRPC_ENDPOINT));
         } else if (!System.getProperty("CONFIG_FILE").equals("")) {
             try {
                 return Client.fromConfigFile(System.getProperty("CONFIG_FILE"));
@@ -123,11 +103,11 @@ public class IntegrationTestEnv implements AutoCloseable {
         var key = PrivateKey.generateED25519();
         operatorKey = key.getPublicKey();
         operatorId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
-            .setKey(key)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setInitialBalance(initialBalance)
+                .setKey(key)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         client = Client.forNetwork(originalClient.getNetwork());
         client.setMirrorNetwork(originalClient.getMirrorNetwork());
@@ -156,17 +136,15 @@ public class IntegrationTestEnv implements AutoCloseable {
     public void close() throws Exception {
         if (!operatorId.equals(originalClient.getOperatorAccountId())) {
             try {
-                var hbarsBalance = new AccountBalanceQuery()
-                    .setAccountId(operatorId)
-                    .execute(originalClient)
-                    .hbars;
+                var hbarsBalance =
+                        new AccountBalanceQuery().setAccountId(operatorId).execute(originalClient).hbars;
                 new TransferTransaction()
-                    .addHbarTransfer(operatorId, hbarsBalance.negated())
-                    .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
-                    .freezeWith(originalClient)
-                    .signWithOperator(client)
-                    .execute(originalClient)
-                    .getReceipt(originalClient);
+                        .addHbarTransfer(operatorId, hbarsBalance.negated())
+                        .addHbarTransfer(Objects.requireNonNull(originalClient.getOperatorAccountId()), hbarsBalance)
+                        .freezeWith(originalClient)
+                        .signWithOperator(client)
+                        .execute(originalClient)
+                        .getReceipt(originalClient);
 
             } catch (Exception e) {
                 client.close();
@@ -189,18 +167,20 @@ public class IntegrationTestEnv implements AutoCloseable {
         public void nextNode(Map<String, AccountId> outMap) throws Exception {
             if (nodes.isEmpty()) {
                 throw new IllegalStateException(
-                    "IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
+                        "IntegrationTestEnv needs another node, but there aren't enough nodes in client network");
             }
             for (; index < nodes.size(); index++) {
                 var node = nodes.get(index);
                 try {
                     new TransferTransaction()
-                        .setNodeAccountIds(Collections.singletonList(node.getValue()))
-                        .setMaxAttempts(1)
-                        .addHbarTransfer(client.getOperatorAccountId(), Hbar.fromTinybars(1).negated())
-                        .addHbarTransfer(AccountId.fromString("0.0.3"), Hbar.fromTinybars(1))
-                        .execute(client)
-                        .getReceipt(client);
+                            .setNodeAccountIds(Collections.singletonList(node.getValue()))
+                            .setMaxAttempts(1)
+                            .addHbarTransfer(
+                                    client.getOperatorAccountId(),
+                                    Hbar.fromTinybars(1).negated())
+                            .addHbarTransfer(AccountId.fromString("0.0.3"), Hbar.fromTinybars(1))
+                            .execute(client)
+                            .getReceipt(client);
                     nodes.remove(index);
                     outMap.put(node.getKey(), node.getValue());
                     return;

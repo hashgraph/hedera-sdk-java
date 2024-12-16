@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hiero.sdk;
 
 public interface Function<T, R> {
