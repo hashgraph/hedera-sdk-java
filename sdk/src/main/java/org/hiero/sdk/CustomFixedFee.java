@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import org.hiero.sdk.proto.FixedFee;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.FixedFee;
 
 /**
  * Custom fixed fee utility class.

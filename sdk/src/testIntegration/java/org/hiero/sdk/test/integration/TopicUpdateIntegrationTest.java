@@ -3,11 +3,11 @@ package org.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Objects;
 import org.hiero.sdk.TopicCreateTransaction;
 import org.hiero.sdk.TopicDeleteTransaction;
 import org.hiero.sdk.TopicInfoQuery;
 import org.hiero.sdk.TopicUpdateTransaction;
-import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

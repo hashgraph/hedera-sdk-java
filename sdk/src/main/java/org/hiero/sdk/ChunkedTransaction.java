@@ -3,10 +3,6 @@ package org.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.SignatureMap;
-import org.hiero.sdk.proto.SignedTransaction;
-import org.hiero.sdk.proto.TransactionBody;
-import org.hiero.sdk.proto.TransactionID;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +18,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.SignatureMap;
+import org.hiero.sdk.proto.SignedTransaction;
+import org.hiero.sdk.proto.TransactionBody;
+import org.hiero.sdk.proto.TransactionID;
 
 /**
  * A common base for file and topic message transactions.

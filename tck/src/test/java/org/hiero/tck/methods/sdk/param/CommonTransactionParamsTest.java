@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import net.minidev.json.JSONArray;
-import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.junit.jupiter.api.Test;
 
 class CommonTransactionParamsTest {

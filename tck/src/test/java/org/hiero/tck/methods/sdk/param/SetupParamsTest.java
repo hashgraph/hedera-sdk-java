@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import org.hiero.tck.methods.sdk.param.SetupParams;
 import org.junit.jupiter.api.Test;
 
 class SetupParamsTest {

@@ -4,7 +4,6 @@ package org.hiero.tck.methods.sdk.response;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.hiero.tck.methods.sdk.response.SetupResponse;
 import org.junit.jupiter.api.Test;
 
 class SetupResponseTest {

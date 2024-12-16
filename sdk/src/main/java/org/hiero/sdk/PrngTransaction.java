@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import org.hiero.sdk.proto.*;
-import org.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.*;
+import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Random Number Generator Transaction.

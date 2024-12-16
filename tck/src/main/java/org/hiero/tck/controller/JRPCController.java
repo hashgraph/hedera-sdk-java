@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.controller;
 
-import org.hiero.tck.annotation.JSONRPC2Controller;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.server.Dispatcher;
 import jakarta.servlet.http.HttpServletRequest;
+import org.hiero.tck.annotation.JSONRPC2Controller;
 import org.hiero.tck.util.JSONRPC2ServiceScanner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

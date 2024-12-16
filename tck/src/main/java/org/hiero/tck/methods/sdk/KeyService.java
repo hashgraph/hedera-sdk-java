@@ -2,6 +2,7 @@
 package org.hiero.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bouncycastle.util.encoders.Hex;
 import org.hiero.sdk.Key;
 import org.hiero.sdk.KeyList;
 import org.hiero.sdk.PrivateKey;
@@ -12,7 +13,6 @@ import org.hiero.tck.exception.InvalidJSONRPC2RequestException;
 import org.hiero.tck.methods.AbstractJSONRPC2Service;
 import org.hiero.tck.methods.sdk.param.GenerateKeyParams;
 import org.hiero.tck.methods.sdk.response.GenerateKeyResponse;
-import org.bouncycastle.util.encoders.Hex;
 import org.hiero.tck.util.KeyUtils;
 import org.hiero.tck.util.KeyUtils.KeyType;
 
@@ -51,7 +51,8 @@ public class KeyService extends AbstractJSONRPC2Service {
                     "invalid request: keys list is required for generating a KeyList type.");
         }
 
-        if (params.getType().equals(KeyType.THRESHOLD_KEY) && params.getThreshold().isEmpty()) {
+        if (params.getType().equals(KeyType.THRESHOLD_KEY)
+                && params.getThreshold().isEmpty()) {
             throw new InvalidJSONRPC2RequestException(
                     "invalid request: threshold is required for generating a ThresholdKey type.");
         }
@@ -110,7 +111,8 @@ public class KeyService extends AbstractJSONRPC2Service {
 
             case EVM_ADDRESS_KEY:
                 if (params.getFromKey().isPresent()) {
-                    Key hederaKey = KeyUtils.getKeyFromString(params.getFromKey().get());
+                    Key hederaKey =
+                            KeyUtils.getKeyFromString(params.getFromKey().get());
                     if (hederaKey instanceof PrivateKey pk) {
                         return pk.getPublicKey().toEvmAddress().toString();
                     } else if (hederaKey instanceof PublicKey pk) {

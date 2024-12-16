@@ -3,6 +3,10 @@ package org.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import org.hiero.sdk.AccountId;
 import org.hiero.sdk.CustomFee;
 import org.hiero.sdk.CustomFixedFee;
@@ -15,10 +19,6 @@ import org.hiero.sdk.ReceiptStatusException;
 import org.hiero.sdk.Status;
 import org.hiero.sdk.TokenCreateTransaction;
 import org.hiero.sdk.TokenType;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

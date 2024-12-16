@@ -3,8 +3,8 @@ package org.hiero.sdk;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hiero.sdk.proto.ResponseCodeEnum;
 import java.time.Instant;
+import org.hiero.sdk.proto.ResponseCodeEnum;
 import org.junit.jupiter.api.Test;
 
 class ReceiptStatusExceptionTest {

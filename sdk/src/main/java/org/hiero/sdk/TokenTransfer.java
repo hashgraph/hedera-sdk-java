@@ -2,10 +2,10 @@
 package org.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
-import org.hiero.sdk.proto.AccountAmount;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.AccountAmount;
 
 /**
  * A token transfer record.

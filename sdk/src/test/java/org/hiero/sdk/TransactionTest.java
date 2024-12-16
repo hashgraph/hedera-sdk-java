@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import static org.hiero.sdk.Transaction.fromBytes;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hiero.sdk.Transaction.fromBytes;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.SignedTransaction;
-import org.hiero.sdk.proto.TokenAssociateTransactionBody;
-import org.hiero.sdk.proto.TransactionBody;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
+import org.hiero.sdk.proto.SignedTransaction;
+import org.hiero.sdk.proto.TokenAssociateTransactionBody;
+import org.hiero.sdk.proto.TransactionBody;
 import org.junit.jupiter.api.Test;
 
 public class TransactionTest {

@@ -3,12 +3,6 @@ package org.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.QueryHeader;
-import org.hiero.sdk.proto.Response;
-import org.hiero.sdk.proto.ResponseHeader;
-import org.hiero.sdk.proto.ResponseType;
-import org.hiero.sdk.proto.Transaction;
-import org.hiero.sdk.proto.TransactionBody;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
@@ -21,6 +15,12 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.QueryHeader;
+import org.hiero.sdk.proto.Response;
+import org.hiero.sdk.proto.ResponseHeader;
+import org.hiero.sdk.proto.ResponseType;
+import org.hiero.sdk.proto.Transaction;
+import org.hiero.sdk.proto.TransactionBody;
 
 /**
  * Base class for all queries that can be submitted to Hedera.

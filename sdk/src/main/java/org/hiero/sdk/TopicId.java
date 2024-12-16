@@ -2,10 +2,10 @@
 package org.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.TopicID;
 import java.util.Objects;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.TopicID;
 
 /**
  * Unique identifier for a topic (used by the consensus service).

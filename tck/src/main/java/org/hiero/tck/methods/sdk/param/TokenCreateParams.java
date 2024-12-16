@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.methods.sdk.param;
 
-import org.hiero.tck.methods.JSONRPC2Param;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import org.hiero.tck.methods.JSONRPC2Param;
 
 /**
  * TokenCreateParams for token create method

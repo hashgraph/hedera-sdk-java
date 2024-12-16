@@ -3,12 +3,6 @@ package org.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.SchedulableTransactionBody;
-import org.hiero.sdk.proto.SignatureMap;
-import org.hiero.sdk.proto.SignaturePair;
-import org.hiero.sdk.proto.SignedTransaction;
-import org.hiero.sdk.proto.TransactionBody;
-import org.hiero.sdk.proto.TransactionList;
 import java.lang.reflect.Modifier;
 import java.time.Duration;
 import java.time.Instant;
@@ -26,6 +20,12 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import javax.annotation.Nullable;
 import org.bouncycastle.crypto.digests.SHA384Digest;
+import org.hiero.sdk.proto.SchedulableTransactionBody;
+import org.hiero.sdk.proto.SignatureMap;
+import org.hiero.sdk.proto.SignaturePair;
+import org.hiero.sdk.proto.SignedTransaction;
+import org.hiero.sdk.proto.TransactionBody;
+import org.hiero.sdk.proto.TransactionList;
 
 /**
  * Base class for all transactions that may be built and submitted to Hedera.

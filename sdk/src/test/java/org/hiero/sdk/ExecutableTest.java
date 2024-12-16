@@ -4,18 +4,10 @@ package org.hiero.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.hiero.sdk.Executable.GrpcRequest;
-import org.hiero.sdk.logger.LogLevel;
-import org.hiero.sdk.logger.Logger;
-import org.hiero.sdk.proto.QueryHeader;
-import org.hiero.sdk.proto.Response;
-import org.hiero.sdk.proto.ResponseCodeEnum;
-import org.hiero.sdk.proto.ResponseHeader;
 import io.grpc.MethodDescriptor;
 import io.grpc.StatusRuntimeException;
 import java.time.Duration;
@@ -28,7 +20,13 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.annotation.Nullable;
-import org.assertj.core.api.Assertions;
+import org.hiero.sdk.Executable.GrpcRequest;
+import org.hiero.sdk.logger.LogLevel;
+import org.hiero.sdk.logger.Logger;
+import org.hiero.sdk.proto.QueryHeader;
+import org.hiero.sdk.proto.Response;
+import org.hiero.sdk.proto.ResponseCodeEnum;
+import org.hiero.sdk.proto.ResponseHeader;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -504,12 +502,10 @@ class ExecutableTest {
 
         assertThat(tx.getExecutionState(Status.PLATFORM_TRANSACTION_NOT_CREATED, null))
                 .isEqualTo(ExecutionState.SERVER_ERROR);
-        assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null))
-                .isEqualTo(ExecutionState.SERVER_ERROR);
+        assertThat(tx.getExecutionState(Status.PLATFORM_NOT_ACTIVE, null)).isEqualTo(ExecutionState.SERVER_ERROR);
         assertThat(tx.getExecutionState(Status.BUSY, null)).isEqualTo(ExecutionState.RETRY);
         assertThat(tx.getExecutionState(Status.OK, null)).isEqualTo(ExecutionState.SUCCESS);
-        assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null))
-                .isEqualTo(ExecutionState.REQUEST_ERROR);
+        assertThat(tx.getExecutionState(Status.ACCOUNT_DELETED, null)).isEqualTo(ExecutionState.REQUEST_ERROR);
     }
 
     @Test

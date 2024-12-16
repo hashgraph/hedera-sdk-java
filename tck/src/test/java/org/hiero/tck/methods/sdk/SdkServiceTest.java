@@ -5,10 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.hiero.tck.methods.sdk.SdkService;
+import java.util.Optional;
 import org.hiero.tck.methods.sdk.param.SetupParams;
 import org.hiero.tck.methods.sdk.response.SetupResponse;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

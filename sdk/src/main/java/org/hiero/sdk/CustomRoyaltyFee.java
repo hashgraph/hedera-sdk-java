@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import org.hiero.sdk.proto.Fraction;
-import org.hiero.sdk.proto.RoyaltyFee;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.Fraction;
+import org.hiero.sdk.proto.RoyaltyFee;
 
 /**
  * Custom royalty fee utility class.

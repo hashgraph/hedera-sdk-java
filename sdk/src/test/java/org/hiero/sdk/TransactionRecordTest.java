@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hiero.sdk.ContractFunctionResultTest.CALL_RESULT_HEX;
 import static org.hiero.sdk.TransactionReceiptTest.spawnReceiptExample;
-import static org.assertj.core.api.Assertions.assertThat;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.BytesValue;

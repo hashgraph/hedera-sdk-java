@@ -3,12 +3,12 @@ package org.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
-import org.hiero.sdk.proto.ServiceEndpoint;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.ServiceEndpoint;
 
 /**
  * The metadata for a Node – including IP Address, and the crypto account associated with the Node.

@@ -4,12 +4,12 @@ package org.hiero.sdk;
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.ExchangeRateSet;
-import org.hiero.sdk.proto.TimestampSeconds;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 import org.bouncycastle.util.encoders.Hex;
+import org.hiero.sdk.proto.ExchangeRateSet;
+import org.hiero.sdk.proto.TimestampSeconds;
 
 /**
  * The consensus result for a transaction, which might not be currently

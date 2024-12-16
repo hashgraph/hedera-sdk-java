@@ -2,6 +2,9 @@
 package org.hiero.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import org.hiero.sdk.AccountId;
 import org.hiero.sdk.CustomFixedFee;
 import org.hiero.sdk.CustomFractionalFee;
@@ -22,9 +25,6 @@ import org.hiero.tck.methods.sdk.param.TokenDeleteParams;
 import org.hiero.tck.methods.sdk.param.TokenUpdateParams;
 import org.hiero.tck.methods.sdk.response.TokenResponse;
 import org.hiero.tck.util.KeyUtils;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * TokenService for token related methods

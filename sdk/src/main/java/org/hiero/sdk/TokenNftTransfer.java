@@ -3,12 +3,12 @@ package org.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.NftTransfer;
-import org.hiero.sdk.proto.TokenID;
-import org.hiero.sdk.proto.TokenTransferList;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.hiero.sdk.proto.NftTransfer;
+import org.hiero.sdk.proto.TokenID;
+import org.hiero.sdk.proto.TokenTransferList;
 
 /**
  * Internal utility class.

@@ -3,6 +3,12 @@ package org.hiero.sdk;
 
 import com.google.common.base.MoreObjects;
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.grpc.MethodDescriptor;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.hiero.sdk.proto.AccountAmount;
 import org.hiero.sdk.proto.CryptoServiceGrpc;
 import org.hiero.sdk.proto.CryptoTransferTransactionBody;
@@ -10,12 +16,6 @@ import org.hiero.sdk.proto.SchedulableTransactionBody;
 import org.hiero.sdk.proto.TransactionBody;
 import org.hiero.sdk.proto.TransactionResponse;
 import org.hiero.sdk.proto.TransferList;
-import io.grpc.MethodDescriptor;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * A transaction that transfers hbars and tokens between Hedera accounts. You can enter multiple transfers in a single

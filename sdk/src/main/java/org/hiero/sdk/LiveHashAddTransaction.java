@@ -3,12 +3,6 @@ package org.hiero.sdk;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.proto.CryptoAddLiveHashTransactionBody;
-import org.hiero.sdk.proto.CryptoServiceGrpc;
-import org.hiero.sdk.proto.LiveHash;
-import org.hiero.sdk.proto.SchedulableTransactionBody;
-import org.hiero.sdk.proto.TransactionBody;
-import org.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.util.Arrays;
@@ -17,6 +11,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.CryptoAddLiveHashTransactionBody;
+import org.hiero.sdk.proto.CryptoServiceGrpc;
+import org.hiero.sdk.proto.LiveHash;
+import org.hiero.sdk.proto.SchedulableTransactionBody;
+import org.hiero.sdk.proto.TransactionBody;
+import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys,

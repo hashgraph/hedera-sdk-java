@@ -3,17 +3,17 @@ package org.hiero.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import org.hiero.sdk.proto.ConsensusServiceGrpc;
-import org.hiero.sdk.proto.ConsensusUpdateTopicTransactionBody;
-import org.hiero.sdk.proto.SchedulableTransactionBody;
-import org.hiero.sdk.proto.TransactionBody;
-import org.hiero.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.ConsensusServiceGrpc;
+import org.hiero.sdk.proto.ConsensusUpdateTopicTransactionBody;
+import org.hiero.sdk.proto.SchedulableTransactionBody;
+import org.hiero.sdk.proto.TransactionBody;
+import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Update a topic.

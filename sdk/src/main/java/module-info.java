@@ -37,5 +37,6 @@ module org.hiero.sdk {
     exports org.hiero.sdk.proto;
 
     opens org.hiero.sdk;
+
     exports org.hiero.sdk.logger;
 }

@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import org.hiero.sdk.proto.mirror.NetworkServiceGrpc;
 import io.grpc.CallOptions;
 import io.grpc.ClientCall;
 import io.grpc.Deadline;
@@ -17,6 +16,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nullable;
+import org.hiero.sdk.proto.mirror.NetworkServiceGrpc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

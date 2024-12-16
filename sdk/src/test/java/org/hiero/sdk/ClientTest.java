@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import static org.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.hiero.sdk.BaseNodeAddress.PORT_NODE_PLAIN;
 
 import com.google.protobuf.ByteString;
 import java.io.File;

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
+import java.util.Objects;
 import org.hiero.sdk.proto.Fraction;
 import org.hiero.sdk.proto.FractionalFee;
-import java.util.Objects;
 
 /**
  * Custom fractional fee utility class.
