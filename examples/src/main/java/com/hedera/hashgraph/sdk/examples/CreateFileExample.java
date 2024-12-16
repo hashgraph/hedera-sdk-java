@@ -19,8 +19,9 @@
  */
 package com.hedera.hashgraph.sdk.examples;
 
-import com.hiero.sdk.logger.LogLevel;
-import com.hiero.sdk.logger.Logger;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.util.Objects;
@@ -92,7 +93,7 @@ class CreateFileExample {
             // The default max fee of 1 Hbar is not enough to create a file (starts around ~1.1 Hbar).
             .setMaxTransactionFee(Hbar.from(2))
             .execute(client);
-
+        
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = fileCreateTxReceipt.fileId;
         Objects.requireNonNull(newFileId);

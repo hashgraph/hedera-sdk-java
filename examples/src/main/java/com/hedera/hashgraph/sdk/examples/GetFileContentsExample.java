@@ -20,8 +20,9 @@
 package com.hedera.hashgraph.sdk.examples;
 
 import com.google.protobuf.ByteString;
-import com.hiero.sdk.logger.LogLevel;
-import com.hiero.sdk.logger.Logger;
+import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.logger.LogLevel;
+import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
 
 import java.nio.charset.StandardCharsets;
