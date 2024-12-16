@@ -18,7 +18,7 @@
  *
  */
 
-module com.hiero.sdk {
+module org.hiero.sdk {
     requires transitive com.google.protobuf;
     requires com.esaulpaugh.headlong;
     requires com.google.common;
@@ -33,9 +33,9 @@ module com.hiero.sdk {
     requires org.slf4j;
     requires static transitive java.annotation;
 
-    exports com.hiero.sdk;
-    exports com.hiero.sdk.logger;
-    exports com.hiero.sdk.proto;
+    exports org.hiero.sdk;
+    exports org.hiero.sdk.proto;
 
-    opens com.hiero.sdk;
+    opens org.hiero.sdk;
+    exports org.hiero.sdk.logger;
 }

@@ -27,7 +27,7 @@ package com.hedera.mirror.api.proto;
  */
 option java_multiple_files = true;
 
-option java_package = "com.hiero.sdk.proto.mirror";
+option java_package = "org.hiero.sdk.proto.mirror";
 
 import "basic_types.proto";
 import "timestamp.proto";

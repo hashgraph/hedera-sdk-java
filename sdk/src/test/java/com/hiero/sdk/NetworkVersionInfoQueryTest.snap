@@ -1,3 +1,0 @@
-com.hiero.sdk.NetworkVersionInfoQueryTest.shouldSerialize=[
-  "# com.hiero.sdk.proto.Query\nnetwork_get_version_info {\n  header {\n    payment {\n      signed_transaction_bytes: \"\\336\\255\\276\\357\"\n    }\n  }\n}"
-]
