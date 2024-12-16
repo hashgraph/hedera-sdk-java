@@ -18,9 +18,7 @@ import com.hedera.hashgraph.sdk.ReceiptStatusException;
 import com.hedera.hashgraph.sdk.Status;
 import com.hedera.hashgraph.sdk.TransactionId;
 import com.hedera.hashgraph.sdk.TransactionRecord;
-
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
@@ -29,7 +27,6 @@ import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
 
 /*
 ContractHelper declutters PrecompileExample.java
@@ -60,13 +57,14 @@ public class ContractHelper {
 
     public static String getBytecodeHex(String filename) throws IOException {
         try (Reader reader = new InputStreamReader(
-            Optional.ofNullable(ContractHelper.class.getResourceAsStream(filename))
-                .orElseThrow(() -> new RuntimeException("Failed to find: " + filename)),
-            StandardCharsets.UTF_8)) {
+                Optional.ofNullable(ContractHelper.class.getResourceAsStream(filename))
+                        .orElseThrow(() -> new RuntimeException("Failed to find: " + filename)),
+                StandardCharsets.UTF_8)) {
 
             JsonObject json = new Gson().fromJson(reader, JsonObject.class);
-            JsonElement bytecodeElement = Optional.ofNullable(json.has("object") ? json.get("object") : json.get("bytecode"))
-                .orElseThrow(() -> new RuntimeException("No bytecode or object found in json."));
+            JsonElement bytecodeElement = Optional.ofNullable(
+                            json.has("object") ? json.get("object") : json.get("bytecode"))
+                    .orElseThrow(() -> new RuntimeException("No bytecode or object found in json."));
 
             if (bytecodeElement.isJsonObject()) {
                 bytecodeElement = bytecodeElement.getAsJsonObject().get("object");
@@ -75,22 +73,20 @@ public class ContractHelper {
         }
     }
 
-    public ContractHelper(
-        String filename,
-        ContractFunctionParameters constructorParameters,
-        Client client
-    ) throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
+    public ContractHelper(String filename, ContractFunctionParameters constructorParameters, Client client)
+            throws PrecheckStatusException, TimeoutException, ReceiptStatusException, IOException {
         contractId = Objects.requireNonNull(new ContractCreateFlow()
-            .setBytecode(getBytecodeHex(filename))
-            .setMaxChunks(30)
-            .setGas(8_000_000)
-            .setConstructorParameters(constructorParameters)
-            .execute(client)
-            .getReceipt(client)
-            .contractId);
+                .setBytecode(getBytecodeHex(filename))
+                .setMaxChunks(30)
+                .setGas(8_000_000)
+                .setConstructorParameters(constructorParameters)
+                .execute(client)
+                .getReceipt(client)
+                .contractId);
     }
 
-    public ContractHelper setResultValidatorForStep(int stepIndex, Function<ContractFunctionResult, Boolean> validator) {
+    public ContractHelper setResultValidatorForStep(
+            int stepIndex, Function<ContractFunctionResult, Boolean> validator) {
         stepResultValidators.put(stepIndex, validator);
         return this;
     }
@@ -128,17 +124,17 @@ public class ContractHelper {
 
     private Function<ContractFunctionResult, Boolean> getResultValidator(int stepIndex) {
         return stepResultValidators.getOrDefault(
-            stepIndex,
-            // if no custom validator is given, assume that the step returns a response code which ought to be SUCCESS
-            contractFunctionResult -> {
-                Status responseStatus = Status.fromResponseCode(contractFunctionResult.getInt32(0));
-                boolean isValid = responseStatus == Status.SUCCESS;
-                if (!isValid) {
-                    System.out.println("Encountered invalid response status " + responseStatus);
-                }
-                return isValid;
-            }
-        );
+                stepIndex,
+                // if no custom validator is given, assume that the step returns a response code which ought to be
+                // SUCCESS
+                contractFunctionResult -> {
+                    Status responseStatus = Status.fromResponseCode(contractFunctionResult.getInt32(0));
+                    boolean isValid = responseStatus == Status.SUCCESS;
+                    if (!isValid) {
+                        System.out.println("Encountered invalid response status " + responseStatus);
+                    }
+                    return isValid;
+                });
     }
 
     private Supplier<ContractFunctionParameters> getParameterSupplier(int stepIndex) {
@@ -153,16 +149,11 @@ public class ContractHelper {
         return stepSigners.getOrDefault(stepIndex, Collections.emptyList());
     }
 
-    public ContractHelper executeSteps(
-        int firstStepToExecute,
-        int lastStepToExecute,
-        Client client
-    ) throws Exception {
+    public ContractHelper executeSteps(int firstStepToExecute, int lastStepToExecute, Client client) throws Exception {
         for (int stepIndex = firstStepToExecute; stepIndex <= lastStepToExecute; stepIndex++) {
             System.out.println("Attempting to execute step " + stepIndex);
-            ContractExecuteTransaction tx = new ContractExecuteTransaction()
-                .setContractId(contractId)
-                .setGas(10_000_000);
+            ContractExecuteTransaction tx =
+                    new ContractExecuteTransaction().setContractId(contractId).setGas(10_000_000);
 
             Hbar payableAmount = getPayableAmount(stepIndex);
             if (payableAmount != null) {
@@ -170,7 +161,8 @@ public class ContractHelper {
             }
 
             String functionName = "step" + stepIndex;
-            ContractFunctionParameters parameters = getParameterSupplier(stepIndex).get();
+            ContractFunctionParameters parameters =
+                    getParameterSupplier(stepIndex).get();
             if (parameters != null) {
                 tx.setFunction(functionName, parameters);
             } else {
@@ -187,14 +179,13 @@ public class ContractHelper {
                 tx.sign(signer);
             }
 
-            TransactionRecord record = tx
-                .execute(client)
-                .setValidateStatus(false)
-                .getRecord(client);
+            TransactionRecord record =
+                    tx.execute(client).setValidateStatus(false).getRecord(client);
 
             try {
                 if (record.receipt.status != Status.SUCCESS) {
-                    throw new Exception("transaction receipt yielded unsuccessful response code " + record.receipt.status);
+                    throw new Exception(
+                            "transaction receipt yielded unsuccessful response code " + record.receipt.status);
                 }
 
                 ContractFunctionResult functionResult = Objects.requireNonNull(record.contractFunctionResult);
@@ -206,12 +197,14 @@ public class ContractHelper {
                 }
 
                 if (getResultValidator(stepIndex).apply(functionResult)) {
-                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \"" + record.transactionId + "\")");
+                    System.out.println("step " + stepIndex + " completed, and returned valid result. (TransactionId \""
+                            + record.transactionId + "\")");
                 } else {
                     throw new Exception("returned invalid result");
                 }
             } catch (Throwable error) {
-                throw new Exception("Error occurred in step " + stepIndex + ": " + error.getMessage() + "\n" + "Transaction record: " + record);
+                throw new Exception("Error occurred in step " + stepIndex + ": " + error.getMessage() + "\n"
+                        + "Transaction record: " + record);
             }
 
             // otherwise will meet local-node throttle
