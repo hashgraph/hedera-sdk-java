@@ -68,4 +68,4 @@ jobs:
           cd hedera-services
           docker-compose up &
           cd ../hedera-sdk-java
-          ./gradlew -PHEDERA_NETWORK=$HEDERA_NETWORK -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID jacocoTestReport
+          ./gradlew -PHEDERA_NETWORK=$HEDERA_NETWORK -POPERATOR_KEY=$OPERATOR_KEY -POPERATOR_ID=$OPERATOR_ID testIntegration
