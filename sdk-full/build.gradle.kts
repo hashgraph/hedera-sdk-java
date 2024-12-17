@@ -6,12 +6,35 @@ plugins {
 
 description = "Hedera™ Hashgraph SDK for Java"
 
+// TODO following block to be extracted into a plugin
+//      https://github.com/hiero-ledger/hiero-gradle-conventions/issues/41
+val publishDependencyConstraint =
+    configurations.create("publishDependencyConstraint") {
+        extendsFrom(configurations.internal.get())
+        dependencies.all {
+            val addedDependency = this
+            project.dependencies.constraints.add(
+                "api",
+                incoming.resolutionResult.rootComponent.map {
+                    (it.dependencies.single {
+                            it is ResolvedDependencyResult &&
+                                it.selected.moduleVersion?.group == addedDependency.group &&
+                                it.selected.moduleVersion?.name == addedDependency.name
+                        } as ResolvedDependencyResult)
+                        .selected
+                        .moduleVersion
+                        .toString()
+                }
+            )
+        }
+    }
+
 // Define dependency constraints for gRPC implementations so that clients automatically get the
 // correct version
-dependencies.constraints {
-    api("io.grpc:grpc-netty:1.64.0")
-    api("io.grpc:grpc-netty-shaded:1.64.0")
-    api("io.grpc:grpc-okhttp:1.64.0")
+dependencies {
+    publishDependencyConstraint("io.grpc:grpc-netty")
+    publishDependencyConstraint("io.grpc:grpc-netty-shaded")
+    publishDependencyConstraint("io.grpc:grpc-okhttp")
 }
 
 javaModuleDependencies.moduleNameToGA.put(
