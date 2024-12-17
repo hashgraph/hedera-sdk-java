@@ -297,17 +297,17 @@ message SchedulableTransactionBody {
     /**
      * Transaction body for a scheduled transaction to create a new node.
      */
-    com.hedera.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 42;
+   org.hiero.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 42;
 
     /**
      * Transaction body for a scheduled transaction to modify an existing node.
      */
-    com.hedera.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 43;
+    org.hiero.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 43;
 
     /**
      * Transaction body for a scheduled transaction to remove a node.
      */
-    com.hedera.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 44;
+    org.hiero.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 44;
 
     /**
      * A transaction body to "reject" undesired tokens.<br/>

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package com.hedera.hapi.node.state.addressbook;
+package org.hiero.hapi.node.state.addressbook;
 
 /*
  * Copyright (C) 2024 Hedera Hashgraph, LLC

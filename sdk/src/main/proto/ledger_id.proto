@@ -15,7 +15,7 @@
  */
 syntax = "proto3";
 
-package com.hedera.hapi.node.state.roster;
+package org.hiero.hapi.node.state.roster;
 
 /*
  * Copyright (C) 2024 Hedera Hashgraph, LLC
