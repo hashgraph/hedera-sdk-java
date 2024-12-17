@@ -63,6 +63,7 @@ dependencyAnalysis {
         onAny {
             severity("fail")
             exclude("com.google.protobuf:protobuf-javalite")
+            onUnusedDependencies { exclude(":sdk") }
         }
     }
 }
