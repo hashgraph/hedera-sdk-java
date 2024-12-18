@@ -18,7 +18,7 @@
  *
  */
 
-module com.hedera.hashgraph.sdk.full {
+module org.hiero.sdk.full {
     requires transitive com.google.protobuf;
     requires com.esaulpaugh.headlong;
     requires com.google.common;
@@ -33,9 +33,9 @@ module com.hedera.hashgraph.sdk.full {
     requires org.slf4j;
     requires static transitive java.annotation;
 
-    exports com.hedera.hashgraph.sdk;
-    exports com.hedera.hashgraph.sdk.logger;
-    exports com.hedera.hashgraph.sdk.proto;
+    exports org.hiero.sdk;
+    exports org.hiero.sdk.logger;
+    exports org.hiero.sdk.proto;
 
-    opens com.hedera.hashgraph.sdk;
+    opens org.hiero.sdk;
 }

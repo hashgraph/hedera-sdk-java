@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -60,8 +60,8 @@ message TransactionGetReceiptQuery {
     bool includeDuplicates = 3;
 
     /**
-     * Whether the response should include the receipts of any child transactions spawned by the 
-     * top-level transaction with the given transactionID. 
+     * Whether the response should include the receipts of any child transactions spawned by the
+     * top-level transaction with the given transactionID.
      */
     bool include_child_receipts = 4;
 }
@@ -94,7 +94,7 @@ message TransactionGetReceiptResponse {
     repeated TransactionReceipt duplicateTransactionReceipts = 4;
 
     /**
-     * The receipts (if any) of all child transactions spawned by the transaction with the 
+     * The receipts (if any) of all child transactions spawned by the transaction with the
      * given top-level id, in consensus order. Always empty if the top-level status is UNKNOWN.
      */
     repeated TransactionReceipt child_transaction_receipts = 5;

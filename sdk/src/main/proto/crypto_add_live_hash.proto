@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -32,7 +32,7 @@ import "duration.proto";
 
 /**
  * A hash---presumably of some kind of credential or certificate---along with a list of keys, each
- * of which may be either a primitive or a threshold key. 
+ * of which may be either a primitive or a threshold key.
  */
 message LiveHash {
     /**
