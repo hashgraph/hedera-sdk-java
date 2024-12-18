@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -34,7 +34,7 @@ import "schedulable_transaction_body.proto";
 
 /**
  * Gets information about a schedule in the network's action queue.
- * 
+ *
  * Responds with <tt>INVALID_SCHEDULE_ID</tt> if the requested schedule doesn't exist.
  */
 message ScheduleGetInfoQuery {
@@ -53,7 +53,7 @@ message ScheduleGetInfoQuery {
 /**
  * Information summarizing schedule state
  */
-message ScheduleInfo {  
+message ScheduleInfo {
   /**
    * The id of the schedule
    */
@@ -117,7 +117,7 @@ message ScheduleInfo {
   TransactionID scheduledTransactionID = 11;
 
   /**
-   * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs. 
+   * The ledger ID the response was returned from; please see <a href="https://github.com/hashgraph/hedera-improvement-proposal/blob/master/HIP/hip-198.md">HIP-198</a> for the network-specific IDs.
    */
   bytes ledger_id = 12;
 
@@ -130,7 +130,7 @@ message ScheduleInfo {
    * Note: this field is unused until Long Term Scheduled Transactions are enabled.
    */
   bool wait_for_expiry = 13;
-}  
+}
 
 /**
  * Response wrapper for the <tt>ScheduleInfo</tt>

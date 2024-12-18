@@ -25,7 +25,7 @@ package proto;
 import "timestamp.proto";
 import "basic_types.proto";
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.state.token">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -64,13 +64,13 @@ message Nft {
     bytes metadata = 5;
 
     /**
-     * If the owner of this NFT is not its token treasury, the id of the previous NFT 
+     * If the owner of this NFT is not its token treasury, the id of the previous NFT
      * in the owner's "doubly-linked list" of owned NFTs (if any).
      */
     NftID owner_previous_nft_id = 6;
 
     /**
-     * If the owner of this NFT is not its token treasury, the id of the next NFT in 
+     * If the owner of this NFT is not its token treasury, the id of the next NFT in
      * the owner's "doubly-linked list" of owned NFTs (if any).
      */
     NftID owner_next_nft_id = 7;

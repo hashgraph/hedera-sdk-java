@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -37,10 +37,10 @@ import "basic_types.proto";
  * Otherwise, if the resulting set of signing keys satisfy the
  * scheduled transaction's signing requirements, it will be executed immediately after the
  * triggering <tt>ScheduleSign</tt>.
- * 
+ *
  * Upon <tt>SUCCESS</tt>, the receipt includes the <tt>scheduledTransactionID</tt> to use to query
- * for the record of the scheduled transaction's execution (if it occurs). 
- * 
+ * for the record of the scheduled transaction's execution (if it occurs).
+ *
  * Other notable response codes include <tt>INVALID_SCHEDULE_ID</tt>, <tt>SCHEDULE_ALREADY_DELETED</tt>,
  * <tt>SCHEDULE_PENDING_EXPIRATION</tt>, <tt>SCHEDULE_ALREADY_EXPIRED</tt>,
  * <tt>INVALID_ACCOUNT_ID</tt>, <tt>UNRESOLVABLE_REQUIRED_SIGNERS</tt>,
