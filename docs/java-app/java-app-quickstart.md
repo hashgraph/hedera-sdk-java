@@ -7,37 +7,44 @@ To get started with a Java project, you'll need to add the following **three** d
 **1. Hedera Java™ SDK:**
 
 _Gradle:_
+
 ```groovy
-implementation 'com.hedera.hashgraph:sdk:2.46.0'
+implementation 'com.hedera.hashgraph:sdk:2.47.0-beta.1'
 ```
 
 _Maven:_
+
 ```xml
 <dependency>
   <groupId>com.hedera.hashgraph</groupId>
   <artifactId>sdk</artifactId>
-  <version>2.46.0</version>
+  <version>2.47.0-beta.1</version>
 </dependency>
 ```
 
 **2. gRPC implementation** _(select one of the following)_**:**
 
 _Gradle:_
+
 > It is automatically aligned with the `grpc-api` version Hedera™ Java SDK use.
-```groovy
-// netty transport (for high throughput applications)
-implementation 'io.grpc:grpc-netty-shaded'
-```
-```groovy
-// netty transport, unshaded (if you have a matching Netty dependency already)
-implementation 'io.grpc:grpc-netty'
-```
-```groovy
-// okhttp transport (for lighter-weight applications or Android)
-implementation 'io.grpc:grpc-okhttp'
-```
+>
+> ```groovy
+> // netty transport (for high throughput applications)
+> implementation 'io.grpc:grpc-netty-shaded'
+> ```
+>
+> ```groovy
+> // netty transport, unshaded (if you have a matching Netty dependency already)
+> implementation 'io.grpc:grpc-netty'
+> ```
+>
+> ```groovy
+> // okhttp transport (for lighter-weight applications or Android)
+> implementation 'io.grpc:grpc-okhttp'
+> ```
 
 _Maven:_
+
 ```xml
 <!-- netty transport (for server or desktop applications) -->
 <dependency>
@@ -46,6 +53,7 @@ _Maven:_
   <version>1.64.0</version>
 </dependency>
 ```
+
 ```xml
 <!-- netty transport, unshaded (if you have a matching Netty dependency already) -->
 <dependency>
@@ -54,6 +62,7 @@ _Maven:_
   <version>1.64.0</version>
 </dependency>
 ```
+
 ```xml
 <!-- okhttp transport (for lighter-weight applications or Android) -->
 <dependency>
@@ -66,16 +75,19 @@ _Maven:_
 **3. Simple Logging Facade for Java** _(select one of the following to enable or disable logs)_**:**
 
 _Gradle:_
+
 ```groovy
 // Enable logs
 implementation 'org.slf4j:slf4j-simple:2.0.9'
 ```
+
 ```groovy
 // Disable logs
 implementation 'org.slf4j:slf4j-nop:2.0.9'
 ```
 
 _Maven:_
+
 ```xml
 <!-- Enable logs -->
 <dependency>
@@ -84,6 +96,7 @@ _Maven:_
     <version>2.0.9</version>
 </dependency>
 ```
+
 ```xml
 <!-- Disable logs -->
 <dependency>
@@ -94,7 +107,9 @@ _Maven:_
 ```
 
 ## Additional useful information
+
 ## Next steps
+
 To make it easier to start your Java project using the Hedera™ Java SDK,
 we recommend checking out the [Java examples](../../examples/README.md).
 These examples show different uses and workflows,
