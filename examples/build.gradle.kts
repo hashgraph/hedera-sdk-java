@@ -36,8 +36,7 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
             mainModule = "org.hiero.sdk.examples"
-            mainClass =
-                "org.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
+            mainClass = "org.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
