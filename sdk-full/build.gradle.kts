@@ -4,7 +4,7 @@ plugins {
     id("org.hiero.gradle.feature.protobuf")
 }
 
-description = "Hedera™ Hashgraph SDK for Java"
+description = "Hiero SDK for Java"
 
 // TODO following block to be extracted into a plugin
 //      https://github.com/hiero-ledger/hiero-gradle-conventions/issues/41
