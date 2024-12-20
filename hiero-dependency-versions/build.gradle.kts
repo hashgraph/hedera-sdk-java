@@ -6,7 +6,7 @@ plugins {
     id("org.hiero.gradle.check.spotless-kotlin")
 }
 
-group = "com.hedera.hashgraph"
+group = "org.hiero"
 
 val bouncycastle = "1.79"
 val grpc = "1.69.0"

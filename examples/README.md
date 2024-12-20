@@ -104,7 +104,7 @@ for configuring the network. If the `HEDERA_NETWORK` is not set, it will default
 - You can set the `SDK_LOG_LEVEL` to `TRACE`, `DEBUG`, `INFO`, `WARN`, `ERROR` or `SILENT`
 for configuring the logging. If the `SDK_LOG_LEVEL` is not set, it will default to `SILENT`.
 Important pre-requisite to see logs: set simple logger log level to same level as the `SDK_LOG_LEVEL`,
-for example via VM options: `-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace`.
+for example via VM options: `-Dorg.slf4j.simpleLogger.log.org.hiero=trace`.
 
 Therefore, the format of the configuration file should be as follows:
 

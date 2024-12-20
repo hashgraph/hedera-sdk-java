@@ -5,9 +5,9 @@
 [![](https://img.shields.io/github/actions/workflow/status/hashgraph/hedera-sdk-java/build.yml?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
 [![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
-> The Java SDK for interacting with Hedera Hashgraph: the official distributed
+> The Java SDK for interacting with Hiero: the official distributed
 > consensus platform built using the hashgraph consensus algorithm for fast,
-> fair and secure transactions. Hedera enables and empowers developers to
+> fair and secure transactions. Hiero enables and empowers developers to
 > build an entirely new class of decentralized applications.
 
 **NOTE**: v1 of the SDK is deprecated and support was discontinued after October 2021.
@@ -17,12 +17,12 @@ You can reference the [migration documentation](docs/sdk/MIGRATING_V1.md).
 ## Java app quickstart
 
 [The Java application quickstart guide](docs/java-app/java-app-quickstart.md) covers how to properly set up the dependencies
-needed to start developing your Java project using the Hedera™ Java SDK.
+needed to start developing your Java project using the Hiero Java SDK.
 
 ## Android app quickstart
 
 [The Android application quickstart guide](docs/android-app/android-app-quickstart.md) covers how to properly set up the dependencies
-needed to start developing your Android project using the Hedera™ Java SDK.
+needed to start developing your Android project using the Hiero Java SDK.
 
 ## Examples
 
@@ -33,7 +33,7 @@ that showcase different use cases and workflows.
 
 The [developer quickstart guide](docs/sdk/developer-guide.md) provides instructions on how to set up the environment,
 run unit and integration tests, and configure the project to work with different networks
-such as the Hedera test network, preview network, etc.
+such as the Hiero test network, preview network, etc.
 
 ## Support
 

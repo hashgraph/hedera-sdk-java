@@ -9,8 +9,8 @@ import org.hiero.sdk.*;
 
 /*
 This example just instantiates the solidity contract
-defined in resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.sol, which has been
-compiled into resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/PrecompileExample.json.
+defined in resources/org/hiero/sdk/examples/contracts/precompile/PrecompileExample.sol, which has been
+compiled into resources/org/hiero/sdk/examples/contracts/precompile/PrecompileExample.json.
 
 You should go look at that PrecompileExample.sol file, because that's where the meat of this example is.
 
