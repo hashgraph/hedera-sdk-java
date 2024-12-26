@@ -10,7 +10,7 @@ group = "com.hedera.hashgraph"
 
 val bouncycastle = "1.79"
 val grpc = "1.69.0"
-val protobuf = "4.29.1"
+val protobuf = "4.29.2"
 val slf4j = "2.0.16"
 
 dependencies.constraints {
