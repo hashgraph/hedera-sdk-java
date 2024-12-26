@@ -38,7 +38,7 @@ dependencies.constraints {
     api("io.github.cdimascio:java-dotenv:5.3.1") { because("java.dotenv") }
     api("io.github.json-snapshot:json-snapshot:1.0.17") { because("json.snapshot") }
     api("org.apache.commons:commons-lang3:3.17.0") { because("org.apache.commons.lang3") }
-    api("org.assertj:assertj-core:3.26.3") { because("org.assertj.core") }
+    api("org.assertj:assertj-core:3.27.0") { because("org.assertj.core") }
     api("org.junit.jupiter:junit-jupiter-api:5.11.4") { because("org.junit.jupiter.api") }
     api("org.mockito:mockito-core:5.14.2") { because("org.mockito") }
 
