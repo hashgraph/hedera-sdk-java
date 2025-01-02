@@ -40,7 +40,7 @@ tasks:
 
     "update:snapshots":
         cmds:
-            - rm sdk/src/test/java/com/hedera/hashgraph/sdk/*.snap
+            - rm sdk/src/test/java/org/hiero/sdk/*.snap
             - ./gradlew clean test
 
     "update:proto":
