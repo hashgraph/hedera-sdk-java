@@ -32,25 +32,13 @@ Augments the Java compiler to output more comprehensive errors and warnings.
 
 Library to assist in code generation (see **FunctionalExecutableProcessor**).
 
-
-
-
-
 ## Classes:
-
-
-
-
 
 ### `LockableList`:
 
 An internal utility class that represents a list of things, and which has these capabilities:
- * It can be locked, which prevents the list from being mutated.
- * It has an index which can be incremented with the `advance()` method, and the index will loop back around to 0 on reaching the end of the list.
-
-
-
-
+* It can be locked, which prevents the list from being mutated.
+* It has an index which can be incremented with the `advance()` method, and the index will loop back around to 0 on reaching the end of the list.
 
 ### `Client`:
 
@@ -61,10 +49,6 @@ An `Operator` is an inner class of `Client`, and has an `AccountId`, a `PublicKe
 A `Client` can be initialized from a config file (json).  A `Client` can be initialized for previewnet, testnet, or mainnet, or a custom network, where a custom network is a list of `<"ipAddress:portNumber", AccountID>` pairs (in the form of a hashtable).  Multiple endpoints may be mapped to the same node account ID (put another way, there may be multiple proxies for the same node).  If initialized for previewnet, testnet, or mainnet, the `Client` just uses a hard-coded list of `<"ipAddress:portNumber", AccountID>` pairs.
 
 `executor` will be used to initialize the gRPC `BaseChannel`, and in the event that an RPC fails and needs to be retried after a delay, `executor` will be used to schedule that delayed retry.
-
-
-
-
 
 ### `BaseNode`:
 
@@ -78,11 +62,7 @@ Has an `address`, a `channel`, an `executor` (ultimately from `Client`), `lastUs
 
 `BaseNode` has the methods `inUse()`, which causes the `BaseNode` to record that it is being used, `getChannel()`, `close()`, and `getUserAgent()`.
 
-The user agent is a string that is used to identify the client to the server.  In this case, it's `"hedera-sdk-java/v{NUMBER}"`.
-
-
-
-
+The user agent is a string that is used to identify the client to the server.  In this case, it's `"hiero-sdk-java/v{NUMBER}"`.
 
 ### `BaseNetwork`:
 
@@ -96,27 +76,15 @@ Has these critical fields:
 
 `setNetwork()` will update this `Network` to the given list.  It will close a `Node` and remove it from this network if it is not in the given list, and then it will then add nodes from the list.
 
-
-
-
-
 ### `Network`:
 
 This represents a network of Hedera nodes, a `Client` connects to a `Network`.
 
 `getNodeAccountIdsForExecute()` gets a list of N randomly selected `AccountId`s where N is 1/3rd (rounded up) of healthy nodes in this `Network`.  This is used by  `Query` and `Transaction` to populate their `nodeAccountId`s, lists containing the `AccountId`s of `Node`s that the `Query` or `Transaction` will be attempted with.
 
-
-
-
-
 ### `Node`:
 
 This is a connection to one node in the network.  Inherits from `BaseNode` (which is where much of the meat is).
-
-
-
-
 
 ### `Executable`:
 
@@ -156,10 +124,6 @@ It should also be noted that the future returned by `grpc.ClientCalls.futureUnar
 
 `execute()` is simpler by virtue of not being async, but it does approximately the same thing, just without the future mumbo jumbo.
 
-
-
-
-
 ### `Query`:
 
 The `Query` class extends `Executable`.
@@ -180,23 +144,19 @@ Query also adds some abstract methods of its own:
 
 `onExecute[async]()` seems to be where most of the action is in `Query`.  It first makes sure that `nodeAccountIds` is filled, then it fetches the `queryPayment` amount (via `QueryCostQuery`) if one hasn't been set, then it generates the payment transactions for paying the query fee. The `paymentTransactions` list is a parallel array to `nodeAccountIds`.  The `Query` proto message includes a `Transaction` proto message inside of it for paying the query fee, and `onExecuteAsync()` just goes ahead and builds a parallel array of `Transaction` messages which are to be used in the event that we attempt to send our query to that node.
 
-
-
-
-
 ### `Transaction`:
 
 The `Transaction` class extends `Executable`.
 
 A transaction is used like this:
- - Instantiate a subclass of `Transaction`.
- - Call methods to configure it.
- - OPTIONAL:
-     - Freeze the transaction.
-     - Add more signatures.
- - Execute the transaction (it will be frozen if not already frozen, and will be signed with client operator).
- - `execute()` returns (or in the case of `executeAsync()`, returns in future) a `TransactionResponse`.
- - OPTIONAL: use the resulting `TransactionResponse` to get the `TransactionReceipt` for free, or pay a fee to get the `TransactionRecord`.  Fetching either of these is itself a query.
+- Instantiate a subclass of `Transaction`.
+- Call methods to configure it.
+- OPTIONAL:
+- Freeze the transaction.
+- Add more signatures.
+- Execute the transaction (it will be frozen if not already frozen, and will be signed with client operator).
+- `execute()` returns (or in the case of `executeAsync()`, returns in future) a `TransactionResponse`.
+- OPTIONAL: use the resulting `TransactionResponse` to get the `TransactionReceipt` for free, or pay a fee to get the `TransactionRecord`.  Fetching either of these is itself a query.
 
 The `Transaction` class is greatly complicated by three factors:
 
@@ -309,10 +269,6 @@ The `Transaction` is not immediately sent after freezing.  Instead, the user of 
 
 `validateChecksums()` has the same function as in `Query`
 
-
-
-
-
 ### `TopicMessageQuery`
 
 Unlike most classes in the Hedera SDK, this is _not_ a query to a Hedera Hashgraph network, it is a query to a _mirror_ network.  As such, it is _not_ a subclass of `Query`, despite its name.
@@ -324,10 +280,6 @@ The proto messages used under the hood are defined in `"proto/mirror/ConsensusSe
 The responses may be chunked.  If they are, `TopicMessageQuery` will collect all of the chunks into one `TopicMessage` before passing it to the `onNext()` handler.  The `initialTransactionID` field of each responses' `chunkInfo` field is used to identify which pending message this response is a chunk of and store it appropriately.  `chunkInfo`'s `total` field is used to identify whether we've collected all of the chunks of a pending message, and if we have, we construct the `TopicMessage` and dispatch it to the `onNext()` handler.  Because grpc works over HTTP, we're guaranteed to receive all of the chunks, and in the correct order (unless an error occurs, obviously), though chunks from different topic messages may be interleaved.
 
 In addition to the `onNext()` handler, there are several optional handlers which can be set with `setCompletionHandler()`, `setErrorhandler()`, and `setRetryHandler()`.  The retry handler returns a boolean to indicate whether the query should be retried.
-
-
-
-
 
 ### `FunctionalExecutable` and `FunctionalExecutableProcessor`
 
@@ -348,11 +300,6 @@ Note that the last two are synchronous versions, and in `Executable`, the synchr
 
 The `FunctionalAnnotationProcessor` can't add these methods to `Bar` directly.  Instead, it will generate a new interface called `WithFoo`.  The `WithFoo` interface will have an abstract `CompletableFuture<Integer> fooAsync(Client client)` method, and it will have all of the variations of the `fooAsync()` and `foo()` methods which are listed above, which will use and build on the abstract `fooAsync()` method.  You are expected to declare `Bar` as an implementation of this generated `WithFoo` interface.  You should use the `@Override` annotation on your `fooAsync()` method in `Bar` to make sure that it overrides the abstract `fooAsync()` method from `WithFoo`.
 
-If you want to get a better grasp on what the `FunctionalExecutableProcessor` actually does, I suggest that after building the SDK, you should look at the files in `sdk/build/generated/sources/annotationProcessor/java/main/com/hedera/hashgraph/sdk/`.  These are the `With*.java` files that are generated by the `FunctionalExecutableProcessor` during the build process.  For example, the `WithExecute.java` file was generated because of the `@FunctionalExecutable` annotation on the `Executable.executeAsync()` method, and if you look at `WithExecute.java` side-by-side with the `FunctionalExecutableProcessor.process()` method body, you should be able to see how each of the default methods in the `WithExecute` interface were generated by the processor
-
-
-
-
+If you want to get a better grasp on what the `FunctionalExecutableProcessor` actually does, I suggest that after building the SDK, you should look at the files in `sdk/build/generated/sources/annotationProcessor/java/main/org/hiero/sdk/`.  These are the `With*.java` files that are generated by the `FunctionalExecutableProcessor` during the build process.  For example, the `WithExecute.java` file was generated because of the `@FunctionalExecutable` annotation on the `Executable.executeAsync()` method, and if you look at `WithExecute.java` side-by-side with the `FunctionalExecutableProcessor.process()` method body, you should be able to see how each of the default methods in the `WithExecute` interface were generated by the processor
 
 **This document is not comprehensive.  There are classes I have not yet documented, or which I have only documented in passing, like `ChunkedTransaction`.**
-
