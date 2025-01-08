@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-package com.hedera.android_example.ui.main
+package org.hiero.android_example.ui.main
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -11,11 +11,11 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.hedera.android_example.R
-import com.hedera.hashgraph.sdk.AccountBalanceQuery
-import com.hedera.hashgraph.sdk.AccountId
-import com.hedera.hashgraph.sdk.Client
-import com.hedera.hashgraph.sdk.PrecheckStatusException
+import org.hiero.android_example.R
+import org.hiero.sdk.AccountBalanceQuery
+import org.hiero.sdk.AccountId
+import org.hiero.sdk.Client
+import org.hiero.sdk.PrecheckStatusException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
