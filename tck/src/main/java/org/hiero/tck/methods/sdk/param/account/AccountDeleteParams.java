@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
@@ -28,8 +27,7 @@ public class AccountDeleteParams extends JSONRPC2Param {
         var parsedDeleteAccountId = Optional.ofNullable((String) jrpcParams.get("deleteAccountId"));
         var parsedTransferAccountId = Optional.ofNullable((String) jrpcParams.get("transferAccountId"));
 
-        var parsedCommonTransactionParams =
-            JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
         return new AccountDeleteParams(parsedDeleteAccountId, parsedTransferAccountId, parsedCommonTransactionParams);
     }

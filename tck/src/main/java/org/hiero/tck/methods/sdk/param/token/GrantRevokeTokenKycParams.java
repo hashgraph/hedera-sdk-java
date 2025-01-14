@@ -1,5 +1,8 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.methods.sdk.param.token;
 
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,9 +10,6 @@ import org.hiero.tck.exception.JSONRPCParseException;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
-
-import java.util.Map;
-import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
@@ -24,13 +24,9 @@ public class GrantRevokeTokenKycParams extends JSONRPC2Param {
         try {
             var parsedTokenId = Optional.ofNullable((String) jrpcParams.get("tokenId"));
             var parsedAccountId = Optional.ofNullable((String) jrpcParams.get("accountId"));
-            var parsedCommonTransactionParams =
-                JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+            var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-            return new GrantRevokeTokenKycParams(
-                parsedTokenId,
-                parsedAccountId,
-                parsedCommonTransactionParams);
+            return new GrantRevokeTokenKycParams(parsedTokenId, parsedAccountId, parsedCommonTransactionParams);
         } catch (ClassCastException e) {
             throw new JSONRPCParseException("Invalid parameter type", e);
         } catch (JSONRPCParseException e) {

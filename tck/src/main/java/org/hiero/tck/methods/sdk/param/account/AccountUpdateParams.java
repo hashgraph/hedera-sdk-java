@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
@@ -44,8 +43,7 @@ public class AccountUpdateParams extends JSONRPC2Param {
         var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
         var parsedExpirationTime = Optional.ofNullable((Long) jrpcParams.get("expirationTime"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
-        var parsedCommonTransactionParams =
-            JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
         return new AccountUpdateParams(
                 parsedKey,

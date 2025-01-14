@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.exception;
 
 public class JSONRPCParseException extends RuntimeException {

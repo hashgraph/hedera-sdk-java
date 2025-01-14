@@ -1,5 +1,9 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.methods.sdk.param.token;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,10 +11,6 @@ import org.hiero.tck.exception.JSONRPCParseException;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 @Getter
 @AllArgsConstructor
@@ -25,13 +25,9 @@ public class AssociateDisassociateTokenParams extends JSONRPC2Param {
         try {
             var parsedAccountId = Optional.ofNullable((String) jrpcParams.get("accountId"));
             var parsedTokenIds = Optional.ofNullable((List<String>) jrpcParams.get("tokenIds"));
-            var parsedCommonTransactionParams =
-                JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+            var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-            return new AssociateDisassociateTokenParams(
-                parsedAccountId,
-                parsedTokenIds,
-                parsedCommonTransactionParams);
+            return new AssociateDisassociateTokenParams(parsedAccountId, parsedTokenIds, parsedCommonTransactionParams);
         } catch (ClassCastException e) {
             throw new JSONRPCParseException("Invalid parameter type", e);
         } catch (JSONRPCParseException e) {

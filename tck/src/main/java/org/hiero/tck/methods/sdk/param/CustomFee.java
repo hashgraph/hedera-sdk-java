@@ -85,7 +85,12 @@ public class CustomFee extends JSONRPC2Param {
             var minimumAmountParsed = (String) jrpcParams.get("minimumAmount");
             var maximumAmountParsed = (String) jrpcParams.get("maximumAmount");
             var assessmentMethodParsed = (String) jrpcParams.get("assessmentMethod");
-            return new FractionalFee(numeratorParsed, denominatorParsed, minimumAmountParsed, maximumAmountParsed, assessmentMethodParsed);
+            return new FractionalFee(
+                    numeratorParsed,
+                    denominatorParsed,
+                    minimumAmountParsed,
+                    maximumAmountParsed,
+                    assessmentMethodParsed);
         }
     }
 
@@ -117,48 +122,45 @@ public class CustomFee extends JSONRPC2Param {
         for (var customFee : customFees) {
             customFee.getFixedFee().ifPresent(fixedFee -> {
                 var sdkFixedFee = new CustomFixedFee()
-                    .setAmount(Long.parseLong(fixedFee.getAmount()))
-                    .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
-                    .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
+                        .setAmount(Long.parseLong(fixedFee.getAmount()))
+                        .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                        .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
 
                 fixedFee.getDenominatingTokenId()
-                    .ifPresent(tokenId ->
-                        sdkFixedFee.setDenominatingTokenId(TokenId.fromString(tokenId)));
+                        .ifPresent(tokenId -> sdkFixedFee.setDenominatingTokenId(TokenId.fromString(tokenId)));
 
                 customFeeList.add(sdkFixedFee);
             });
 
             customFee.getFractionalFee().ifPresent(fractionalFee -> {
                 var sdkFractionalFee = new CustomFractionalFee()
-                    .setNumerator(Long.parseLong(fractionalFee.getNumerator()))
-                    .setDenominator(Long.parseLong(fractionalFee.getDenominator()))
-                    .setMin(Long.parseLong(fractionalFee.getMinimumAmount()))
-                    .setMax(Long.parseLong(fractionalFee.getMaximumAmount()))
-                    .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
-                    .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt())
-                    .setAssessmentMethod(
-                        "inclusive".equalsIgnoreCase(fractionalFee.getAssessmentMethod())
-                            ? FeeAssessmentMethod.INCLUSIVE
-                            : FeeAssessmentMethod.EXCLUSIVE
-                    );
+                        .setNumerator(Long.parseLong(fractionalFee.getNumerator()))
+                        .setDenominator(Long.parseLong(fractionalFee.getDenominator()))
+                        .setMin(Long.parseLong(fractionalFee.getMinimumAmount()))
+                        .setMax(Long.parseLong(fractionalFee.getMaximumAmount()))
+                        .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                        .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt())
+                        .setAssessmentMethod(
+                                "inclusive".equalsIgnoreCase(fractionalFee.getAssessmentMethod())
+                                        ? FeeAssessmentMethod.INCLUSIVE
+                                        : FeeAssessmentMethod.EXCLUSIVE);
 
                 customFeeList.add(sdkFractionalFee);
             });
 
             customFee.getRoyaltyFee().ifPresent(royaltyFee -> {
                 var sdkRoyaltyFee = new CustomRoyaltyFee()
-                    .setDenominator(Long.parseLong(royaltyFee.getDenominator()))
-                    .setNumerator(Long.parseLong(royaltyFee.getNumerator()))
-                    .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
-                    .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
+                        .setDenominator(Long.parseLong(royaltyFee.getDenominator()))
+                        .setNumerator(Long.parseLong(royaltyFee.getNumerator()))
+                        .setFeeCollectorAccountId(AccountId.fromString(customFee.getFeeCollectorAccountId()))
+                        .setAllCollectorsAreExempt(customFee.getFeeCollectorsExempt());
 
                 royaltyFee.getFallbackFee().ifPresent(fallbackFee -> {
-                    var fixedFallback = new CustomFixedFee()
-                        .setAmount(Long.parseLong(fallbackFee.getAmount()));
+                    var fixedFallback = new CustomFixedFee().setAmount(Long.parseLong(fallbackFee.getAmount()));
 
-                    fallbackFee.getDenominatingTokenId()
-                        .ifPresent(tokenId ->
-                            fixedFallback.setDenominatingTokenId(TokenId.fromString(tokenId)));
+                    fallbackFee
+                            .getDenominatingTokenId()
+                            .ifPresent(tokenId -> fixedFallback.setDenominatingTokenId(TokenId.fromString(tokenId)));
 
                     sdkRoyaltyFee.setFallbackFee(fixedFallback);
                 });

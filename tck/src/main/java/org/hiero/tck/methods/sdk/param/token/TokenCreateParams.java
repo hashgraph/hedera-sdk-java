@@ -69,11 +69,9 @@ public class TokenCreateParams extends JSONRPC2Param {
         var parsedMaxSupply = Optional.ofNullable((String) jrpcParams.get("maxSupply"));
         var parsedMetadata = Optional.ofNullable((String) jrpcParams.get("metadata"));
 
-        var parsedCommonTransactionParams =
-            JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-        var parsedCustomFees =
-            JSONRPCParamParser.parseCustomFees(jrpcParams);
+        var parsedCustomFees = JSONRPCParamParser.parseCustomFees(jrpcParams);
 
         return new TokenCreateParams(
                 parsedName,

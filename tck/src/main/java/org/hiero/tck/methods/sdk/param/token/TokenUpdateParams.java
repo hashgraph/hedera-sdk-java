@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
@@ -57,8 +56,7 @@ public class TokenUpdateParams extends JSONRPC2Param {
         var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
         var parsedMetadata = Optional.ofNullable((String) jrpcParams.get("metadata"));
 
-        var parsedCommonTransactionParams =
-            JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
         return new TokenUpdateParams(
                 parsedTokenId,

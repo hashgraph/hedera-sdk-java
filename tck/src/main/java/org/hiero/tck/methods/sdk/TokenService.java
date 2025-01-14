@@ -5,7 +5,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.bouncycastle.util.encoders.Hex;
 import org.hiero.sdk.*;
 import org.hiero.tck.annotation.JSONRPC2Method;
@@ -146,7 +145,8 @@ public class TokenService extends AbstractJSONRPC2Service {
         params.getMaxSupply().ifPresent(maxSupply -> tokenCreateTransaction.setMaxSupply(Long.valueOf(maxSupply)));
 
         params.getCustomFees()
-            .ifPresent(customFees -> tokenCreateTransaction.setCustomFees(customFees.get(0).fillOutCustomFees(customFees)));
+                .ifPresent(customFees ->
+                        tokenCreateTransaction.setCustomFees(customFees.get(0).fillOutCustomFees(customFees)));
 
         params.getMetadata().ifPresent(metadata -> tokenCreateTransaction.setTokenMetadata(metadata.getBytes()));
 
@@ -286,272 +286,206 @@ public class TokenService extends AbstractJSONRPC2Service {
 
     @JSONRPC2Method("updateTokenFeeSchedule")
     public TokenResponse updateTokenFeeSchedule(TokenUpdateFeeScheduleParams params) throws Exception {
-        TokenFeeScheduleUpdateTransaction transaction = new TokenFeeScheduleUpdateTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenFeeScheduleUpdateTransaction transaction =
+                new TokenFeeScheduleUpdateTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
         params.getCustomFees()
-            .ifPresent(customFees -> transaction.setCustomFees(customFees.get(0).fillOutCustomFees(customFees)));
-
+                .ifPresent(customFees ->
+                        transaction.setCustomFees(customFees.get(0).fillOutCustomFees(customFees)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("freezeToken")
     public TokenResponse tokenFreezeTransaction(FreezeUnfreezeTokenParams params) throws Exception {
-        TokenFreezeTransaction transaction = new TokenFreezeTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenFreezeTransaction transaction = new TokenFreezeTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("unfreezeToken")
     public TokenResponse tokenUnfreezeTransaction(FreezeUnfreezeTokenParams params) throws Exception {
-        TokenUnfreezeTransaction transaction = new TokenUnfreezeTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenUnfreezeTransaction transaction = new TokenUnfreezeTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("associateToken")
     public TokenResponse associateToken(AssociateDisassociateTokenParams params) throws Exception {
-        TokenAssociateTransaction transaction = new TokenAssociateTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenAssociateTransaction transaction = new TokenAssociateTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenIds()
-            .ifPresent(tokenIds -> {
-                List<TokenId> tokenIdList = tokenIds.stream().map(TokenId::fromString).collect(Collectors.toList());
-                transaction.setTokenIds(tokenIdList);
-            });
+        params.getTokenIds().ifPresent(tokenIds -> {
+            List<TokenId> tokenIdList =
+                    tokenIds.stream().map(TokenId::fromString).collect(Collectors.toList());
+            transaction.setTokenIds(tokenIdList);
+        });
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("dissociateToken")
     public TokenResponse dissociateToken(AssociateDisassociateTokenParams params) throws Exception {
-        TokenDissociateTransaction transaction = new TokenDissociateTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenDissociateTransaction transaction =
+                new TokenDissociateTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenIds()
-            .ifPresent(tokenIds -> {
-                List<TokenId> tokenIdList = tokenIds.stream().map(TokenId::fromString).collect(Collectors.toList());
-                transaction.setTokenIds(tokenIdList);
-            });
+        params.getTokenIds().ifPresent(tokenIds -> {
+            List<TokenId> tokenIdList =
+                    tokenIds.stream().map(TokenId::fromString).collect(Collectors.toList());
+            transaction.setTokenIds(tokenIdList);
+        });
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("pauseToken")
     public TokenResponse pauseToken(PauseUnpauseTokenParams params) throws Exception {
-        TokenPauseTransaction transaction = new TokenPauseTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenPauseTransaction transaction = new TokenPauseTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("unpauseToken")
     public TokenResponse tokenUnpauseTransaction(PauseUnpauseTokenParams params) throws Exception {
-        TokenUnpauseTransaction transaction = new TokenUnpauseTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenUnpauseTransaction transaction = new TokenUnpauseTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("grantTokenKyc")
     public TokenResponse grantTokenKyc(GrantRevokeTokenKycParams params) throws Exception {
-        TokenGrantKycTransaction transaction = new TokenGrantKycTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenGrantKycTransaction transaction = new TokenGrantKycTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("revokeTokenKyc")
     public TokenResponse revokeTokenKyc(GrantRevokeTokenKycParams params) throws Exception {
-        TokenRevokeKycTransaction transaction = new TokenRevokeKycTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenRevokeKycTransaction transaction = new TokenRevokeKycTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
-        params.getAccountId()
-            .ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
+        params.getAccountId().ifPresent(accountId -> transaction.setAccountId(AccountId.fromString(accountId)));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenResponse("", receipt.status);
     }
 
     @JSONRPC2Method("mintToken")
     public TokenMintResponse mintToken(MintTokenParams params) throws Exception {
-        TokenMintTransaction transaction = new TokenMintTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenMintTransaction transaction = new TokenMintTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
         try {
-            params.getAmount()
-                .ifPresent(amount -> transaction.setAmount(Long.parseLong(amount)));
+            params.getAmount().ifPresent(amount -> transaction.setAmount(Long.parseLong(amount)));
         } catch (NumberFormatException e) {
             transaction.setAmount(-1L);
         }
 
-
-        params.getMetadata().ifPresent(metadata ->
-            transaction.setMetadata(metadata.stream()
-                .map(Hex::decode)
-                .toList())
-        );
+        params.getMetadata()
+                .ifPresent(metadata -> transaction.setMetadata(
+                        metadata.stream().map(Hex::decode).toList()));
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new TokenMintResponse(
-            "",
-            receipt.status,
-            receipt.totalSupply.toString(),
-            receipt.serials.stream().map(String::valueOf).toList());
+                "",
+                receipt.status,
+                receipt.totalSupply.toString(),
+                receipt.serials.stream().map(String::valueOf).toList());
     }
 
     @JSONRPC2Method("burnToken")
     public TokenBurnResponse burnToken(BurnTokenParams params) throws Exception {
-        TokenBurnTransaction transaction = new TokenBurnTransaction()
-            .setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
+        TokenBurnTransaction transaction = new TokenBurnTransaction().setGrpcDeadline(DEFAULT_GRPC_DEADLINE);
 
-        params.getTokenId()
-            .ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
+        params.getTokenId().ifPresent(tokenId -> transaction.setTokenId(TokenId.fromString(tokenId)));
 
         try {
-            params.getAmount()
-                .ifPresent(amount -> transaction.setAmount(Long.parseLong(amount)));
+            params.getAmount().ifPresent(amount -> transaction.setAmount(Long.parseLong(amount)));
         } catch (NumberFormatException e) {
             transaction.setAmount(-1L);
         }
 
-        params.getSerialNumbers()
-            .ifPresent(serialNumbers -> {
-                List<Long> tokenIdList = serialNumbers.stream().map(Long::parseLong).collect(Collectors.toList());
-                transaction.setSerials(tokenIdList);
-            });
+        params.getSerialNumbers().ifPresent(serialNumbers -> {
+            List<Long> tokenIdList = serialNumbers.stream().map(Long::parseLong).collect(Collectors.toList());
+            transaction.setSerials(tokenIdList);
+        });
 
         params.getCommonTransactionParams()
-            .ifPresent(commonParams ->
-                commonParams.fillOutTransaction(transaction, sdkService.getClient()));
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(transaction, sdkService.getClient()));
 
-        TransactionReceipt receipt = transaction
-            .execute(sdkService.getClient())
-            .getReceipt(sdkService.getClient());
+        TransactionReceipt receipt = transaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
-        return new TokenBurnResponse(
-            "",
-            receipt.status,
-            receipt.totalSupply.toString());
+        return new TokenBurnResponse("", receipt.status, receipt.totalSupply.toString());
     }
 }
