@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.file">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -34,7 +34,7 @@ import "basic_types.proto";
  * single FileCreateTransaction, then it can be created with the first part of its contents, and
  * then appended as many times as necessary to create the entire file. This transaction must be
  * signed by all initial M-of-M KeyList keys. If keys contains additional KeyList or ThresholdKey
- * then M-of-M secondary KeyList or ThresholdKey signing requirements must be meet. 
+ * then M-of-M secondary KeyList or ThresholdKey signing requirements must be meet.
  */
 message FileAppendTransactionBody {
     /**

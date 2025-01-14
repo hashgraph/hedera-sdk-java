@@ -19,7 +19,7 @@ plugins {
     id("org.hiero.gradle.report.test-logger")
 }
 
-description = "Hedera SDK TCK Server"
+description = "Hiero SDK TCK Server"
 
 version = "0.0.1"
 
@@ -63,6 +63,7 @@ dependencyAnalysis {
         onAny {
             severity("fail")
             exclude("com.google.protobuf:protobuf-javalite")
+            onUnusedDependencies { exclude(":sdk") }
         }
     }
 }

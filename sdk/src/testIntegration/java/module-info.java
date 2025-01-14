@@ -18,8 +18,8 @@
  *
  */
 
-open module com.hedera.hashgraph.sdk.test.integration {
-    requires com.hedera.hashgraph.sdk;
+open module org.hiero.sdk.test.integration {
+    requires org.hiero.sdk;
     requires com.esaulpaugh.headlong;
     requires org.assertj.core;
     requires org.bouncycastle.provider;

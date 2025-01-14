@@ -22,7 +22,7 @@ package proto;
  * ‍
  */
 
-option java_package = "com.hedera.hashgraph.sdk.proto";
+option java_package = "org.hiero.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.file">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -38,14 +38,14 @@ import "timestamp.proto";
  * at the expirationTime, unless its expiration is extended by another transaction before that time.
  * If the file is deleted, then its contents will become empty and it will be marked as deleted
  * until it expires, and then it will cease to exist.
- * 
+ *
  * The keys field is a list of keys. All keys within the top-level key list must sign (M-M) to
  * create or modify a file. However, to delete the file, only one key (1-M) is required to sign from
  * the top-level key list.  Each of those "keys" may itself be threshold key containing other keys
  * (including other threshold keys). In other words, the behavior is an AND for create/modify, OR
  * for delete. This is useful for acting as a revocation server. If it is desired to have the
  * behavior be AND for all 3 operations (or OR for all 3), then the list should have only a single
- * Key, which is a threshold key, with N=1 for OR, N=M for AND. If the auto_renew_account field 
+ * Key, which is a threshold key, with N=1 for OR, N=M for AND. If the auto_renew_account field
  * is set, the key of the referenced account must sign.
  *
  * If a file is created without ANY keys in the keys field, the file is immutable and ONLY the
