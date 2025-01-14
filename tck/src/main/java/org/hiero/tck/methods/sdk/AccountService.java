@@ -15,9 +15,9 @@ import org.hiero.sdk.TransactionReceipt;
 import org.hiero.tck.annotation.JSONRPC2Method;
 import org.hiero.tck.annotation.JSONRPC2Service;
 import org.hiero.tck.methods.AbstractJSONRPC2Service;
-import org.hiero.tck.methods.sdk.param.AccountCreateParams;
-import org.hiero.tck.methods.sdk.param.AccountDeleteParams;
-import org.hiero.tck.methods.sdk.param.AccountUpdateParams;
+import org.hiero.tck.methods.sdk.param.account.AccountCreateParams;
+import org.hiero.tck.methods.sdk.param.account.AccountDeleteParams;
+import org.hiero.tck.methods.sdk.param.account.AccountUpdateParams;
 import org.hiero.tck.methods.sdk.response.AccountResponse;
 import org.hiero.tck.util.KeyUtils;
 

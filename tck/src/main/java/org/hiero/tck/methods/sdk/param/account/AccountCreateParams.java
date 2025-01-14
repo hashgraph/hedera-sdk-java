@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.tck.methods.sdk.param;
+package org.hiero.tck.methods.sdk.param.account;
 
 import java.util.Map;
 import java.util.Optional;
@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
+import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
+import org.hiero.tck.util.JSONRPCParamParser;
 
 /**
  * AccountCreateParams for account create method
@@ -42,11 +44,8 @@ public class AccountCreateParams extends JSONRPC2Param {
         var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
         var parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
-        Optional<CommonTransactionParams> parsedCommonTransactionParams = Optional.empty();
-        if (jrpcParams.containsKey("commonTransactionParams")) {
-            JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
-            parsedCommonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
-        }
+        var parsedCommonTransactionParams =
+            JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
         return new AccountCreateParams(
                 parsedKey,

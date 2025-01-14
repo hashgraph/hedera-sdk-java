@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import org.hiero.tck.methods.sdk.param.account.AccountCreateParams;
 import org.junit.jupiter.api.Test;
 
 class AccountCreateParamsTest {
