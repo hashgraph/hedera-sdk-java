@@ -19,9 +19,9 @@ public class TransactionReceiptIntegrationTest {
 
             var transaction = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
 
-            var record = transaction.getRecord(testEnv.client);
+            var receipt = transaction.getReceipt(testEnv.client);
 
-            var nextExchangeRate = record.receipt.nextExchangeRate;
+            var nextExchangeRate = receipt.nextExchangeRate;
             assertThat(nextExchangeRate).isNotNull();
         }
     }
