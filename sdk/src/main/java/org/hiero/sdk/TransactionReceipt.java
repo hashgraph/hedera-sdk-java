@@ -130,24 +130,24 @@ public final class TransactionReceipt {
     public final List<TransactionReceipt> children;
 
     TransactionReceipt(
-        @Nullable TransactionId transactionId,
-        Status status,
-        ExchangeRate exchangeRate,
-        ExchangeRate nextExchangeRate,
-        @Nullable AccountId accountId,
-        @Nullable FileId fileId,
-        @Nullable ContractId contractId,
-        @Nullable TopicId topicId,
-        @Nullable TokenId tokenId,
-        @Nullable Long topicSequenceNumber,
-        @Nullable ByteString topicRunningHash,
-        Long totalSupply,
-        @Nullable ScheduleId scheduleId,
-        @Nullable TransactionId scheduledTransactionId,
-        List<Long> serials,
-        long nodeId,
-        List<TransactionReceipt> duplicates,
-        List<TransactionReceipt> children) {
+            @Nullable TransactionId transactionId,
+            Status status,
+            ExchangeRate exchangeRate,
+            ExchangeRate nextExchangeRate,
+            @Nullable AccountId accountId,
+            @Nullable FileId fileId,
+            @Nullable ContractId contractId,
+            @Nullable TopicId topicId,
+            @Nullable TokenId tokenId,
+            @Nullable Long topicSequenceNumber,
+            @Nullable ByteString topicRunningHash,
+            Long totalSupply,
+            @Nullable ScheduleId scheduleId,
+            @Nullable TransactionId scheduledTransactionId,
+            List<Long> serials,
+            long nodeId,
+            List<TransactionReceipt> duplicates,
+            List<TransactionReceipt> children) {
         this.transactionId = transactionId;
         this.status = status;
         this.exchangeRate = exchangeRate;
@@ -177,10 +177,10 @@ public final class TransactionReceipt {
      * @return                          the new transaction receipt
      */
     static TransactionReceipt fromProtobuf(
-        org.hiero.sdk.proto.TransactionReceipt transactionReceipt,
-        List<TransactionReceipt> duplicates,
-        List<TransactionReceipt> children,
-        @Nullable TransactionId transactionId) {
+            org.hiero.sdk.proto.TransactionReceipt transactionReceipt,
+            List<TransactionReceipt> duplicates,
+            List<TransactionReceipt> children,
+            @Nullable TransactionId transactionId) {
         var status = Status.valueOf(transactionReceipt.getStatus());
 
         var rate = transactionReceipt.getExchangeRate();
@@ -188,55 +188,55 @@ public final class TransactionReceipt {
         var nextExchangeRate = ExchangeRate.fromProtobuf(rate.getNextRate());
 
         var accountId =
-            transactionReceipt.hasAccountID() ? AccountId.fromProtobuf(transactionReceipt.getAccountID()) : null;
+                transactionReceipt.hasAccountID() ? AccountId.fromProtobuf(transactionReceipt.getAccountID()) : null;
 
         var fileId = transactionReceipt.hasFileID() ? FileId.fromProtobuf(transactionReceipt.getFileID()) : null;
 
         var contractId =
-            transactionReceipt.hasContractID() ? ContractId.fromProtobuf(transactionReceipt.getContractID()) : null;
+                transactionReceipt.hasContractID() ? ContractId.fromProtobuf(transactionReceipt.getContractID()) : null;
 
         var topicId = transactionReceipt.hasTopicID() ? TopicId.fromProtobuf(transactionReceipt.getTopicID()) : null;
 
         var tokenId = transactionReceipt.hasTokenID() ? TokenId.fromProtobuf(transactionReceipt.getTokenID()) : null;
 
         var topicSequenceNumber =
-            transactionReceipt.getTopicSequenceNumber() == 0 ? null : transactionReceipt.getTopicSequenceNumber();
+                transactionReceipt.getTopicSequenceNumber() == 0 ? null : transactionReceipt.getTopicSequenceNumber();
 
         var topicRunningHash =
-            transactionReceipt.getTopicRunningHash().isEmpty() ? null : transactionReceipt.getTopicRunningHash();
+                transactionReceipt.getTopicRunningHash().isEmpty() ? null : transactionReceipt.getTopicRunningHash();
 
         var totalSupply = transactionReceipt.getNewTotalSupply();
 
         var scheduleId =
-            transactionReceipt.hasScheduleID() ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID()) : null;
+                transactionReceipt.hasScheduleID() ? ScheduleId.fromProtobuf(transactionReceipt.getScheduleID()) : null;
 
         var scheduledTransactionId = transactionReceipt.hasScheduledTransactionID()
-            ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID())
-            : null;
+                ? TransactionId.fromProtobuf(transactionReceipt.getScheduledTransactionID())
+                : null;
 
         var serials = transactionReceipt.getSerialNumbersList();
 
         var nodeId = transactionReceipt.getNodeId();
 
         return new TransactionReceipt(
-            transactionId,
-            status,
-            exchangeRate,
-            nextExchangeRate,
-            accountId,
-            fileId,
-            contractId,
-            topicId,
-            tokenId,
-            topicSequenceNumber,
-            topicRunningHash,
-            totalSupply,
-            scheduleId,
-            scheduledTransactionId,
-            serials,
-            nodeId,
-            duplicates,
-            children);
+                transactionId,
+                status,
+                exchangeRate,
+                nextExchangeRate,
+                accountId,
+                fileId,
+                contractId,
+                topicId,
+                tokenId,
+                topicSequenceNumber,
+                topicRunningHash,
+                totalSupply,
+                scheduleId,
+                scheduledTransactionId,
+                serials,
+                nodeId,
+                duplicates,
+                children);
     }
 
     /**
@@ -250,7 +250,7 @@ public final class TransactionReceipt {
     }
 
     static TransactionReceipt fromProtobuf(
-        org.hiero.sdk.proto.TransactionReceipt transactionReceipt, @Nullable TransactionId transactionId) {
+            org.hiero.sdk.proto.TransactionReceipt transactionReceipt, @Nullable TransactionId transactionId) {
         return fromProtobuf(transactionReceipt, new ArrayList<>(), new ArrayList<>(), transactionId);
     }
 
@@ -263,7 +263,7 @@ public final class TransactionReceipt {
      */
     public static TransactionReceipt fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
         return fromProtobuf(org.hiero.sdk.proto.TransactionReceipt.parseFrom(bytes).toBuilder()
-            .build());
+                .build());
     }
 
     /**
@@ -287,19 +287,19 @@ public final class TransactionReceipt {
      */
     org.hiero.sdk.proto.TransactionReceipt toProtobuf() {
         var transactionReceiptBuilder = org.hiero.sdk.proto.TransactionReceipt.newBuilder()
-            .setStatus(status.code)
-            .setExchangeRate(ExchangeRateSet.newBuilder()
-                .setCurrentRate(org.hiero.sdk.proto.ExchangeRate.newBuilder()
-                    .setHbarEquiv(exchangeRate.hbars)
-                    .setCentEquiv(exchangeRate.cents)
-                    .setExpirationTime(TimestampSeconds.newBuilder()
-                        .setSeconds(exchangeRate.expirationTime.getEpochSecond())))
-                .setNextRate(org.hiero.sdk.proto.ExchangeRate.newBuilder()
-                    .setHbarEquiv(nextExchangeRate.hbars)
-                    .setCentEquiv(nextExchangeRate.cents)
-                    .setExpirationTime(TimestampSeconds.newBuilder()
-                        .setSeconds(nextExchangeRate.expirationTime.getEpochSecond()))))
-            .setNewTotalSupply(totalSupply);
+                .setStatus(status.code)
+                .setExchangeRate(ExchangeRateSet.newBuilder()
+                        .setCurrentRate(org.hiero.sdk.proto.ExchangeRate.newBuilder()
+                                .setHbarEquiv(exchangeRate.hbars)
+                                .setCentEquiv(exchangeRate.cents)
+                                .setExpirationTime(TimestampSeconds.newBuilder()
+                                        .setSeconds(exchangeRate.expirationTime.getEpochSecond())))
+                        .setNextRate(org.hiero.sdk.proto.ExchangeRate.newBuilder()
+                                .setHbarEquiv(nextExchangeRate.hbars)
+                                .setCentEquiv(nextExchangeRate.cents)
+                                .setExpirationTime(TimestampSeconds.newBuilder()
+                                        .setSeconds(nextExchangeRate.expirationTime.getEpochSecond()))))
+                .setNewTotalSupply(totalSupply);
 
         if (accountId != null) {
             transactionReceiptBuilder.setAccountID(accountId.toProtobuf());
@@ -349,25 +349,25 @@ public final class TransactionReceipt {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("transactionId", transactionId)
-            .add("status", status)
-            .add("exchangeRate", exchangeRate)
-            .add("nextExchangeRate", nextExchangeRate)
-            .add("accountId", accountId)
-            .add("fileId", fileId)
-            .add("contractId", contractId)
-            .add("topicId", topicId)
-            .add("tokenId", tokenId)
-            .add("topicSequenceNumber", topicSequenceNumber)
-            .add("topicRunningHash", topicRunningHash != null ? Hex.encode(topicRunningHash.toByteArray()) : null)
-            .add("totalSupply", totalSupply)
-            .add("scheduleId", scheduleId)
-            .add("scheduledTransactionId", scheduledTransactionId)
-            .add("serials", serials)
-            .add("nodeId", nodeId)
-            .add("duplicates", duplicates)
-            .add("children", children)
-            .toString();
+                .add("transactionId", transactionId)
+                .add("status", status)
+                .add("exchangeRate", exchangeRate)
+                .add("nextExchangeRate", nextExchangeRate)
+                .add("accountId", accountId)
+                .add("fileId", fileId)
+                .add("contractId", contractId)
+                .add("topicId", topicId)
+                .add("tokenId", tokenId)
+                .add("topicSequenceNumber", topicSequenceNumber)
+                .add("topicRunningHash", topicRunningHash != null ? Hex.encode(topicRunningHash.toByteArray()) : null)
+                .add("totalSupply", totalSupply)
+                .add("scheduleId", scheduleId)
+                .add("scheduledTransactionId", scheduledTransactionId)
+                .add("serials", serials)
+                .add("nodeId", nodeId)
+                .add("duplicates", duplicates)
+                .add("children", children)
+                .toString();
     }
 
     /**

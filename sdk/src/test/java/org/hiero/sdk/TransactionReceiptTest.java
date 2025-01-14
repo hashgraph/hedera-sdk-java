@@ -28,24 +28,24 @@ public class TransactionReceiptTest {
 
     static TransactionReceipt spawnReceiptExample() {
         return new TransactionReceipt(
-            null,
-            Status.SCHEDULE_ALREADY_DELETED,
-            new ExchangeRate(3, 4, time),
-            new ExchangeRate(3, 4, time),
-            AccountId.fromString("1.2.3"),
-            FileId.fromString("4.5.6"),
-            ContractId.fromString("3.2.1"),
-            TopicId.fromString("9.8.7"),
-            TokenId.fromString("6.5.4"),
-            3L,
-            ByteString.copyFrom("how now brown cow", StandardCharsets.UTF_8),
-            30L,
-            ScheduleId.fromString("1.1.1"),
-            TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
-            List.of(1L, 2L, 3L),
-            1,
-            new ArrayList<>(),
-            new ArrayList<>());
+                null,
+                Status.SCHEDULE_ALREADY_DELETED,
+                new ExchangeRate(3, 4, time),
+                new ExchangeRate(3, 4, time),
+                AccountId.fromString("1.2.3"),
+                FileId.fromString("4.5.6"),
+                ContractId.fromString("3.2.1"),
+                TopicId.fromString("9.8.7"),
+                TokenId.fromString("6.5.4"),
+                3L,
+                ByteString.copyFrom("how now brown cow", StandardCharsets.UTF_8),
+                30L,
+                ScheduleId.fromString("1.1.1"),
+                TransactionId.withValidStart(AccountId.fromString("3.3.3"), time),
+                List.of(1L, 2L, 3L),
+                1,
+                new ArrayList<>(),
+                new ArrayList<>());
     }
 
     @Test
