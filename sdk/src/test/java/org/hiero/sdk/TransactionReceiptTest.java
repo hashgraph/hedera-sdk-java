@@ -31,6 +31,7 @@ public class TransactionReceiptTest {
                 null,
                 Status.SCHEDULE_ALREADY_DELETED,
                 new ExchangeRate(3, 4, time),
+                new ExchangeRate(3, 4, time),
                 AccountId.fromString("1.2.3"),
                 FileId.fromString("4.5.6"),
                 ContractId.fromString("3.2.1"),
