@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.tck.methods.sdk.param;
+package org.hiero.tck.methods.sdk.param.token;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
+import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
+import org.hiero.tck.methods.sdk.param.CustomFee;
+import org.hiero.tck.util.JSONRPCParamParser;
 
 /**
  * TokenCreateParams for token create method
@@ -21,7 +21,7 @@ import org.hiero.tck.methods.JSONRPC2Param;
 public class TokenCreateParams extends JSONRPC2Param {
     private Optional<String> name;
     private Optional<String> symbol;
-    private Optional<Long> decimals;
+    private Optional<String> decimals;
     private Optional<String> initialSupply;
     private Optional<String> treasuryAccountId;
     private Optional<String> adminKey;
@@ -48,7 +48,7 @@ public class TokenCreateParams extends JSONRPC2Param {
     public JSONRPC2Param parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedName = Optional.ofNullable((String) jrpcParams.get("name"));
         var parsedSymbol = Optional.ofNullable((String) jrpcParams.get("symbol"));
-        var parsedDecimals = Optional.ofNullable((Long) jrpcParams.get("decimals"));
+        var parsedDecimals = Optional.ofNullable((String) jrpcParams.get("decimals"));
         var parsedInitialSupply = Optional.ofNullable((String) jrpcParams.get("initialSupply"));
         var parsedTreasuryAccountId = Optional.ofNullable((String) jrpcParams.get("treasuryAccountId"));
         var parsedAdminKey = Optional.ofNullable((String) jrpcParams.get("adminKey"));
@@ -69,24 +69,9 @@ public class TokenCreateParams extends JSONRPC2Param {
         var parsedMaxSupply = Optional.ofNullable((String) jrpcParams.get("maxSupply"));
         var parsedMetadata = Optional.ofNullable((String) jrpcParams.get("metadata"));
 
-        Optional<List<CustomFee>> parsedCustomFees = Optional.empty();
-        if (jrpcParams.containsKey("customFees")) {
-            JSONArray jsonArray = (JSONArray) jrpcParams.get("customFees");
-            List<CustomFee> customFees = new ArrayList<>();
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-            for (Object o : jsonArray) {
-                JSONObject jsonObject = (JSONObject) o;
-                CustomFee customFee = new CustomFee().parse(jsonObject);
-                customFees.add(customFee);
-            }
-            parsedCustomFees = Optional.of(customFees);
-        }
-
-        Optional<CommonTransactionParams> parsedCommonTransactionParams = Optional.empty();
-        if (jrpcParams.containsKey("commonTransactionParams")) {
-            JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
-            parsedCommonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
-        }
+        var parsedCustomFees = JSONRPCParamParser.parseCustomFees(jrpcParams);
 
         return new TokenCreateParams(
                 parsedName,
