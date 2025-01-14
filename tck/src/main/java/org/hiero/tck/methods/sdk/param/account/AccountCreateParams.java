@@ -31,7 +31,7 @@ public class AccountCreateParams extends JSONRPC2Param {
     private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
-    public AccountCreateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
+    public AccountCreateParams parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
         var parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
         var parsedReceiverSignatureRequired =

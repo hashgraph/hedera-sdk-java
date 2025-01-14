@@ -23,7 +23,7 @@ public class AccountDeleteParams extends JSONRPC2Param {
     private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
-    public AccountDeleteParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
+    public AccountDeleteParams parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedDeleteAccountId = Optional.ofNullable((String) jrpcParams.get("deleteAccountId"));
         var parsedTransferAccountId = Optional.ofNullable((String) jrpcParams.get("transferAccountId"));
 

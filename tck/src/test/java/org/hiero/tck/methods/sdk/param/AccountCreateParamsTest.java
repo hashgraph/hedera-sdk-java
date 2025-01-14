@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
 class AccountCreateParamsTest {
 
     @Test
-    void testParseWithAllFields() {
+    void testParseWithAllFields() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
         jrpcParams.put("initialBalance", 1000L);
@@ -71,7 +71,7 @@ class AccountCreateParamsTest {
     }
 
     @Test
-    void testParseWithOptionalFieldsAbsent() {
+    void testParseWithOptionalFieldsAbsent() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
 
@@ -101,7 +101,7 @@ class AccountCreateParamsTest {
     }
 
     @Test
-    void testParseWithEmptyParams() {
+    void testParseWithEmptyParams() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
 
         AccountCreateParams params = new AccountCreateParams().parse(jrpcParams);

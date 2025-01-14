@@ -7,7 +7,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hiero.tck.exception.JSONRPCParseException;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
@@ -23,19 +22,11 @@ public class MintTokenParams extends JSONRPC2Param {
 
     @Override
     public JSONRPC2Param parse(Map<String, Object> jrpcParams) throws Exception {
-        try {
-            var parsedTokenId = Optional.ofNullable((String) jrpcParams.get("tokenId"));
-            var parsedAmount = Optional.ofNullable((String) jrpcParams.get("amount"));
-            var parsedMetadata = Optional.ofNullable((List<String>) jrpcParams.get("metadata"));
-            var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedTokenId = Optional.ofNullable((String) jrpcParams.get("tokenId"));
+        var parsedAmount = Optional.ofNullable((String) jrpcParams.get("amount"));
+        var parsedMetadata = Optional.ofNullable((List<String>) jrpcParams.get("metadata"));
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-            return new MintTokenParams(parsedTokenId, parsedAmount, parsedMetadata, parsedCommonTransactionParams);
-        } catch (ClassCastException e) {
-            throw new JSONRPCParseException("Invalid parameter type", e);
-        } catch (JSONRPCParseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JSONRPCParseException("Failed to parse MintToken parameters", e);
-        }
+        return new MintTokenParams(parsedTokenId, parsedAmount, parsedMetadata, parsedCommonTransactionParams);
     }
 }

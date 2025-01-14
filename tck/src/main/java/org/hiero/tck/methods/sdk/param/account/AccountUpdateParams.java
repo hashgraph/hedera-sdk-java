@@ -31,7 +31,7 @@ public class AccountUpdateParams extends JSONRPC2Param {
     private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
-    public AccountUpdateParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
+    public AccountUpdateParams parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
         var parsedReceiverSignatureRequired =
                 Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));

@@ -7,32 +7,18 @@ import java.util.Map;
 import java.util.Optional;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
-import org.hiero.tck.exception.JSONRPCParseException;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.methods.sdk.param.CustomFee;
 
 public class JSONRPCParamParser {
 
-    public static Optional<CommonTransactionParams> parseCommonTransactionParams(Map<String, Object> jrpcParams) {
-        try {
-            return parseJsonObject(jrpcParams, "commonTransactionParams", CommonTransactionParams::parse);
-        } catch (Exception e) {
-            throw new JSONRPCParseException("Failed to parse CommonTransactionParams", e);
-        }
+    public static Optional<CommonTransactionParams> parseCommonTransactionParams(Map<String, Object> jrpcParams)
+            throws Exception {
+        return parseJsonObject(jrpcParams, "commonTransactionParams", CommonTransactionParams::parse);
     }
 
-    public static Optional<List<CustomFee>> parseCustomFees(Map<String, Object> jrpcParams) {
-        try {
-            return parseJsonArray(jrpcParams, "customFees", jsonObj -> {
-                try {
-                    return new CustomFee().parse(jsonObj);
-                } catch (Exception e) {
-                    throw new JSONRPCParseException("Failed to parse CustomFee", e);
-                }
-            });
-        } catch (Exception e) {
-            throw new JSONRPCParseException("Failed to parse CustomFees array", e);
-        }
+    public static Optional<List<CustomFee>> parseCustomFees(Map<String, Object> jrpcParams) throws Exception {
+        return parseJsonArray(jrpcParams, "customFees", jsonObj -> new CustomFee().parse(jsonObj));
     }
 
     private static <T> Optional<T> parseJsonObject(

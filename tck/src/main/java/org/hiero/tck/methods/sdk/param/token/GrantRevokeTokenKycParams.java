@@ -6,7 +6,6 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hiero.tck.exception.JSONRPCParseException;
 import org.hiero.tck.methods.JSONRPC2Param;
 import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
 import org.hiero.tck.util.JSONRPCParamParser;
@@ -21,18 +20,10 @@ public class GrantRevokeTokenKycParams extends JSONRPC2Param {
 
     @Override
     public JSONRPC2Param parse(Map<String, Object> jrpcParams) throws Exception {
-        try {
-            var parsedTokenId = Optional.ofNullable((String) jrpcParams.get("tokenId"));
-            var parsedAccountId = Optional.ofNullable((String) jrpcParams.get("accountId"));
-            var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
+        var parsedTokenId = Optional.ofNullable((String) jrpcParams.get("tokenId"));
+        var parsedAccountId = Optional.ofNullable((String) jrpcParams.get("accountId"));
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
-            return new GrantRevokeTokenKycParams(parsedTokenId, parsedAccountId, parsedCommonTransactionParams);
-        } catch (ClassCastException e) {
-            throw new JSONRPCParseException("Invalid parameter type", e);
-        } catch (JSONRPCParseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new JSONRPCParseException("Failed to parse GrantRevokeTokenKyc parameters", e);
-        }
+        return new GrantRevokeTokenKycParams(parsedTokenId, parsedAccountId, parsedCommonTransactionParams);
     }
 }
