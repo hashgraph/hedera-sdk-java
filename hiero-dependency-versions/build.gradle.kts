@@ -13,6 +13,8 @@ val grpc = "1.69.0"
 val protobuf = "4.29.3"
 val slf4j = "2.0.16"
 
+dependencies { api(platform("org.springframework.boot:spring-boot-dependencies:3.2.3")) }
+
 dependencies.constraints {
     api("com.esaulpaugh:headlong:12.3.3") { because("com.esaulpaugh.headlong") }
     api("com.google.code.findbugs:jsr305:3.0.2") { because("java.annotation") }
@@ -44,6 +46,8 @@ dependencies.constraints {
 
     api("com.google.protobuf:protoc:$protobuf")
     api("io.grpc:protoc-gen-grpc-java:$grpc")
+
+    api("com.thetransactioncompany:jsonrpc2-server:2.0")
 
     // Examples
     api("org.jetbrains.kotlin:kotlin-stdlib:2.1.0") { because("kotlin.stdlib") }
