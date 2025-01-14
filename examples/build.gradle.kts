@@ -9,8 +9,7 @@ mainModuleInfo {
     runtimeOnly("org.slf4j.simple")
 }
 
-// 'com.google.protobuf' implementation is provided through 'sdk' as it differs between 'sdk' and
-// 'sdk-full'
+// 'protobuf' implementation provided through 'sdk' as it differs between 'sdk' and 'sdk-full'
 dependencyAnalysis {
     issues {
         all { onUsedTransitiveDependencies { exclude("com.google.protobuf:protobuf-javalite") } }
