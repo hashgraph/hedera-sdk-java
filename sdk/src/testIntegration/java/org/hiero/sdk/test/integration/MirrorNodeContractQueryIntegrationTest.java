@@ -100,28 +100,24 @@ class MirrorNodeContractQueryIntegrationTest {
     }
 
     @Test
-    @DisplayName("Fails when contract is not deployed")
-    void failsWhenContractIsNotDeployed() throws Exception {
+    @DisplayName("Returns default values when contract is not deployed")
+    void returnsDefaultValuesWhenContractIsNotDeployed() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
+            var defaultGas = 22892;
             var contractId = new ContractId(1231456);
 
-            assertThatExceptionOfType(ExecutionException.class)
-                    .isThrownBy(() -> {
-                        new MirrorNodeContractEstimateGasQuery()
-                                .setContractId(contractId)
-                                .setFunction("getOwner")
-                                .execute(testEnv.client);
-                    })
-                    .withMessageContaining("Received non-200 response from Mirror Node");
+            var gas = new MirrorNodeContractEstimateGasQuery()
+                    .setContractId(contractId)
+                    .setFunction("getOwner")
+                    .execute(testEnv.client);
+            assertThat(gas).isEqualTo(defaultGas);
 
-            assertThatExceptionOfType(ExecutionException.class)
-                    .isThrownBy(() -> {
-                        new MirrorNodeContractCallQuery()
-                                .setContractId(contractId)
-                                .setFunction("getOwner")
-                                .execute(testEnv.client);
-                    })
-                    .withMessageContaining("Received non-200 response from Mirror Node");
+            var result = new MirrorNodeContractCallQuery()
+                    .setContractId(contractId)
+                    .setFunction("getOwner")
+                    .execute(testEnv.client);
+
+            assertThat(result).isEqualTo("0x");
         }
     }
 
