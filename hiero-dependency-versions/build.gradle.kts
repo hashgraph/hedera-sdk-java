@@ -13,7 +13,7 @@ val grpc = "1.69.0"
 val protobuf = "4.29.3"
 val slf4j = "2.0.16"
 
-dependencies { api(platform("org.springframework.boot:spring-boot-dependencies:3.2.3")) }
+dependencies { api(platform("org.springframework.boot:spring-boot-dependencies:3.4.1")) }
 
 dependencies.constraints {
     api("com.esaulpaugh:headlong:12.3.3") { because("com.esaulpaugh.headlong") }
