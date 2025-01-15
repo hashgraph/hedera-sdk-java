@@ -300,13 +300,6 @@ public class EntityIdHelper {
         return responseFuture.thenApply(response -> parseNumFromMirrorNodeResponse(response, "contract_id"));
     }
 
-    public static CompletableFuture<String> getContractAddressFromMirrorNodeAsync(Client client, String id) {
-        String apiEndpoint = "/contracts/" + id;
-        CompletableFuture<String> responseFuture = performQueryToMirrorNodeAsync(client, apiEndpoint, null, false);
-
-        return responseFuture.thenApply(response -> parseStringMirrorNodeResponse(response, "evm_address"));
-    }
-
     static CompletableFuture<String> performQueryToMirrorNodeAsync(
             Client client, String apiEndpoint, String jsonBody, boolean isContractCall) {
         Optional<String> mirrorUrl = client.getMirrorNetwork().stream()
