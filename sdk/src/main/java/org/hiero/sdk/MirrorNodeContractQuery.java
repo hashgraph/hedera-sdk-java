@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk;
 
-import static org.hiero.sdk.EntityIdHelper.getContractAddressFromMirrorNodeAsync;
-import static org.hiero.sdk.EntityIdHelper.getEvmAddressFromMirrorNodeAsync;
 import static org.hiero.sdk.EntityIdHelper.performQueryToMirrorNodeAsync;
 
 import com.google.gson.JsonObject;
@@ -228,7 +226,7 @@ public abstract class MirrorNodeContractQuery<T extends MirrorNodeContractQuery<
      * @throws InterruptedException
      */
     protected long estimate(Client client) throws ExecutionException, InterruptedException {
-        fillEvmAddresses(client);
+        fillEvmAddresses();
         return getEstimateGasFromMirrorNodeAsync(client).get();
     }
 
@@ -241,22 +239,19 @@ public abstract class MirrorNodeContractQuery<T extends MirrorNodeContractQuery<
      * @throws InterruptedException
      */
     protected String call(Client client) throws ExecutionException, InterruptedException {
-        fillEvmAddresses(client);
+        fillEvmAddresses();
         var blockNum = this.blockNumber == 0 ? "latest" : String.valueOf(this.blockNumber);
         return getContractCallResultFromMirrorNodeAsync(client, blockNum).get();
     }
 
-    private void fillEvmAddresses(Client client) throws ExecutionException, InterruptedException {
+    private void fillEvmAddresses() {
         if (this.contractEvmAddress == null) {
             Objects.requireNonNull(this.contractId);
-            this.contractEvmAddress = getContractAddressFromMirrorNodeAsync(client, this.contractId.toString())
-                    .get();
+            this.contractEvmAddress = contractId.toSolidityAddress();
         }
 
         if (this.senderEvmAddress == null && this.sender != null) {
-            this.senderEvmAddress = getEvmAddressFromMirrorNodeAsync(client, this.sender.num)
-                    .get()
-                    .toString();
+            this.senderEvmAddress = sender.toSolidityAddress();
         }
     }
 
