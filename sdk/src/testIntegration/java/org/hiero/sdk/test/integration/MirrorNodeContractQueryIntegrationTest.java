@@ -100,8 +100,8 @@ class MirrorNodeContractQueryIntegrationTest {
     }
 
     @Test
-    @DisplayName("Fails when contract is not deployed")
-    void returnsDefaultGasWhenContractIsNotDeployed() throws Exception {
+    @DisplayName("Returns default values when contract is not deployed")
+    void returnsDefaultValuesWhenContractIsNotDeployed() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var defaultGas = 22892;
             var contractId = new ContractId(1231456);
