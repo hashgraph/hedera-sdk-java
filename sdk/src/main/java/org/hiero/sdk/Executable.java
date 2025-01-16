@@ -604,6 +604,9 @@ abstract class Executable<SdkRequestT, ProtoRequestT extends MessageLite, Respon
         for (var accountId : nodeAccountIds) {
             @Nullable var nodeProxies = client.network.getNodeProxies(accountId);
             if (nodeProxies == null || nodeProxies.isEmpty()) {
+                logger.warn(
+                        "Attempting to fetch node {} proxy which is not included in the Client's network. Please review your Client config.",
+                        accountId.toString());
                 continue;
             }
 
