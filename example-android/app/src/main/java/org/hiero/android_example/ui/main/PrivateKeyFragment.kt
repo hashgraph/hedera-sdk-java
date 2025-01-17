@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
-package com.hedera.android_example.ui.main
+package org.hiero.android_example.ui.main
 
 import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
-import com.hedera.android_example.R
+import org.hiero.android_example.R
 import androidx.fragment.app.Fragment
-import com.hedera.hashgraph.sdk.PrivateKey
+import org.hiero.sdk.PrivateKey
 
 class PrivateKeyFragment : Fragment() {
     private  lateinit var privateKey: TextView

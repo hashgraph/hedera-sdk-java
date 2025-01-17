@@ -4,8 +4,8 @@ plugins { id("org.hiero.gradle.build") version "0.3.0" }
 rootProject.name = "hiero-sdk-java"
 
 javaModules {
-    module("sdk") { group = "org.hiero" }
-    module("sdk-full") { group = "org.hiero" }
+    module("sdk") { group = "org.hiero.sdk" }
+    module("sdk-full") { group = "org.hiero.sdk" }
     module("tck") { group = "org.hiero.sdk.tck" }
 }
 
