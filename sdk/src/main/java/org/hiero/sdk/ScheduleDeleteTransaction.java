@@ -14,7 +14,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Mark a schedule in the network state as deleted.
-
+ *
  * This transaction MUST be signed by the `adminKey` for the
  * identified schedule.<br/>
  * If a schedule does not have `adminKey` set or if `adminKey` is an empty
@@ -22,7 +22,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * A deleted schedule SHALL not be executed.<br/>
  * A deleted schedule MUST NOT be the subject of a subsequent
  * `scheduleSign` transaction.
-
+ *
  * ### Block Stream Effects
  * None
  */

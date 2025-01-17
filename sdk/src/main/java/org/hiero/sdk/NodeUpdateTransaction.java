@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * A transaction to modify address book node attributes.
-
+ *
  * - This transaction SHALL enable the node operator, as identified by the
  *   `admin_key`, to modify operational attributes of the node.
  * - This transaction MUST be signed by the active `admin_key` for the node.
@@ -32,7 +32,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * - All pending node updates SHALL be applied to the active network
  *   configuration during the next `freeze` transaction with the field
  *   `freeze_type` set to `PREPARE_UPGRADE`.
-
+ *
  * ### Record Stream Effects
  * Upon completion the `node_id` for the updated entry SHALL be in the
  * transaction receipt.
@@ -341,7 +341,6 @@ public class NodeUpdateTransaction extends Transaction<NodeUpdateTransaction> {
     public Key getAdminKey() {
         return adminKey;
     }
-
 
     /**
      * An administrative key controlled by the node operator.

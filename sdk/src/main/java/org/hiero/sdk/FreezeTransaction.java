@@ -19,12 +19,12 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * A transaction body for all five freeze transactions.
-
+ *
  * Combining five different transactions into a single message, this
  * transaction body MUST support options to schedule a freeze, abort a
  * scheduled freeze, prepare a software upgrade, prepare a telemetry
  * upgrade, or initiate a software upgrade.
-
+ *
  * For a scheduled freeze, at the scheduled time, according to
  * network consensus time
  *   - A freeze (`FREEZE_ONLY`) causes the network nodes to stop creating
@@ -34,7 +34,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  *     creating events or accepting transactions, and upgrade the node software
  *     from a previously prepared upgrade package. The network nodes then
  *     restart and rejoin the network after upgrading.
-
+ *
  * For other freeze types, immediately upon processing the freeze transaction
  *   - A Freeze Abort (`FREEZE_ABORT`) cancels any pending scheduled freeze.
  *   - A prepare upgrade (`PREPARE_UPGRADE`) begins to extract the contents of
@@ -43,7 +43,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  *     extract a telemetry upgrade package to the local filesystem and signal
  *     other software on the machine to upgrade, without impacting the node or
  *     network processing.
-
+ *
  * ### Block Stream Effects
  * Unknown
  */
@@ -271,7 +271,7 @@ public final class FreezeTransaction extends Transaction<FreezeTransaction> {
      * transactions in the same transaction body. Depending on this value
      * the service may schedule a freeze, prepare upgrades, perform upgrades,
      * or even abort a previously scheduled freeze.
-
+     *
      * {@link org.hiero.sdk.FreezeTransaction}
      *
      * @param freezeType                the freeze type

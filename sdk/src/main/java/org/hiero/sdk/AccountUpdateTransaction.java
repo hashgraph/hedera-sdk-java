@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Modify the current state of an account.
-
+ *
  * ### Requirements
  * - The `key` for this account MUST sign all account update transactions.
  * - If the `key` field is set for this transaction, then _both_ the current
@@ -32,7 +32,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  *   updated on success.
  * - All fields that may be modified in this transaction SHALL have a
  *   default value of unset (a.k.a. `null`).
-
+ *
  * ### Block Stream Effects
  * None
  */

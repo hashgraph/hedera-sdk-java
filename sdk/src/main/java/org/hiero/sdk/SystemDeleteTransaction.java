@@ -17,11 +17,11 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Delete a file or contract bytecode as an administrative transaction.
-
+ *
  * > Note
  * >> A system delete/undelete for a `contractID` is not supported and
  * >> SHALL return `INVALID_FILE_ID` or `MISSING_ENTITY_ID`.
-
+ *
  * This transaction MAY be reversed by the `systemUndelete` transaction.
  * A file deleted via `fileDelete`, however SHALL be irrecoverable.<br/>
  * This transaction MUST specify an expiration timestamp (with seconds
@@ -29,12 +29,12 @@ import org.hiero.sdk.proto.TransactionResponse;
  * network consensus time exceeds the specified expiration time.<br/>
  * This transaction MUST be signed by an Hedera administrative ("system")
  * account.
-
+ *
  * ### What is a "system" file
  * A "system" file is any file with a file number less than or equal to the
  * current configuration value for `ledger.numReservedSystemEntities`,
  * typically `750`.
-
+ *
  * ### Block Stream Effects
  * None
  */
@@ -93,7 +93,7 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      * The identified file MUST NOT be deleted.<br/>
      * The identified file MUST NOT be a "system" file.<br/>
      * This field is REQUIRED.
-
+     *
      * Mutually exclusive with {@link #setContractId(ContractId)}.
      *
      * @param fileId The FileId to be set

@@ -149,7 +149,7 @@ public final class ContractExecuteTransaction extends Transaction<ContractExecut
      * <p>
      * Use this instead of {@link #setFunction(String, ContractFunctionParameters)} if you have already
      * pre-encoded a solidity function call.
-
+     *
      * This MUST contain The application binary interface (ABI) encoding of the
      * function call per the Ethereum contract ABI standard, giving the
      * function signature and arguments being passed to the function.

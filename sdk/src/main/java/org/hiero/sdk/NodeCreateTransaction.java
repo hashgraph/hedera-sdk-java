@@ -34,13 +34,12 @@ import org.hiero.sdk.proto.TransactionResponse;
  * - All new address book entries SHALL be added to the active network
  *   configuration during the next `freeze` transaction with the field
  *   `freeze_type` set to `PREPARE_UPGRADE`.
-
+ *
  * ### Record Stream Effects
  * Upon completion the newly assigned `node_id` SHALL be in the transaction
  * receipt.
  */
 public class NodeCreateTransaction extends Transaction<NodeCreateTransaction> {
-
 
     @Nullable
     private AccountId accountId = null;
@@ -261,7 +260,6 @@ public class NodeCreateTransaction extends Transaction<NodeCreateTransaction> {
         return grpcCertificateHash;
     }
 
-
     /**
      * A hash of the node gRPC TLS certificate.
      * <p>
@@ -290,7 +288,6 @@ public class NodeCreateTransaction extends Transaction<NodeCreateTransaction> {
     public Key getAdminKey() {
         return adminKey;
     }
-
 
     /**
      * An administrative key controlled by the node operator.

@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * Reject undesired token(s).<br/>
  * Transfer one or more token balances held by the requesting account to the
  * treasury for each token type.
-
+ *
  * Each transfer SHALL be one of the following
  * - A single non-fungible/unique token.
  * - The full balance held for a fungible/common token.
@@ -30,7 +30,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * the token(s) MUST NOT be rejected.<br/>
  * The `payer` for this transaction, and `owner` if set, SHALL NOT be charged
  * any custom fees or other fees beyond the `tokenReject` transaction fee.
-
+ *
  * ### Block Stream Effects
  * - Each successful transfer from `payer` to `treasury` SHALL be recorded in
  *   the `token_transfer_list` for the transaction record.
@@ -107,7 +107,6 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
         return tokenIds;
     }
 
-
     /**
      * A list of one or more token rejections (a fungible/common token type).
      *
@@ -139,7 +138,6 @@ public class TokenRejectTransaction extends Transaction<TokenRejectTransaction> 
     public List<NftId> getNftIds() {
         return nftIds;
     }
-
 
     /**
      * A list of one or more token rejections (a single specific serialized non-fungible/unique token).

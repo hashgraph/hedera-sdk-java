@@ -26,7 +26,6 @@ import org.hiero.sdk.proto.TransactionResponse;
  * account, now or in the future (if `approved_for_all` is set).
  *
  **/
-
 public class AccountAllowanceApproveTransaction extends Transaction<AccountAllowanceApproveTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances = new ArrayList<>();

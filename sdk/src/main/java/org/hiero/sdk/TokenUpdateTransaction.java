@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Update an existing token.
-
+ *
  * This transaction SHALL NOT update any field that is not set.<br/>
  * Most changes MUST be signed by the current `admin_key` of the token. If the
  * token does not currently have a valid `admin_key`, then this transaction
@@ -29,7 +29,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * If the `treasury` is set to a new account for a _non-fungible/unique_ token,
  * The current treasury MUST NOT hold any tokens, or the network configuration
  * property `tokens.nfts.useTreasuryWildcards` MUST be set.
-
+ *
  * #### Requirements for Keys
  * Any of the key values may be changed, even without an admin key, but the
  * key to be changed MUST have an existing valid key assigned, and both the
@@ -37,7 +37,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * A key value MAY be set to an empty `KeyList`. In this case the existing
  * key MUST sign this transaction, but the new value is not a valid key, and the
  * update SHALL effectively remove the existing key.
-
+ *
  * ### Block Stream Effects
  * None
  */
@@ -86,7 +86,6 @@ public class TokenUpdateTransaction extends Transaction<TokenUpdateTransaction> 
     private Instant expirationTime = null;
 
     private Duration expirationTimeDuration = null;
-
 
     @Nullable
     private Duration autoRenewPeriod = null;

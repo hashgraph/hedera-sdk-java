@@ -16,7 +16,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Associate a Hedera Token Service (HTS) token and an account.
-
+ *
  * An association MUST exist between an account and a token before that
  * account may transfer or receive that token.<br/>
  * If the identified account is not found,
@@ -30,7 +30,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * If an association already exists for any of the identified tokens,
  * the transaction SHALL return `TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT`.<br/>
  * The identified account MUST sign this transaction.
-
+ *
  * ### Block Stream Effects
  * None
  */

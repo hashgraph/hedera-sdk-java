@@ -20,7 +20,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * TOKEN_IS_IMMUTABlE. Once deleted update, mint, burn, wipe, freeze,
  * unfreeze, grant kyc, revoke kyc and token transfer transactions will
  * resolve to TOKEN_WAS_DELETED.
-
+ *
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/delete-a-token">Hedera Documentation</a>
  */
 public class TokenDeleteTransaction extends org.hiero.sdk.Transaction<TokenDeleteTransaction> {

@@ -16,7 +16,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Dissociate an account from one or more HTS tokens.
-
+ *
  * If the identified account is not found,
  * the transaction SHALL return `INVALID_ACCOUNT_ID`.<br/>
  * If the identified account has been deleted,
@@ -38,7 +38,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * individual NFT of that token. In this situation the transaction SHALL
  * return `TRANSACTION_REQUIRED_ZERO_TOKEN_BALANCES`.<br/>
  * The identified account MUST sign this transaction.
-
+ *
  * ### Block Stream Effects
  * None
  */

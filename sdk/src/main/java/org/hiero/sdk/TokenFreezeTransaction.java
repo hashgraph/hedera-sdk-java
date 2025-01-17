@@ -17,7 +17,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * This, effectively, freezes assets of one account with respect to
  * one token type. While frozen, that account cannot send or receive tokens
  * of the identified type.
-
+ *
  * The token MUST have a `freeze_key` set and that key MUST NOT
  * be an empty `KeyList`.<br/>
  * The token `freeze_key` MUST sign this transaction.<br/>
@@ -29,7 +29,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * token, the transaction SHALL succeed, but no change SHALL be made.<br/>
  * An association between the identified account and the identified
  * token MUST exist.
-
+ *
  * ### Block Stream Effects
  * None
  */

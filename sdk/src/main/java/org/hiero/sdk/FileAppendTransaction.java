@@ -24,18 +24,18 @@ import org.hiero.sdk.proto.TransactionResponse;
  * file, append more data until the full content is stored, verify the file is
  * correct, then update the file entry with any final metadata changes (e.g.
  * adding threshold keys and removing the initial upload key).
-
+ *
  * Each append transaction MUST remain within the total transaction size limit
  * for the network (typically 6144 bytes).<br/>
  * The total size of a file MUST remain within the maximum file size limit for
  * the network (typically 1048576 bytes).
-
+ *
  * #### Signature Requirements
  * Append transactions MUST have signatures from _all_ keys in the `KeyList`
  * assigned to the `keys` field of the file.<br/>
  * See the [File Service](#FileService) specification for a detailed
  * explanation of the signature requirements for all file transactions.
-
+ *
  * ### Block Stream Effects
  * None
  */

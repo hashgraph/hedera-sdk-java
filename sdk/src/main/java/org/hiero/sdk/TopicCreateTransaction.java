@@ -15,25 +15,25 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Create a topic to accept and group consensus messages.
-
+ *
  * If `autoRenewAccount` is specified, that account Key MUST also sign this
  * transaction.<br/>
  * If `adminKey` is set, that Key MUST sign the transaction.<br/>
  * On success, the resulting `TransactionReceipt` SHALL contain the newly
  * created `TopicId`.
-
+ *
  * The `autoRenewPeriod` on a topic MUST be set to a value between
  * `autoRenewPeriod.minDuration` and `autoRenewPeriod.maxDuration`. These
  * values are configurable, typically 30 and 92 days.<br/>
  * This also sets the initial expirationTime of the topic.
-
+ *
  * If no `adminKey` is set on a topic
  *   -`autoRenewAccount` SHALL NOT be set on the topic.
  *   - A `deleteTopic` transaction SHALL fail.
  *   - An `updateTopic` transaction that only extends the expirationTime MAY
  *     succeed.
  *   - Any other `updateTopic` transaction SHALL fail.
-
+ *
  * If the topic expires and is not automatically renewed, the topic SHALL enter
  * the `EXPIRED` state.
  *   - All transactions on the topic SHALL fail with TOPIC_EXPIRED
@@ -44,7 +44,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * After the grace period, if the topic's expirationTime is not extended, the
  * topic SHALL be automatically deleted from state entirely, and cannot be
  * recovered or recreated.
-
+ *
  * ### Block Stream Effects
  * None
  */
@@ -138,7 +138,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * A topic without an admin key SHALL be immutable, except for expiration
      * and renewal.<br/>
      * If adminKey is not set, then `autoRenewAccount` SHALL NOT be set.
-
+     *
      * @param adminKey The Key to be set
      * @return {@code this}
      */

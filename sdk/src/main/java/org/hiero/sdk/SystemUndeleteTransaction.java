@@ -17,21 +17,21 @@ import org.hiero.sdk.proto.TransactionResponse;
 /**
  * Recover a file or contract bytecode deleted from the Hedera File
  * System (HFS) by a `systemDelete` transaction.
-
+ *
  * > Note
  * >> A system delete/undelete for a `contractID` is not supported and
  * >> SHALL return `INVALID_FILE_ID` or `MISSING_ENTITY_ID`.
-
+ *
  * This transaction can _only_ recover a file removed with the `systemDelete`
  * transaction. A file deleted via `fileDelete` SHALL be irrecoverable.<br/>
  * This transaction MUST be signed by an Hedera administrative ("system")
  * account.
-
+ *
  * ### What is a "system" file
  * A "system" file is any file with a file number less than or equal to the
  * current configuration value for `ledger.numReservedSystemEntities`,
  * typically `750`.
-
+ *
  * ### Block Stream Effects
  * None
  */
@@ -90,7 +90,7 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
      * `systemDelete` transaction.<br/>
      * The identified file MUST NOT be a "system" file.<br/>
      * This field is REQUIRED.
-
+     *
      * Mutually exclusive with {@link #setContractId(ContractId)}.
      *
      * @param fileId The FileId to be set

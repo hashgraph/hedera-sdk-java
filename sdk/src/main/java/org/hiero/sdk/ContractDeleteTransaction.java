@@ -15,10 +15,10 @@ import org.hiero.sdk.proto.TransactionResponse;
 /**
  * Delete a smart contract, and transfer any remaining HBAR balance to a
  * designated account.
-
+ *
  * If this call succeeds then all subsequent calls to that smart contract
  * SHALL execute the `0x0` opcode, as required for EVM equivalence.
-
+ *
  * ### Requirements
  *  - An account or smart contract MUST be designated to receive all remaining
  *    account balances.
@@ -35,7 +35,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  *    internal system use when purging the smart contract from state. Any user
  *    transaction with that field set SHALL be rejected and a response code
  *    `PERMANENT_REMOVAL_REQUIRES_SYSTEM_INITIATION` SHALL be set.
-
+ *
  * ### Block Stream Effects
  * None
  */

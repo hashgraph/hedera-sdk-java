@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Mint tokens and deliver the new tokens to the token treasury account.
-
+ *
  * The token MUST have a `supply_key` set and that key MUST NOT
  * be an empty `KeyList`.<br/>
  * The token `supply_key` MUST sign this transaction.<br/>
@@ -36,7 +36,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * The global batch size limit (`tokens.nfts.maxBatchSizeMint`) SHALL set
  * the maximum number of individual NFT metadata permitted in a single
  * `tokenMint` transaction.
-
+ *
  * ### Block Stream Effects
  * None
  */

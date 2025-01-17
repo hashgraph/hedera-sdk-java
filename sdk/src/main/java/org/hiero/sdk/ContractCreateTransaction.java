@@ -286,9 +286,9 @@ public final class ContractCreateTransaction extends Transaction<ContractCreateT
 
     /**
      * @deprecated with no replacement
-
+     *
      * Extract the proxy account id.
-
+     *
      * @return                          the proxy account id
      */
     @Deprecated

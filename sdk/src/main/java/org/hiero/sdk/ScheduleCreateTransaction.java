@@ -15,7 +15,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Create a new Schedule.
-
+ *
  * #### Requirements
  * This transaction SHALL create a new _schedule_ entity in network state.<br/>
  * The schedule created SHALL contain the `scheduledTransactionBody` to be
@@ -43,7 +43,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * existing schedule and the `TransactionID` of the earlier `scheduleCreate`
  * so that the earlier schedule may be queried and/or referred to in a
  * subsequent `scheduleSign`.
-
+ *
  * #### Signature Requirements
  * A `scheduleSign` transaction SHALL be used to add additional signatures
  * to an existing schedule.<br/>
@@ -56,7 +56,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * network consensus time reaches the schedule `expiration_time`.<br/>
  * A "short term" schedule SHALL execute immediately once signature
  * requirements are met. This MAY be immediately when created.
-
+ *
  * #### Long Term Schedules
  * A "short term" schedule SHALL have the flag `wait_for_expiry` _unset_.<br/>
  * A "long term" schedule SHALL have the flag  `wait_for_expiry` _set_.<br/>
@@ -73,14 +73,14 @@ import org.hiero.sdk.proto.TransactionResponse;
  * A short term schedule SHALL expire, and be removed from state,
  * after the network consensus time exceeds the current network
  * configuration for `ledger.scheduleTxExpiryTimeSecs`.
-
+ *
  * > Note
  * >> Long term schedules are not (as of release 0.56.0) enabled. Any schedule
  * >> created currently MUST NOT set the `wait_for_expiry` flag.<br/>
  * >> When long term schedules are not enabled, schedules SHALL NOT be
  * >> executed at expiration, and MUST meet signature requirements strictly
  * >> before expiration to be executed.
-
+ *
  * ### Block Stream Effects
  * If the scheduled transaction is executed immediately, the transaction
  * record SHALL include a `scheduleRef` with the schedule identifier of the

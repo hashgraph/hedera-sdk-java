@@ -14,7 +14,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Resume transaction activity for a token.
-
+ *
  * This transaction MUST be signed by the Token `pause_key`.<br/>
  * The `token` identified MUST exist, and MUST NOT be deleted.<br/>
  * The `token` identified MAY not be paused; if the token is not paused,
@@ -22,7 +22,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * The `token` identified MUST have a `pause_key` set, the `pause_key` MUST be
  * a valid `Key`, and the `pause_key` MUST NOT be an empty `KeyList`.<br/>
  * An `unpaused` token MAY be transferred or otherwise modified.
-
+ *
  * ### Block Stream Effects
  * None
  */

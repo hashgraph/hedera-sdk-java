@@ -20,12 +20,12 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Create a new file.
-
+ *
  * If successful, the new file SHALL contain the (possibly empty) content
  * provided in the `contents` field.<br/>
  * When the current consensus time exceeds the `expirationTime` value, the
  * network SHALL expire the file, and MAY archive the state entry.
-
+ *
  * #### Signature Requirements
  * The HFS manages file authorization in a manner that can be confusing.
  * The core element of file authorization is the `keys` field,
@@ -45,16 +45,16 @@ import org.hiero.sdk.proto.TransactionResponse;
  * including additional `ThresholdKey` or `KeyList` descendants) may be
  * assigned as the sole entry in a file `keys` field to ensure all transactions
  * have the same signature requirements.
-
+ *
  * If the `keys` field is an empty `KeyList`, then the file SHALL be immutable
  * and the only transaction permitted to modify that file SHALL be a
  * `fileUpdate` transaction with _only_ the `expirationTime` set.
-
+ *
  * #### Shard and Realm
  * The current API ignores shardID and realmID. All files are created in
  * shard 0 and realm 0. Future versions of the API may support multiple
  * realms and multiple shards.
-
+ *
  * ### Block Stream Effects
  * After the file is created, the FileID for it SHALL be returned in the
  * transaction receipt, and SHALL be recorded in the transaction record.

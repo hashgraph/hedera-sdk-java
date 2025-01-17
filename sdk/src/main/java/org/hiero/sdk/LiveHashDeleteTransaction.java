@@ -16,10 +16,10 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Delete a specific live hash associated to a given account.
-
+ *
  * This transaction MUST be signed by either the key of the associated account,
  * or at least one of the keys listed in the live hash.
-
+ *
  * ### Block Stream Effects
  * None
  */

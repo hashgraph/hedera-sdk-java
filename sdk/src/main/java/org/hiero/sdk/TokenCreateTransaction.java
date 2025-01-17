@@ -20,7 +20,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Create an HTS token.
-
+ *
  * #### Keys
  * Each token has several keys that, separately, control different functions
  * for that token. It is *_strongly_* recommended that each key assigned to
@@ -51,7 +51,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * - `wipe` may authorize a token wipe account transaction.
  *   If this key is not present, accounts holding this token cannot have
  *   their balance or NFTs wiped (effectively burned).
-
+ *
  * #### Requirements
  * If `tokenType` is fungible/common, the `initialSupply` MUST be strictly
  * greater than zero(`0`).<br/>

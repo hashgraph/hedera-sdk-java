@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Modify the metadata field for an individual non-fungible/unique token (NFT).
-
+ *
  * Updating the metadata of an NFT SHALL NOT affect ownership or
  * the ability to transfer that NFT.<br/>
  * This transaction SHALL affect only the specific serial numbered tokens
@@ -28,7 +28,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * This transaction MUST be signed by the token `metadata_key`.<br/>
  * The token `metadata_key` MUST be a valid `Key`.<br/>
  * The token `metadata_key` MUST NOT be an empty `KeyList`.
-
+ *
  * ### Block Stream Effects
  * None
  */

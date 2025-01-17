@@ -22,12 +22,12 @@ import org.hiero.sdk.proto.TransactionResponse;
 /**
  * Update the metadata, and/or replace the content, of a file in the
  * Hedera File Service (HFS).
-
+ *
  * Any field which is not set (i.e. is null) in this message, other than
  * `fileID`, SHALL be ignored.<br/>
  * If the `keys` list for the identified file is an empty `KeyList`, then
  * this message MUST NOT set any field except `expirationTime`.
-
+ *
  * #### Signature Requirements
  * Every `Key` in the `keys` list for the identified file MUST sign this
  * transaction, if any field other than `expirationTime` is to be updated.<br/>
@@ -37,10 +37,10 @@ import org.hiero.sdk.proto.TransactionResponse;
  * field except `expirationTime`.<br/>
  * See the [File Service](#FileService) specification for a detailed
  * explanation of the signature requirements for all file transactions.
-
+ *
  * ### Block Stream Effects
  * None
-
+ *
  * See <a href="https://docs.hedera.com/guides/docs/sdks/file-storage/update-a-file">Hedera Documentation</a>
  */
 public final class FileUpdateTransaction extends Transaction<FileUpdateTransaction> {

@@ -14,7 +14,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Grant "Know Your Customer"(KYC) for one account for a single token.
-
+ *
  * This transaction MUST be signed by the `kyc_key` for the token.<br/>
  * The identified token MUST have a `kyc_key` set to a valid `Key` value.<br/>
  * The token `kyc_key` MUST NOT be an empty `KeyList`.<br/>
@@ -23,7 +23,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * The identified account MUST have an association to the identified token.<br/>
  * On success the association between the identified account and the identified
  * token SHALL be marked as "KYC granted".
-
+ *
  * ### Block Stream Effects
  * None
  */

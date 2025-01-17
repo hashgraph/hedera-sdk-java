@@ -18,7 +18,7 @@ import org.hiero.sdk.proto.TransactionResponse;
 
 /**
  * Burns tokens from the Token's treasury Account.
-
+ *
  * The token MUST have a `supply_key` set and that key MUST NOT
  * be an empty `KeyList`.<br/>
  * The token `supply_key` MUST sign this transaction.<br/>
@@ -33,7 +33,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * The global batch size limit (`tokens.nfts.maxBatchSizeBurn`) SHALL set
  * the maximum number of individual NFT serial numbers permitted in a single
  * `tokenBurn` transaction.
-
+ *
  * ### Block Stream Effects
  * None
  */
@@ -111,13 +111,13 @@ public class TokenBurnTransaction extends org.hiero.sdk.Transaction<TokenBurnTra
 
     /**
      * Assign the amount of tokens to burn.
-
+     *
      * The amount provided must be in the lowest denomination possible.
-
+     *
      * Example: Token A has 2 decimals. In order to burn 100 tokens, one must
      * provide an amount of 10000. In order to burn 100.55 tokens, one must
      * provide an amount of 10055.
-
+     *
      * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/burn-a-token">Hedera Documentation</a>
      *
      * @param amount                    the amount of tokens to burn

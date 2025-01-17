@@ -16,7 +16,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * Delete an account.<br/>
  * This will mark an account deleted, and transfer all tokens to a "sweep"
  * account.
-
+ *
  * A deleted account SHALL NOT hold a balance in any token type.<br/>
  * A deleted account SHALL remain in state until it expires.<br/>
  * Transfers that would increase the balance of a deleted account
@@ -25,7 +25,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * its expiration.<br/>
  * When a deleted account expires it SHALL be removed entirely, and SHALL NOT
  * be archived.
-
+ *
  * ### Block Stream Effects
  * None
  */

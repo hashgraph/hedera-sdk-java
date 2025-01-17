@@ -21,7 +21,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * with the fee schedule key to update the fee schedule for the token. If you
  * do not have a fee schedule key set for the token, you will not be able to
  * update the fee schedule.
-
+ *
  * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/update-a-fee-schedule">Hedera Documentation</a>
  */
 public class TokenFeeScheduleUpdateTransaction extends Transaction<TokenFeeScheduleUpdateTransaction> {

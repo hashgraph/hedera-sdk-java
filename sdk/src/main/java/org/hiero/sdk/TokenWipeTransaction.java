@@ -19,7 +19,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * Wipe (administratively burn) tokens held by a non-treasury account.<br/>
  * On success, the requested tokens will be removed from the identified account
  * and the token supply will be reduced by the amount "wiped".
-
+ *
  * This transaction MUST be signed by the token `wipe_key`.<br/>
  * The identified token MUST exist, MUST NOT be deleted,
  * and MUST NOT be paused.<br/>
@@ -31,7 +31,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * token or the specific serial numbers provided.<br/>
  * This transaction SHOULD provide a value for `amount` or `serialNumbers`,
  * but MUST NOT set both fields.
-
+ *
  * ### Block Stream Effects
  * The new total supply for the wiped token type SHALL be recorded.
  */
