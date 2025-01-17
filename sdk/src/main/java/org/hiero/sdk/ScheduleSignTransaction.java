@@ -22,7 +22,7 @@ import org.hiero.sdk.proto.TransactionResponse;
  * schedule transaction, you can query the network for the schedule info.
  * Once a schedule transaction receives the last required signature, the
  * schedule transaction executes.
- *
+
  * See <a href="https://docs.hedera.com/guides/docs/sdks/schedule-transaction/sign-a-schedule-transaction">Hedera Documentation</a>
  */
 public final class ScheduleSignTransaction extends Transaction<ScheduleSignTransaction> {
@@ -61,7 +61,9 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     /**
-     * Assign the schedule id.
+     * A schedule identifier.
+     * <p>
+     * This MUST identify the schedule which SHALL be deleted.
      *
      * @param scheduleId                the schedule id
      * @return {@code this}
