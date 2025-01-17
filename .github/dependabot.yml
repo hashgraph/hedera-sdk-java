@@ -1,17 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
 version: 2
 updates:
-- package-ecosystem: gradle
-  directory: "/hiero-dependency-versions"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: gradle
-  directory: "/gradle/plugins"
-  schedule:
-    interval: weekly
-  open-pull-requests-limit: 10
-- package-ecosystem: github-actions
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/hiero-dependency-versions"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/examples"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: gradle
+    directory: "/example-android"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 10
