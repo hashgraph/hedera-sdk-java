@@ -4,6 +4,7 @@ package org.hiero.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
+import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -16,6 +17,8 @@ import org.junit.jupiter.api.Test;
 public class AccountCreateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
+
+    PrivateKeyECDSA privateKeyECDSA = new PrivateKeyECDSA(BigInteger.ONE, unusedPrivateKey.getChainCode());
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
@@ -33,7 +36,9 @@ public class AccountCreateTransactionTest {
         return new AccountCreateTransaction()
                 .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
                 .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-                .setKey(unusedPrivateKey)
+                .setKeyWithAlias(privateKeyECDSA)
+                .setKeyWithAlias(unusedPrivateKey, privateKeyECDSA)
+                .setKeyWithoutAlias(unusedPrivateKey)
                 .setInitialBalance(Hbar.fromTinybars(450))
                 .setProxyAccountId(AccountId.fromString("0.0.1001"))
                 .setAccountMemo("some dumb memo")
@@ -51,7 +56,9 @@ public class AccountCreateTransactionTest {
         return new AccountCreateTransaction()
                 .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
                 .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-                .setKey(unusedPrivateKey)
+                .setKeyWithAlias(privateKeyECDSA)
+                .setKeyWithAlias(unusedPrivateKey, privateKeyECDSA)
+                .setKeyWithoutAlias(unusedPrivateKey)
                 .setInitialBalance(Hbar.fromTinybars(450))
                 .setProxyAccountId(AccountId.fromString("0.0.1001"))
                 .setAccountMemo("some dumb memo")
