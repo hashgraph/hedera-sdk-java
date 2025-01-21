@@ -2,18 +2,12 @@
 plugins {
     id("org.springframework.boot") version "3.2.3"
     id("org.hiero.gradle.module.application")
-    id("org.gradlex.java-module-dependencies")
+    id("org.hiero.gradle.feature.legacy-classpath")
 }
 
 description = "Hiero SDK TCK Server"
 
 version = "0.0.1"
-
-// Allow non-module Jars
-extraJavaModuleInfo {
-    failOnMissingModuleInfo = false
-    failOnAutomaticModules = false
-}
 
 mainModuleInfo {
     requires("com.thetransactioncompany.jsonrpc2.base")

@@ -34,9 +34,8 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
         tasks.register<JavaExec>(this) {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-            mainModule = "com.hedera.hashgraph.examples"
-            mainClass =
-                "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
+            mainModule = "org.hiero.sdk.examples"
+            mainClass = "org.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
@@ -81,12 +80,31 @@ abstract class RunAllExample : DefaultTask() {
             exec.javaexec {
                 workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
-                mainModule = "com.hedera.hashgraph.examples"
-                mainClass = "com.hedera.hashgraph.sdk.examples.$className"
+                mainModule = "org.hiero.sdk.examples"
+                mainClass = "org.hiero.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
-                // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+                // jvmArgs "-Dorg.slf4j.simpleLogger.log.org.hiero=trace"
             }
         }
     }
+}
+
+val updateAddressbooks = tasks.register("updateAddressbooks")
+
+listOf("mainnet", "testnet", "previewnet").forEach { network ->
+    val taskName = "updateAddressbooks${network.replaceFirstChar(Char::titlecase)}"
+    tasks.register<JavaExec>(taskName) {
+        workingDir = rootDir
+        classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
+        mainModule = "com.hedera.hashgraph.examples"
+        mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
+        environment("HEDERA_NETWORK", network)
+        doLast {
+            val binFile = File(workingDir, "address-book.proto.bin")
+            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            binFile.copyTo(target, overwrite = true)
+        }
+    }
+    updateAddressbooks { dependsOn(taskName) }
 }

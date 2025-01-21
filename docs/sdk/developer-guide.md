@@ -116,22 +116,18 @@ More details about how to add/modify dependencies are found in the Hiero Gradle 
 
 ## Maintaining generated files
 
-> To execute the tasks below, you need to install the tool from this link: https://taskfile.dev/
-> (these tasks are from the file Taskfile.yml, which is located in the root of the repository).
-> Once installed, you can run the commands as shown below.
->
-> Note that the below `task` commands should be run from the root of the project.
+> Note that the below `./gradlew` commands should be run from the root of the project.
 
 ### Updating unit tests snapshots
 
 ```sh
-task update:snapshots
+./gradlew updateSnapshots
 ```
 
 ### Updating proto files
 
 ```sh
-task update:proto
+./gradlew updateSnapshots
 ```
 
 ### Updating address books
@@ -139,23 +135,23 @@ task update:proto
 Update all address books:
 
 ```sh
-task update:addressbooks
+./gradlew examples:updateAddressbooks
 ```
 
 Update address books only for a mainnet:
 
 ```sh
-task update:addressbooks:mainnet
+./gradlew examples:updateAddressbooksMainnet
 ```
 
 Update address books only for a testnet:
 
 ```sh
-task update:addressbooks:testnet
+./gradlew examples:updateAddressbooksTestnet
 ```
 
 Update address books only for a previewnet:
 
 ```sh
-task update:addressbooks:previewnet
+./gradlew examples:updateAddressbooksPreviewnet
 ```

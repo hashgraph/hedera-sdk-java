@@ -76,3 +76,13 @@ dependencyAnalysis.abi {
         excludeClasses(".*Grpc")
     }
 }
+
+tasks.register<Delete>("updateSnapshots") {
+    delete(sourceSets.test.get().allSource.matching { include("**/*.snap") })
+    finalizedBy(tasks.test)
+}
+
+tasks.register<Exec>("updateProto") {
+    executable = File(rootDir, "scripts/update_protobufs.py").absolutePath
+    args("main") // argument is the branch/tag
+}
