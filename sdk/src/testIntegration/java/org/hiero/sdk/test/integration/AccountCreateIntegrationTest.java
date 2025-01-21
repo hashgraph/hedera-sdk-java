@@ -361,22 +361,21 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                .setKeyWithoutAlias(adminKey)
-                .freezeWith(testEnv.client)
-                .execute(testEnv.client);
+                    .setKeyWithoutAlias(adminKey)
+                    .freezeWith(testEnv.client)
+                    .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
 
             assertThatExceptionOfType(ReceiptStatusException.class)
-                .isThrownBy(() -> new AccountCreateTransaction()
-                    .setReceiverSignatureRequired(true)
-                    .setKeyWithAlias(key, adminKey)
-                    .freezeWith(testEnv.client)
-                    .sign(adminKey)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client))
-                .withMessageContaining(Status.INVALID_SIGNATURE.toString());
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setReceiverSignatureRequired(true)
+                            .setKeyWithAlias(key, adminKey)
+                            .freezeWith(testEnv.client)
+                            .sign(adminKey)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
-
 }
