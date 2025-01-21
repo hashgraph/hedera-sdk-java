@@ -106,13 +106,17 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param privateKeyECDSA
      * @return this
      */
-    public AccountCreateTransaction setKeyWithAlias(PrivateKeyECDSA privateKeyECDSA) {
+    public AccountCreateTransaction setKeyWithAlias(PrivateKey privateKeyECDSA) {
         Objects.requireNonNull(privateKeyECDSA);
         requireNotFrozen();
-        this.key = privateKeyECDSA;
-        EvmAddress evmAddress = privateKeyECDSA.getPublicKey().toEvmAddress();
-        Objects.requireNonNull(evmAddress);
-        this.alias = evmAddress;
+        if (privateKeyECDSA.isECDSA()) {
+            this.key = privateKeyECDSA;
+            EvmAddress evmAddress = privateKeyECDSA.getPublicKey().toEvmAddress();
+            Objects.requireNonNull(evmAddress);
+            this.alias = evmAddress;
+        } else {
+            this.setKeyWithoutAlias(privateKeyECDSA);
+        }
         return this;
     }
 
@@ -124,13 +128,15 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
      * @param privateKeyECDSA
      * @return this
      */
-    public AccountCreateTransaction setKeyWithAlias(Key key, PrivateKeyECDSA privateKeyECDSA) {
+    public AccountCreateTransaction setKeyWithAlias(Key key, PrivateKey privateKeyECDSA) {
         Objects.requireNonNull(key);
         requireNotFrozen();
         this.key = key;
-        EvmAddress evmAddress = privateKeyECDSA.getPublicKey().toEvmAddress();
-        Objects.requireNonNull(evmAddress);
-        this.alias = evmAddress;
+        if (privateKeyECDSA.isECDSA()) {
+            EvmAddress evmAddress = privateKeyECDSA.getPublicKey().toEvmAddress();
+            Objects.requireNonNull(evmAddress);
+            this.alias = evmAddress;
+        }
         return this;
     }
 

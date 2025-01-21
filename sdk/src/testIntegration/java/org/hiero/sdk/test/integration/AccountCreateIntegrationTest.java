@@ -20,7 +20,7 @@ class AccountCreateIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var response = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .setInitialBalance(new Hbar(1))
                     .execute(testEnv.client);
 
@@ -45,7 +45,8 @@ class AccountCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             var accountId = Objects.requireNonNull(response.getReceipt(testEnv.client).accountId);
 
@@ -104,7 +105,7 @@ class AccountCreateIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var response = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .setTransactionId(
                             new TransactionId(testEnv.operatorId, Instant.now().minusSeconds(40)))
                     .setTransactionValidDuration(Duration.ofSeconds(30))
@@ -137,13 +138,12 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(adminKey)
-                    .setAlias(evmAddress)
+                    .setKeyWithAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -171,14 +171,13 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
             var accountId = new AccountCreateTransaction()
                     .setReceiverSignatureRequired(true)
-                    .setKey(adminKey)
-                    .setAlias(evmAddress)
+                    .setKeyWithAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .sign(adminKey)
                     .execute(testEnv.client)
@@ -205,14 +204,14 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
             assertThatExceptionOfType(ReceiptStatusException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
                             .setReceiverSignatureRequired(true)
-                            .setKey(adminKey)
+                            .setKeyWithAlias(adminKey)
                             .setAlias(evmAddress)
                             .freezeWith(testEnv.client)
                             .execute(testEnv.client)
@@ -232,7 +231,7 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
@@ -240,7 +239,7 @@ class AccountCreateIntegrationTest {
             var evmAddress = key.getPublicKey().toEvmAddress();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .setAlias(evmAddress)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -267,7 +266,7 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
@@ -277,8 +276,7 @@ class AccountCreateIntegrationTest {
             assertThatExceptionOfType(ReceiptStatusException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
                             .setReceiverSignatureRequired(true)
-                            .setKey(adminKey)
-                            .setAlias(evmAddress)
+                            .setKeyWithAlias(key, adminKey)
                             .freezeWith(testEnv.client)
                             .execute(testEnv.client)
                             .getReceipt(testEnv.client))
@@ -297,7 +295,7 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
@@ -306,7 +304,7 @@ class AccountCreateIntegrationTest {
 
             var accountId = new AccountCreateTransaction()
                     .setReceiverSignatureRequired(true)
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .setAlias(evmAddress)
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -335,7 +333,7 @@ class AccountCreateIntegrationTest {
 
             // Create the admin account
             new AccountCreateTransaction()
-                    .setKey(adminKey)
+                    .setKeyWithoutAlias(adminKey)
                     .freezeWith(testEnv.client)
                     .execute(testEnv.client);
 
@@ -345,8 +343,7 @@ class AccountCreateIntegrationTest {
             assertThatExceptionOfType(ReceiptStatusException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
                             .setReceiverSignatureRequired(true)
-                            .setKey(adminKey)
-                            .setAlias(evmAddress)
+                            .setKeyWithAlias(adminKey)
                             .freezeWith(testEnv.client)
                             .sign(key)
                             .execute(testEnv.client)
@@ -354,4 +351,32 @@ class AccountCreateIntegrationTest {
                     .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
     }
+
+    @Test
+    @DisplayName("Cannot create account with alias different from admin key without both key signature")
+    void cannotCreateAccountWithAliasWithoutBothKeySignatures() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            var adminKey = PrivateKey.generateED25519();
+
+            // Create the admin account
+            new AccountCreateTransaction()
+                .setKeyWithoutAlias(adminKey)
+                .freezeWith(testEnv.client)
+                .execute(testEnv.client);
+
+            var key = PrivateKey.generateECDSA();
+
+            assertThatExceptionOfType(ReceiptStatusException.class)
+                .isThrownBy(() -> new AccountCreateTransaction()
+                    .setReceiverSignatureRequired(true)
+                    .setKeyWithAlias(key, adminKey)
+                    .freezeWith(testEnv.client)
+                    .sign(adminKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client))
+                .withMessageContaining(Status.INVALID_SIGNATURE.toString());
+        }
+    }
+
 }
