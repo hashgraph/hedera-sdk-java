@@ -5,7 +5,7 @@
 [![](https://img.shields.io/github/actions/workflow/status/hashgraph/hedera-sdk-java/build.yml?style=flat-square)](https://github.com/hashgraph/hedera-sdk-java/actions)
 [![](https://img.shields.io/maven-central/v/com.hedera.hashgraph/sdk/2?label=maven&style=flat-square)](https://search.maven.org/artifact/com.hedera.hashgraph/sdk)
 
-> The Java SDK for interacting with Hiero: the official distributed
+> The Java SDK for interacting a Hiero based network:: the official distributed
 > consensus platform built using the hashgraph consensus algorithm for fast,
 > fair and secure transactions. Hiero enables and empowers developers to
 > build an entirely new class of decentralized applications.
@@ -33,7 +33,7 @@ that showcase different use cases and workflows.
 
 The [developer quickstart guide](docs/sdk/developer-guide.md) provides instructions on how to set up the environment,
 run unit and integration tests, and configure the project to work with different networks
-such as the Hiero test network, preview network, etc.
+such as the Hedera test network, preview network, etc.
 
 ## Support
 
