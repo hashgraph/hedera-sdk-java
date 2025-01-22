@@ -4,7 +4,6 @@ package org.hiero.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
-import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -18,7 +17,7 @@ public class AccountCreateTransactionTest {
     private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
-    PrivateKeyECDSA privateKeyECDSA = new PrivateKeyECDSA(BigInteger.ONE, unusedPrivateKey.getChainCode());
+    PrivateKey privateKeyECDSA = PrivateKey.generateECDSA();
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 

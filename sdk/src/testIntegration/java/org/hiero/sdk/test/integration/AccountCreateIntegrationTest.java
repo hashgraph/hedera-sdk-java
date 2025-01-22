@@ -3,10 +3,12 @@ package org.hiero.sdk.test.integration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import org.bouncycastle.util.encoders.Hex;
 import org.hiero.sdk.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -271,7 +273,6 @@ class AccountCreateIntegrationTest {
                     .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
-            var evmAddress = key.getPublicKey().toEvmAddress();
 
             assertThatExceptionOfType(ReceiptStatusException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
@@ -329,7 +330,7 @@ class AccountCreateIntegrationTest {
     void cannotCreateAccountWithAliasWithReceiverSigRequiredWithoutSignature() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var adminKey = PrivateKey.generateED25519();
+            var adminKey = PrivateKey.generateECDSA();
 
             // Create the admin account
             new AccountCreateTransaction()
@@ -338,7 +339,6 @@ class AccountCreateIntegrationTest {
                     .execute(testEnv.client);
 
             var key = PrivateKey.generateECDSA();
-            var evmAddress = key.getPublicKey().toEvmAddress();
 
             assertThatExceptionOfType(ReceiptStatusException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
@@ -377,5 +377,126 @@ class AccountCreateIntegrationTest {
                             .getReceipt(testEnv.client))
                     .withMessageContaining(Status.INVALID_SIGNATURE.toString());
         }
+    }
+
+    @Test
+    @DisplayName(
+            "Can create account with ECDSA key using setKeyWithAlias, account should have same ECDSA as key and same key's alias")
+    void createAccountUsingSetKeyWithAliasAccountShouldHaveSameKeyAndSameKeysAlias() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+            var ecdsaKey = PrivateKey.generateECDSA();
+            var evmAddress = ecdsaKey.getPublicKey().toEvmAddress();
+
+            var accountId = new AccountCreateTransaction()
+                    .setReceiverSignatureRequired(true)
+                    .setKeyWithAlias(ecdsaKey)
+                    .freezeWith(testEnv.client)
+                    .sign(ecdsaKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
+
+            assertThat(accountId).isNotNull();
+
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
+
+            assertThat(info.accountId).isNotNull();
+            assertThat(info.key).isEqualTo(ecdsaKey.getPublicKey());
+            assertThat(info.contractAccountId).hasToString(evmAddress.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("Can create account with using setKeyWithAlias, account should have key as key and ECDSA key as alias")
+    void createAccountUsingSetKeyWithAliasAccountShouldHaveKeyAsKeyAndECDSAKEyAsAlias() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+            var ecdsaKey = PrivateKey.generateECDSA();
+            var key = PrivateKey.generateED25519();
+
+            var evmAddress = ecdsaKey.getPublicKey().toEvmAddress();
+
+            var accountId = new AccountCreateTransaction()
+                    .setReceiverSignatureRequired(true)
+                    .setKeyWithAlias(key, ecdsaKey)
+                    .freezeWith(testEnv.client)
+                    .sign(key)
+                    .sign(ecdsaKey)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
+
+            assertThat(accountId).isNotNull();
+
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
+
+            assertThat(info.accountId).isNotNull();
+            assertThat(info.key).isEqualTo(key.getPublicKey());
+            assertThat(info.contractAccountId).hasToString(evmAddress.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("Can create account using setKeyWithoutAlias, account should have key as key and no alias")
+    void createAccountUsingSetKeyWithoutAliasAccountShouldHaveKeyAsKeyAndNoAlias() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            var key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                    .setReceiverSignatureRequired(true)
+                    .setKeyWithoutAlias(key)
+                    .freezeWith(testEnv.client)
+                    .sign(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
+
+            assertThat(accountId).isNotNull();
+
+            var info = new AccountInfoQuery().setAccountId(accountId).execute(testEnv.client);
+
+            assertThat(info.accountId).isNotNull();
+            assertThat(info.key).isEqualTo(key.getPublicKey());
+            assertTrue(isLongZeroAddress(Hex.decode(info.contractAccountId)));
+        }
+    }
+
+    @Test
+    @DisplayName("Can not create account using setKeyWithAlias with only ed25519 key, exception should be thrown")
+    void createAccountUsingSetKeyWithAliasWithED25519KeyShouldThrowAnException() throws Exception {
+        try (var testEnv = new IntegrationTestEnv(1)) {
+
+            var key = PrivateKey.generateED25519();
+
+            var accountId = new AccountCreateTransaction()
+                    .setReceiverSignatureRequired(true)
+                    .setKeyWithoutAlias(key)
+                    .freezeWith(testEnv.client)
+                    .sign(key)
+                    .execute(testEnv.client)
+                    .getReceipt(testEnv.client)
+                    .accountId;
+
+            assertThat(accountId).isNotNull();
+
+            assertThatExceptionOfType(BadKeyException.class)
+                    .isThrownBy(() -> new AccountCreateTransaction()
+                            .setReceiverSignatureRequired(true)
+                            .setKeyWithAlias(key)
+                            .freezeWith(testEnv.client)
+                            .sign(key)
+                            .execute(testEnv.client)
+                            .getReceipt(testEnv.client))
+                    .withMessageContaining("Private key is not ECDSA");
+        }
+    }
+
+    private boolean isLongZeroAddress(byte[] address) {
+        for (int i = 0; i < 12; i++) {
+            if (address[i] != 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

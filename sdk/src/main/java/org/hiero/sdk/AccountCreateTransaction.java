@@ -115,7 +115,7 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             Objects.requireNonNull(evmAddress);
             this.alias = evmAddress;
         } else {
-            this.setKeyWithoutAlias(privateKeyECDSA);
+            throw new BadKeyException("Private key is not ECDSA");
         }
         return this;
     }
