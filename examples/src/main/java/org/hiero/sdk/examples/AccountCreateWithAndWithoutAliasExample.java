@@ -38,17 +38,13 @@ public class AccountCreateWithAndWithoutAliasExample {
         PublicKey publicKey = privateKey.getPublicKey();
         EvmAddress evmAddress = publicKey.toEvmAddress();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKeyWithAlias(privateKey)
-            .freezeWith(client);
+        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
 
         transaction.sign(privateKey);
         TransactionResponse response = transaction.execute(client);
 
         AccountId accountId = response.getReceipt(client).accountId;
-        AccountInfo info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(client);
+        AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         System.out.println("Initial EVM address: " + evmAddress + " is the same as " + info.contractAccountId);
     }
@@ -58,18 +54,14 @@ public class AccountCreateWithAndWithoutAliasExample {
         PrivateKey ecdsaKey = PrivateKey.generateECDSA();
         EvmAddress evmAddress = ecdsaKey.getPublicKey().toEvmAddress();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKeyWithAlias(ed25519Key, ecdsaKey)
-            .freezeWith(client);
+        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithAlias(ed25519Key, ecdsaKey).freezeWith(client);
 
         transaction.sign(ed25519Key);
         transaction.sign(ecdsaKey);
         TransactionResponse response = transaction.execute(client);
 
         AccountId accountId = response.getReceipt(client).accountId;
-        AccountInfo info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(client);
+        AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         System.out.println("Account's key: " + info.key + " is the same as " + ed25519Key.getPublicKey());
         System.out.println("Initial EVM address: " + evmAddress + " is the same as " + info.contractAccountId);
@@ -78,17 +70,13 @@ public class AccountCreateWithAndWithoutAliasExample {
     public void createAccountWithoutAlias() throws Exception {
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKeyWithoutAlias(privateKey)
-            .freezeWith(client);
+        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
 
         transaction.sign(privateKey);
         TransactionResponse response = transaction.execute(client);
 
         AccountId accountId = response.getReceipt(client).accountId;
-        AccountInfo info = new AccountInfoQuery()
-            .setAccountId(accountId)
-            .execute(client);
+        AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         System.out.println("Account's key: " + info.key + " is the same as " + privateKey.getPublicKey());
         System.out.println("Account has no alias: " + isZeroAddress(Hex.decode(info.contractAccountId)));
