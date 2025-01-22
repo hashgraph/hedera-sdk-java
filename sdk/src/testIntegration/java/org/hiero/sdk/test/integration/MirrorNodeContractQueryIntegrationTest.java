@@ -239,9 +239,7 @@ class MirrorNodeContractQueryIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var receiverEvmAddress = getEvmAddressFromMirrorNodeAsync(testEnv.client, receiverAccountId.num)
-                    .get()
-                    .toString();
+            var receiverEvmAddress = receiverAccountId.toSolidityAddress();
 
             var owner = new MirrorNodeContractCallQuery()
                     .setContractId(contractId)

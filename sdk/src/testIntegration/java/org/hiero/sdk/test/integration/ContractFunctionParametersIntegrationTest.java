@@ -21,6 +21,7 @@ import org.hiero.sdk.MirrorNodeContractEstimateGasQuery;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +32,8 @@ public class ContractFunctionParametersIntegrationTest {
     private static FileId fileId;
     private static ContractId contractId;
 
-    @BeforeAll
-    public static void beforeAll() throws Exception {
+    @BeforeEach
+    public void beforeEach() throws Exception {
         testEnv = new IntegrationTestEnv(1);
 
         var response = new FileCreateTransaction().setKeys(testEnv.operatorKey).execute(testEnv.client);
@@ -55,8 +56,8 @@ public class ContractFunctionParametersIntegrationTest {
         contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
     }
 
-    @AfterAll
-    public static void afterAll() throws Exception {
+    @AfterEach
+    public void afterEach() throws Exception {
         new ContractDeleteTransaction()
                 .setTransferAccountId(testEnv.operatorId)
                 .setContractId(contractId)
@@ -66,12 +67,6 @@ public class ContractFunctionParametersIntegrationTest {
         new FileDeleteTransaction().setFileId(fileId).execute(testEnv.client).getReceipt(testEnv.client);
 
         testEnv.close();
-    }
-
-    // so we don't get "network is busy" error
-    @AfterEach
-    public void afterEach() throws InterruptedException {
-        Thread.sleep(150);
     }
 
     @Test

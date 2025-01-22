@@ -58,7 +58,10 @@ tasks.withType<Test>().configureEach {
     systemProperty("OPERATOR_KEY", providers.gradleProperty("OPERATOR_KEY").getOrElse(""))
 }
 
-tasks.testIntegration { failFast = true }
+tasks.testIntegration {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors()).coerceAtLeast(1)
+    failFast = true
+}
 
 tasks.withType<JavaCompile>().configureEach { options.compilerArgs.add("-Xlint:-exports,-dep-ann") }
 
