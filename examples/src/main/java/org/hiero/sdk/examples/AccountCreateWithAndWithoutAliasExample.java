@@ -1,12 +1,12 @@
+// SPDX-License-Identifier: Apache-2.0
 package org.hiero.sdk.examples;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import java.util.Objects;
 import org.bouncycastle.util.encoders.Hex;
 import org.hiero.sdk.*;
 import org.hiero.sdk.logger.LogLevel;
 import org.hiero.sdk.logger.Logger;
-
-import java.util.Objects;
 
 public class AccountCreateWithAndWithoutAliasExample {
     private static final String DEFAULT_NETWORK = "testnet";
@@ -18,8 +18,10 @@ public class AccountCreateWithAndWithoutAliasExample {
 
     public AccountCreateWithAndWithoutAliasExample() throws InterruptedException {
         Dotenv env = Dotenv.load();
-        this.operatorId = AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR_ID"), "OPERATOR_ID must be set"));
-        this.operatorKey = PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_KEY"), "OPERATOR_KEY must be set"));
+        this.operatorId =
+                AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR_ID"), "OPERATOR_ID must be set"));
+        this.operatorKey =
+                PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_KEY"), "OPERATOR_KEY must be set"));
         String network = env.get("HEDERA_NETWORK", DEFAULT_NETWORK);
         String logLevel = env.get("SDK_LOG_LEVEL", DEFAULT_LOG_LEVEL);
 
@@ -38,7 +40,8 @@ public class AccountCreateWithAndWithoutAliasExample {
         PublicKey publicKey = privateKey.getPublicKey();
         EvmAddress evmAddress = publicKey.toEvmAddress();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
+        AccountCreateTransaction transaction =
+                new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
 
         transaction.sign(privateKey);
         TransactionResponse response = transaction.execute(client);
@@ -54,7 +57,9 @@ public class AccountCreateWithAndWithoutAliasExample {
         PrivateKey ecdsaKey = PrivateKey.generateECDSA();
         EvmAddress evmAddress = ecdsaKey.getPublicKey().toEvmAddress();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithAlias(ed25519Key, ecdsaKey).freezeWith(client);
+        AccountCreateTransaction transaction = new AccountCreateTransaction()
+                .setKeyWithAlias(ed25519Key, ecdsaKey)
+                .freezeWith(client);
 
         transaction.sign(ed25519Key);
         transaction.sign(ecdsaKey);
@@ -70,7 +75,8 @@ public class AccountCreateWithAndWithoutAliasExample {
     public void createAccountWithoutAlias() throws Exception {
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
-        AccountCreateTransaction transaction = new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
+        AccountCreateTransaction transaction =
+                new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
 
         transaction.sign(privateKey);
         TransactionResponse response = transaction.execute(client);
@@ -93,7 +99,8 @@ public class AccountCreateWithAndWithoutAliasExample {
 
     public static void main(String[] args) {
         try {
-            AccountCreateWithAndWithoutAliasExample accountCreateWithAndWithoutAliasExample = new AccountCreateWithAndWithoutAliasExample();
+            AccountCreateWithAndWithoutAliasExample accountCreateWithAndWithoutAliasExample =
+                    new AccountCreateWithAndWithoutAliasExample();
 
             accountCreateWithAndWithoutAliasExample.createAccountWithAlias();
             accountCreateWithAndWithoutAliasExample.createAccountWithBothKeys();
