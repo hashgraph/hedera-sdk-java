@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.tck.methods.sdk.param;
+package org.hiero.tck.methods.sdk.param.account;
 
 import java.util.Map;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.hiero.tck.methods.JSONRPC2Param;
+import org.hiero.tck.methods.sdk.param.CommonTransactionParams;
+import org.hiero.tck.util.JSONRPCParamParser;
 
 /**
  * AccountDeleteParams for account delete method
@@ -22,15 +23,11 @@ public class AccountDeleteParams extends JSONRPC2Param {
     private Optional<CommonTransactionParams> commonTransactionParams;
 
     @Override
-    public AccountDeleteParams parse(Map<String, Object> jrpcParams) throws ClassCastException {
+    public AccountDeleteParams parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedDeleteAccountId = Optional.ofNullable((String) jrpcParams.get("deleteAccountId"));
         var parsedTransferAccountId = Optional.ofNullable((String) jrpcParams.get("transferAccountId"));
 
-        Optional<CommonTransactionParams> parsedCommonTransactionParams = Optional.empty();
-        if (jrpcParams.containsKey("commonTransactionParams")) {
-            JSONObject jsonObject = (JSONObject) jrpcParams.get("commonTransactionParams");
-            parsedCommonTransactionParams = Optional.of(CommonTransactionParams.parse(jsonObject));
-        }
+        var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);
 
         return new AccountDeleteParams(parsedDeleteAccountId, parsedTransferAccountId, parsedCommonTransactionParams);
     }

@@ -15,13 +15,13 @@ cd tck
 **2. Build the project using Gradle.**
 
 ```shell
-./gradlew build
+../gradlew build
 ```
 
 **3. Run the server.**
 
 ```shell
-./gradlew bootRun
+../gradlew bootRun
 ```
 
 By default, the server will occupy port 80. If you need to specify a different port, modify the port in the `application.yml` file:

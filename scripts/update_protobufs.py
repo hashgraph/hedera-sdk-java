@@ -325,7 +325,7 @@ def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
 
 def add_to_FreezeType(original_name, cap_snake_name, comment_lines):
     FreezeType_sections[1] += \
-        generate_enum(original_name, cap_snake_name, comment_lines, "com.hedera.hashgraph.sdk.proto.FreezeType", 1)
+        generate_enum(original_name, cap_snake_name, comment_lines, "org.hiero.sdk.proto.FreezeType", 1)
     FreezeType_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
 
 

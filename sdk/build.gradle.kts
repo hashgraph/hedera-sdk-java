@@ -3,6 +3,7 @@ plugins {
     id("org.hiero.gradle.module.library")
     id("org.hiero.gradle.feature.protobuf")
     id("org.hiero.gradle.feature.test-integration")
+    id("org.hiero.gradle.feature.publish-dependency-constraints")
 }
 
 description = "Hedera™ Hashgraph SDK for Java"
@@ -11,29 +12,6 @@ javaModuleDependencies.moduleNameToGA.put(
     "com.google.protobuf",
     "com.google.protobuf:protobuf-javalite"
 )
-
-// TODO following block to be extracted into a plugin
-//      https://github.com/hiero-ledger/hiero-gradle-conventions/issues/41
-val publishDependencyConstraint =
-    configurations.create("publishDependencyConstraint") {
-        extendsFrom(configurations.internal.get())
-        dependencies.all {
-            val constraint = this
-            project.dependencies.constraints.add(
-                "api",
-                incoming.resolutionResult.rootComponent.map {
-                    (it.dependencies.single {
-                            it is ResolvedDependencyResult &&
-                                it.selected.moduleVersion?.group == constraint.group &&
-                                it.selected.moduleVersion?.name == constraint.name
-                        } as ResolvedDependencyResult)
-                        .selected
-                        .moduleVersion
-                        .toString()
-                }
-            )
-        }
-    }
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
 // correct version
@@ -97,4 +75,14 @@ dependencyAnalysis.abi {
         // Exposes: io.grpc.stub.AbstractFutureStub (and others)
         excludeClasses(".*Grpc")
     }
+}
+
+tasks.register<Delete>("updateSnapshots") {
+    delete(sourceSets.test.get().allSource.matching { include("**/*.snap") })
+    finalizedBy(tasks.test)
+}
+
+tasks.register<Exec>("updateProto") {
+    executable = File(rootDir, "scripts/update_protobufs.py").absolutePath
+    args("main") // argument is the branch/tag
 }

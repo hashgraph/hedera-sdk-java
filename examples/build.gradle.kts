@@ -9,8 +9,7 @@ mainModuleInfo {
     runtimeOnly("org.slf4j.simple")
 }
 
-// 'com.google.protobuf' implementation is provided through 'sdk' as it differs between 'sdk' and
-// 'sdk-full'
+// 'protobuf' implementation provided through 'sdk' as it differs between 'sdk' and 'sdk-full'
 dependencyAnalysis {
     issues {
         all { onUsedTransitiveDependencies { exclude("com.google.protobuf:protobuf-javalite") } }
@@ -89,4 +88,23 @@ abstract class RunAllExample : DefaultTask() {
             }
         }
     }
+}
+
+val updateAddressbooks = tasks.register("updateAddressbooks")
+
+listOf("mainnet", "testnet", "previewnet").forEach { network ->
+    val taskName = "updateAddressbooks${network.replaceFirstChar(Char::titlecase)}"
+    tasks.register<JavaExec>(taskName) {
+        workingDir = rootDir
+        classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
+        mainModule = "com.hedera.hashgraph.examples"
+        mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
+        environment("HEDERA_NETWORK", network)
+        doLast {
+            val binFile = File(workingDir, "address-book.proto.bin")
+            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            binFile.copyTo(target, overwrite = true)
+        }
+    }
+    updateAddressbooks { dependsOn(taskName) }
 }

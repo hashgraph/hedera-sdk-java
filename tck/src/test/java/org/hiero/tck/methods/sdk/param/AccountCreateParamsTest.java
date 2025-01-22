@@ -9,12 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import net.minidev.json.JSONArray;
 import net.minidev.json.JSONObject;
+import org.hiero.tck.methods.sdk.param.account.AccountCreateParams;
 import org.junit.jupiter.api.Test;
 
 class AccountCreateParamsTest {
 
     @Test
-    void testParseWithAllFields() {
+    void testParseWithAllFields() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
         jrpcParams.put("initialBalance", 1000L);
@@ -70,7 +71,7 @@ class AccountCreateParamsTest {
     }
 
     @Test
-    void testParseWithOptionalFieldsAbsent() {
+    void testParseWithOptionalFieldsAbsent() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
 
@@ -100,7 +101,7 @@ class AccountCreateParamsTest {
     }
 
     @Test
-    void testParseWithEmptyParams() {
+    void testParseWithEmptyParams() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
 
         AccountCreateParams params = new AccountCreateParams().parse(jrpcParams);

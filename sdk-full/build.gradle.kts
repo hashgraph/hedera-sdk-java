@@ -2,32 +2,10 @@
 plugins {
     id("org.hiero.gradle.module.library")
     id("org.hiero.gradle.feature.protobuf")
+    id("org.hiero.gradle.feature.publish-dependency-constraints")
 }
 
 description = "Hiero SDK for Java"
-
-// TODO following block to be extracted into a plugin
-//      https://github.com/hiero-ledger/hiero-gradle-conventions/issues/41
-val publishDependencyConstraint =
-    configurations.create("publishDependencyConstraint") {
-        extendsFrom(configurations.internal.get())
-        dependencies.all {
-            val addedDependency = this
-            project.dependencies.constraints.add(
-                "api",
-                incoming.resolutionResult.rootComponent.map {
-                    (it.dependencies.single {
-                            it is ResolvedDependencyResult &&
-                                it.selected.moduleVersion?.group == addedDependency.group &&
-                                it.selected.moduleVersion?.name == addedDependency.name
-                        } as ResolvedDependencyResult)
-                        .selected
-                        .moduleVersion
-                        .toString()
-                }
-            )
-        }
-    }
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
 // correct version

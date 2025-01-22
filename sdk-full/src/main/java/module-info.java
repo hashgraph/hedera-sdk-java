@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: Apache-2.0
-
 module org.hiero.sdk.full {
     requires transitive com.google.protobuf;
     requires com.esaulpaugh.headlong;

@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(project(":sdk"))
+    implementation(project(":tck"))
     implementation("io.grpc:grpc-protobuf")
 }
 
