@@ -6,4 +6,6 @@ module org.hiero.sdk.test.integration {
     requires org.bouncycastle.provider;
     requires org.junit.jupiter.api;
     requires static java.annotation;
+
+    opens org.hiero.sdk.test.integration;
 }
