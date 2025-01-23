@@ -19,9 +19,7 @@ import org.hiero.sdk.FileId;
 import org.hiero.sdk.Hbar;
 import org.hiero.sdk.MirrorNodeContractEstimateGasQuery;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +30,8 @@ public class ContractFunctionParametersIntegrationTest {
     private static FileId fileId;
     private static ContractId contractId;
 
-    @BeforeEach
-    public void beforeEach() throws Exception {
+    @BeforeAll
+    public static void beforeAll() throws Exception {
         testEnv = new IntegrationTestEnv(1);
 
         var response = new FileCreateTransaction().setKeys(testEnv.operatorKey).execute(testEnv.client);
@@ -48,7 +46,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         response = new ContractCreateTransaction()
                 .setAdminKey(testEnv.operatorKey)
-                .setGas(1500000)
+                .setGas(1_500_000)
                 .setConstructorParameters(new ContractFunctionParameters())
                 .setBytecodeFileId(fileId)
                 .execute(testEnv.client);
@@ -56,8 +54,8 @@ public class ContractFunctionParametersIntegrationTest {
         contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
     }
 
-    @AfterEach
-    public void afterEach() throws Exception {
+    @AfterAll
+    public static void afterAll() throws Exception {
         new ContractDeleteTransaction()
                 .setTransferAccountId(testEnv.operatorId)
                 .setContractId(contractId)
@@ -141,7 +139,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint16Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint16", new ContractFunctionParameters().addUint16(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -268,7 +266,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint32Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint32", new ContractFunctionParameters().addUint32(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -284,7 +282,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint32", new ContractFunctionParameters().addUint32(uint32MaxInt))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -304,7 +302,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint32Arr", new ContractFunctionParameters().addUint32Array(uint32Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -320,7 +318,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint40Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint40", new ContractFunctionParameters().addUint40(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -336,7 +334,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint40", new ContractFunctionParameters().addUint40(uint40MaxLong))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -356,7 +354,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint40Arr", new ContractFunctionParameters().addUint40Array(uint40Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -371,7 +369,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint48Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint48", new ContractFunctionParameters().addUint48(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -387,7 +385,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint48", new ContractFunctionParameters().addUint48(uint48MaxLong))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -407,7 +405,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint48Arr", new ContractFunctionParameters().addUint48Array(uint48Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -422,7 +420,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint56Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint56", new ContractFunctionParameters().addUint56(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -438,7 +436,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint56", new ContractFunctionParameters().addUint56(uint56MaxLong))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -458,7 +456,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint56Arr", new ContractFunctionParameters().addUint56Array(uint56Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -473,7 +471,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint64Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint64", new ContractFunctionParameters().addUint64(0))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -489,7 +487,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint64", new ContractFunctionParameters().addUint64(uint64MaxLong))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -509,7 +507,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint64Arr", new ContractFunctionParameters().addUint64Array(uint64Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -525,7 +523,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint72Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint72", new ContractFunctionParameters().addUint72(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -540,7 +538,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint72", new ContractFunctionParameters().addUint72(uint72Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -557,7 +555,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint72Arr", new ContractFunctionParameters().addUint72Array(uint72Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -572,7 +570,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint80Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint80", new ContractFunctionParameters().addUint80(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -587,7 +585,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint80", new ContractFunctionParameters().addUint80(uint80Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -604,7 +602,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint80Arr", new ContractFunctionParameters().addUint80Array(uint80Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -619,7 +617,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint88Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint88", new ContractFunctionParameters().addUint88(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -634,7 +632,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint88", new ContractFunctionParameters().addUint88(uint88Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -651,7 +649,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint88Arr", new ContractFunctionParameters().addUint88Array(uint88Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -666,7 +664,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint96Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint96", new ContractFunctionParameters().addUint96(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -681,7 +679,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint96", new ContractFunctionParameters().addUint96(uint96Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -698,7 +696,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint96Arr", new ContractFunctionParameters().addUint96Array(uint96Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -713,7 +711,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint104Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint104", new ContractFunctionParameters().addUint104(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -728,7 +726,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint104", new ContractFunctionParameters().addUint104(uint104Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -745,7 +743,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint104Arr", new ContractFunctionParameters().addUint104Array(uint104Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -760,7 +758,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint112Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint112", new ContractFunctionParameters().addUint112(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -775,7 +773,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint112", new ContractFunctionParameters().addUint112(uint112Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -792,7 +790,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint112Arr", new ContractFunctionParameters().addUint112Array(uint112Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -807,7 +805,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint120Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint120", new ContractFunctionParameters().addUint120(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -822,7 +820,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint120", new ContractFunctionParameters().addUint120(uint120Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -839,7 +837,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint120Arr", new ContractFunctionParameters().addUint120Array(uint120Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -854,7 +852,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint128Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint128", new ContractFunctionParameters().addUint128(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -869,7 +867,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint128", new ContractFunctionParameters().addUint128(uint128Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -886,7 +884,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint128Arr", new ContractFunctionParameters().addUint128Array(uint128Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -901,7 +899,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint136Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint136", new ContractFunctionParameters().addUint136(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -916,7 +914,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint136", new ContractFunctionParameters().addUint136(uint136Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -933,7 +931,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint136Arr", new ContractFunctionParameters().addUint136Array(uint136Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -948,7 +946,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint144Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint144", new ContractFunctionParameters().addUint144(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -963,7 +961,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint144", new ContractFunctionParameters().addUint144(uint144Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -980,7 +978,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint144Arr", new ContractFunctionParameters().addUint144Array(uint144Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -995,7 +993,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint152Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint152", new ContractFunctionParameters().addUint152(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1010,7 +1008,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint152", new ContractFunctionParameters().addUint152(uint152Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1027,7 +1025,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint152Arr", new ContractFunctionParameters().addUint152Array(uint152Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1042,7 +1040,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint160Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint160", new ContractFunctionParameters().addUint160(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1057,7 +1055,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint160", new ContractFunctionParameters().addUint160(uint160Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1074,7 +1072,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint160Arr", new ContractFunctionParameters().addUint160Array(uint160Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1089,7 +1087,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint168Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint168", new ContractFunctionParameters().addUint168(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1104,7 +1102,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint168", new ContractFunctionParameters().addUint168(uint168Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1121,7 +1119,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint168Arr", new ContractFunctionParameters().addUint168Array(uint168Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1136,7 +1134,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint176Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint176", new ContractFunctionParameters().addUint176(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1151,7 +1149,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint176", new ContractFunctionParameters().addUint176(uint176Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1168,7 +1166,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint176Arr", new ContractFunctionParameters().addUint176Array(uint176Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1183,7 +1181,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint184Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint184", new ContractFunctionParameters().addUint184(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1198,7 +1196,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint184", new ContractFunctionParameters().addUint184(uint184Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1215,7 +1213,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint184Arr", new ContractFunctionParameters().addUint184Array(uint184Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1230,7 +1228,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint192Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint192", new ContractFunctionParameters().addUint192(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1245,7 +1243,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint192", new ContractFunctionParameters().addUint192(uint192Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1262,7 +1260,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint192Arr", new ContractFunctionParameters().addUint192Array(uint192Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1277,7 +1275,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint200Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint200", new ContractFunctionParameters().addUint200(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1292,7 +1290,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint200", new ContractFunctionParameters().addUint200(uint200Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1309,7 +1307,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint200Arr", new ContractFunctionParameters().addUint200Array(uint200Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1324,7 +1322,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint208Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint208", new ContractFunctionParameters().addUint208(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1339,7 +1337,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint208", new ContractFunctionParameters().addUint208(uint208Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1356,7 +1354,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint208Arr", new ContractFunctionParameters().addUint208Array(uint208Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1371,7 +1369,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint216Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint216", new ContractFunctionParameters().addUint216(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1386,7 +1384,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint216", new ContractFunctionParameters().addUint216(uint216Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1403,7 +1401,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint216Arr", new ContractFunctionParameters().addUint216Array(uint216Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1418,7 +1416,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint224Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint224", new ContractFunctionParameters().addUint224(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1433,7 +1431,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint224", new ContractFunctionParameters().addUint224(uint224Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1450,7 +1448,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint224Arr", new ContractFunctionParameters().addUint224Array(uint224Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1465,7 +1463,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint232Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint232", new ContractFunctionParameters().addUint232(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1481,7 +1479,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint232", new ContractFunctionParameters().addUint232(uint232Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1499,7 +1497,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint232Arr", new ContractFunctionParameters().addUint232Array(uint232Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1514,7 +1512,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint240Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint240", new ContractFunctionParameters().addUint240(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1530,7 +1528,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint240", new ContractFunctionParameters().addUint240(uint240Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1548,7 +1546,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint240Arr", new ContractFunctionParameters().addUint240Array(uint240Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1563,7 +1561,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint248Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint248", new ContractFunctionParameters().addUint248(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1579,7 +1577,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint248", new ContractFunctionParameters().addUint248(uint248Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1597,7 +1595,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint248Arr", new ContractFunctionParameters().addUint248Array(uint248Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1612,7 +1610,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionUint256Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint256", new ContractFunctionParameters().addUint256(BigInteger.ZERO))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1627,7 +1625,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint256", new ContractFunctionParameters().addUint256(uint256Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1644,7 +1642,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint256Arr", new ContractFunctionParameters().addUint256Array(uint256Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1659,7 +1657,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt8Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt8", new ContractFunctionParameters().addInt8(Byte.MIN_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1672,7 +1670,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt8Max() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt8", new ContractFunctionParameters().addInt8(Byte.MAX_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1687,7 +1685,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt8Arr", new ContractFunctionParameters().addInt8Array(int8Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1705,7 +1703,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt16", new ContractFunctionParameters().addInt16(int16Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1720,7 +1718,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt16", new ContractFunctionParameters().addInt16(int16Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1737,7 +1735,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt16Arr", new ContractFunctionParameters().addInt16Array(int16Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1754,7 +1752,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt24", new ContractFunctionParameters().addInt24(int24Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1769,7 +1767,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt24", new ContractFunctionParameters().addInt24(int24Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1786,7 +1784,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt24Arr", new ContractFunctionParameters().addInt24Array(int24Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1801,7 +1799,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt32Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt32", new ContractFunctionParameters().addInt32(Integer.MIN_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1814,7 +1812,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt32Max() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt32", new ContractFunctionParameters().addInt32(Integer.MAX_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1831,7 +1829,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt32Arr", new ContractFunctionParameters().addInt32Array(int32Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1848,7 +1846,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt40", new ContractFunctionParameters().addInt40(int40Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1863,7 +1861,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt40", new ContractFunctionParameters().addInt40(int40Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1880,7 +1878,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt40Arr", new ContractFunctionParameters().addInt40Array(int40Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1897,7 +1895,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt48", new ContractFunctionParameters().addInt48(int48Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1912,7 +1910,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt48", new ContractFunctionParameters().addInt48(int48Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1929,7 +1927,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt48Arr", new ContractFunctionParameters().addInt48Array(int48Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1946,7 +1944,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt56", new ContractFunctionParameters().addInt56(int56Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1961,7 +1959,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt56", new ContractFunctionParameters().addInt56(int56Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1978,7 +1976,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt56Arr", new ContractFunctionParameters().addInt56Array(int56Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -1993,7 +1991,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt64Min() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt64", new ContractFunctionParameters().addInt64(Long.MIN_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2006,7 +2004,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionInt64Max() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnUint64", new ContractFunctionParameters().addUint64(Long.MAX_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2023,7 +2021,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt64Arr", new ContractFunctionParameters().addInt64Array(int64Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2040,7 +2038,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt72", new ContractFunctionParameters().addInt72(int72Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2055,7 +2053,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt72", new ContractFunctionParameters().addInt72(int72Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2072,7 +2070,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt72Arr", new ContractFunctionParameters().addInt72Array(int72Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2089,7 +2087,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt80", new ContractFunctionParameters().addInt80(int80Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2104,7 +2102,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt80", new ContractFunctionParameters().addInt80(int80Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2121,7 +2119,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt80Arr", new ContractFunctionParameters().addInt80Array(int80Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2138,7 +2136,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt88", new ContractFunctionParameters().addInt88(int88Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2153,7 +2151,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt88", new ContractFunctionParameters().addInt88(int88Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2170,7 +2168,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt88Arr", new ContractFunctionParameters().addInt88Array(int88Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2187,7 +2185,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt96", new ContractFunctionParameters().addInt96(int96Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2202,7 +2200,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt96", new ContractFunctionParameters().addInt96(int96Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2219,7 +2217,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt96Arr", new ContractFunctionParameters().addInt96Array(int96Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2236,7 +2234,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt104", new ContractFunctionParameters().addInt104(int104Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2251,7 +2249,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt104", new ContractFunctionParameters().addInt104(int104Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2268,7 +2266,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt104Arr", new ContractFunctionParameters().addInt104Array(int104Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2285,7 +2283,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt112", new ContractFunctionParameters().addInt112(int112Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2300,7 +2298,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt112", new ContractFunctionParameters().addInt112(int112Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2317,7 +2315,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt112Arr", new ContractFunctionParameters().addInt112Array(int112Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2334,7 +2332,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt120", new ContractFunctionParameters().addInt120(int120Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2349,7 +2347,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt120", new ContractFunctionParameters().addInt120(int120Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2366,7 +2364,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt120Arr", new ContractFunctionParameters().addInt120Array(int120Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2383,7 +2381,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt128", new ContractFunctionParameters().addInt128(int128Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2398,7 +2396,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt128", new ContractFunctionParameters().addInt128(int128Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2415,7 +2413,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt128Arr", new ContractFunctionParameters().addInt128Array(int128Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2432,7 +2430,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt136", new ContractFunctionParameters().addInt136(int136Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2447,7 +2445,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt136", new ContractFunctionParameters().addInt136(int136Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2464,7 +2462,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt136Arr", new ContractFunctionParameters().addInt136Array(int136Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2481,7 +2479,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt144", new ContractFunctionParameters().addInt144(int144Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2496,7 +2494,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt144", new ContractFunctionParameters().addInt144(int144Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2513,7 +2511,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt144Arr", new ContractFunctionParameters().addInt144Array(int144Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2530,7 +2528,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt152", new ContractFunctionParameters().addInt152(int152Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2545,7 +2543,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt152", new ContractFunctionParameters().addInt152(int152Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2562,7 +2560,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt152Arr", new ContractFunctionParameters().addInt152Array(int152Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2579,7 +2577,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt160", new ContractFunctionParameters().addInt160(int160Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2594,7 +2592,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt160", new ContractFunctionParameters().addInt160(int160Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2611,7 +2609,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt160Arr", new ContractFunctionParameters().addInt160Array(int160Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2628,7 +2626,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt168", new ContractFunctionParameters().addInt168(int168Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2643,7 +2641,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt168", new ContractFunctionParameters().addInt168(int168Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2660,7 +2658,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt168Arr", new ContractFunctionParameters().addInt168Array(int168Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2677,7 +2675,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt176", new ContractFunctionParameters().addInt176(int176Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2692,7 +2690,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt176", new ContractFunctionParameters().addInt176(int176Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2709,7 +2707,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt176Arr", new ContractFunctionParameters().addInt176Array(int176Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2726,7 +2724,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt184", new ContractFunctionParameters().addInt184(int184Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2741,7 +2739,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt184", new ContractFunctionParameters().addInt184(int184Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2758,7 +2756,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt184Arr", new ContractFunctionParameters().addInt184Array(int184Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2775,7 +2773,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt192", new ContractFunctionParameters().addInt192(int192Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2790,7 +2788,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt192", new ContractFunctionParameters().addInt192(int192Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2807,7 +2805,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt192Arr", new ContractFunctionParameters().addInt192Array(int192Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2824,7 +2822,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt200", new ContractFunctionParameters().addInt200(int200Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2839,7 +2837,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt200", new ContractFunctionParameters().addInt200(int200Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2856,7 +2854,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt200Arr", new ContractFunctionParameters().addInt200Array(int200Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2873,7 +2871,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt208", new ContractFunctionParameters().addInt208(int208Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2888,7 +2886,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt208", new ContractFunctionParameters().addInt208(int208Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2905,7 +2903,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt208Arr", new ContractFunctionParameters().addInt208Array(int208Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2922,7 +2920,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt216", new ContractFunctionParameters().addInt216(int216Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2937,7 +2935,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt216", new ContractFunctionParameters().addInt216(int216Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2954,7 +2952,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt216Arr", new ContractFunctionParameters().addInt216Array(int216Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2971,7 +2969,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt224", new ContractFunctionParameters().addInt224(int224Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -2986,7 +2984,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt224", new ContractFunctionParameters().addInt224(int224Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3003,7 +3001,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt224Arr", new ContractFunctionParameters().addInt224Array(int224Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3021,7 +3019,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt232", new ContractFunctionParameters().addInt232(int232Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3036,7 +3034,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt232", new ContractFunctionParameters().addInt232(int232Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3054,7 +3052,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt232Arr", new ContractFunctionParameters().addInt232Array(int232Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3072,7 +3070,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt240", new ContractFunctionParameters().addInt240(int240Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3088,7 +3086,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt240", new ContractFunctionParameters().addInt240(int240Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3107,7 +3105,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt240Arr", new ContractFunctionParameters().addInt240Array(int240Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3125,7 +3123,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt248", new ContractFunctionParameters().addInt248(int248Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3141,7 +3139,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt248", new ContractFunctionParameters().addInt248(int248Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3160,7 +3158,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt248Arr", new ContractFunctionParameters().addInt248Array(int248Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3178,7 +3176,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt256", new ContractFunctionParameters().addInt256(int256Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3194,7 +3192,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt256", new ContractFunctionParameters().addInt256(int256Max))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3213,7 +3211,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt256Arr", new ContractFunctionParameters().addInt256Array(int256Array))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3228,7 +3226,7 @@ public class ContractFunctionParametersIntegrationTest {
     void canCallContractFunctionMultipleInt8() throws Exception {
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnInt8Multiple", new ContractFunctionParameters().addInt8(Byte.MIN_VALUE))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3244,7 +3242,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnMultipleInt40", new ContractFunctionParameters().addInt40(int40))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3261,7 +3259,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnMultipleInt256", new ContractFunctionParameters().addInt256(int256Min))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3278,7 +3276,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnMultipleTypeParams", new ContractFunctionParameters().addUint32(uint32MaxInt))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3295,7 +3293,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnString", new ContractFunctionParameters().addString(testString))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3310,7 +3308,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnStringArr", new ContractFunctionParameters().addStringArray(testStringArray))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3326,7 +3324,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnStringArr", new ContractFunctionParameters().addStringArray(testStringArray))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3342,7 +3340,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnAddress", new ContractFunctionParameters().addAddress(testAddress))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3358,7 +3356,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnAddressArr", new ContractFunctionParameters().addAddressArray(testAddressArray))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3380,7 +3378,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBoolean", new ContractFunctionParameters().addBool(testBoolean))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3395,7 +3393,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBooleanArr", new ContractFunctionParameters().addBoolArray(testBooleanArray))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3412,7 +3410,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBytes", new ContractFunctionParameters().addBytes(testBytes))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3427,7 +3425,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBytesArr", new ContractFunctionParameters().addBytesArray(testBytes))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3446,7 +3444,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBytes32", new ContractFunctionParameters().addBytes32(testBytesLen32))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
@@ -3465,7 +3463,7 @@ public class ContractFunctionParametersIntegrationTest {
 
         var response = new ContractCallQuery()
                 .setContractId(contractId)
-                .setGas(1500000)
+                .setGas(30_000)
                 .setFunction("returnBytes32Arr", new ContractFunctionParameters().addBytes32Array(testBytesLen32))
                 .setQueryPayment(new Hbar(10))
                 .execute(testEnv.client);
