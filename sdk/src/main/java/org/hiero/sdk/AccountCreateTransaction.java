@@ -136,6 +136,8 @@ public final class AccountCreateTransaction extends Transaction<AccountCreateTra
             EvmAddress evmAddress = privateKeyECDSA.getPublicKey().toEvmAddress();
             Objects.requireNonNull(evmAddress);
             this.alias = evmAddress;
+        } else {
+            throw new BadKeyException("Private key is not ECDSA");
         }
         return this;
     }
