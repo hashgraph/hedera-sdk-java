@@ -375,7 +375,7 @@ class AccountCreateIntegrationTest {
                             .sign(adminKey)
                             .execute(testEnv.client)
                             .getReceipt(testEnv.client))
-                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
+                    .withMessageContaining("Private key is not ECDSA");
         }
     }
 

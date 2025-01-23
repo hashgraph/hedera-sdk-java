@@ -8,155 +8,231 @@ import org.hiero.sdk.*;
 import org.hiero.sdk.logger.LogLevel;
 import org.hiero.sdk.logger.Logger;
 
+/**
+ * Hedera Account Creation Example.
+ * <p>
+ * Demonstrates different methods of creating Hedera accounts with various key configurations.
+ * Shows how to create accounts with and without aliases using different key types.
+ */
 public class AccountCreateWithAndWithoutAliasExample {
-    /*
-     * Constants for default network and log level configurations
-     */
-    private static final String DEFAULT_NETWORK = "testnet";
-    private static final String DEFAULT_LOG_LEVEL = "SILENT";
+
+    // UTIL VARIABLES BELOW
+    private static final int TOTAL_ACCOUNT_CREATION_METHODS = 3;
+
+    // CONFIG VARIABLES BELOW
 
     /*
-     * Client and operator credentials for Hedera network interactions
+     * See .env.sample in the examples folder root for how to specify values below
+     * or set environment variables with the same names.
      */
-    private final Client client;
-    private final AccountId operatorId;
-    private final PrivateKey operatorKey;
 
     /**
-     * Constructor to initialize Hedera client with environment configurations
+     * Operator's account ID.
+     * Used to sign and pay for operations on Hedera.
      */
-    public AccountCreateWithAndWithoutAliasExample() throws InterruptedException {
-        /*
-         * Step 0: Load environment configurations
-         * - Retrieve OPERATOR_ID and OPERATOR_KEY from .env file
-         * - Set default network and log level if not specified
-         */
-        Dotenv env = Dotenv.load();
-        this.operatorId =
-                AccountId.fromString(Objects.requireNonNull(env.get("OPERATOR_ID"), "OPERATOR_ID must be set"));
-        this.operatorKey =
-                PrivateKey.fromString(Objects.requireNonNull(env.get("OPERATOR_KEY"), "OPERATOR_KEY must be set"));
-        String network = env.get("HEDERA_NETWORK", DEFAULT_NETWORK);
-        String logLevel = env.get("SDK_LOG_LEVEL", DEFAULT_LOG_LEVEL);
-
-        /*
-         * Step 1: Initialize Hedera client with network and logging configurations
-         */
-        this.client = initializeClient(network, logLevel);
-    }
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
-     * Initialize Hedera client with specified network and log level
+     * Operator's private key.
      */
-    private Client initializeClient(String network, String logLevel) throws InterruptedException {
-        Client client = ClientHelper.forName(network);
-        client.setOperator(operatorId, operatorKey);
-        client.setLogger(new Logger(LogLevel.valueOf(logLevel)));
-        return client;
-    }
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
-     * Create account with EVM address alias using single key
+     * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
+     * Network can be: localhost, testnet, previewnet or mainnet.
      */
-    private void createAccountWithAlias() throws Exception {
+    private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
+
+    /**
+     * SDK_LOG_LEVEL defaults to SILENT if not specified in dotenv file.
+     * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
+     * <p>
+     * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
+     */
+    private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
+
+    /**
+     * Creates a Hedera account with an alias using an ECDSA key.
+     *
+     * @param client The Hedera network client used to execute the transaction
+     * @throws Exception If there's an error during account creation
+     */
+    public static void createAccountWithAlias(Client client) throws Exception {
         /*
-         * Step 2: Generate ECDSA key pair
+         * Step 1:
+         * Create an ECDSA private key.
          */
         PrivateKey privateKey = PrivateKey.generateECDSA();
+
+        /*
+         * Step 2:
+         * Extract the ECDSA public key and generate EVM address.
+         */
         PublicKey publicKey = privateKey.getPublicKey();
         EvmAddress evmAddress = publicKey.toEvmAddress();
 
         /*
-         * Step 3: Create account transaction with key alias
+         * Step 3:
+         * Create an account creation transaction with the key as an alias.
          */
         AccountCreateTransaction transaction =
                 new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
 
         /*
-         * Step 4: Sign and execute transaction
+         * Step 4:
+         * Sign the transaction with the private key.
          */
         transaction.sign(privateKey);
+
+        /*
+         * Step 5:
+         * Execute the transaction and get the response.
+         */
         TransactionResponse response = transaction.execute(client);
 
         /*
-         * Step 5: Retrieve and verify account information
+         * Step 6:
+         * Retrieve the newly created account ID.
          */
         AccountId accountId = response.getReceipt(client).accountId;
+
+        /*
+         * Step 7:
+         * Query the account information to verify details.
+         */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
+        /*
+         * Step 8:
+         * Print the EVM address to confirm it matches the contract account ID.
+         */
         System.out.println("Initial EVM address: " + evmAddress + " is the same as " + info.contractAccountId);
     }
 
     /**
-     * Create account with both ED25519 and ECDSA keys
+     * Creates a Hedera account with both ED25519 and ECDSA keys.
+     *
+     * @param client The Hedera network client used to execute the transaction
+     * @throws Exception If there's an error during account creation
      */
-    private void createAccountWithBothKeys() throws Exception {
+    public static void createAccountWithBothKeys(Client client) throws Exception {
         /*
-         * Step 6: Generate ED25519 and ECDSA key pairs
+         * Step 1:
+         * Generate separate ED25519 and ECDSA private keys.
          */
         PrivateKey ed25519Key = PrivateKey.generateED25519();
         PrivateKey ecdsaKey = PrivateKey.generateECDSA();
+
+        /*
+         * Step 2:
+         * Derive the EVM address from the ECDSA public key.
+         */
         EvmAddress evmAddress = ecdsaKey.getPublicKey().toEvmAddress();
 
         /*
-         * Step 7: Create account transaction with multiple keys
+         * Step 3:
+         * Create an account creation transaction with both keys.
          */
         AccountCreateTransaction transaction = new AccountCreateTransaction()
                 .setKeyWithAlias(ed25519Key, ecdsaKey)
                 .freezeWith(client);
 
         /*
-         * Step 8: Sign transaction with both keys
+         * Step 4:
+         * Sign the transaction with both keys.
          */
         transaction.sign(ed25519Key);
         transaction.sign(ecdsaKey);
+
+        /*
+         * Step 5:
+         * Execute the transaction and get the response.
+         */
         TransactionResponse response = transaction.execute(client);
 
         /*
-         * Step 9: Retrieve and verify account information
+         * Step 6:
+         * Retrieve the newly created account ID.
          */
         AccountId accountId = response.getReceipt(client).accountId;
+
+        /*
+         * Step 7:
+         * Query the account information to verify details.
+         */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
+        /*
+         * Step 8:
+         * Print key and EVM address details for verification.
+         */
         System.out.println("Account's key: " + info.key + " is the same as " + ed25519Key.getPublicKey());
         System.out.println("Initial EVM address: " + evmAddress + " is the same as " + info.contractAccountId);
     }
 
     /**
-     * Create account without EVM address alias
+     * Creates a Hedera account without an alias.
+     *
+     * @param client The Hedera network client used to execute the transaction
+     * @throws Exception If there's an error during account creation
      */
-    private void createAccountWithoutAlias() throws Exception {
+    public static void createAccountWithoutAlias(Client client) throws Exception {
         /*
-         * Step 10: Generate ECDSA key pair
+         * Step 1:
+         * Create a new ECDSA private key.
          */
         PrivateKey privateKey = PrivateKey.generateECDSA();
 
         /*
-         * Step 11: Create account transaction without alias
+         * Step 2:
+         * Create an account creation transaction without an alias.
          */
         AccountCreateTransaction transaction =
                 new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
 
         /*
-         * Step 12: Sign and execute transaction
+         * Step 3:
+         * Sign the transaction with the private key.
          */
         transaction.sign(privateKey);
+
+        /*
+         * Step 4:
+         * Execute the transaction and get the response.
+         */
         TransactionResponse response = transaction.execute(client);
 
         /*
-         * Step 13: Retrieve and verify account information
+         * Step 5:
+         * Retrieve the newly created account ID.
          */
         AccountId accountId = response.getReceipt(client).accountId;
+
+        /*
+         * Step 6:
+         * Query the account information to verify details.
+         */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
+        /*
+         * Step 7:
+         * Print key and alias details for verification.
+         */
         System.out.println("Account's key: " + info.key + " is the same as " + privateKey.getPublicKey());
         System.out.println("Account has no alias: " + isZeroAddress(Hex.decode(info.contractAccountId)));
     }
 
     /**
-     * Check if the first 12 bytes of an address are zero
+     * Checks if an address is a zero address (all first 12 bytes are zero).
+     *
+     * @param address The byte array representing the address to check
+     * @return true if the address is a zero address, false otherwise
      */
     private static boolean isZeroAddress(byte[] address) {
+        // Check if the first 12 bytes of the address are all zero
         for (int i = 0; i < 12; i++) {
             if (address[i] != 0) {
                 return false;
@@ -166,17 +242,60 @@ public class AccountCreateWithAndWithoutAliasExample {
     }
 
     /**
-     * Main method to demonstrate account creation scenarios
+     * Main method to demonstrate different account creation methods.
+     *
+     * @param args Command-line arguments (not used in this example)
      */
     public static void main(String[] args) throws Exception {
-        /*
-         * Step 14: Create example instance and demonstrate account creation methods
-         */
-        AccountCreateWithAndWithoutAliasExample accountCreateWithAndWithoutAliasExample =
-                new AccountCreateWithAndWithoutAliasExample();
+        System.out.println("Example Start!");
 
-        accountCreateWithAndWithoutAliasExample.createAccountWithAlias();
-        accountCreateWithAndWithoutAliasExample.createAccountWithBothKeys();
-        accountCreateWithAndWithoutAliasExample.createAccountWithoutAlias();
+        /*
+         * Step 0:
+         * Create and configure SDK Client.
+         */
+        Client client = createClient();
+
+        /*
+         * Step 1:
+         * Demonstrate different account creation methods.
+         */
+        createAccountWithAlias(client);
+        createAccountWithBothKeys(client);
+        createAccountWithoutAlias(client);
+
+        /*
+         * Clean up:
+         */
+        client.close();
+
+        System.out.println("Example Complete!");
+    }
+
+    /**
+     * Creates a Hedera network client using configuration from class-level constants.
+     *
+     * @return Configured Hedera network client
+     * @throws InterruptedException If there's an interruption during client creation
+     */
+    public static Client createClient() throws InterruptedException {
+        /*
+         * Step 1:
+         * Create a client for the specified network.
+         */
+        Client client = ClientHelper.forName(HEDERA_NETWORK);
+
+        /*
+         * Step 2:
+         * Set the operator (account paying for transactions).
+         */
+        client.setOperator(OPERATOR_ID, OPERATOR_KEY);
+
+        /*
+         * Step 3:
+         * Configure logging for the client.
+         */
+        client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
+
+        return client;
     }
 }
