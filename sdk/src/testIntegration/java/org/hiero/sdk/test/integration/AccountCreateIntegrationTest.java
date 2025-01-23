@@ -274,14 +274,14 @@ class AccountCreateIntegrationTest {
 
             var key = PrivateKey.generateECDSA();
 
-            assertThatExceptionOfType(ReceiptStatusException.class)
+            assertThatExceptionOfType(BadKeyException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
                             .setReceiverSignatureRequired(true)
                             .setKeyWithAlias(key, adminKey)
                             .freezeWith(testEnv.client)
                             .execute(testEnv.client)
                             .getReceipt(testEnv.client))
-                    .withMessageContaining(Status.INVALID_SIGNATURE.toString());
+                    .withMessageContaining("Private key is not ECDSA");
         }
     }
 
