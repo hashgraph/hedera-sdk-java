@@ -366,11 +366,10 @@ public abstract class Query<O, T extends Query<O, T>> extends Executable<T, org.
         paymentTransactionId = TransactionId.generate(Objects.requireNonNull(paymentOperator).accountId);
 
         var newPaymentTx = makePaymentTransaction(
-            paymentTransactionId,
-            nodeAccountIds.get(index),
-            paymentOperator,
-            Objects.requireNonNull(chosenQueryPayment)
-        );
+                paymentTransactionId,
+                nodeAccountIds.get(index),
+                paymentOperator,
+                Objects.requireNonNull(chosenQueryPayment));
         paymentTransactions.set(index, newPaymentTx);
         return newPaymentTx;
     }
