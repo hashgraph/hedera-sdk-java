@@ -367,7 +367,7 @@ class AccountCreateIntegrationTest {
 
             var key = PrivateKey.generateECDSA();
 
-            assertThatExceptionOfType(ReceiptStatusException.class)
+            assertThatExceptionOfType(BadKeyException.class)
                     .isThrownBy(() -> new AccountCreateTransaction()
                             .setReceiverSignatureRequired(true)
                             .setKeyWithAlias(key, adminKey)
