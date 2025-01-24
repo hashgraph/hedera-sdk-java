@@ -120,7 +120,6 @@ public final class TransactionResponse {
                 // Check if the exception status indicates throttling
                 if (e.receipt.status == Status.THROTTLED_AT_CONSENSUS) {
                     // Retry the transaction
-                    System.out.println("throttled");
                     return retryTransaction(client);
                 } else {
                     // If not throttled, rethrow the exception
