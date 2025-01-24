@@ -133,8 +133,7 @@ public final class TransactionResponse {
         }
     }
 
-    private TransactionReceipt retryTransaction(Client client)
-            throws PrecheckStatusException, TimeoutException {
+    private TransactionReceipt retryTransaction(Client client) throws PrecheckStatusException, TimeoutException {
         // reset the transaction body
         transaction.frozenBodyBuilder = null;
         // regenerate the transaction id
