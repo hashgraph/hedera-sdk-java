@@ -4,7 +4,6 @@ package org.hiero.sdk;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.jsonSnapshot.SnapshotMatcher;
-import java.math.BigInteger;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
@@ -15,10 +14,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 public class AccountCreateTransactionTest {
-    private static final PrivateKey unusedPrivateKey = PrivateKey.fromString(
+    private static final PrivateKey privateKeyED25519 = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
-    PrivateKeyECDSA privateKeyECDSA = new PrivateKeyECDSA(BigInteger.ONE, unusedPrivateKey.getChainCode());
+    PrivateKey privateKeyECDSA = PrivateKey.generateECDSA();
 
     final Instant validStart = Instant.ofEpochSecond(1554158542);
 
@@ -37,8 +36,8 @@ public class AccountCreateTransactionTest {
                 .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
                 .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
                 .setKeyWithAlias(privateKeyECDSA)
-                .setKeyWithAlias(unusedPrivateKey, privateKeyECDSA)
-                .setKeyWithoutAlias(unusedPrivateKey)
+                .setKeyWithAlias(privateKeyED25519, privateKeyECDSA)
+                .setKeyWithoutAlias(privateKeyED25519)
                 .setInitialBalance(Hbar.fromTinybars(450))
                 .setProxyAccountId(AccountId.fromString("0.0.1001"))
                 .setAccountMemo("some dumb memo")
@@ -49,7 +48,7 @@ public class AccountCreateTransactionTest {
                 .setMaxAutomaticTokenAssociations(100)
                 .setMaxTransactionFee(Hbar.fromTinybars(100_000))
                 .freeze()
-                .sign(unusedPrivateKey);
+                .sign(privateKeyED25519);
     }
 
     AccountCreateTransaction spawnTestTransaction2() {
@@ -57,8 +56,8 @@ public class AccountCreateTransactionTest {
                 .setNodeAccountIds(Arrays.asList(AccountId.fromString("0.0.5005"), AccountId.fromString("0.0.5006")))
                 .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
                 .setKeyWithAlias(privateKeyECDSA)
-                .setKeyWithAlias(unusedPrivateKey, privateKeyECDSA)
-                .setKeyWithoutAlias(unusedPrivateKey)
+                .setKeyWithAlias(privateKeyED25519, privateKeyECDSA)
+                .setKeyWithoutAlias(privateKeyED25519)
                 .setInitialBalance(Hbar.fromTinybars(450))
                 .setProxyAccountId(AccountId.fromString("0.0.1001"))
                 .setAccountMemo("some dumb memo")
@@ -68,7 +67,7 @@ public class AccountCreateTransactionTest {
                 .setMaxAutomaticTokenAssociations(100)
                 .setMaxTransactionFee(Hbar.fromTinybars(100_000))
                 .freeze()
-                .sign(unusedPrivateKey);
+                .sign(privateKeyED25519);
     }
 
     @Test
@@ -106,7 +105,7 @@ public class AccountCreateTransactionTest {
     void propertiesTest() {
         var tx = spawnTestTransaction();
 
-        assertThat(tx.getKey()).isEqualTo(unusedPrivateKey);
+        assertThat(tx.getKey()).isEqualTo(privateKeyED25519);
         assertThat(tx.getInitialBalance()).isEqualTo(Hbar.fromTinybars(450));
         assertThat(tx.getReceiverSignatureRequired()).isTrue();
         assertThat(tx.getProxyAccountId()).hasToString("0.0.1001");
