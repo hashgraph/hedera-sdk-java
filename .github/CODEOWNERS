@@ -1,5 +1,5 @@
 # Default code owners for entire repository
-*   @hashgraph/hedera-sdk-java-maintainers 
+*                                               @hiero-ledger/hiero-sdk-java-maintainers
 
 #########################
 #####  Core Files  ######
@@ -8,34 +8,35 @@
 # NOTE: Must be placed last to ensure enforcement over all other rules
 
 # Protection Rules for Github Configuration Files and Actions Workflows
-/.github/                                       @hashgraph/platform-ci @hashgraph/release-engineering-managers
-/.github/workflows/                             @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
+/.github/                                       @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+/.github/workflows/                             @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+/.github/dependabot.yml                         @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
 
 # Legacy Maven project files
-**/pom.xml                                      @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-sdk-java-maintainers
+**/pom.xml                                      @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
 
 # Gradle project files and inline plugins
-/gradle/                                        @hashgraph/platform-ci @hashgraph/platform-ci-committers
-gradlew                                         @hashgraph/platform-ci @hashgraph/platform-ci-committers
-gradlew.bat                                     @hashgraph/platform-ci @hashgraph/platform-ci-committers
-**/build-logic/                                 @hashgraph/platform-ci @hashgraph/platform-ci-committers
-**/gradle.*                                     @hashgraph/platform-ci @hashgraph/platform-ci-committers
-**/*.gradle.*                                   @hashgraph/platform-ci @hashgraph/platform-ci-committers
+/gradle/                                        @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+gradlew                                         @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+gradlew.bat                                     @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+**/build-logic/                                 @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+**/gradle.*                                     @hiero-ledger/github-maintainers @hiero-ledger/github-committers
+**/*.gradle.*                                   @hiero-ledger/github-maintainers @hiero-ledger/github-committers
 
 # Codacy Tool Configurations
-/config/                                        @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-sdk-java-maintainers
-.remarkrc                                       @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-sdk-java-maintainers
+/config/                                        @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
+.remarkrc                                       @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
-/CODEOWNERS                                      @hashgraph/release-engineering-managers
+/CODEOWNERS                                     @hiero-ledger/github-maintainers
 
 # Protect the repository root files
-/README.md                                      @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers @hashgraph/hedera-sdk-java-maintainers
-**/LICENSE                                      @hashgraph/release-engineering-managers
+/README.md                                      @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
+**/LICENSE                                      @hiero-ledger/github-maintainers @hiero-ledger/hiero-sdk-java-maintainers
 
 # CodeCov configuration
-**/codecov.yml                                  @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
+**/codecov.yml                                  @hiero-ledger/github-maintainers @hiero-ledger/github-committers
 
 # Git Ignore definitions
-**/.gitignore                                   @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
-**/.gitignore.*                                 @hashgraph/platform-ci @hashgraph/platform-ci-committers @hashgraph/release-engineering-managers
+**/.gitignore                                   @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
+**/.gitignore.*                                 @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers

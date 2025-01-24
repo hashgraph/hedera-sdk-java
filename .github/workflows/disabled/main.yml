@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     strategy:
       matrix:
         version: [ 'current', 'latest' ]
