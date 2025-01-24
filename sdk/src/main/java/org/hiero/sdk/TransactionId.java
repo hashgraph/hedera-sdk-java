@@ -111,7 +111,7 @@ public final class TransactionId implements Comparable<TransactionId> {
         return new TransactionId(
                 accountId,
                 Instant.ofEpochSecond(
-                        0, currentTime + ThreadLocalRandom.current().nextLong(50_000_000)));
+                        0, currentTime + ThreadLocalRandom.current().nextLong(1_000)));
     }
 
     /**
