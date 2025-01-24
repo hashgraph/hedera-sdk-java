@@ -123,7 +123,6 @@ public final class TransactionResponse {
                     System.out.println("throttled");
                     System.out.println("throttled");
                     System.out.println("throttled");
-                    System.out.println("throttled");
                     return retryTransaction(client);
                 } else {
                     // If not throttled, rethrow the exception
