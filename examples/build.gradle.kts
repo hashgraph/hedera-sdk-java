@@ -97,12 +97,12 @@ listOf("mainnet", "testnet", "previewnet").forEach { network ->
     tasks.register<JavaExec>(taskName) {
         workingDir = rootDir
         classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-        mainModule = "com.hedera.hashgraph.examples"
-        mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
+        mainModule = "org.hiero.sdk.java.examples"
+        mainClass = "org.hiero.sdk.java.examples.GetAddressBookExample"
         environment("HEDERA_NETWORK", network)
         doLast {
             val binFile = File(workingDir, "address-book.proto.bin")
-            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            val target = File(workingDir, "../sdk-java/src/main/resources/addressbook/$network.pb")
             binFile.copyTo(target, overwrite = true)
         }
     }
