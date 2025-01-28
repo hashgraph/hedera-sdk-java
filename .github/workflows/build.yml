@@ -51,7 +51,7 @@ jobs:
           cache-read-only: false
 
       - name: Build SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc
+        run: ./gradlew assemble
 
   test:
     name: Unit and Integration Tests
