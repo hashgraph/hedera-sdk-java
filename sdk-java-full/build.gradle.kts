@@ -17,7 +17,7 @@ dependencies {
 
 javaModuleDependencies.moduleNameToGA.put(
     "com.google.protobuf",
-    "com.google.protobuf:protobuf-java"
+    "com.google.protobuf:protobuf-java",
 )
 
 tasks.withType<JavaCompile>().configureEach { options.compilerArgs.add("-Xlint:-exports,-dep-ann") }

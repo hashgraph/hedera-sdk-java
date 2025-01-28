@@ -48,7 +48,8 @@ public final class SystemDeleteTransaction extends Transaction<SystemDeleteTrans
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    SystemDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    SystemDeleteTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();

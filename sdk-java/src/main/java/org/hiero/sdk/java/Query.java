@@ -28,7 +28,8 @@ import org.hiero.sdk.java.proto.TransactionBody;
  * @param <O> The output type of the query.
  * @param <T> The type of the query itself. Used to enable chaining.
  */
-public abstract class Query<O, T extends Query<O, T>> extends Executable<T, org.hiero.sdk.java.proto.Query, Response, O> {
+public abstract class Query<O, T extends Query<O, T>>
+        extends Executable<T, org.hiero.sdk.java.proto.Query, Response, O> {
     private final org.hiero.sdk.java.proto.Query.Builder builder;
 
     private final QueryHeader.Builder headerBuilder;

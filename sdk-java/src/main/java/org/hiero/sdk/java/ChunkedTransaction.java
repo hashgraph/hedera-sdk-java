@@ -426,7 +426,8 @@ abstract class ChunkedTransaction<T extends ChunkedTransaction<T>> extends Trans
     }
 
     @Override
-    public CompletableFuture<org.hiero.sdk.java.TransactionResponse> executeAsync(Client client, Duration timeoutPerChunk) {
+    public CompletableFuture<org.hiero.sdk.java.TransactionResponse> executeAsync(
+            Client client, Duration timeoutPerChunk) {
         return executeAllAsync(client, timeoutPerChunk).thenApply(responses -> responses.get(0));
     }
 

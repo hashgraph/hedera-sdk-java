@@ -246,8 +246,8 @@ public class AddressBookQuery {
         return builder.build();
     }
 
-    private ClientCall<org.hiero.sdk.java.proto.mirror.AddressBookQuery, org.hiero.sdk.java.proto.NodeAddress> buildCall(
-            Client client, Deadline deadline) {
+    private ClientCall<org.hiero.sdk.java.proto.mirror.AddressBookQuery, org.hiero.sdk.java.proto.NodeAddress>
+            buildCall(Client client, Deadline deadline) {
         try {
             return client.mirrorNetwork
                     .getNextMirrorNode()

@@ -43,7 +43,8 @@ public final class FileAppendTransaction extends ChunkedTransaction<FileAppendTr
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    FileAppendTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    FileAppendTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
 

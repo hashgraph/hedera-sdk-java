@@ -129,7 +129,8 @@ public abstract class CustomFee {
      * @param customFeeBuilder              the builder object
      * @return                              the protobuf
      */
-    protected org.hiero.sdk.java.proto.CustomFee finishToProtobuf(org.hiero.sdk.java.proto.CustomFee.Builder customFeeBuilder) {
+    protected org.hiero.sdk.java.proto.CustomFee finishToProtobuf(
+            org.hiero.sdk.java.proto.CustomFee.Builder customFeeBuilder) {
         if (feeCollectorAccountId != null) {
             customFeeBuilder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
         }

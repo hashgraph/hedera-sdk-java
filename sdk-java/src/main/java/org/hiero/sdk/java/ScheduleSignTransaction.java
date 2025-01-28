@@ -44,7 +44,8 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    ScheduleSignTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    ScheduleSignTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();

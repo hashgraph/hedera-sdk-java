@@ -36,7 +36,8 @@ public final class TopicDeleteTransaction extends Transaction<TopicDeleteTransac
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    TopicDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    TopicDeleteTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();

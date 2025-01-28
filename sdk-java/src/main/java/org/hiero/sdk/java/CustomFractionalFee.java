@@ -185,7 +185,8 @@ public class CustomFractionalFee extends CustomFeeBase<CustomFractionalFee> {
 
     @Override
     org.hiero.sdk.java.proto.CustomFee toProtobuf() {
-        var customFeeBuilder = org.hiero.sdk.java.proto.CustomFee.newBuilder().setFractionalFee(toFractionalFeeProtobuf());
+        var customFeeBuilder =
+                org.hiero.sdk.java.proto.CustomFee.newBuilder().setFractionalFee(toFractionalFeeProtobuf());
         return finishToProtobuf(customFeeBuilder);
     }
 }

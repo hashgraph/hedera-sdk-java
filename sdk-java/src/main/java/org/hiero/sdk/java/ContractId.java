@@ -254,7 +254,9 @@ public class ContractId extends Key implements Comparable<ContractId> {
 
     @Override
     org.hiero.sdk.java.proto.Key toProtobufKey() {
-        return org.hiero.sdk.java.proto.Key.newBuilder().setContractID(toProtobuf()).build();
+        return org.hiero.sdk.java.proto.Key.newBuilder()
+                .setContractID(toProtobuf())
+                .build();
     }
 
     @Override

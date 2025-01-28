@@ -39,7 +39,8 @@ public final class FileDeleteTransaction extends Transaction<FileDeleteTransacti
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    FileDeleteTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    FileDeleteTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();

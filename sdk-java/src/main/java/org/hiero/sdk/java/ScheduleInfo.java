@@ -176,8 +176,8 @@ public final class ScheduleInfo {
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
     public static ScheduleInfo fromBytes(byte[] bytes) throws InvalidProtocolBufferException {
-        return fromProtobuf(
-                org.hiero.sdk.java.proto.ScheduleInfo.parseFrom(bytes).toBuilder().build());
+        return fromProtobuf(org.hiero.sdk.java.proto.ScheduleInfo.parseFrom(bytes).toBuilder()
+                .build());
     }
 
     /**

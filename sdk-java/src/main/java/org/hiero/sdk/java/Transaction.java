@@ -34,7 +34,10 @@ import org.hiero.sdk.java.proto.TransactionList;
  */
 public abstract class Transaction<T extends Transaction<T>>
         extends Executable<
-                T, org.hiero.sdk.java.proto.Transaction, org.hiero.sdk.java.proto.TransactionResponse, TransactionResponse> {
+                T,
+                org.hiero.sdk.java.proto.Transaction,
+                org.hiero.sdk.java.proto.TransactionResponse,
+                TransactionResponse> {
 
     /**
      * Default auto renew duration for accounts, contracts, topics, and files (entities)
@@ -82,7 +85,8 @@ public abstract class Transaction<T extends Transaction<T>>
      * except pointing to different nodes. When retrying a transaction after a network error or retry-able status
      * response, we try a different transaction and thus a different node.
      */
-    protected List<org.hiero.sdk.java.proto.SignedTransaction.Builder> innerSignedTransactions = Collections.emptyList();
+    protected List<org.hiero.sdk.java.proto.SignedTransaction.Builder> innerSignedTransactions =
+            Collections.emptyList();
 
     /**
      * A set of signatures corresponding to every unique public key used to sign the transaction.
@@ -364,7 +368,8 @@ public abstract class Transaction<T extends Transaction<T>>
      * @param scheduled the scheduled transaction
      * @return the new transaction
      */
-    public static Transaction<?> fromScheduledTransaction(org.hiero.sdk.java.proto.SchedulableTransactionBody scheduled) {
+    public static Transaction<?> fromScheduledTransaction(
+            org.hiero.sdk.java.proto.SchedulableTransactionBody scheduled) {
         var body = TransactionBody.newBuilder()
                 .setMemo(scheduled.getMemo())
                 .setTransactionFee(scheduled.getTransactionFee());

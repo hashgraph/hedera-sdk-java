@@ -17,13 +17,14 @@ public class AssessedCustomFeeTest {
     private static final List<AccountId> payerAccountIds =
             List.of(new AccountId(8, 9, 10), new AccountId(11, 12, 13), new AccountId(14, 15, 16));
 
-    private final org.hiero.sdk.java.proto.AssessedCustomFee fee = org.hiero.sdk.java.proto.AssessedCustomFee.newBuilder()
-            .setAmount(amount)
-            .setTokenId(tokenId.toProtobuf())
-            .setFeeCollectorAccountId(feeCollector.toProtobuf())
-            .addAllEffectivePayerAccountId(
-                    payerAccountIds.stream().map(AccountId::toProtobuf).toList())
-            .build();
+    private final org.hiero.sdk.java.proto.AssessedCustomFee fee =
+            org.hiero.sdk.java.proto.AssessedCustomFee.newBuilder()
+                    .setAmount(amount)
+                    .setTokenId(tokenId.toProtobuf())
+                    .setFeeCollectorAccountId(feeCollector.toProtobuf())
+                    .addAllEffectivePayerAccountId(
+                            payerAccountIds.stream().map(AccountId::toProtobuf).toList())
+                    .build();
 
     @BeforeAll
     public static void beforeAll() {

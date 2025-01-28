@@ -521,7 +521,10 @@ class ExecutableTest {
 
     static class DummyTransaction<T extends Transaction<T>>
             extends Executable<
-                    T, org.hiero.sdk.java.proto.Transaction, org.hiero.sdk.java.proto.TransactionResponse, TransactionResponse> {
+                    T,
+                    org.hiero.sdk.java.proto.Transaction,
+                    org.hiero.sdk.java.proto.TransactionResponse,
+                    TransactionResponse> {
 
         @Override
         void onExecute(Client client) {}

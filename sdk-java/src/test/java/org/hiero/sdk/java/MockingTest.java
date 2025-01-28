@@ -472,7 +472,8 @@ public class MockingTest {
         "PLATFORM_TRANSACTION_NOT_CREATED, 3, async",
         "TRANSACTION_EXPIRED, 3, async"
     })
-    void shouldRetryFunctionsCorrectly(org.hiero.sdk.java.Status status, int numberOfErrors, String sync) throws Exception {
+    void shouldRetryFunctionsCorrectly(org.hiero.sdk.java.Status status, int numberOfErrors, String sync)
+            throws Exception {
         var service = new TestCryptoService();
         var server = new TestServer("shouldRetryFunctionsCorrectly" + status + numberOfErrors + sync, service);
 

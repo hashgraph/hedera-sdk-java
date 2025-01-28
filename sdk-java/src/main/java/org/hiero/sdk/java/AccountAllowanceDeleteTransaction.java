@@ -20,7 +20,8 @@ import org.hiero.sdk.java.proto.TransactionResponse;
 /**
  * This transaction type is for deleting an account allowance.
  */
-public class AccountAllowanceDeleteTransaction extends org.hiero.sdk.java.Transaction<AccountAllowanceDeleteTransaction> {
+public class AccountAllowanceDeleteTransaction
+        extends org.hiero.sdk.java.Transaction<AccountAllowanceDeleteTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances = new ArrayList<>();
     private final List<TokenNftAllowance> nftAllowances = new ArrayList<>();

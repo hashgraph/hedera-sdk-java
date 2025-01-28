@@ -49,7 +49,8 @@ public final class FileCreateTransaction extends Transaction<FileCreateTransacti
      *            records
      * @throws InvalidProtocolBufferException       when there is an issue with the protobuf
      */
-    FileCreateTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    FileCreateTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();

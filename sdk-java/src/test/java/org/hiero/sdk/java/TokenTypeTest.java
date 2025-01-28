@@ -26,7 +26,8 @@ public class TokenTypeTest {
     void fromProtobuf() {
         SnapshotMatcher.expect(
                         org.hiero.sdk.java.TokenType.valueOf(tokenTypeFungible).toString(),
-                        org.hiero.sdk.java.TokenType.valueOf(tokenTypeNonFungible).toString())
+                        org.hiero.sdk.java.TokenType.valueOf(tokenTypeNonFungible)
+                                .toString())
                 .toMatchSnapshot();
     }
 
@@ -34,7 +35,8 @@ public class TokenTypeTest {
     void toProtobuf() {
         SnapshotMatcher.expect(
                         org.hiero.sdk.java.TokenType.valueOf(tokenTypeFungible).toProtobuf(),
-                        org.hiero.sdk.java.TokenType.valueOf(tokenTypeNonFungible).toProtobuf())
+                        org.hiero.sdk.java.TokenType.valueOf(tokenTypeNonFungible)
+                                .toProtobuf())
                 .toMatchSnapshot();
     }
 }

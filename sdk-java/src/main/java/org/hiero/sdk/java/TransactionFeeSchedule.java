@@ -132,8 +132,8 @@ public class TransactionFeeSchedule implements Cloneable {
      *         org.hiero.sdk.java.proto.TransactionFeeSchedule}
      */
     org.hiero.sdk.java.proto.TransactionFeeSchedule toProtobuf() {
-        var returnBuilder =
-                org.hiero.sdk.java.proto.TransactionFeeSchedule.newBuilder().setHederaFunctionality(getRequestType().code);
+        var returnBuilder = org.hiero.sdk.java.proto.TransactionFeeSchedule.newBuilder()
+                .setHederaFunctionality(getRequestType().code);
         if (feeData != null) {
             returnBuilder.setFeeData(feeData.toProtobuf());
         }

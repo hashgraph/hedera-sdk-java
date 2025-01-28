@@ -188,7 +188,9 @@ public final class KeyList extends Key implements Collection<Key> {
                     .build();
         }
 
-        return org.hiero.sdk.java.proto.Key.newBuilder().setKeyList(protoKeyList).build();
+        return org.hiero.sdk.java.proto.Key.newBuilder()
+                .setKeyList(protoKeyList)
+                .build();
     }
 
     /**

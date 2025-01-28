@@ -27,7 +27,8 @@ public class EthereumTransaction extends Transaction<EthereumTransaction> {
      */
     public EthereumTransaction() {}
 
-    EthereumTransaction(LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
+    EthereumTransaction(
+            LinkedHashMap<TransactionId, LinkedHashMap<AccountId, org.hiero.sdk.java.proto.Transaction>> txs)
             throws InvalidProtocolBufferException {
         super(txs);
         initFromTransactionBody();
