@@ -34,8 +34,8 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
         tasks.register<JavaExec>(this) {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-            mainModule = "org.hiero.sdk.examples"
-            mainClass = "org.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
+            mainModule = "org.hiero.sdk.java.examples"
+            mainClass = "org.hiero.sdk.java.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
@@ -80,8 +80,8 @@ abstract class RunAllExample : DefaultTask() {
             exec.javaexec {
                 workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
-                mainModule = "org.hiero.sdk.examples"
-                mainClass = "org.hiero.sdk.examples.$className"
+                mainModule = "org.hiero.sdk.java.examples"
+                mainClass = "org.hiero.sdk.java.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
                 // jvmArgs "-Dorg.slf4j.simpleLogger.log.org.hiero=trace"

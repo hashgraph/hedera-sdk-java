@@ -6,7 +6,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.bouncycastle.util.encoders.Hex;
-import org.hiero.sdk.*;
+import org.hiero.sdk.java.*;
 import org.hiero.tck.annotation.JSONRPC2Method;
 import org.hiero.tck.annotation.JSONRPC2Service;
 import org.hiero.tck.methods.AbstractJSONRPC2Service;

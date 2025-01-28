@@ -3,10 +3,10 @@ package org.hiero.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bouncycastle.util.encoders.Hex;
-import org.hiero.sdk.Key;
-import org.hiero.sdk.KeyList;
-import org.hiero.sdk.PrivateKey;
-import org.hiero.sdk.PublicKey;
+import org.hiero.sdk.java.Key;
+import org.hiero.sdk.java.KeyList;
+import org.hiero.sdk.java.PrivateKey;
+import org.hiero.sdk.java.PublicKey;
 import org.hiero.tck.annotation.JSONRPC2Method;
 import org.hiero.tck.annotation.JSONRPC2Service;
 import org.hiero.tck.exception.InvalidJSONRPC2RequestException;

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.sdk;
+package org.hiero.sdk.java;
 
 /**
  * Enum for the freeze types.

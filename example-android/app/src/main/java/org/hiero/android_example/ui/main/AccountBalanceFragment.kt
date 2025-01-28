@@ -12,10 +12,10 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import org.hiero.android_example.R
-import org.hiero.sdk.AccountBalanceQuery
-import org.hiero.sdk.AccountId
-import org.hiero.sdk.Client
-import org.hiero.sdk.PrecheckStatusException
+import org.hiero.sdk.java.AccountBalanceQuery
+import org.hiero.sdk.java.AccountId
+import org.hiero.sdk.java.Client
+import org.hiero.sdk.java.PrecheckStatusException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

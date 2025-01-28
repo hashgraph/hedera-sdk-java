@@ -2,7 +2,7 @@
 package org.hiero.tck.methods.sdk.response.token;
 
 import java.util.List;
-import org.hiero.sdk.Status;
+import org.hiero.sdk.java.Status;
 
 public class TokenMintResponse extends TokenResponse {
     private final String newTotalSupply;

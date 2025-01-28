@@ -1,8 +1,8 @@
-    final org.hiero.sdk.proto.FreezeType code;
+    final org.hiero.sdk.java.proto.FreezeType code;
 
-    FreezeType(org.hiero.sdk.proto.FreezeType code) {
+    FreezeType(org.hiero.sdk.java.proto.FreezeType code) {
         this.code = code;
     }
 
-    static FreezeType valueOf(org.hiero.sdk.proto.FreezeType code) {
+    static FreezeType valueOf(org.hiero.sdk.java.proto.FreezeType code) {
         return switch (code) {
