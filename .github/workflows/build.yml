@@ -55,7 +55,7 @@ jobs:
 
   test:
     name: Unit and Integration Tests
-    runs-on: hiero-client-sdk-linux-large
+    runs-on: hiero-client-sdk-linux-medium
     needs:
       - build
     steps:
