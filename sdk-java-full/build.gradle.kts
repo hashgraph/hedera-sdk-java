@@ -48,8 +48,8 @@ tasks.named<Jar>("sourcesJar") {
 // 'sdk-full' is an alternative to 'sdk'. They cannot be used together.
 // We express this via capability.
 listOf(configurations.apiElements.get(), configurations.runtimeElements.get()).forEach {
-    it.outgoing.capability(
-        "${project.group}:${project.name}:${project.version}"
-    ) // The default capability
-    it.outgoing.capability("${project.group}:sdk:${project.version}") // The 'sdk' capability
+    // The 'sdk-java-full' capability (default)
+    it.outgoing.capability("${project.group}:${project.name}:${project.version}")
+    // The 'sdk-java' capability
+    it.outgoing.capability("${project.group}:sdk-java:${project.version}")
 }
