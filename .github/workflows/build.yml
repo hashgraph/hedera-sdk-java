@@ -29,7 +29,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
@@ -55,7 +55,7 @@ jobs:
 
   test:
     name: Unit and Integration Tests
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     needs:
       - build
     steps:
@@ -114,7 +114,7 @@ jobs:
 
   run-examples:
     name: Run Examples
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     needs:
       - build
     steps:
@@ -169,7 +169,7 @@ jobs:
 
   test-tck:
     name: TCK Tests
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     needs:
       - build
     steps:
