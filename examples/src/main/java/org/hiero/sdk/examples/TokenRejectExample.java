@@ -202,10 +202,20 @@ class TokenRejectExample {
 
         /*
          * Step 8:
+         * Initialize TokenRejectTransaction && TokenDisassociateTransaction .
+         */
+
+        TokenRejectTransaction rejectTx = new TokenRejectTransaction();
+        TokenDissociateTransaction dissTx = new TokenDissociateTransaction();
+
+        /*
+         * Step 9:
          * Execute the token reject flow -- reject NFTs.
          */
         System.out.println("Receiver rejects example NFTs...");
         new TokenRejectFlow()
+                .setTokenRejectTransaction(rejectTx)
+                .setTokenDissociateTransaction(dissTx)
                 .setOwnerId(receiverAccountId)
                 .setNftIds(List.of(
                         nftId.nft(nftSerials.get(0)), nftId.nft(nftSerials.get(1)), nftId.nft(nftSerials.get(2))))
@@ -215,7 +225,7 @@ class TokenRejectExample {
                 .getReceipt(client);
 
         /*
-         * Step 9:
+         * Step 10:
          * Check receiver account balance after token reject.
          */
         var receiverAccountBalance_AfterTokenReject =
@@ -237,7 +247,7 @@ class TokenRejectExample {
         }
 
         /*
-         * Step 10:
+         * Step 11:
          * Check treasury account balance after token reject.
          */
         var treasuryAccountBalance =

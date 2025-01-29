@@ -6,18 +6,21 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.util.Collections;
 import java.util.List;
-import org.hiero.sdk.AccountBalanceQuery;
-import org.hiero.sdk.PrivateKey;
-import org.hiero.sdk.TokenAssociateTransaction;
-import org.hiero.sdk.TokenDeleteTransaction;
-import org.hiero.sdk.TokenMintTransaction;
-import org.hiero.sdk.TokenNftInfoQuery;
-import org.hiero.sdk.TokenRejectFlow;
-import org.hiero.sdk.TransferTransaction;
+import org.hiero.sdk.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class TokenRejectFlowIntegrationTest {
+
+    private TokenRejectTransaction tokenRejectTransaction;
+    private TokenDissociateTransaction tokenDissociateTransaction;
+
+    @BeforeEach
+    public void setup() {
+        tokenRejectTransaction = new TokenRejectTransaction();
+        tokenDissociateTransaction = new TokenDissociateTransaction();
+    }
 
     @Test
     @DisplayName("Can execute TokenReject flow for Fungible Token")
@@ -45,6 +48,8 @@ public class TokenRejectFlowIntegrationTest {
 
             // execute the token reject flow
             new TokenRejectFlow()
+                    .setTokenRejectTransaction(tokenRejectTransaction)
+                    .setTokenDissociateTransaction(tokenDissociateTransaction)
                     .setOwnerId(receiverAccountId)
                     .addTokenId(ftTokenId)
                     .freezeWith(testEnv.client)
@@ -102,6 +107,8 @@ public class TokenRejectFlowIntegrationTest {
 
             // execute the token reject flow
             new TokenRejectFlow()
+                    .setTokenRejectTransaction(tokenRejectTransaction)
+                    .setTokenDissociateTransaction(tokenDissociateTransaction)
                     .setOwnerId(receiverAccountId)
                     .addTokenId(ftTokenId)
                     .freezeWith(testEnv.client)
@@ -168,6 +175,8 @@ public class TokenRejectFlowIntegrationTest {
 
             // execute the token reject flow
             new TokenRejectFlow()
+                    .setTokenDissociateTransaction(tokenDissociateTransaction)
+                    .setTokenRejectTransaction(tokenRejectTransaction)
                     .setOwnerId(receiverAccountId)
                     .setNftIds(List.of(nftTokenId.nft(nftSerials.get(0)), nftTokenId.nft(nftSerials.get(1))))
                     .freezeWith(testEnv.client)
@@ -236,6 +245,8 @@ public class TokenRejectFlowIntegrationTest {
             assertThatExceptionOfType(Exception.class)
                     .isThrownBy(() -> {
                         new TokenRejectFlow()
+                                .setTokenRejectTransaction(tokenRejectTransaction)
+                                .setTokenDissociateTransaction(tokenDissociateTransaction)
                                 .setOwnerId(receiverAccountId)
                                 .addNftId(nftTokenId1.nft(nftSerials.get(1)))
                                 .freezeWith(testEnv.client)
