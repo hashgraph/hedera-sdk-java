@@ -19,8 +19,8 @@ dependencyAnalysis {
 dependencies.constraints {
     implementation("com.google.guava:guava:33.3.1-android")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
-    implementation("com.hedera.hashgraph:sdk:2.46.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.46.0")
+    implementation("org.hiero.sdk:sdk-java:2.47.0-beta.2")
+    implementation("org.hiero.sdk:sdk-java-full:2.47.0-beta.2")
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
