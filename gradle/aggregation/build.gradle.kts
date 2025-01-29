@@ -7,7 +7,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":sdk"))
+    implementation(project(":sdk-java"))
     implementation(project(":tck"))
     implementation("io.grpc:grpc-protobuf")
 }
@@ -24,15 +24,15 @@ tasks.testCodeCoverageReport {
                 componentFilter { id -> id is ProjectComponentIdentifier }
                 attributes.attribute(
                     Category.CATEGORY_ATTRIBUTE,
-                    objects.named(Category.VERIFICATION)
+                    objects.named(Category.VERIFICATION),
                 )
                 attributes.attribute(
                     VerificationType.VERIFICATION_TYPE_ATTRIBUTE,
-                    objects.named(VerificationType.JACOCO_RESULTS)
+                    objects.named(VerificationType.JACOCO_RESULTS),
                 )
                 attributes.attribute(
                     TestSuiteType.TEST_SUITE_TYPE_ATTRIBUTE,
-                    objects.named(TestSuiteType.INTEGRATION_TEST)
+                    objects.named(TestSuiteType.INTEGRATION_TEST),
                 )
             }
             .files

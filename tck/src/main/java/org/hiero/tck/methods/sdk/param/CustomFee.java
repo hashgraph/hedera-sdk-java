@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import net.minidev.json.JSONObject;
-import org.hiero.sdk.*;
+import org.hiero.sdk.java.*;
 import org.hiero.tck.methods.JSONRPC2Param;
 
 @Getter
@@ -116,8 +116,8 @@ public class CustomFee extends JSONRPC2Param {
         }
     }
 
-    public List<org.hiero.sdk.CustomFee> fillOutCustomFees(@NonNull List<CustomFee> customFees) {
-        List<org.hiero.sdk.CustomFee> customFeeList = new ArrayList<>();
+    public List<org.hiero.sdk.java.CustomFee> fillOutCustomFees(@NonNull List<CustomFee> customFees) {
+        List<org.hiero.sdk.java.CustomFee> customFeeList = new ArrayList<>();
 
         for (var customFee : customFees) {
             customFee.getFixedFee().ifPresent(fixedFee -> {

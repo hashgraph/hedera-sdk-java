@@ -1,0 +1,88 @@
+org.hiero.sdk.java.AccountIdTest.fromBytes=[
+  "0.0.5005"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromBytesAlias=[
+  "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromBytesAliasEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromBytesEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromSolidityAddress=[
+  "0.0.5005"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromSolidityAddressWith0x=[
+  "0.0.5005"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromString=[
+  "0.0.5005"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithAliasEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithAliasKey=[
+  "0.0.302a300506032b6570032100114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithChecksumOnMainnet=[
+  "0.0.123-vfmkw"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithChecksumOnPreviewnet=[
+  "0.0.123-ogizo"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithChecksumOnTestnet=[
+  "0.0.123-esxsf"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.fromStringWithEvmAddress=[
+  "0.0.302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.toBytes=[
+  "188d27"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.toBytesAlias=[
+  "22221220114e6abc371b82dab5c15ea149f02d34a012087b163516dd70f44acafabf7777"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.toBytesAliasEvmAddress=[
+  "2214302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.toBytesEvmAddress=[
+  "2214302a300506032b6570032100114e6abc371b82da"
+]
+
+
+org.hiero.sdk.java.AccountIdTest.toSolidityAddress=[
+  "000000000000000000000000000000000000138d"
+]

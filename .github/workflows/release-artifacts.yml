@@ -122,7 +122,7 @@ jobs:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc
+        run: ./gradlew assemble
 
       - name: Nexus Release
         if: ${{ github.event_name == 'push' }}

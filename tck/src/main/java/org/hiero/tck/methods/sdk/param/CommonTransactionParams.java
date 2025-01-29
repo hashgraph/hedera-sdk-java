@@ -10,11 +10,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import net.minidev.json.JSONArray;
-import org.hiero.sdk.Client;
-import org.hiero.sdk.Hbar;
-import org.hiero.sdk.PrivateKey;
-import org.hiero.sdk.Transaction;
-import org.hiero.sdk.TransactionId;
+import org.hiero.sdk.java.Client;
+import org.hiero.sdk.java.Hbar;
+import org.hiero.sdk.java.PrivateKey;
+import org.hiero.sdk.java.Transaction;
+import org.hiero.sdk.java.TransactionId;
 
 /**
  * CommonTransactionParams

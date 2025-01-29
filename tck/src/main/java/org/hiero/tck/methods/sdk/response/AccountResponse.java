@@ -2,7 +2,7 @@
 package org.hiero.tck.methods.sdk.response;
 
 import lombok.Data;
-import org.hiero.sdk.Status;
+import org.hiero.sdk.java.Status;
 
 @Data
 public class AccountResponse {

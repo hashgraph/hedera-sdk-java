@@ -15,7 +15,7 @@ mainModuleInfo {
     requires("net.minidev.json.smart")
     requires("org.apache.tomcat.embed.core")
     requires("org.bouncycastle.provider")
-    requires("org.hiero.sdk")
+    requires("org.hiero.sdk.java")
     requires("org.slf4j")
     requires("spring.boot")
     requires("spring.boot.autoconfigure")

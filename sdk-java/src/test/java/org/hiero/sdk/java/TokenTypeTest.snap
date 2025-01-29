@@ -1,0 +1,10 @@
+org.hiero.sdk.java.TokenTypeTest.fromProtobuf=[
+  "FUNGIBLE_COMMON",
+  "NON_FUNGIBLE_UNIQUE"
+]
+
+
+org.hiero.sdk.java.TokenTypeTest.toProtobuf=[
+  "FUNGIBLE_COMMON",
+  "NON_FUNGIBLE_UNIQUE"
+]
