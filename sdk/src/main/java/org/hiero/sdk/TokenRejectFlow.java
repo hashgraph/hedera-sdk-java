@@ -50,10 +50,10 @@ public class TokenRejectFlow {
     private UnaryOperator<byte[]> transactionSigner = null;
 
     @Nullable
-    private TokenRejectTransaction tokenRejectTransaction = null;
+    private TokenRejectTransaction tokenRejectTransaction = new TokenRejectTransaction();
 
     @Nullable
-    private TokenDissociateTransaction tokenDissociateTransaction = null;
+    private TokenDissociateTransaction tokenDissociateTransaction = new TokenDissociateTransaction();
 
     public TokenRejectFlow() {}
 
@@ -159,33 +159,11 @@ public class TokenRejectFlow {
     }
 
     /**
-     * Assign the tokenRejectTransaction.
-     * @param tokenRejectTransaction the tokenRejectTransaction.
-     * @return {@code this}
-     */
-    public TokenRejectFlow setTokenRejectTransaction(TokenRejectTransaction tokenRejectTransaction) {
-        Objects.requireNonNull(tokenRejectTransaction);
-        this.tokenRejectTransaction = tokenRejectTransaction;
-        return this;
-    }
-
-    /**
      * Extract tokenDissociateTransaction.
      * @return tokenDissociateTransaction.
      */
     public TokenDissociateTransaction getTokenDissociateTransaction() {
         return tokenDissociateTransaction;
-    }
-
-    /**
-     * Assign the tokenDissociateTransaction.
-     * @param tokenDissociateTransaction the tokenDissociateTransaction.
-     * @return {@code this}
-     */
-    public TokenRejectFlow setTokenDissociateTransaction(TokenDissociateTransaction tokenDissociateTransaction) {
-        Objects.requireNonNull(tokenDissociateTransaction);
-        this.tokenDissociateTransaction = tokenDissociateTransaction;
-        return this;
     }
 
     /**
@@ -277,12 +255,14 @@ public class TokenRejectFlow {
             if (ownerId != null) {
                 tx.setAccountId(ownerId);
             }
-            List<TokenId> tokenIdsToReject = Stream.concat(
-                            tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
-                    .distinct()
-                    .collect(Collectors.toList());
+            if (!tokenIds.isEmpty() || !nftIds.isEmpty()) {
+                List<TokenId> tokenIdsToReject = Stream.concat(
+                                tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
+                        .distinct()
+                        .collect(Collectors.toList());
 
-            tx.setTokenIds(tokenIdsToReject);
+                tx.setTokenIds(tokenIdsToReject);
+            }
 
             fillOutTransactionBaseFields(tx);
         }
