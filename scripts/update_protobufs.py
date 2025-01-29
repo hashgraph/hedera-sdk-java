@@ -13,7 +13,7 @@ if len(sys.argv) > 2:
 
 if len(sys.argv) == 1:
     print(">>> Usage: `" + sys.argv[0] + " ref`")
-    print(">>> Where \"ref\" is a valid branch or tag in the Hedera Protobufs git repo")
+    print(">>> Where \"ref\" is a valid branch or tag in the Services git repo")
 
 print("\n\n")
 
@@ -31,7 +31,7 @@ go_to_script_dir()
 
 
 PROTO_GIT_REMOTE = "https://github.com/hashgraph/hedera-services.git"
-PROTO_GIT_PATH = os.path.join("hedera-protos-git")
+PROTO_GIT_PATH = os.path.join("hiero-protos-git")
 PROTO_GIT_REF = sys.argv[1] if len(sys.argv)>1   else ""
 
 
@@ -100,7 +100,7 @@ def do_replacements_proto_imports(s, replacements):
     for r in replacements:
         # Check if the replacement should be skipped
         # Skip statements like `import "google/protobuf/wrappers.proto"`
-        # to update imports ONLY referred to hedera protobufs
+        # to update imports ONLY referred to hiero protobufs
         if 'google' in s:
             continue
         s = re.sub(r[0], r[1], s)

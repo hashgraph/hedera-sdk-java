@@ -5,7 +5,7 @@ plugins {
     id("org.hiero.gradle.feature.publish-dependency-constraints")
 }
 
-description = "Hedera™ Hashgraph SDK for Java"
+description = "Hiero SDK for Java"
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
 // correct version
