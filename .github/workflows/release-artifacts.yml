@@ -28,7 +28,7 @@ env:
 jobs:
   validate-release:
     name: Validate Release
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
@@ -73,7 +73,7 @@ jobs:
 
   maven-central:
     name: Publish to Maven Central
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     needs:
       # This needs clause exists solely to provide a dependency on the previous step. This publish step will not occur
       # until the validate-release step completes successfully.
@@ -122,7 +122,7 @@ jobs:
           cache-read-only: false
 
       - name: Compile SDK & Javadoc
-        run: ./gradlew assemble :sdk:javadoc
+        run: ./gradlew assemble
 
       - name: Nexus Release
         if: ${{ github.event_name == 'push' }}

@@ -3,9 +3,9 @@ package org.hiero.tck.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.hiero.sdk.Key;
-import org.hiero.sdk.PrivateKey;
-import org.hiero.sdk.PublicKey;
+import org.hiero.sdk.java.Key;
+import org.hiero.sdk.java.PrivateKey;
+import org.hiero.sdk.java.PublicKey;
 
 public final class KeyUtils {
 

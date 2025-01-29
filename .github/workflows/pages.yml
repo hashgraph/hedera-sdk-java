@@ -22,7 +22,7 @@ env:
 jobs:
   publish:
     name: Publish
-    runs-on: client-sdk-linux-medium
+    runs-on: hiero-client-sdk-linux-medium
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
@@ -45,7 +45,7 @@ jobs:
         run: ./gradlew compileJava
 
       - name: Generate Javadoc
-        run: ./gradlew sdk:javadoc
+        run: ./gradlew :sdk-java:javadoc
 
       - name: Pages
         uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1

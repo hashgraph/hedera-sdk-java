@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.sdk;
+package org.hiero.sdk.java;
 
-import org.hiero.sdk.proto.HederaFunctionality;
+import org.hiero.sdk.java.proto.HederaFunctionality;
 
 /**
  * Enum for the request types.

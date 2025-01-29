@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.sdk;
+package org.hiero.sdk.java;
 
-import org.hiero.sdk.proto.ResponseCodeEnum;
+import org.hiero.sdk.java.proto.ResponseCodeEnum;
 
 import java.util.Objects;
 

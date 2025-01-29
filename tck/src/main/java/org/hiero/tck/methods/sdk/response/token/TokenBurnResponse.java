@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package org.hiero.tck.methods.sdk.response.token;
 
-import org.hiero.sdk.Status;
+import org.hiero.sdk.java.Status;
 
 public class TokenBurnResponse extends TokenResponse {
 

@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.view.View
 import org.hiero.android_example.R
 import androidx.fragment.app.Fragment
-import org.hiero.sdk.PrivateKey
+import org.hiero.sdk.java.PrivateKey
 
 class PrivateKeyFragment : Fragment() {
     private  lateinit var privateKey: TextView
