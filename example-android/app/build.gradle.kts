@@ -50,7 +50,7 @@ dependencies {
     implementation(platform("org.hiero:hiero-dependency-versions"))
     // ---------------------------------------------
 
-    implementation("org.hiero.sdk:sdk-java:2.47.0-beta.2")
+    implementation("org.hiero.sdk:sdk-java:2.47.0-beta.3")
 
     implementation("com.google.android.material:material:1.11.0")
 
