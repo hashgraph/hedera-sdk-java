@@ -75,13 +75,13 @@ COMMENT_REPLACEMENTS = (
 
 PROTO_REPLACEMENTS = (
     ("option java_package = \"com.hederahashgraph.api.proto.java\";",
-     "option java_package = \"org.hiero.sdk.java.proto\";"),
+     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
 
     ("option java_package = \"com.hederahashgraph.service.proto.java\";",
-     "option java_package = \"org.hiero.sdk.java.proto\";"),
+     "option java_package = \"com.hedera.hashgraph.sdk.proto\";"),
 
     ("option java_package = \"com.hedera.mirror.api.proto\";",
-     "option java_package = \"org.hiero.sdk.java.proto.mirror\";")
+     "option java_package = \"com.hedera.hashgraph.sdk.proto.mirror\";")
 )
 
 PROTO_REPLACEMENTS_IMPORTS = (
@@ -325,7 +325,7 @@ def add_to_FeeDataType(original_name, cap_snake_name, comment_lines):
 
 def add_to_FreezeType(original_name, cap_snake_name, comment_lines):
     FreezeType_sections[1] += \
-        generate_enum(original_name, cap_snake_name, comment_lines, "org.hiero.sdk.java.proto.FreezeType", 1)
+        generate_enum(original_name, cap_snake_name, comment_lines, "com.hedera.hashgraph.sdk.proto.FreezeType", 1)
     FreezeType_sections[3] += generate_valueOf(original_name, cap_snake_name, 3)
 
 
