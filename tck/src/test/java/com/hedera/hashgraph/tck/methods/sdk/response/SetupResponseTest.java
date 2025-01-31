@@ -4,7 +4,6 @@ package com.hedera.hashgraph.tck.methods.sdk.response;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import com.hedera.hashgraph.tck.sdk.response.SetupResponse;
 import org.junit.jupiter.api.Test;
 
 class SetupResponseTest {

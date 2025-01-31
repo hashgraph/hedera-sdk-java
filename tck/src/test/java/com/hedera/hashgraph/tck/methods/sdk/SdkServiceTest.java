@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import com.hedera.hashgraph.tck.sdk.SdkService;
-import com.hedera.hashgraph.tck.sdk.param.SetupParams;
-import com.hedera.hashgraph.tck.sdk.response.SetupResponse;
+import com.hedera.hashgraph.tck.methods.sdk.param.*;
+import com.hedera.hashgraph.tck.methods.sdk.response.*;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -3,7 +3,6 @@ package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.hedera.hashgraph.tck.sdk.param.GenerateKeyParams;
 import com.hedera.hashgraph.tck.util.KeyUtils.KeyType;
 import java.util.HashMap;
 import java.util.Map;

@@ -5,9 +5,8 @@ import static com.hedera.hashgraph.tck.util.KeyUtils.KeyType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.hedera.hashgraph.tck.exception.InvalidJSONRPC2RequestException;
-import com.hedera.hashgraph.tck.sdk.KeyService;
-import com.hedera.hashgraph.tck.sdk.param.GenerateKeyParams;
-import com.hedera.hashgraph.tck.sdk.response.GenerateKeyResponse;
+import com.hedera.hashgraph.tck.methods.sdk.param.*;
+import com.hedera.hashgraph.tck.methods.sdk.response.*;
 import java.util.Collections;
 import java.util.Optional;
 import org.junit.jupiter.api.Assertions;

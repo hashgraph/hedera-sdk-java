@@ -3,8 +3,7 @@ package com.hedera.hashgraph.tck.methods.sdk.param;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.hedera.hashgraph.tck.sdk.param.CommonTransactionParams;
-import com.hedera.hashgraph.tck.sdk.param.account.AccountCreateParams;
+import com.hedera.hashgraph.tck.methods.sdk.param.account.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
