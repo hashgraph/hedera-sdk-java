@@ -34,9 +34,9 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
         tasks.register<JavaExec>(this) {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-            mainModule = "com.hedera.hashgraph.java.examples"
+            mainModule = "com.hedera.hashgraph.sdk.examples"
             mainClass =
-                "com.hedera.hashgraph.java.examples.${this@addRule.substring("run".length)}Example"
+                "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
@@ -98,8 +98,8 @@ listOf("mainnet", "testnet", "previewnet").forEach { network ->
     tasks.register<JavaExec>(taskName) {
         workingDir = rootDir
         classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-        mainModule = "com.hedera.hashgraph.sdk.java.examples"
-        mainClass = "com.hedera.hashgraph.sdk.java.examples.GetAddressBookExample"
+        mainModule = "com.hedera.hashgraph.sdk.examples"
+        mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
         environment("HEDERA_NETWORK", network)
         doLast {
             val binFile = File(workingDir, "address-book.proto.bin")
