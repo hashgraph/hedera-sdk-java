@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-package org.hiero.android_example
+package com.hedera.android_example
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import org.hiero.android_example.ui.main.SectionsPagerAdapter
+import com.hedera.android_example.ui.main.SectionsPagerAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
