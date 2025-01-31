@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Renamed packages to `org.hiero.sdk.java`
+- Renamed packages to `com.hedera.hashgraph.sdk`
 
 ## 2.47.0-beta.1
 
