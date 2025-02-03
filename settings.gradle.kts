@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 plugins { id("org.hiero.gradle.build") version "0.3.1" }
 
-rootProject.name = "hiero-sdk-java"
+rootProject.name = "hedera-sdk-java"
 
 javaModules {
-    module("sdk") { group = "org.hiero.sdk" }
-    module("sdk-full") { group = "org.hiero.sdk" }
-    module("tck") { group = "org.hiero.sdk.tck" }
+    module("sdk") { group = "com.hedera.hashgraph" }
+    module("sdk-full") { group = "com.hedera.hashgraph" }
+    module("tck") { group = "com.hedera.hashgraph.tck" }
 }
 
 includeBuild("examples")

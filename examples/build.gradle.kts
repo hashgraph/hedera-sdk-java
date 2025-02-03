@@ -19,8 +19,8 @@ dependencyAnalysis {
 dependencies.constraints {
     implementation("com.google.guava:guava:33.3.1-android")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
-    implementation("com.hedera.hashgraph:sdk:2.46.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.46.0")
+    implementation("com.hedera.hashgraph:sdk:2.47.0-beta.4")
+    implementation("com.hedera.hashgraph:sdk-full:2.47.0-beta.4")
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
@@ -34,8 +34,9 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
         tasks.register<JavaExec>(this) {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-            mainModule = "org.hiero.sdk.examples"
-            mainClass = "org.hiero.sdk.examples.${this@addRule.substring("run".length)}Example"
+            mainModule = "com.hedera.hashgraph.sdk.examples"
+            mainClass =
+                "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
     }
 }
@@ -80,8 +81,8 @@ abstract class RunAllExample : DefaultTask() {
             exec.javaexec {
                 workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
-                mainModule = "org.hiero.sdk.examples"
-                mainClass = "org.hiero.sdk.examples.$className"
+                mainModule = "com.hedera.hashgraph.sdk.examples"
+                mainClass = "com.hedera.hashgraph.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
                 // jvmArgs "-Dorg.slf4j.simpleLogger.log.org.hiero=trace"
@@ -97,12 +98,12 @@ listOf("mainnet", "testnet", "previewnet").forEach { network ->
     tasks.register<JavaExec>(taskName) {
         workingDir = rootDir
         classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-        mainModule = "com.hedera.hashgraph.examples"
+        mainModule = "com.hedera.hashgraph.sdk.examples"
         mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
         environment("HEDERA_NETWORK", network)
         doLast {
             val binFile = File(workingDir, "address-book.proto.bin")
-            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            val target = File(workingDir, "../sdk-java/src/main/resources/addressbook/$network.pb")
             binFile.copyTo(target, overwrite = true)
         }
     }
