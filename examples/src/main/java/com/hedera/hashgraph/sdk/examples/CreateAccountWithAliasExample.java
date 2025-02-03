@@ -77,27 +77,15 @@ public class CreateAccountWithAliasExample {
         /*
          * Step 3:
          * Create an account creation transaction with the key as an alias.
+         * Extract accountId from Transaction's receipt
          */
-        AccountCreateTransaction transaction =
-                new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
-
-        /*
-         * Step 4:
-         * Sign the transaction with the private key.
-         */
-        transaction.sign(privateKey);
-
-        /*
-         * Step 5:
-         * Execute the transaction and get the response.
-         */
-        TransactionResponse response = transaction.execute(client);
-
-        /*
-         * Step 6:
-         * Retrieve the newly created account ID.
-         */
-        AccountId accountId = response.getReceipt(client).accountId;
+        AccountId accountId = new AccountCreateTransaction()
+                .setKeyWithAlias(privateKey)
+                .freezeWith(client)
+                .sign(privateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         /*
          * Step 7:
@@ -135,29 +123,17 @@ public class CreateAccountWithAliasExample {
         /*
          * Step 3:
          * Create an account creation transaction with both keys.
+         * It is required that transaction is signed with both keys
+         * Extract accountId from Transaction's receipt
          */
-        AccountCreateTransaction transaction = new AccountCreateTransaction()
+        AccountId accountId = new AccountCreateTransaction()
                 .setKeyWithAlias(ed25519Key, ecdsaKey)
-                .freezeWith(client);
-
-        /*
-         * Step 4:
-         * Sign the transaction with both keys.
-         */
-        transaction.sign(ed25519Key);
-        transaction.sign(ecdsaKey);
-
-        /*
-         * Step 5:
-         * Execute the transaction and get the response.
-         */
-        TransactionResponse response = transaction.execute(client);
-
-        /*
-         * Step 6:
-         * Retrieve the newly created account ID.
-         */
-        AccountId accountId = response.getReceipt(client).accountId;
+                .freezeWith(client)
+                .sign(ed25519Key)
+                .sign(ecdsaKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         /*
          * Step 7:
@@ -189,27 +165,15 @@ public class CreateAccountWithAliasExample {
         /*
          * Step 2:
          * Create an account creation transaction without an alias.
+         * Extract accountId from Transaction's receipt
          */
-        AccountCreateTransaction transaction =
-                new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
-
-        /*
-         * Step 3:
-         * Sign the transaction with the private key.
-         */
-        transaction.sign(privateKey);
-
-        /*
-         * Step 4:
-         * Execute the transaction and get the response.
-         */
-        TransactionResponse response = transaction.execute(client);
-
-        /*
-         * Step 5:
-         * Retrieve the newly created account ID.
-         */
-        AccountId accountId = response.getReceipt(client).accountId;
+        AccountId accountId = new AccountCreateTransaction()
+                .setKeyWithoutAlias(privateKey)
+                .freezeWith(client)
+                .sign(privateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         /*
          * Step 6:
