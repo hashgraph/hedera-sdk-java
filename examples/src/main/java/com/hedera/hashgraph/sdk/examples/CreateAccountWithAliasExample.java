@@ -5,6 +5,8 @@ import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.bouncycastle.util.encoders.Hex;
+
 import java.util.Objects;
 
 /**
@@ -30,13 +32,13 @@ public class CreateAccountWithAliasExample {
      * Used to sign and pay for operations on Hedera.
      */
     private static final AccountId OPERATOR_ID =
-        AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
     private static final PrivateKey OPERATOR_KEY =
-        PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -78,7 +80,7 @@ public class CreateAccountWithAliasExample {
          * Create an account creation transaction with the key as an alias.
          */
         AccountCreateTransaction transaction =
-            new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
+                new AccountCreateTransaction().setKeyWithAlias(privateKey).freezeWith(client);
 
         /*
          * Step 4:
@@ -136,8 +138,8 @@ public class CreateAccountWithAliasExample {
          * Create an account creation transaction with both keys.
          */
         AccountCreateTransaction transaction = new AccountCreateTransaction()
-            .setKeyWithAlias(ed25519Key, ecdsaKey)
-            .freezeWith(client);
+                .setKeyWithAlias(ed25519Key, ecdsaKey)
+                .freezeWith(client);
 
         /*
          * Step 4:
@@ -190,7 +192,7 @@ public class CreateAccountWithAliasExample {
          * Create an account creation transaction without an alias.
          */
         AccountCreateTransaction transaction =
-            new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
+                new AccountCreateTransaction().setKeyWithoutAlias(privateKey).freezeWith(client);
 
         /*
          * Step 3:
