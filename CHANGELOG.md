@@ -5,21 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## 2.47.0-beta.4
+## 2.47.0
 
-## 2.47.0-beta.3
+### Added
 
-## 2.47.0-beta.2
-
-### Changed
-
-- Renamed packages to `com.hedera.hashgraph.sdk`
-
-## 2.47.0-beta.1
+- `nextExchangeRate` property in the `TransactionReceipt`.
+- Warning log when trying to execute transaction against nodeID which is not in the client configuration.
 
 ### Changed
 
-- Renamed packages to `org.hiero`
+- Optimised `MirrorNodeContractEstimateGasQuery` and `MirrorNodeContractCallQuery` to call `toEvmAddress` instead calling the mirror node.
 
 ## 2.46.0
 
