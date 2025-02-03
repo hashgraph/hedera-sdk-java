@@ -12,10 +12,10 @@ repositories {
 
 android {
     compileSdk = 34
-    namespace = "com.hedera.hashgraph.android_example"
+    namespace = "com.hedera.android_example"
 
     defaultConfig {
-        applicationId = "com.hedera.hashgraph.android_example"
+        applicationId = "com.hedera.android_example"
         minSdk = 26
         targetSdk =  34
         versionCode = 1

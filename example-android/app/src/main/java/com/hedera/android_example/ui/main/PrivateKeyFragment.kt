@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
-package com.hedera.hashgraph.android_example.ui.main
+package com.hedera.android_example.ui.main
 
 import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
-import com.hedera.hashgraph.android_example.R
+import com.hedera.android_example.R
 import androidx.fragment.app.Fragment
 import com.hedera.hashgraph.sdk.PrivateKey
 
