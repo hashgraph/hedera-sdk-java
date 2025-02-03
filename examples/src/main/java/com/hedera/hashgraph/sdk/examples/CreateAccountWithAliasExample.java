@@ -5,9 +5,8 @@ import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.util.Objects;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * Hedera Account Creation Example.

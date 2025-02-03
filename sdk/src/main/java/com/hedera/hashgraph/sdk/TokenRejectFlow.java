@@ -49,12 +49,6 @@ public class TokenRejectFlow {
     @Nullable
     private UnaryOperator<byte[]> transactionSigner = null;
 
-    @Nullable
-    private TokenRejectTransaction tokenRejectTransaction = new TokenRejectTransaction();
-
-    @Nullable
-    private TokenDissociateTransaction tokenDissociateTransaction = new TokenDissociateTransaction();
-
     public TokenRejectFlow() {}
 
     /**
@@ -151,22 +145,6 @@ public class TokenRejectFlow {
     }
 
     /**
-     * Extract tokenRejectTransaction.
-     * @return tokenRejectTransaction.
-     */
-    public TokenRejectTransaction getTokenRejectTransaction() {
-        return tokenRejectTransaction;
-    }
-
-    /**
-     * Extract tokenDissociateTransaction.
-     * @return tokenDissociateTransaction.
-     */
-    public TokenDissociateTransaction getTokenDissociateTransaction() {
-        return tokenDissociateTransaction;
-    }
-
-    /**
      * Set the client that this transaction will be frozen with.
      *
      * @param client the client with the transaction to execute
@@ -218,7 +196,7 @@ public class TokenRejectFlow {
         return this;
     }
 
-    private void fillOutTransactionBaseFields(final Transaction<?> transaction) {
+    private void fillOutTransaction(final Transaction<?> transaction) {
         if (nodeAccountIds != null) {
             transaction.setNodeAccountIds(nodeAccountIds);
         }
@@ -232,42 +210,29 @@ public class TokenRejectFlow {
         }
     }
 
-    private TokenRejectTransaction fillOutTokenRejectTransaction() {
-        TokenRejectTransaction tx = this.tokenRejectTransaction;
-        if (tx != null) {
-            if (ownerId != null) {
-                tx.setOwnerId(ownerId);
-            }
-            if (!tokenIds.isEmpty()) {
-                tx.setTokenIds(tokenIds);
-            }
-            if (!nftIds.isEmpty()) {
-                tx.setNftIds(nftIds);
-            }
-            fillOutTransactionBaseFields(tx);
-        }
-        return tx;
+    private TokenRejectTransaction createTokenRejectTransaction() {
+        var tokenRejectTransaction = new TokenRejectTransaction()
+                .setOwnerId(ownerId)
+                .setTokenIds(tokenIds)
+                .setNftIds(nftIds);
+
+        fillOutTransaction(tokenRejectTransaction);
+
+        return tokenRejectTransaction;
     }
 
-    private TokenDissociateTransaction fillOutTokenDissociateTransaction() {
-        TokenDissociateTransaction tx = this.tokenDissociateTransaction;
-        if (tx != null) {
-            if (ownerId != null) {
-                tx.setAccountId(ownerId);
-            }
-            if (!tokenIds.isEmpty() || !nftIds.isEmpty()) {
-                List<TokenId> tokenIdsToReject = Stream.concat(
-                                tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
-                        .distinct()
-                        .collect(Collectors.toList());
+    private TokenDissociateTransaction createTokenDissociateTransaction() {
+        List<TokenId> tokenIdsToReject = Stream.concat(
+                        tokenIds.stream(), nftIds.stream().map(nftId -> nftId.tokenId))
+                .distinct()
+                .collect(Collectors.toList());
 
-                tx.setTokenIds(tokenIdsToReject);
-            }
+        var tokenDissociateTransaction =
+                new TokenDissociateTransaction().setAccountId(ownerId).setTokenIds(tokenIdsToReject);
 
-            fillOutTransactionBaseFields(tx);
-        }
+        fillOutTransaction(tokenDissociateTransaction);
 
-        return tx;
+        return tokenDissociateTransaction;
     }
 
     /**
@@ -294,10 +259,10 @@ public class TokenRejectFlow {
     public TransactionResponse execute(Client client, Duration timeoutPerTransaction)
             throws PrecheckStatusException, TimeoutException {
         try {
-            var tokenRejectTxResponse = fillOutTokenRejectTransaction().execute(client, timeoutPerTransaction);
+            var tokenRejectTxResponse = createTokenRejectTransaction().execute(client, timeoutPerTransaction);
             tokenRejectTxResponse.getReceipt(client, timeoutPerTransaction);
 
-            var tokenDissociateTxResponse = fillOutTokenDissociateTransaction().execute(client, timeoutPerTransaction);
+            var tokenDissociateTxResponse = createTokenDissociateTransaction().execute(client, timeoutPerTransaction);
             tokenDissociateTxResponse.getReceipt(client, timeoutPerTransaction);
 
             return tokenRejectTxResponse;
@@ -324,12 +289,11 @@ public class TokenRejectFlow {
      * @return the response
      */
     public CompletableFuture<TransactionResponse> executeAsync(Client client, Duration timeoutPerTransaction) {
-        return fillOutTokenRejectTransaction()
+        return createTokenRejectTransaction()
                 .executeAsync(client, timeoutPerTransaction)
                 .thenCompose(tokenRejectResponse ->
                         tokenRejectResponse.getReceiptQuery().executeAsync(client, timeoutPerTransaction))
-                .thenCompose(
-                        receipt -> fillOutTokenDissociateTransaction().executeAsync(client, timeoutPerTransaction));
+                .thenCompose(receipt -> createTokenDissociateTransaction().executeAsync(client, timeoutPerTransaction));
     }
 
     /**

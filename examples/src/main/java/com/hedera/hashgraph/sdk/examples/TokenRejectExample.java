@@ -205,15 +205,10 @@ class TokenRejectExample {
          * Execute the token reject flow -- reject NFTs.
          */
         System.out.println("Receiver rejects example NFTs...");
-        TokenRejectFlow tokenRejectFlow = new TokenRejectFlow()
+        new TokenRejectFlow()
                 .setOwnerId(receiverAccountId)
                 .setNftIds(List.of(
-                        nftId.nft(nftSerials.get(0)), nftId.nft(nftSerials.get(1)), nftId.nft(nftSerials.get(2))));
-
-        tokenRejectFlow.getTokenRejectTransaction().setTransactionMemo("Rejecting NFTs");
-        tokenRejectFlow.getTokenDissociateTransaction().setTransactionMemo("Dissociating NFTs");
-
-        tokenRejectFlow
+                        nftId.nft(nftSerials.get(0)), nftId.nft(nftSerials.get(1)), nftId.nft(nftSerials.get(2))))
                 .freezeWith(client)
                 .sign(receiverAccountPrivateKey)
                 .execute(client)

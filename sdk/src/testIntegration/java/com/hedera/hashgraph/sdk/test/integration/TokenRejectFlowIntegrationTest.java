@@ -4,7 +4,14 @@ package com.hedera.hashgraph.sdk.test.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-import com.hedera.hashgraph.sdk.*;
+import com.hedera.hashgraph.sdk.AccountBalanceQuery;
+import com.hedera.hashgraph.sdk.PrivateKey;
+import com.hedera.hashgraph.sdk.TokenAssociateTransaction;
+import com.hedera.hashgraph.sdk.TokenDeleteTransaction;
+import com.hedera.hashgraph.sdk.TokenMintTransaction;
+import com.hedera.hashgraph.sdk.TokenNftInfoQuery;
+import com.hedera.hashgraph.sdk.TokenRejectFlow;
+import com.hedera.hashgraph.sdk.TransferTransaction;
 import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -237,88 +244,6 @@ public class TokenRejectFlowIntegrationTest {
                                 .getReceipt(testEnv.client);
                     })
                     .withMessageContaining("ACCOUNT_STILL_OWNS_NFTS");
-        }
-    }
-
-    @Test
-    @DisplayName("Can execute via modifying individual transactions")
-    void canExecuteViaModifyingIndividualTransactions() throws Exception {
-        try (var testEnv = new IntegrationTestEnv(1).useThrowawayAccount()) {
-            final long FULL_TREASURY_BALANCE = 1_000_000;
-
-            // Create first token
-            var tokenCreateTx1 = new TokenCreateTransaction()
-                    .setTokenName("ffff")
-                    .setTokenSymbol("F")
-                    .setDecimals(3)
-                    .setInitialSupply(FULL_TREASURY_BALANCE)
-                    .setTreasuryAccountId(testEnv.operatorId)
-                    .setPauseKey(testEnv.operatorKey)
-                    .setAdminKey(testEnv.operatorKey)
-                    .setSupplyKey(testEnv.operatorKey)
-                    .execute(testEnv.client);
-
-            var tokenId1 = tokenCreateTx1.getReceipt(testEnv.client).tokenId;
-
-            // Create second token
-            var tokenCreateTx2 = new TokenCreateTransaction()
-                    .setTokenName("ffff")
-                    .setTokenSymbol("F")
-                    .setDecimals(3)
-                    .setInitialSupply(FULL_TREASURY_BALANCE)
-                    .setTreasuryAccountId(testEnv.operatorId)
-                    .setPauseKey(testEnv.operatorKey)
-                    .setAdminKey(testEnv.operatorKey)
-                    .setSupplyKey(testEnv.operatorKey)
-                    .execute(testEnv.client);
-
-            var tokenId2 = tokenCreateTx2.getReceipt(testEnv.client).tokenId;
-
-            // Create receiver account
-            var receiverPrivateKey = PrivateKey.generateECDSA();
-            var receiverCreateAccount = new AccountCreateTransaction()
-                    .setKey(receiverPrivateKey)
-                    .setInitialBalance(Hbar.fromTinybars(1))
-                    .execute(testEnv.client);
-
-            var receiverId = receiverCreateAccount.getReceipt(testEnv.client).accountId;
-
-            // Associate receiver with tokens
-            new TokenAssociateTransaction()
-                    .setAccountId(receiverId)
-                    .setTokenIds(List.of(tokenId1, tokenId2))
-                    .freezeWith(testEnv.client)
-                    .sign(receiverPrivateKey)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-
-            // Transfer tokens to the receiver
-            new TransferTransaction()
-                    .addTokenTransfer(tokenId1, testEnv.operatorId, -100)
-                    .addTokenTransfer(tokenId1, receiverId, 100)
-                    .addTokenTransfer(tokenId2, testEnv.operatorId, -100)
-                    .addTokenTransfer(tokenId2, receiverId, 100)
-                    .execute(testEnv.client)
-                    .getReceipt(testEnv.client);
-
-            // Execute TokenRejectFlow
-            var rejectFlow = new TokenRejectFlow();
-
-            rejectFlow
-                    .getTokenRejectTransaction()
-                    .setOwnerId(receiverId)
-                    .setTokenIds(List.of(tokenId1, tokenId2))
-                    .freezeWith(testEnv.client)
-                    .sign(receiverPrivateKey);
-
-            rejectFlow
-                    .getTokenDissociateTransaction()
-                    .setAccountId(receiverId)
-                    .setTokenIds(List.of(tokenId1, tokenId2))
-                    .freezeWith(testEnv.client)
-                    .sign(receiverPrivateKey);
-
-            rejectFlow.execute(testEnv.client);
         }
     }
 }
