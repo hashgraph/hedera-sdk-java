@@ -38,7 +38,7 @@ class LoadIntegrationTest {
                         client.setOperator(operatorId, operatorPrivateKey);
                         client.setMaxAttempts(10);
                         new AccountCreateTransaction()
-                                .setKey(PrivateKey.generateED25519())
+                                .setKeyWithoutAlias(PrivateKey.generateED25519())
                                 .execute(client)
                                 .getReceipt(client);
                         System.out.println(finalI);

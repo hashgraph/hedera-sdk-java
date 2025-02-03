@@ -95,7 +95,7 @@ class CreateAccountThresholdKeyExample {
          */
         System.out.println("Creating new account...");
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
-                .setKey(thresholdKey)
+                .setKeyWithoutAlias(thresholdKey)
                 .setInitialBalance(Hbar.from(1))
                 .execute(client);
 

@@ -1369,7 +1369,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `AccountCreateTransaction().setInitialBalance(new Hbar(5))`. This of course applies to more than just
   `setInitialBalance()`.
 - Any method that used to require a `PublicKey` will now require `Key`.
-  - `AccountCreateTransaction.setKey(PublicKey)` is now `AccountCreateTransaction.setKey(Key)` as an example.
+  - `AccountCreateTransaction.setKey(PublicKey)` is now `AccountCreateTransaction.setKeyWithoutAlias(Key)` as an example.
 - All `Id` types (`Account`, `File`, `Contract`, `Topic`, and `TransactionId`)
   - Support `fromBytes()` and `toBytes()`
   - No longer have the `toProto()` method.

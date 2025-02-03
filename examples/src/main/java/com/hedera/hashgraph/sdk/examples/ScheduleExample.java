@@ -75,7 +75,7 @@ class ScheduleExample {
          */
         System.out.println("Creating new account...");
         AccountId accountId = new AccountCreateTransaction()
-                .setKey(KeyList.of(publicKey1, publicKey2))
+                .setKeyWithoutAlias(KeyList.of(publicKey1, publicKey2))
                 .setInitialBalance(Hbar.from(1))
                 .execute(client)
                 .getReceipt(client)

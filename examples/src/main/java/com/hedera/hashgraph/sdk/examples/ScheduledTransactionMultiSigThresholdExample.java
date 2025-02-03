@@ -92,7 +92,7 @@ class ScheduledTransactionMultiSigThresholdExample {
          */
         System.out.println("Creating new account...(with the above Key List as an account key).");
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
-                .setKey(thresholdKey)
+                .setKeyWithoutAlias(thresholdKey)
                 .setInitialBalance(Hbar.from(1))
                 .setAccountMemo("3-of-4 multi-sig account")
                 .execute(client);

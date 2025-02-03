@@ -52,7 +52,7 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var transaction = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .freezeWith(testEnv.client)
                     .signWithOperator(testEnv.client);
 
@@ -88,7 +88,7 @@ public class TransactionIntegrationTest {
             var publicKey = adminKey.getPublicKey();
 
             var accountCreateTransaction =
-                    new AccountCreateTransaction().setKey(publicKey).setInitialBalance(new Hbar(1L));
+                    new AccountCreateTransaction().setKeyWithoutAlias(publicKey).setInitialBalance(new Hbar(1L));
 
             var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
             var expectedBalance = new Hbar(1L);
@@ -121,7 +121,7 @@ public class TransactionIntegrationTest {
 
             var accountCreateTransaction = new AccountCreateTransaction()
                     .setNodeAccountIds(nodeAccountIds)
-                    .setKey(publicKey)
+                    .setKeyWithoutAlias(publicKey)
                     .setInitialBalance(new Hbar(1L));
 
             var expectedNodeAccountIds = accountCreateTransaction.getNodeAccountIds();
@@ -154,7 +154,7 @@ public class TransactionIntegrationTest {
             var publicKey = adminKey.getPublicKey();
 
             var accountCreateTransaction =
-                    new AccountCreateTransaction().setKey(publicKey).setInitialBalance(new Hbar(1L));
+                    new AccountCreateTransaction().setKeyWithoutAlias(publicKey).setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
             AccountCreateTransaction accountCreateTransactionDeserialized =
@@ -188,7 +188,7 @@ public class TransactionIntegrationTest {
 
             var accountCreateTransaction = new AccountCreateTransaction()
                     .setNodeAccountIds(nodeAccountIds)
-                    .setKey(publicKey)
+                    .setKeyWithoutAlias(publicKey)
                     .setInitialBalance(new Hbar(1L));
 
             var transactionBytesSerialized = accountCreateTransaction.toBytes();
@@ -219,7 +219,7 @@ public class TransactionIntegrationTest {
             var adminKey = PrivateKey.generateECDSA();
             var publicKey = adminKey.getPublicKey();
 
-            var accountCreateTransaction = new AccountCreateTransaction().setKey(publicKey);
+            var accountCreateTransaction = new AccountCreateTransaction().setKeyWithoutAlias(publicKey);
 
             var expectedBalance = new Hbar(1L);
             var nodeAccountIds = testEnv.client.getNetwork().values().stream().toList();
@@ -263,7 +263,7 @@ public class TransactionIntegrationTest {
 
             var accountCreateTransaction = new AccountCreateTransaction()
                     .setNodeAccountIds(nodeAccountIds)
-                    .setKey(publicKey);
+                    .setKeyWithoutAlias(publicKey);
 
             var expectedBalance = new Hbar(1L);
 
@@ -307,7 +307,7 @@ public class TransactionIntegrationTest {
             var maxAutomaticTokenAssociations = 4;
 
             var accountCreateTransaction = new AccountCreateTransaction()
-                    .setKey(publicKey)
+                    .setKeyWithoutAlias(publicKey)
                     .setInitialBalance(initialBalance)
                     .setReceiverSignatureRequired(true)
                     .setAutoRenewPeriod(autoRenewPeriod)
@@ -349,7 +349,7 @@ public class TransactionIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var transaction = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .freezeWith(testEnv.client)
                     .signWithOperator(testEnv.client);
 

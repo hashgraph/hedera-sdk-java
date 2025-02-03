@@ -91,7 +91,7 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Creating new account...(with the above Key List as an account key).");
         var alice = new AccountCreateTransaction()
-                .setKey(thresholdKey)
+                .setKeyWithoutAlias(thresholdKey)
                 .setInitialBalance(new Hbar(2))
                 .execute(client)
                 .getReceipt(client)

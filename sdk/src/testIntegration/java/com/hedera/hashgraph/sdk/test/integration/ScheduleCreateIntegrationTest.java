@@ -48,7 +48,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
                     .setScheduledTransaction(transaction)
@@ -72,7 +73,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
                     .setScheduledTransaction(transaction)
@@ -97,7 +99,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var tx = transaction.schedule();
 
@@ -131,7 +134,7 @@ class ScheduleCreateIntegrationTest {
 
             // Creat the account with the `KeyList`
             TransactionResponse response = new AccountCreateTransaction()
-                    .setKey(keyList)
+                    .setKeyWithoutAlias(keyList)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client);
 

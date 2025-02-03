@@ -100,7 +100,7 @@ class ScheduledTransferExample {
         System.out.println("Create Bob's account...(with receiver signature property enabled).");
         AccountId bobAccountId = new AccountCreateTransaction()
                 .setReceiverSignatureRequired(true)
-                .setKey(bobPublicKey)
+                .setKeyWithoutAlias(bobPublicKey)
                 .setInitialBalance(Hbar.from(1))
                 .freezeWith(client)
                 .sign(bobPrivateKey)

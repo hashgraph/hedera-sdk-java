@@ -72,7 +72,7 @@ class ExemptCustomFeesExample {
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceAccountId = new AccountCreateTransaction()
                 .setInitialBalance(initialBalance)
-                .setKey(alicePublicKey)
+                .setKeyWithoutAlias(alicePublicKey)
                 .freezeWith(client)
                 .sign(alicePrivateKey)
                 .execute(client)
@@ -84,7 +84,7 @@ class ExemptCustomFeesExample {
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
         AccountId bobAccountId = new AccountCreateTransaction()
                 .setInitialBalance(initialBalance)
-                .setKey(bobPublicKey)
+                .setKeyWithoutAlias(bobPublicKey)
                 .freezeWith(client)
                 .sign(bobPrivateKey)
                 .execute(client)
@@ -96,7 +96,7 @@ class ExemptCustomFeesExample {
         PublicKey charilePublicKey = charilePrivateKey.getPublicKey();
         AccountId charlieAccountId = new AccountCreateTransaction()
                 .setInitialBalance(initialBalance)
-                .setKey(charilePublicKey)
+                .setKeyWithoutAlias(charilePublicKey)
                 .freezeWith(client)
                 .sign(charilePrivateKey)
                 .execute(client)

@@ -125,7 +125,7 @@ class TransferUsingEvmAddressExample {
 
         System.out.println("Creating Bob's account...");
         AccountCreateTransaction accountCreateTx =
-                new AccountCreateTransaction().setKey(bobPublicKey).freezeWith(client);
+                new AccountCreateTransaction().setKeyWithoutAlias(bobPublicKey).freezeWith(client);
 
         /*
          * Step 8:

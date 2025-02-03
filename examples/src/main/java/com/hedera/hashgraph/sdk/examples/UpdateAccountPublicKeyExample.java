@@ -76,7 +76,7 @@ class UpdateAccountPublicKeyExample {
          */
         System.out.println("Creating new account...");
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
-                .setKey(publicKey1)
+                .setKeyWithoutAlias(publicKey1)
                 .setInitialBalance(Hbar.from(1))
                 .execute(client);
 

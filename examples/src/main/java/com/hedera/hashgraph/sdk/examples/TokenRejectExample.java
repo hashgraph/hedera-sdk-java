@@ -77,7 +77,7 @@ class TokenRejectExample {
         System.out.println("Creating treasury and receiver accounts...");
         // Create a treasury account.
         var treasuryAccountId = new AccountCreateTransaction()
-                .setKey(treasuryAccountPublicKey)
+                .setKeyWithoutAlias(treasuryAccountPublicKey)
                 .setMaxAutomaticTokenAssociations(100)
                 .freezeWith(client)
                 .sign(treasuryAccountPrivateKey)
@@ -88,7 +88,7 @@ class TokenRejectExample {
 
         // Create a receiver account with unlimited max auto associations (-1).
         var receiverAccountId = new AccountCreateTransaction()
-                .setKey(receiverAccountPublicKey)
+                .setKeyWithoutAlias(receiverAccountPublicKey)
                 .setMaxAutomaticTokenAssociations(-1)
                 .freezeWith(client)
                 .sign(receiverAccountPrivateKey)

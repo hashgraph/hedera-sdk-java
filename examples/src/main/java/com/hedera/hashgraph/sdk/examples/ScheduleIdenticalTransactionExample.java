@@ -84,7 +84,7 @@ class ScheduleIdenticalTransactionExample {
 
             System.out.println("Creating new account...");
             TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
-                    .setKey(newPublicKey)
+                    .setKeyWithoutAlias(newPublicKey)
                     .setInitialBalance(Hbar.from(1))
                     .execute(client);
 
@@ -122,7 +122,7 @@ class ScheduleIdenticalTransactionExample {
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
                 // The key that must sign each transfer out of the account. If receiverSigRequired is true, then
                 // it must also sign any transfer into the account.
-                .setKey(thresholdKey)
+                .setKeyWithoutAlias(thresholdKey)
                 .setInitialBalance(Hbar.from(10))
                 .execute(client);
 
