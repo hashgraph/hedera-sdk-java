@@ -18,7 +18,7 @@ package proto;
  * limitations under the License.
  */
 
-option java_package = "org.hiero.sdk.proto";
+option java_package = "com.hedera.hashgraph.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -297,17 +297,17 @@ message SchedulableTransactionBody {
     /**
      * Transaction body for a scheduled transaction to create a new node.
      */
-   org.hiero.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 42;
+   com.hedera.hashgraph.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 42;
 
     /**
      * Transaction body for a scheduled transaction to modify an existing node.
      */
-    org.hiero.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 43;
+    com.hedera.hashgraph.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 43;
 
     /**
      * Transaction body for a scheduled transaction to remove a node.
      */
-    org.hiero.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 44;
+    com.hedera.hashgraph.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 44;
 
     /**
      * A transaction body to "reject" undesired tokens.<br/>

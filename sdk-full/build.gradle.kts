@@ -5,7 +5,7 @@ plugins {
     id("org.hiero.gradle.feature.publish-dependency-constraints")
 }
 
-description = "Hedera™ Hashgraph SDK for Java"
+description = "Hiero SDK for Java"
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
 // correct version
@@ -17,7 +17,7 @@ dependencies {
 
 javaModuleDependencies.moduleNameToGA.put(
     "com.google.protobuf",
-    "com.google.protobuf:protobuf-java"
+    "com.google.protobuf:protobuf-java",
 )
 
 tasks.withType<JavaCompile>().configureEach { options.compilerArgs.add("-Xlint:-exports,-dep-ann") }
@@ -48,8 +48,8 @@ tasks.named<Jar>("sourcesJar") {
 // 'sdk-full' is an alternative to 'sdk'. They cannot be used together.
 // We express this via capability.
 listOf(configurations.apiElements.get(), configurations.runtimeElements.get()).forEach {
-    it.outgoing.capability(
-        "${project.group}:${project.name}:${project.version}"
-    ) // The default capability
-    it.outgoing.capability("${project.group}:sdk:${project.version}") // The 'sdk' capability
+    // The 'sdk-full' capability (default)
+    it.outgoing.capability("${project.group}:${project.name}:${project.version}")
+    // The 'sdk' capability
+    it.outgoing.capability("${project.group}:sdk:${project.version}")
 }

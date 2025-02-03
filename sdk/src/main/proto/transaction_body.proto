@@ -18,7 +18,7 @@ package proto;
  * limitations under the License.
  */
 
-option java_package = "org.hiero.sdk.proto";
+option java_package = "com.hedera.hashgraph.sdk.proto";
 // <<<pbj.java_package = "com.hedera.hapi.node.transaction">>> This comment is special code for setting PBJ Compiler java package
 option java_multiple_files = true;
 
@@ -371,7 +371,7 @@ message TransactionBody {
          * This transaction SHALL create a new consensus node record and add
          * that record to the network address book.
          */
-        org.hiero.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 54;
+        com.hedera.hashgraph.hapi.node.addressbook.NodeCreateTransactionBody nodeCreate = 54;
 
         /**
          * A transaction body for an `updateNode` request.
@@ -379,7 +379,7 @@ message TransactionBody {
          * This transaction SHALL update an existing consensus node record in
          * the network address book.
          */
-        org.hiero.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 55;
+        com.hedera.hashgraph.hapi.node.addressbook.NodeUpdateTransactionBody nodeUpdate = 55;
 
         /**
          * A transaction body for a `deleteNode` request.
@@ -387,7 +387,7 @@ message TransactionBody {
          * This transaction SHALL remove an existing consensus node record from
          * the network address book.
          */
-        org.hiero.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 56;
+        com.hedera.hashgraph.hapi.node.addressbook.NodeDeleteTransactionBody nodeDelete = 56;
 
         /**
          * A transaction body to "reject" undesired tokens.<br/>
@@ -426,16 +426,16 @@ message TransactionBody {
         /**
          * A transaction body for a `tssMessage` request.
          */
-        org.hiero.hapi.services.auxiliary.tss.TssMessageTransactionBody tssMessage = 61;
+        com.hedera.hashgraph.hapi.services.auxiliary.tss.TssMessageTransactionBody tssMessage = 61;
 
         /**
          * A transaction body for a `tssVote` request.
          */
-        org.hiero.hapi.services.auxiliary.tss.TssVoteTransactionBody tssVote = 62;
+        com.hedera.hashgraph.hapi.services.auxiliary.tss.TssVoteTransactionBody tssVote = 62;
 
         /**
          * A transaction body for a 'tssShareSignature` request
          */
-        org.hiero.hapi.services.auxiliary.tss.TssShareSignatureTransactionBody tssShareSignature = 63;
+        com.hedera.hashgraph.hapi.services.auxiliary.tss.TssShareSignatureTransactionBody tssShareSignature = 63;
     }
 }
