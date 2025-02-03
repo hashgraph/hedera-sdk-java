@@ -10,7 +10,7 @@ description = "Hedera™ Hashgraph SDK for Java"
 
 javaModuleDependencies.moduleNameToGA.put(
     "com.google.protobuf",
-    "com.google.protobuf:protobuf-javalite"
+    "com.google.protobuf:protobuf-javalite",
 )
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
