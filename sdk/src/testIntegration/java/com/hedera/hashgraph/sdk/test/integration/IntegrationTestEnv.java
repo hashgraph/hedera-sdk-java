@@ -104,7 +104,7 @@ public class IntegrationTestEnv implements AutoCloseable {
         operatorKey = key.getPublicKey();
         operatorId = new AccountCreateTransaction()
                 .setInitialBalance(initialBalance)
-                .setKey(key)
+                .setKeyWithoutAlias(key)
                 .execute(client)
                 .getReceipt(client)
                 .accountId;

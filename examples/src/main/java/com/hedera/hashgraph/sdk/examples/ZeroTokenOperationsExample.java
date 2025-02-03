@@ -119,7 +119,7 @@ class ZeroTokenOperationsExample {
         // Update the signer to have contractId KeyList (this is by security requirement)
         new AccountUpdateTransaction()
                 .setAccountId(OPERATOR_ID)
-                .setKey(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId)
+                .setKeyWithoutAlias(KeyList.of(OPERATOR_KEY.getPublicKey(), contractHelper.contractId)
                         .setThreshold(1))
                 .execute(client)
                 .getReceipt(client);

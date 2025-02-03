@@ -1641,7 +1641,7 @@ All changes are not immediately breaking as the previous method still should exi
 
   ```java
   AccountId newAccountId = new AccountCreateTransaction(hederaClient)
-      .setKey(newKey.getPublicKey())
+      .setKeyWithoutAlias(newKey.getPublicKey())
       .setInitialBalance(1000)
       .executeForReceipt() // TransactionReceipt
       .getAccountId();
@@ -1651,7 +1651,7 @@ All changes are not immediately breaking as the previous method still should exi
 
   ```java
   AccountId newAccountId = new AccountCreateTransaction()
-      .setKey(newKey.getPublicKey())
+      .setKeyWithoutAlias(newKey.getPublicKey())
       .setInitialBalance(1000)
       .execute(hederaClient) // TranactionId
       .getReceipt(hederaClient) // TransactionReceipt

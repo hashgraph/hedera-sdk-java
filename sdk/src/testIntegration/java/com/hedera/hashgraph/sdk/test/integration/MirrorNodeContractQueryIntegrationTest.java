@@ -231,7 +231,7 @@ class MirrorNodeContractQueryIntegrationTest {
             var contractId = Objects.requireNonNull(response.getReceipt(testEnv.client).contractId);
 
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(PrivateKey.generateED25519())
+                    .setKeyWithoutAlias(PrivateKey.generateED25519())
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;

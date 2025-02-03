@@ -133,7 +133,7 @@ class TokenMintIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             var response = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .setInitialBalance(new Hbar(1))
                     .execute(testEnv.client);
 

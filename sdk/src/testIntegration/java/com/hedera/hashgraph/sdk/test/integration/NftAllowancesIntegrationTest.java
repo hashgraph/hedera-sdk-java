@@ -33,7 +33,7 @@ public class NftAllowancesIntegrationTest {
 
             var spenderKey = PrivateKey.generateED25519();
             var spenderAccountId = new AccountCreateTransaction()
-                    .setKey(spenderKey)
+                    .setKeyWithoutAlias(spenderKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -41,7 +41,7 @@ public class NftAllowancesIntegrationTest {
 
             var receiverKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverKey)
+                    .setKeyWithoutAlias(receiverKey)
                     .setMaxAutomaticTokenAssociations(10)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -96,7 +96,7 @@ public class NftAllowancesIntegrationTest {
 
             var spenderKey = PrivateKey.generateED25519();
             var spenderAccountId = new AccountCreateTransaction()
-                    .setKey(spenderKey)
+                    .setKeyWithoutAlias(spenderKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -104,7 +104,7 @@ public class NftAllowancesIntegrationTest {
 
             var receiverKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverKey)
+                    .setKeyWithoutAlias(receiverKey)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;
@@ -189,7 +189,7 @@ public class NftAllowancesIntegrationTest {
 
             var spenderKey = PrivateKey.generateED25519();
             var spenderAccountId = new AccountCreateTransaction()
-                    .setKey(spenderKey)
+                    .setKeyWithoutAlias(spenderKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -197,7 +197,7 @@ public class NftAllowancesIntegrationTest {
 
             var receiverKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverKey)
+                    .setKeyWithoutAlias(receiverKey)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;
@@ -285,7 +285,7 @@ public class NftAllowancesIntegrationTest {
 
             var delegatingSpenderKey = PrivateKey.generateED25519();
             var delegatingSpenderAccountId = new AccountCreateTransaction()
-                    .setKey(delegatingSpenderKey)
+                    .setKeyWithoutAlias(delegatingSpenderKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -293,7 +293,7 @@ public class NftAllowancesIntegrationTest {
 
             var spenderKey = PrivateKey.generateED25519();
             var spenderAccountId = new AccountCreateTransaction()
-                    .setKey(spenderKey)
+                    .setKeyWithoutAlias(spenderKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -301,7 +301,7 @@ public class NftAllowancesIntegrationTest {
 
             var receiverKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverKey)
+                    .setKeyWithoutAlias(receiverKey)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;

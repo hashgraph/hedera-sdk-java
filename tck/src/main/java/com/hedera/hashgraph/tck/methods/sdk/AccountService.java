@@ -37,7 +37,7 @@ public class AccountService extends AbstractJSONRPC2Service {
         AccountCreateTransaction accountCreateTransaction = new AccountCreateTransaction();
         params.getKey().ifPresent(key -> {
             try {
-                accountCreateTransaction.setKey(KeyUtils.getKeyFromString(key));
+                accountCreateTransaction.setKeyWithoutAlias(KeyUtils.getKeyFromString(key));
             } catch (InvalidProtocolBufferException e) {
                 throw new IllegalArgumentException(e);
             }
