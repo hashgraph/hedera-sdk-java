@@ -12,10 +12,10 @@ repositories {
 
 android {
     compileSdk = 34
-    namespace = "com.hedera.android_example"
+    namespace = "com.hedera.hashgraph.android_example"
 
     defaultConfig {
-        applicationId = "com.hedera.android_example"
+        applicationId = "com.hedera.hashgraph.android_example"
         minSdk = 26
         targetSdk =  34
         versionCode = 1
@@ -50,7 +50,7 @@ dependencies {
     implementation(platform("org.hiero:hiero-dependency-versions"))
     // ---------------------------------------------
 
-    implementation("com.hedera.hashgraph:sdk:2.46.0")
+    implementation("com.hedera.hashgraph:sdk:2.47.0-beta.4")
 
     implementation("com.google.android.material:material:1.11.0")
 
