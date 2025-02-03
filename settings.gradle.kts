@@ -4,8 +4,8 @@ plugins { id("org.hiero.gradle.build") version "0.3.1" }
 rootProject.name = "hedera-sdk-java"
 
 javaModules {
-    module("sdk") { group = "com.hedera.hashgraph.sdk" }
-    module("sdk-full") { group = "com.hedera.hashgraph.sdk" }
+    module("sdk") { group = "com.hedera.hashgraph" }
+    module("sdk-full") { group = "com.hedera.hashgraph" }
     module("tck") { group = "com.hedera.hashgraph.tck" }
 }
 
