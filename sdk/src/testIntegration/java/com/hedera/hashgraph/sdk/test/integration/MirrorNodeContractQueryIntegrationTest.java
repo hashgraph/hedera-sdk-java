@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.test.integration;
 
-import static com.hedera.hashgraph.sdk.EntityIdHelper.getEvmAddressFromMirrorNodeAsync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
