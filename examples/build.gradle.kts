@@ -103,7 +103,7 @@ listOf("mainnet", "testnet", "previewnet").forEach { network ->
         environment("HEDERA_NETWORK", network)
         doLast {
             val binFile = File(workingDir, "address-book.proto.bin")
-            val target = File(workingDir, "../sdk-java/src/main/resources/addressbook/$network.pb")
+            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
             binFile.copyTo(target, overwrite = true)
         }
     }
