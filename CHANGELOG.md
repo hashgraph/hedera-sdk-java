@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.48.0
+
+### Changed
+
+- New query payment is generated when the SDK receives status `BUSY`.
+
+### Added
+
+- Retry mechanism for resubmitting the transaction in case the SDK receives status `THROTTLED_AT_CONSENSUS` in the transaction receipt.
+
 ## 2.47.0
 
 ### Added
