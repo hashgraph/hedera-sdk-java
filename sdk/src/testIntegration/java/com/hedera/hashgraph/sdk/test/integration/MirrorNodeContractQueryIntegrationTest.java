@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.test.integration;
 
-import static com.hedera.hashgraph.sdk.EntityIdHelper.getEvmAddressFromMirrorNodeAsync;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -239,9 +238,7 @@ class MirrorNodeContractQueryIntegrationTest {
             // Wait for mirror node to import data
             Thread.sleep(2000);
 
-            var receiverEvmAddress = getEvmAddressFromMirrorNodeAsync(testEnv.client, receiverAccountId.num)
-                    .get()
-                    .toString();
+            var receiverEvmAddress = receiverAccountId.toSolidityAddress();
 
             var owner = new MirrorNodeContractCallQuery()
                     .setContractId(contractId)
