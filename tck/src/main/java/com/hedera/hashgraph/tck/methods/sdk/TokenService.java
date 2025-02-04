@@ -97,7 +97,7 @@ public class TokenService extends AbstractJSONRPC2Service {
 
         params.getName().ifPresent(tokenCreateTransaction::setTokenName);
         params.getSymbol().ifPresent(tokenCreateTransaction::setTokenSymbol);
-        params.getDecimals().ifPresent(decimals -> tokenCreateTransaction.setDecimals(Integer.parseInt(decimals)));
+        params.getDecimals().ifPresent(decimals -> tokenCreateTransaction.setDecimals(decimals.intValue()));
         params.getInitialSupply()
                 .ifPresent(initialSupply -> tokenCreateTransaction.setInitialSupply(Long.parseLong(initialSupply)));
 

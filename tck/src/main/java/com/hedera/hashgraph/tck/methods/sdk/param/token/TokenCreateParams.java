@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 public class TokenCreateParams extends JSONRPC2Param {
     private Optional<String> name;
     private Optional<String> symbol;
-    private Optional<String> decimals;
+    private Optional<Long> decimals;
     private Optional<String> initialSupply;
     private Optional<String> treasuryAccountId;
     private Optional<String> adminKey;
@@ -48,7 +48,7 @@ public class TokenCreateParams extends JSONRPC2Param {
     public JSONRPC2Param parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedName = Optional.ofNullable((String) jrpcParams.get("name"));
         var parsedSymbol = Optional.ofNullable((String) jrpcParams.get("symbol"));
-        var parsedDecimals = Optional.ofNullable((String) jrpcParams.get("decimals"));
+        var parsedDecimals = Optional.ofNullable((Long) jrpcParams.get("decimals"));
         var parsedInitialSupply = Optional.ofNullable((String) jrpcParams.get("initialSupply"));
         var parsedTreasuryAccountId = Optional.ofNullable((String) jrpcParams.get("treasuryAccountId"));
         var parsedAdminKey = Optional.ofNullable((String) jrpcParams.get("adminKey"));
