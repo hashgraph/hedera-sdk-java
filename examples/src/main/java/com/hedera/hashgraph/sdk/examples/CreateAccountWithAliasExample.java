@@ -88,13 +88,13 @@ public class CreateAccountWithAliasExample {
                 .accountId;
 
         /*
-         * Step 7:
+         * Step 4:
          * Query the account information to verify details.
          */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         /*
-         * Step 8:
+         * Step 5:
          * Print the EVM address to confirm it matches the contract account ID.
          */
         System.out.println("Initial EVM address: " + evmAddress + " is the same as " + info.contractAccountId);
@@ -136,13 +136,13 @@ public class CreateAccountWithAliasExample {
                 .accountId;
 
         /*
-         * Step 7:
+         * Step 4:
          * Query the account information to verify details.
          */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         /*
-         * Step 8:
+         * Step 5:
          * Print key and EVM address details for verification.
          */
         System.out.println("Account's key: " + info.key + " is the same as " + ed25519Key.getPublicKey());
@@ -176,13 +176,13 @@ public class CreateAccountWithAliasExample {
                 .accountId;
 
         /*
-         * Step 6:
+         * Step 3:
          * Query the account information to verify details.
          */
         AccountInfo info = new AccountInfoQuery().setAccountId(accountId).execute(client);
 
         /*
-         * Step 7:
+         * Step 4:
          * Print key and alias details for verification.
          */
         System.out.println("Account's key: " + info.key + " is the same as " + privateKey.getPublicKey());
