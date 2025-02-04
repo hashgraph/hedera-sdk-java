@@ -19,8 +19,8 @@ dependencyAnalysis {
 dependencies.constraints {
     implementation("com.google.guava:guava:33.3.1-android")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
-    implementation("com.hedera.hashgraph:sdk:2.47.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.47.0")
+    implementation("com.hedera.hashgraph:sdk:2.48.0")
+    implementation("com.hedera.hashgraph:sdk-full:2.48.0")
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
@@ -103,7 +103,7 @@ listOf("mainnet", "testnet", "previewnet").forEach { network ->
         environment("HEDERA_NETWORK", network)
         doLast {
             val binFile = File(workingDir, "address-book.proto.bin")
-            val target = File(workingDir, "../sdk-java/src/main/resources/addressbook/$network.pb")
+            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
             binFile.copyTo(target, overwrite = true)
         }
     }
