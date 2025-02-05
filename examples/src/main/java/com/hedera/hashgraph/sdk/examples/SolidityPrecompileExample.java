@@ -44,7 +44,7 @@ public class SolidityPrecompileExample {
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceAccountId = Objects.requireNonNull(new AccountCreateTransaction()
-                .setKey(alicePublicKey)
+                .setKeyWithoutAlias(alicePublicKey)
                 .setInitialBalance(Hbar.fromTinybars(1000))
                 .execute(client)
                 .getReceipt(client)

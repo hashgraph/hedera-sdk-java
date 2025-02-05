@@ -78,7 +78,7 @@ class StakingExample {
         System.out.println("Creating new account with staked account ID...");
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
-                .setKey(publicKey)
+                .setKeyWithoutAlias(publicKey)
                 .setInitialBalance(Hbar.from(1))
                 .setStakedAccountId(stakedAccountId)
                 .execute(client)

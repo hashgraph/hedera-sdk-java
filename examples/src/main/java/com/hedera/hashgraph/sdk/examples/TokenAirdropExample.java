@@ -75,7 +75,7 @@ public class TokenAirdropExample {
          */
         var privateKey1 = PrivateKey.generateECDSA();
         var alice = new AccountCreateTransaction()
-                .setKey(privateKey1)
+                .setKeyWithoutAlias(privateKey1)
                 .setInitialBalance(new Hbar(10))
                 .setMaxAutomaticTokenAssociations(-1)
                 .execute(client)
@@ -84,7 +84,7 @@ public class TokenAirdropExample {
 
         var privateKey2 = PrivateKey.generateECDSA();
         var bob = new AccountCreateTransaction()
-                .setKey(privateKey2)
+                .setKeyWithoutAlias(privateKey2)
                 .setMaxAutomaticTokenAssociations(1)
                 .execute(client)
                 .getReceipt(client)
@@ -92,7 +92,7 @@ public class TokenAirdropExample {
 
         var privateKey3 = PrivateKey.generateECDSA();
         var carol = new AccountCreateTransaction()
-                .setKey(privateKey3)
+                .setKeyWithoutAlias(privateKey3)
                 .setMaxAutomaticTokenAssociations(0)
                 .execute(client)
                 .getReceipt(client)
@@ -100,7 +100,7 @@ public class TokenAirdropExample {
 
         var treasuryKey = PrivateKey.generateECDSA();
         var treasuryAccount = new AccountCreateTransaction()
-                .setKey(treasuryKey)
+                .setKeyWithoutAlias(treasuryKey)
                 .setInitialBalance(new Hbar(10))
                 .execute(client)
                 .getReceipt(client)

@@ -28,7 +28,7 @@ class TokenTransferIntegrationTest {
             var key = PrivateKey.generateED25519();
 
             TransactionResponse response = new AccountCreateTransaction()
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .setInitialBalance(new Hbar(1))
                     .execute(testEnv.client);
 
@@ -83,13 +83,13 @@ class TokenTransferIntegrationTest {
             PrivateKey key1 = PrivateKey.generateED25519();
             PrivateKey key2 = PrivateKey.generateED25519();
             var accountId1 = new AccountCreateTransaction()
-                    .setKey(key1)
+                    .setKeyWithoutAlias(key1)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;
             var accountId2 = new AccountCreateTransaction()
-                    .setKey(key2)
+                    .setKeyWithoutAlias(key2)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)

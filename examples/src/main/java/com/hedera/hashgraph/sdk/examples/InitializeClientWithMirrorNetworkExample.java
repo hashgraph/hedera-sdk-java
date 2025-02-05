@@ -62,7 +62,7 @@ public class InitializeClientWithMirrorNetworkExample {
          * Create account
          */
         AccountId aliceId = new AccountCreateTransaction()
-                .setKey(privateKey)
+                .setKeyWithoutAlias(privateKey)
                 .setInitialBalance(Hbar.from(5))
                 .execute(client)
                 .getReceipt(client)

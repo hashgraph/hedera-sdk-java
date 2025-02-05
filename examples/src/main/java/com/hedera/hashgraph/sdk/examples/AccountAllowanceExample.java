@@ -89,7 +89,7 @@ class AccountAllowanceExample {
         System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
 
         AccountId aliceId = new AccountCreateTransaction()
-                .setKey(alicePublicKey)
+                .setKeyWithoutAlias(alicePublicKey)
                 .setInitialBalance(Hbar.from(5))
                 .execute(client)
                 .getReceipt(client)
@@ -97,7 +97,7 @@ class AccountAllowanceExample {
         Objects.requireNonNull(aliceId);
 
         AccountId bobId = new AccountCreateTransaction()
-                .setKey(bobPublicKey)
+                .setKeyWithoutAlias(bobPublicKey)
                 .setInitialBalance(Hbar.from(5))
                 .execute(client)
                 .getReceipt(client)
@@ -105,7 +105,7 @@ class AccountAllowanceExample {
         Objects.requireNonNull(bobId);
 
         AccountId charlieId = new AccountCreateTransaction()
-                .setKey(charliePublicKey)
+                .setKeyWithoutAlias(charliePublicKey)
                 .setInitialBalance(Hbar.from(5))
                 .execute(client)
                 .getReceipt(client)

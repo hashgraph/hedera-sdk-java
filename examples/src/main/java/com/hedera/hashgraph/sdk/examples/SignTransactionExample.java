@@ -86,7 +86,7 @@ class SignTransactionExample {
         System.out.println("Creating new account...");
         TransactionResponse createAccountTxResponse = new AccountCreateTransaction()
                 .setInitialBalance(Hbar.from(2))
-                .setKey(keylist)
+                .setKeyWithoutAlias(keylist)
                 .execute(client);
 
         TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);

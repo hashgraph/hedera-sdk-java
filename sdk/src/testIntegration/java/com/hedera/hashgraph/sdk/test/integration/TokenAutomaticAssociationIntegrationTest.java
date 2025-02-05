@@ -512,7 +512,7 @@ public class TokenAutomaticAssociationIntegrationTest {
             assertThatExceptionOfType(Exception.class)
                     .isThrownBy(() -> {
                         new AccountCreateTransaction()
-                                .setKey(accountKey)
+                                .setKeyWithoutAlias(accountKey)
                                 .setMaxAutomaticTokenAssociations(-2)
                                 .execute(testEnv.client);
                     })
@@ -521,7 +521,7 @@ public class TokenAutomaticAssociationIntegrationTest {
             assertThatExceptionOfType(Exception.class)
                     .isThrownBy(() -> {
                         new AccountCreateTransaction()
-                                .setKey(accountKey)
+                                .setKeyWithoutAlias(accountKey)
                                 .setMaxAutomaticTokenAssociations(-1000)
                                 .execute(testEnv.client);
                     })

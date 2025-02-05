@@ -48,7 +48,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
                     .setScheduledTransaction(transaction)
@@ -72,7 +73,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var response = new ScheduleCreateTransaction()
                     .setScheduledTransaction(transaction)
@@ -97,7 +99,8 @@ class ScheduleCreateIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).setInitialBalance(new Hbar(10));
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).setInitialBalance(new Hbar(10));
 
             var tx = transaction.schedule();
 
@@ -131,7 +134,7 @@ class ScheduleCreateIntegrationTest {
 
             // Creat the account with the `KeyList`
             TransactionResponse response = new AccountCreateTransaction()
-                    .setKey(keyList)
+                    .setKeyWithoutAlias(keyList)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client);
 
@@ -206,7 +209,7 @@ class ScheduleCreateIntegrationTest {
 
             var accountId = new AccountCreateTransaction()
                     .setReceiverSignatureRequired(true)
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .setInitialBalance(new Hbar(10))
                     .freezeWith(testEnv.client)
                     .sign(key)
@@ -273,7 +276,7 @@ class ScheduleCreateIntegrationTest {
             var key = PrivateKey.generateED25519();
             var accountId = new AccountCreateTransaction()
                     .setInitialBalance(new Hbar(10))
-                    .setKey(key)
+                    .setKeyWithoutAlias(key)
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
                     .accountId;
@@ -324,7 +327,7 @@ class ScheduleCreateIntegrationTest {
 
             var response = new AccountCreateTransaction()
                     .setInitialBalance(new Hbar(100))
-                    .setKey(keyList)
+                    .setKeyWithoutAlias(keyList)
                     .execute(testEnv.client);
 
             assertThat(response.getReceipt(testEnv.client).accountId).isNotNull();
@@ -384,7 +387,7 @@ class ScheduleCreateIntegrationTest {
             PrivateKey key = PrivateKey.generateED25519();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(key.getPublicKey())
+                    .setKeyWithoutAlias(key.getPublicKey())
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -437,7 +440,7 @@ class ScheduleCreateIntegrationTest {
             PrivateKey key = PrivateKey.generateED25519();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(key.getPublicKey())
+                    .setKeyWithoutAlias(key.getPublicKey())
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -467,7 +470,7 @@ class ScheduleCreateIntegrationTest {
             PrivateKey key = PrivateKey.generateED25519();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(key.getPublicKey())
+                    .setKeyWithoutAlias(key.getPublicKey())
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -498,7 +501,7 @@ class ScheduleCreateIntegrationTest {
             PrivateKey key = PrivateKey.generateED25519();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(key.getPublicKey())
+                    .setKeyWithoutAlias(key.getPublicKey())
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -561,7 +564,7 @@ class ScheduleCreateIntegrationTest {
             keyList.add(key3.getPublicKey());
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(keyList)
+                    .setKeyWithoutAlias(keyList)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -646,7 +649,7 @@ class ScheduleCreateIntegrationTest {
             keyList.add(key3.getPublicKey());
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(keyList)
+                    .setKeyWithoutAlias(keyList)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -722,7 +725,7 @@ class ScheduleCreateIntegrationTest {
             PrivateKey key1 = PrivateKey.generateED25519();
 
             var accountId = new AccountCreateTransaction()
-                    .setKey(key1)
+                    .setKeyWithoutAlias(key1)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)

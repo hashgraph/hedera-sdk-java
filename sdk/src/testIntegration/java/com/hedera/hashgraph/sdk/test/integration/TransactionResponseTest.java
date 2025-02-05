@@ -16,7 +16,8 @@ public class TransactionResponseTest {
 
             var key = PrivateKey.generateED25519();
 
-            var transaction = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var transaction =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             var record = transaction.getRecord(testEnv.client);
 

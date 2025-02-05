@@ -100,7 +100,7 @@ public final class EntityHelper {
     public static AccountId createAccount(IntegrationTestEnv testEnv, Key accountKey, int maxAutomaticTokenAssociations)
             throws PrecheckStatusException, TimeoutException, ReceiptStatusException {
         return new AccountCreateTransaction()
-                .setKey(accountKey)
+                .setKeyWithoutAlias(accountKey)
                 .setInitialBalance(new Hbar(10))
                 .setMaxAutomaticTokenAssociations(maxAutomaticTokenAssociations)
                 .execute(testEnv.client)

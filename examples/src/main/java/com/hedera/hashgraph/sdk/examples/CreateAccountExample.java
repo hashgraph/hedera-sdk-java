@@ -74,7 +74,7 @@ class CreateAccountExample {
         System.out.println("Creating new account...");
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
                 // The only required property here is `key`.
-                .setKey(publicKey)
+                .setKeyWithoutAlias(publicKey)
                 .setInitialBalance(Hbar.from(1))
                 .execute(client);
 

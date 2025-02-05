@@ -21,7 +21,7 @@ public class PrivateKeyTest {
         byte[] bytes = new AccountCreateTransaction()
                 .setNodeAccountIds(Collections.singletonList(AccountId.fromString("0.0.5005")))
                 .setTransactionId(TransactionId.withValidStart(AccountId.fromString("0.0.5006"), validStart))
-                .setKey(unusedPrivateKey)
+                .setKeyWithoutAlias(unusedPrivateKey)
                 .setInitialBalance(Hbar.fromTinybars(450))
                 .setProxyAccountId(AccountId.fromString("0.0.1001"))
                 .setReceiverSignatureRequired(true)

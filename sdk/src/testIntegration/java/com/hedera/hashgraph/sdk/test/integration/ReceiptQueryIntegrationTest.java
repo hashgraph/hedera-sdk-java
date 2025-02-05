@@ -21,7 +21,8 @@ public class ReceiptQueryIntegrationTest {
 
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)
@@ -35,7 +36,8 @@ public class ReceiptQueryIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)
@@ -54,7 +56,8 @@ public class ReceiptQueryIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)
@@ -74,7 +77,8 @@ public class ReceiptQueryIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)
@@ -96,7 +100,8 @@ public class ReceiptQueryIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)
@@ -123,7 +128,8 @@ public class ReceiptQueryIntegrationTest {
         try (var testEnv = new IntegrationTestEnv(1)) {
             var key = PrivateKey.generateED25519();
 
-            var response = new AccountCreateTransaction().setKey(key).execute(testEnv.client);
+            var response =
+                    new AccountCreateTransaction().setKeyWithoutAlias(key).execute(testEnv.client);
 
             var receipt = new TransactionReceiptQuery()
                     .setTransactionId(response.transactionId)

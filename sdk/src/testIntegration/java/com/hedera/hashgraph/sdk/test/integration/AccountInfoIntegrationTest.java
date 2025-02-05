@@ -109,13 +109,13 @@ class AccountInfoIntegrationTest {
             var newPublicKey = newKey.getPublicKey();
 
             Transaction<?> signedTx = new AccountCreateTransaction()
-                    .setKey(newPublicKey)
+                    .setKeyWithoutAlias(newPublicKey)
                     .setInitialBalance(Hbar.fromTinybars(1000))
                     .freezeWith(testEnv.client)
                     .signWithOperator(testEnv.client);
 
             Transaction<?> unsignedTx = new AccountCreateTransaction()
-                    .setKey(newPublicKey)
+                    .setKeyWithoutAlias(newPublicKey)
                     .setInitialBalance(Hbar.fromTinybars(1000))
                     .freezeWith(testEnv.client);
 

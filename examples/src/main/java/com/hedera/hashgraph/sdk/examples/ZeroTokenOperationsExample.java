@@ -76,7 +76,7 @@ class ZeroTokenOperationsExample {
          */
         System.out.println("Creating Alice account...");
         AccountCreateTransaction accountCreateTx = new AccountCreateTransaction()
-                .setKey(alicePublicKey)
+                .setKeyWithoutAlias(alicePublicKey)
                 .setInitialBalance(Hbar.from(1))
                 .freezeWith(client);
 

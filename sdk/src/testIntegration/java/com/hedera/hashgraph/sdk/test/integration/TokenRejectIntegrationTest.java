@@ -267,7 +267,7 @@ public class TokenRejectIntegrationTest {
 
             var treasuryAccountKey = PrivateKey.generateED25519();
             var treasuryAccountId = new AccountCreateTransaction()
-                    .setKey(treasuryAccountKey)
+                    .setKeyWithoutAlias(treasuryAccountKey)
                     .setInitialBalance(new Hbar(0))
                     .setReceiverSignatureRequired(true)
                     .setMaxAutomaticTokenAssociations(100)

@@ -135,7 +135,7 @@ class UpdateNftsMetadataExample {
          */
         System.out.println("Creating Alice's account...");
         var aliceAccountCreateTx = new AccountCreateTransaction()
-                .setKey(operatorKeyPublic)
+                .setKeyWithoutAlias(operatorKeyPublic)
                 // If the account does not have any automatic token association,
                 // slots open ONLY then associate the NFT to the account.
                 .setMaxAutomaticTokenAssociations(10)
@@ -243,7 +243,7 @@ class UpdateNftsMetadataExample {
          */
         System.out.println("Creating Bob's account...");
         var bobAccountCreateTx = new AccountCreateTransaction()
-                .setKey(operatorKeyPublic)
+                .setKeyWithoutAlias(operatorKeyPublic)
                 // If the account does not have any automatic token association,
                 // slots open ONLY then associate the NFT to the account.
                 .setMaxAutomaticTokenAssociations(10)

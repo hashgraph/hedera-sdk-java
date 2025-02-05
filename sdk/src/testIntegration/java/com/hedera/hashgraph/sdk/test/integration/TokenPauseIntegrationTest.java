@@ -26,7 +26,7 @@ public class TokenPauseIntegrationTest {
             var accountKey = PrivateKey.generateED25519();
             var testTokenAmount = 10;
             var accountId = new AccountCreateTransaction()
-                    .setKey(accountKey)
+                    .setKeyWithoutAlias(accountKey)
                     .setInitialBalance(new Hbar(2))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)

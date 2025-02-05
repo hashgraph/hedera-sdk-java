@@ -271,7 +271,7 @@ class TokenAirdropTransactionIntegrationTest {
             // create receiver with unlimited auto associations and receiverSig = true
             var receiverAccountKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverAccountKey)
+                    .setKeyWithoutAlias(receiverAccountKey)
                     .setInitialBalance(new Hbar(1))
                     .setReceiverSignatureRequired(true)
                     .setMaxAutomaticTokenAssociations(-1)
@@ -308,7 +308,7 @@ class TokenAirdropTransactionIntegrationTest {
             // create receiver with unlimited auto associations and receiverSig = true
             var receiverAccountKey = PrivateKey.generateED25519();
             var receiverAccountId = new AccountCreateTransaction()
-                    .setKey(receiverAccountKey)
+                    .setKeyWithoutAlias(receiverAccountKey)
                     .setInitialBalance(new Hbar(1))
                     .setReceiverSignatureRequired(true)
                     .setMaxAutomaticTokenAssociations(-1)

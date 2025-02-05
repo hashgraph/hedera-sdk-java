@@ -97,7 +97,7 @@ class ScheduleMultiSigTransactionExample {
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
                 .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
                 // The only required property here is key.
-                .setKey(keyList)
+                .setKeyWithoutAlias(keyList)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client);
 

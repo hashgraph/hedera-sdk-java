@@ -79,7 +79,7 @@ class TransferTokensExample {
         Hbar initialBalance = Hbar.from(1);
         TransactionResponse aliceAccountCreateTxResponse = new AccountCreateTransaction()
                 // The only required property here is key.
-                .setKey(alicePublicKey)
+                .setKeyWithoutAlias(alicePublicKey)
                 .setInitialBalance(initialBalance)
                 .execute(client);
 
@@ -91,7 +91,7 @@ class TransferTokensExample {
 
         TransactionResponse bobAccountCreateTxResponse = new AccountCreateTransaction()
                 // The only required property here is key.
-                .setKey(bobPublicKey)
+                .setKeyWithoutAlias(bobPublicKey)
                 .setInitialBalance(initialBalance)
                 .execute(client);
 

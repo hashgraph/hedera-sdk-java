@@ -22,7 +22,7 @@ public class AccountAllowanceIntegrationTest {
 
             var aliceKey = PrivateKey.generateED25519();
             var aliceId = new AccountCreateTransaction()
-                    .setKey(aliceKey)
+                    .setKeyWithoutAlias(aliceKey)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)
@@ -30,7 +30,7 @@ public class AccountAllowanceIntegrationTest {
 
             var bobKey = PrivateKey.generateED25519();
             var bobId = new AccountCreateTransaction()
-                    .setKey(bobKey)
+                    .setKeyWithoutAlias(bobKey)
                     .setInitialBalance(new Hbar(10))
                     .execute(testEnv.client)
                     .getReceipt(testEnv.client)

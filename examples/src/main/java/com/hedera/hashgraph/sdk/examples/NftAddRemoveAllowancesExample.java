@@ -123,7 +123,7 @@ class NftAddRemoveAllowancesExample {
         PrivateKey spenderPrivateKey = PrivateKey.generateECDSA();
         PublicKey spenderPublicKey = spenderPrivateKey.getPublicKey();
         AccountId spenderAccountId = new AccountCreateTransaction()
-                .setKey(spenderPublicKey)
+                .setKeyWithoutAlias(spenderPublicKey)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client)
                 .getReceipt(client)
@@ -134,7 +134,7 @@ class NftAddRemoveAllowancesExample {
         PrivateKey receiverPrivateKey = PrivateKey.generateECDSA();
         PublicKey receiverPublicKey = receiverPrivateKey.getPublicKey();
         AccountId receiverAccountId = new AccountCreateTransaction()
-                .setKey(receiverPublicKey)
+                .setKeyWithoutAlias(receiverPublicKey)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client)
                 .getReceipt(client)
@@ -295,7 +295,7 @@ class NftAddRemoveAllowancesExample {
         PrivateKey delegatingSpenderPrivateKey = PrivateKey.generateECDSA();
         PublicKey delegatingSpenderPublicKey2 = delegatingSpenderPrivateKey.getPublicKey();
         AccountId delegatingSpenderAccountId = new AccountCreateTransaction()
-                .setKey(delegatingSpenderPublicKey2)
+                .setKeyWithoutAlias(delegatingSpenderPublicKey2)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client)
                 .getReceipt(client)
@@ -306,7 +306,7 @@ class NftAddRemoveAllowancesExample {
         PrivateKey receiverPrivateKey2 = PrivateKey.generateECDSA();
         PublicKey receiverPublicKey2 = receiverPrivateKey2.getPublicKey();
         AccountId receiverAccountId2 = new AccountCreateTransaction()
-                .setKey(receiverPublicKey2)
+                .setKeyWithoutAlias(receiverPublicKey2)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client)
                 .getReceipt(client)
@@ -362,7 +362,7 @@ class NftAddRemoveAllowancesExample {
         PrivateKey spenderPrivateKey2 = PrivateKey.generateECDSA();
         PublicKey spenderPublicKey2 = spenderPrivateKey2.getPublicKey();
         AccountId spenderAccountId2 = new AccountCreateTransaction()
-                .setKey(spenderPublicKey2)
+                .setKeyWithoutAlias(spenderPublicKey2)
                 .setInitialBalance(Hbar.from(2))
                 .execute(client)
                 .getReceipt(client)
