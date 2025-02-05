@@ -440,7 +440,7 @@ class AccountCreateIntegrationTest {
     void createAccountUsingSetKeyWithoutAliasAccountShouldHaveKeyAsKeyAndNoAlias() throws Exception {
         try (var testEnv = new IntegrationTestEnv(1)) {
 
-            var key = PrivateKey.generateED25519();
+            var key = PrivateKey.generateECDSA();
 
             var accountId = new AccountCreateTransaction()
                     .setReceiverSignatureRequired(true)
