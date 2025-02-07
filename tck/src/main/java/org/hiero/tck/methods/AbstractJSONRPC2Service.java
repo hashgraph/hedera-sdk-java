@@ -3,10 +3,6 @@ package org.hiero.tck.methods;
 
 import com.hedera.hashgraph.sdk.PrecheckStatusException;
 import com.hedera.hashgraph.sdk.ReceiptStatusException;
-import org.hiero.tck.annotation.JSONRPC2Method;
-import org.hiero.tck.exception.InvalidJSONRPC2ParamsException;
-import org.hiero.tck.exception.InvalidJSONRPC2RequestException;
-import org.hiero.tck.methods.JSONRPC2Error.ErrorData;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Error;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Request;
 import com.thetransactioncompany.jsonrpc2.JSONRPC2Response;
@@ -18,6 +14,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import net.minidev.json.JSONObject;
+import org.hiero.tck.annotation.JSONRPC2Method;
+import org.hiero.tck.exception.InvalidJSONRPC2ParamsException;
+import org.hiero.tck.exception.InvalidJSONRPC2RequestException;
+import org.hiero.tck.methods.JSONRPC2Error.ErrorData;
 
 /**
  * Implements RequestHandler and overrides some of the Dispatcher logic,

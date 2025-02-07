@@ -6,6 +6,7 @@ import com.hedera.hashgraph.sdk.Key;
 import com.hedera.hashgraph.sdk.KeyList;
 import com.hedera.hashgraph.sdk.PrivateKey;
 import com.hedera.hashgraph.sdk.PublicKey;
+import org.bouncycastle.util.encoders.Hex;
 import org.hiero.tck.annotation.JSONRPC2Method;
 import org.hiero.tck.annotation.JSONRPC2Service;
 import org.hiero.tck.exception.InvalidJSONRPC2RequestException;
@@ -14,7 +15,6 @@ import org.hiero.tck.methods.sdk.param.GenerateKeyParams;
 import org.hiero.tck.methods.sdk.response.GenerateKeyResponse;
 import org.hiero.tck.util.KeyUtils;
 import org.hiero.tck.util.KeyUtils.KeyType;
-import org.bouncycastle.util.encoders.Hex;
 
 @JSONRPC2Service
 public class KeyService extends AbstractJSONRPC2Service {

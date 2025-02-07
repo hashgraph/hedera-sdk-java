@@ -2,7 +2,6 @@
 package org.hiero.tck.methods.sdk.param;
 
 import com.hedera.hashgraph.sdk.*;
-import org.hiero.tck.methods.JSONRPC2Param;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import net.minidev.json.JSONObject;
+import org.hiero.tck.methods.JSONRPC2Param;
 
 @Getter
 @AllArgsConstructor
