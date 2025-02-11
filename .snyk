@@ -5,3 +5,7 @@ ignore:
 patch: {}
 exclude:
   global:
+    - >-
+      sdk/src/main/java/com/hedera/hashgraph/sdk/PrivateKeyECDSA.java
+    - >-
+      sdk/src/main/java/com/hedera/hashgraph/sdk/PrivateKeyED25519.java
