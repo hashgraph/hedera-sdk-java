@@ -9,7 +9,7 @@ plugins {
 group = "org.hiero"
 
 val bouncycastle = "1.80"
-val grpc = "1.70.0"
+val grpc = "1.69.1"
 val protobuf = "4.29.3"
 val slf4j = "2.0.16"
 
@@ -27,7 +27,7 @@ dependencies.constraints {
     api("io.grpc:grpc-protobuf:$grpc") { because("io.grpc.protobuf") }
     api("io.grpc:grpc-stub:$grpc") { because("io.grpc.stub") }
     api("io.grpc:grpc-netty:$grpc")
-    api("io.grpc:grpc-netty-shaded:1.69.1") // this should be io.grpc:grpc-netty-shaded:$grpc however 1.70.0 isn't linking properly from MC
+    api("io.grpc:grpc-netty-shaded:$grpc")
     api("io.grpc:grpc-okhttp:$grpc")
     api("org.bouncycastle:bcpkix-jdk18on:$bouncycastle") { because("org.bouncycastle.pkix") }
     api("org.bouncycastle:bcprov-jdk18on:$bouncycastle") { because("org.bouncycastle.provider") }
