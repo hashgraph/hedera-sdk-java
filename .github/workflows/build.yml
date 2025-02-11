@@ -39,6 +39,8 @@ jobs:
 
       - name: Checkout Code
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: '0'
 
       - name: Setup NodeJS
         uses: actions/setup-node@1d0ff469b7ec7b3cb9d8673fde0c81c44821de2a # v4.2.0
@@ -102,7 +104,7 @@ jobs:
             ) &&
             !cancelled()
           }}
-        run: ${CG_EXEC} snyk code test --severity-threshold=high --json-file-output=snyk-code.json --org=hiero-client-sdks
+        run: ${CG_EXEC} snyk code test --severity-threshold=high --json-file-output=snyk-code.json --org=hiero-client-sdks --policy-path=.snyk
 
       - name: Publish Snyk Results
         if: >-
