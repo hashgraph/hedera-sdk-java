@@ -93,7 +93,10 @@ abstract class RunAllExample : DefaultTask() {
 
 listOf("mainnet", "previewnet", "testnet").forEachIndexed { index, network ->
     val taskName = "updateAddressbooks${network.replaceFirstChar(Char::titlecase)}"
-    val previousTaskName = if (index > 0) "updateAddressbooks${listOf("mainnet", "previewnet", "testnet")[index - 1].replaceFirstChar(Char::titlecase)}" else null
+    val previousTaskName =
+        if (index > 0)
+            "updateAddressbooks${listOf("mainnet", "previewnet", "testnet")[index - 1].replaceFirstChar(Char::titlecase)}"
+        else null
 
     tasks.register<JavaExec>(taskName) {
         workingDir = rootDir
@@ -127,5 +130,9 @@ listOf("mainnet", "previewnet", "testnet").forEachIndexed { index, network ->
 
 // Aggregate task to run all
 tasks.register("updateAddressbooks") {
-    dependsOn("updateAddressbooksMainnet", "updateAddressbooksPreviewnet", "updateAddressbooksTestnet")
+    dependsOn(
+        "updateAddressbooksMainnet",
+        "updateAddressbooksPreviewnet",
+        "updateAddressbooksTestnet"
+    )
 }
