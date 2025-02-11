@@ -104,9 +104,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
             @Nullable AccountId ownerAccountId, AccountId spenderAccountId, Hbar amount) {
         requireNotFrozen();
         Objects.requireNonNull(amount);
-        if (amount.compareTo(Hbar.ZERO) < 0) {
-            throw new IllegalArgumentException("amount passed to approveHbarAllowance must be positive");
-        }
         hbarAllowances.add(new HbarAllowance(ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
     }
@@ -156,9 +153,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     public AccountAllowanceApproveTransaction approveTokenAllowance(
             TokenId tokenId, @Nullable AccountId ownerAccountId, AccountId spenderAccountId, long amount) {
         requireNotFrozen();
-        if (amount < 0) {
-            throw new IllegalArgumentException("amount given to approveTokenAllowance must be positive");
-        }
         tokenAllowances.add(new TokenAllowance(
                 Objects.requireNonNull(tokenId), ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
