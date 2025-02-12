@@ -158,7 +158,6 @@ public class PrivateKeyECDSA extends PrivateKey {
 
         var ki = keyData.add(new BigInteger(1, il)).mod(ECDSA_SECP256K1_CURVE.getN());
 
-        // The hardcoded array data is required for compatibility with 24-word recovery phrases
         return new PrivateKeyECDSA(ki, new KeyParameter(ir));
     }
 
