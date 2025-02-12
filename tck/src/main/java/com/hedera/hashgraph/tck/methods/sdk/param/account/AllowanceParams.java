@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.tck.methods.sdk.param.account;
 
-import io.micrometer.common.util.StringUtils;
 import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Getter
 @AllArgsConstructor
@@ -46,7 +46,7 @@ public class AllowanceParams {
                 var tokenId = tokenMap.get("tokenId").toString();
 
                 parsedToken = Optional.of(new TokenAllowance(
-                        StringUtils.isEmpty(tokenId) ? null : tokenId,
+                        !StringUtils.hasLength(tokenId) ? null : tokenId,
                         parsedOwnerAccountId.orElseThrow(),
                         parsedSpenderAccountId.orElseThrow(),
                         amount));
@@ -63,7 +63,7 @@ public class AllowanceParams {
                 var approvedForAll = (Boolean) nftMap.get("approvedForAll");
                 var nftSerialNumbers = (List<String>) nftMap.get("serialNumbers");
                 parsedNft = Optional.of(new TokenNftAllowance(
-                        StringUtils.isEmpty(tokenId) ? null : tokenId,
+                        !StringUtils.hasLength(tokenId) ? null : tokenId,
                         parsedOwnerAccountId.orElseThrow(),
                         parsedSpenderAccountId.orElseThrow(),
                         delegateSpenderAccountId,
