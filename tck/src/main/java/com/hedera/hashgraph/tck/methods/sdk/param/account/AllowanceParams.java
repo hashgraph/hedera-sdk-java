@@ -5,7 +5,6 @@ import java.util.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
 
 @Getter
 @AllArgsConstructor
@@ -46,10 +45,7 @@ public class AllowanceParams {
                 var tokenId = tokenMap.get("tokenId").toString();
 
                 parsedToken = Optional.of(new TokenAllowance(
-                        !StringUtils.hasLength(tokenId) ? null : tokenId,
-                        parsedOwnerAccountId.orElseThrow(),
-                        parsedSpenderAccountId.orElseThrow(),
-                        amount));
+                        tokenId, parsedOwnerAccountId.orElseThrow(), parsedSpenderAccountId.orElseThrow(), amount));
             }
         }
 
@@ -63,7 +59,7 @@ public class AllowanceParams {
                 var approvedForAll = (Boolean) nftMap.get("approvedForAll");
                 var nftSerialNumbers = (List<String>) nftMap.get("serialNumbers");
                 parsedNft = Optional.of(new TokenNftAllowance(
-                        !StringUtils.hasLength(tokenId) ? null : tokenId,
+                        tokenId,
                         parsedOwnerAccountId.orElseThrow(),
                         parsedSpenderAccountId.orElseThrow(),
                         delegateSpenderAccountId,
