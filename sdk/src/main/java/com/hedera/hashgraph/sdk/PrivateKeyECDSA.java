@@ -163,13 +163,22 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     /**
      * Create an ECDSA key from seed.
+     * Implement the published algorithm as defined in BIP32 in order to derive the primary account key from the
+     * original (and never stored) master key.
+     * The original master key, which is a secure key generated according to the BIP39 specification, is input to this
+     * operation, and provides the base cryptographic seed material required to ensure the output is sufficiently random
+     * to maintain strong cryptographic assurances.
+     * The fromSeed() method must be provided with cryptographically secure material; otherwise, it will produce
+     * insecure output.
+     *
+     * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">BIP-32 Definition</a>
+     * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP-39 Definition</a>
      *
      * @param seed                      the seed bytes
      * @return                          the new key
      */
     public static PrivateKey fromSeed(byte[] seed) {
         var hmacSha512 = new HMac(new SHA512Digest());
-        // The hardcoded string 'Bitcoin seed' is required for compatibility with 24-word recovery phrases
         hmacSha512.init(new KeyParameter("Bitcoin seed".getBytes(StandardCharsets.UTF_8)));
         hmacSha512.update(seed, 0, seed.length);
 
@@ -181,12 +190,24 @@ public class PrivateKeyECDSA extends PrivateKey {
 
     /**
      * Create a derived key.
+     * The industry standard protocol for deriving an active ECDSA keypair from a BIP39 master key is described in
+     * BIP32. By using this deterministic mechanism to derive cryptographically secure keypairs from a single original
+     * secret, the user maintains secure access to their wallet, even if they lose access to a particular system or
+     * wallet local data store.
+     * The active keypair can always be re-derived from the original master key.
+     * The use of the fixed "key" values in this code is defined by this deterministic protocol, and this data is mixed,
+     * in a deterministic but cryptographically secure manner, with the original master key and/or other derived keys
+     * "higher" in the tree to produce a cryptographically secure derived key.
+     * This "Key Derivation Function" makes use of secure hash algorithm and a secure hash based message authentication
+     * code to produce an initialization vector, and then produces the actual key from a portion of that vector.
+     *
+     * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki">BIP-32 Definition</a>
+     * @see <a href="https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki">BIP-39 Definition</a>
      *
      * @param deriveData                data to derive the key
      * @return                          the new key
      */
     static PrivateKeyECDSA derivableKeyECDSA(byte[] deriveData) {
-        // The hardcoded array data is required for compatibility with 24-word recovery phrases
         var keyData = java.util.Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
