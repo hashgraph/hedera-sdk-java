@@ -4,7 +4,7 @@ version: v1.25.0
 ignore:
   SNYK-JAVA-NETMINIDEV-8689573:
     - '*':
-        reason: No gRPC version with a fix is available
+        reason: No net-minidev version with a fix is available
         expires: 2025-06-30T00:00:00.000Z
         created: 2025-02-12T14:49:55Z
 patch: {}
