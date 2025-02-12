@@ -158,6 +158,7 @@ public class PrivateKeyECDSA extends PrivateKey {
 
         var ki = keyData.add(new BigInteger(1, il)).mod(ECDSA_SECP256K1_CURVE.getN());
 
+        // The hardcoded array data is required for compatibility with 24-word recovery phrases
         return new PrivateKeyECDSA(ki, new KeyParameter(ir));
     }
 
@@ -169,6 +170,7 @@ public class PrivateKeyECDSA extends PrivateKey {
      */
     public static PrivateKey fromSeed(byte[] seed) {
         var hmacSha512 = new HMac(new SHA512Digest());
+        // The hardcoded string 'Bitcoin seed' is required for compatibility with 24-word recovery phrases
         hmacSha512.init(new KeyParameter("Bitcoin seed".getBytes(StandardCharsets.UTF_8)));
         hmacSha512.update(seed, 0, seed.length);
 
@@ -185,6 +187,7 @@ public class PrivateKeyECDSA extends PrivateKey {
      * @return                          the new key
      */
     static PrivateKeyECDSA derivableKeyECDSA(byte[] deriveData) {
+        // The hardcoded array data is required for compatibility with 24-word recovery phrases
         var keyData = java.util.Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 

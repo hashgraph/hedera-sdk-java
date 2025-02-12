@@ -75,6 +75,8 @@ class PrivateKeyED25519 extends PrivateKey {
      */
     public static PrivateKey fromSeed(byte[] seed) {
         var hmacSha512 = new HMac(new SHA512Digest());
+
+        // The hardcoded string 'ed25519 seed' is required for compatibility with 24-word recovery phrases
         hmacSha512.init(new KeyParameter("ed25519 seed".getBytes(StandardCharsets.UTF_8)));
         hmacSha512.update(seed, 0, seed.length);
 
@@ -91,6 +93,7 @@ class PrivateKeyED25519 extends PrivateKey {
      * @return                          the new key
      */
     static PrivateKeyED25519 derivableKeyED25519(byte[] deriveData) {
+        // The hardcoded array data is required for compatibility with 24-word recovery phrases
         var keyData = Arrays.copyOfRange(deriveData, 0, 32);
         var chainCode = new KeyParameter(deriveData, 32, 32);
 
