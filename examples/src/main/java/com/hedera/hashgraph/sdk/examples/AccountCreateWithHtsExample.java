@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,12 +28,14 @@ class AccountCreateWithHtsExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -65,7 +48,7 @@ class AccountCreateWithHtsExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -121,21 +104,21 @@ class AccountCreateWithHtsExample {
         System.out.println("Creating NFT using the Hedera Token Service...");
 
         TokenCreateTransaction nftCreateTx = new TokenCreateTransaction()
-            .setTokenName("HIP-542 Example Collection")
-            .setTokenSymbol("HIP-542")
-            .setTokenName("HIP-542 NFT")
-            .setTokenSymbol("HIP542NFT")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setDecimals(0)
-            .setInitialSupply(0)
-            .setMaxSupply(CIDs.length)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(operatorPublicKey)
-            .setFreezeKey(freezePublicKey)
-            .setWipeKey(wipePublicKey)
-            .setSupplyKey(supplyPublicKey)
-            .freezeWith(client);
+                .setTokenName("HIP-542 Example Collection")
+                .setTokenSymbol("HIP-542")
+                .setTokenName("HIP-542 NFT")
+                .setTokenSymbol("HIP542NFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setDecimals(0)
+                .setInitialSupply(0)
+                .setMaxSupply(CIDs.length)
+                .setTreasuryAccountId(OPERATOR_ID)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setAdminKey(operatorPublicKey)
+                .setFreezeKey(freezePublicKey)
+                .setWipeKey(wipePublicKey)
+                .setSupplyKey(supplyPublicKey)
+                .freezeWith(client);
 
         // Sign the transaction with the operator key.
         TokenCreateTransaction nftCreateTxSigned = nftCreateTx.sign(OPERATOR_KEY);
@@ -160,16 +143,17 @@ class AccountCreateWithHtsExample {
             byte[] nftMetadata = CIDs[i].getBytes();
 
             TokenMintTransaction nftMintTx = new TokenMintTransaction()
-                .setTokenId(nftTokenId)
-                .setMetadata(List.of(nftMetadata))
-                .freezeWith(client);
+                    .setTokenId(nftTokenId)
+                    .setMetadata(List.of(nftMetadata))
+                    .freezeWith(client);
 
             TokenMintTransaction nftMintTxSigned = nftMintTx.sign(supplyPrivateKey);
             TransactionResponse nftMintTxResponse = nftMintTxSigned.execute(client);
 
             nftMintTxReceipts[i] = nftMintTxResponse.getReceipt(client);
 
-            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftMintTxReceipts[i].serials.get(0));
+            System.out.println(
+                    "Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftMintTxReceipts[i].serials.get(0));
         }
 
         long exampleNftId = nftMintTxReceipts[0].serials.get(0);
@@ -197,8 +181,8 @@ class AccountCreateWithHtsExample {
         System.out.println("Transferring NFT to Alice's account...");
 
         TransferTransaction nftTransferTx = new TransferTransaction()
-            .addNftTransfer(nftTokenId.nft(exampleNftId), OPERATOR_ID, aliceAliasAccountId)
-            .freezeWith(client);
+                .addNftTransfer(nftTokenId.nft(exampleNftId), OPERATOR_ID, aliceAliasAccountId)
+                .freezeWith(client);
 
         // Sign the transaction with the operator key.
         TransferTransaction nftTransferTxSigned = nftTransferTx.sign(OPERATOR_KEY);
@@ -213,9 +197,8 @@ class AccountCreateWithHtsExample {
          * Step 6:
          * Get the new account ID from the child record.
          */
-        List<TokenNftInfo> nftsInfo = new TokenNftInfoQuery()
-            .setNftId(nftTokenId.nft(exampleNftId))
-            .execute(client);
+        List<TokenNftInfo> nftsInfo =
+                new TokenNftInfoQuery().setNftId(nftTokenId.nft(exampleNftId)).execute(client);
 
         String nftOwnerAccountId_FromChildRecord = nftsInfo.get(0).accountId.toString();
         System.out.println("Current owner account ID: " + nftOwnerAccountId_FromChildRecord);
@@ -225,9 +208,10 @@ class AccountCreateWithHtsExample {
          * Show the normal account ID of account which owns the NFT.
          */
         String nftOwnerAccountId_FromQuery = new AccountInfoQuery()
-            .setAccountId(aliceAliasAccountId)
-            .execute(client)
-            .accountId.toString();
+                .setAccountId(aliceAliasAccountId)
+                .execute(client)
+                .accountId
+                .toString();
 
         System.out.println("The \"normal\" account ID of the given alias: " + nftOwnerAccountId_FromQuery);
 
@@ -250,16 +234,16 @@ class AccountCreateWithHtsExample {
         System.out.println("Creating Fungible Token using the Hedera Token Service...");
 
         TokenCreateTransaction ftCreateTx = new TokenCreateTransaction()
-            .setTokenName("HIP-542 Fungible Token")
-            .setTokenSymbol("HIP542FT")
-            .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
-            .setDecimals(2)
-            .setTokenType(TokenType.FUNGIBLE_COMMON)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setAutoRenewAccountId(OPERATOR_ID)
-            .setAdminKey(operatorPublicKey)
-            .setWipeKey(wipePrivateKey)
-            .freezeWith(client);
+                .setTokenName("HIP-542 Fungible Token")
+                .setTokenSymbol("HIP542FT")
+                .setInitialSupply(10_000) // Total supply = 10000 / 10 ^ 2
+                .setDecimals(2)
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setTreasuryAccountId(OPERATOR_ID)
+                .setAutoRenewAccountId(OPERATOR_ID)
+                .setAdminKey(operatorPublicKey)
+                .setWipeKey(wipePrivateKey)
+                .freezeWith(client);
 
         // Sign the transaction with the operator key.
         TokenCreateTransaction ftCreateTxSigned = ftCreateTx.sign(OPERATOR_KEY);
@@ -295,9 +279,9 @@ class AccountCreateWithHtsExample {
          */
         System.out.println("Transferring Fungible Token the Bob's account...");
         TransferTransaction tokenTransferTx = new TransferTransaction()
-            .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10)
-            .addTokenTransfer(fungibleTokenId, bobAliasAccountId, 10)
-            .freezeWith(client);
+                .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10)
+                .addTokenTransfer(fungibleTokenId, bobAliasAccountId, 10)
+                .freezeWith(client);
 
         // Sign the transaction with the operator key.
         TransferTransaction tokenTransferTxSign = tokenTransferTx.sign(OPERATOR_KEY);
@@ -313,10 +297,10 @@ class AccountCreateWithHtsExample {
          * Get the new account ID from the child record.
          */
         String bobAccountInfo = new AccountInfoQuery()
-            .setAccountId(bobAliasAccountId)
-            .execute(client)
-            .accountId
-            .toString();
+                .setAccountId(bobAliasAccountId)
+                .execute(client)
+                .accountId
+                .toString();
 
         System.out.println("The \"normal\" account ID of the given alias: " + bobAccountInfo);
 
@@ -324,9 +308,8 @@ class AccountCreateWithHtsExample {
          * Step 13:
          * Show the normal account ID of account which owns the NFT.
          */
-        AccountBalance bobAccountBalances = new AccountBalanceQuery()
-            .setAccountId(bobAliasAccountId)
-            .execute(client);
+        AccountBalance bobAccountBalances =
+                new AccountBalanceQuery().setAccountId(bobAliasAccountId).execute(client);
 
         /*
          * Step 14:
@@ -346,59 +329,57 @@ class AccountCreateWithHtsExample {
         AccountId nftOwnerAccountId = AccountId.fromString(nftOwnerAccountId_FromQuery);
 
         new TokenWipeTransaction()
-            .setTokenId(nftTokenId)
-            .addSerial(exampleNftId)
-            .setAccountId(nftOwnerAccountId)
-            .freezeWith(client)
-            .sign(wipePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(nftTokenId)
+                .addSerial(exampleNftId)
+                .setAccountId(nftOwnerAccountId)
+                .freezeWith(client)
+                .sign(wipePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         AccountId bobAccountId = AccountId.fromString(bobAccountInfo);
 
-        Map<TokenId, Long> bobsTokens = new AccountBalanceQuery()
-            .setAccountId(bobAccountId)
-            .execute(client)
-            .tokens;
+        Map<TokenId, Long> bobsTokens =
+                new AccountBalanceQuery().setAccountId(bobAccountId).execute(client).tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(fungibleTokenId)
-            .setAmount(bobsTokens.get(fungibleTokenId))
-            .setAccountId(bobAccountId)
-            .freezeWith(client)
-            .sign(wipePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(fungibleTokenId)
+                .setAmount(bobsTokens.get(fungibleTokenId))
+                .setAccountId(bobAccountId)
+                .freezeWith(client)
+                .sign(wipePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(nftOwnerAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(nftOwnerAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(bobAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(bobAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new TokenDeleteTransaction()
-            .setTokenId(nftTokenId)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(nftTokenId)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client)
+                .getReceipt(client);
 
         new TokenDeleteTransaction()
-            .setTokenId(fungibleTokenId)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(fungibleTokenId)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

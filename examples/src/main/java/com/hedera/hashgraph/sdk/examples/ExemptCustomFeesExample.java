@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,12 +23,14 @@ class ExemptCustomFeesExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -60,7 +43,7 @@ class ExemptCustomFeesExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -88,37 +71,37 @@ class ExemptCustomFeesExample {
         PrivateKey alicePrivateKey = PrivateKey.generateED25519();
         PublicKey alicePublicKey = alicePrivateKey.getPublicKey();
         AccountId aliceAccountId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
-            .setKey(alicePublicKey)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setInitialBalance(initialBalance)
+                .setKeyWithoutAlias(alicePublicKey)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(aliceAccountId);
 
         PrivateKey bobPrivateKey = PrivateKey.generateED25519();
         PublicKey bobPublicKey = bobPrivateKey.getPublicKey();
         AccountId bobAccountId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
-            .setKey(bobPublicKey)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setInitialBalance(initialBalance)
+                .setKeyWithoutAlias(bobPublicKey)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(bobAccountId);
 
         PrivateKey charilePrivateKey = PrivateKey.generateED25519();
         PublicKey charilePublicKey = charilePrivateKey.getPublicKey();
         AccountId charlieAccountId = new AccountCreateTransaction()
-            .setInitialBalance(initialBalance)
-            .setKey(charilePublicKey)
-            .freezeWith(client)
-            .sign(charilePrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setInitialBalance(initialBalance)
+                .setKeyWithoutAlias(charilePublicKey)
+                .freezeWith(client)
+                .sign(charilePrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(charlieAccountId);
 
         /*
@@ -129,43 +112,43 @@ class ExemptCustomFeesExample {
          * - charlieFee sends 3/100 of the transferred value to Charlie's account.
          */
         CustomFractionalFee aliceFee = new CustomFractionalFee()
-            .setFeeCollectorAccountId(aliceAccountId)
-            .setNumerator(1)
-            .setDenominator(100)
-            .setAllCollectorsAreExempt(true);
+                .setFeeCollectorAccountId(aliceAccountId)
+                .setNumerator(1)
+                .setDenominator(100)
+                .setAllCollectorsAreExempt(true);
 
         CustomFractionalFee bobFee = new CustomFractionalFee()
-            .setFeeCollectorAccountId(bobAccountId)
-            .setNumerator(2)
-            .setDenominator(100)
-            .setAllCollectorsAreExempt(true);
+                .setFeeCollectorAccountId(bobAccountId)
+                .setNumerator(2)
+                .setDenominator(100)
+                .setAllCollectorsAreExempt(true);
 
         CustomFractionalFee charlieFee = new CustomFractionalFee()
-            .setFeeCollectorAccountId(charlieAccountId)
-            .setNumerator(3)
-            .setDenominator(100)
-            .setAllCollectorsAreExempt(true);
+                .setFeeCollectorAccountId(charlieAccountId)
+                .setNumerator(3)
+                .setDenominator(100)
+                .setAllCollectorsAreExempt(true);
 
         System.out.println("Creating new Fungible Token using the Hedera Token Service...");
         TokenId fungibleTokenId = new TokenCreateTransaction()
-            .setTokenName("HIP-573 Fungible Token")
-            .setTokenSymbol("HIP573FT")
-            .setTokenType(TokenType.FUNGIBLE_COMMON)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setAutoRenewAccountId(OPERATOR_ID)
-            .setAdminKey(operatorPublicKey)
-            .setFreezeKey(operatorPublicKey)
-            .setWipeKey(operatorPublicKey)
-            .setInitialSupply(100_000_000)
-            .setDecimals(2)
-            .setCustomFees(List.of(aliceFee, bobFee, charlieFee))
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .sign(bobPrivateKey)
-            .sign(charilePrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .tokenId;
+                .setTokenName("HIP-573 Fungible Token")
+                .setTokenSymbol("HIP573FT")
+                .setTokenType(TokenType.FUNGIBLE_COMMON)
+                .setTreasuryAccountId(OPERATOR_ID)
+                .setAutoRenewAccountId(OPERATOR_ID)
+                .setAdminKey(operatorPublicKey)
+                .setFreezeKey(operatorPublicKey)
+                .setWipeKey(operatorPublicKey)
+                .setInitialSupply(100_000_000)
+                .setDecimals(2)
+                .setCustomFees(List.of(aliceFee, bobFee, charlieFee))
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .sign(bobPrivateKey)
+                .sign(charilePrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .tokenId;
         Objects.requireNonNull(fungibleTokenId);
         System.out.println("Created new fungible token with ID: " + fungibleTokenId);
 
@@ -177,27 +160,25 @@ class ExemptCustomFeesExample {
          */
         System.out.println("Transferring 10_000 units of the Fungible Token from the operator's to Bob's account...");
         new TransferTransaction()
-            .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10_000)
-            .addTokenTransfer(fungibleTokenId, bobAccountId, 10_000)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client);
+                .addTokenTransfer(fungibleTokenId, OPERATOR_ID, -10_000)
+                .addTokenTransfer(fungibleTokenId, bobAccountId, 10_000)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client);
 
         System.out.println("Transferring 10_000 units of the Fungible Token from Bob's to Alice's account...");
         TransactionResponse transferTxResponse = new TransferTransaction()
-            .addTokenTransfer(fungibleTokenId, bobAccountId, -10_000)
-            .addTokenTransfer(fungibleTokenId, aliceAccountId, 10_000)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client);
+                .addTokenTransfer(fungibleTokenId, bobAccountId, -10_000)
+                .addTokenTransfer(fungibleTokenId, aliceAccountId, 10_000)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client);
 
         /*
          * Step 4:
          * Get the transaction fee for that transfer transaction.
          */
-        Hbar transactionFee = transferTxResponse
-            .getRecord(client)
-            .transactionFee;
+        Hbar transactionFee = transferTxResponse.getRecord(client).transactionFee;
 
         System.out.println("Transaction fee for the transfer above: " + transactionFee);
 
@@ -207,70 +188,69 @@ class ExemptCustomFeesExample {
          * of the token that was created was not charged a custom fee in the transfer.
          */
         Long aliceAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(aliceAccountId)
-            .execute(client)
-            .tokens.get(fungibleTokenId);
+                .setAccountId(aliceAccountId)
+                .execute(client)
+                .tokens
+                .get(fungibleTokenId);
 
         Long bobAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(bobAccountId)
-            .execute(client)
-            .tokens.get(fungibleTokenId);
+                .setAccountId(bobAccountId)
+                .execute(client)
+                .tokens
+                .get(fungibleTokenId);
 
         Long charlieAccountBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(charlieAccountId)
-            .execute(client)
-            .tokens.get(fungibleTokenId);
+                .setAccountId(charlieAccountId)
+                .execute(client)
+                .tokens
+                .get(fungibleTokenId);
 
         System.out.println("Alice's balance after transferring the fungible token: " + aliceAccountBalanceAfter);
         System.out.println("Bob's account balance after transferring the fungible token: " + bobAccountBalanceAfter);
-        System.out.println("Charlie's account balance after transferring the fungible token: " + charlieAccountBalanceAfter);
+        System.out.println(
+                "Charlie's account balance after transferring the fungible token: " + charlieAccountBalanceAfter);
 
         /*
          * Clean up:
          * Delete created accounts and token.
          */
-        Map<TokenId, Long> alicesTokens = new AccountBalanceQuery()
-            .setAccountId(aliceAccountId)
-            .execute(client)
-            .tokens;
+        Map<TokenId, Long> alicesTokens =
+                new AccountBalanceQuery().setAccountId(aliceAccountId).execute(client).tokens;
 
         new TokenWipeTransaction()
-            .setTokenId(fungibleTokenId)
-            .setAmount(alicesTokens.get(fungibleTokenId))
-            .setAccountId(aliceAccountId)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(fungibleTokenId)
+                .setAmount(alicesTokens.get(fungibleTokenId))
+                .setAccountId(aliceAccountId)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(aliceAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(aliceAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(bobAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(bobAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(charlieAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(charilePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(charlieAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(charilePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
-        new TokenDeleteTransaction()
-            .setTokenId(fungibleTokenId)
-            .execute(client)
-            .getReceipt(client);
+        new TokenDeleteTransaction().setTokenId(fungibleTokenId).execute(client).getReceipt(client);
 
         client.close();
 

@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Objects;
@@ -42,12 +23,14 @@ class MultiSigOfflineExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -60,7 +43,7 @@ class MultiSigOfflineExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -107,9 +90,9 @@ class MultiSigOfflineExample {
 
         System.out.println("Creating a new account...");
         TransactionResponse createAccountTxResponse = new AccountCreateTransaction()
-            .setInitialBalance(Hbar.from(2))
-            .setKey(keylist)
-            .execute(client);
+                .setInitialBalance(Hbar.from(2))
+                .setKeyWithoutAlias(keylist)
+                .execute(client);
 
         TransactionReceipt createAccountTxReceipt = createAccountTxResponse.getReceipt(client);
         var newAccountId = createAccountTxReceipt.accountId;
@@ -122,10 +105,12 @@ class MultiSigOfflineExample {
          */
         System.out.println("Transferring 1 Hbar from new account to the account with ID `0.0.3`...");
         TransferTransaction transferTx = new TransferTransaction()
-            .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            .addHbarTransfer(Objects.requireNonNull(createAccountTxReceipt.accountId), Hbar.from(1).negated())
-            .addHbarTransfer(new AccountId(3), Hbar.from(1))
-            .freezeWith(client);
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                .addHbarTransfer(
+                        Objects.requireNonNull(createAccountTxReceipt.accountId),
+                        Hbar.from(1).negated())
+                .addHbarTransfer(new AccountId(3), Hbar.from(1))
+                .freezeWith(client);
 
         /*
          * Step 3:
@@ -167,13 +152,13 @@ class MultiSigOfflineExample {
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setAccountId(newAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(newAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

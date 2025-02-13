@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-
-module org.hiero.sdk {
+module com.hedera.hashgraph.sdk {
     requires transitive com.google.protobuf;
     requires com.esaulpaugh.headlong;
     requires com.google.common;
@@ -15,10 +14,9 @@ module org.hiero.sdk {
     requires org.slf4j;
     requires static transitive java.annotation;
 
-    exports org.hiero.sdk;
-    exports org.hiero.sdk.proto;
+    exports com.hedera.hashgraph.sdk;
+    exports com.hedera.hashgraph.sdk.proto;
+    exports com.hedera.hashgraph.sdk.logger;
 
-    opens org.hiero.sdk;
-
-    exports org.hiero.sdk.logger;
+    opens com.hedera.hashgraph.sdk;
 }

@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AddressBookQuery;
@@ -26,7 +8,6 @@ import com.hedera.hashgraph.sdk.NodeAddressBook;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.io.ByteArrayInputStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -53,7 +34,7 @@ class GetAddressBookExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -75,9 +56,8 @@ class GetAddressBookExample {
          */
         System.out.println("Getting address book for " + HEDERA_NETWORK + "...");
 
-        NodeAddressBook addressBook = new AddressBookQuery()
-            .setFileId(FileId.ADDRESS_BOOK)
-            .execute(client);
+        NodeAddressBook addressBook =
+                new AddressBookQuery().setFileId(FileId.ADDRESS_BOOK).execute(client);
 
         Objects.requireNonNull(addressBook);
         System.out.println("Address book for " + HEDERA_NETWORK + ": " + addressBook);
@@ -88,8 +68,9 @@ class GetAddressBookExample {
         Files.deleteIfExists(FileSystems.getDefault().getPath("address-book.proto.bin"));
         client.close();
 
-        Files.copy(new ByteArrayInputStream(addressBook.toBytes().toByteArray()),
-            FileSystems.getDefault().getPath("address-book.proto.bin"));
+        Files.copy(
+                new ByteArrayInputStream(addressBook.toBytes().toByteArray()),
+                FileSystems.getDefault().getPath("address-book.proto.bin"));
 
         System.out.println("Get Address Book Example Complete!");
     }

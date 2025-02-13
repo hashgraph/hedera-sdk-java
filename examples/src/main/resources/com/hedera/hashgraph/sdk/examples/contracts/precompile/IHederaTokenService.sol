@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
 
 // This file was copied from github.com/hashgraph/hedera-smart-contracts on Aug 7 2024
 
-import "../HederaResponseCodes.sol";
+import "./HederaResponseCodes.sol";
 import "./IHederaTokenService.sol";
 
 abstract contract HederaTokenService {

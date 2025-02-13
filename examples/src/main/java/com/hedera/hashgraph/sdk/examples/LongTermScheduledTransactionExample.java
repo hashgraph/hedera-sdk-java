@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
@@ -50,14 +32,14 @@ class LongTermScheduledTransactionExample {
     /**
      * Operator's account ID. Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file. Network can be: localhost, testnet,
@@ -70,7 +52,7 @@ class LongTermScheduledTransactionExample {
      * ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL, for example via VM
-     * options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -95,8 +77,9 @@ class LongTermScheduledTransactionExample {
         var publicKey1 = privateKey1.getPublicKey();
         var privateKey2 = PrivateKey.generateED25519();
 
-        System.out.println("Creating a Key List..." +
-            "(with threshold, it will require 2 of 2 keys we generated to sign on anything modifying this account).");
+        System.out.println(
+                "Creating a Key List..."
+                        + "(with threshold, it will require 2 of 2 keys we generated to sign on anything modifying this account).");
         KeyList thresholdKey = KeyList.withThreshold(2);
         thresholdKey.add(privateKey1);
         thresholdKey.add(privateKey2);
@@ -108,10 +91,11 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Creating new account...(with the above Key List as an account key).");
         var alice = new AccountCreateTransaction()
-            .setKey(thresholdKey)
-            .setInitialBalance(new Hbar(2))
-            .execute(client)
-            .getReceipt(client).accountId;
+                .setKeyWithoutAlias(thresholdKey)
+                .setInitialBalance(new Hbar(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         System.out.println("Created new account with ID: " + alice);
 
         /*
@@ -122,17 +106,16 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Creating new scheduled transaction with 1 day expiry");
         TransferTransaction transfer = new TransferTransaction()
-            .addHbarTransfer(alice, new Hbar(1).negated())
-            .addHbarTransfer(client.getOperatorAccountId(), new Hbar(1));
+                .addHbarTransfer(alice, new Hbar(1).negated())
+                .addHbarTransfer(client.getOperatorAccountId(), new Hbar(1));
 
         int oneDayInSecs = 86400;
-        var scheduleId = transfer
-            .schedule()
-            .setWaitForExpiry(false)
-            .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
-            .execute(client)
-            .getReceipt(client)
-            .scheduleId;
+        var scheduleId = transfer.schedule()
+                .setWaitForExpiry(false)
+                .setExpirationTime(Instant.now().plusSeconds(oneDayInSecs))
+                .execute(client)
+                .getReceipt(client)
+                .scheduleId;
 
         /*
          * Step 4:
@@ -140,42 +123,34 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Signing the new scheduled transaction with 1 key");
         new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .execute(client)
-            .getReceipt(client);
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .execute(client)
+                .getReceipt(client);
 
-        ScheduleInfo info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(client);
+        ScheduleInfo info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(client);
         System.out.println("Scheduled transaction is not yet executed. Executed at: " + info.executedAt);
 
         /*
          * Step 5:
          * Sign the transaction with the other key and verify the transaction executes successfully
          */
-        var accountBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
+        var accountBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
         System.out.println("Alice's account balance before schedule transfer: " + accountBalance.hbars);
 
         System.out.println("Signing the new scheduled transaction with the 2nd key");
         new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(privateKey2)
+                .execute(client)
+                .getReceipt(client);
 
-        accountBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
+        accountBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
         System.out.println("Alice's account balance after schedule transfer: " + accountBalance.hbars);
 
-        info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(client);
+        info = new ScheduleInfoQuery().setScheduleId(scheduleId).execute(client);
         System.out.println("Scheduled transaction is executed. Executed at: " + info.executedAt);
 
         /*
@@ -185,16 +160,15 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Creating new scheduled transaction with 10 seconds expiry");
         transfer = new TransferTransaction()
-            .addHbarTransfer(alice, new Hbar(1).negated())
-            .addHbarTransfer(client.getOperatorAccountId(), new Hbar(1));
+                .addHbarTransfer(alice, new Hbar(1).negated())
+                .addHbarTransfer(client.getOperatorAccountId(), new Hbar(1));
 
-        var scheduleId2 = transfer
-            .schedule()
-            .setWaitForExpiry(true)
-            .setExpirationTime(Instant.now().plusSeconds(10))
-            .execute(client)
-            .getReceipt(client)
-            .scheduleId;
+        var scheduleId2 = transfer.schedule()
+                .setWaitForExpiry(true)
+                .setExpirationTime(Instant.now().plusSeconds(10))
+                .execute(client)
+                .getReceipt(client)
+                .scheduleId;
         long startTime = System.currentTimeMillis();
         long elapsedTime = 0;
 
@@ -204,15 +178,13 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Signing the new scheduled transaction with 1 key");
         new ScheduleSignTransaction()
-            .setScheduleId(scheduleId2)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .execute(client)
-            .getReceipt(client);
+                .setScheduleId(scheduleId2)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .execute(client)
+                .getReceipt(client);
 
-        info = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId2)
-            .execute(client);
+        info = new ScheduleInfoQuery().setScheduleId(scheduleId2).execute(client);
         System.out.println("Scheduled transaction is not yet executed. Executed at: " + info.executedAt);
 
         /*
@@ -222,21 +194,19 @@ class LongTermScheduledTransactionExample {
          */
         System.out.println("Updating Alice's key to be the 1st key");
         new AccountUpdateTransaction()
-            .setAccountId(alice)
-            .setKey(publicKey1)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(alice)
+                .setKey(publicKey1)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .sign(privateKey2)
+                .execute(client)
+                .getReceipt(client);
 
         /*
          * Step 9:
          * Verify that the transfer successfully executes roughly at the time of its expiration.
          */
-        accountBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
+        accountBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
 
         System.out.println("Alice's account balance before schedule transfer: " + accountBalance.hbars);
         while (elapsedTime < 10 * 1000) {
@@ -244,9 +214,7 @@ class LongTermScheduledTransactionExample {
             System.out.printf("Elapsed time: %.1f seconds\r", elapsedTime / 1000.0);
             Thread.sleep(100); // Pause briefly to reduce CPU usage
         }
-        accountBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
+        accountBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
         System.out.println("Alice's account balance after schedule transfer: " + accountBalance.hbars);
 
         System.out.println("Long Term Scheduled Transaction Example Complete!");

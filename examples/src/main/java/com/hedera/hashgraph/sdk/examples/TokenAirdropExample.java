@@ -1,22 +1,4 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountBalanceQuery;
@@ -50,14 +32,14 @@ public class TokenAirdropExample {
     /**
      * Operator's account ID. Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file. Network can be: localhost, testnet,
@@ -70,7 +52,7 @@ public class TokenAirdropExample {
      * ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL, for example via VM
-     * options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -93,86 +75,85 @@ public class TokenAirdropExample {
          */
         var privateKey1 = PrivateKey.generateECDSA();
         var alice = new AccountCreateTransaction()
-            .setKey(privateKey1)
-            .setInitialBalance(new Hbar(10))
-            .setMaxAutomaticTokenAssociations(-1)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(privateKey1)
+                .setInitialBalance(new Hbar(10))
+                .setMaxAutomaticTokenAssociations(-1)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         var privateKey2 = PrivateKey.generateECDSA();
         var bob = new AccountCreateTransaction()
-            .setKey(privateKey2)
-            .setMaxAutomaticTokenAssociations(1)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(privateKey2)
+                .setMaxAutomaticTokenAssociations(1)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         var privateKey3 = PrivateKey.generateECDSA();
         var carol = new AccountCreateTransaction()
-            .setKey(privateKey3)
-            .setMaxAutomaticTokenAssociations(0)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(privateKey3)
+                .setMaxAutomaticTokenAssociations(0)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         var treasuryKey = PrivateKey.generateECDSA();
         var treasuryAccount = new AccountCreateTransaction()
-            .setKey(treasuryKey)
-            .setInitialBalance(new Hbar(10))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(treasuryKey)
+                .setInitialBalance(new Hbar(10))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
 
         /*
          * Step 2:
          * Create FT and NFT and mint
          */
         var tokenID = new TokenCreateTransaction()
-            .setTokenName("Fungible Token")
-            .setTokenSymbol("TFT")
-            .setTokenMemo("Example memo")
-            .setDecimals(3)
-            .setInitialSupply(100)
-            .setMaxSupply(100)
-            .setTreasuryAccountId(treasuryAccount)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(client.getOperatorPublicKey())
-            .setFreezeKey(client.getOperatorPublicKey())
-            .setSupplyKey(client.getOperatorPublicKey())
-            .setMetadataKey(client.getOperatorPublicKey())
-            .setPauseKey(client.getOperatorPublicKey())
-            .freezeWith(client)
-            .sign(treasuryKey)
-            .execute(client)
-            .getReceipt(client)
-            .tokenId;
+                .setTokenName("Fungible Token")
+                .setTokenSymbol("TFT")
+                .setTokenMemo("Example memo")
+                .setDecimals(3)
+                .setInitialSupply(100)
+                .setMaxSupply(100)
+                .setTreasuryAccountId(treasuryAccount)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setAdminKey(client.getOperatorPublicKey())
+                .setFreezeKey(client.getOperatorPublicKey())
+                .setSupplyKey(client.getOperatorPublicKey())
+                .setMetadataKey(client.getOperatorPublicKey())
+                .setPauseKey(client.getOperatorPublicKey())
+                .freezeWith(client)
+                .sign(treasuryKey)
+                .execute(client)
+                .getReceipt(client)
+                .tokenId;
 
         var nftID = new TokenCreateTransaction()
-            .setTokenName("Test NFT")
-            .setTokenSymbol("TNFT")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setTreasuryAccountId(treasuryAccount)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setMaxSupply(10)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(client.getOperatorPublicKey())
-            .setFreezeKey(client.getOperatorPublicKey())
-            .setSupplyKey(client.getOperatorPublicKey())
-            .setMetadataKey(client.getOperatorPublicKey())
-            .setPauseKey(client.getOperatorPublicKey())
-            .freezeWith(client)
-            .sign(treasuryKey)
-            .execute(client)
-            .getReceipt(client)
-            .tokenId;
+                .setTokenName("Test NFT")
+                .setTokenSymbol("TNFT")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setTreasuryAccountId(treasuryAccount)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setMaxSupply(10)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setAdminKey(client.getOperatorPublicKey())
+                .setFreezeKey(client.getOperatorPublicKey())
+                .setSupplyKey(client.getOperatorPublicKey())
+                .setMetadataKey(client.getOperatorPublicKey())
+                .setPauseKey(client.getOperatorPublicKey())
+                .freezeWith(client)
+                .sign(treasuryKey)
+                .execute(client)
+                .getReceipt(client)
+                .tokenId;
 
         new TokenMintTransaction()
-            .setTokenId(nftID)
-            .setMetadata(generateNftMetadata((byte) 3))
-            .execute(client)
-            .getReceipt(client);
-
+                .setTokenId(nftID)
+                .setMetadata(generateNftMetadata((byte) 3))
+                .execute(client)
+                .getReceipt(client);
 
         /*
          * Step 3:
@@ -180,16 +161,16 @@ public class TokenAirdropExample {
          */
         System.out.println("Airdropping fts");
         var txnRecord = new TokenAirdropTransaction()
-            .addTokenTransfer(tokenID, alice, 10)
-            .addTokenTransfer(tokenID, treasuryAccount, -10)
-            .addTokenTransfer(tokenID, bob, 10)
-            .addTokenTransfer(tokenID, treasuryAccount, -10)
-            .addTokenTransfer(tokenID, carol, 10)
-            .addTokenTransfer(tokenID, treasuryAccount, -10)
-            .freezeWith(client)
-            .sign(treasuryKey)
-            .execute(client)
-            .getRecord(client);
+                .addTokenTransfer(tokenID, alice, 10)
+                .addTokenTransfer(tokenID, treasuryAccount, -10)
+                .addTokenTransfer(tokenID, bob, 10)
+                .addTokenTransfer(tokenID, treasuryAccount, -10)
+                .addTokenTransfer(tokenID, carol, 10)
+                .addTokenTransfer(tokenID, treasuryAccount, -10)
+                .freezeWith(client)
+                .sign(treasuryKey)
+                .execute(client)
+                .getRecord(client);
 
         /*
          * Step 4:
@@ -202,15 +183,9 @@ public class TokenAirdropExample {
          * Step 5:
          * Query to verify alice and bob received the airdrops and carol did not
          */
-        var aliceBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
-        var bobBalance = new AccountBalanceQuery()
-            .setAccountId(bob)
-            .execute(client);
-        var carolBalance = new AccountBalanceQuery()
-            .setAccountId(carol)
-            .execute(client);
+        var aliceBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
+        var bobBalance = new AccountBalanceQuery().setAccountId(bob).execute(client);
+        var carolBalance = new AccountBalanceQuery().setAccountId(carol).execute(client);
 
         System.out.println("Alice ft balance after airdrop: " + aliceBalance.tokens.get(tokenID));
         System.out.println("Bob ft balance after airdrop: " + bobBalance.tokens.get(tokenID));
@@ -222,15 +197,13 @@ public class TokenAirdropExample {
          */
         System.out.println("Claiming ft with carol");
         new TokenClaimAirdropTransaction()
-            .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(client)
-            .sign(privateKey3)
-            .execute(client)
-            .getReceipt(client);
+                .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .freezeWith(client)
+                .sign(privateKey3)
+                .execute(client)
+                .getReceipt(client);
 
-        carolBalance = new AccountBalanceQuery()
-            .setAccountId(carol)
-            .execute(client);
+        carolBalance = new AccountBalanceQuery().setAccountId(carol).execute(client);
         System.out.println("Carol ft balance after claim: " + carolBalance.tokens.get(tokenID));
 
         /*
@@ -239,13 +212,13 @@ public class TokenAirdropExample {
          */
         System.out.println("Airdropping nfts");
         txnRecord = new TokenAirdropTransaction()
-            .addNftTransfer(nftID.nft(1), treasuryAccount, alice)
-            .addNftTransfer(nftID.nft(2), treasuryAccount, bob)
-            .addNftTransfer(nftID.nft(3), treasuryAccount, carol)
-            .freezeWith(client)
-            .sign(treasuryKey)
-            .execute(client)
-            .getRecord(client);
+                .addNftTransfer(nftID.nft(1), treasuryAccount, alice)
+                .addNftTransfer(nftID.nft(2), treasuryAccount, bob)
+                .addNftTransfer(nftID.nft(3), treasuryAccount, carol)
+                .freezeWith(client)
+                .sign(treasuryKey)
+                .execute(client)
+                .getRecord(client);
 
         /*
          * Step 8:
@@ -259,15 +232,9 @@ public class TokenAirdropExample {
          * Step 9:
          * Query to verify alice received the airdrop and bob and carol did not
          */
-        aliceBalance = new AccountBalanceQuery()
-            .setAccountId(alice)
-            .execute(client);
-        bobBalance = new AccountBalanceQuery()
-            .setAccountId(bob)
-            .execute(client);
-        carolBalance = new AccountBalanceQuery()
-            .setAccountId(carol)
-            .execute(client);
+        aliceBalance = new AccountBalanceQuery().setAccountId(alice).execute(client);
+        bobBalance = new AccountBalanceQuery().setAccountId(bob).execute(client);
+        carolBalance = new AccountBalanceQuery().setAccountId(carol).execute(client);
 
         System.out.println("Alice nft balance after airdrop: " + aliceBalance.tokens.get(nftID));
         System.out.println("Bob nft balance after airdrop: " + bobBalance.tokens.get(nftID));
@@ -279,15 +246,13 @@ public class TokenAirdropExample {
          */
         System.out.println("Claiming nft with Bob");
         new TokenClaimAirdropTransaction()
-            .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
-            .freezeWith(client)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(0).getPendingAirdropId())
+                .freezeWith(client)
+                .sign(privateKey2)
+                .execute(client)
+                .getReceipt(client);
 
-        bobBalance = new AccountBalanceQuery()
-            .setAccountId(bob)
-            .execute(client);
+        bobBalance = new AccountBalanceQuery().setAccountId(bob).execute(client);
         System.out.println("Bob nft balance after claim: " + bobBalance.tokens.get(nftID));
 
         /*
@@ -296,15 +261,13 @@ public class TokenAirdropExample {
          */
         System.out.println("Canceling nft for Carol");
         new TokenCancelAirdropTransaction()
-            .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(1).getPendingAirdropId())
-            .freezeWith(client)
-            .sign(treasuryKey)
-            .execute(client)
-            .getReceipt(client);
+                .addPendingAirdrop(txnRecord.pendingAirdropRecords.get(1).getPendingAirdropId())
+                .freezeWith(client)
+                .sign(treasuryKey)
+                .execute(client)
+                .getReceipt(client);
 
-        carolBalance = new AccountBalanceQuery()
-            .setAccountId(carol)
-            .execute(client);
+        carolBalance = new AccountBalanceQuery().setAccountId(carol).execute(client);
         System.out.println("Carol nft balance after cancel: " + carolBalance.tokens.get(nftID));
 
         /*
@@ -313,29 +276,26 @@ public class TokenAirdropExample {
          */
         System.out.println("Rejecting nft with Bob");
         new TokenRejectTransaction()
-            .setOwnerId(bob)
-            .addNftId(nftID.nft(2))
-            .freezeWith(client)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .setOwnerId(bob)
+                .addNftId(nftID.nft(2))
+                .freezeWith(client)
+                .sign(privateKey2)
+                .execute(client)
+                .getReceipt(client);
 
         /*
          * Step 13:
          * Query to verify bob no longer has the NFT
          */
-        bobBalance = new AccountBalanceQuery()
-            .setAccountId(bob)
-            .execute(client);
+        bobBalance = new AccountBalanceQuery().setAccountId(bob).execute(client);
         System.out.println("Bob nft balance after reject: " + bobBalance.tokens.get(nftID));
 
         /*
          * Step 13:
          * Query to verify the NFT was returned to the Treasury
          */
-        var treasuryBalance = new AccountBalanceQuery()
-            .setAccountId(treasuryAccount)
-            .execute(client);
+        var treasuryBalance =
+                new AccountBalanceQuery().setAccountId(treasuryAccount).execute(client);
         System.out.println("Treasury nft balance after reject: " + treasuryBalance.tokens.get(nftID));
 
         /*
@@ -344,29 +304,26 @@ public class TokenAirdropExample {
          */
         System.out.println("Rejecting ft with Carol");
         new TokenRejectTransaction()
-            .setOwnerId(carol)
-            .addTokenId(tokenID)
-            .freezeWith(client)
-            .sign(privateKey3)
-            .execute(client)
-            .getReceipt(client);
+                .setOwnerId(carol)
+                .addTokenId(tokenID)
+                .freezeWith(client)
+                .sign(privateKey3)
+                .execute(client)
+                .getReceipt(client);
 
         /*
          * Step 14:
          * Query to verify carol no longer has the fungible tokens
          */
-        carolBalance = new AccountBalanceQuery()
-            .setAccountId(carol)
-            .execute(client);
+        carolBalance = new AccountBalanceQuery().setAccountId(carol).execute(client);
         System.out.println("Carol ft balance after reject: " + carolBalance.tokens.get(tokenID));
 
         /*
          * Step 15:
          * Query to verify Treasury received the rejected fungible tokens
          */
-        treasuryBalance = new AccountBalanceQuery()
-            .setAccountId(treasuryAccount)
-            .execute(client);
+        treasuryBalance =
+                new AccountBalanceQuery().setAccountId(treasuryAccount).execute(client);
         System.out.println("Treasury ft balance after reject: " + treasuryBalance.tokens.get(tokenID));
 
         /*

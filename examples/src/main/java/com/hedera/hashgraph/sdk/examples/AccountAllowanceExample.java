@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -50,12 +31,14 @@ class AccountAllowanceExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -68,7 +51,7 @@ class AccountAllowanceExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -106,45 +89,39 @@ class AccountAllowanceExample {
         System.out.println("Creating Alice's, Bob's and Charlie's accounts...");
 
         AccountId aliceId = new AccountCreateTransaction()
-            .setKey(alicePublicKey)
-            .setInitialBalance(Hbar.from(5))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(alicePublicKey)
+                .setInitialBalance(Hbar.from(5))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(aliceId);
 
         AccountId bobId = new AccountCreateTransaction()
-            .setKey(bobPublicKey)
-            .setInitialBalance(Hbar.from(5))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(bobPublicKey)
+                .setInitialBalance(Hbar.from(5))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(bobId);
 
         AccountId charlieId = new AccountCreateTransaction()
-            .setKey(charliePublicKey)
-            .setInitialBalance(Hbar.from(5))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(charliePublicKey)
+                .setInitialBalance(Hbar.from(5))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(charlieId);
 
         System.out.println("Alice's account ID: " + aliceId);
         System.out.println("Bob's account ID: " + bobId);
         System.out.println("Charlie's account ID: " + charlieId);
 
-        System.out.println(
-            "Alice's balance: " +
-                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
-        );
-        System.out.println(
-            "Bob's balance: " +
-                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
-        );
-        System.out.println(
-            "Charlie's balance: " +
-                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
-        );
+        System.out.println("Alice's balance: "
+                + new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars);
+        System.out.println("Bob's balance: "
+                + new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars);
+        System.out.println("Charlie's balance: "
+                + new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars);
 
         /*
          * Step 3:
@@ -153,59 +130,47 @@ class AccountAllowanceExample {
         System.out.println("Approving an allowance of 2 Hbar with owner Alice and spender Bob...");
 
         new AccountAllowanceApproveTransaction()
-            .approveHbarAllowance(aliceId, bobId, Hbar.from(2))
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .approveHbarAllowance(aliceId, bobId, Hbar.from(2))
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
-        System.out.println(
-            "Alice's balance: " +
-                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
-        );
-        System.out.println(
-            "Bob's balance: " +
-                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
-        );
-        System.out.println(
-            "Charlie's balance: " +
-                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
-        );
+        System.out.println("Alice's balance: "
+                + new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars);
+        System.out.println("Bob's balance: "
+                + new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars);
+        System.out.println("Charlie's balance: "
+                + new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars);
 
         /*
          * Step 4:
          * Demonstrate allowance -- transfer 1 Hbar from Alice to Charlie, but the transaction is signed only by Bob
          * (Bob is dipping into his allowance from Alice).
          */
-        System.out.println("Transferring 1 Hbar from Alice to Charlie, " +
-            "but the transaction is signed only by Bob (Bob is dipping into his allowance from Alice)...");
+        System.out.println("Transferring 1 Hbar from Alice to Charlie, "
+                + "but the transaction is signed only by Bob (Bob is dipping into his allowance from Alice)...");
 
         new TransferTransaction()
-            // "addApproved*Transfer()" means that the transfer has been approved by an allowance
-            .addApprovedHbarTransfer(aliceId, Hbar.from(1).negated())
-            .addHbarTransfer(charlieId, Hbar.from(1))
-            // The allowance spender must be pay the fee for the transaction.
-            // use setTransactionId() to set the account ID that will pay the fee for the transaction.
-            .setTransactionId(TransactionId.generate(bobId))
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                // "addApproved*Transfer()" means that the transfer has been approved by an allowance
+                .addApprovedHbarTransfer(aliceId, Hbar.from(1).negated())
+                .addHbarTransfer(charlieId, Hbar.from(1))
+                // The allowance spender must be pay the fee for the transaction.
+                // use setTransactionId() to set the account ID that will pay the fee for the transaction.
+                .setTransactionId(TransactionId.generate(bobId))
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         System.out.println("Transfer succeeded. Bob should now have 1 Hbar left in his allowance.");
 
-        System.out.println(
-            "Alice's balance: " +
-                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
-        );
-        System.out.println(
-            "Bob's balance: " +
-                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
-        );
-        System.out.println(
-            "Charlie's balance: " +
-                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
-        );
+        System.out.println("Alice's balance: "
+                + new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars);
+        System.out.println("Bob's balance: "
+                + new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars);
+        System.out.println("Charlie's balance: "
+                + new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars);
 
         /*
          * Step 5:
@@ -214,17 +179,17 @@ class AccountAllowanceExample {
          * This should fail, because there is only 1 Hbar left in Bob's allowance.
          */
         try {
-            System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance... " +
-                "(this should fail, because there is only 1 Hbar left in Bob's allowance).");
+            System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance... "
+                    + "(this should fail, because there is only 1 Hbar left in Bob's allowance).");
 
             new TransferTransaction()
-                .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
-                .addHbarTransfer(charlieId, Hbar.from(2))
-                .setTransactionId(TransactionId.generate(bobId))
-                .freezeWith(client)
-                .sign(bobPrivateKey)
-                .execute(client)
-                .getReceipt(client);
+                    .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
+                    .addHbarTransfer(charlieId, Hbar.from(2))
+                    .setTransactionId(TransactionId.generate(bobId))
+                    .freezeWith(client)
+                    .sign(bobPrivateKey)
+                    .execute(client)
+                    .getReceipt(client);
 
             throw new Exception("This transfer shouldn't have succeeded!");
         } catch (Throwable error) {
@@ -238,77 +203,71 @@ class AccountAllowanceExample {
         System.out.println("Adjusting Bob's allowance to 3 Hbar...");
 
         new AccountAllowanceApproveTransaction()
-            .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .approveHbarAllowance(aliceId, bobId, Hbar.from(3))
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         /*
          * Step 7:
          * Demonstrate allowance -- transfer 2 Hbar from Alice to Charlie using Bob's allowance again.
          */
-        System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again... " +
-            "(this time it should succeed).");
+        System.out.println("Attempting to transfer 2 Hbar from Alice to Charlie using Bob's allowance again... "
+                + "(this time it should succeed).");
 
         new TransferTransaction()
-            .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
-            .addHbarTransfer(charlieId, Hbar.from(2))
-            .setTransactionId(TransactionId.generate(bobId))
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .addApprovedHbarTransfer(aliceId, Hbar.from(2).negated())
+                .addHbarTransfer(charlieId, Hbar.from(2))
+                .setTransactionId(TransactionId.generate(bobId))
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         System.out.println("Transfer succeeded.");
 
-        System.out.println(
-            "Alice's balance: " +
-                new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars
-        );
-        System.out.println(
-            "Bob's balance: " +
-                new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars
-        );
-        System.out.println(
-            "Charlie's balance: " +
-                new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars
-        );
+        System.out.println("Alice's balance: "
+                + new AccountBalanceQuery().setAccountId(aliceId).execute(client).hbars);
+        System.out.println("Bob's balance: "
+                + new AccountBalanceQuery().setAccountId(bobId).execute(client).hbars);
+        System.out.println("Charlie's balance: "
+                + new AccountBalanceQuery().setAccountId(charlieId).execute(client).hbars);
 
         /*
          * Clean up:
          * Delete allowance and created accounts.
          */
         new AccountAllowanceApproveTransaction()
-            .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .approveHbarAllowance(aliceId, bobId, Hbar.ZERO)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(aliceId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(alicePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(aliceId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(alicePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(bobId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(bobId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(charlieId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(charliePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(charlieId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(charliePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -40,12 +21,14 @@ class CreateStatefulContractExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -58,7 +41,7 @@ class CreateStatefulContractExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -88,10 +71,10 @@ class CreateStatefulContractExample {
         String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/stateful/stateful.json");
 
         TransactionResponse fileCreateTxResponse = new FileCreateTransaction()
-            // Use the same key as the operator to "own" this file.
-            .setKeys(operatorPublicKey)
-            .setContents(contractBytecodeHex)
-            .execute(client);
+                // Use the same key as the operator to "own" this file.
+                .setKeys(operatorPublicKey)
+                .setContents(contractBytecodeHex)
+                .execute(client);
 
         TransactionReceipt fileCreateTxReceipt = fileCreateTxResponse.getReceipt(client);
         FileId newFileId = Objects.requireNonNull(fileCreateTxReceipt.fileId);
@@ -103,14 +86,12 @@ class CreateStatefulContractExample {
          * Create a smart contract.
          */
         TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
-            // Set an Admin Key, so we can delete the contract later.
-            .setGas(150_000)
-            .setBytecodeFileId(newFileId)
-            .setAdminKey(operatorPublicKey)
-            .setConstructorParameters(
-                new ContractFunctionParameters()
-                    .addString("Hello from Hedera!"))
-            .execute(client);
+                // Set an Admin Key, so we can delete the contract later.
+                .setGas(150_000)
+                .setBytecodeFileId(newFileId)
+                .setAdminKey(operatorPublicKey)
+                .setConstructorParameters(new ContractFunctionParameters().addString("Hello from Hedera!"))
+                .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
         ContractId newContractId = Objects.requireNonNull(contractCreateTxReceipt.contractId);
@@ -123,26 +104,27 @@ class CreateStatefulContractExample {
          */
         System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractCallResult_BeforeSetMessage = new ContractCallQuery()
-            .setContractId(newContractId)
-            .setGas(100_000)
-            .setFunction("get_message")
-            .setMaxQueryPayment(Hbar.from(1))
-            .execute(client);
+                .setContractId(newContractId)
+                .setGas(100_000)
+                .setFunction("get_message")
+                .setMaxQueryPayment(Hbar.from(1))
+                .execute(client);
 
         if (contractCallResult_BeforeSetMessage.errorMessage != null) {
-            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult_BeforeSetMessage.errorMessage);
+            throw new Exception("Error calling contract function \"get_message\": "
+                    + contractCallResult_BeforeSetMessage.errorMessage);
         }
 
         String contractCallResult_BeforeSetMessage_String = contractCallResult_BeforeSetMessage.getString(0);
-        System.out.println("Contract call result (\"get_message\" function returned): " + contractCallResult_BeforeSetMessage_String);
+        System.out.println("Contract call result (\"get_message\" function returned): "
+                + contractCallResult_BeforeSetMessage_String);
 
         System.out.println("Calling contract function \"set_message\"...");
         TransactionResponse contractExecuteTxResponse = new ContractExecuteTransaction()
-            .setContractId(newContractId)
-            .setGas(100_000)
-            .setFunction("set_message", new ContractFunctionParameters()
-                .addString("Hello from hedera again!"))
-            .execute(client);
+                .setContractId(newContractId)
+                .setGas(100_000)
+                .setFunction("set_message", new ContractFunctionParameters().addString("Hello from hedera again!"))
+                .execute(client);
 
         // If this doesn't throw then we know the contract executed successfully.
         contractExecuteTxResponse.getReceipt(client);
@@ -153,29 +135,31 @@ class CreateStatefulContractExample {
          */
         System.out.println("Calling contract function \"get_message\"...");
         ContractFunctionResult contractCallResult_AfterSetMessage = new ContractCallQuery()
-            .setGas(100_000)
-            .setContractId(newContractId)
-            .setFunction("get_message")
-            .setMaxQueryPayment(Hbar.from(1))
-            .execute(client);
+                .setGas(100_000)
+                .setContractId(newContractId)
+                .setFunction("get_message")
+                .setMaxQueryPayment(Hbar.from(1))
+                .execute(client);
 
         if (contractCallResult_AfterSetMessage.errorMessage != null) {
-            throw new Exception("Error calling contract function \"get_message\": " + contractCallResult_AfterSetMessage.errorMessage);
+            throw new Exception("Error calling contract function \"get_message\": "
+                    + contractCallResult_AfterSetMessage.errorMessage);
         }
 
         String contractCallResult_AfterSetMessage_String = contractCallResult_AfterSetMessage.getString(0);
-        System.out.println("Contract call result (\"get_message\" function returned): " + contractCallResult_AfterSetMessage_String);
+        System.out.println("Contract call result (\"get_message\" function returned): "
+                + contractCallResult_AfterSetMessage_String);
 
         /*
          * Clean up:
          * Delete created contract.
          */
         new ContractDeleteTransaction()
-            .setContractId(newContractId)
-            .setTransferAccountId(contractCreateTxResponse.transactionId.accountId)
-            .setMaxTransactionFee(Hbar.from(1))
-            .execute(client)
-            .getReceipt(client);
+                .setContractId(newContractId)
+                .setTransferAccountId(contractCreateTxResponse.transactionId.accountId)
+                .setMaxTransactionFee(Hbar.from(1))
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

@@ -1,8 +1,15 @@
 ## JVM
+
 JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.net/) are strongly recommended.
 
 ## Setup
+
 > Note that the below `./gradlew` commands should be run from the root of the project.
+
+This project uses the
+[Hiero Gradle Conventions](https://github.com/hiero-ledger/hiero-gradle-conventions)
+Gradle setup. More details on how to work with the project can be found in the
+[documentation](https://github.com/hiero-ledger/hiero-gradle-conventions#build).
 
 ### Building
 
@@ -22,6 +29,7 @@ JDK 17 is required. The Temurin builds of [Eclipse Adoptium](https://adoptium.ne
 > That's why we need to pass the configuration file at the beginning of the command.
 
 #### Using Gradle properties
+
 `OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK` must be passed as Gradle properties (`-P` parameters).\
 `HEDERA_NETWORK` can be set to `localhost`, `testnet` or `previewnet`.
 
@@ -41,6 +49,7 @@ An example configuration file can be found in the repo here:
 **Running against the local network**
 
 The format of the configuration file should be as follows:
+
 ```json
 {
     "network": {
@@ -60,6 +69,7 @@ The format of the configuration file should be as follows:
 **Running against remote networks**
 
 The format of the configuration file should be as follows:
+
 ```json
 {
     "network": "testnet",
@@ -75,51 +85,73 @@ The format of the configuration file should be as follows:
 #### Running individual test classes or functions
 
 Running test class:
+
 ```sh
 ./gradlew :sdk:testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass>"
 ```
 
 Running test function:
+
 ```sh
 ./gradlew :sdk:testIntegration -POPERATOR_ID="<shard.realm.num>" -POPERATOR_KEY="<PrivateKey>" -PHEDERA_NETWORK="testnet" --tests "<TestClass.functionName>"
 ```
 
 #### Running with Intellij IDEA
+
 1. Create a new Gradle run configuration (easiest way is to run test class or individual test function from the IDE).
 2. Update "Run" configuration to pass the required Gradle properties (`OPERATOR_ID`, `OPERATOR_KEY` and `HEDERA_NETWORK`).
-<img src="../assets/intellij-integration-tests.png">
+   <img src="../assets/intellij-integration-tests.png">
+
+## Managing dependencies
+
+This project uses a combination of Java Modules (JPMS) and Gradle to define and manage dependencies to 3rd party
+libraries. In this structure, dependencies of the SDK are defined in
+[sdk/src/main/java/module-info.java](../../sdk/src/main/java/module-info.java) (which is mirrored in
+[sdk-full/src/main/java/module-info.java](../../sdk-full/src/main/java/module-info.java)).
+Running `./gradlew qualityGate` contains a _dependency scope check_ that makes sure that both files are in sync.
+Versions of 3rd party dependencies are defined in
+[hiero-dependency-versions/build.gradle.kts](../../hiero-dependency-versions/build.gradle.kts).
+More details about how to add/modify dependencies are found in the Hiero Gradle Conventions documentation on
+[Defining modules and dependencies](https://github.com/hiero-ledger/hiero-gradle-conventions#modules).
 
 ## Maintaining generated files
->To execute the tasks below, you need to install the tool from this link: https://taskfile.dev/
-> (these tasks are from the file Taskfile.yml, which is located in the root of the repository).
-> Once installed, you can run the commands as shown below.
->
-> Note that the below `task` commands should be run from the root of the project.
+
+> Note that the below `./gradlew` commands should be run from the root of the project.
 
 ### Updating unit tests snapshots
+
 ```sh
-task update:snapshots
+./gradlew updateSnapshots
 ```
 
 ### Updating proto files
+
 ```sh
-task update:proto
+./gradlew updateSnapshots
 ```
 
 ### Updating address books
+
 Update all address books:
+
 ```sh
-task update:addressbooks
+./gradlew examples:updateAddressbooks
 ```
+
 Update address books only for a mainnet:
+
 ```sh
-task update:addressbooks:mainnet
+./gradlew examples:updateAddressbooksMainnet
 ```
+
 Update address books only for a testnet:
+
 ```sh
-task update:addressbooks:testnet
+./gradlew examples:updateAddressbooksTestnet
 ```
+
 Update address books only for a previewnet:
+
 ```sh
-task update:addressbooks:previewnet
+./gradlew examples:updateAddressbooksPreviewnet
 ```

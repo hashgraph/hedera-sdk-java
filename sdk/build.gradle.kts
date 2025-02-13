@@ -10,7 +10,7 @@ description = "Hedera™ Hashgraph SDK for Java"
 
 javaModuleDependencies.moduleNameToGA.put(
     "com.google.protobuf",
-    "com.google.protobuf:protobuf-javalite"
+    "com.google.protobuf:protobuf-javalite",
 )
 
 // Define dependency constraints for gRPC implementations so that clients automatically get the
@@ -30,8 +30,6 @@ testModuleInfo {
     requires("org.junit.jupiter.api")
     requires("org.junit.jupiter.params")
     requires("org.mockito")
-
-    requiresStatic("java.annotation")
 
     runtimeOnly("io.grpc.netty.shaded")
     runtimeOnly("org.slf4j.simple")
@@ -58,7 +56,10 @@ tasks.withType<Test>().configureEach {
     systemProperty("OPERATOR_KEY", providers.gradleProperty("OPERATOR_KEY").getOrElse(""))
 }
 
-tasks.testIntegration { failFast = true }
+tasks.testIntegration {
+    maxParallelForks = (Runtime.getRuntime().availableProcessors()).coerceAtLeast(1)
+    failFast = true
+}
 
 tasks.withType<JavaCompile>().configureEach { options.compilerArgs.add("-Xlint:-exports,-dep-ann") }
 
@@ -75,4 +76,14 @@ dependencyAnalysis.abi {
         // Exposes: io.grpc.stub.AbstractFutureStub (and others)
         excludeClasses(".*Grpc")
     }
+}
+
+tasks.register<Delete>("updateSnapshots") {
+    delete(sourceSets.test.get().allSource.matching { include("**/*.snap") })
+    finalizedBy(tasks.test)
+}
+
+tasks.register<Exec>("updateProto") {
+    executable = File(rootDir, "scripts/update_protobufs.py").absolutePath
+    args("main") // argument is the branch/tag
 }

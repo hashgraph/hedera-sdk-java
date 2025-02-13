@@ -19,8 +19,8 @@ dependencyAnalysis {
 dependencies.constraints {
     implementation("com.google.guava:guava:33.3.1-android")
     implementation("io.github.cdimascio:dotenv-java:3.0.2")
-    implementation("com.hedera.hashgraph:sdk:2.46.0")
-    implementation("com.hedera.hashgraph:sdk-full:2.46.0")
+    implementation("com.hedera.hashgraph:sdk:2.49.0")
+    implementation("com.hedera.hashgraph:sdk-full:2.49.0")
 }
 
 tasks.register<RunAllExample>("runAllExamples") {
@@ -34,7 +34,7 @@ tasks.addRule("Pattern: run<Example>: Runs an example.") {
         tasks.register<JavaExec>(this) {
             workingDir = rootDir
             classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
-            mainModule = "com.hedera.hashgraph.examples"
+            mainModule = "com.hedera.hashgraph.sdk.examples"
             mainClass =
                 "com.hedera.hashgraph.sdk.examples.${this@addRule.substring("run".length)}Example"
         }
@@ -81,12 +81,58 @@ abstract class RunAllExample : DefaultTask() {
             exec.javaexec {
                 workingDir = workingDirectory.get().asFile
                 classpath = rtClasspath
-                mainModule = "com.hedera.hashgraph.examples"
+                mainModule = "com.hedera.hashgraph.sdk.examples"
                 mainClass = "com.hedera.hashgraph.sdk.examples.$className"
 
                 // NOTE: Uncomment to enable trace logs in the SDK during the examples
-                // jvmArgs "-Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace"
+                // jvmArgs "-Dorg.slf4j.simpleLogger.log.org.hiero=trace"
             }
         }
     }
+}
+
+listOf("mainnet", "previewnet", "testnet").forEachIndexed { index, network ->
+    val taskName = "updateAddressbooks${network.replaceFirstChar(Char::titlecase)}"
+    val previousTaskName =
+        if (index > 0)
+            "updateAddressbooks${listOf("mainnet", "previewnet", "testnet")[index - 1].replaceFirstChar(Char::titlecase)}"
+        else null
+
+    tasks.register<JavaExec>(taskName) {
+        workingDir = rootDir
+        classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
+        mainModule = "com.hedera.hashgraph.sdk.examples"
+        mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
+        environment("HEDERA_NETWORK", network)
+
+        // Ensure the file is deleted before each run to avoid caching issues
+        doFirst {
+            val binFile = File(workingDir, "address-book.proto.bin")
+            if (binFile.exists()) {
+                binFile.delete()
+            }
+        }
+
+        doLast {
+            println("Fetching address book for network: $network")
+            val binFile = File(workingDir, "address-book.proto.bin")
+            val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            println("Copying from ${binFile.absolutePath} to ${target.absolutePath}")
+            binFile.copyTo(target, overwrite = true)
+        }
+
+        // Ensure tasks run one after another
+        if (previousTaskName != null) {
+            mustRunAfter(previousTaskName)
+        }
+    }
+}
+
+// Aggregate task to run all
+tasks.register("updateAddressbooks") {
+    dependsOn(
+        "updateAddressbooksMainnet",
+        "updateAddressbooksPreviewnet",
+        "updateAddressbooksTestnet"
+    )
 }

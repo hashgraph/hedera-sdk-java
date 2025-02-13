@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -42,12 +23,14 @@ class ScheduleMultiSigTransactionExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -60,7 +43,7 @@ class ScheduleMultiSigTransactionExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -112,11 +95,11 @@ class ScheduleMultiSigTransactionExample {
          */
         System.out.println("Creating new account...");
         TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
-            .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
-            // The only required property here is key.
-            .setKey(keyList)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client);
+                .setNodeAccountIds(Collections.singletonList(new AccountId(3)))
+                // The only required property here is key.
+                .setKeyWithoutAlias(keyList)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client);
 
         // This will wait for the receipt to become available.
         TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
@@ -136,16 +119,17 @@ class ScheduleMultiSigTransactionExample {
         // Create a transfer transaction with 2/3 signatures.
         System.out.println("Creating a token transfer transaction...");
         TransferTransaction transferTx = new TransferTransaction()
-            .addHbarTransfer(accountId, Hbar.from(1).negated())
-            .addHbarTransfer(OPERATOR_ID, Hbar.from(1));
+                .addHbarTransfer(accountId, Hbar.from(1).negated())
+                .addHbarTransfer(OPERATOR_ID, Hbar.from(1));
 
         // Schedule the transaction.
         System.out.println("Scheduling the token transfer transaction...");
-        ScheduleCreateTransaction scheduled = transferTx.schedule()
-            .setPayerAccountId(OPERATOR_ID)
-            .setAdminKey(operatorPublicKey)
-            .freezeWith(client)
-            .sign(privateKey2);
+        ScheduleCreateTransaction scheduled = transferTx
+                .schedule()
+                .setPayerAccountId(OPERATOR_ID)
+                .setAdminKey(operatorPublicKey)
+                .freezeWith(client)
+                .sign(privateKey2);
 
         accountCreateTxReceipt = scheduled.execute(client).getReceipt(client);
         // Get the schedule ID from the receipt.
@@ -157,9 +141,9 @@ class ScheduleMultiSigTransactionExample {
          * Get the schedule info to see if signatories is populated with 2/3 signatures.
          */
         ScheduleInfo scheduleInfo_BeforeLastSignature = new ScheduleInfoQuery()
-            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
-            .setScheduleId(scheduleId)
-            .execute(client);
+                .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
+                .setScheduleId(scheduleId)
+                .execute(client);
 
         System.out.println("Schedule info: " + scheduleInfo_BeforeLastSignature);
 
@@ -176,7 +160,8 @@ class ScheduleMultiSigTransactionExample {
         }
 
         if (!transfers.get(OPERATOR_ID).equals(Hbar.from(1))) {
-            throw new Exception("Transfer for " + OPERATOR_ID + " is not what is expected " + transfers.get(OPERATOR_ID));
+            throw new Exception(
+                    "Transfer for " + OPERATOR_ID + " is not what is expected " + transfers.get(OPERATOR_ID));
         }
 
         System.out.println("Sending schedule sign transaction...");
@@ -187,27 +172,28 @@ class ScheduleMultiSigTransactionExample {
          *
          * This last signature should mean the transaction executes since all 3 signatures have been provided.
          */
-        System.out.println("Appending private key #3 signature to a schedule transaction..." +
-            "(This last signature should mean the transaction executes since all 3 signatures have been provided)");
+        System.out.println(
+                "Appending private key #3 signature to a schedule transaction..."
+                        + "(This last signature should mean the transaction executes since all 3 signatures have been provided)");
         TransactionReceipt scheduleSignTxReceipt = new ScheduleSignTransaction()
-            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(privateKey3)
-            .execute(client)
-            .getReceipt(client);
+                .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(privateKey3)
+                .execute(client)
+                .getReceipt(client);
 
-        System.out.println("A transaction that appends signature to a schedule transaction (private key #3) " +
-            "was complete with status: " + scheduleSignTxReceipt.status);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #3) "
+                + "was complete with status: " + scheduleSignTxReceipt.status);
 
         /*
          * Step 7:
          * Query the schedule info again.
          */
         ScheduleInfo scheduleInfo_AfterAllSigned = new ScheduleInfoQuery()
-            .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
-            .setScheduleId(scheduleId)
-            .execute(client);
+                .setNodeAccountIds(Collections.singletonList(accountCreateTxResponse.nodeId))
+                .setScheduleId(scheduleId)
+                .execute(client);
 
         System.out.println("Schedule info: " + scheduleInfo_AfterAllSigned);
 
@@ -216,13 +202,13 @@ class ScheduleMultiSigTransactionExample {
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setAccountId(accountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .sign(privateKey2)
-            .sign(privateKey3)
-            .execute(client);
+                .setAccountId(accountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .sign(privateKey2)
+                .sign(privateKey3)
+                .execute(client);
 
         client.close();
 

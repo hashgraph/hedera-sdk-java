@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -41,12 +22,14 @@ class StakingExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -59,7 +42,7 @@ class StakingExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -95,12 +78,12 @@ class StakingExample {
         System.out.println("Creating new account with staked account ID...");
         AccountId stakedAccountId = AccountId.fromString("0.0.3");
         AccountId newAccountId = new AccountCreateTransaction()
-            .setKey(publicKey)
-            .setInitialBalance(Hbar.from(1))
-            .setStakedAccountId(stakedAccountId)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(publicKey)
+                .setInitialBalance(Hbar.from(1))
+                .setStakedAccountId(stakedAccountId)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(newAccountId);
         System.out.println("Created new account with ID: " + newAccountId);
 
@@ -114,9 +97,7 @@ class StakingExample {
          * Step 3:
          * Query the account info, it should show the staked account ID to be 0.0.3.
          */
-        AccountInfo info = new AccountInfoQuery()
-            .setAccountId(newAccountId)
-            .execute(client);
+        AccountInfo info = new AccountInfoQuery().setAccountId(newAccountId).execute(client);
 
         if (info.stakingInfo.stakedAccountId.equals(stakedAccountId)) {
             System.out.println("New account staking info: " + info.stakingInfo);
@@ -129,12 +110,12 @@ class StakingExample {
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setAccountId(newAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(privateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(newAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(privateKey)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

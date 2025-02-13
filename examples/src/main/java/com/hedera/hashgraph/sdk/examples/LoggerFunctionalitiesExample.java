@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2023 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -41,12 +22,14 @@ public class LoggerFunctionalitiesExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -99,10 +82,10 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Transferring Hbar to the the new account...");
         new TransferTransaction()
-            .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
-            .addHbarTransfer(aliasAccountId, Hbar.from(1))
-            .setTransactionMemo("")
-            .execute(client);
+                .addHbarTransfer(OPERATOR_ID, Hbar.from(1).negated())
+                .addHbarTransfer(aliasAccountId, Hbar.from(1))
+                .setTransactionMemo("")
+                .execute(client);
 
         /*
          * Step 5:
@@ -110,12 +93,12 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Creating new topic...(with attached info logger).");
         TopicId hederaTopicId = new TopicCreateTransaction()
-            .setLogger(infoLogger)
-            .setTopicMemo("Hedera topic")
-            .setAdminKey(operatorPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .topicId;
+                .setLogger(infoLogger)
+                .setTopicMemo("Hedera topic")
+                .setAdminKey(operatorPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .topicId;
         Objects.requireNonNull(hederaTopicId);
 
         /*
@@ -132,12 +115,12 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Creating new topic...(with attached info logger).");
         var logisticsTopicId = new TopicCreateTransaction()
-            .setLogger(infoLogger)
-            .setTopicMemo("Logistics topic")
-            .setAdminKey(operatorPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .topicId;
+                .setLogger(infoLogger)
+                .setTopicMemo("Logistics topic")
+                .setAdminKey(operatorPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .topicId;
         Objects.requireNonNull(logisticsTopicId);
 
         /*
@@ -155,12 +138,12 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Creating new topic...(with attached debug logger).");
         var supplyChainTopicId = new TopicCreateTransaction()
-            .setLogger(debugLogger)
-            .setTopicMemo("Supply chain topic")
-            .setAdminKey(operatorPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .topicId;
+                .setLogger(debugLogger)
+                .setTopicMemo("Supply chain topic")
+                .setAdminKey(operatorPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .topicId;
         Objects.requireNonNull(supplyChainTopicId);
 
         /*
@@ -177,37 +160,31 @@ public class LoggerFunctionalitiesExample {
          */
         System.out.println("Creating new topic...(with attached debug logger).");
         var chatTopicId = new TopicCreateTransaction()
-            .setLogger(debugLogger)
-            .setTopicMemo("Chat topic")
-            .setAdminKey(operatorPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .topicId;
+                .setLogger(debugLogger)
+                .setTopicMemo("Chat topic")
+                .setAdminKey(operatorPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .topicId;
         Objects.requireNonNull(chatTopicId);
 
         /*
          * Clean up:
          * Delete created topics.
          */
-        new TopicDeleteTransaction()
-            .setTopicId(hederaTopicId)
-            .execute(client)
-            .getReceipt(client);
+        new TopicDeleteTransaction().setTopicId(hederaTopicId).execute(client).getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(logisticsTopicId)
-            .execute(client)
-            .getReceipt(client);
+                .setTopicId(logisticsTopicId)
+                .execute(client)
+                .getReceipt(client);
 
         new TopicDeleteTransaction()
-            .setTopicId(supplyChainTopicId)
-            .execute(client)
-            .getReceipt(client);
+                .setTopicId(supplyChainTopicId)
+                .execute(client)
+                .getReceipt(client);
 
-        new TopicDeleteTransaction()
-            .setTopicId(chatTopicId)
-            .execute(client)
-            .getReceipt(client);
+        new TopicDeleteTransaction().setTopicId(chatTopicId).execute(client).getReceipt(client);
 
         client.close();
 

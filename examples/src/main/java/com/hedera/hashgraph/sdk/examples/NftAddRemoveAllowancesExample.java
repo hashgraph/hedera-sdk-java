@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -43,12 +24,14 @@ class NftAddRemoveAllowancesExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -61,7 +44,7 @@ class NftAddRemoveAllowancesExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -95,20 +78,20 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Creating NFT using the Hedera Token Service...");
         TransactionReceipt nftCreateTxReceipt = new TokenCreateTransaction()
-            .setTokenName("HIP-336 NFT1")
-            .setTokenSymbol("HIP336NFT1")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setDecimals(0)
-            .setInitialSupply(0)
-            .setMaxSupply(CIDs.length)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(operatorPublicKey)
-            .setSupplyKey(operatorPublicKey)
-            .setWipeKey(operatorPublicKey)
-            .freezeWith(client)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenName("HIP-336 NFT1")
+                .setTokenSymbol("HIP336NFT1")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setDecimals(0)
+                .setInitialSupply(0)
+                .setMaxSupply(CIDs.length)
+                .setTreasuryAccountId(OPERATOR_ID)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setAdminKey(operatorPublicKey)
+                .setSupplyKey(operatorPublicKey)
+                .setWipeKey(operatorPublicKey)
+                .freezeWith(client)
+                .execute(client)
+                .getReceipt(client);
 
         TokenId nftTokenId = nftCreateTxReceipt.tokenId;
         Objects.requireNonNull(nftTokenId);
@@ -122,13 +105,14 @@ class NftAddRemoveAllowancesExample {
         List<TransactionReceipt> nftMintTxReceipts = new ArrayList<>();
         for (int i = 0; i < CIDs.length; i++) {
             nftMintTxReceipts.add(new TokenMintTransaction()
-                .setTokenId(nftTokenId)
-                .setMetadata(List.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
-                .freezeWith(client)
-                .execute(client)
-                .getReceipt(client));
+                    .setTokenId(nftTokenId)
+                    .setMetadata(List.of(CIDs[i].getBytes(StandardCharsets.UTF_8)))
+                    .freezeWith(client)
+                    .execute(client)
+                    .getReceipt(client));
 
-            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: " + nftMintTxReceipts.get(i).serials.get(0));
+            System.out.println("Minted NFT (token ID: " + nftTokenId + ") with serial: "
+                    + nftMintTxReceipts.get(i).serials.get(0));
         }
 
         /*
@@ -139,22 +123,22 @@ class NftAddRemoveAllowancesExample {
         PrivateKey spenderPrivateKey = PrivateKey.generateECDSA();
         PublicKey spenderPublicKey = spenderPrivateKey.getPublicKey();
         AccountId spenderAccountId = new AccountCreateTransaction()
-            .setKey(spenderPublicKey)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(spenderPublicKey)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(spenderAccountId);
         System.out.println("Created spender account with ID: " + spenderAccountId);
 
         PrivateKey receiverPrivateKey = PrivateKey.generateECDSA();
         PublicKey receiverPublicKey = receiverPrivateKey.getPublicKey();
         AccountId receiverAccountId = new AccountCreateTransaction()
-            .setKey(receiverPublicKey)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(receiverPublicKey)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(receiverAccountId);
         System.out.println("Created receiver account with ID: " + receiverAccountId);
 
@@ -164,22 +148,24 @@ class NftAddRemoveAllowancesExample {
          */
         System.out.println("Associating spender and receiver accounts with the NFT...");
         TransactionReceipt spenderAssociateReceipt = new TokenAssociateTransaction()
-            .setAccountId(spenderAccountId)
-            .setTokenIds(List.of(nftTokenId))
-            .freezeWith(client)
-            .sign(spenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("Spender association transaction was complete with status: " + spenderAssociateReceipt.status);
+                .setAccountId(spenderAccountId)
+                .setTokenIds(List.of(nftTokenId))
+                .freezeWith(client)
+                .sign(spenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println(
+                "Spender association transaction was complete with status: " + spenderAssociateReceipt.status);
 
         TransactionReceipt receiverAssociateReceipt = new TokenAssociateTransaction()
-            .setAccountId(receiverAccountId)
-            .setTokenIds(List.of(nftTokenId))
-            .freezeWith(client)
-            .sign(receiverPrivateKey)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("Receiver association transaction was complete with status: " + receiverAssociateReceipt.status);
+                .setAccountId(receiverAccountId)
+                .setTokenIds(List.of(nftTokenId))
+                .freezeWith(client)
+                .sign(receiverPrivateKey)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println(
+                "Receiver association transaction was complete with status: " + receiverAssociateReceipt.status);
 
         /*
          * Step 5:
@@ -190,10 +176,10 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Approving spender account allowance for NFT (serials #1 and #2)...");
         TransactionReceipt approveReceipt = new AccountAllowanceApproveTransaction()
-            .approveTokenNftAllowance(nft1, OPERATOR_ID, spenderAccountId)
-            .approveTokenNftAllowance(nft2, OPERATOR_ID, spenderAccountId)
-            .execute(client)
-            .getReceipt(client);
+                .approveTokenNftAllowance(nft1, OPERATOR_ID, spenderAccountId)
+                .approveTokenNftAllowance(nft2, OPERATOR_ID, spenderAccountId)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Approve spender allowance transaction was complete with status: " + approveReceipt.status);
 
         /*
@@ -207,12 +193,12 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Transferring NFT (serial #1) on behalf of the spender...");
         TransactionReceipt approvedSendReceipt = new TransferTransaction()
-            .addApprovedNftTransfer(nft1, OPERATOR_ID, receiverAccountId)
-            .setTransactionId(onBehalfOfTransactionId)
-            .freezeWith(client)
-            .sign(spenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .addApprovedNftTransfer(nft1, OPERATOR_ID, receiverAccountId)
+                .setTransactionId(onBehalfOfTransactionId)
+                .freezeWith(client)
+                .sign(spenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Transfer transaction was complete with status: " + approvedSendReceipt.status);
 
         /*
@@ -221,9 +207,9 @@ class NftAddRemoveAllowancesExample {
          */
         System.out.println("Removing all NFT token allowances (for serial #2)...");
         TransactionReceipt deleteAllowanceReceipt = new AccountAllowanceDeleteTransaction()
-            .deleteAllTokenNftAllowances(nft2, OPERATOR_ID)
-            .execute(client)
-            .getReceipt(client);
+                .deleteAllTokenNftAllowances(nft2, OPERATOR_ID)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Remove allowance transaction was complete with status: " + deleteAllowanceReceipt.status);
 
         /*
@@ -236,12 +222,12 @@ class NftAddRemoveAllowancesExample {
         try {
             System.out.println("Transferring NFT (serial #2) on behalf of the spender...");
             new TransferTransaction()
-                .addApprovedNftTransfer(nft2, OPERATOR_ID, receiverAccountId)
-                .setTransactionId(onBehalfOfTransactionId2)
-                .freezeWith(client)
-                .sign(spenderPrivateKey)
-                .execute(client)
-                .getReceipt(client);
+                    .addApprovedNftTransfer(nft2, OPERATOR_ID, receiverAccountId)
+                    .setTransactionId(onBehalfOfTransactionId2)
+                    .freezeWith(client)
+                    .sign(spenderPrivateKey)
+                    .execute(client)
+                    .getReceipt(client);
         } catch (Exception e) {
             System.out.println("Transferring NFT (serial #2) was failed (as expected): " + e.getMessage());
         }
@@ -253,7 +239,8 @@ class NftAddRemoveAllowancesExample {
          * The beginning of the second example (approve/delete allowances for ALL serial numbers at once).
          * Create a fungible HTS token using the Hedera Token Service.
          */
-        System.out.println("The beginning of the second example (approve/delete allowances for ALL serial numbers at once).");
+        System.out.println(
+                "The beginning of the second example (approve/delete allowances for ALL serial numbers at once).");
 
         String[] CIDs2 = {
             "QmNPCiNA3Dsu3K5FxDPMG5Q3fZRwVTg14EXA92uqEeSRXn",
@@ -263,20 +250,20 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Creating NFT using the Hedera Token Service...");
         TransactionReceipt nftCreateReceipt2 = new TokenCreateTransaction()
-            .setTokenName("HIP336NFT2")
-            .setTokenSymbol("HIP336NFT2")
-            .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
-            .setDecimals(0)
-            .setInitialSupply(0)
-            .setMaxSupply(CIDs2.length)
-            .setTreasuryAccountId(OPERATOR_ID)
-            .setSupplyType(TokenSupplyType.FINITE)
-            .setAdminKey(operatorPublicKey)
-            .setSupplyKey(operatorPublicKey)
-            .setWipeKey(operatorPublicKey)
-            .freezeWith(client)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenName("HIP336NFT2")
+                .setTokenSymbol("HIP336NFT2")
+                .setTokenType(TokenType.NON_FUNGIBLE_UNIQUE)
+                .setDecimals(0)
+                .setInitialSupply(0)
+                .setMaxSupply(CIDs2.length)
+                .setTreasuryAccountId(OPERATOR_ID)
+                .setSupplyType(TokenSupplyType.FINITE)
+                .setAdminKey(operatorPublicKey)
+                .setSupplyKey(operatorPublicKey)
+                .setWipeKey(operatorPublicKey)
+                .freezeWith(client)
+                .execute(client)
+                .getReceipt(client);
 
         TokenId nftTokenId2 = nftCreateReceipt2.tokenId;
         Objects.requireNonNull(nftCreateReceipt2);
@@ -290,13 +277,14 @@ class NftAddRemoveAllowancesExample {
         List<TransactionReceipt> nftCollection2 = new ArrayList<>();
         for (int i = 0; i < CIDs2.length; i++) {
             nftCollection2.add(new TokenMintTransaction()
-                .setTokenId(nftTokenId2)
-                .setMetadata(List.of(CIDs2[i].getBytes(StandardCharsets.UTF_8)))
-                .freezeWith(client)
-                .execute(client)
-                .getReceipt(client));
+                    .setTokenId(nftTokenId2)
+                    .setMetadata(List.of(CIDs2[i].getBytes(StandardCharsets.UTF_8)))
+                    .freezeWith(client)
+                    .execute(client)
+                    .getReceipt(client));
 
-            System.out.println("Minted NFT (token ID: " + nftTokenId2 + ") with serial: " + nftCollection2.get(i).serials.get(0));
+            System.out.println("Minted NFT (token ID: " + nftTokenId2 + ") with serial: "
+                    + nftCollection2.get(i).serials.get(0));
         }
 
         /*
@@ -307,22 +295,22 @@ class NftAddRemoveAllowancesExample {
         PrivateKey delegatingSpenderPrivateKey = PrivateKey.generateECDSA();
         PublicKey delegatingSpenderPublicKey2 = delegatingSpenderPrivateKey.getPublicKey();
         AccountId delegatingSpenderAccountId = new AccountCreateTransaction()
-            .setKey(delegatingSpenderPublicKey2)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(delegatingSpenderPublicKey2)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(delegatingSpenderAccountId);
         System.out.println("Created spender account with ID: " + delegatingSpenderAccountId);
 
         PrivateKey receiverPrivateKey2 = PrivateKey.generateECDSA();
         PublicKey receiverPublicKey2 = receiverPrivateKey2.getPublicKey();
         AccountId receiverAccountId2 = new AccountCreateTransaction()
-            .setKey(receiverPublicKey2)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(receiverPublicKey2)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(receiverAccountId2);
         System.out.println("Created receiver account with ID: " + receiverAccountId2);
 
@@ -332,22 +320,24 @@ class NftAddRemoveAllowancesExample {
          */
         System.out.println("Associating spender and receiver accounts with the NFT...");
         TransactionReceipt spenderAssociateReceipt2 = new TokenAssociateTransaction()
-            .setAccountId(delegatingSpenderAccountId)
-            .setTokenIds(List.of(nftTokenId2))
-            .freezeWith(client)
-            .sign(delegatingSpenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("Spender association transaction was complete with status: " + spenderAssociateReceipt2.status);
+                .setAccountId(delegatingSpenderAccountId)
+                .setTokenIds(List.of(nftTokenId2))
+                .freezeWith(client)
+                .sign(delegatingSpenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println(
+                "Spender association transaction was complete with status: " + spenderAssociateReceipt2.status);
 
         TransactionReceipt receiverAssociateReceipt2 = new TokenAssociateTransaction()
-            .setAccountId(receiverAccountId2)
-            .setTokenIds(List.of(nftTokenId2))
-            .freezeWith(client)
-            .sign(receiverPrivateKey2)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("Receiver association transaction was complete with status: " + receiverAssociateReceipt2.status);
+                .setAccountId(receiverAccountId2)
+                .setTokenIds(List.of(nftTokenId2))
+                .freezeWith(client)
+                .sign(receiverPrivateKey2)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println(
+                "Receiver association transaction was complete with status: " + receiverAssociateReceipt2.status);
 
         /*
          * Step 13:
@@ -359,9 +349,9 @@ class NftAddRemoveAllowancesExample {
 
         System.out.println("Approving spender account allowance for NFT (all serials)...");
         TransactionReceipt approveReceipt2 = new AccountAllowanceApproveTransaction()
-            .approveTokenNftAllowanceAllSerials(nftTokenId2, OPERATOR_ID, delegatingSpenderAccountId)
-            .execute(client)
-            .getReceipt(client);
+                .approveTokenNftAllowanceAllSerials(nftTokenId2, OPERATOR_ID, delegatingSpenderAccountId)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Approve spender allowance transaction was complete with status: " + approveReceipt2.status);
 
         /*
@@ -372,11 +362,11 @@ class NftAddRemoveAllowancesExample {
         PrivateKey spenderPrivateKey2 = PrivateKey.generateECDSA();
         PublicKey spenderPublicKey2 = spenderPrivateKey2.getPublicKey();
         AccountId spenderAccountId2 = new AccountCreateTransaction()
-            .setKey(spenderPublicKey2)
-            .setInitialBalance(Hbar.from(2))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(spenderPublicKey2)
+                .setInitialBalance(Hbar.from(2))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(spenderAccountId2);
         System.out.println("Created delegate spender account with ID: : " + spenderAccountId2);
 
@@ -384,14 +374,16 @@ class NftAddRemoveAllowancesExample {
          * Step 15:
          * Give delegatingSpender allowance for NFT with serial #3 on behalf of spender account which has approveForAll rights.
          */
-        System.out.println("Approving delegate spender account allowance for NFT (serial #3) on behalf of spender account which has `approveForAll` rights...");
+        System.out.println(
+                "Approving delegate spender account allowance for NFT (serial #3) on behalf of spender account which has `approveForAll` rights...");
         TransactionReceipt approveDelegateAllowanceReceipt = new AccountAllowanceApproveTransaction()
-            .approveTokenNftAllowance(example2Nft3, OPERATOR_ID, spenderAccountId2, delegatingSpenderAccountId)
-            .freezeWith(client)
-            .sign(delegatingSpenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("Approve delegated spender allowance for serial 3 - status: " + approveDelegateAllowanceReceipt.status);
+                .approveTokenNftAllowance(example2Nft3, OPERATOR_ID, spenderAccountId2, delegatingSpenderAccountId)
+                .freezeWith(client)
+                .sign(delegatingSpenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println(
+                "Approve delegated spender allowance for serial 3 - status: " + approveDelegateAllowanceReceipt.status);
 
         /*
          * Step 16:
@@ -404,12 +396,12 @@ class NftAddRemoveAllowancesExample {
         TransactionId delegatedOnBehalfOfTxId = TransactionId.generate(spenderAccountId2);
 
         TransactionReceipt delegatedSendTx = new TransferTransaction()
-            .addApprovedNftTransfer(example2Nft3, OPERATOR_ID, receiverAccountId2)
-            .setTransactionId(delegatedOnBehalfOfTxId)
-            .freezeWith(client)
-            .sign(spenderPrivateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .addApprovedNftTransfer(example2Nft3, OPERATOR_ID, receiverAccountId2)
+                .setTransactionId(delegatedOnBehalfOfTxId)
+                .freezeWith(client)
+                .sign(spenderPrivateKey2)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Transfer serial 3 on behalf of the delegated spender status:" + delegatedSendTx.status);
 
         /*
@@ -423,12 +415,12 @@ class NftAddRemoveAllowancesExample {
         TransactionId onBehalfOfTransactionId3 = TransactionId.generate(delegatingSpenderAccountId);
 
         TransactionReceipt approvedSendReceipt3 = new TransferTransaction()
-            .addApprovedNftTransfer(example2Nft1, OPERATOR_ID, receiverAccountId2)
-            .setTransactionId(onBehalfOfTransactionId3)
-            .freezeWith(client)
-            .sign(delegatingSpenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .addApprovedNftTransfer(example2Nft1, OPERATOR_ID, receiverAccountId2)
+                .setTransactionId(onBehalfOfTransactionId3)
+                .freezeWith(client)
+                .sign(delegatingSpenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Transfer serial 1 on behalf of the spender status:" + approvedSendReceipt3.status);
 
         /*
@@ -436,9 +428,9 @@ class NftAddRemoveAllowancesExample {
          * Remove delegatingSpender allowance for all of NFT serials.
          */
         TransactionReceipt deleteAllowanceReceipt2 = new AccountAllowanceApproveTransaction()
-            .deleteTokenNftAllowanceAllSerials(nftTokenId2, OPERATOR_ID, delegatingSpenderAccountId)
-            .execute(client)
-            .getReceipt(client);
+                .deleteTokenNftAllowanceAllSerials(nftTokenId2, OPERATOR_ID, delegatingSpenderAccountId)
+                .execute(client)
+                .getReceipt(client);
         System.out.println("Remove spender's allowance for serial 2 - status: " + deleteAllowanceReceipt2.status);
 
         /*
@@ -452,12 +444,12 @@ class NftAddRemoveAllowancesExample {
 
         try {
             new TransferTransaction()
-                .addApprovedNftTransfer(example2Nft2, OPERATOR_ID, receiverAccountId2)
-                .setTransactionId(onBehalfOfTransactionId4)
-                .freezeWith(client)
-                .sign(delegatingSpenderPrivateKey)
-                .execute(client)
-                .getReceipt(client);
+                    .addApprovedNftTransfer(example2Nft2, OPERATOR_ID, receiverAccountId2)
+                    .setTransactionId(onBehalfOfTransactionId4)
+                    .freezeWith(client)
+                    .sign(delegatingSpenderPrivateKey)
+                    .execute(client)
+                    .getReceipt(client);
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -467,65 +459,59 @@ class NftAddRemoveAllowancesExample {
          * Delete created accounts and tokens.
          */
         new TokenWipeTransaction()
-            .setTokenId(nftTokenId)
-            .addSerial(1)
-            .setAccountId(receiverAccountId)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(nftTokenId)
+                .addSerial(1)
+                .setAccountId(receiverAccountId)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client)
+                .getReceipt(client);
 
         new TokenWipeTransaction()
-            .setTokenId(nftTokenId2)
-            .addSerial(1)
-            .addSerial(3)
-            .setAccountId(receiverAccountId2)
-            .freezeWith(client)
-            .sign(OPERATOR_KEY)
-            .execute(client)
-            .getReceipt(client);
+                .setTokenId(nftTokenId2)
+                .addSerial(1)
+                .addSerial(3)
+                .setAccountId(receiverAccountId2)
+                .freezeWith(client)
+                .sign(OPERATOR_KEY)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(spenderAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(spenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(spenderAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(spenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(receiverAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(receiverPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(receiverAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(receiverPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(delegatingSpenderAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(delegatingSpenderPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(delegatingSpenderAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(delegatingSpenderPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(receiverAccountId2)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(receiverPrivateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(receiverAccountId2)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(receiverPrivateKey2)
+                .execute(client)
+                .getReceipt(client);
 
-        new TokenDeleteTransaction()
-            .setTokenId(nftTokenId)
-            .execute(client)
-            .getReceipt(client);
+        new TokenDeleteTransaction().setTokenId(nftTokenId).execute(client).getReceipt(client);
 
-        new TokenDeleteTransaction()
-            .setTokenId(nftTokenId2)
-            .execute(client)
-            .getReceipt(client);
+        new TokenDeleteTransaction().setTokenId(nftTokenId2).execute(client).getReceipt(client);
 
         client.close();
 

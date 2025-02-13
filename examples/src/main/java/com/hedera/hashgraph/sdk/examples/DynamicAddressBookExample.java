@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountId;
@@ -20,15 +21,15 @@ import java.util.concurrent.TimeoutException;
 public class DynamicAddressBookExample {
     // see `.env.sample` in the repository root for how to specify these values
     // or set environment variables with the same names
-    private static final AccountId OPERATOR_ID = AccountId.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(
-        Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
     // HEDERA_NETWORK defaults to testnet if not specified in dotenv
     private static final String HEDERA_NETWORK = Dotenv.load().get("HEDERA_NETWORK", "testnet");
 
     public static void main(String[] args)
-        throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
+            throws TimeoutException, PrecheckStatusException, ReceiptStatusException, InterruptedException {
         Client client = ClientHelper.forName(HEDERA_NETWORK);
 
         // Defaults the operator account ID and key such that all generated transactions will be paid for
@@ -41,53 +42,50 @@ public class DynamicAddressBookExample {
 
         // Set up IPv4 address
         Endpoint gossipEndpoint = new Endpoint();
-        gossipEndpoint
-            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
+        gossipEndpoint.setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
 
         // Set up service endpoint
         Endpoint serviceEndpoint = new Endpoint();
-        serviceEndpoint
-            .setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
+        serviceEndpoint.setAddress(new byte[] {0x00, 0x01, 0x02, 0x03});
 
         // Generate admin key
         PrivateKey adminKey = PrivateKey.generateED25519();
 
         // Create node create transaction
         NodeCreateTransaction nodeCreateTransaction = new NodeCreateTransaction()
-            .setAccountId(accountId)
-            .setDescription(description)
-            .setGossipCaCertificate("gossipCaCertificate".getBytes())
-            .setServiceEndpoints(Collections.singletonList(serviceEndpoint))
-            .setGossipEndpoints(Collections.singletonList(gossipEndpoint))
-            .setAdminKey(adminKey.getPublicKey());
+                .setAccountId(accountId)
+                .setDescription(description)
+                .setGossipCaCertificate("gossipCaCertificate".getBytes())
+                .setServiceEndpoints(Collections.singletonList(serviceEndpoint))
+                .setGossipEndpoints(Collections.singletonList(gossipEndpoint))
+                .setAdminKey(adminKey.getPublicKey());
 
         try {
             nodeCreateTransaction.execute(client).getReceipt(client);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
         var nodeUpdateTransaction = new NodeUpdateTransaction()
-            .setNodeId(123)
-            .setAccountId(accountId)
-            .setDescription(newDescription)
-            .setGossipCaCertificate("gossipCaCertificate".getBytes())
-            .setServiceEndpoints(Collections.singletonList(serviceEndpoint))
-            .setGossipEndpoints(Collections.singletonList(gossipEndpoint))
-            .setAdminKey(adminKey.getPublicKey());
+                .setNodeId(123)
+                .setAccountId(accountId)
+                .setDescription(newDescription)
+                .setGossipCaCertificate("gossipCaCertificate".getBytes())
+                .setServiceEndpoints(Collections.singletonList(serviceEndpoint))
+                .setGossipEndpoints(Collections.singletonList(gossipEndpoint))
+                .setAdminKey(adminKey.getPublicKey());
 
         try {
             nodeUpdateTransaction.execute(client).getReceipt(client);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
 
-        var nodeDeleteTransaction = new NodeDeleteTransaction()
-            .setNodeId(123);
+        var nodeDeleteTransaction = new NodeDeleteTransaction().setNodeId(123);
 
         try {
             nodeDeleteTransaction.execute(client).getReceipt(client);
-        } catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e);
         }
     }

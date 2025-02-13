@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.time.Instant;
 import java.util.Objects;
 
@@ -41,12 +22,14 @@ class ScheduleExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -59,7 +42,7 @@ class ScheduleExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -92,11 +75,11 @@ class ScheduleExample {
          */
         System.out.println("Creating new account...");
         AccountId accountId = new AccountCreateTransaction()
-            .setKey(KeyList.of(publicKey1, publicKey2))
-            .setInitialBalance(Hbar.from(1))
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setKeyWithoutAlias(KeyList.of(publicKey1, publicKey2))
+                .setInitialBalance(Hbar.from(1))
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(accountId);
         System.out.println("Created new account with ID: " + accountId);
 
@@ -106,14 +89,14 @@ class ScheduleExample {
          */
         System.out.println("Scheduling token transfer...");
         TransactionResponse transferTxResponse = new TransferTransaction()
-            .addHbarTransfer(accountId, Hbar.from(1).negated())
-            .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1))
-            .schedule()
-            // Set expiration time to be now + 24 hours
-            .setExpirationTime(Instant.now().plusSeconds(24 * 60 * 60))
-            // Set wait for expiry to true
-            .setWaitForExpiry(true)
-            .execute(client);
+                .addHbarTransfer(accountId, Hbar.from(1).negated())
+                .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1))
+                .schedule()
+                // Set expiration time to be now + 24 hours
+                .setExpirationTime(Instant.now().plusSeconds(24 * 60 * 60))
+                // Set wait for expiry to true
+                .setWaitForExpiry(true)
+                .execute(client);
 
         System.out.println("Scheduled transaction ID: " + transferTxResponse.transactionId);
 
@@ -129,22 +112,21 @@ class ScheduleExample {
          */
         System.out.println("Appending private key #1 signature to a schedule transaction...");
         var scheduleSignTxReceiptFirstSignature = new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .execute(client)
-            .getReceipt(client);
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .execute(client)
+                .getReceipt(client);
 
-        System.out.println("A transaction that appends signature to a schedule transaction (private key #1) " +
-            "was complete with status: " + scheduleSignTxReceiptFirstSignature.status);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #1) "
+                + "was complete with status: " + scheduleSignTxReceiptFirstSignature.status);
 
         /*
          * Step 4:
          * Query the state of a schedule transaction.
          */
-        ScheduleInfo scheduleInfo = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(client);
+        ScheduleInfo scheduleInfo =
+                new ScheduleInfoQuery().setScheduleId(scheduleId).execute(client);
 
         System.out.println("Schedule info: " + scheduleInfo);
 
@@ -154,31 +136,34 @@ class ScheduleExample {
          */
         System.out.println("Appending private key #2 signature to a schedule transaction...");
         var scheduleSignTxReceiptSecondSignature = new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(privateKey2)
-            .execute(client)
-            .getReceipt(client);
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(privateKey2)
+                .execute(client)
+                .getReceipt(client);
 
-        System.out.println("A transaction that appends signature to a schedule transaction (private key #2) " +
-            "was complete with status: " + scheduleSignTxReceiptSecondSignature.status);
+        System.out.println("A transaction that appends signature to a schedule transaction (private key #2) "
+                + "was complete with status: " + scheduleSignTxReceiptSecondSignature.status);
 
         TransactionId transactionId = transferTxResponse.transactionId;
-        String validMirrorTransactionId = transactionId.accountId.toString() + "-" + transactionId.validStart.getEpochSecond() + "-" + transactionId.validStart.getNano();
-        String mirrorNodeUrl = "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId;
-        System.out.println("The following link should query the mirror node for the scheduled transaction: " + mirrorNodeUrl);
+        String validMirrorTransactionId = transactionId.accountId.toString() + "-"
+                + transactionId.validStart.getEpochSecond() + "-" + transactionId.validStart.getNano();
+        String mirrorNodeUrl =
+                "https://" + HEDERA_NETWORK + ".mirrornode.hedera.com/api/v1/transactions/" + validMirrorTransactionId;
+        System.out.println(
+                "The following link should query the mirror node for the scheduled transaction: " + mirrorNodeUrl);
 
         /*
          * Clean up:
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setAccountId(accountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(privateKey1)
-            .sign(privateKey2)
-            .execute(client);
+                .setAccountId(accountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(privateKey1)
+                .sign(privateKey2)
+                .execute(client);
 
         client.close();
 

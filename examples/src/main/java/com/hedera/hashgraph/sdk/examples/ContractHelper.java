@@ -36,7 +36,7 @@ which is assumed to have functions named "step0()" through "stepN()".
 
 Each of these step functions is assumed to take no function parameters, and to return a Hedera ResponseCode
 which ought to be SUCCESS -- in other words, an int32 with value 22.
-See resources/com/hedera/hashgraph/sdk/examples/contracts/precompile/HederaResponseCodes.sol
+See resources/org/hiero/sdk/java/examples/contracts/precompile/HederaResponseCodes.sol
 
 If a step takes function parameters, or if its ContractFunctionResult should be validated with a different method,
 the user can specify a supplier for a particular step with setParameterSupplier(stepIndex, parametersSupplier),

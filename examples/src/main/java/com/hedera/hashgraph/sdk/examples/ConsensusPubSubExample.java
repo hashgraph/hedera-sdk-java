@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -50,12 +31,14 @@ class ConsensusPubSubExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -68,7 +51,7 @@ class ConsensusPubSubExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -93,9 +76,8 @@ class ConsensusPubSubExample {
          */
         System.out.println("Creating new topic...");
 
-        TransactionResponse topicCreateTxResponse = new TopicCreateTransaction()
-            .setAdminKey(operatorPublicKey)
-            .execute(client);
+        TransactionResponse topicCreateTxResponse =
+                new TopicCreateTransaction().setAdminKey(operatorPublicKey).execute(client);
 
         TransactionReceipt transactionReceipt = topicCreateTxResponse.getReceipt(client);
         TopicId hederaTopicId = Objects.requireNonNull(transactionReceipt.topicId);
@@ -114,15 +96,13 @@ class ConsensusPubSubExample {
          * Hedera mirror node.
          */
         System.out.println("Setting up a mirror client...");
-        new TopicMessageQuery()
-            .setTopicId(hederaTopicId)
-            .subscribe(client, resp -> {
-                String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
-                System.out.println("Topic message received!" +
-                    " | Time: " + resp.consensusTimestamp +
-                    " | Content: " + messageAsString);
-                MESSAGES_LATCH.countDown();
-            });
+        new TopicMessageQuery().setTopicId(hederaTopicId).subscribe(client, resp -> {
+            String messageAsString = new String(resp.contents, StandardCharsets.UTF_8);
+            System.out.println("Topic message received!" + " | Time: "
+                    + resp.consensusTimestamp + " | Content: "
+                    + messageAsString);
+            MESSAGES_LATCH.countDown();
+        });
 
         /*
          * Step 4:
@@ -134,10 +114,10 @@ class ConsensusPubSubExample {
             System.out.println("Publishing message to the topic: " + message);
 
             new TopicMessageSubmitTransaction()
-                .setTopicId(hederaTopicId)
-                .setMessage(message)
-                .execute(client)
-                .getReceipt(client);
+                    .setTopicId(hederaTopicId)
+                    .setMessage(message)
+                    .execute(client)
+                    .getReceipt(client);
 
             Thread.sleep(2_000);
         }
@@ -149,10 +129,7 @@ class ConsensusPubSubExample {
          * Clean up:
          * Delete created topic.
          */
-        new TopicDeleteTransaction()
-            .setTopicId(hederaTopicId)
-            .execute(client)
-            .getReceipt(client);
+        new TopicDeleteTransaction().setTopicId(hederaTopicId).execute(client).getReceipt(client);
 
         client.close();
 

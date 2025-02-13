@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.List;
 import java.util.Objects;
 
@@ -47,12 +28,14 @@ class ContractNoncesExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -65,7 +48,7 @@ class ContractNoncesExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -90,12 +73,13 @@ class ContractNoncesExample {
          * Step 1:
          * Create a file with smart contract bytecode.
          */
-        String contractBytecodeHex = ContractHelper.getBytecodeHex("contracts/parent_deploys_child/parent_deploys_child.json");
+        String contractBytecodeHex =
+                ContractHelper.getBytecodeHex("contracts/parent_deploys_child/parent_deploys_child.json");
         TransactionResponse bytecodeFileCreateTxResponse = new FileCreateTransaction()
-            .setKeys(operatorPublicKey)
-            .setContents(contractBytecodeHex)
-            .setMaxTransactionFee(Hbar.from(2))
-            .execute(client);
+                .setKeys(operatorPublicKey)
+                .setContents(contractBytecodeHex)
+                .setMaxTransactionFee(Hbar.from(2))
+                .execute(client);
 
         TransactionReceipt bytecodeFileCreateTxReceipt = bytecodeFileCreateTxResponse.getReceipt(client);
         FileId bytecodeFileId = bytecodeFileCreateTxReceipt.fileId;
@@ -106,11 +90,11 @@ class ContractNoncesExample {
          * Create a smart contract.
          */
         TransactionResponse contractCreateTxResponse = new ContractCreateTransaction()
-            .setAdminKey(operatorPublicKey)
-            .setGas(100_000)
-            .setBytecodeFileId(bytecodeFileId)
-            .setContractMemo("HIP-729 Contract")
-            .execute(client);
+                .setAdminKey(operatorPublicKey)
+                .setGas(100_000)
+                .setBytecodeFileId(bytecodeFileId)
+                .setContractMemo("HIP-729 Contract")
+                .execute(client);
 
         TransactionReceipt contractCreateTxReceipt = contractCreateTxResponse.getReceipt(client);
         ContractId contractId = contractCreateTxReceipt.contractId;
@@ -123,10 +107,8 @@ class ContractNoncesExample {
          * Get a record from a contract create transaction to check contracts nonces.
          * We expect to see `nonce=2` as we deploy a contract that creates another contract in its constructor.
          */
-        List<ContractNonceInfo> contractNonces = contractCreateTxResponse.
-            getRecord(client)
-            .contractFunctionResult
-            .contractNonces;
+        List<ContractNonceInfo> contractNonces =
+                contractCreateTxResponse.getRecord(client).contractFunctionResult.contractNonces;
 
         System.out.println("Contract nonces: " + contractNonces);
 
@@ -135,11 +117,11 @@ class ContractNoncesExample {
          * Delete created contract.
          */
         new ContractDeleteTransaction()
-            .setContractId(contractId)
-            .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)
-            .setMaxTransactionFee(Hbar.from(1))
-            .execute(client)
-            .getReceipt(client);
+                .setContractId(contractId)
+                .setTransferAccountId(contractCreateTxReceipt.transactionId.accountId)
+                .setMaxTransactionFee(Hbar.from(1))
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

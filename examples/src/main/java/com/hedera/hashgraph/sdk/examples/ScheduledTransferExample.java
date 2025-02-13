@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -64,12 +45,14 @@ class ScheduledTransferExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -82,7 +65,7 @@ class ScheduledTransferExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -100,7 +83,7 @@ class ScheduledTransferExample {
         client.setLogger(new Logger(LogLevel.valueOf(SDK_LOG_LEVEL)));
 
         System.out.println("In this example Alice's account ID would be equal to the Operator's account ID: "
-            + client.getOperatorAccountId());
+                + client.getOperatorAccountId());
 
         /*
          * Step 1:
@@ -116,14 +99,14 @@ class ScheduledTransferExample {
          */
         System.out.println("Create Bob's account...(with receiver signature property enabled).");
         AccountId bobAccountId = new AccountCreateTransaction()
-            .setReceiverSignatureRequired(true)
-            .setKey(bobPublicKey)
-            .setInitialBalance(Hbar.from(1))
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setReceiverSignatureRequired(true)
+                .setKeyWithoutAlias(bobPublicKey)
+                .setInitialBalance(Hbar.from(1))
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(bobAccountId);
         System.out.println("Created Bob's account with ID: " + bobAccountId);
 
@@ -131,9 +114,8 @@ class ScheduledTransferExample {
          * Step 3:
          * Check Bob's initial balance.
          */
-        AccountBalance bobsInitialBalance = new AccountBalanceQuery()
-            .setAccountId(bobAccountId)
-            .execute(client);
+        AccountBalance bobsInitialBalance =
+                new AccountBalanceQuery().setAccountId(bobAccountId).execute(client);
         System.out.println("Bob's initial account balance: " + bobsInitialBalance);
 
         /*
@@ -141,8 +123,8 @@ class ScheduledTransferExample {
          * Create a transfer transaction which we will schedule.
          */
         TransferTransaction transferTx = new TransferTransaction()
-            .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1).negated())
-            .addHbarTransfer(bobAccountId, Hbar.from(1));
+                .addHbarTransfer(client.getOperatorAccountId(), Hbar.from(1).negated())
+                .addHbarTransfer(bobAccountId, Hbar.from(1));
         System.out.println("Scheduling token transfer: " + transferTx);
 
         /*
@@ -163,11 +145,11 @@ class ScheduledTransferExample {
          * will be charged for executing the scheduled transaction.
          */
         ScheduleId scheduleId = new ScheduleCreateTransaction()
-            .setScheduledTransaction(transferTx)
-            .setPayerAccountId(bobAccountId)
-            .execute(client)
-            .getReceipt(client)
-            .scheduleId;
+                .setScheduledTransaction(transferTx)
+                .setPayerAccountId(bobAccountId)
+                .execute(client)
+                .getReceipt(client)
+                .scheduleId;
         Objects.requireNonNull(scheduleId);
         System.out.println("Schedule ID for the transaction above: " + scheduleId);
 
@@ -176,10 +158,10 @@ class ScheduledTransferExample {
          * Check Bob's balance -- it should be unchanged, because the transfer has been scheduled,
          * but it hasn't been executed yet as it requires Bob's signature.
          */
-        AccountBalance bobsBalanceAfterSchedule = new AccountBalanceQuery()
-            .setAccountId(bobAccountId)
-            .execute(client);
-        System.out.println("Bob's balance after scheduling the transfer (should be unchanged): " + bobsBalanceAfterSchedule);
+        AccountBalance bobsBalanceAfterSchedule =
+                new AccountBalanceQuery().setAccountId(bobAccountId).execute(client);
+        System.out.println(
+                "Bob's balance after scheduling the transfer (should be unchanged): " + bobsBalanceAfterSchedule);
 
         /*
          * Step 7:
@@ -188,9 +170,8 @@ class ScheduledTransferExample {
          * Once Alice has communicated the scheduleId to Bob, Bob can query for information about the
          * scheduled transaction.
          */
-        ScheduleInfo scheduledTransactionInfo = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(client);
+        ScheduleInfo scheduledTransactionInfo =
+                new ScheduleInfoQuery().setScheduleId(scheduleId).execute(client);
         System.out.println("Scheduled transaction info: " + scheduledTransactionInfo);
 
         // getScheduledTransaction() will return an SDK Transaction object identical to the transaction
@@ -211,43 +192,42 @@ class ScheduledTransferExample {
          */
         System.out.println("Appending Bob's signature to a schedule transaction...");
         var scheduleSignTxReceipt = new ScheduleSignTransaction()
-            .setScheduleId(scheduleId)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
-        System.out.println("A transaction that appends Bob's signature to a schedule transfer transaction " +
-            "was complete with status: " + scheduleSignTxReceipt.status);
+                .setScheduleId(scheduleId)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
+        System.out.println("A transaction that appends Bob's signature to a schedule transfer transaction "
+                + "was complete with status: " + scheduleSignTxReceipt.status);
 
         /*
          * Step 9:
          * Check Bob's account balance after signing the scheduled transaction.
          */
-        AccountBalance balanceAfterSigning = new AccountBalanceQuery()
-            .setAccountId(bobAccountId)
-            .execute(client);
+        AccountBalance balanceAfterSigning =
+                new AccountBalanceQuery().setAccountId(bobAccountId).execute(client);
         System.out.println("Bob's balance after signing the scheduled transaction: " + balanceAfterSigning);
 
         /*
          * Step 10:
          * Query the state of a schedule transaction.
          */
-        ScheduleInfo postTransactionInfo = new ScheduleInfoQuery()
-            .setScheduleId(scheduleId)
-            .execute(client);
-        System.out.println("Scheduled transaction info (`executedAt` should no longer be `null`): " + postTransactionInfo);
+        ScheduleInfo postTransactionInfo =
+                new ScheduleInfoQuery().setScheduleId(scheduleId).execute(client);
+        System.out.println(
+                "Scheduled transaction info (`executedAt` should no longer be `null`): " + postTransactionInfo);
 
         /*
          * Clean up:
          * Delete created account.
          */
         new AccountDeleteTransaction()
-            .setTransferAccountId(client.getOperatorAccountId())
-            .setAccountId(bobAccountId)
-            .freezeWith(client)
-            .sign(bobPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setTransferAccountId(client.getOperatorAccountId())
+                .setAccountId(bobAccountId)
+                .freezeWith(client)
+                .sign(bobPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 

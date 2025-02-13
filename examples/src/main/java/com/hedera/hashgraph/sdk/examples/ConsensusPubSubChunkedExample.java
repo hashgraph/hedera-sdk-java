@@ -1,29 +1,12 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +15,6 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * How to send large message to the private HCS topic and how to subscribe to the topic to receive it.
@@ -51,12 +32,14 @@ class ConsensusPubSubChunkedExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -69,7 +52,7 @@ class ConsensusPubSubChunkedExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -103,12 +86,12 @@ class ConsensusPubSubChunkedExample {
         System.out.println("Creating new topic...");
 
         TopicId hederaTopicID = new TopicCreateTransaction()
-            .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
-            .setAdminKey(operatorPublicKey)
-            .setSubmitKey(submitPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .topicId;
+                .setTopicMemo("hedera-sdk-java/ConsensusPubSubChunkedExample")
+                .setAdminKey(operatorPublicKey)
+                .setSubmitKey(submitPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .topicId;
         Objects.requireNonNull(hederaTopicID);
 
         System.out.println("Created new topic with ID: " + hederaTopicID);
@@ -126,15 +109,13 @@ class ConsensusPubSubChunkedExample {
          * Hedera mirror node.
          */
         System.out.println("Setting up a mirror client...");
-        new TopicMessageQuery()
-            .setTopicId(hederaTopicID)
-            .subscribe(client, topicMessage -> {
-                System.out.println("Topic message received!" +
-                    " | Time: " + topicMessage.consensusTimestamp +
-                    " | Sequence No.: " + topicMessage.sequenceNumber +
-                    " | Size: " + topicMessage.contents.length + " bytes.");
-                LARGE_MESSAGE_LATCH.countDown();
-            });
+        new TopicMessageQuery().setTopicId(hederaTopicID).subscribe(client, topicMessage -> {
+            System.out.println("Topic message received!" + " | Time: "
+                    + topicMessage.consensusTimestamp + " | Sequence No.: "
+                    + topicMessage.sequenceNumber + " | Size: "
+                    + topicMessage.contents.length + " bytes.");
+            LARGE_MESSAGE_LATCH.countDown();
+        });
 
         /*
          * Step 5:
@@ -145,14 +126,14 @@ class ConsensusPubSubChunkedExample {
 
         // Prepare a message send transaction that requires a submit key from "somewhere else".
         Transaction<?> topicMessageSubmitTx = new TopicMessageSubmitTransaction()
-            // This is value 10 by default,
-            // increasing so large message will "fit".
-            .setMaxChunks(15)
-            .setTopicId(hederaTopicID)
-            .setMessage(largeMessage)
-            // Sign with the operator or "sender" of the message,
-            // this is the party who will be charged the transaction fee.
-            .signWithOperator(client);
+                // This is value 10 by default,
+                // increasing so large message will "fit".
+                .setMaxChunks(15)
+                .setTopicId(hederaTopicID)
+                .setMessage(largeMessage)
+                // Sign with the operator or "sender" of the message,
+                // this is the party who will be charged the transaction fee.
+                .signWithOperator(client);
 
         // Serialize to bytes, so we can be signed "somewhere else" by the submit key.
         byte[] transactionBytes = topicMessageSubmitTx.toBytes();
@@ -163,8 +144,11 @@ class ConsensusPubSubChunkedExample {
 
         // View out the message size from the parsed transaction.
         // This can be useful to display what we are about to sign.
-        long transactionMessageSize = ((TopicMessageSubmitTransaction) topicMessageSubmitTx).getMessage().size();
-        System.out.println("Preparing to submit a message to the created topic (size of the message: " + transactionMessageSize + " bytes)...");
+        long transactionMessageSize = ((TopicMessageSubmitTransaction) topicMessageSubmitTx)
+                .getMessage()
+                .size();
+        System.out.println("Preparing to submit a message to the created topic (size of the message: "
+                + transactionMessageSize + " bytes)...");
 
         // Sign with that Submit Key.
         topicMessageSubmitTx.sign(submitPrivateKey);
@@ -179,10 +163,7 @@ class ConsensusPubSubChunkedExample {
          * Clean up:
          * Delete created topic.
          */
-        new TopicDeleteTransaction()
-            .setTopicId(hederaTopicID)
-            .execute(client)
-            .getReceipt(client);
+        new TopicDeleteTransaction().setTopicId(hederaTopicID).execute(client).getReceipt(client);
 
         client.close();
 
@@ -197,7 +178,8 @@ class ConsensusPubSubChunkedExample {
     private static String readResources(String filename) {
         InputStream inputStream = ConsensusPubSubChunkedExample.class.getResourceAsStream(filename);
         StringBuilder bigContents = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
+        try (BufferedReader reader =
+                new BufferedReader(new InputStreamReader(Objects.requireNonNull(inputStream), UTF_8))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 bigContents.append(line).append("\n");

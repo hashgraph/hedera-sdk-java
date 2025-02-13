@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.nio.charset.Charset;
 import java.util.Objects;
 import java.util.Scanner;
@@ -93,12 +74,14 @@ class ValidateChecksumExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -111,7 +94,7 @@ class ValidateChecksumExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -145,7 +128,8 @@ class ValidateChecksumExample {
                 AccountId accountId = AccountId.fromString(inputString);
 
                 System.out.println("The account ID with no checksum is: " + accountId.toString());
-                System.out.println("The account ID with the correct checksum is: " + accountId.toStringWithChecksum(client));
+                System.out.println(
+                        "The account ID with the correct checksum is: " + accountId.toStringWithChecksum(client));
 
                 if (accountId.getChecksum() == null) {
                     System.out.println("You must enter a checksum.");
@@ -156,9 +140,8 @@ class ValidateChecksumExample {
                 // Throws BadEntityIdException if checksum is incorrect.
                 accountId.validateChecksum(client);
 
-                AccountBalance accountBalance = new AccountBalanceQuery()
-                    .setAccountId(accountId)
-                    .execute(client);
+                AccountBalance accountBalance =
+                        new AccountBalanceQuery().setAccountId(accountId).execute(client);
 
                 System.out.println("Account Balance: " + accountBalance);
 
@@ -168,10 +151,8 @@ class ValidateChecksumExample {
                 System.out.println(exc.getMessage());
             } catch (BadEntityIdException exc) {
                 System.out.println(exc.getMessage());
-                System.out.println(
-                    "You entered " + exc.shard + "." + exc.realm + "." + exc.num + "-" + exc.presentChecksum +
-                        ", the expected checksum was " + exc.expectedChecksum
-                );
+                System.out.println("You entered " + exc.shard + "." + exc.realm + "." + exc.num + "-"
+                        + exc.presentChecksum + ", the expected checksum was " + exc.expectedChecksum);
             }
         }
 
@@ -205,9 +186,8 @@ class ValidateChecksumExample {
                     continue;
                 }
 
-                AccountBalance accountBalance = new AccountBalanceQuery()
-                    .setAccountId(accountId)
-                    .execute(client);
+                AccountBalance accountBalance =
+                        new AccountBalanceQuery().setAccountId(accountId).execute(client);
 
                 System.out.println("Account Balance: " + accountBalance);
 

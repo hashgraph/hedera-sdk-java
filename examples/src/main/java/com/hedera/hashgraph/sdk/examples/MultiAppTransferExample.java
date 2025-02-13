@@ -1,29 +1,10 @@
-/*-
- *
- * Hedera Java SDK
- *
- * Copyright (C) 2020 - 2024 Hedera Hashgraph, LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+// SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.sdk.logger.LogLevel;
 import com.hedera.hashgraph.sdk.logger.Logger;
 import io.github.cdimascio.dotenv.Dotenv;
-
 import java.util.Objects;
 
 /**
@@ -40,12 +21,14 @@ class MultiAppTransferExample {
      * Operator's account ID.
      * Used to sign and pay for operations on Hedera.
      */
-    private static final AccountId OPERATOR_ID = AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
+    private static final AccountId OPERATOR_ID =
+            AccountId.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_ID")));
 
     /**
      * Operator's private key.
      */
-    private static final PrivateKey OPERATOR_KEY = PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
+    private static final PrivateKey OPERATOR_KEY =
+            PrivateKey.fromString(Objects.requireNonNull(Dotenv.load().get("OPERATOR_KEY")));
 
     /**
      * HEDERA_NETWORK defaults to testnet if not specified in dotenv file.
@@ -58,7 +41,7 @@ class MultiAppTransferExample {
      * Log levels can be: TRACE, DEBUG, INFO, WARN, ERROR, SILENT.
      * <p>
      * Important pre-requisite: set simple logger log level to same level as the SDK_LOG_LEVEL,
-     * for example via VM options: -Dorg.slf4j.simpleLogger.log.com.hedera.hashgraph=trace
+     * for example via VM options: -Dorg.slf4j.simpleLogger.log.org.hiero=trace
      */
     private static final String SDK_LOG_LEVEL = Dotenv.load().get("SDK_LOG_LEVEL", "SILENT");
 
@@ -94,35 +77,31 @@ class MultiAppTransferExample {
         System.out.println("Creating exchange and receiver accounts...");
         // The exchange creates an account for the user to transfer funds to.
         AccountId exchangeAccountId = new AccountCreateTransaction()
-            // The exchange only accepts transfers that it validates through a side channel (e.g. REST API).
-            .setReceiverSignatureRequired(true)
-            .setKey(exchangePublicKey)
-            // The owner key has to sign this transaction when setReceiverSignatureRequired is true.
-            .freezeWith(client)
-            .sign(exchangePrivateKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                // The exchange only accepts transfers that it validates through a side channel (e.g. REST API).
+                .setReceiverSignatureRequired(true)
+                .setKeyWithoutAlias(exchangePublicKey)
+                // The owner key has to sign this transaction when setReceiverSignatureRequired is true.
+                .freezeWith(client)
+                .sign(exchangePrivateKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(exchangeAccountId);
 
         // For the purpose of this example we create an account for the user with a balance of 5 Hbar.
         AccountId userAccountId = new AccountCreateTransaction()
-            .setInitialBalance(Hbar.from(2))
-            .setKey(userPublicKey)
-            .execute(client)
-            .getReceipt(client)
-            .accountId;
+                .setInitialBalance(Hbar.from(2))
+                .setKeyWithoutAlias(userPublicKey)
+                .execute(client)
+                .getReceipt(client)
+                .accountId;
         Objects.requireNonNull(userAccountId);
 
-        Hbar senderBalanceBefore = new AccountBalanceQuery()
-            .setAccountId(userAccountId)
-            .execute(client)
-            .hbars;
+        Hbar senderBalanceBefore =
+                new AccountBalanceQuery().setAccountId(userAccountId).execute(client).hbars;
 
-        Hbar exchangeBalanceBefore = new AccountBalanceQuery()
-            .setAccountId(exchangeAccountId)
-            .execute(client)
-            .hbars;
+        Hbar exchangeBalanceBefore =
+                new AccountBalanceQuery().setAccountId(exchangeAccountId).execute(client).hbars;
 
         System.out.println("User account (" + userAccountId + ") balance: " + senderBalanceBefore);
         System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + exchangeBalanceBefore);
@@ -132,23 +111,28 @@ class MultiAppTransferExample {
          * Make a transfer from the user account to the exchange account, this requires signing by both parties.
          */
         TransferTransaction transferTx = new TransferTransaction()
-            .addHbarTransfer(userAccountId, Hbar.from(1).negated())
-            .addHbarTransfer(exchangeAccountId, Hbar.from(1))
-            // The exchange-provided memo required to validate the transaction.
-            .setTransactionMemo("https://some-exchange.com/user1/account1")
-            // NOTE: to manually sign, you must freeze the Transaction first
-            .freezeWith(client)
-            .sign(userPrivateKey);
+                .addHbarTransfer(userAccountId, Hbar.from(1).negated())
+                .addHbarTransfer(exchangeAccountId, Hbar.from(1))
+                // The exchange-provided memo required to validate the transaction.
+                .setTransactionMemo("https://some-exchange.com/user1/account1")
+                // NOTE: to manually sign, you must freeze the Transaction first
+                .freezeWith(client)
+                .sign(userPrivateKey);
 
         // The exchange must sign the transaction in order for it to be accepted by the network
         // (assume this is some REST call to the exchange API server).
-        byte[] signedTransferTxBytes = Transaction.fromBytes(transferTx.toBytes()).sign(exchangePrivateKey).toBytes();
+        byte[] signedTransferTxBytes = Transaction.fromBytes(transferTx.toBytes())
+                .sign(exchangePrivateKey)
+                .toBytes();
 
         // Parse the transaction bytes returned from the exchange.
         Transaction<?> signedTransferTx = Transaction.fromBytes(signedTransferTxBytes);
 
         // Get the amount we are about to transfer (we built this with +2, -2).
-        Hbar transferAmount = ((TransferTransaction) signedTransferTx).getHbarTransfers().values().toArray(new Hbar[0])[0];
+        Hbar transferAmount = ((TransferTransaction) signedTransferTx)
+                .getHbarTransfers()
+                .values()
+                .toArray(new Hbar[0])[0];
 
         System.out.println("Transferring " + transferAmount + " from the user account to the exchange account...");
 
@@ -162,15 +146,11 @@ class MultiAppTransferExample {
          * Step 4:
          * Query user and exchange account balance to validate the transfer was successfully complete.
          */
-        Hbar senderBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(userAccountId)
-            .execute(client)
-            .hbars;
+        Hbar senderBalanceAfter =
+                new AccountBalanceQuery().setAccountId(userAccountId).execute(client).hbars;
 
-        Hbar exchangeBalanceAfter = new AccountBalanceQuery()
-            .setAccountId(exchangeAccountId)
-            .execute(client)
-            .hbars;
+        Hbar exchangeBalanceAfter =
+                new AccountBalanceQuery().setAccountId(exchangeAccountId).execute(client).hbars;
 
         System.out.println("User account (" + userAccountId + ") balance: " + senderBalanceAfter);
         System.out.println("Exchange account (" + exchangeAccountId + ") balance: " + exchangeBalanceAfter);
@@ -180,20 +160,20 @@ class MultiAppTransferExample {
          * Delete created accounts.
          */
         new AccountDeleteTransaction()
-            .setAccountId(exchangeAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(exchangePrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(exchangeAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(exchangePrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         new AccountDeleteTransaction()
-            .setAccountId(userAccountId)
-            .setTransferAccountId(OPERATOR_ID)
-            .freezeWith(client)
-            .sign(userPrivateKey)
-            .execute(client)
-            .getReceipt(client);
+                .setAccountId(userAccountId)
+                .setTransferAccountId(OPERATOR_ID)
+                .freezeWith(client)
+                .sign(userPrivateKey)
+                .execute(client)
+                .getReceipt(client);
 
         client.close();
 
