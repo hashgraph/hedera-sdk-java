@@ -13,11 +13,25 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * Freezes transfers of the specified token for the account.
+ * Block transfers of a token type for an account.<br/>
+ * This, effectively, freezes assets of one account with respect to
+ * one token type. While frozen, that account cannot send or receive tokens
+ * of the identified type.
  *
- * The transaction must be signed by the token's Freeze Key.
+ * The token MUST have a `freeze_key` set and that key MUST NOT
+ * be an empty `KeyList`.<br/>
+ * The token `freeze_key` MUST sign this transaction.<br/>
+ * The identified token MUST exist, MUST NOT be deleted, MUST NOT be paused,
+ * and MUST NOT be expired.<br/>
+ * The identified account MUST exist, MUST NOT be deleted, and
+ * MUST NOT be expired.<br/>
+ * If the identified account is already frozen with respect to the identified
+ * token, the transaction SHALL succeed, but no change SHALL be made.<br/>
+ * An association between the identified account and the identified
+ * token MUST exist.
  *
- * See <a href="https://docs.hedera.com/guides/docs/sdks/tokens/freeze-an-account">Hedera Documentation</a>
+ * ### Block Stream Effects
+ * None
  */
 public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction<TokenFreezeTransaction> {
     @Nullable
@@ -66,7 +80,11 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     /**
-     * Assign the token id.
+     * A token identifier.
+     * <p>
+     * This SHALL identify the token type to "freeze".<br/>
+     * The identified token MUST exist, MUST NOT be deleted, and MUST be
+     * associated to the identified account.
      *
      * @param tokenId                   the token id
      * @return {@code this}
@@ -89,7 +107,13 @@ public class TokenFreezeTransaction extends com.hedera.hashgraph.sdk.Transaction
     }
 
     /**
-     * Assign the account id.
+     * An account identifier.
+     * <p>
+     * This shall identify the account to "freeze".<br/>
+     * The identified account MUST exist, MUST NOT be deleted, MUST NOT be
+     * expired, and MUST be associated to the identified token.<br/>
+     * The identified account SHOULD NOT be "frozen" with respect to the
+     * identified token.
      *
      * @param accountId                 the account id
      * @return {@code this}

@@ -18,7 +18,21 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * This transaction type is for deleting an account allowance.
+ * Delete one or more allowances.
+ * Given one or more, previously approved, allowances for non-fungible/unique
+ * tokens to be transferred by a spending account from an owning account;
+ * this transaction removes a specified set of those allowances.
+ *
+ * The owner account for each listed allowance MUST sign this transaction.
+ * Allowances for HBAR cannot be removed with this transaction. The owner
+ * account MUST submit a new `cryptoApproveAllowance` transaction with the
+ * amount set to `0` to "remove" that allowance.
+ * Allowances for fungible/common tokens cannot be removed with this
+ * transaction. The owner account MUST submit a new `cryptoApproveAllowance`
+ * transaction with the amount set to `0` to "remove" that allowance.
+ *
+ * ### Block Stream Effects
+ * None
  */
 public class AccountAllowanceDeleteTransaction
         extends com.hedera.hashgraph.sdk.Transaction<AccountAllowanceDeleteTransaction> {

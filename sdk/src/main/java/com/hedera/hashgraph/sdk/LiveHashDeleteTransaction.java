@@ -15,8 +15,13 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * At consensus, deletes a livehash associated to the given account. The transaction must be signed
- * by either the key of the owning account, or at least one of the keys associated to the livehash.
+ * Delete a specific live hash associated to a given account.
+ *
+ * This transaction MUST be signed by either the key of the associated account,
+ * or at least one of the keys listed in the live hash.
+ *
+ * ### Block Stream Effects
+ * None
  */
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
     @Nullable
