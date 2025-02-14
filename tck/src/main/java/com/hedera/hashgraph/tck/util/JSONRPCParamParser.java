@@ -3,6 +3,7 @@ package com.hedera.hashgraph.tck.util;
 
 import com.hedera.hashgraph.tck.methods.sdk.param.CommonTransactionParams;
 import com.hedera.hashgraph.tck.methods.sdk.param.CustomFee;
+import com.hedera.hashgraph.tck.methods.sdk.param.account.AllowanceParams;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,10 @@ public class JSONRPCParamParser {
     public static Optional<CommonTransactionParams> parseCommonTransactionParams(Map<String, Object> jrpcParams)
             throws Exception {
         return parseJsonObject(jrpcParams, "commonTransactionParams", CommonTransactionParams::parse);
+    }
+
+    public static Optional<List<AllowanceParams>> parseAllowances(Map<String, Object> jrpcParams) throws Exception {
+        return parseJsonArray(jrpcParams, "allowances", AllowanceParams::parse);
     }
 
     public static Optional<List<CustomFee>> parseCustomFees(Map<String, Object> jrpcParams) throws Exception {
