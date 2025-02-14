@@ -218,7 +218,7 @@ public class AccountService extends AbstractJSONRPC2Service {
                         ds -> tx.approveTokenNftAllowance(nftId, owner, spender, AccountId.fromString(ds)),
                         () -> tx.approveTokenNftAllowance(nftId, owner, spender));
             });
-        } else if (Boolean.TRUE.equals(nft.getAllSerials())) {
+        } else if (nft.getAllSerials()) {
             tx.approveTokenNftAllowanceAllSerials(tokenId, owner, spender);
         } else {
             tx.deleteTokenNftAllowanceAllSerials(tokenId, owner, spender);
