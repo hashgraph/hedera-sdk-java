@@ -9,8 +9,11 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -74,6 +77,11 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     @Nullable
     private Key submitKey = null;
 
+    private Key feeScheduleKey = null;
+
+    private List<Key> feeExemptKeys = new ArrayList<>();
+
+    private List<CustomFixedFee> customFees = new ArrayList<>();
     /**
      * Constructor.
      */
@@ -242,6 +250,115 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
     }
 
     /**
+     * Returns the key which allows updates to the new topic’s fees.
+     * @return the feeScheduleKey
+     */
+    public Key getFeeScheduleKey() {
+        return feeScheduleKey;
+    }
+
+    /**
+     * Sets the key which allows updates to the new topic’s fees.
+     * @param feeScheduleKey the feeScheduleKey to be set
+     * @return {@code this}
+     */
+    public TopicCreateTransaction setFeeScheduleKey(Key feeScheduleKey) {
+        Objects.requireNonNull(feeScheduleKey);
+        requireNotFrozen();
+        this.feeScheduleKey = feeScheduleKey;
+        return this;
+    }
+
+    /**
+     * Returns the keys that will be exempt from paying fees.
+     * @return the feeExemptKeys
+     */
+    public List<Key> getFeeExemptKeys() {
+        return feeExemptKeys;
+    }
+
+    /**
+     * Sets the keys that will be exempt from paying fees.
+     * @param feeExemptKeys the keys to be set
+     * @return {@code this}
+     */
+    public TopicCreateTransaction setFeeExemptKeys(List<Key> feeExemptKeys) {
+        Objects.requireNonNull(feeExemptKeys);
+        requireNotFrozen();
+        this.feeExemptKeys = feeExemptKeys;
+        return this;
+    }
+
+    /**
+     * Clears all keys that will be exempt from paying fees.
+     * @return {@code this}
+     */
+    public TopicCreateTransaction clearFeeExemptKeys() {
+        requireNotFrozen();
+        this.feeExemptKeys.clear();
+        return this;
+    }
+
+    /**
+     * Adds a key that will be exempt from paying fees.
+     * @param feeExemptKey
+     * @return {@code this}
+     */
+    public TopicCreateTransaction addFeeExemptKey(Key feeExemptKey) {
+        Objects.requireNonNull(feeExemptKey);
+        requireNotFrozen();
+        if (feeExemptKeys != null) {
+            feeExemptKeys.add(feeExemptKey);
+        }
+        return this;
+    }
+
+    /**
+     * Returns the fixed fees to assess when a message is submitted to the new topic.
+     * @return the List<CustomFixedFee>
+     */
+    public List<CustomFixedFee> getCustomFees() {
+        return customFees;
+    }
+
+    /**
+     * Sets the fixed fees to assess when a message is submitted to the new topic.
+     *
+     * @param  customFees List of CustomFixedFee
+     * @return {@code this}
+     */
+    public TopicCreateTransaction setCustomFees(List<CustomFixedFee> customFees) {
+        Objects.requireNonNull(customFees);
+        requireNotFrozen();
+        this.customFees = customFees;
+        return this;
+    }
+
+    /**
+     * Clears fixed fees.
+     *
+     * @return {@code this}
+     */
+    public TopicCreateTransaction clearCustomFees() {
+        requireNotFrozen();
+        this.customFees = new ArrayList<>();
+        return this;
+    }
+
+    /**
+     * Adds fixed fee to assess when a message is submitted to the new topic.
+     *
+     * @param  customFixedFee CustomFixedFee
+     * @return {@code this}
+     */
+    public TopicCreateTransaction addCustomFee(CustomFixedFee customFixedFee) {
+        Objects.requireNonNull(customFees);
+        customFees.add(customFixedFee);
+        requireNotFrozen();
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -257,6 +374,19 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         }
         if (body.hasAutoRenewPeriod()) {
             autoRenewPeriod = DurationConverter.fromProtobuf(body.getAutoRenewPeriod());
+        }
+        if (body.hasFeeScheduleKey()) {
+            feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
+        }
+        if (body.getFeeExemptKeyListList() != null) {
+            feeExemptKeys = body.getFeeExemptKeyListList().stream()
+                    .map(Key::fromProtobufKey)
+                    .collect(Collectors.toList());
+        }
+        if (body.getCustomFeesList() != null) {
+            customFees = body.getCustomFeesList().stream()
+                    .map(x -> CustomFixedFee.fromProtobuf(x.getFixedFee()))
+                    .collect(Collectors.toList());
         }
         topicMemo = body.getMemo();
     }
@@ -281,6 +411,20 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
         if (autoRenewPeriod != null) {
             builder.setAutoRenewPeriod(DurationConverter.toProtobuf(autoRenewPeriod));
         }
+        if (feeScheduleKey != null) {
+            builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if (feeExemptKeys != null) {
+            for (var feeExemptKey : feeExemptKeys) {
+                builder.addFeeExemptKeyList(feeExemptKey.toProtobufKey());
+            }
+        }
+        if (customFees != null) {
+            for (CustomFixedFee customFee : customFees) {
+                builder.addCustomFees(customFee.toTopicFeeProtobuf());
+            }
+        }
+
         builder.setMemo(topicMemo);
 
         return builder;

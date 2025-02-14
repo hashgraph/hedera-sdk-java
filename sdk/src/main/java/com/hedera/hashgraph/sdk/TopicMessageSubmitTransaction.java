@@ -12,6 +12,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
@@ -119,6 +120,26 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
      */
     public TopicMessageSubmitTransaction setMessage(String message) {
         return setData(message);
+    }
+
+    @Override
+    public List<CustomFeeLimit> getCustomFeeLimits() {
+        return super.getCustomFeeLimits();
+    }
+
+    @Override
+    public TopicMessageSubmitTransaction setCustomFeeLimits(List<CustomFeeLimit> customFeeLimits) {
+        return super.setCustomFeeLimits(customFeeLimits);
+    }
+
+    @Override
+    public TopicMessageSubmitTransaction addCustomFeeLimit(CustomFeeLimit customFeeLimit) {
+        return super.addCustomFeeLimit(customFeeLimit);
+    }
+
+    @Override
+    public TopicMessageSubmitTransaction clearCustomFeeLimits() {
+        return super.clearCustomFeeLimits();
     }
 
     /**

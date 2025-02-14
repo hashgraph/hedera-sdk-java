@@ -3,16 +3,16 @@ package com.hedera.hashgraph.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.StringValue;
-import com.hedera.hashgraph.sdk.proto.ConsensusServiceGrpc;
-import com.hedera.hashgraph.sdk.proto.ConsensusUpdateTopicTransactionBody;
-import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
-import com.hedera.hashgraph.sdk.proto.TransactionBody;
+import com.hedera.hashgraph.sdk.proto.*;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 /**
@@ -64,6 +64,12 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
 
     @Nullable
     private Instant expirationTime = null;
+
+    private Key feeScheduleKey = null;
+
+    private List<Key> feeExemptKeys = new ArrayList<>();
+
+    private List<CustomFixedFee> customFees = new ArrayList<>();
 
     /**
      * Constructor.
@@ -312,6 +318,115 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
     }
 
     /**
+     * Returns the key which allows updates to the new topic’s fees.
+     * @return feeScheduleKey
+     */
+    public Key getFeeScheduleKey() {
+        return feeScheduleKey;
+    }
+
+    /**
+     * Sets the key which allows updates to the new topic’s fees.
+     * @param feeScheduleKey the feeScheduleKey
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction setFeeScheduleKey(Key feeScheduleKey) {
+        Objects.requireNonNull(feeScheduleKey);
+        requireNotFrozen();
+        this.feeScheduleKey = feeScheduleKey;
+        return this;
+    }
+
+    /**
+     * Returns the keys that will be exempt from paying fees.
+     * @return {List of feeExemptKeys}
+     */
+    public List<Key> getFeeExemptKeys() {
+        return feeExemptKeys;
+    }
+
+    /**
+     * Sets the keys that will be exempt from paying fees.
+     * @param feeExemptKeys List of feeExemptKeys
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction setFeeExemptKeys(List<Key> feeExemptKeys) {
+        Objects.requireNonNull(feeExemptKeys);
+        requireNotFrozen();
+        this.feeExemptKeys = feeExemptKeys;
+        return this;
+    }
+
+    /**
+     * Clears all keys that will be exempt from paying fees.
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction clearFeeExemptKeys() {
+        requireNotFrozen();
+        this.feeExemptKeys = new ArrayList<>();
+        return this;
+    }
+
+    /**
+     * Adds a key that will be exempt from paying fees.
+     * @param feeExemptKey key
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction addFeeExemptKey(Key feeExemptKey) {
+        Objects.requireNonNull(feeExemptKey);
+        if (feeExemptKeys != null) {
+            feeExemptKeys.add(feeExemptKey);
+        }
+        requireNotFrozen();
+        return this;
+    }
+
+    /**
+     * Returns the fixed fees to assess when a message is submitted to the new topic.
+     * @return {List of CustomFixedFee}
+     */
+    public List<CustomFixedFee> getCustomFees() {
+        return customFees;
+    }
+
+    /**
+     * Sets the fixed fees to assess when a message is submitted to the new topic.
+     *
+     * @param customFees List of CustomFixedFee customFees
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction setCustomFees(List<CustomFixedFee> customFees) {
+        Objects.requireNonNull(customFees);
+        requireNotFrozen();
+        this.customFees = customFees;
+        return this;
+    }
+
+    /**
+     * Clears fixed fees.
+     *
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction clearCustomFees() {
+        requireNotFrozen();
+        this.customFees.clear();
+        return this;
+    }
+
+    /**
+     * Adds fixed fee to assess when a message is submitted to the new topic.
+     *
+     * @param customFixedFee {CustomFixedFee} customFee
+     * @return {@code this}
+     */
+    public TopicUpdateTransaction addCustomFee(CustomFixedFee customFixedFee) {
+        Objects.requireNonNull(customFees);
+        customFees.add(customFixedFee);
+        requireNotFrozen();
+        return this;
+    }
+
+    /**
      * Initialize from the transaction body.
      */
     void initFromTransactionBody() {
@@ -336,6 +451,19 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
         if (body.hasExpirationTime()) {
             expirationTime = InstantConverter.fromProtobuf(body.getExpirationTime());
+        }
+        if (body.hasFeeScheduleKey()) {
+            feeScheduleKey = Key.fromProtobufKey(body.getFeeScheduleKey());
+        }
+        if (body.getFeeExemptKeyList() != null) {
+            feeExemptKeys = body.getFeeExemptKeyList().getKeysList().stream()
+                    .map(Key::fromProtobufKey)
+                    .collect(Collectors.toList());
+        }
+        if (body.getCustomFees() != null) {
+            customFees = body.getCustomFees().getFeesList().stream()
+                    .map(x -> CustomFixedFee.fromProtobuf(x.getFixedFee()))
+                    .collect(Collectors.toList());
         }
     }
 
@@ -367,6 +495,19 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         }
         if (expirationTime != null) {
             builder.setExpirationTime(InstantConverter.toProtobuf(expirationTime));
+        }
+        if (feeScheduleKey != null) {
+            builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+        if (feeExemptKeys != null) {
+            for (var feeExemptKey : feeExemptKeys) {
+                builder.getFeeExemptKeyList().getKeysList().add(feeExemptKey.toProtobufKey());
+            }
+        }
+        if (customFees != null) {
+            for (CustomFixedFee customFee : customFees) {
+                builder.getCustomFees().getFeesList().add(customFee.toTopicFeeProtobuf());
+            }
         }
         return builder;
     }
