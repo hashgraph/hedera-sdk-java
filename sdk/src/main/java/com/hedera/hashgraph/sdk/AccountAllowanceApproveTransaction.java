@@ -18,8 +18,14 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * This transaction type is for approving account allowance.
- */
+ * # Approve Allowance
+ * This transaction body provides a mechanism to add "allowance" entries
+ * for an account. These allowances enable one account to spend or transfer
+ * token balances (for fungible/common tokens), individual tokens (for
+ * non-fungible/unique tokens), or all non-fungible tokens owned by the
+ * account, now or in the future (if `approved_for_all` is set).
+ *
+ **/
 public class AccountAllowanceApproveTransaction extends Transaction<AccountAllowanceApproveTransaction> {
     private final List<HbarAllowance> hbarAllowances = new ArrayList<>();
     private final List<TokenAllowance> tokenAllowances = new ArrayList<>();
@@ -104,9 +110,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
             @Nullable AccountId ownerAccountId, AccountId spenderAccountId, Hbar amount) {
         requireNotFrozen();
         Objects.requireNonNull(amount);
-        if (amount.compareTo(Hbar.ZERO) < 0) {
-            throw new IllegalArgumentException("amount passed to approveHbarAllowance must be positive");
-        }
         hbarAllowances.add(new HbarAllowance(ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;
     }
@@ -156,9 +159,6 @@ public class AccountAllowanceApproveTransaction extends Transaction<AccountAllow
     public AccountAllowanceApproveTransaction approveTokenAllowance(
             TokenId tokenId, @Nullable AccountId ownerAccountId, AccountId spenderAccountId, long amount) {
         requireNotFrozen();
-        if (amount < 0) {
-            throw new IllegalArgumentException("amount given to approveTokenAllowance must be positive");
-        }
         tokenAllowances.add(new TokenAllowance(
                 Objects.requireNonNull(tokenId), ownerAccountId, Objects.requireNonNull(spenderAccountId), amount));
         return this;

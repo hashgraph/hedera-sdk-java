@@ -62,7 +62,9 @@ public final class ScheduleSignTransaction extends Transaction<ScheduleSignTrans
     }
 
     /**
-     * Assign the schedule id.
+     * A schedule identifier.
+     * <p>
+     * This MUST identify the schedule which SHALL be deleted.
      *
      * @param scheduleId                the schedule id
      * @return {@code this}
