@@ -73,6 +73,7 @@ public class EthereumFlow {
                                 .setContents(Arrays.copyOfRange(
                                         callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
                                 .executeAsync(client, timeoutPerTransaction)
+                                .thenCompose((response) -> response.getReceiptAsync(client, timeoutPerTransaction))
                                 .thenApply((r) -> receipt.fileId);
                     } else {
                         return CompletableFuture.completedFuture(receipt.fileId);
