@@ -3,6 +3,7 @@ package com.hedera.hashgraph.sdk;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
@@ -37,6 +38,7 @@ public class EthereumFlow {
             throws PrecheckStatusException, TimeoutException {
         try {
             var transaction = new FileCreateTransaction()
+                    .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()))
                     .setContents(Arrays.copyOfRange(
                             callData, 0, Math.min(FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length)))
                     .execute(client, timeoutPerTransaction);
@@ -47,7 +49,8 @@ public class EthereumFlow {
                         .setFileId(fileId)
                         .setContents(
                                 Arrays.copyOfRange(callData, FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length))
-                        .execute(client, timeoutPerTransaction);
+                        .execute(client, timeoutPerTransaction)
+                        .getReceipt(client);
             }
             return fileId;
         } catch (ReceiptStatusException e) {
@@ -58,6 +61,7 @@ public class EthereumFlow {
     private static CompletableFuture<FileId> createFileAsync(
             byte[] callData, Client client, Duration timeoutPerTransaction) {
         return new FileCreateTransaction()
+                .setKeys(Objects.requireNonNull(client.getOperatorPublicKey()))
                 .setContents(Arrays.copyOfRange(
                         callData, 0, Math.min(FileAppendTransaction.DEFAULT_CHUNK_SIZE, callData.length)))
                 .executeAsync(client, timeoutPerTransaction)
@@ -169,7 +173,6 @@ public class EthereumFlow {
             ethereumTransaction.setEthereumData(ethereumDataBytes);
         } else {
             var callDataFileId = createFile(ethereumData.callData, client, timeoutPerTransaction);
-            ethereumData.callData = new byte[] {};
             ethereumTransaction.setEthereumData(ethereumData.toBytes()).setCallDataFileId(callDataFileId);
         }
 
@@ -216,13 +219,10 @@ public class EthereumFlow {
             return ethereumTransaction.setEthereumData(ethereumDataBytes).executeAsync(client);
         } else {
             return createFileAsync(ethereumData.callData, client, timeoutPerTransaction)
-                    .thenCompose((callDataFileId) -> {
-                        ethereumData.callData = new byte[] {};
-                        return ethereumTransaction
-                                .setEthereumData(ethereumData.toBytes())
-                                .setCallDataFileId(callDataFileId)
-                                .executeAsync(client, timeoutPerTransaction);
-                    });
+                    .thenCompose((callDataFileId) -> ethereumTransaction
+                            .setEthereumData(ethereumData.toBytes())
+                            .setCallDataFileId(callDataFileId)
+                            .executeAsync(client, timeoutPerTransaction));
         }
     }
 
