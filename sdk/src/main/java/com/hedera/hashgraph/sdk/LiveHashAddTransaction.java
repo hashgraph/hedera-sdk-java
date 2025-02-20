@@ -19,12 +19,16 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * A Live Hash value associating some item of content to an account.
+ * @deprecated
+ * This transaction is obsolete, not supported, and SHALL fail with a
+ * pre-check result of `NOT_SUPPORTED`.
  *
+ * A Live Hash value associating some item of content to an account.
  * This message represents a desired entry in the ledger for a SHA-384
  * hash of some content, an associated specific account, a list of authorized
  * keys, and a duration the live hash is "valid".
  */
+@Deprecated
 public final class LiveHashAddTransaction extends Transaction<LiveHashAddTransaction> {
     @Nullable
     private AccountId accountId = null;

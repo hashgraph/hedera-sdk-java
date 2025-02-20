@@ -16,8 +16,11 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 /**
- * Delete a file or contract bytecode as an administrative transaction.
+ * @deprecated
+ * This transaction is obsolete, not supported, and SHALL fail with a
+ * pre-check result of `NOT_SUPPORTED`.
  *
+ * Delete a file or contract bytecode as an administrative transaction.
  * > Note
  * >> A system delete/undelete for a `contractID` is not supported and
  * >> SHALL return `INVALID_FILE_ID` or `MISSING_ENTITY_ID`.
@@ -38,6 +41,7 @@ import javax.annotation.Nullable;
  * ### Block Stream Effects
  * None
  */
+@Deprecated
 public final class SystemDeleteTransaction extends Transaction<SystemDeleteTransaction> {
     @Nullable
     private FileId fileId = null;

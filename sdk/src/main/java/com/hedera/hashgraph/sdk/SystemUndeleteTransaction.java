@@ -15,9 +15,12 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 /**
+ * @deprecated
+ * This transaction is obsolete, not supported, and SHALL fail with a
+ * pre-check result of `NOT_SUPPORTED`.
+ *
  * Recover a file or contract bytecode deleted from the Hedera File
  * System (HFS) by a `systemDelete` transaction.
- *
  * > Note
  * >> A system delete/undelete for a `contractID` is not supported and
  * >> SHALL return `INVALID_FILE_ID` or `MISSING_ENTITY_ID`.
@@ -35,6 +38,7 @@ import javax.annotation.Nullable;
  * ### Block Stream Effects
  * None
  */
+@Deprecated
 public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteTransaction> {
     @Nullable
     private FileId fileId;
