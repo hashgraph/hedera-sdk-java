@@ -2,24 +2,17 @@
 package com.hedera.hashgraph.tck.methods.sdk;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.hedera.hashgraph.sdk.AccountCreateTransaction;
-import com.hedera.hashgraph.sdk.AccountDeleteTransaction;
-import com.hedera.hashgraph.sdk.AccountId;
-import com.hedera.hashgraph.sdk.AccountUpdateTransaction;
-import com.hedera.hashgraph.sdk.Hbar;
-import com.hedera.hashgraph.sdk.HbarUnit;
-import com.hedera.hashgraph.sdk.Status;
-import com.hedera.hashgraph.sdk.TransactionReceipt;
+import com.hedera.hashgraph.sdk.*;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Method;
 import com.hedera.hashgraph.tck.annotation.JSONRPC2Service;
 import com.hedera.hashgraph.tck.methods.AbstractJSONRPC2Service;
-import com.hedera.hashgraph.tck.methods.sdk.param.account.AccountCreateParams;
-import com.hedera.hashgraph.tck.methods.sdk.param.account.AccountDeleteParams;
-import com.hedera.hashgraph.tck.methods.sdk.param.account.AccountUpdateParams;
+import com.hedera.hashgraph.tck.methods.sdk.param.account.*;
+import com.hedera.hashgraph.tck.methods.sdk.response.AccountAllowanceResponse;
 import com.hedera.hashgraph.tck.methods.sdk.response.AccountResponse;
 import com.hedera.hashgraph.tck.util.KeyUtils;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * AccountService for account related methods
@@ -151,5 +144,84 @@ public class AccountService extends AbstractJSONRPC2Service {
                 accountDeleteTransaction.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
 
         return new AccountResponse(null, transactionReceipt.status);
+    }
+
+    @JSONRPC2Method("approveAllowance")
+    public AccountAllowanceResponse approveAllowance(final AccountAllowanceParams params) throws Exception {
+        AccountAllowanceApproveTransaction tx = new AccountAllowanceApproveTransaction();
+
+        params.getAllowances().ifPresent(allowances -> allowances.forEach(allowance -> approve(tx, allowance)));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(tx, sdkService.getClient()));
+
+        TransactionReceipt transactionReceipt =
+                tx.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
+        return new AccountAllowanceResponse(transactionReceipt.status);
+    }
+
+    @JSONRPC2Method("deleteAllowance")
+    public AccountAllowanceResponse deleteAllowance(final AccountAllowanceParams params) throws Exception {
+        AccountAllowanceDeleteTransaction tx = new AccountAllowanceDeleteTransaction();
+
+        params.getAllowances().ifPresent(allowances -> allowances.forEach(allowance -> delete(tx, allowance)));
+
+        params.getCommonTransactionParams()
+                .ifPresent(commonParams -> commonParams.fillOutTransaction(tx, sdkService.getClient()));
+
+        TransactionReceipt transactionReceipt =
+                tx.execute(sdkService.getClient()).getReceipt(sdkService.getClient());
+        return new AccountAllowanceResponse(transactionReceipt.status);
+    }
+
+    private void approve(AccountAllowanceApproveTransaction tx, AllowanceParams allowance) {
+        AccountId owner = AccountId.fromString(allowance.getOwnerAccountId().orElseThrow());
+        AccountId spender = AccountId.fromString(allowance.getSpenderAccountId().orElseThrow());
+
+        allowance
+                .getHbar()
+                .ifPresent(hbar ->
+                        tx.approveHbarAllowance(owner, spender, Hbar.fromTinybars(Long.parseLong(hbar.getAmount()))));
+
+        allowance
+                .getToken()
+                .ifPresent(token -> tx.approveTokenAllowance(
+                        TokenId.fromString(token.getTokenId()), owner, spender, token.getAmount()));
+
+        allowance.getNft().ifPresent(nft -> approveNFT(tx, owner, spender, nft));
+    }
+
+    private void delete(AccountAllowanceDeleteTransaction tx, AllowanceParams allowance) {
+        var owner = AccountId.fromString(allowance.getOwnerAccountId().orElseThrow());
+        var tokenId = allowance.getTokenId().orElseThrow();
+
+        if (allowance.getSerialNumbers().isPresent()) {
+            allowance.getSerialNumbers().get().forEach(serialNumber -> {
+                var nftId = new NftId(TokenId.fromString(tokenId), Long.parseLong(serialNumber));
+                tx.deleteAllTokenNftAllowances(nftId, owner);
+            });
+        }
+    }
+
+    private void approveNFT(
+            AccountAllowanceApproveTransaction tx,
+            AccountId owner,
+            AccountId spender,
+            AllowanceParams.TokenNftAllowance nft) {
+        TokenId tokenId = TokenId.fromString(nft.getTokenId());
+        Optional<String> delegateSpender = Optional.ofNullable(nft.getDelegatingSpender());
+
+        if (!nft.getSerialNumbers().isEmpty()) {
+            nft.getSerialNumbers().forEach(serial -> {
+                NftId nftId = new NftId(tokenId, serial);
+                delegateSpender.ifPresentOrElse(
+                        ds -> tx.approveTokenNftAllowance(nftId, owner, spender, AccountId.fromString(ds)),
+                        () -> tx.approveTokenNftAllowance(nftId, owner, spender));
+            });
+        } else if (nft.getAllSerials()) {
+            tx.approveTokenNftAllowanceAllSerials(tokenId, owner, spender);
+        } else {
+            tx.deleteTokenNftAllowanceAllSerials(tokenId, owner, spender);
+        }
     }
 }

@@ -10,6 +10,20 @@ import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.util.LinkedHashMap;
 
+/**
+ * Token cancel airdrop<br/>
+ * Remove one or more pending airdrops from state on behalf of the
+ * sender(s) for each airdrop.
+ *
+ * Each pending airdrop canceled SHALL be removed from state and
+ * SHALL NOT be available to claim.<br/>
+ * Each cancellation SHALL be represented in the transaction body and
+ * SHALL NOT be restated in the record file.<br/>
+ * All cancellations MUST succeed for this transaction to succeed.
+ *
+ * ### Block Stream Effects
+ * None
+ */
 public class TokenCancelAirdropTransaction extends PendingAirdropLogic<TokenCancelAirdropTransaction> {
 
     /**

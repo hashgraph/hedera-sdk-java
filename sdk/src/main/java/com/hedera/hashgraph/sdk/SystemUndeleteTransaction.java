@@ -18,9 +18,25 @@ import javax.annotation.Nullable;
  * @deprecated
  * This transaction is obsolete, not supported, and SHALL fail with a
  * pre-check result of `NOT_SUPPORTED`.
- * Undelete a file or smart contract that was deleted by AdminDelete.
- * <p>
- * Can only be done with a Hedera admin.
+ *
+ * Recover a file or contract bytecode deleted from the Hedera File
+ * System (HFS) by a `systemDelete` transaction.
+ * > Note
+ * >> A system delete/undelete for a `contractID` is not supported and
+ * >> SHALL return `INVALID_FILE_ID` or `MISSING_ENTITY_ID`.
+ *
+ * This transaction can _only_ recover a file removed with the `systemDelete`
+ * transaction. A file deleted via `fileDelete` SHALL be irrecoverable.<br/>
+ * This transaction MUST be signed by an Hedera administrative ("system")
+ * account.
+ *
+ * ### What is a "system" file
+ * A "system" file is any file with a file number less than or equal to the
+ * current configuration value for `ledger.numReservedSystemEntities`,
+ * typically `750`.
+ *
+ * ### Block Stream Effects
+ * None
  */
 @Deprecated
 public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteTransaction> {
@@ -65,19 +81,26 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
      * @return                          the file id
      */
     @Nullable
-    public final FileId getFileId() {
+    public FileId getFileId() {
         return fileId;
     }
 
     /**
-     * Sets the file ID to undelete.
+     * A file identifier.
      * <p>
+     * The identified file MUST exist in the HFS.<br/>
+     * The identified file MUST be deleted.<br/>
+     * The identified file deletion MUST be a result of a
+     * `systemDelete` transaction.<br/>
+     * The identified file MUST NOT be a "system" file.<br/>
+     * This field is REQUIRED.
+     *
      * Mutually exclusive with {@link #setContractId(ContractId)}.
      *
      * @param fileId The FileId to be set
      * @return {@code this}
      */
-    public final SystemUndeleteTransaction setFileId(FileId fileId) {
+    public SystemUndeleteTransaction setFileId(FileId fileId) {
         Objects.requireNonNull(fileId);
         requireNotFrozen();
         this.fileId = fileId;
@@ -95,14 +118,17 @@ public final class SystemUndeleteTransaction extends Transaction<SystemUndeleteT
     }
 
     /**
-     * Sets the contract ID to undelete.
+     * A contract identifier.
      * <p>
-     * Mutually exclusive with {@link #setFileId(FileId)}.
-     *
+     * The identified contract MUST exist in network state.<br/>
+     * The identified contract bytecode MUST be deleted.<br/>
+     * The identified contract deletion MUST be a result of a
+     * `systemDelete` transaction.
+     * <p>
      * @param contractId The ContractId to be set
      * @return {@code this}
      */
-    public final SystemUndeleteTransaction setContractId(ContractId contractId) {
+    public SystemUndeleteTransaction setContractId(ContractId contractId) {
         Objects.requireNonNull(contractId);
         requireNotFrozen();
         this.contractId = contractId;

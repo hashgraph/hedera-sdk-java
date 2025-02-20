@@ -91,21 +91,48 @@ abstract class RunAllExample : DefaultTask() {
     }
 }
 
-val updateAddressbooks = tasks.register("updateAddressbooks")
-
-listOf("mainnet", "testnet", "previewnet").forEach { network ->
+listOf("mainnet", "previewnet", "testnet").forEachIndexed { index, network ->
     val taskName = "updateAddressbooks${network.replaceFirstChar(Char::titlecase)}"
+    val previousTaskName =
+        if (index > 0)
+            "updateAddressbooks${listOf("mainnet", "previewnet", "testnet")[index - 1].replaceFirstChar(Char::titlecase)}"
+        else null
+
     tasks.register<JavaExec>(taskName) {
         workingDir = rootDir
         classpath = configurations.runtimeClasspath.get() + files(tasks.jar)
         mainModule = "com.hedera.hashgraph.sdk.examples"
         mainClass = "com.hedera.hashgraph.sdk.examples.GetAddressBookExample"
         environment("HEDERA_NETWORK", network)
+
+        // Ensure the file is deleted before each run to avoid caching issues
+        doFirst {
+            val binFile = File(workingDir, "address-book.proto.bin")
+            if (binFile.exists()) {
+                binFile.delete()
+            }
+        }
+
         doLast {
+            println("Fetching address book for network: $network")
             val binFile = File(workingDir, "address-book.proto.bin")
             val target = File(workingDir, "../sdk/src/main/resources/addressbook/$network.pb")
+            println("Copying from ${binFile.absolutePath} to ${target.absolutePath}")
             binFile.copyTo(target, overwrite = true)
         }
+
+        // Ensure tasks run one after another
+        if (previousTaskName != null) {
+            mustRunAfter(previousTaskName)
+        }
     }
-    updateAddressbooks { dependsOn(taskName) }
+}
+
+// Aggregate task to run all
+tasks.register("updateAddressbooks") {
+    dependsOn(
+        "updateAddressbooksMainnet",
+        "updateAddressbooksPreviewnet",
+        "updateAddressbooksTestnet"
+    )
 }
