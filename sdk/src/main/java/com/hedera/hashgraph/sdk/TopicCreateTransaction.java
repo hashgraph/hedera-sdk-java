@@ -301,7 +301,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
 
     /**
      * Adds a key that will be exempt from paying fees.
-     * @param feeExemptKey
+     * @param feeExemptKey feeExemptKey
      * @return {@code this}
      */
     public TopicCreateTransaction addFeeExemptKey(Key feeExemptKey) {

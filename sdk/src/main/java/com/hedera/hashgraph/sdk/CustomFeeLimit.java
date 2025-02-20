@@ -14,15 +14,9 @@ import java.util.stream.Collectors;
  */
 public class CustomFeeLimit {
 
-    /**
-     * A payer account identifier.
-     */
-    public final AccountId payerId;
+    public AccountId payerId;
 
-    /**
-     * The maximum fees that the user is willing to pay for the message.
-     */
-    public final List<CustomFixedFee> customFees;
+    public List<CustomFixedFee> customFees;
 
     /**
      * Constructor
@@ -30,9 +24,41 @@ public class CustomFeeLimit {
      * @param payerId       the payer's account id
      * @param customFees    maximum fees user is willing to pay
      */
-    private CustomFeeLimit(AccountId payerId, List<CustomFixedFee> customFees) {
+    public CustomFeeLimit(AccountId payerId, List<CustomFixedFee> customFees) {
         this.payerId = payerId;
         this.customFees = customFees;
+    }
+
+    /**
+     * Extracts the payer accountId
+     * @return payerId
+     */
+    public AccountId getPayerId() {
+        return payerId;
+    }
+
+    /**
+     * A payer account identifier.
+     */
+    public CustomFeeLimit setPayerId(AccountId payerId) {
+        this.payerId = payerId;
+        return this;
+    }
+
+    /**
+     * Extracts a list of CustomFixedFee
+     * @return
+     */
+    public List<CustomFixedFee> getCustomFees() {
+        return customFees;
+    }
+
+    /**
+     * The maximum fees that the user is willing to pay for the message.
+     */
+    public CustomFeeLimit setCustomFees(List<CustomFixedFee> customFees) {
+        this.customFees = customFees;
+        return this;
     }
 
     public static CustomFeeLimit fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFeeLimit customFeeLimit) {

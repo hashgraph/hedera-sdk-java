@@ -8,7 +8,6 @@ import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Nullable;
 
@@ -71,11 +70,11 @@ public final class TopicInfo {
      */
     public final LedgerId ledgerId;
 
-    private Key feeScheduleKey = null;
+    public final Key feeScheduleKey;
 
-    private List<Key> feeExemptKeys = new ArrayList<>();
+    public final List<Key> feeExemptKeys;
 
-    private List<CustomFixedFee> customFees = new ArrayList<>();
+    public final List<CustomFixedFee> customFees;
 
     private TopicInfo(
             TopicId topicId,

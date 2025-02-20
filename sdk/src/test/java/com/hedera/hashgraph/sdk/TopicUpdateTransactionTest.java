@@ -13,7 +13,9 @@ import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -281,5 +283,120 @@ public class TopicUpdateTransactionTest {
     void clearAutoRenewAccountIdFrozen() {
         var tx = spawnTestTransaction();
         assertThrows(IllegalStateException.class, () -> tx.clearAutoRenewAccountId());
+    }
+
+    @Test
+    void shouldSetFeeScheduleKey() {
+        PrivateKey feeScheduleKey = PrivateKey.generateECDSA();
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+
+        topicUpdateTransaction.setFeeScheduleKey(feeScheduleKey);
+
+        assertThat(topicUpdateTransaction.getFeeScheduleKey().toString()).isEqualTo(feeScheduleKey.toString());
+    }
+
+    @Test
+    void shouldSetFeeExemptKeys() {
+        List<PrivateKey> feeExemptKeys = List.of(PrivateKey.generateECDSA(), PrivateKey.generateECDSA());
+
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+        topicUpdateTransaction.setFeeExemptKeys(new ArrayList<>(feeExemptKeys));
+
+        assertThat(topicUpdateTransaction.getFeeExemptKeys()).containsExactlyElementsOf(feeExemptKeys);
+    }
+
+    @Test
+    void shouldAddFeeExemptKeyToEmptyList() {
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+
+        PrivateKey feeExemptKeyToBeAdded = PrivateKey.generateECDSA();
+        topicUpdateTransaction.addFeeExemptKey(feeExemptKeyToBeAdded);
+
+        assertThat(topicUpdateTransaction.getFeeExemptKeys()).hasSize(1).containsExactly(feeExemptKeyToBeAdded);
+    }
+
+    @Test
+    void shouldAddFeeExemptKeyToList() {
+        PrivateKey feeExemptKey = PrivateKey.generateECDSA();
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+
+        topicUpdateTransaction.setFeeExemptKeys(new ArrayList<>(List.of(feeExemptKey)));
+
+        PrivateKey feeExemptKeyToBeAdded = PrivateKey.generateECDSA();
+        topicUpdateTransaction.addFeeExemptKey(feeExemptKeyToBeAdded);
+
+        assertThat(topicUpdateTransaction.getFeeExemptKeys())
+                .hasSize(2)
+                .containsExactly(feeExemptKey, feeExemptKeyToBeAdded);
+    }
+
+    @Test
+    void shouldClearFeeExemptKeys() {
+        PrivateKey feeExemptKey = PrivateKey.generateECDSA();
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+
+        topicUpdateTransaction.setFeeExemptKeys(new ArrayList<>(List.of(feeExemptKey)));
+        topicUpdateTransaction.clearFeeExemptKeys();
+
+        assertThat(topicUpdateTransaction.getFeeExemptKeys()).isEmpty();
+    }
+
+    @Test
+    void shouldSetCustomFees() {
+        List<CustomFixedFee> customFixedFees = List.of(
+                new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(0)),
+                new CustomFixedFee().setAmount(2).setDenominatingTokenId(new TokenId(1)),
+                new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(2)));
+
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+        topicUpdateTransaction.setCustomFees(new ArrayList<>(customFixedFees));
+
+        assertThat(topicUpdateTransaction.getCustomFees()).hasSize(3).containsExactlyElementsOf(customFixedFees);
+    }
+
+    @Test
+    void shouldAddCustomFeeToList() {
+        List<CustomFixedFee> customFixedFees = List.of(
+                new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(0)),
+                new CustomFixedFee().setAmount(2).setDenominatingTokenId(new TokenId(1)),
+                new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(2)));
+
+        CustomFixedFee customFixedFeeToBeAdded =
+                new CustomFixedFee().setAmount(4).setDenominatingTokenId(new TokenId(3));
+
+        List<CustomFixedFee> expectedCustomFees = new ArrayList<>(customFixedFees);
+        expectedCustomFees.add(customFixedFeeToBeAdded);
+
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+        topicUpdateTransaction.setCustomFees(new ArrayList<>(customFixedFees));
+        topicUpdateTransaction.addCustomFee(customFixedFeeToBeAdded);
+
+        assertThat(topicUpdateTransaction.getCustomFees()).hasSize(4).containsExactlyElementsOf(expectedCustomFees);
+    }
+
+    @Test
+    void shouldAddCustomFeeToEmptyList() {
+        CustomFixedFee customFixedFeeToBeAdded =
+                new CustomFixedFee().setAmount(4).setDenominatingTokenId(new TokenId(3));
+
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+        topicUpdateTransaction.addCustomFee(customFixedFeeToBeAdded);
+
+        assertThat(topicUpdateTransaction.getCustomFees()).hasSize(1).containsExactly(customFixedFeeToBeAdded);
+    }
+
+    @Test
+    void shouldClearCustomFees() {
+        List<CustomFixedFee> customFixedFees = List.of(
+                new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(0)),
+                new CustomFixedFee().setAmount(2).setDenominatingTokenId(new TokenId(1)),
+                new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(2)));
+
+        TopicUpdateTransaction topicUpdateTransaction = new TopicUpdateTransaction();
+        topicUpdateTransaction.setCustomFees(new ArrayList<>(customFixedFees));
+
+        topicUpdateTransaction.clearCustomFees();
+
+        assertThat(topicUpdateTransaction.getCustomFees()).isEmpty();
     }
 }
