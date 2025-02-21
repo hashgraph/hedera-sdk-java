@@ -38,7 +38,7 @@ public class AccountCreateParams extends JSONRPC2Param {
                 Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
         var parsedAutoRenewPeriod = Optional.ofNullable((String) jrpcParams.get("autoRenewPeriod"));
         var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
-        var parsedMaxAutoTokenAssociations = Optional.ofNullable((Long)jrpcParams.get("maxAutoTokenAssociations"));
+        var parsedMaxAutoTokenAssociations = Optional.ofNullable((Long) jrpcParams.get("maxAutoTokenAssociations"));
         var parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
         var parsedStakedNodeId = Optional.ofNullable((String) jrpcParams.get("stakedNodeId"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
