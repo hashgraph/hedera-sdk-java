@@ -13,7 +13,7 @@
 /.github/dependabot.yml                         @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
 
 # Legacy Maven project files
-**/pom.xml                                      @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
+**/pom.xml                                      @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
 
 # Gradle project files and inline plugins
 /gradle/                                        @hiero-ledger/github-maintainers @hiero-ledger/github-committers
@@ -24,8 +24,8 @@ gradlew.bat                                     @hiero-ledger/github-maintainers
 **/*.gradle.*                                   @hiero-ledger/github-maintainers @hiero-ledger/github-committers
 
 # Codacy Tool Configurations
-/config/                                        @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
-.remarkrc                                       @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
+/config/                                        @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
+.remarkrc                                       @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers
 
 # Self-protection for root CODEOWNERS files (this file should not exist and should definitely require approval)
 /CODEOWNERS                                     @hiero-ledger/github-maintainers
@@ -38,5 +38,5 @@ gradlew.bat                                     @hiero-ledger/github-maintainers
 **/codecov.yml                                  @hiero-ledger/github-maintainers @hiero-ledger/github-committers
 
 # Git Ignore definitions
-**/.gitignore                                   @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers @hiero-ledger/hiero-sdk-java-committers
-**/.gitignore.*                                 @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers @hiero-ledger/hiero-sdk-java-committers
+**/.gitignore                                   @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
+**/.gitignore.*                                 @hiero-ledger/github-maintainers @hiero-ledger/github-committers @hiero-ledger/hiero-sdk-java-maintainers @hiero-ledger/hiero-sdk-java-committers
