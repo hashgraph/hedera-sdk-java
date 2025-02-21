@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Livehash` transactions and queries `SystemDeleteTransaction` and `SystemUndeleteTransaction`.
 
 ### Fixed
+
 - Race condition when updating the address books.
 
 ## 2.49.0
