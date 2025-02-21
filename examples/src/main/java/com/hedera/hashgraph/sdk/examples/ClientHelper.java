@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
 import java.util.HashMap;
 import java.util.List;
 
