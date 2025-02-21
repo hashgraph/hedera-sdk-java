@@ -38,13 +38,13 @@ public class AccountService extends AbstractJSONRPC2Service {
 
         params.getInitialBalance()
                 .ifPresent(initialBalanceTinybars -> accountCreateTransaction.setInitialBalance(
-                        Hbar.from(initialBalanceTinybars, HbarUnit.TINYBAR)));
+                        Hbar.from(Long.parseLong(initialBalanceTinybars), HbarUnit.TINYBAR)));
 
         params.getReceiverSignatureRequired().ifPresent(accountCreateTransaction::setReceiverSignatureRequired);
 
         params.getAutoRenewPeriod()
                 .ifPresent(autoRenewPeriodSeconds ->
-                        accountCreateTransaction.setAutoRenewPeriod(Duration.ofSeconds(autoRenewPeriodSeconds)));
+                        accountCreateTransaction.setAutoRenewPeriod(Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
 
         params.getMemo().ifPresent(accountCreateTransaction::setAccountMemo);
 
@@ -56,7 +56,7 @@ public class AccountService extends AbstractJSONRPC2Service {
                 .ifPresent(stakedAccountId ->
                         accountCreateTransaction.setStakedAccountId(AccountId.fromString(stakedAccountId)));
 
-        params.getStakedNodeId().ifPresent(accountCreateTransaction::setStakedNodeId);
+        params.getStakedNodeId().ifPresent(stakedNodeId -> accountCreateTransaction.setStakedNodeId(Long.parseLong(stakedNodeId)));
 
         params.getDeclineStakingReward().ifPresent(accountCreateTransaction::setDeclineStakingReward);
 
@@ -96,13 +96,13 @@ public class AccountService extends AbstractJSONRPC2Service {
 
         params.getAutoRenewPeriod()
                 .ifPresent(autoRenewPeriodSeconds ->
-                        accountUpdateTransaction.setAutoRenewPeriod(Duration.ofSeconds(autoRenewPeriodSeconds)));
+                        accountUpdateTransaction.setAutoRenewPeriod(Duration.ofSeconds(Long.parseLong(autoRenewPeriodSeconds))));
 
         params.getMemo().ifPresent(accountUpdateTransaction::setAccountMemo);
 
         params.getExpirationTime()
                 .ifPresent(expirationTime ->
-                        accountUpdateTransaction.setExpirationTime(Instant.ofEpochSecond(expirationTime)));
+                        accountUpdateTransaction.setExpirationTime(Instant.ofEpochSecond(Long.parseLong(expirationTime))));
 
         params.getMaxAutoTokenAssociations()
                 .ifPresent(autoAssociations ->
@@ -112,7 +112,7 @@ public class AccountService extends AbstractJSONRPC2Service {
                 .ifPresent(stakedAccountId ->
                         accountUpdateTransaction.setStakedAccountId(AccountId.fromString(stakedAccountId)));
 
-        params.getStakedNodeId().ifPresent(accountUpdateTransaction::setStakedNodeId);
+        params.getStakedNodeId().ifPresent(stakedNodeId -> accountUpdateTransaction.setStakedNodeId(Long.parseLong(stakedNodeId)));
 
         params.getDeclineStakingReward().ifPresent(accountUpdateTransaction::setDeclineStakingReward);
 
