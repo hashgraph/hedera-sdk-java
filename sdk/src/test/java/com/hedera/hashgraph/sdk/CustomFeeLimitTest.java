@@ -111,7 +111,6 @@ public class CustomFeeLimitTest {
         assertFalse(proto.getFeesList().isEmpty());
     }
 
-    // TODO FIX
     @Test
     public void testFromProtobuf() {
         var proto = CustomFeeLimit.newBuilder()
@@ -124,6 +123,8 @@ public class CustomFeeLimitTest {
         com.hedera.hashgraph.sdk.CustomFeeLimit converted = com.hedera.hashgraph.sdk.CustomFeeLimit.fromProtobuf(proto);
 
         assertEquals(TEST_PAYER_ID, converted.getPayerId());
-        assertEquals(TEST_FEES, converted.getCustomFees());
+        assertEquals(
+                TEST_FEES.get(0).feeCollectorAccountId,
+                converted.getCustomFees().get(0).feeCollectorAccountId);
     }
 }

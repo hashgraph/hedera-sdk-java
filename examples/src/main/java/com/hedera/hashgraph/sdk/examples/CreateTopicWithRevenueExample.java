@@ -42,14 +42,13 @@ public class CreateTopicWithRevenueExample {
             System.out.println("Creating Alice's account...");
             PrivateKey aliceKey = PrivateKey.generateECDSA();
 
-            TransactionResponse accountCreateTxResponse = new AccountCreateTransaction()
+            var aliceAccountId = new AccountCreateTransaction()
                     .setKeyWithoutAlias(aliceKey)
                     .setMaxAutomaticTokenAssociations(1)
                     .setInitialBalance(Hbar.from(2))
-                    .execute(client);
-
-            TransactionReceipt accountCreateTxReceipt = accountCreateTxResponse.getReceipt(client);
-            AccountId aliceAccountId = Objects.requireNonNull(accountCreateTxReceipt.accountId);
+                    .execute(client)
+                    .getReceipt(client)
+                    .accountId;
             Objects.requireNonNull(aliceAccountId);
 
             System.out.println("Alice's Account ID: " + aliceAccountId);
@@ -83,9 +82,10 @@ public class CreateTopicWithRevenueExample {
             var feeCollectorBalanceBefore =
                     new AccountBalanceQuery().setAccountId(OPERATOR_ID).execute(client).hbars;
 
-            var customFeeLimit = new CustomFeeLimit(
-                    aliceAccountId,
-                    List.of(new CustomFixedFee().setAmount(Hbar.from(2).toTinybars())));
+            var customFeeLimit = new CustomFeeLimit()
+                    .setPayerId(aliceAccountId)
+                    .setCustomFees(
+                            List.of(new CustomFixedFee().setAmount(Hbar.from(2).toTinybars())));
 
             client.setOperator(aliceAccountId, aliceKey);
 
@@ -187,11 +187,11 @@ public class CreateTopicWithRevenueExample {
              * Step 9: Create Bob's account with 10 HBAR.
              */
             System.out.println("Creating Bob's account...");
-
+            Hbar initialBalance = new Hbar(10);
             PrivateKey bobKey = PrivateKey.generateECDSA();
             var bobAccountId = new AccountCreateTransaction()
                     .setKey(bobKey)
-                    .setInitialBalance(new Hbar(10))
+                    .setInitialBalance(initialBalance)
                     .setMaxAutomaticTokenAssociations(100)
                     .execute(client)
                     .getReceipt(client)
@@ -222,6 +222,14 @@ public class CreateTopicWithRevenueExample {
                     .getReceipt(client);
 
             System.out.println("Message submitted successfully by Bob without being charged.");
+
+            /**
+             * Step 12: Verify Bob's balance should be almost the same as the initial
+             */
+            var bobBalanceAfter =
+                    new AccountBalanceQuery().setAccountId(bobAccountId).execute(client).hbars;
+            System.out.println("Bob's initial balance: " + initialBalance + ", after: " + bobBalanceAfter);
+
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

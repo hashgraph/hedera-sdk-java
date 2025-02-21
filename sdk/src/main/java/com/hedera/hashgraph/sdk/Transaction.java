@@ -233,9 +233,10 @@ public abstract class Transaction<T extends Transaction<T>>
                 DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
         setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
         setTransactionMemo(sourceTransactionBody.getMemo());
-        setCustomFeeLimits(customFeeLimits.stream()
-                .map(x -> CustomFeeLimit.fromProtobuf(x.toProtobuf()))
-                .toList());
+
+        this.customFeeLimits = sourceTransactionBody.getMaxCustomFeesList().stream()
+                .map(CustomFeeLimit::fromProtobuf)
+                .toList();
 
         // The presence of signatures implies the Transaction should be frozen.
         if (!publicKeys.isEmpty()) {
@@ -749,48 +750,6 @@ public abstract class Transaction<T extends Transaction<T>>
         // noinspection unchecked
         return (T) this;
     }
-
-    /**
-     * Extract the custom fee limits of the transaction
-     * @return the custom fee limits of the transaction
-     */
-    public List<CustomFeeLimit> getCustomFeeLimits() {
-        return customFeeLimits;
-    }
-
-    /**
-     * The maximum custom fee that the user is willing to pay for the message. If left empty, the user is willing to pay any custom fee.
-     * If used with a transaction type that does not support custom fee limits, the transaction will fail.
-     */
-    public T setCustomFeeLimits(List<CustomFeeLimit> customFeeLimits) {
-        requireNotFrozen();
-        Objects.requireNonNull(customFeeLimits);
-        this.customFeeLimits = customFeeLimits;
-        return (T) this;
-    }
-
-    /**
-     * Adds a custom fee limit
-     * @param customFeeLimit
-     * @return {@code this}
-     */
-    public T addCustomFeeLimit(CustomFeeLimit customFeeLimit) {
-        requireNotFrozen();
-        Objects.requireNonNull(customFeeLimit);
-        customFeeLimits.add(customFeeLimit);
-        return (T) this;
-    }
-
-    /**
-     * Clears all custom fee limits.
-     * @return {@code this}
-     */
-    public T clearCustomFeeLimits() {
-        requireNotFrozen();
-        customFeeLimits.clear();
-        return (T) this;
-    }
-
     /**
      * Extract a byte array representation.
      *

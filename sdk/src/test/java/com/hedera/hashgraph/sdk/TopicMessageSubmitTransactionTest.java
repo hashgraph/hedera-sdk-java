@@ -124,12 +124,14 @@ public class TopicMessageSubmitTransactionTest {
     @Test
     void shouldSetCustomFeeLimits() {
         var customFeeLimits = Arrays.asList(
-                new CustomFeeLimit(
-                        new AccountId(1),
-                        List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1)))),
-                new CustomFeeLimit(
-                        new AccountId(2),
-                        List.of(new CustomFixedFee().setAmount(2).setDenominatingTokenId(new TokenId(2)))));
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(1))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1)))),
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(2))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(2)))));
 
         var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction().setCustomFeeLimits(customFeeLimits);
 
@@ -139,18 +141,19 @@ public class TopicMessageSubmitTransactionTest {
     @Test
     void shouldAddCustomFeeLimitToList() {
         var customFeeLimits = new ArrayList<>(List.of(
-                new CustomFeeLimit(
-                        new AccountId(1),
-                        new ArrayList<>(
-                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1))))),
-                new CustomFeeLimit(
-                        new AccountId(2),
-                        new ArrayList<>(
-                                List.of(new CustomFixedFee().setAmount(2).setDenominatingTokenId(new TokenId(2)))))));
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(1))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1)))),
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(2))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(2))))));
 
-        var customFeeLimitToBeAdded = new CustomFeeLimit(
-                new AccountId(3),
-                new ArrayList<>(List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3)))));
+        var customFeeLimitToBeAdded = new CustomFeeLimit()
+                .setPayerId(new AccountId(3))
+                .setCustomFees(new ArrayList<>(
+                        List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3)))));
 
         var expectedCustomFeeLimits = new ArrayList<>(customFeeLimits);
         expectedCustomFeeLimits.add(customFeeLimitToBeAdded);
@@ -164,8 +167,10 @@ public class TopicMessageSubmitTransactionTest {
 
     @Test
     void shouldAddCustomFeeLimitToEmptyList() {
-        var customFeeLimitToBeAdded = new CustomFeeLimit(
-                new AccountId(3), List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3))));
+        var customFeeLimitToBeAdded = new CustomFeeLimit()
+                .setPayerId(new AccountId(3))
+                .setCustomFees(new ArrayList<>(
+                        List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3)))));
 
         var topicMessageSubmitTransaction =
                 new TopicMessageSubmitTransaction().addCustomFeeLimit(customFeeLimitToBeAdded);

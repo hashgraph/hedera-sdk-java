@@ -352,9 +352,14 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
      * @return {@code this}
      */
     public TopicUpdateTransaction setFeeScheduleKey(Key feeScheduleKey) {
-        Objects.requireNonNull(feeScheduleKey);
         requireNotFrozen();
         this.feeScheduleKey = feeScheduleKey;
+        return this;
+    }
+
+    public TopicUpdateTransaction clearFeeScheduleKey() {
+        requireNotFrozen();
+        this.feeScheduleKey = null;
         return this;
     }
 
@@ -520,14 +525,14 @@ public final class TopicUpdateTransaction extends Transaction<TopicUpdateTransac
         if (feeScheduleKey != null) {
             builder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
         }
-        if (feeExemptKeys != null) {
+        if (!feeExemptKeys.isEmpty()) {
             var feeExemptKeyList = FeeExemptKeyList.newBuilder();
             for (var feeExemptKey : feeExemptKeys) {
                 feeExemptKeyList.addKeys(feeExemptKey.toProtobufKey());
             }
             builder.setFeeExemptKeyList(feeExemptKeyList);
         }
-        if (customFees != null) {
+        if (!customFees.isEmpty()) {
             var protoCustomFeeList = FixedCustomFeeList.newBuilder();
             for (CustomFixedFee customFee : customFees) {
                 protoCustomFeeList.addFees(customFee.toTopicFeeProtobuf());

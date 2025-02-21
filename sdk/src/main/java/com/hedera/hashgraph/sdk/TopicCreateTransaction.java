@@ -267,7 +267,6 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      * @return {@code this}
      */
     public TopicCreateTransaction setFeeScheduleKey(Key feeScheduleKey) {
-        Objects.requireNonNull(feeScheduleKey);
         requireNotFrozen();
         this.feeScheduleKey = feeScheduleKey;
         return this;

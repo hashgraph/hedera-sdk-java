@@ -14,20 +14,14 @@ import java.util.stream.Collectors;
  */
 public class CustomFeeLimit {
 
-    public AccountId payerId;
+    private AccountId payerId;
 
-    public List<CustomFixedFee> customFees;
+    private List<CustomFixedFee> customFees;
 
     /**
      * Constructor
-     *
-     * @param payerId       the payer's account id
-     * @param customFees    maximum fees user is willing to pay
      */
-    public CustomFeeLimit(AccountId payerId, List<CustomFixedFee> customFees) {
-        this.payerId = payerId;
-        this.customFees = customFees;
-    }
+    public CustomFeeLimit() {}
 
     /**
      * Extracts the payer accountId
@@ -61,15 +55,15 @@ public class CustomFeeLimit {
         return this;
     }
 
-    public static CustomFeeLimit fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFeeLimit customFeeLimit) {
-        return new CustomFeeLimit(
-                AccountId.fromProtobuf(customFeeLimit.getAccountId()),
-                customFeeLimit.getFeesList().stream()
+    static CustomFeeLimit fromProtobuf(com.hedera.hashgraph.sdk.proto.CustomFeeLimit customFeeLimit) {
+        return new CustomFeeLimit()
+                .setPayerId(AccountId.fromProtobuf(customFeeLimit.getAccountId()))
+                .setCustomFees(customFeeLimit.getFeesList().stream()
                         .map(CustomFixedFee::fromProtobuf)
                         .collect(Collectors.toList()));
     }
 
-    public com.hedera.hashgraph.sdk.proto.CustomFeeLimit toProtobuf() {
+    com.hedera.hashgraph.sdk.proto.CustomFeeLimit toProtobuf() {
         com.hedera.hashgraph.sdk.proto.CustomFeeLimit.Builder builder =
                 com.hedera.hashgraph.sdk.proto.CustomFeeLimit.newBuilder();
 

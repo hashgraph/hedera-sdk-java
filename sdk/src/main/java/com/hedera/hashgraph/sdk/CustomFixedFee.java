@@ -36,7 +36,7 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
         return returnFee;
     }
 
-    public FixedCustomFee toTopicFeeProtobuf() {
+    FixedCustomFee toTopicFeeProtobuf() {
         var builder = FixedCustomFee.newBuilder();
         var fixedFeeBuilder = FixedFee.newBuilder();
 

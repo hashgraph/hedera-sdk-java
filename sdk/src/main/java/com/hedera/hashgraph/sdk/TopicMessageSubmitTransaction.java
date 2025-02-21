@@ -122,24 +122,49 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
         return setData(message);
     }
 
-    @Override
+    /**
+     * Extract the custom fee limits of the transaction
+     * @return the custom fee limits of the transaction
+     */
     public List<CustomFeeLimit> getCustomFeeLimits() {
-        return super.getCustomFeeLimits();
+        return this.customFeeLimits;
     }
 
-    @Override
+    /**
+     * The maximum custom fee that the user is willing to pay for the message. If left empty, the user is willing to pay any custom fee.
+     * If used with a transaction type that does not support custom fee limits, the transaction will fail.
+     */
     public TopicMessageSubmitTransaction setCustomFeeLimits(List<CustomFeeLimit> customFeeLimits) {
-        return super.setCustomFeeLimits(customFeeLimits);
+        Objects.requireNonNull(customFeeLimits);
+        requireNotFrozen();
+        this.customFeeLimits = customFeeLimits;
+        return this;
     }
 
-    @Override
+    /**
+     * Adds a custom fee limit
+     * @param customFeeLimit
+     * @return {@code this}
+     */
     public TopicMessageSubmitTransaction addCustomFeeLimit(CustomFeeLimit customFeeLimit) {
-        return super.addCustomFeeLimit(customFeeLimit);
+        Objects.requireNonNull(customFeeLimit);
+        requireNotFrozen();
+        if (this.customFeeLimits != null) {
+            this.customFeeLimits.add(customFeeLimit);
+        }
+        return this;
     }
 
-    @Override
+    /**
+     * Clears all custom fee limits.
+     * @return {@code this}
+     */
     public TopicMessageSubmitTransaction clearCustomFeeLimits() {
-        return super.clearCustomFeeLimits();
+        requireNotFrozen();
+        if (this.customFeeLimits != null) {
+            this.customFeeLimits.clear();
+        }
+        return this;
     }
 
     /**
