@@ -18,13 +18,13 @@ class AccountCreateParamsTest {
     void testParseWithAllFields() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
-        jrpcParams.put("initialBalance", 1000L);
+        jrpcParams.put("initialBalance", "1000");
         jrpcParams.put("receiverSignatureRequired", true);
-        jrpcParams.put("autoRenewPeriod", 7890000L);
+        jrpcParams.put("autoRenewPeriod", "7890000");
         jrpcParams.put("memo", "test memo");
         jrpcParams.put("maxAutoTokenAssociations", 10L);
         jrpcParams.put("stakedAccountId", "stakedAccountId");
-        jrpcParams.put("stakedNodeId", 5L);
+        jrpcParams.put("stakedNodeId", "5");
         jrpcParams.put("declineStakingReward", true);
         jrpcParams.put("alias", "alias");
 
