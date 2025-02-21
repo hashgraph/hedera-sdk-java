@@ -25,7 +25,7 @@ public class ClientHelper {
         } else {
             client = Client.forName(network);
         }
-        return client.setDefaultMaxTransactionFee(new Hbar(50));
+        return client;
     }
 
     public static Client forLocalNetwork() throws InterruptedException {

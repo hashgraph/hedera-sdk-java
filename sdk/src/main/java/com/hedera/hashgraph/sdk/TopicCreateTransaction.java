@@ -77,6 +77,7 @@ public final class TopicCreateTransaction extends Transaction<TopicCreateTransac
      */
     public TopicCreateTransaction() {
         setAutoRenewPeriod(DEFAULT_AUTO_RENEW_PERIOD);
+        defaultMaxTransactionFee = new Hbar(25);
     }
 
     /**

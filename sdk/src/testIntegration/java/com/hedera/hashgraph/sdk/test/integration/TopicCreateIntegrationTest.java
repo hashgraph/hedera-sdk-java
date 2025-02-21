@@ -69,7 +69,6 @@ class TopicCreateIntegrationTest {
             var response = new TopicCreateTransaction()
                     .setFeeScheduleKey(testEnv.operatorKey)
                     .setSubmitKey(testEnv.operatorKey)
-                    .setMaxTransactionFee(new Hbar(1))
                     .setAdminKey(testEnv.operatorKey)
                     .setFeeExemptKeys(feeExemptKeys)
                     .setCustomFees(customFixedFees)
@@ -280,7 +279,6 @@ class TopicCreateIntegrationTest {
                     .setAdminKey(testEnv.operatorKey)
                     .setFeeScheduleKey(testEnv.operatorKey)
                     .addCustomFee(customFixedFee)
-                    .setMaxTransactionFee(new Hbar(100))
                     .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
@@ -321,7 +319,6 @@ class TopicCreateIntegrationTest {
                     .setFeeScheduleKey(testEnv.operatorKey)
                     .setFeeExemptKeys(List.of(feeExemptKey1.getPublicKey(), feeExemptKey2.getPublicKey()))
                     .addCustomFee(customFixedFee)
-                    .setMaxTransactionFee(new Hbar(100))
                     .execute(testEnv.client);
 
             var topicId = Objects.requireNonNull(response.getReceipt(testEnv.client).topicId);
