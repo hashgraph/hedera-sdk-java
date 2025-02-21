@@ -133,6 +133,6 @@ tasks.register("updateAddressbooks") {
     dependsOn(
         "updateAddressbooksMainnet",
         "updateAddressbooksPreviewnet",
-        "updateAddressbooksTestnet"
+        "updateAddressbooksTestnet",
     )
 }
