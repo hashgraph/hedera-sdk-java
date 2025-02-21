@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.50.0
+
+### Added
+
+- Support for HIP-991: revenue generating topics.
+
+### Removed
+
+- `AccountStakersQuery`, since it was not supported in consensus node for a long time and now it's removed permanently.
+
+### Deprecated
+
+- `Livehash` transactions and queries `SystemDeleteTransaction` and `SystemUndeleteTransaction`.
+
+### Fixed
+
+- Race condition when updating the address books.
+
 ## 2.49.0
 
 ### Added
