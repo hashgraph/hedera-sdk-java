@@ -19,13 +19,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AccountCreateParams extends JSONRPC2Param {
     private Optional<String> key;
-    private Optional<Long> initialBalance;
+    private Optional<String> initialBalance;
     private Optional<Boolean> receiverSignatureRequired;
-    private Optional<Long> autoRenewPeriod;
+    private Optional<String> autoRenewPeriod;
     private Optional<String> memo;
     private Optional<Long> maxAutoTokenAssociations;
     private Optional<String> stakedAccountId;
-    private Optional<Long> stakedNodeId;
+    private Optional<String> stakedNodeId;
     private Optional<Boolean> declineStakingReward;
     private Optional<String> alias;
     private Optional<CommonTransactionParams> commonTransactionParams;
@@ -33,14 +33,14 @@ public class AccountCreateParams extends JSONRPC2Param {
     @Override
     public AccountCreateParams parse(Map<String, Object> jrpcParams) throws Exception {
         var parsedKey = Optional.ofNullable((String) jrpcParams.get("key"));
-        var parsedInitialBalance = Optional.ofNullable((Long) jrpcParams.get("initialBalance"));
+        var parsedInitialBalance = Optional.ofNullable((String) jrpcParams.get("initialBalance"));
         var parsedReceiverSignatureRequired =
                 Optional.ofNullable((Boolean) jrpcParams.get("receiverSignatureRequired"));
-        var parsedAutoRenewPeriod = Optional.ofNullable((Long) jrpcParams.get("autoRenewPeriod"));
+        var parsedAutoRenewPeriod = Optional.ofNullable((String) jrpcParams.get("autoRenewPeriod"));
         var parsedMemo = Optional.ofNullable((String) jrpcParams.get("memo"));
         var parsedMaxAutoTokenAssociations = Optional.ofNullable((Long) jrpcParams.get("maxAutoTokenAssociations"));
         var parsedStakedAccountId = Optional.ofNullable((String) jrpcParams.get("stakedAccountId"));
-        var parsedStakedNodeId = Optional.ofNullable((Long) jrpcParams.get("stakedNodeId"));
+        var parsedStakedNodeId = Optional.ofNullable((String) jrpcParams.get("stakedNodeId"));
         var parsedDeclineStakingReward = Optional.ofNullable((Boolean) jrpcParams.get("declineStakingReward"));
         var parsedAlias = Optional.ofNullable((String) jrpcParams.get("alias"));
         var parsedCommonTransactionParams = JSONRPCParamParser.parseCommonTransactionParams(jrpcParams);

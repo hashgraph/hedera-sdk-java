@@ -18,13 +18,13 @@ class AccountCreateParamsTest {
     void testParseWithAllFields() throws Exception {
         Map<String, Object> jrpcParams = new HashMap<>();
         jrpcParams.put("key", "someKey");
-        jrpcParams.put("initialBalance", 1000L);
+        jrpcParams.put("initialBalance", "1000");
         jrpcParams.put("receiverSignatureRequired", true);
-        jrpcParams.put("autoRenewPeriod", 7890000L);
+        jrpcParams.put("autoRenewPeriod", "7890000");
         jrpcParams.put("memo", "test memo");
         jrpcParams.put("maxAutoTokenAssociations", 10L);
         jrpcParams.put("stakedAccountId", "stakedAccountId");
-        jrpcParams.put("stakedNodeId", 5L);
+        jrpcParams.put("stakedNodeId", "5");
         jrpcParams.put("declineStakingReward", true);
         jrpcParams.put("alias", "alias");
 
@@ -45,13 +45,13 @@ class AccountCreateParamsTest {
         AccountCreateParams params = new AccountCreateParams().parse(jrpcParams);
 
         assertEquals(Optional.of("someKey"), params.getKey());
-        assertEquals(Optional.of(1000L), params.getInitialBalance());
+        assertEquals(Optional.of("1000"), params.getInitialBalance());
         assertEquals(Optional.of(true), params.getReceiverSignatureRequired());
-        assertEquals(Optional.of(7890000L), params.getAutoRenewPeriod());
+        assertEquals(Optional.of("7890000"), params.getAutoRenewPeriod());
         assertEquals(Optional.of("test memo"), params.getMemo());
         assertEquals(Optional.of(10L), params.getMaxAutoTokenAssociations());
         assertEquals(Optional.of("stakedAccountId"), params.getStakedAccountId());
-        assertEquals(Optional.of(5L), params.getStakedNodeId());
+        assertEquals(Optional.of("5"), params.getStakedNodeId());
         assertEquals(Optional.of(true), params.getDeclineStakingReward());
         assertEquals(Optional.of("alias"), params.getAlias());
 
