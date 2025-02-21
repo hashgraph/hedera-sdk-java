@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 import org.bouncycastle.crypto.digests.SHA384Digest;
 
@@ -128,6 +129,8 @@ public abstract class Transaction<T extends Transaction<T>>
 
     private String memo = "";
 
+    List<CustomFeeLimit> customFeeLimits = new ArrayList<>();
+
     /**
      * Constructor.
      */
@@ -230,6 +233,10 @@ public abstract class Transaction<T extends Transaction<T>>
                 DurationConverter.fromProtobuf(sourceTransactionBody.getTransactionValidDuration()));
         setMaxTransactionFee(Hbar.fromTinybars(sourceTransactionBody.getTransactionFee()));
         setTransactionMemo(sourceTransactionBody.getMemo());
+
+        this.customFeeLimits = sourceTransactionBody.getMaxCustomFeesList().stream()
+                .map(CustomFeeLimit::fromProtobuf)
+                .toList();
 
         // The presence of signatures implies the Transaction should be frozen.
         if (!publicKeys.isEmpty()) {
@@ -743,7 +750,6 @@ public abstract class Transaction<T extends Transaction<T>>
         // noinspection unchecked
         return (T) this;
     }
-
     /**
      * Extract a byte array representation.
      *
@@ -1083,6 +1089,8 @@ public abstract class Transaction<T extends Transaction<T>>
         return TransactionBody.newBuilder()
                 .setTransactionFee(feeHbars.toTinybars())
                 .setTransactionValidDuration(DurationConverter.toProtobuf(transactionValidDuration).toBuilder())
+                .addAllMaxCustomFees(
+                        customFeeLimits.stream().map(CustomFeeLimit::toProtobuf).collect(Collectors.toList()))
                 .setMemo(memo);
     }
 

@@ -10,7 +10,9 @@ import com.hedera.hashgraph.sdk.proto.SchedulableTransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -117,5 +119,62 @@ public class TopicMessageSubmitTransactionTest {
                 IllegalStateException.class, () -> topicSubmitMessageTransactionString.setMessage(testMessageBytes));
         assertThrows(
                 IllegalStateException.class, () -> topicSubmitMessageTransactionBytes.setMessage(testMessageBytes));
+    }
+
+    @Test
+    void shouldSetCustomFeeLimits() {
+        var customFeeLimits = Arrays.asList(
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(1))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1)))),
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(2))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(2)))));
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction().setCustomFeeLimits(customFeeLimits);
+
+        assertThat(topicMessageSubmitTransaction.getCustomFeeLimits()).isEqualTo(customFeeLimits);
+    }
+
+    @Test
+    void shouldAddCustomFeeLimitToList() {
+        var customFeeLimits = new ArrayList<>(List.of(
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(1))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(1)))),
+                new CustomFeeLimit()
+                        .setPayerId(new AccountId(2))
+                        .setCustomFees(
+                                List.of(new CustomFixedFee().setAmount(1).setDenominatingTokenId(new TokenId(2))))));
+
+        var customFeeLimitToBeAdded = new CustomFeeLimit()
+                .setPayerId(new AccountId(3))
+                .setCustomFees(new ArrayList<>(
+                        List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3)))));
+
+        var expectedCustomFeeLimits = new ArrayList<>(customFeeLimits);
+        expectedCustomFeeLimits.add(customFeeLimitToBeAdded);
+
+        var topicMessageSubmitTransaction = new TopicMessageSubmitTransaction()
+                .setCustomFeeLimits(customFeeLimits)
+                .addCustomFeeLimit(customFeeLimitToBeAdded);
+
+        assertThat(topicMessageSubmitTransaction.getCustomFeeLimits()).isEqualTo(expectedCustomFeeLimits);
+    }
+
+    @Test
+    void shouldAddCustomFeeLimitToEmptyList() {
+        var customFeeLimitToBeAdded = new CustomFeeLimit()
+                .setPayerId(new AccountId(3))
+                .setCustomFees(new ArrayList<>(
+                        List.of(new CustomFixedFee().setAmount(3).setDenominatingTokenId(new TokenId(3)))));
+
+        var topicMessageSubmitTransaction =
+                new TopicMessageSubmitTransaction().addCustomFeeLimit(customFeeLimitToBeAdded);
+
+        assertThat(topicMessageSubmitTransaction.getCustomFeeLimits()).containsExactly(customFeeLimitToBeAdded);
     }
 }

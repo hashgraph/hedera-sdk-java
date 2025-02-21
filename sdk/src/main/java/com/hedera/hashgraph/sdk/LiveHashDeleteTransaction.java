@@ -15,14 +15,17 @@ import java.util.Objects;
 import javax.annotation.Nullable;
 
 /**
- * Delete a specific live hash associated to a given account.
+ * @deprecated
+ * This transaction is obsolete, not supported, and SHALL fail with a
+ * pre-check result of `NOT_SUPPORTED`.
  *
+ * Delete a specific live hash associated to a given account.
  * This transaction MUST be signed by either the key of the associated account,
  * or at least one of the keys listed in the live hash.
- *
  * ### Block Stream Effects
  * None
  */
+@Deprecated
 public final class LiveHashDeleteTransaction extends Transaction<LiveHashDeleteTransaction> {
     @Nullable
     private AccountId accountId = null;

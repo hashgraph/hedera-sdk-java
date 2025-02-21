@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import io.github.jsonSnapshot.SnapshotMatcher;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,7 +18,19 @@ public class TopicInfoTest {
     private static final PrivateKey privateKey = PrivateKey.fromString(
             "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10");
 
+    private static final PrivateKey feeScheduleKey = PrivateKey.fromString(
+            "302e020100300506032b657004220420aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899");
+
+    private static final List<PrivateKey> feeExemptKeys = List.of(
+            PrivateKey.fromString(
+                    "302e020100300506032b657004220420db484b828e64b2d8f12ce3c0a0e93a0b8cce7af1bb8f39c97732394482538e10"),
+            PrivateKey.fromString(
+                    "302e020100300506032b657004220420aabbccddeeff00112233445566778899aabbccddeeff00112233445566778899"));
+
     private static final byte[] hash = {2};
+
+    private static final List<CustomFixedFee> customFees =
+            List.of(new CustomFixedFee().setAmount(100).setDenominatingTokenId(new TokenId(0)));
 
     private static final ConsensusGetTopicInfoResponse info = ConsensusGetTopicInfoResponse.newBuilder()
             .setTopicInfo(ConsensusTopicInfo.newBuilder()
@@ -28,6 +41,13 @@ public class TopicInfoTest {
                     .setAutoRenewPeriod(DurationConverter.toProtobuf(Duration.ofDays(5)))
                     .setAdminKey(privateKey.getPublicKey().toProtobufKey())
                     .setSubmitKey(privateKey.getPublicKey().toProtobufKey())
+                    .setFeeScheduleKey(feeScheduleKey.getPublicKey().toProtobufKey())
+                    .addAllFeeExemptKeyList(feeExemptKeys.stream()
+                            .map(k -> k.getPublicKey().toProtobufKey())
+                            .toList())
+                    .addAllCustomFees(customFees.stream()
+                            .map(CustomFixedFee::toTopicFeeProtobuf)
+                            .toList())
                     .setAutoRenewAccount(new AccountId(4).toProtobuf())
                     .setLedgerId(LedgerId.TESTNET.toByteString()))
             .build();
