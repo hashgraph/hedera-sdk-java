@@ -8,6 +8,7 @@ import com.hedera.hashgraph.sdk.proto.ConsensusGetTopicInfoResponse;
 import com.hedera.hashgraph.sdk.proto.ConsensusTopicInfo;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import javax.annotation.Nullable;
 
 /**
@@ -69,6 +70,12 @@ public final class TopicInfo {
      */
     public final LedgerId ledgerId;
 
+    public final Key feeScheduleKey;
+
+    public final List<Key> feeExemptKeys;
+
+    public final List<CustomFixedFee> customFees;
+
     private TopicInfo(
             TopicId topicId,
             String topicMemo,
@@ -79,7 +86,10 @@ public final class TopicInfo {
             @Nullable Key submitKey,
             Duration autoRenewPeriod,
             @Nullable AccountId autoRenewAccountId,
-            LedgerId ledgerId) {
+            LedgerId ledgerId,
+            Key feeScheduleKey,
+            List<Key> feeExemptKeys,
+            List<CustomFixedFee> customFees) {
         this.topicId = topicId;
         this.topicMemo = topicMemo;
         this.runningHash = runningHash;
@@ -90,6 +100,9 @@ public final class TopicInfo {
         this.autoRenewPeriod = autoRenewPeriod;
         this.autoRenewAccountId = autoRenewAccountId;
         this.ledgerId = ledgerId;
+        this.feeScheduleKey = feeScheduleKey;
+        this.feeExemptKeys = feeExemptKeys;
+        this.customFees = customFees;
     }
 
     /**
@@ -108,6 +121,20 @@ public final class TopicInfo {
         var autoRenewAccountId =
                 topicInfo.hasAutoRenewAccount() ? AccountId.fromProtobuf(topicInfo.getAutoRenewAccount()) : null;
 
+        var feeScheduleKey = topicInfo.hasFeeScheduleKey() ? Key.fromProtobufKey(topicInfo.getFeeScheduleKey()) : null;
+
+        var feeExemptKeys = topicInfo.getFeeExemptKeyListList() != null
+                ? topicInfo.getFeeExemptKeyListList().stream()
+                        .map(Key::fromProtobufKey)
+                        .toList()
+                : null;
+
+        var customFees = topicInfo.getCustomFeesList() != null
+                ? topicInfo.getCustomFeesList().stream()
+                        .map(x -> CustomFixedFee.fromProtobuf(x.getFixedFee()))
+                        .toList()
+                : null;
+
         return new TopicInfo(
                 TopicId.fromProtobuf(topicInfoResponse.getTopicID()),
                 topicInfo.getMemo(),
@@ -118,7 +145,10 @@ public final class TopicInfo {
                 submitKey,
                 DurationConverter.fromProtobuf(topicInfo.getAutoRenewPeriod()),
                 autoRenewAccountId,
-                LedgerId.fromByteString(topicInfo.getLedgerId()));
+                LedgerId.fromByteString(topicInfo.getLedgerId()),
+                feeScheduleKey,
+                feeExemptKeys,
+                customFees);
     }
 
     /**
@@ -160,6 +190,22 @@ public final class TopicInfo {
 
         if (autoRenewAccountId != null) {
             topicInfoBuilder.setAutoRenewAccount(autoRenewAccountId.toProtobuf());
+        }
+
+        if (feeScheduleKey != null) {
+            topicInfoBuilder.setFeeScheduleKey(feeScheduleKey.toProtobufKey());
+        }
+
+        if (feeExemptKeys != null) {
+            for (Key feeExemptKey : feeExemptKeys) {
+                topicInfoBuilder.addFeeExemptKeyList(feeExemptKey.toProtobufKey());
+            }
+        }
+
+        if (customFees != null) {
+            for (CustomFixedFee customFee : customFees) {
+                topicInfoBuilder.addCustomFees(customFee.toTopicFeeProtobuf());
+            }
         }
 
         return topicInfoResponseBuilder.setTopicInfo(topicInfoBuilder).build();

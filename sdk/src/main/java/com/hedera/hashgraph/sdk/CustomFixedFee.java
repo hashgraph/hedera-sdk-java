@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package com.hedera.hashgraph.sdk;
 
+import com.hedera.hashgraph.sdk.proto.FixedCustomFee;
 import com.hedera.hashgraph.sdk.proto.FixedFee;
 import javax.annotation.Nullable;
 
@@ -33,6 +34,23 @@ public class CustomFixedFee extends CustomFeeBase<CustomFixedFee> {
             returnFee.setDenominatingTokenId(TokenId.fromProtobuf(fixedFee.getDenominatingTokenId()));
         }
         return returnFee;
+    }
+
+    FixedCustomFee toTopicFeeProtobuf() {
+        var builder = FixedCustomFee.newBuilder();
+        var fixedFeeBuilder = FixedFee.newBuilder();
+
+        if (feeCollectorAccountId != null) {
+            builder.setFeeCollectorAccountId(feeCollectorAccountId.toProtobuf());
+        }
+
+        builder.setFixedFee(fixedFeeBuilder.setAmount(amount));
+
+        if (denominatingTokenId != null) {
+            builder.setFixedFee(fixedFeeBuilder.setDenominatingTokenId(denominatingTokenId.toProtobuf()));
+        }
+
+        return builder.build();
     }
 
     @Override

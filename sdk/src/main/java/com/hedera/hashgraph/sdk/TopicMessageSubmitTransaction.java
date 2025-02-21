@@ -12,6 +12,7 @@ import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionResponse;
 import io.grpc.MethodDescriptor;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 
@@ -119,6 +120,51 @@ public final class TopicMessageSubmitTransaction extends ChunkedTransaction<Topi
      */
     public TopicMessageSubmitTransaction setMessage(String message) {
         return setData(message);
+    }
+
+    /**
+     * Extract the custom fee limits of the transaction
+     * @return the custom fee limits of the transaction
+     */
+    public List<CustomFeeLimit> getCustomFeeLimits() {
+        return this.customFeeLimits;
+    }
+
+    /**
+     * The maximum custom fee that the user is willing to pay for the message. If left empty, the user is willing to pay any custom fee.
+     * If used with a transaction type that does not support custom fee limits, the transaction will fail.
+     */
+    public TopicMessageSubmitTransaction setCustomFeeLimits(List<CustomFeeLimit> customFeeLimits) {
+        Objects.requireNonNull(customFeeLimits);
+        requireNotFrozen();
+        this.customFeeLimits = customFeeLimits;
+        return this;
+    }
+
+    /**
+     * Adds a custom fee limit
+     * @param customFeeLimit
+     * @return {@code this}
+     */
+    public TopicMessageSubmitTransaction addCustomFeeLimit(CustomFeeLimit customFeeLimit) {
+        Objects.requireNonNull(customFeeLimit);
+        requireNotFrozen();
+        if (this.customFeeLimits != null) {
+            this.customFeeLimits.add(customFeeLimit);
+        }
+        return this;
+    }
+
+    /**
+     * Clears all custom fee limits.
+     * @return {@code this}
+     */
+    public TopicMessageSubmitTransaction clearCustomFeeLimits() {
+        requireNotFrozen();
+        if (this.customFeeLimits != null) {
+            this.customFeeLimits.clear();
+        }
+        return this;
     }
 
     /**

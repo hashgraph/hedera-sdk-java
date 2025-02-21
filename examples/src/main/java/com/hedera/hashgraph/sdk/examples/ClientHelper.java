@@ -3,7 +3,6 @@ package com.hedera.hashgraph.sdk.examples;
 
 import com.hedera.hashgraph.sdk.AccountId;
 import com.hedera.hashgraph.sdk.Client;
-import com.hedera.hashgraph.sdk.Hbar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class ClientHelper {
         } else {
             client = Client.forName(network);
         }
-        return client.setDefaultMaxTransactionFee(new Hbar(50));
+        return client;
     }
 
     public static Client forLocalNetwork() throws InterruptedException {
