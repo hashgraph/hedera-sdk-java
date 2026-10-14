@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2.79.0
+
+### Changed
+
+- chore(tck): remove Lombok by converting JSON-RPC params to records (#2962)
+- chore: replace JSR-305 with JSpecify for nullability (#2938)
+
+### Added
+
+- feat(tck): add ping, mirror balance and AccountBalanceQuery deprecation methods (#2963)
+
 ## 2.78.0
 
 ### Changed
