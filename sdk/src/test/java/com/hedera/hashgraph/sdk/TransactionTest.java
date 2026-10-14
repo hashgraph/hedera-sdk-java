@@ -3,15 +3,19 @@ package com.hedera.hashgraph.sdk;
 
 import static com.hedera.hashgraph.sdk.Transaction.fromBytes;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.hedera.hashgraph.sdk.proto.AccountAmount;
 import com.hedera.hashgraph.sdk.proto.AccountID;
+import com.hedera.hashgraph.sdk.proto.ConsensusSubmitMessageTransactionBody;
 import com.hedera.hashgraph.sdk.proto.CryptoTransferTransactionBody;
 import com.hedera.hashgraph.sdk.proto.SignedTransaction;
 import com.hedera.hashgraph.sdk.proto.Timestamp;
 import com.hedera.hashgraph.sdk.proto.TokenAssociateTransactionBody;
+import com.hedera.hashgraph.sdk.proto.TopicID;
 import com.hedera.hashgraph.sdk.proto.TransactionBody;
 import com.hedera.hashgraph.sdk.proto.TransactionID;
 import com.hedera.hashgraph.sdk.proto.TransactionList;
@@ -952,5 +956,127 @@ public class TransactionTest {
         TransactionBody bodyFalse =
                 TransactionBody.parseFrom(signableBodiesFalse.get(0).getBody());
         assertThat(bodyFalse.getHighVolume()).isFalse();
+    }
+
+    private static TransactionID protoTxId(long validStartSeconds) {
+        return TransactionID.newBuilder()
+                .setAccountID(AccountID.newBuilder().setAccountNum(5006))
+                .setTransactionValidStart(Timestamp.newBuilder().setSeconds(validStartSeconds))
+                .build();
+    }
+
+    private static TransactionBody topicMessageBody(TransactionID txId, long node, long topic, String message) {
+        return TransactionBody.newBuilder()
+                .setTransactionID(txId)
+                .setNodeAccountID(AccountID.newBuilder().setAccountNum(node))
+                .setTransactionFee(100_000_000L)
+                .setConsensusSubmitMessage(ConsensusSubmitMessageTransactionBody.newBuilder()
+                        .setTopicID(TopicID.newBuilder().setTopicNum(topic))
+                        .setMessage(ByteString.copyFromUtf8(message)))
+                .build();
+    }
+
+    private static TransactionBody maliciousTransferBody(TransactionID txId, long node) {
+        return TransactionBody.newBuilder()
+                .setTransactionID(txId)
+                .setNodeAccountID(AccountID.newBuilder().setAccountNum(node))
+                .setTransactionFee(100_000_000L)
+                .setCryptoTransfer(CryptoTransferTransactionBody.newBuilder()
+                        .setTransfers(TransferList.newBuilder()
+                                .addAccountAmounts(AccountAmount.newBuilder()
+                                        .setAccountID(AccountID.newBuilder().setAccountNum(5006))
+                                        .setAmount(-100_000_000_000L))
+                                .addAccountAmounts(AccountAmount.newBuilder()
+                                        .setAccountID(AccountID.newBuilder().setAccountNum(9999))
+                                        .setAmount(100_000_000_000L))))
+                .build();
+    }
+
+    private static byte[] transactionListOf(TransactionBody... bodies) {
+        var list = TransactionList.newBuilder();
+        for (var body : bodies) {
+            var signed = SignedTransaction.newBuilder()
+                    .setBodyBytes(body.toByteString())
+                    .build();
+            list.addTransactionList(com.hedera.hashgraph.sdk.proto.Transaction.newBuilder()
+                    .setSignedTransactionBytes(signed.toByteString()));
+        }
+        return list.build().toByteArray();
+    }
+
+    @Test
+    @DisplayName("fromBytes() rejects a smuggled entry of a different type in an uneven chunk")
+    void fromBytesRejectsSmuggledEntryInUnevenChunk() {
+        var txIdA = protoTxId(1554158542);
+        var txIdB = protoTxId(1554158543);
+        var bytes = transactionListOf(
+                topicMessageBody(txIdA, 3, 1000, "hello-"),
+                topicMessageBody(txIdB, 3, 1000, "world"),
+                maliciousTransferBody(txIdB, 4));
+
+        assertThatThrownBy(() -> Transaction.fromBytes(bytes))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("body type");
+    }
+
+    @Test
+    @DisplayName("fromBytes() rejects a chunk with a different transaction type")
+    void fromBytesRejectsChunkWithDifferentTransactionType() {
+        var txIdA = protoTxId(1554158542);
+        var txIdB = protoTxId(1554158543);
+        var bytes = transactionListOf(topicMessageBody(txIdA, 3, 1000, "hello-"), maliciousTransferBody(txIdB, 3));
+
+        assertThatThrownBy(() -> Transaction.fromBytes(bytes))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("body type");
+    }
+
+    @Test
+    @DisplayName("fromBytes() rejects a chunk targeting a different topic")
+    void fromBytesRejectsChunkWithDifferentTopic() {
+        var txIdA = protoTxId(1554158542);
+        var txIdB = protoTxId(1554158543);
+        var bytes = transactionListOf(
+                topicMessageBody(txIdA, 3, 1000, "hello-"), topicMessageBody(txIdB, 3, 2000, "world"));
+
+        assertThatThrownBy(() -> Transaction.fromBytes(bytes))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("TopicNum");
+    }
+
+    @Test
+    @DisplayName("fromBytes() accepts a valid multi-chunk, multi-node TopicMessageSubmitTransaction")
+    void fromBytesAcceptsValidMultiChunkTopicMessage() throws Exception {
+        var message = "a".repeat(2500);
+        var tx = new TopicMessageSubmitTransaction()
+                .setTopicId(new TopicId(0, 0, 1000))
+                .setMessage(message)
+                .setNodeAccountIds(nodeAccountIDs)
+                .setTransactionId(testTransactionID)
+                .freeze()
+                .sign(unusedPrivateKey);
+
+        var parsed = (TopicMessageSubmitTransaction) Transaction.fromBytes(tx.toBytes());
+
+        assertThat(parsed.getMessage().toStringUtf8()).isEqualTo(message);
+        assertThat(parsed.getNodeAccountIds()).isEqualTo(nodeAccountIDs);
+    }
+
+    @Test
+    @DisplayName("fromBytes() accepts a valid multi-chunk, multi-node FileAppendTransaction")
+    void fromBytesAcceptsValidMultiChunkFileAppend() throws Exception {
+        var contents = "b".repeat(5000);
+        var tx = new FileAppendTransaction()
+                .setFileId(fileID)
+                .setContents(contents)
+                .setNodeAccountIds(nodeAccountIDs)
+                .setTransactionId(testTransactionID)
+                .freeze()
+                .sign(unusedPrivateKey);
+
+        var parsed = (FileAppendTransaction) Transaction.fromBytes(tx.toBytes());
+
+        assertThat(parsed.getContents().toStringUtf8()).isEqualTo(contents);
+        assertThat(parsed.getFileId()).isEqualTo(fileID);
     }
 }
