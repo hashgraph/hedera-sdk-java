@@ -58,6 +58,12 @@ public abstract class Transaction<T extends Transaction<T>>
             TransactionId.withValidStart(DUMMY_ACCOUNT_ID, Instant.EPOCH);
 
     /**
+     * TransactionBody fields that may legitimately differ between the chunks of a ChunkedTransaction.
+     */
+    private static final Set<String> CHUNK_VARYING_FIELDS =
+            Set.of("TransactionID", "NodeAccountID", "Message", "ChunkInfo", "Contents");
+
+    /**
      * Default transaction duration
      */
     private static final Duration DEFAULT_TRANSACTION_VALID_DURATION = Duration.ofSeconds(120);
@@ -238,6 +244,22 @@ public abstract class Transaction<T extends Transaction<T>>
                     }
                 }
             }
+
+            if (this instanceof ChunkedTransaction) {
+                var chunk0Body =
+                        parseTransactionBody(innerSignedTransactions.get(0).getBodyBytes());
+                for (int k = 1; k < innerSignedTransactions.size(); k++) {
+                    var chunkBody =
+                            parseTransactionBody(innerSignedTransactions.get(k).getBodyBytes());
+                    if (chunkBody.getDataCase() != chunk0Body.getDataCase()) {
+                        throw new IllegalArgumentException("failed because transaction body type "
+                                + chunkBody.getDataCase() + " does not match chunk 0 body type "
+                                + chunk0Body.getDataCase());
+                    }
+                    requireProtoMatches(chunk0Body, chunkBody, CHUNK_VARYING_FIELDS, "TransactionBody");
+                }
+            }
+
             sourceTransactionBody =
                     parseTransactionBody(innerSignedTransactions.get(0).getBodyBytes());
         }
