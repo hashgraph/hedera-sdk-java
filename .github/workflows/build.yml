@@ -284,3 +284,77 @@ jobs:
 
       - name: Run TCK Unit Tests
         run: ./gradlew :tck:test
+
+  tck-compatibility:
+    name: TCK Compatibility
+    runs-on: hiero-client-sdk-linux-medium
+    needs:
+      - build
+      - test
+      - test-tck
+    timeout-minutes: 45
+    steps:
+      - name: Harden Runner
+        uses: step-security/harden-runner@351661ca32ac09a36dc5ee2d536e3128f2a3c8ed # v2.22.0
+        with:
+          egress-policy: audit
+
+      - name: Checkout Code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Setup NodeJS
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 18
+
+      - name: Setup Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          distribution: temurin
+          java-version: "21.0.6"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Build and Start TCK Server
+        id: tck-server
+        run: |
+          ./gradlew assemble
+          nohup ./gradlew tck:bootRun > "${RUNNER_TEMP}/tck-server.log" 2>&1 &
+          echo "pid=$!" >> "${GITHUB_OUTPUT}"
+
+      - name: Prepare Hiero Solo
+        id: solo
+        uses: hiero-ledger/hiero-solo-action@c5326debc5b38e50fa4032361c0a35f46166c0e7 # v0.25.0
+        with:
+          installMirrorNode: true
+          soloVersion: v0.91.0
+          hieroVersion: v0.73.0
+          mirrorNodeVersion: v0.153.0
+
+      - name: Run TCK Compatibility
+        uses: hiero-ledger/hiero-sdk-tck@c9e7169888d86be4793cde5932ce57d9450a9761 # v0.14.0
+        with:
+          json-rpc-server-url: http://127.0.0.1:8544
+          node-ip: 127.0.0.1:35211
+          mirror-node-rest-url: http://127.0.0.1:38081
+          artifact-name: tck-compatibility
+
+      - name: Upload TCK Server Log
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: tck-server-log
+          path: ${{ runner.temp }}/tck-server.log
+          if-no-files-found: warn
+
+      - name: Stop TCK Server
+        if: ${{ always() }}
+        run: |
+          if kill "${{ steps.tck-server.outputs.pid }}" 2>/dev/null; then
+            echo "TCK server stopped"
+          else
+            echo "TCK server already stopped"
+          fi
