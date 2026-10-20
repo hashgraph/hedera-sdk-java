@@ -218,7 +218,7 @@ jobs:
           java-version: "21.0.6"
 
       - name: Setup Android SDK
-        uses: step-security/setup-android@3f1fe1f5a3b3708402227c91d92c67e0f7f5a8bb # v4.0.1
+        uses: step-security/setup-android@6be8e374894861aef6b01c150cf6a9822297e319 # v4.0.4
         with:
           packages: platform-tools
 
